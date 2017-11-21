@@ -33,6 +33,7 @@ export class TableNode implements INode {
             password: this.password,
             database: this.database,
         });
+        // TODO
         Global.activeConnection = {
             host: this.host,
             user: this.user,

@@ -18,6 +18,7 @@ export class Utility {
     }
 
     public static runQuery() {
+        // TODO
         const sql = vscode.window.activeTextEditor.document.getText();
         const connection = mysql.createConnection(Global.activeConnection);
         Utility.queryPromise<any[]>(connection, sql)
