@@ -1,0 +1,63 @@
+{
+    "name": "vscode-mysql",
+    "displayName": "MySQL",
+    "description": "MySQL for VS Code",
+    "version": "0.0.1",
+    "publisher": "formulahendry",
+    "engines": {
+        "vscode": "^1.18.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onView:mysql",
+        "onCommand:mysql.add"
+    ],
+    "main": "./out/extension",
+    "contributes": {
+        "views": {
+            "explorer": [{
+                "id": "mysql",
+                "name": "MySQL"
+            }]
+        },
+        "commands": [{
+                "command": "mysql.add",
+                "title": "Add"
+            },
+            {
+                "command": "mysql.selectTop1000",
+                "title": "Select Top 1000"
+            }
+        ],
+        "menus": {
+            "view/title": [{
+                "command": "mysql.add",
+                "when": "view == mysql",
+                "group": "navigation@1"
+            }],
+            "view/item/context": [{
+                "command": "mysql.selectTop1000",
+                "when": "view == mysql && viewItem == table"
+            }]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^7.0.43",
+        "tslint": "^5.8.0",
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6"
+    },
+    "dependencies": {
+        "mysql": "^2.15.0"
+    }
+}
