@@ -31,6 +31,10 @@
                 "title": "Run MySQL Query"
             },
             {
+                "command": "mysql.newQuery",
+                "title": "New Query"
+            },
+            {
                 "command": "mysql.selectTop1000",
                 "title": "Select Top 1000"
             }
@@ -47,9 +51,14 @@
                 "group": "navigation@1"
             }],
             "view/item/context": [{
-                "command": "mysql.selectTop1000",
-                "when": "view == mysql && viewItem == table"
-            }]
+                    "command": "mysql.newQuery",
+                    "when": "view == mysql && viewItem == database"
+                },
+                {
+                    "command": "mysql.selectTop1000",
+                    "when": "view == mysql && viewItem == table"
+                }
+            ]
         }
     },
     "scripts": {

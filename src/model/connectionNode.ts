@@ -7,7 +7,7 @@ import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
 
 export class ConnectionNode implements INode {
-    constructor(private readonly host: string, private readonly user: string, private readonly password: string) {
+    constructor(private readonly host: string, private readonly user: string, private readonly password: string, private readonly port: number) {
     }
 
     public getTreeItem(): vscode.TreeItem {
@@ -23,11 +23,12 @@ export class ConnectionNode implements INode {
             host: this.host,
             user: this.user,
             password: this.password,
+            port: this.port,
         });
         return Utility.queryPromise<any[]>(connection, "SHOW DATABASES")
             .then((databases) => {
                 return databases.map<DatabaseNode>((database) => {
-                    return new DatabaseNode(this.host, this.user, this.password, database.Database);
+                    return new DatabaseNode(this.host, this.user, this.password, this.port, database.Database);
                 });
             })
             .catch((err) => {

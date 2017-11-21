@@ -30,9 +30,10 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
             connections = [];
         }
         connections.push({
-            host: "abc",
+            host: "hendry-mysql.mysql.database.azure.com",
             user: "mysqluser@hendry-mysql",
             password: "",
+            port: 3306,
         });
         await this.context.globalState.update(Constants.GlobalStateMySQLConectionsKey, connections);
         this.refresh();
@@ -45,7 +46,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     private getConnectionNodes(): ConnectionNode[] {
         const connections = this.context.globalState.get<IConnection[]>(Constants.GlobalStateMySQLConectionsKey);
         return connections.map<ConnectionNode>((connection) => {
-            return new ConnectionNode(connection.host, connection.user, connection.password);
+            return new ConnectionNode(connection.host, connection.user, connection.password, connection.port);
         });
     }
 }

@@ -7,7 +7,8 @@ import { Utility } from "../common/utility";
 import { INode } from "./INode";
 
 export class TableNode implements INode {
-    constructor(private readonly host: string, private readonly user: string, private readonly password: string, private readonly database: string, private readonly table: string) {
+    constructor(private readonly host: string, private readonly user: string, private readonly password: string,
+                private readonly port: number, private readonly database: string, private readonly table: string) {
     }
 
     public getTreeItem(): vscode.TreeItem {
@@ -27,19 +28,15 @@ export class TableNode implements INode {
         const textDocument = await vscode.workspace.openTextDocument({ content: sql, language: "sql" });
         vscode.window.showTextDocument(textDocument);
 
-        const connection = mysql.createConnection({
-            host: this.host,
-            user: this.user,
-            password: this.password,
-            database: this.database,
-        });
-        // TODO
         Global.activeConnection = {
             host: this.host,
             user: this.user,
             password: this.password,
+            port: this.port,
             database: this.database,
         };
+
+        const connection = mysql.createConnection(Global.activeConnection);
         Utility.queryPromise<any[]>(connection, sql)
             .then((result) => {
                 OutputChannel.appendLine(JSON.stringify(result, null, 2));

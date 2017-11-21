@@ -18,7 +18,14 @@ export class Utility {
     }
 
     public static runQuery() {
-        // TODO
+        if (!vscode.window.activeTextEditor) {
+            vscode.window.showWarningMessage("SQL file not selected");
+            return;
+        }
+        if (!Global.activeConnection) {
+            vscode.window.showWarningMessage("Database not selected");
+            return;
+        }
         const sql = vscode.window.activeTextEditor.document.getText();
         const connection = mysql.createConnection(Global.activeConnection);
         Utility.queryPromise<any[]>(connection, sql)
