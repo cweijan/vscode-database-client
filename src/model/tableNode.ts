@@ -1,6 +1,7 @@
 import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
+import { Global } from "../common/global";
 import { OutputChannel } from "../common/outputChannel";
 import { Utility } from "../common/utility";
 import { INode } from "./INode";
@@ -32,6 +33,12 @@ export class TableNode implements INode {
             password: this.password,
             database: this.database,
         });
+        Global.activeConnection = {
+            host: this.host,
+            user: this.user,
+            password: this.password,
+            database: this.database,
+        };
         Utility.queryPromise<any[]>(connection, sql)
             .then((result) => {
                 OutputChannel.appendLine(JSON.stringify(result, null, 2));

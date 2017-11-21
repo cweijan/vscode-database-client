@@ -27,11 +27,20 @@
                 "title": "Add"
             },
             {
+                "command": "mysql.runQuery",
+                "title": "Run MySQL Query"
+            },
+            {
                 "command": "mysql.selectTop1000",
                 "title": "Select Top 1000"
             }
         ],
         "menus": {
+            "editor/context": [{
+                "command": "mysql.runQuery",
+                "when": "editorLangId == sql",
+                "group": "navigation"
+            }],
             "view/title": [{
                 "command": "mysql.add",
                 "when": "view == mysql",
