@@ -41,31 +41,37 @@
         },
         "commands": [{
                 "command": "mysql.refresh",
-                "title": "Refresh"
+                "title": "Refresh",
+                "category": "MySQL"
             },
             {
                 "command": "mysql.addConnection",
-                "title": "Add",
+                "title": "Add Connection",
                 "icon": {
                     "light": "resources/light/add.svg",
                     "dark": "resources/dark/add.svg"
-                }
+                },
+                "category": "MySQL"
             },
             {
                 "command": "mysql.deleteConnection",
-                "title": "Delete Connection"
+                "title": "Delete Connection",
+                "category": "MySQL"
             },
             {
                 "command": "mysql.runQuery",
-                "title": "Run MySQL Query"
+                "title": "Run MySQL Query",
+                "category": "MySQL"
             },
             {
                 "command": "mysql.newQuery",
-                "title": "New Query"
+                "title": "New Query",
+                "category": "MySQL"
             },
             {
                 "command": "mysql.selectTop1000",
-                "title": "Select Top 1000"
+                "title": "Select Top 1000",
+                "category": "MySQL"
             }
         ],
         "menus": {

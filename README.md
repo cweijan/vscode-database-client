@@ -12,9 +12,21 @@ MySQL management tool
 
 ## Usage
 
-* Open a .NET Core project, right click on a `.csproj` file, and run .NET Core command from context menu.
+* To add MySQL connection: in Explorer of VS Code, click "MYSQL" in the bottom left corner, then click the `+` button, then type host, user, password and port in the input box.
 
-![test-explorer](images/usage.png)
+![connection](images/connection.png)
+
+* To run MySQL query, open a SQL file first then:
+  * right click on the SQL file, then click `Run MySQL Query` in editor context menu
+  * or press `F1` and then select/type `Run MySQL Query`,
+
+![run](images/run.png)
+
+* To create a new MySQL query or change active MySQL connection (You could see active MySQL connection in status bar):
+  * right click on a MySQL server, then click `New Query`
+  * or right click on a MySQL database, then click `New Query`
+
+![newquery](images/newquery.png)
 
 ## Telemetry data
 

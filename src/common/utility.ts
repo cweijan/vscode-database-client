@@ -15,7 +15,7 @@ export class Utility {
         return new Promise((resolve, reject) => {
             connection.query(sql, (err, rows) => {
                 if (err) {
-                    reject("MySQL Error: " + err.stack);
+                    reject("Error: " + err.message);
                     return;
                 }
                 resolve(rows);
