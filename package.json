@@ -1,37 +1,55 @@
 {
     "name": "vscode-mysql",
     "displayName": "MySQL",
-    "description": "MySQL for VS Code",
+    "description": "MySQL management tool",
     "version": "0.0.1",
     "publisher": "formulahendry",
+    "icon": "logo.png",
     "engines": {
         "vscode": "^1.18.0"
     },
     "categories": [
-        "Other"
+        "Languages"
     ],
+    "keywords": [
+        "SQL",
+        "MySQL",
+        "Database",
+        "DB",
+        "RDBMS"
+    ],
+    "bugs": {
+        "url": "https://github.com/formulahendry/vscode-azure-storage-explorer/issues",
+        "email": "formulahendry@gmail.com"
+    },
+    "homepage": "https://github.com/formulahendry/vscode-azure-storage-explorer/blob/master/README.md",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/formulahendry/vscode-azure-storage-explorer.git"
+    },
     "activationEvents": [
         "onView:mysql",
-        "onCommand:mysql.add"
+        "onCommand:mysql.addConnection"
     ],
     "main": "./out/extension",
     "contributes": {
         "views": {
-            "explorer": [
-                {
-                    "id": "mysql",
-                    "name": "MySQL"
-                }
-            ]
+            "explorer": [{
+                "id": "mysql",
+                "name": "MySQL"
+            }]
         },
-        "commands": [
-            {
+        "commands": [{
                 "command": "mysql.refresh",
                 "title": "Refresh"
             },
             {
-                "command": "mysql.add",
-                "title": "Add"
+                "command": "mysql.addConnection",
+                "title": "Add",
+                "icon": {
+                    "light": "resources/light/add.svg",
+                    "dark": "resources/dark/add.svg"
+                }
             },
             {
                 "command": "mysql.deleteConnection",
@@ -51,22 +69,17 @@
             }
         ],
         "menus": {
-            "editor/context": [
-                {
-                    "command": "mysql.runQuery",
-                    "when": "editorLangId == sql",
-                    "group": "navigation"
-                }
-            ],
-            "view/title": [
-                {
-                    "command": "mysql.add",
-                    "when": "view == mysql",
-                    "group": "navigation@1"
-                }
-            ],
-            "view/item/context": [
-                {
+            "editor/context": [{
+                "command": "mysql.runQuery",
+                "when": "editorLangId == sql",
+                "group": "navigation"
+            }],
+            "view/title": [{
+                "command": "mysql.addConnection",
+                "when": "view == mysql",
+                "group": "navigation@1"
+            }],
+            "view/item/context": [{
                     "command": "mysql.newQuery",
                     "when": "view == mysql && viewItem == connection",
                     "group": "mysql@1"
@@ -97,6 +110,17 @@
                     "group": "mysql@0"
                 }
             ]
+        },
+        "configuration": {
+            "type": "object",
+            "title": "MySQL",
+            "properties": {
+                "vscode-mysql.enableTelemetry": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Whether to enable anonymous usage collection."
+                }
+            }
         }
     },
     "scripts": {
@@ -115,6 +139,7 @@
         "vscode": "^1.1.6"
     },
     "dependencies": {
+        "applicationinsights": "^1.0.0",
         "mysql": "^2.15.0",
         "uuid": "^3.1.0"
     }

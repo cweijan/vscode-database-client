@@ -1,65 +1,34 @@
-# mysql README
+# MySQL
 
-This is the README for your extension "mysql". After writing up a brief description, we recommend including the following sections.
+MySQL management tool
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+* Manage MySQL Connections
+* List MySQL Servers
+* List MySQL Databases
+* List MySQL Tables
+* Run MySQL Query
 
-For example if there is an image subfolder under your extension project workspace:
+## Usage
 
-\!\[feature X\]\(images/feature-x.png\)
+* Open a .NET Core project, right click on a `.csproj` file, and run .NET Core command from context menu.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+![test-explorer](images/usage.png)
 
-## Requirements
+## Telemetry data
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+By default, anonymous telemetry data collection is turned on to understand user behavior to improve this extension. To disable it, update the settings.json as below:
+```json
+{
+    "vscode-mysql.enableTelemetry": false
+}
+```
 
-## Extension Settings
+## Change Log
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+See Change Log [here](CHANGELOG.md)
 
-For example:
+## Issues
 
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Currently, the extension is in the very initial phase. If you find any bug or have any suggestion/feature request, please submit the [issues](https://github.com/formulahendry/vscode-mysql/issues) to the GitHub Repo.

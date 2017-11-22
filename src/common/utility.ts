@@ -2,10 +2,15 @@
 import * as mysql from "mysql";
 import * as vscode from "vscode";
 import { IConnection } from "../model/connection";
+import { AppInsightsClient } from "./appInsightsClient";
 import { Global } from "./global";
 import { OutputChannel } from "./outputChannel";
 
 export class Utility {
+    public static getConfiguration(): vscode.WorkspaceConfiguration {
+        return vscode.workspace.getConfiguration("vscode-mysql");
+    }
+
     public static queryPromise<T>(connection, sql: string): Promise<T> {
         return new Promise((resolve, reject) => {
             connection.query(sql, (err, rows) => {
@@ -19,6 +24,7 @@ export class Utility {
     }
 
     public static runQuery(sql?: string, connectionOptions?: IConnection) {
+        AppInsightsClient.sendEvent("runQuery.start");
         if (!sql && !vscode.window.activeTextEditor) {
             vscode.window.showWarningMessage("No SQL file selected");
             return;
@@ -36,12 +42,14 @@ export class Utility {
         Utility.queryPromise<any>(connection, sql)
             .then((result) => {
                 OutputChannel.appendLine(JSON.stringify(result).replace(/},/g, "},\r\n"));
+                AppInsightsClient.sendEvent("runQuery.end", { Result: "Success" });
             })
             .catch((err) => {
                 OutputChannel.appendLine(err);
+                AppInsightsClient.sendEvent("runQuery.end", { Result: "Fail" });
             })
             .then(() => {
-                OutputChannel.appendLine("[Done] Finished executing MySQL query.");
+                OutputChannel.appendLine("[Done] Finished MySQL query.");
             });
     }
 

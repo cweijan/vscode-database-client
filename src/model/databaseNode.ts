@@ -1,6 +1,7 @@
 import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
+import { AppInsightsClient } from "../common/appInsightsClient";
 import { Global } from "../common/global";
 import { Utility } from "../common/utility";
 import { InfoNode } from "./infoNode";
@@ -16,6 +17,7 @@ export class DatabaseNode implements INode {
             label: this.database,
             collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
             contextValue: "database",
+            iconPath: path.join(__filename, "..", "..", "..", "resources", "database.svg"),
         };
     }
 
@@ -39,6 +41,7 @@ export class DatabaseNode implements INode {
     }
 
     public async newQuery() {
+        AppInsightsClient.sendEvent("newQuery");
         Utility.createSQLTextDocument();
 
         Global.activeConnection = {

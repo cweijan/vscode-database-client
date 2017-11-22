@@ -1,6 +1,7 @@
 import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
+import { AppInsightsClient } from "../common/appInsightsClient";
 import { Constants } from "../common/constants";
 import { Global } from "../common/global";
 import { Utility } from "../common/utility";
@@ -19,6 +20,7 @@ export class ConnectionNode implements INode {
             label: this.host,
             collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
             contextValue: "connection",
+            iconPath: path.join(__filename, "..", "..", "..", "resources", "server.png"),
         };
     }
 
@@ -52,6 +54,7 @@ export class ConnectionNode implements INode {
     }
 
     public async deleteConnection(context: vscode.ExtensionContext, mysqlTreeDataProvider: MySQLTreeDataProvider) {
+        AppInsightsClient.sendEvent("deleteConnection");
         const connections = context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
         delete connections[this.id];
         await context.globalState.update(Constants.GlobalStateMySQLConectionsKey, connections);

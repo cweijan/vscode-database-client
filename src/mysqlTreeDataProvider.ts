@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as uuidv1 from "uuid/v1";
 import * as vscode from "vscode";
+import { AppInsightsClient } from "./common/appInsightsClient";
 import { Constants } from "./common/constants";
 import { Global } from "./common/global";
 import { IConnection } from "./model/connection";
@@ -27,6 +28,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     }
 
     public async addConnection() {
+        AppInsightsClient.sendEvent("addConnection.start");
         const host = await vscode.window.showInputBox({ prompt: "The hostname of the database", placeHolder: "host", ignoreFocusOut: true });
         if (!host) {
             return;
@@ -65,6 +67,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
         }
         await this.context.globalState.update(Constants.GlobalStateMySQLConectionsKey, connections);
         this.refresh();
+        AppInsightsClient.sendEvent("addConnection.end");
     }
 
     public refresh(element?: INode): void {
