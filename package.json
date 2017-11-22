@@ -67,22 +67,27 @@
             ],
             "view/item/context": [
                 {
-                    "command": "mysql.refresh",
-                    "when": "view == mysql && viewItem == connection",
-                    "group": "mysql@0"
-                },
-                {
-                    "command": "mysql.deleteConnection",
+                    "command": "mysql.newQuery",
                     "when": "view == mysql && viewItem == connection",
                     "group": "mysql@1"
                 },
                 {
                     "command": "mysql.refresh",
+                    "when": "view == mysql && viewItem == connection",
+                    "group": "mysql@1"
+                },
+                {
+                    "command": "mysql.deleteConnection",
+                    "when": "view == mysql && viewItem == connection",
+                    "group": "mysql@2"
+                },
+                {
+                    "command": "mysql.newQuery",
                     "when": "view == mysql && viewItem == database",
                     "group": "mysql@0"
                 },
                 {
-                    "command": "mysql.newQuery",
+                    "command": "mysql.refresh",
                     "when": "view == mysql && viewItem == database",
                     "group": "mysql@1"
                 },

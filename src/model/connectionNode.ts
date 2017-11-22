@@ -40,6 +40,17 @@ export class ConnectionNode implements INode {
             });
     }
 
+    public async newQuery() {
+        Utility.createSQLTextDocument();
+
+        Global.activeConnection = {
+            host: this.host,
+            user: this.user,
+            password: this.password,
+            port: this.port,
+        };
+    }
+
     public async deleteConnection(context: vscode.ExtensionContext, mysqlTreeDataProvider: MySQLTreeDataProvider) {
         const connections = context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
         delete connections[this.id];

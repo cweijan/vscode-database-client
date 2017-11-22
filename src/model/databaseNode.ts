@@ -39,8 +39,7 @@ export class DatabaseNode implements INode {
     }
 
     public async newQuery() {
-        const textDocument = await vscode.workspace.openTextDocument({ content: "", language: "sql" });
-        vscode.window.showTextDocument(textDocument);
+        Utility.createSQLTextDocument();
 
         Global.activeConnection = {
             host: this.host,
