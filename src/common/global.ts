@@ -1,8 +1,11 @@
 "use strict";
+import * as keytarType from "keytar";
 import * as vscode from "vscode";
 import { IConnection } from "../model/connection";
 
 export class Global {
+    public static keytar: typeof keytarType = require(`${vscode.env.appRoot}/node_modules/keytar`);
+
     static get activeConnection(): IConnection {
         return Global._activeConnection;
     }

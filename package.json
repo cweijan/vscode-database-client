@@ -17,14 +17,25 @@
     "main": "./out/extension",
     "contributes": {
         "views": {
-            "explorer": [{
-                "id": "mysql",
-                "name": "MySQL"
-            }]
+            "explorer": [
+                {
+                    "id": "mysql",
+                    "name": "MySQL"
+                }
+            ]
         },
-        "commands": [{
+        "commands": [
+            {
+                "command": "mysql.refresh",
+                "title": "Refresh"
+            },
+            {
                 "command": "mysql.add",
                 "title": "Add"
+            },
+            {
+                "command": "mysql.deleteConnection",
+                "title": "Delete Connection"
             },
             {
                 "command": "mysql.runQuery",
@@ -40,23 +51,45 @@
             }
         ],
         "menus": {
-            "editor/context": [{
-                "command": "mysql.runQuery",
-                "when": "editorLangId == sql",
-                "group": "navigation"
-            }],
-            "view/title": [{
-                "command": "mysql.add",
-                "when": "view == mysql",
-                "group": "navigation@1"
-            }],
-            "view/item/context": [{
+            "editor/context": [
+                {
+                    "command": "mysql.runQuery",
+                    "when": "editorLangId == sql",
+                    "group": "navigation"
+                }
+            ],
+            "view/title": [
+                {
+                    "command": "mysql.add",
+                    "when": "view == mysql",
+                    "group": "navigation@1"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "mysql.refresh",
+                    "when": "view == mysql && viewItem == connection",
+                    "group": "mysql@0"
+                },
+                {
+                    "command": "mysql.deleteConnection",
+                    "when": "view == mysql && viewItem == connection",
+                    "group": "mysql@1"
+                },
+                {
+                    "command": "mysql.refresh",
+                    "when": "view == mysql && viewItem == database",
+                    "group": "mysql@0"
+                },
+                {
                     "command": "mysql.newQuery",
-                    "when": "view == mysql && viewItem == database"
+                    "when": "view == mysql && viewItem == database",
+                    "group": "mysql@1"
                 },
                 {
                     "command": "mysql.selectTop1000",
-                    "when": "view == mysql && viewItem == table"
+                    "when": "view == mysql && viewItem == table",
+                    "group": "mysql@0"
                 }
             ]
         }
@@ -69,6 +102,7 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
+        "@types/keytar": "^4.0.1",
         "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
         "tslint": "^5.8.0",
@@ -76,6 +110,7 @@
         "vscode": "^1.1.6"
     },
     "dependencies": {
-        "mysql": "^2.15.0"
+        "mysql": "^2.15.0",
+        "uuid": "^3.1.0"
     }
 }

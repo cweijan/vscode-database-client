@@ -1,13 +1,17 @@
 import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
+import { Constants } from "../common/constants";
+import { Global } from "../common/global";
 import { Utility } from "../common/utility";
+import { MySQLTreeDataProvider } from "../mysqlTreeDataProvider";
+import { IConnection } from "./connection";
 import { DatabaseNode } from "./databaseNode";
 import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
 
 export class ConnectionNode implements INode {
-    constructor(private readonly host: string, private readonly user: string, private readonly password: string, private readonly port: number) {
+    constructor(private readonly id: string, private readonly host: string, private readonly user: string, private readonly password: string, private readonly port: string) {
     }
 
     public getTreeItem(): vscode.TreeItem {
@@ -34,5 +38,15 @@ export class ConnectionNode implements INode {
             .catch((err) => {
                 return [new InfoNode(err)];
             });
+    }
+
+    public async deleteConnection(context: vscode.ExtensionContext, mysqlTreeDataProvider: MySQLTreeDataProvider) {
+        const connections = context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
+        delete connections[this.id];
+        await context.globalState.update(Constants.GlobalStateMySQLConectionsKey, connections);
+
+        await Global.keytar.deletePassword(Constants.ExtensionId, this.id);
+
+        mysqlTreeDataProvider.refresh();
     }
 }

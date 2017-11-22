@@ -1,6 +1,8 @@
 import * as path from "path";
+import * as uuidv1 from "uuid/v1";
 import * as vscode from "vscode";
 import { Constants } from "./common/constants";
+import { Global } from "./common/global";
 import { IConnection } from "./model/connection";
 import { ConnectionNode } from "./model/connectionNode";
 import { INode } from "./model/INode";
@@ -25,28 +27,59 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     }
 
     public async addConnection() {
-        let connections = this.context.globalState.get<IConnection[]>(Constants.GlobalStateMySQLConectionsKey);
-        if (!connections) {
-            connections = [];
+        const host = await vscode.window.showInputBox({ prompt: "The hostname of the database", placeHolder: "host", ignoreFocusOut: true });
+        if (!host) {
+            return;
         }
-        connections.push({
-            host: "hendry-mysql.mysql.database.azure.com",
-            user: "mysqluser@hendry-mysql",
-            password: "",
-            port: 3306,
-        });
+
+        const user = await vscode.window.showInputBox({ prompt: "The MySQL user to authenticate as", placeHolder: "user", ignoreFocusOut: true });
+        if (!user) {
+            return;
+        }
+
+        const password = await vscode.window.showInputBox({ prompt: "The password of the MySQL user", placeHolder: "password", ignoreFocusOut: true, password: true });
+        if (password === undefined) {
+            return;
+        }
+
+        const port = await vscode.window.showInputBox({ prompt: "The port number to connect to", placeHolder: "port", ignoreFocusOut: true, value: "3306" });
+        if (!port) {
+            return;
+        }
+
+        let connections = this.context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
+
+        if (!connections) {
+            connections = {};
+        }
+
+        const id = uuidv1();
+        connections[id] = {
+            host,
+            user,
+            port,
+        };
+
+        if (password) {
+            await Global.keytar.setPassword(Constants.ExtensionId, id, password);
+        }
         await this.context.globalState.update(Constants.GlobalStateMySQLConectionsKey, connections);
         this.refresh();
     }
 
-    private refresh(element?: INode): void {
+    public refresh(element?: INode): void {
         this._onDidChangeTreeData.fire(element);
     }
 
-    private getConnectionNodes(): ConnectionNode[] {
-        const connections = this.context.globalState.get<IConnection[]>(Constants.GlobalStateMySQLConectionsKey);
-        return connections.map<ConnectionNode>((connection) => {
-            return new ConnectionNode(connection.host, connection.user, connection.password, connection.port);
-        });
+    private async getConnectionNodes(): Promise<ConnectionNode[]> {
+        const connections = this.context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
+        const ConnectionNodes = [];
+        if (connections) {
+            for (const id of Object.keys(connections)) {
+                const password = await Global.keytar.getPassword(Constants.ExtensionId, id);
+                ConnectionNodes.push(new ConnectionNode(id, connections[id].host, connections[id].user, password, connections[id].port));
+            }
+        }
+        return ConnectionNodes;
     }
 }

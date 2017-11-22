@@ -1,7 +1,9 @@
 "use strict";
 import * as vscode from "vscode";
 import { Utility } from "./common/utility";
+import { ConnectionNode } from "./model/connectionNode";
 import { DatabaseNode } from "./model/databaseNode";
+import { INode } from "./model/INode";
 import { TableNode } from "./model/tableNode";
 import { MySQLTreeDataProvider } from "./mysqlTreeDataProvider";
 
@@ -9,8 +11,16 @@ export function activate(context: vscode.ExtensionContext) {
     const mysqlTreeDataProvider = new MySQLTreeDataProvider(context);
     context.subscriptions.push(vscode.window.registerTreeDataProvider("mysql", mysqlTreeDataProvider));
 
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.refresh", (node: INode) => {
+        mysqlTreeDataProvider.refresh(node);
+    }));
+
     context.subscriptions.push(vscode.commands.registerCommand("mysql.add", () => {
         mysqlTreeDataProvider.addConnection();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.deleteConnection", (connectionNode: ConnectionNode) => {
+        connectionNode.deleteConnection(context, mysqlTreeDataProvider);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.runQuery", () => {

@@ -8,7 +8,7 @@ import { INode } from "./INode";
 import { TableNode } from "./tableNode";
 
 export class DatabaseNode implements INode {
-    constructor(private readonly host: string, private readonly user: string, private readonly password: string, private readonly port: number, private readonly database: string) {
+    constructor(private readonly host: string, private readonly user: string, private readonly password: string, private readonly port: string, private readonly database: string) {
     }
 
     public getTreeItem(): vscode.TreeItem {
