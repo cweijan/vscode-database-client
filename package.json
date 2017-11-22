@@ -19,13 +19,13 @@
         "RDBMS"
     ],
     "bugs": {
-        "url": "https://github.com/formulahendry/vscode-azure-storage-explorer/issues",
+        "url": "https://github.com/formulahendry/vscode-mysql/issues",
         "email": "formulahendry@gmail.com"
     },
-    "homepage": "https://github.com/formulahendry/vscode-azure-storage-explorer/blob/master/README.md",
+    "homepage": "https://github.com/formulahendry/vscode-mysql/blob/master/README.md",
     "repository": {
         "type": "git",
-        "url": "https://github.com/formulahendry/vscode-azure-storage-explorer.git"
+        "url": "https://github.com/formulahendry/vscode-mysql.git"
     },
     "activationEvents": [
         "onView:mysql",
