@@ -1,5 +1,7 @@
 # MySQL
 
+[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/formulahendry.vscode-mysql.svg)](https://marketplace.visualstudio.com/items?itemName=formulahendry.vscode-mysql) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/formulahendry.vscode-mysql.svg)](https://marketplace.visualstudio.com/items?itemName=formulahendry.vscode-mysql) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/formulahendry.vscode-mysql.svg)](https://marketplace.visualstudio.com/items?itemName=formulahendry.vscode-mysql) [![Build Status](https://travis-ci.org/formulahendry/vscode-mysql.svg?branch=master)](https://travis-ci.org/formulahendry/vscode-mysql)
+
 MySQL management tool
 
 ## Features
