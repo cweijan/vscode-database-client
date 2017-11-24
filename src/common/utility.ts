@@ -53,7 +53,7 @@ export class Utility {
             })
             .catch((err) => {
                 OutputChannel.appendLine(err);
-                AppInsightsClient.sendEvent("runQuery.end", { Result: "Fail" });
+                AppInsightsClient.sendEvent("runQuery.end", { Result: "Fail", ErrorMessage: err });
             })
             .then(() => {
                 OutputChannel.appendLine("[Done] Finished MySQL query.");
