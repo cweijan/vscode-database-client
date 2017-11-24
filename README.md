@@ -30,6 +30,10 @@ MySQL management tool
 
 ![newquery](images/newquery.png)
 
+## Settings
+
+* `vscode-mysql.maxTableCount`: The maximum table count shown in the tree view. (Default is **500**)
+
 ## Telemetry data
 
 By default, anonymous telemetry data collection is turned on to understand user behavior to improve this extension. To disable it, update the settings.json as below:

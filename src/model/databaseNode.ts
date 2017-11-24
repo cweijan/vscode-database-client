@@ -29,7 +29,7 @@ export class DatabaseNode implements INode {
             port: this.port,
             database: this.database,
         });
-        return Utility.queryPromise<any[]>(connection, `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' LIMIT 100`)
+        return Utility.queryPromise<any[]>(connection, `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' LIMIT ${Utility.maxTableCount}`)
             .then((tables) => {
                 return tables.map<TableNode>((table) => {
                     return new TableNode(this.host, this.user, this.password, this.port, this.database, table.TABLE_NAME);

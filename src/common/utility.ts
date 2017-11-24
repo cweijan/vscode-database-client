@@ -8,6 +8,8 @@ import { Global } from "./global";
 import { OutputChannel } from "./outputChannel";
 
 export class Utility {
+    public static readonly maxTableCount = Utility.getConfiguration().get<number>("maxTableCount");
+
     public static getConfiguration(): vscode.WorkspaceConfiguration {
         return vscode.workspace.getConfiguration("vscode-mysql");
     }

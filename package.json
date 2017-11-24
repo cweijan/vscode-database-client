@@ -125,6 +125,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Whether to enable anonymous usage collection."
+                },
+                "vscode-mysql.maxTableCount": {
+                    "type": "integer",
+                    "default": 500,
+                    "description": "The maximum table count shown in the tree view"
                 }
             }
         }
