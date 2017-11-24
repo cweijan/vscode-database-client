@@ -1,4 +1,5 @@
 "use strict";
+import * as asciitable from "asciitable";
 import * as mysql from "mysql";
 import * as vscode from "vscode";
 import { IConnection } from "../model/connection";
@@ -41,7 +42,11 @@ export class Utility {
         OutputChannel.appendLine("[Start] Executing MySQL query...");
         Utility.queryPromise<any>(connection, sql)
             .then((result) => {
-                OutputChannel.appendLine(JSON.stringify(result).replace(/},/g, "},\r\n"));
+                if (Array.isArray(result)) {
+                    OutputChannel.appendLine(asciitable(result));
+                } else {
+                    OutputChannel.appendLine(JSON.stringify(result));
+                }
                 AppInsightsClient.sendEvent("runQuery.end", { Result: "Success" });
             })
             .catch((err) => {

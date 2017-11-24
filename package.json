@@ -147,6 +147,7 @@
     },
     "dependencies": {
         "applicationinsights": "^1.0.0",
+        "asciitable": "0.0.7",
         "mysql": "^2.15.0",
         "uuid": "^3.1.0"
     }
