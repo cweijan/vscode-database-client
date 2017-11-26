@@ -26,15 +26,20 @@ export class Utility {
         });
     }
 
-    public static runQuery(sql?: string, connectionOptions?: IConnection) {
+    public static async runQuery(sql?: string, connectionOptions?: IConnection) {
         AppInsightsClient.sendEvent("runQuery.start");
         if (!sql && !vscode.window.activeTextEditor) {
             vscode.window.showWarningMessage("No SQL file selected");
+            AppInsightsClient.sendEvent("runQuery.noFile");
             return;
         }
         if (!connectionOptions && !Global.activeConnection) {
-            vscode.window.showWarningMessage("No MySQL Server or Database selected");
-            return;
+            const hasActiveConnection = await Utility.hasActiveConnection();
+            if (!hasActiveConnection) {
+                vscode.window.showWarningMessage("No MySQL Server or Database selected");
+                AppInsightsClient.sendEvent("runQuery.noMySQL");
+                return;
+            }
         }
 
         sql = sql ? sql : vscode.window.activeTextEditor.document.getText();
@@ -63,5 +68,20 @@ export class Utility {
     public static async createSQLTextDocument(sql: string = "") {
         const textDocument = await vscode.workspace.openTextDocument({ content: sql, language: "sql" });
         return vscode.window.showTextDocument(textDocument);
+    }
+
+    private static async hasActiveConnection(): Promise<boolean> {
+        let count = 5;
+        while (!Global.activeConnection && count > 0) {
+            await Utility.sleep(100);
+            count--;
+        }
+        return !!Global.activeConnection;
+    }
+
+    private static sleep(ms) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
     }
 }

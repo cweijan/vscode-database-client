@@ -2,7 +2,7 @@
     "name": "vscode-mysql",
     "displayName": "MySQL",
     "description": "MySQL management tool",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "publisher": "formulahendry",
     "icon": "logo.png",
     "engines": {
@@ -29,7 +29,8 @@
     },
     "activationEvents": [
         "onView:mysql",
-        "onCommand:mysql.addConnection"
+        "onCommand:mysql.addConnection",
+        "onCommand:mysql.runQuery"
     ],
     "main": "./out/extension",
     "contributes": {
