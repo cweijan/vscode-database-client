@@ -1,3 +1,6 @@
+## 0.1.0 (2017-11-30)
+* Support multiple statement queries
+
 ## 0.0.3 (2017-11-26)
 * Activate extension when running MySQL query
 

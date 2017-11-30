@@ -4,4 +4,5 @@ export interface IConnection {
     readonly password?: string;
     readonly port: string;
     readonly database?: string;
+    multipleStatements?: boolean;
 }

@@ -44,25 +44,34 @@ export class Utility {
 
         sql = sql ? sql : vscode.window.activeTextEditor.document.getText();
         connectionOptions = connectionOptions ? connectionOptions : Global.activeConnection;
+        connectionOptions.multipleStatements = true;
         const connection = mysql.createConnection(connectionOptions);
 
         OutputChannel.appendLine("[Start] Executing MySQL query...");
-        Utility.queryPromise<any>(connection, sql)
-            .then((result) => {
-                if (Array.isArray(result)) {
-                    OutputChannel.appendLine(asciitable(result));
+        connection.query(sql, (err, rows) => {
+            if (Array.isArray(rows)) {
+                if (rows.some(((row) => Array.isArray(row)))) {
+                    rows.forEach((row) => {
+                        if (Array.isArray(row)) {
+                            OutputChannel.appendLine(asciitable(row));
+                        } else {
+                            OutputChannel.appendLine(JSON.stringify(row));
+                        }
+                    });
                 } else {
-                    OutputChannel.appendLine(JSON.stringify(result));
+                    OutputChannel.appendLine(asciitable(rows));
                 }
-                AppInsightsClient.sendEvent("runQuery.end", { Result: "Success" });
-            })
-            .catch((err) => {
+            } else {
+                OutputChannel.appendLine(JSON.stringify(rows));
+            }
+            if (err) {
                 OutputChannel.appendLine(err);
                 AppInsightsClient.sendEvent("runQuery.end", { Result: "Fail", ErrorMessage: err });
-            })
-            .then(() => {
-                OutputChannel.appendLine("[Done] Finished MySQL query.");
-            });
+            } else {
+                AppInsightsClient.sendEvent("runQuery.end", { Result: "Success" });
+            }
+            OutputChannel.appendLine("[Done] Finished MySQL query.");
+        });
     }
 
     public static async createSQLTextDocument(sql: string = "") {

@@ -2,14 +2,15 @@
     "name": "vscode-mysql",
     "displayName": "MySQL",
     "description": "MySQL management tool",
-    "version": "0.0.3",
+    "version": "0.1.0",
     "publisher": "formulahendry",
     "icon": "logo.png",
     "engines": {
         "vscode": "^1.18.0"
     },
     "categories": [
-        "Languages"
+        "Languages",
+        "Azure"
     ],
     "keywords": [
         "SQL",
