@@ -1,3 +1,6 @@
+## 0.1.1 (2017-12-03)
+* List columns
+
 ## 0.1.0 (2017-11-30)
 * Support multiple statement queries
 

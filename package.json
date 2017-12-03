@@ -2,7 +2,7 @@
     "name": "vscode-mysql",
     "displayName": "MySQL",
     "description": "MySQL management tool",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "publisher": "formulahendry",
     "icon": "logo.png",
     "engines": {
@@ -116,6 +116,11 @@
                     "command": "mysql.selectTop1000",
                     "when": "view == mysql && viewItem == table",
                     "group": "mysql@0"
+                },
+                {
+                    "command": "mysql.refresh",
+                    "when": "view == mysql && viewItem == table",
+                    "group": "mysql@1"
                 }
             ]
         },

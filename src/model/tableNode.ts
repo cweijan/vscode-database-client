@@ -32,9 +32,9 @@ export class TableNode implements INode {
             database: this.database,
         });
         return Utility.queryPromise<any[]>(connection, `SELECT * FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
-            .then((tables) => {
-                return tables.map<ColumnNode>((table) => {
-                    return new ColumnNode(this.host, this.user, this.password, this.port, this.database, table );
+            .then((columns) => {
+                return columns.map<ColumnNode>((column) => {
+                    return new ColumnNode(this.host, this.user, this.password, this.port, this.database, column );
                 });
             })
             .catch((err) => {

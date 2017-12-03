@@ -10,15 +10,15 @@ import { INode } from "./INode";
 
 export class ColumnNode implements INode {
     constructor(private readonly host: string, private readonly user: string, private readonly password: string,
-                private readonly port: string, private readonly database: string, private readonly table: any ) {
+                private readonly port: string, private readonly database: string, private readonly column: any ) {
     }
 
     public getTreeItem(): vscode.TreeItem {
         return {
-            label: `${this.table.COLUMN_NAME} : ${this.table.COLUMN_TYPE}     \n${this.table.COLUMN_COMMENT}`,
+            label: `${this.column.COLUMN_NAME} : ${this.column.COLUMN_TYPE}     \n${this.column.COLUMN_COMMENT}`,
             collapsibleState: vscode.TreeItemCollapsibleState.None,
             contextValue: "column",
-            iconPath: path.join(__filename, "..", "..", "..", "resources", this.table.COLUMN_KEY === "PRI" ? "b_primary.png" : "b_props.png"),
+            iconPath: path.join(__filename, "..", "..", "..", "resources", this.column.COLUMN_KEY === "PRI" ? "b_primary.png" : "b_props.png"),
         };
     }
 

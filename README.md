@@ -10,6 +10,7 @@ MySQL management tool
 * List MySQL Servers
 * List MySQL Databases
 * List MySQL Tables
+* List MySQL Columns
 * Run MySQL Query
 
 ## Usage
