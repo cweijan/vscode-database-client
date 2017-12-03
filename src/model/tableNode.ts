@@ -5,6 +5,8 @@ import { AppInsightsClient } from "../common/appInsightsClient";
 import { Global } from "../common/global";
 import { OutputChannel } from "../common/outputChannel";
 import { Utility } from "../common/utility";
+import { ColumnNode } from "./columnNode";
+import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
 
 export class TableNode implements INode {
@@ -15,14 +17,29 @@ export class TableNode implements INode {
     public getTreeItem(): vscode.TreeItem {
         return {
             label: this.table,
-            collapsibleState: vscode.TreeItemCollapsibleState.None,
+            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
             contextValue: "table",
             iconPath: path.join(__filename, "..", "..", "..", "resources", "table.svg"),
         };
     }
 
     public async getChildren(): Promise<INode[]> {
-        return [];
+        const connection = mysql.createConnection({
+            host: this.host,
+            user: this.user,
+            password: this.password,
+            port: this.port,
+            database: this.database,
+        });
+        return Utility.queryPromise<any[]>(connection, `SELECT * FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
+            .then((tables) => {
+                return tables.map<ColumnNode>((table) => {
+                    return new ColumnNode(this.host, this.user, this.password, this.port, this.database, table );
+                });
+            })
+            .catch((err) => {
+                return [new InfoNode(err)];
+            });
     }
 
     public async selectTop1000() {
