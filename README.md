@@ -6,7 +6,7 @@ MySQL management tool
 
 ## Features
 
-* Manage MySQL Connections
+* Manage MySQL Connections (support SSL connection)
 * List MySQL Servers
 * List MySQL Databases
 * List MySQL Tables
@@ -15,7 +15,7 @@ MySQL management tool
 
 ## Usage
 
-* To add MySQL connection: in Explorer of VS Code, click "MYSQL" in the bottom left corner, then click the `+` button, then type host, user, password and port in the input box.
+* To add MySQL connection: in Explorer of VS Code, click "MYSQL" in the bottom left corner, then click the `+` button, then type host, user, password, port and certificate file path (optional) in the input box.
 
 ![connection](images/connection.png)
 

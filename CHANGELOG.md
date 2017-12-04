@@ -1,3 +1,6 @@
+## 0.2.0 (2017-12-04)
+* Support SSL connection
+
 ## 0.1.1 (2017-12-03)
 * List columns
 
