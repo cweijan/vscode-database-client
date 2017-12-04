@@ -20,10 +20,11 @@ export class Utility {
             connection.query(sql, (err, rows) => {
                 if (err) {
                     reject("Error: " + err.message);
-                    return;
+                } else {
+                    resolve(rows);
                 }
-                resolve(rows);
             });
+            connection.end();
         });
     }
 
@@ -73,6 +74,7 @@ export class Utility {
             }
             OutputChannel.appendLine("[Done] Finished MySQL query.");
         });
+        connection.end();
     }
 
     public static async createSQLTextDocument(sql: string = "") {
