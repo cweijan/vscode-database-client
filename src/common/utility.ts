@@ -1,5 +1,6 @@
 "use strict";
 import * as asciitable from "asciitable";
+import * as fs from "fs";
 import * as mysql from "mysql";
 import * as vscode from "vscode";
 import { IConnection } from "../model/connection";
@@ -45,7 +46,7 @@ export class Utility {
         sql = sql ? sql : vscode.window.activeTextEditor.document.getText();
         connectionOptions = connectionOptions ? connectionOptions : Global.activeConnection;
         connectionOptions.multipleStatements = true;
-        const connection = mysql.createConnection(connectionOptions);
+        const connection = Utility.createConnection(connectionOptions);
 
         OutputChannel.appendLine("[Start] Executing MySQL query...");
         connection.query(sql, (err, rows) => {
@@ -77,6 +78,29 @@ export class Utility {
     public static async createSQLTextDocument(sql: string = "") {
         const textDocument = await vscode.workspace.openTextDocument({ content: sql, language: "sql" });
         return vscode.window.showTextDocument(textDocument);
+    }
+
+    public static createConnection(connectionOptions: IConnection): any {
+        let connection;
+        if (connectionOptions.certPath && fs.existsSync(connectionOptions.certPath)) {
+            connection = mysql.createConnection({
+                host: connectionOptions.host,
+                user: connectionOptions.user,
+                password: connectionOptions.password,
+                port: connectionOptions.port,
+                ssl  : {
+                    ca : fs.readFileSync(connectionOptions.certPath),
+                },
+                });
+        } else {
+            connection = mysql.createConnection({
+                host: connectionOptions.host,
+                user: connectionOptions.user,
+                password: connectionOptions.password,
+                port: connectionOptions.port,
+                });
+        }
+        return connection;
     }
 
     private static async hasActiveConnection(): Promise<boolean> {

@@ -5,4 +5,5 @@ export interface IConnection {
     readonly port: string;
     readonly database?: string;
     multipleStatements?: boolean;
+    readonly certPath: string;
 }

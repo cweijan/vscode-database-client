@@ -49,6 +49,11 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
             return;
         }
 
+        const certPath = await vscode.window.showInputBox({ prompt: "[Optional] SSL certificate path. Leave empty to ignore", placeHolder: "certificate file path", ignoreFocusOut: true });
+        if (certPath === undefined) {
+            return;
+        }
+
         let connections = this.context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
 
         if (!connections) {
@@ -60,6 +65,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
             host,
             user,
             port,
+            certPath,
         };
 
         if (password) {
@@ -80,13 +86,14 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
         if (connections) {
             for (const id of Object.keys(connections)) {
                 const password = await Global.keytar.getPassword(Constants.ExtensionId, id);
-                ConnectionNodes.push(new ConnectionNode(id, connections[id].host, connections[id].user, password, connections[id].port));
+                ConnectionNodes.push(new ConnectionNode(id, connections[id].host, connections[id].user, password, connections[id].port, connections[id].certPath));
                 if (!Global.activeConnection) {
                     Global.activeConnection = {
                         host: connections[id].host,
                         user: connections[id].user,
                         password,
                         port: connections[id].port,
+                        certPath: connections[id].certPath,
                     };
                 }
             }

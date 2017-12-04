@@ -11,7 +11,8 @@ import { INode } from "./INode";
 
 export class TableNode implements INode {
     constructor(private readonly host: string, private readonly user: string, private readonly password: string,
-                private readonly port: string, private readonly database: string, private readonly table: string) {
+                private readonly port: string, private readonly database: string, private readonly table: string,
+                private readonly certPath: string) {
     }
 
     public getTreeItem(): vscode.TreeItem {
@@ -24,13 +25,15 @@ export class TableNode implements INode {
     }
 
     public async getChildren(): Promise<INode[]> {
-        const connection = mysql.createConnection({
+        const connection = Utility.createConnection({
             host: this.host,
             user: this.user,
             password: this.password,
             port: this.port,
             database: this.database,
+            certPath: this.certPath,
         });
+
         return Utility.queryPromise<any[]>(connection, `SELECT * FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
             .then((columns) => {
                 return columns.map<ColumnNode>((column) => {
@@ -53,6 +56,7 @@ export class TableNode implements INode {
             password: this.password,
             port: this.port,
             database: this.database,
+            certPath: this.certPath,
         };
         Global.activeConnection = connection;
 
