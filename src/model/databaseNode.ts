@@ -41,7 +41,7 @@ export class DatabaseNode implements INode {
     }
 
     public async newQuery() {
-        AppInsightsClient.sendEvent("newQuery");
+        AppInsightsClient.sendEvent("newQuery", { viewItem: "database" });
         Utility.createSQLTextDocument();
 
         Global.activeConnection = {
