@@ -83,26 +83,13 @@ export class Utility {
     }
 
     public static createConnection(connectionOptions: IConnection): any {
-        let connection;
+        const newConnectionOptions: any = Object.assign({}, connectionOptions);
         if (connectionOptions.certPath && fs.existsSync(connectionOptions.certPath)) {
-            connection = mysql.createConnection({
-                host: connectionOptions.host,
-                user: connectionOptions.user,
-                password: connectionOptions.password,
-                port: connectionOptions.port,
-                ssl  : {
-                    ca : fs.readFileSync(connectionOptions.certPath),
-                },
-                });
-        } else {
-            connection = mysql.createConnection({
-                host: connectionOptions.host,
-                user: connectionOptions.user,
-                password: connectionOptions.password,
-                port: connectionOptions.port,
-                });
+            newConnectionOptions.ssl = {
+                ca: fs.readFileSync(connectionOptions.certPath),
+            };
         }
-        return connection;
+        return mysql.createConnection(newConnectionOptions);
     }
 
     private static async hasActiveConnection(): Promise<boolean> {
