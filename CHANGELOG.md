@@ -1,3 +1,7 @@
+## 0.2.1 (2017-12-05)
+* Keep original properties when creating connection
+* Close the connection after query
+
 ## 0.2.0 (2017-12-04)
 * Support SSL connection
 
