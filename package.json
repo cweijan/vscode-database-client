@@ -2,7 +2,7 @@
     "name": "vscode-mysql",
     "displayName": "MySQL",
     "description": "MySQL management tool",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "publisher": "formulahendry",
     "icon": "logo.png",
     "engines": {
@@ -74,6 +74,13 @@
                 "command": "mysql.selectTop1000",
                 "title": "Select Top 1000",
                 "category": "MySQL"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "mysql.runQuery",
+                "key": "ctrl+alt+e",
+                "when": "editorLangId == sql"
             }
         ],
         "menus": {

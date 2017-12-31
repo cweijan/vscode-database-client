@@ -21,7 +21,8 @@ MySQL management tool
 
 * To run MySQL query, open a SQL file first then:
   * right click on the SQL file, then click `Run MySQL Query` in editor context menu
-  * or press `F1` and then select/type `Run MySQL Query`,
+  * or use shortcut `Ctrl+Alt+E`
+  * or press `F1` and then select/type `Run MySQL Query`
 
 ![run](images/run.png)
 
