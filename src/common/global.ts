@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { IConnection } from "../model/connection";
 
 export class Global {
-    public static keytar: typeof keytarType = require(`${vscode.env.appRoot}/node_modules/keytar`);
+    public static keytar: typeof keytarType = getCoreNodeModule(`keytar`);
 
     static get activeConnection(): IConnection {
         return Global._activeConnection;
@@ -31,4 +31,19 @@ export class Global {
     private static getStatusBarItemText(activeConnection: IConnection): string {
         return `$(server) ${activeConnection.host}` + (activeConnection.database ? ` $(database) ${activeConnection.database}` : "");
     }
+}
+
+/**
+ * Returns a node module installed with VSCode, or null if it fails.
+ */
+function getCoreNodeModule(moduleName: string) {
+    try {
+        return require(`${vscode.env.appRoot}/node_modules.asar/${moduleName}`);
+    } catch (err) { }
+
+    try {
+        return require(`${vscode.env.appRoot}/node_modules/${moduleName}`);
+    } catch (err) { }
+
+    return null;
 }
