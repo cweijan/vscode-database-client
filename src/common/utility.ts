@@ -44,7 +44,16 @@ export class Utility {
             }
         }
 
-        sql = sql ? sql : vscode.window.activeTextEditor.document.getText();
+        if (!sql) {
+            const activeTextEditor = vscode.window.activeTextEditor;
+            const selection = activeTextEditor.selection;
+            if (selection.isEmpty) {
+                sql = activeTextEditor.document.getText();
+            } else {
+                sql = activeTextEditor.document.getText(selection);
+            }
+        }
+
         connectionOptions = connectionOptions ? connectionOptions : Global.activeConnection;
         connectionOptions.multipleStatements = true;
         const connection = Utility.createConnection(connectionOptions);
