@@ -1,3 +1,6 @@
+## 0.2.3 (2018-02-23)
+* Add support for executing selected query
+
 ## 0.2.2 (2017-12-31)
 * [#10](https://github.com/formulahendry/vscode-mysql/issues/10): Add key bindings for 'Run MySQL Query'
 
