@@ -2,7 +2,7 @@
     "name": "vscode-mysql",
     "displayName": "MySQL",
     "description": "MySQL management tool",
-    "version": "0.2.3",
+    "version": "0.3.0",
     "publisher": "formulahendry",
     "icon": "logo.png",
     "engines": {

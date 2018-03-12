@@ -1,3 +1,6 @@
+## 0.3.0 (2018-03-12)
+* Show query result as HTML table
+
 ## 0.2.3 (2018-02-23)
 * Add support for executing selected query
 
