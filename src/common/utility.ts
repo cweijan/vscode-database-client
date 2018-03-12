@@ -62,19 +62,21 @@ export class Utility {
         connection.query(sql, (err, rows) => {
             if (Array.isArray(rows)) {
                 if (rows.some(((row) => Array.isArray(row)))) {
-                    rows.forEach((row) => {
+                    rows.forEach((row, index) => {
                         if (Array.isArray(row)) {
-                            OutputChannel.appendLine(asciitable(row));
+                             Utility.showQueryResult(row, "Results " + (index + 1));
                         } else {
                             OutputChannel.appendLine(JSON.stringify(row));
                         }
                     });
                 } else {
-                    OutputChannel.appendLine(asciitable(rows));
+                    Utility.showQueryResult(rows, "Results");
                 }
+
             } else {
                 OutputChannel.appendLine(JSON.stringify(rows));
             }
+
             if (err) {
                 OutputChannel.appendLine(err);
                 AppInsightsClient.sendEvent("runQuery.end", { Result: "Fail", ErrorMessage: err });
@@ -99,6 +101,22 @@ export class Utility {
             };
         }
         return mysql.createConnection(newConnectionOptions);
+    }
+
+    private static getPreviewUri(data) {
+        const uri = vscode.Uri.parse("sqlresult://mysql/data");
+
+        return uri.with({ query: data });
+    }
+
+    private static showQueryResult(data, title: string) {
+        vscode.commands.executeCommand(
+            "vscode.previewHtml",
+            Utility.getPreviewUri(JSON.stringify(data)),
+            vscode.ViewColumn.Two,
+            title).then(() => { }, (e) => {
+                OutputChannel.appendLine(e);
+            });
     }
 
     private static async hasActiveConnection(): Promise<boolean> {
