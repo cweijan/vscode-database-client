@@ -42,6 +42,18 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("mysql.selectTop1000", (tableNode: TableNode) => {
         tableNode.selectTop1000();
     }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.copy.names", (tableNode: TableNode) => {
+        tableNode.copyNames();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.copy.insert", (tableNode: TableNode) => {
+        tableNode.copyInsert();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.copy.update", (tableNode: TableNode) => {
+        tableNode.copyUpdate();
+    }));
 }
 
 export function deactivate() {

@@ -74,6 +74,21 @@
                 "command": "mysql.selectTop1000",
                 "title": "Select Top 1000",
                 "category": "MySQL"
+            },
+            {
+                "command": "mysql.copy.names",
+                "title": "Copy Names",
+                "category": "MySQL"
+            },
+            {
+                "command": "mysql.copy.insert",
+                "title": "Copy for Insert",
+                "category": "MySQL"
+            },
+            {
+                "command": "mysql.copy.update",
+                "title": "Copy for Update",
+                "category": "MySQL"
             }
         ],
         "keybindings": [
@@ -121,6 +136,21 @@
                 },
                 {
                     "command": "mysql.selectTop1000",
+                    "when": "view == mysql && viewItem == table",
+                    "group": "mysql@0"
+                },
+                {
+                    "command": "mysql.copy.names",
+                    "when": "view == mysql && viewItem == table",
+                    "group": "mysql@0"
+                },
+                {
+                    "command": "mysql.copy.insert",
+                    "when": "view == mysql && viewItem == table",
+                    "group": "mysql@0"
+                },
+                {
+                    "command": "mysql.copy.update",
                     "when": "view == mysql && viewItem == table",
                     "group": "mysql@0"
                 },

@@ -62,4 +62,45 @@ export class TableNode implements INode {
 
         Utility.runQuery(sql, connection);
     }
+    public copyNames() {
+        this
+        .getChildren()
+        .then((children: INode[]) => {
+            const childrenNames = children.map((child: any) => child.column.COLUMN_NAME);
+
+            OutputChannel.appendLine(`${this.database}.${this.table}`);
+            OutputChannel.appendLine(`  ${childrenNames.toString().replace(/,/g, "\n  ")}`);
+            OutputChannel.appendLine(``);
+
+        });
+    }
+    public copyInsert() {
+        this
+        .getChildren()
+        .then((children: INode[]) => {
+            const childrenNames = children.map((child: any) => child.column.COLUMN_NAME);
+
+            OutputChannel.appendLine(`insert into ${this.database}.${this.table}(${childrenNames.toString().replace(/,/g, ", ")})`);
+            OutputChannel.appendLine(`values`);
+            OutputChannel.appendLine(`(:${childrenNames.toString().replace(/,/g, ", :")})`);
+            OutputChannel.appendLine(`;`);
+            OutputChannel.appendLine(``);
+        });
+    }
+    public copyUpdate() {
+        this
+        .getChildren()
+        .then((children: INode[]) => {
+            const keysNames = children.filter((child: any) => child.column.COLUMN_KEY).map((child: any) => child.column.COLUMN_NAME);
+            const childrenNames = children.filter((child: any) => !child.column.COLUMN_KEY).map((child: any) => child.column.COLUMN_NAME);
+
+            const sets = childrenNames.map((name: string) => `${name} = :${name}`);
+            const where = keysNames.map((name: string) => `${name} = :${name}`);
+
+            OutputChannel.appendLine(`update ${this.database}.${this.table} \nset ${sets.toString().replace(/,/g, "\n  , ")}`);
+            OutputChannel.appendLine(` where ${where.toString().replace(/,/g, "\n   and ")}`);
+            OutputChannel.appendLine(``);
+        });
+    }
+
 }
