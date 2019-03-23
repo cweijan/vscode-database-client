@@ -9,20 +9,28 @@ import { TableNode } from "./model/tableNode";
 import { MySQLTreeDataProvider } from "./mysqlTreeDataProvider";
 import { SqlResultDocumentContentProvider } from "./sqlResultDocumentContentProvider";
 import { CompletionProvider } from "./CompletionProvider";
+import { DatabaseCache } from "./common/DatabaseCache";
+import { OutputChannel } from "./common/outputChannel";
 
 export function activate(context: vscode.ExtensionContext) {
+
+    OutputChannel.appendLine("init")
+
     AppInsightsClient.sendEvent("loadExtension");
+
+    DatabaseCache.initCache(context)
+
+    const mysqlTreeDataProvider = new MySQLTreeDataProvider(context);
+    context.subscriptions.push(vscode.window.registerTreeDataProvider("mysql", mysqlTreeDataProvider));
 
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider('sql',new CompletionProvider(),' ','.'))
 
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider("sqlresult", new SqlResultDocumentContentProvider(context)));
 
-    const mysqlTreeDataProvider = new MySQLTreeDataProvider(context);
-    context.subscriptions.push(vscode.window.registerTreeDataProvider("mysql", mysqlTreeDataProvider));
-
     context.subscriptions.push(vscode.commands.registerCommand("mysql.refresh", (node: INode) => {
-        AppInsightsClient.sendEvent("refresh");
-        mysqlTreeDataProvider.refresh(node);
+        DatabaseCache.evictAllCache()
+        mysqlTreeDataProvider.init()
+        mysqlTreeDataProvider.refresh()
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.addConnection", () => {
@@ -61,6 +69,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("mysql.copy.update", (tableNode: TableNode) => {
         tableNode.updateSqlTemplate();
     }));
+
 }
 
 export function deactivate() {

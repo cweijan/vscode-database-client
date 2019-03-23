@@ -18,12 +18,7 @@ export class TableNode implements INode {
     }
 
     public getTreeItem(): vscode.TreeItem {
-        let treeItem = {
-            label: this.table,
-            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
-            contextValue: "table",
-            iconPath: path.join(__filename, "..", "..", "..", "resources", "table.svg"),
-        }
+       
         let item = new vscode.TreeItem(this.table);
         item.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
         item.contextValue = "table"
@@ -36,7 +31,7 @@ export class TableNode implements INode {
         return item;
     }
 
-    public async getChildren(): Promise<INode[]> {
+    public async getChildren(isRresh:boolean=false): Promise<INode[]> {
         const connection = Utility.createConnection({
             host: this.host,
             user: this.user,
@@ -48,15 +43,16 @@ export class TableNode implements INode {
 
         return Utility.queryPromise<any[]>(connection, `SELECT * FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
             .then((columns) => {
+                
                 let columnNodes = DatabaseCache.getColumnListOfTable(this.table)
-                if (columnNodes && columnNodes.length > 0) {
+                if (columnNodes && columnNodes.length > 0 && !isRresh) {
                     return columnNodes;
                 }
-
                 columnNodes = columns.map<ColumnNode>((column) => {
                     return new ColumnNode(this.host, this.user, this.password, this.port, this.database, column);
                 })
                 DatabaseCache.setColumnListOfTable(this.table, columnNodes)
+                
                 return columnNodes;
             })
             .catch((err) => {

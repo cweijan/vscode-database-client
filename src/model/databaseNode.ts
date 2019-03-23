@@ -26,7 +26,7 @@ export class DatabaseNode implements INode {
         };
     }
 
-    public async getChildren(): Promise<INode[]> {
+    public async getChildren(isRresh:boolean=false): Promise<INode[]> {
         const connection = Utility.createConnection({
             host: this.host,
             user: this.user,
@@ -39,7 +39,7 @@ export class DatabaseNode implements INode {
         return Utility.queryPromise<any[]>(connection, `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' LIMIT ${Utility.maxTableCount}`)
             .then((tables) => {
                 let tableNodes = DatabaseCache.getTableListOfDatabase(this.database)
-                if (tableNodes && tableNodes.length > 1) {
+                if (tableNodes && tableNodes.length > 1 && !isRresh) {
                     return tableNodes
                 }
 

@@ -12,6 +12,7 @@ import { DatabaseNode } from "./databaseNode";
 import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
 import { DatabaseCache } from "../common/DatabaseCache";
+import { OutputChannel } from "../common/outputChannel";
 
 export class ConnectionNode implements INode {
     constructor(private readonly id: string, private readonly host: string, private readonly user: string,
@@ -28,7 +29,7 @@ export class ConnectionNode implements INode {
         };
     }
 
-    public async getChildren(): Promise<INode[]> {
+    public async getChildren(isRresh:boolean=false): Promise<INode[]> {
         const connection = Utility.createConnection({
             host: this.host,
             user: this.user,
@@ -40,13 +41,15 @@ export class ConnectionNode implements INode {
         return Utility.queryPromise<any[]>(connection, "SHOW DATABASES")
             .then((databases) => {
                 let databaseNodes = DatabaseCache.databaseNodes
-                if(databaseNodes&&databaseNodes.length>0){
+                if(databaseNodes&&databaseNodes.length>0 && !isRresh){
                     return databaseNodes
                 }
+                
                 databaseNodes = databases.map<DatabaseNode>((database) => {
                     return new DatabaseNode(this.host, this.user, this.password, this.port, database.Database, this.certPath);
                 })
                 DatabaseCache.databaseNodes = databaseNodes
+                
                 return databaseNodes;
             })
             .catch((err) => {

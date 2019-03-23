@@ -7,7 +7,7 @@ import { Global } from "./common/global";
 import { IConnection } from "./model/connection";
 import { ConnectionNode } from "./model/connectionNode";
 import { INode } from "./model/INode";
-import { TableNode } from "./model/tableNode";
+import { DatabaseCache } from "./common/DatabaseCache";
 
 export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     public _onDidChangeTreeData: vscode.EventEmitter<INode> = new vscode.EventEmitter<INode>();
@@ -17,14 +17,21 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
         this.init()
     }
 
-    init() {
-        this.getConnectionNodes().then(connectionNodes => connectionNodes.forEach(connectionNode => {
-            connectionNode.getChildren().then(databaseNodes => databaseNodes.forEach(databaseNode => {
-                databaseNode.getChildren().then(tableNodes => tableNodes.forEach(tableNode => {
+    async init() {
+        if (DatabaseCache.obtainStoreCache()) {
+            return;
+        }
+
+        (await this.getConnectionNodes()).forEach(async connectionNode => {
+            (await connectionNode.getChildren()).forEach(async databaseNode => {
+                (await databaseNode.getChildren()).forEach(tableNode => {
                     tableNode.getChildren()
-                }))
-            }))
-        }))
+                })
+            })
+        })
+        setTimeout(()=>{
+            DatabaseCache.storeCurrentCache()
+        },1000)
     }
 
     public getTreeItem(element: INode): Promise<vscode.TreeItem> | vscode.TreeItem {

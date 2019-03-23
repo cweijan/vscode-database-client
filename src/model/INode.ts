@@ -4,5 +4,5 @@ export interface INode  {
 
     getTreeItem(): Promise<vscode.TreeItem> | vscode.TreeItem;
 
-    getChildren(): Promise<INode[]> ;
+    getChildren(isRresh?:boolean): Promise<INode[]> ;
 }

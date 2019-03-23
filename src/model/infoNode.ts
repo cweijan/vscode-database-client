@@ -11,7 +11,7 @@ export class InfoNode implements INode {
         };
     }
 
-    public getChildren(): Promise<INode[]>{
-        return Promise.resolve([]);
+    public async getChildren(): Promise<INode[]>{
+        return [];
     }
 }
