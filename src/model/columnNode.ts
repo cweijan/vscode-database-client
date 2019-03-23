@@ -8,14 +8,25 @@ import { Utility } from "../common/utility";
 import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
 
+class ColumnTreeItem extends vscode.TreeItem {
+    columnName:string;
+    detail:string;
+    document:string;
+}
+
 export class ColumnNode implements INode {
     constructor(private readonly host: string, private readonly user: string, private readonly password: string,
                 private readonly port: string, private readonly database: string, private readonly column: any ) {
     }
 
-    public getTreeItem(): vscode.TreeItem {
+    
+
+    public getTreeItem(): ColumnTreeItem {
         return {
-            label: `${this.column.COLUMN_NAME} : ${this.column.COLUMN_TYPE}     \n${this.column.COLUMN_COMMENT}`,
+            columnName:`${this.column.COLUMN_NAME}`,
+            detail:`${this.column.COLUMN_TYPE}`,
+            document:`${this.column.COLUMN_COMMENT}`,
+            label: `${this.column.COLUMN_NAME} : ${this.column.COLUMN_TYPE}     ${this.column.COLUMN_COMMENT}`,
             collapsibleState: vscode.TreeItemCollapsibleState.None,
             contextValue: "column",
             iconPath: path.join(__filename, "..", "..", "..", "resources", this.column.COLUMN_KEY === "PRI" ? "b_primary.png" : "b_props.png"),

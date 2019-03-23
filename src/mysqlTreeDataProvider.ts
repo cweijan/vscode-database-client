@@ -7,12 +7,24 @@ import { Global } from "./common/global";
 import { IConnection } from "./model/connection";
 import { ConnectionNode } from "./model/connectionNode";
 import { INode } from "./model/INode";
+import { TableNode } from "./model/tableNode";
 
 export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     public _onDidChangeTreeData: vscode.EventEmitter<INode> = new vscode.EventEmitter<INode>();
     public readonly onDidChangeTreeData: vscode.Event<INode> = this._onDidChangeTreeData.event;
 
     constructor(private context: vscode.ExtensionContext) {
+        this.init()
+    }
+
+    init() {
+        this.getConnectionNodes().then(connectionNodes => connectionNodes.forEach(connectionNode => {
+            connectionNode.getChildren().then(databaseNodes => databaseNodes.forEach(databaseNode => {
+                databaseNode.getChildren().then(tableNodes => tableNodes.forEach(tableNode => {
+                    tableNode.getChildren()
+                }))
+            }))
+        }))
     }
 
     public getTreeItem(element: INode): Promise<vscode.TreeItem> | vscode.TreeItem {
@@ -29,12 +41,12 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
 
     public async addConnection() {
         AppInsightsClient.sendEvent("addConnection.start");
-        const host = await vscode.window.showInputBox({ prompt: "The hostname of the database", placeHolder: "host", ignoreFocusOut: true });
+        const host = await vscode.window.showInputBox({ prompt: "The hostname of the database", placeHolder: "host", ignoreFocusOut: true, value: "localhost" });
         if (!host) {
             return;
         }
 
-        const user = await vscode.window.showInputBox({ prompt: "The MySQL user to authenticate as", placeHolder: "user", ignoreFocusOut: true });
+        const user = await vscode.window.showInputBox({ prompt: "The MySQL user to authenticate as", placeHolder: "user", ignoreFocusOut: true, value: "root" });
         if (!user) {
             return;
         }
@@ -49,10 +61,11 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
             return;
         }
 
-        const certPath = await vscode.window.showInputBox({ prompt: "[Optional] SSL certificate path. Leave empty to ignore", placeHolder: "certificate file path", ignoreFocusOut: true });
-        if (certPath === undefined) {
-            return;
-        }
+        // const certPath = await vscode.window.showInputBox({ prompt: "[Optional] SSL certificate path. Leave empty to ignore", placeHolder: "certificate file path", ignoreFocusOut: true });
+        // if (certPath === undefined) {
+        //     return;
+        // }
+        const certPath = ''
 
         let connections = this.context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
 
@@ -80,7 +93,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
         this._onDidChangeTreeData.fire(element);
     }
 
-    private async getConnectionNodes(): Promise<ConnectionNode[]> {
+    public async getConnectionNodes(): Promise<ConnectionNode[]> {
         const connections = this.context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
         const ConnectionNodes = [];
         if (connections) {

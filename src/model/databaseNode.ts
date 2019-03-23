@@ -8,11 +8,13 @@ import { Utility } from "../common/utility";
 import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
 import { TableNode } from "./tableNode";
+import { OutputChannel } from "../common/outputChannel";
+import { DatabaseCache } from "../common/DatabaseCache";
 
 export class DatabaseNode implements INode {
     constructor(private readonly host: string, private readonly user: string,
-                private readonly password: string, private readonly port: string, private readonly database: string,
-                private readonly certPath: string) {
+        private readonly password: string, private readonly port: string, private readonly database: string,
+        private readonly certPath: string) {
     }
 
     public getTreeItem(): vscode.TreeItem {
@@ -36,9 +38,17 @@ export class DatabaseNode implements INode {
 
         return Utility.queryPromise<any[]>(connection, `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' LIMIT ${Utility.maxTableCount}`)
             .then((tables) => {
-                return tables.map<TableNode>((table) => {
-                    return new TableNode(this.host, this.user, this.password, this.port, this.database, table.TABLE_NAME, this.certPath);
-                });
+                let tableNodes = DatabaseCache.getTableListOfDatabase(this.database)
+                if (tableNodes && tableNodes.length > 1) {
+                    return tableNodes
+                }
+
+                tableNodes = tables.map<TableNode>((table) => {
+                    let tableNode = new TableNode(this.host, this.user, this.password, this.port, this.database, table.TABLE_NAME, this.certPath)
+                    return tableNode;
+                })
+                DatabaseCache.setTableListOfDatabase(this.database, tableNodes)
+                return tableNodes;
             })
             .catch((err) => {
                 return [new InfoNode(err)];
@@ -46,7 +56,9 @@ export class DatabaseNode implements INode {
     }
 
     public async newQuery() {
+        OutputChannel.appendLine("test")
         AppInsightsClient.sendEvent("newQuery", { viewItem: "database" });
+        OutputChannel.appendLine("test2")
         Utility.createSQLTextDocument();
 
         Global.activeConnection = {

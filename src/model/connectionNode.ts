@@ -11,11 +11,12 @@ import { IConnection } from "./connection";
 import { DatabaseNode } from "./databaseNode";
 import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
+import { DatabaseCache } from "../common/DatabaseCache";
 
 export class ConnectionNode implements INode {
     constructor(private readonly id: string, private readonly host: string, private readonly user: string,
-                private readonly password: string, private readonly port: string,
-                private readonly certPath: string) {
+        private readonly password: string, private readonly port: string,
+        private readonly certPath: string) {
     }
 
     public getTreeItem(): vscode.TreeItem {
@@ -38,9 +39,15 @@ export class ConnectionNode implements INode {
 
         return Utility.queryPromise<any[]>(connection, "SHOW DATABASES")
             .then((databases) => {
-                return databases.map<DatabaseNode>((database) => {
+                let databaseNodes = DatabaseCache.databaseNodes
+                if(databaseNodes&&databaseNodes.length>0){
+                    return databaseNodes
+                }
+                databaseNodes = databases.map<DatabaseNode>((database) => {
                     return new DatabaseNode(this.host, this.user, this.password, this.port, database.Database, this.certPath);
-                });
+                })
+                DatabaseCache.databaseNodes = databaseNodes
+                return databaseNodes;
             })
             .catch((err) => {
                 return [new InfoNode(err)];

@@ -7,6 +7,9 @@ import { IConnection } from "../model/connection";
 import { AppInsightsClient } from "./appInsightsClient";
 import { Global } from "./global";
 import { OutputChannel } from "./outputChannel";
+import { SourceInfo } from "_debugger";
+import { cursorTo } from "readline";
+import { SSL_OP_NO_QUERY_MTU } from "constants";
 
 export class Utility {
     public static readonly maxTableCount = Utility.getConfiguration().get<number>("maxTableCount");
@@ -58,13 +61,13 @@ export class Utility {
         connectionOptions.multipleStatements = true;
         const connection = Utility.createConnection(connectionOptions);
 
-        OutputChannel.appendLine("[Start] Executing MySQL query...");
+        // OutputChannel.appendLine("[Start] Executing MySQL query...");
         connection.query(sql, (err, rows) => {
             if (Array.isArray(rows)) {
                 if (rows.some(((row) => Array.isArray(row)))) {
                     rows.forEach((row, index) => {
                         if (Array.isArray(row)) {
-                             Utility.showQueryResult(row, "Results " + (index + 1));
+                            Utility.showQueryResult(row, "Results " + (index + 1));
                         } else {
                             OutputChannel.appendLine(JSON.stringify(row));
                         }
@@ -83,7 +86,7 @@ export class Utility {
             } else {
                 AppInsightsClient.sendEvent("runQuery.end", { Result: "Success" });
             }
-            OutputChannel.appendLine("[Done] Finished MySQL query.");
+            // OutputChannel.appendLine("[Done] Finished MySQL query.");
         });
         connection.end();
     }
@@ -110,11 +113,18 @@ export class Utility {
     }
 
     private static showQueryResult(data, title: string) {
+
+
+        // let current = vscode.window.activeTextEditor
+        // let viewColumn=vscode.ViewColumn.One
+        
+        // if(current.document.uri.toString().startsWith("output:extension-output")){
+        //     viewColumn=vscode.ViewColumn.Active
+        // }
+        
         vscode.commands.executeCommand(
-            "vscode.previewHtml",
-            Utility.getPreviewUri(JSON.stringify(data)),
-            vscode.ViewColumn.Two,
-            title).then(() => { }, (e) => {
+            "vscode.previewHtml",Utility.getPreviewUri(JSON.stringify(data)),
+            vscode.ViewColumn.One, title).then(() => {}, (e) => {
                 OutputChannel.appendLine(e);
             });
     }

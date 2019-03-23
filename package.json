@@ -1,203 +1,226 @@
 {
-    "name": "vscode-mysql",
-    "displayName": "MySQL",
-    "description": "MySQL management tool",
-    "version": "0.3.0",
-    "publisher": "formulahendry",
-    "icon": "logo.png",
-    "engines": {
-        "vscode": "^1.18.0"
-    },
-    "categories": [
-        "Languages",
-        "Azure"
-    ],
-    "keywords": [
-        "SQL",
-        "MySQL",
-        "Database",
-        "DB",
-        "RDBMS"
-    ],
-    "bugs": {
-        "url": "https://github.com/formulahendry/vscode-mysql/issues",
-        "email": "formulahendry@gmail.com"
-    },
-    "homepage": "https://github.com/formulahendry/vscode-mysql/blob/master/README.md",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/formulahendry/vscode-mysql.git"
-    },
-    "activationEvents": [
-        "onView:mysql",
-        "onCommand:mysql.addConnection",
-        "onCommand:mysql.runQuery"
-    ],
-    "main": "./out/extension",
-    "contributes": {
-        "views": {
-            "explorer": [{
-                "id": "mysql",
-                "name": "MySQL"
-            }]
-        },
-        "commands": [{
-                "command": "mysql.refresh",
-                "title": "Refresh",
-                "category": "MySQL"
-            },
-            {
-                "command": "mysql.addConnection",
-                "title": "Add Connection",
-                "icon": {
-                    "light": "resources/light/add.svg",
-                    "dark": "resources/dark/add.svg"
-                },
-                "category": "MySQL"
-            },
-            {
-                "command": "mysql.deleteConnection",
-                "title": "Delete Connection",
-                "category": "MySQL"
-            },
-            {
-                "command": "mysql.runQuery",
-                "title": "Run MySQL Query",
-                "category": "MySQL"
-            },
-            {
-                "command": "mysql.newQuery",
-                "title": "New Query",
-                "category": "MySQL"
-            },
-            {
-                "command": "mysql.selectTop1000",
-                "title": "Select Top 1000",
-                "category": "MySQL"
-            },
-            {
-                "command": "mysql.copy.names",
-                "title": "Copy Names",
-                "category": "MySQL"
-            },
-            {
-                "command": "mysql.copy.insert",
-                "title": "Copy for Insert",
-                "category": "MySQL"
-            },
-            {
-                "command": "mysql.copy.update",
-                "title": "Copy for Update",
-                "category": "MySQL"
-            }
-        ],
-        "keybindings": [
-            {
-                "command": "mysql.runQuery",
-                "key": "ctrl+alt+e",
-                "when": "editorLangId == sql"
-            }
-        ],
-        "menus": {
-            "editor/context": [{
-                "command": "mysql.runQuery",
-                "when": "editorLangId == sql",
-                "group": "navigation"
-            }],
-            "view/title": [{
-                "command": "mysql.addConnection",
-                "when": "view == mysql",
-                "group": "navigation@1"
-            }],
-            "view/item/context": [{
-                    "command": "mysql.newQuery",
-                    "when": "view == mysql && viewItem == connection",
-                    "group": "mysql@1"
-                },
-                {
-                    "command": "mysql.refresh",
-                    "when": "view == mysql && viewItem == connection",
-                    "group": "mysql@1"
-                },
-                {
-                    "command": "mysql.deleteConnection",
-                    "when": "view == mysql && viewItem == connection",
-                    "group": "mysql@2"
-                },
-                {
-                    "command": "mysql.newQuery",
-                    "when": "view == mysql && viewItem == database",
-                    "group": "mysql@0"
-                },
-                {
-                    "command": "mysql.refresh",
-                    "when": "view == mysql && viewItem == database",
-                    "group": "mysql@1"
-                },
-                {
-                    "command": "mysql.selectTop1000",
-                    "when": "view == mysql && viewItem == table",
-                    "group": "mysql@0"
-                },
-                {
-                    "command": "mysql.copy.names",
-                    "when": "view == mysql && viewItem == table",
-                    "group": "mysql@0"
-                },
-                {
-                    "command": "mysql.copy.insert",
-                    "when": "view == mysql && viewItem == table",
-                    "group": "mysql@0"
-                },
-                {
-                    "command": "mysql.copy.update",
-                    "when": "view == mysql && viewItem == table",
-                    "group": "mysql@0"
-                },
-                {
-                    "command": "mysql.refresh",
-                    "when": "view == mysql && viewItem == table",
-                    "group": "mysql@1"
-                }
-            ]
-        },
-        "configuration": {
-            "type": "object",
-            "title": "MySQL",
-            "properties": {
-                "vscode-mysql.enableTelemetry": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Whether to enable anonymous usage collection."
-                },
-                "vscode-mysql.maxTableCount": {
-                    "type": "integer",
-                    "default": 500,
-                    "description": "The maximum table count shown in the tree view"
-                }
-            }
-        }
-    },
-    "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test",
-        "tslint": "tslint -t verbose src/**/*.ts"
-    },
-    "devDependencies": {
-        "@types/keytar": "^4.0.1",
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^7.0.43",
-        "tslint": "^5.8.0",
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.6"
-    },
-    "dependencies": {
-        "applicationinsights": "^1.0.0",
-        "asciitable": "0.0.7",
-        "mysql": "^2.15.0",
-        "uuid": "^3.1.0"
-    }
+	"name": "vscode-mysql",
+	"displayName": "MySQL",
+	"description": "MySQL management tool",
+	"version": "0.3.0",
+	"publisher": "formulahendry",
+	"icon": "logo.png",
+	"engines": {
+		"vscode": "^1.18.0"
+	},
+	"categories": [
+		"Languages",
+		"Azure"
+	],
+	"keywords": [
+		"SQL",
+		"MySQL",
+		"Database",
+		"DB",
+		"RDBMS"
+	],
+	"bugs": {
+		"url": "https://github.com/formulahendry/vscode-mysql/issues",
+		"email": "formulahendry@gmail.com"
+	},
+	"homepage": "https://github.com/formulahendry/vscode-mysql/blob/master/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/formulahendry/vscode-mysql.git"
+	},
+	"activationEvents": [
+		"onView:mysql",
+		"onCommand:mysql.addConnection",
+		"onCommand:mysql.runQuery"
+	],
+	"main": "./out/extension",
+	"contributes": {
+		"views": {
+			"explorer": [
+				{
+					"id": "mysql",
+					"name": "MySQL"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "mysql.refresh",
+				"title": "Refresh",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.addConnection",
+				"title": "Add Connection",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				},
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.deleteConnection",
+				"title": "Delete Connection",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.runQuery",
+				"title": "Run MySQL Query",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.newQuery",
+				"title": "New Query",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.template.sql",
+				"title": "Select SQL Template",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.template.delete",
+				"title": "Delete SQL Template",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.copy.names",
+				"title": "Print Names",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.copy.insert",
+				"title": "Insert SQL Template",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.copy.update",
+				"title": "Update SQL Template",
+				"category": "MySQL"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "mysql.runQuery",
+				"key": "f9",
+				"when": "editorLangId == sql"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "mysql.runQuery",
+					"when": "editorLangId == sql",
+					"group": "navigation"
+				}
+			],
+			"view/title": [
+				{
+					"command": "mysql.addConnection",
+					"when": "view == mysql",
+					"group": "navigation@1"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "mysql.newQuery",
+					"when": "view == mysql && viewItem == connection",
+					"group": "mysql@1"
+				},
+				{
+					"command": "mysql.refresh",
+					"when": "view == mysql && viewItem == connection",
+					"group": "mysql@1"
+				},
+				{
+					"command": "mysql.deleteConnection",
+					"when": "view == mysql && viewItem == connection",
+					"group": "mysql@2"
+				},
+				{
+					"command": "mysql.newQuery",
+					"when": "view == mysql && viewItem == database",
+					"group": "mysql@0"
+				},
+				{
+					"command": "mysql.refresh",
+					"when": "view == mysql && viewItem == database",
+					"group": "mysql@1"
+				},
+				{
+					"command": "mysql.template.sql",
+					"when": "view == mysql && viewItem == table",
+					"group": "mysql@0"
+				},
+				{
+					"command": "mysql.copy.insert",
+					"when": "view == mysql && viewItem == table",
+					"group": "mysql@1"
+				},
+				{
+					"command": "mysql.template.delete",
+					"when": "view == mysql && viewItem == table",
+					"group": "mysql@4"
+				},
+				{
+					"command": "mysql.copy.update",
+					"when": "view == mysql && viewItem == table",
+					"group": "mysql@2"
+				},
+				{
+					"command": "mysql.copy.names",
+					"when": "view == mysql && viewItem == table",
+					"group": "mysql@4"
+				},
+				{
+					"command": "mysql.refresh",
+					"when": "view == mysql && viewItem == table",
+					"group": "mysql@4"
+				}
+			]
+		},
+		"configuration": {
+			"type": "object",
+			"title": "MySQL",
+			"properties": {
+				"vscode-mysql.enableTelemetry": {
+					"type": "boolean",
+					"default": true,
+					"description": "Whether to enable anonymous usage collection."
+				},
+				"vscode-mysql.maxTableCount": {
+					"type": "integer",
+					"default": 500,
+					"description": "The maximum table count shown in the tree view"
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "npm run compile && node ./node_modules/vscode/bin/test",
+		"tslint": "tslint -t verbose src/**/*.ts"
+	},
+	"devDependencies": {
+		"@types/keytar": "^4.0.1",
+		"@types/mocha": "^2.2.42",
+		"@types/node": "^7.0.43",
+		"tslint": "^5.8.0",
+		"typescript": "^2.6.1",
+		"vscode": "^1.1.30"
+	},
+	"dependencies": {
+		"applicationinsights": "^1.0.0",
+		"asciitable": "0.0.7",
+		"mysql": "^2.15.0",
+		"uuid": "^3.1.0"
+	},
+	"__metadata": {
+		"id": "d4598ff7-3c39-47f6-bf45-2df845252570",
+		"publisherDisplayName": "Jun Han",
+		"publisherId": "38bbe3f0-5204-4170-845e-c2f966d979b8"
+	}
 }
