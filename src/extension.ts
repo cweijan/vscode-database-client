@@ -12,6 +12,7 @@ import { CompletionProvider } from "./provider/CompletionProvider";
 import { DatabaseCache } from "./common/DatabaseCache";
 import { Global } from "./common/global";
 import { ColumnNode } from "./model/columnNode";
+import { OutputChannel } from "./common/outputChannel";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -51,6 +52,14 @@ export function activate(context: vscode.ExtensionContext) {
         tableNode.changeTableName()
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.table.truncate", (tableNode: TableNode) => {
+        tableNode.truncateTable()
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.table.drop", (tableNode: TableNode) => {
+        tableNode.dropTable()
+    }));
+
     context.subscriptions.push(vscode.commands.registerCommand("mysql.changeColumnName", (columnNode: ColumnNode) => {
         columnNode.changeColumnName()
     }));
@@ -72,8 +81,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("mysql.copy.names", (tableNode: TableNode) => {
-        tableNode.printNames();
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.data.export", (iNode: TableNode|DatabaseNode) => {
+        vscode.window.showOpenDialog({canSelectMany:false,openLabel:"Select export file path",canSelectFiles:false,canSelectFolders:true}).then(folderPath=>{
+            iNode.backupData(folderPath[0].fsPath)
+        })
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.template.delete", (tableNode: TableNode) => {

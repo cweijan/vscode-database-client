@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
+import mysqldump from 'mysqldump'
 import { AppInsightsClient } from "../common/appInsightsClient";
 import { Global } from "../common/global";
 import { Utility } from "../common/utility";
@@ -8,6 +9,7 @@ import { INode } from "./INode";
 import { TableNode } from "./tableNode";
 import { DatabaseCache } from "../common/DatabaseCache";
 import { ModelType } from "../common/constants";
+import { OutputChannel } from "../common/outputChannel";
 
 export class DatabaseNode implements INode {
     identify: string;
@@ -54,6 +56,37 @@ export class DatabaseNode implements INode {
             .catch((err) => {
                 return [new InfoNode(err)];
             });
+    }
+
+    public backupData(exportPath: string) {
+
+        OutputChannel.appendLine(`Doing backup ${this.host}_${this.database}...`)
+        mysqldump({
+            connection: {
+                host: this.host,
+                user: this.user,
+                password: this.password,
+                database: this.database,
+                port:parseInt(this.port)
+            },
+            dump:{
+                schema:{
+                    table:{
+                        ifNotExist:false,
+                        dropIfExist:true,
+                        charset:false
+                    },
+                    engine:false
+                }
+            },
+            dumpToFile: `${exportPath}\\${this.database}_${this.host}.sql`
+        }).then(()=>{
+            vscode.window.showInformationMessage(`Backup ${this.host}_${this.database} success!`)
+        }).catch((err)=>{
+            vscode.window.showErrorMessage(`Backup ${this.host}_${this.database} fail!\n${err}`)
+        })
+        OutputChannel.appendLine("backup end.")
+
     }
 
     public async newQuery() {

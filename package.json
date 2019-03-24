@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-manager",
 	"displayName": "MySQL",
 	"description": "MySQL management tool",
-	"version": "1.3.1",
+	"version": "1.4.0",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
@@ -70,12 +70,20 @@
 			{
 				"command": "mysql.runQuery",
 				"title": "Run MySQL Query",
-				"category": "MySQL"
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/run.png",
+					"dark": "resources/dark/run.png"
+				}
 			},
 			{
 				"command": "mysql.newQuery",
 				"title": "New Query",
-				"category": "MySQL"
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/query.svg",
+					"dark": "resources/dark/query.svg"
+				}
 			},
 			{
 				"command": "mysql.template.sql",
@@ -88,8 +96,8 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.copy.names",
-				"title": "Print Names",
+				"command": "mysql.data.export",
+				"title": "Export Data",
 				"category": "MySQL"
 			},
 			{
@@ -100,6 +108,16 @@
 			{
 				"command": "mysql.copy.update",
 				"title": "Update SQL Template",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.table.truncate",
+				"title": "Clear Table Data",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.table.drop",
+				"title": "Delete table",
 				"category": "MySQL"
 			},
 			{
@@ -136,11 +154,17 @@
 					"group": "navigation"
 				}
 			],
+			"editor/title": [
+				{
+					"command": "mysql.runQuery",
+					"group": "navigation"
+				}
+			],
 			"view/title": [
 				{
 					"command": "mysql.addConnection",
 					"when": "view == mysql",
-					"group": "navigation@1"
+					"group": "navigation@2"
 				},
 				{
 					"command": "mysql.refresh",
@@ -166,13 +190,23 @@
 				},
 				{
 					"command": "mysql.newQuery",
+					"when": "view == mysql && viewItem == connection",
+					"group": "inline"
+				},
+				{
+					"command": "mysql.newQuery",
+					"when": "view == mysql && viewItem == database",
+					"group": "inline"
+				},
+				{
+					"command": "mysql.newQuery",
 					"when": "view == mysql && viewItem == database",
 					"group": "mysql@0"
 				},
 				{
 					"command": "mysql.refresh",
 					"when": "view == mysql && viewItem == database",
-					"group": "mysql@1"
+					"group": "mysql"
 				},
 				{
 					"command": "mysql.template.sql",
@@ -192,7 +226,7 @@
 				{
 					"command": "mysql.template.delete",
 					"when": "view == mysql && viewItem == table",
-					"group": "mysql@4"
+					"group": "mysql@3"
 				},
 				{
 					"command": "mysql.copy.update",
@@ -200,9 +234,24 @@
 					"group": "mysql@2"
 				},
 				{
-					"command": "mysql.copy.names",
+					"command": "mysql.table.drop",
 					"when": "view == mysql && viewItem == table",
 					"group": "mysql@4"
+				},
+				{
+					"command": "mysql.table.truncate",
+					"when": "view == mysql && viewItem == table",
+					"group": "mysql@4"
+				},
+				{
+					"command": "mysql.data.export",
+					"when": "view == mysql && viewItem == table",
+					"group": "mysql@5"
+				},
+				{
+					"command": "mysql.data.export",
+					"when": "view == mysql && viewItem == database",
+					"group": "mysql@5"
 				},
 				{
 					"command": "mysql.refresh",
@@ -246,14 +295,15 @@
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^7.0.43",
 		"tslint": "^5.8.0",
-		"typescript": "^3.3.1"
+		"typescript": "^3.3.1",
+		"vscode": "^1.1.33"
 	},
 	"dependencies": {
 		"applicationinsights": "^1.0.0",
 		"asciitable": "0.0.7",
 		"mysql": "^2.15.0",
-		"uuid": "^3.1.0",
-		"vscode": "^1.1.33"
+		"mysqldump": "^2.2.1",
+		"uuid": "^3.1.0"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",

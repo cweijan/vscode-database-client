@@ -171,6 +171,7 @@ export class DatabaseCache {
 
     static getColumnListOfTable(tableName: string): ColumnNode[] {
         if (this.tableNodeMapColumnNode[tableName]) {
+
             return this.tableNodeMapColumnNode[tableName]
         } else {
             return []

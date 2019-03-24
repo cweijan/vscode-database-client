@@ -1,4 +1,3 @@
-import * as path from "path";
 import * as uuidv1 from "uuid/v1";
 import * as vscode from "vscode";
 import { AppInsightsClient } from "../common/appInsightsClient";

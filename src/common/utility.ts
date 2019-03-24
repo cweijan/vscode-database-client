@@ -59,7 +59,6 @@ export class Utility {
         connectionOptions.multipleStatements = true;
         const connection = Utility.createConnection(connectionOptions);
 
-        // OutputChannel.appendLine("[Start] Executing MySQL query...");
         connection.query(sql, (err, rows) => {
             if (Array.isArray(rows)) {
                 if (rows.some(((row) => Array.isArray(row)))) {
@@ -84,7 +83,6 @@ export class Utility {
             } else {
                 AppInsightsClient.sendEvent("runQuery.end", { Result: "Success" });
             }
-            // OutputChannel.appendLine("[Done] Finished MySQL query.");
         });
         connection.end();
     }
@@ -112,21 +110,16 @@ export class Utility {
 
     private static showQueryResult(data) {
 
-        const panel = vscode.window.createWebviewPanel(
-            'catCoding',
-            'Cat Coding',
-            vscode.ViewColumn.One,
-            {}
-          );
+        // const panel = vscode.window.createWebviewPanel(
+        //     'catCoding',
+        //     'Cat Coding',
+        //     vscode.ViewColumn.One,
+        //     {}
+        //   );
 
-          vscode.commands.executeCommand('vscode.open', Utility.getPreviewUri(JSON.stringify(data))).then(text=>{
-              OutputChannel.appendLine(text)
-          })
-          
-
-        // const uri = Utility.getPreviewUri(JSON.stringify(data))
-        // vscode.commands.executeCommand('markdown.showPreview', uri)
-        // vscode.commands.executeCommand('m2arkdown.preview.refresh', uri);
+        const uri = Utility.getPreviewUri(JSON.stringify(data))
+        vscode.commands.executeCommand('markdown.showPreview', uri)
+        vscode.commands.executeCommand('m2arkdown.preview.refresh', uri);
 
     }
 
