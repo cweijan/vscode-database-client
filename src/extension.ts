@@ -1,7 +1,7 @@
 "use strict";
 import * as vscode from "vscode";
 import { AppInsightsClient } from "./common/appInsightsClient";
-import { Utility } from "./common/utility";
+import { Utility } from "./database/utility";
 import { ConnectionNode } from "./model/ConnectionNode";
 import { DatabaseNode } from "./model/databaseNode";
 import { INode } from "./model/INode";
@@ -9,10 +9,11 @@ import { TableNode } from "./model/tableNode";
 import { MySQLTreeDataProvider } from "./provider/mysqlTreeDataProvider";
 import { SqlResultDocumentContentProvider } from "./provider/sqlResultDocumentContentProvider";
 import { CompletionProvider } from "./provider/CompletionProvider";
-import { DatabaseCache } from "./common/DatabaseCache";
+import { DatabaseCache } from "./database/DatabaseCache";
 import { Global } from "./common/global";
 import { ColumnNode } from "./model/columnNode";
 import { OutputChannel } from "./common/outputChannel";
+import { SqlViewManager } from "./database/SqlViewManager";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -20,6 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     DatabaseCache.initCache(context)
 
+    SqlViewManager.initExtesnsionPath(context.extensionPath)
     
     const mysqlTreeDataProvider = new MySQLTreeDataProvider(context);
     const treeview= vscode.window.createTreeView("mysql",{
@@ -74,6 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.newQuery", (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
         databaseOrConnectionNode.newQuery();
+        Utility.webviewPanel.webview.postMessage({command:'mysql.newQuery'})
     }));
     
     context.subscriptions.push(vscode.commands.registerCommand("mysql.template.sql", (tableNode: TableNode, run: Boolean) => {

@@ -3,13 +3,13 @@ import * as vscode from "vscode";
 import { AppInsightsClient } from "../common/appInsightsClient";
 import { Constants, ModelType } from "../common/constants";
 import { Global } from "../common/global";
-import { Utility } from "../common/utility";
+import { Utility } from "../database/utility";
 import { MySQLTreeDataProvider } from "../provider/mysqlTreeDataProvider";
 import { IConnection } from "./connection";
 import { DatabaseNode } from "./databaseNode";
 import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
-import { DatabaseCache } from "../common/DatabaseCache";
+import { DatabaseCache } from "../database/DatabaseCache";
 import { OutputChannel } from "../common/outputChannel";
 
 export class ConnectionNode implements INode {

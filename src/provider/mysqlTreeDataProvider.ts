@@ -6,7 +6,7 @@ import { Global } from "../common/global";
 import { IConnection } from "../model/connection";
 import { ConnectionNode } from "../model/ConnectionNode";
 import { INode } from "../model/INode";
-import { DatabaseCache } from "../common/DatabaseCache";
+import { DatabaseCache } from "../database/DatabaseCache";
 
 export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     public _onDidChangeTreeData: vscode.EventEmitter<INode> = new vscode.EventEmitter<INode>();

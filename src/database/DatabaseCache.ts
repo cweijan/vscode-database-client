@@ -2,8 +2,8 @@ import { DatabaseNode } from "../model/databaseNode";
 import { TableNode } from "../model/tableNode";
 import { ColumnNode } from "../model/columnNode";
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
-import { CacheKey, ModelType } from "./constants";
-import { OutputChannel } from "./outputChannel";
+import { CacheKey, ModelType } from "../common/constants";
+import { OutputChannel } from "../common/outputChannel";
 import { INode } from "../model/INode";
 
 export class DatabaseCache {

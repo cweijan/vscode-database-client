@@ -1,6 +1,6 @@
 "use strict";
 import appInsights = require("applicationinsights");
-import { Utility } from "./utility";
+import { Utility } from "../database/utility";
 
 export class AppInsightsClient {
     public static sendEvent(eventName: string, properties?: { [key: string]: string; }): void {

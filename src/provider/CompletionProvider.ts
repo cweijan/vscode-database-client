@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CompletionManager } from '../common/CompletionManager';
+import { CompletionManager } from './CompletionManager';
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
 

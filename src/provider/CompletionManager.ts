@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { DatabaseCache } from "./DatabaseCache";
+import { DatabaseCache } from "../database/DatabaseCache";
 
 export class CompletionManager {
 

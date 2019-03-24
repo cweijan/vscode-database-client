@@ -2,8 +2,8 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { INode } from "./INode";
 import { ModelType } from "../common/constants";
-import { Utility } from "../common/utility";
-import { DatabaseCache } from "../common/DatabaseCache";
+import { Utility } from "../database/utility";
+import { DatabaseCache } from "../database/DatabaseCache";
 import { OutputChannel } from "../common/outputChannel";
 import { Global } from "../common/global";
 

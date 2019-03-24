@@ -3,11 +3,11 @@ import * as vscode from "vscode";
 import mysqldump from 'mysqldump'
 import { AppInsightsClient } from "../common/appInsightsClient";
 import { Global } from "../common/global";
-import { Utility } from "../common/utility";
+import { Utility } from "../database/utility";
 import { ColumnNode } from "./columnNode";
 import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
-import { DatabaseCache } from "../common/DatabaseCache";
+import { DatabaseCache } from "../database/DatabaseCache";
 import { ModelType } from "../common/constants";
 import { IConnection } from "./connection";
 import { OutputChannel } from "../common/outputChannel";

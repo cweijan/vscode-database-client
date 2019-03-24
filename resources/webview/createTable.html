@@ -1,0 +1,48 @@
+<html>
+
+<head>
+    <title>result</title>
+    <link rel="stylesheet" href="${webviewPath}/test.css">
+    <script src="${webviewPath}/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div v-for="str in list" v-text="str"><br></div>
+        <span class="test">hello</span>
+    </div>
+</body>
+<script>
+    const vue=new Vue({
+        el:'#app',
+        data:{
+            list:["test",'hehe']
+        }
+    })
+    const vscode = acquireVsCodeApi();
+    document.write("test")
+    document.write("${webviewPath}/style.css")
+    console.log('test')
+    vscode.postMessage({
+        command: 'webview.table.change',
+        text: "test text"
+    })
+
+    window.addEventListener('message', event => {
+
+        const message = event.data; // The JSON data our extension sent
+        vue.list.push(message)
+        // console.log(message)
+        // document.write(message)
+
+        // switch (message.command) {
+        //     case 'mysql.newQuery':
+        //         count = Math.ceil(count * 0.5);
+        //         counter.textContent = count;
+        //         document.write(count)
+        //         break;
+        // }
+    });
+</script>
+
+</html>
