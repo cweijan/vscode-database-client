@@ -1,13 +1,11 @@
-import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
-import { AppInsightsClient } from "../common/appInsightsClient";
-import { Global } from "../common/global";
-import { OutputChannel } from "../common/outputChannel";
-import { Utility } from "../common/utility";
-import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
 import { ModelType } from "../common/constants";
+import { Utility } from "../common/utility";
+import { DatabaseCache } from "../common/DatabaseCache";
+import { OutputChannel } from "../common/outputChannel";
+import { Global } from "../common/global";
 
 class ColumnTreeItem extends vscode.TreeItem {
     columnName: string;
@@ -16,10 +14,12 @@ class ColumnTreeItem extends vscode.TreeItem {
 }
 
 export class ColumnNode implements INode {
+
     identify: string;
     type: string = ModelType.COLUMN;
     constructor(private readonly host: string, private readonly user: string, private readonly password: string,
-        private readonly port: string, private readonly database: string, private readonly column: any) {
+        private readonly port: string, private readonly database: string,private readonly table:string,
+        private readonly certPath: string, private readonly column: any) {
     }
 
     public getTreeItem(): ColumnTreeItem {
@@ -37,4 +37,29 @@ export class ColumnNode implements INode {
     public async getChildren(): Promise<INode[]> {
         return [];
     }
+
+    changeColumnName(): any {
+        const connection = Utility.createConnection({
+            host: this.host,
+            user: this.user,
+            password: this.password,
+            port: this.port,
+            database: this.database,
+            certPath: this.certPath,
+        });
+
+        const columnName=this.column.COLUMN_NAME
+        vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(newColumnName => {
+            if (!newColumnName) return
+            const sql = `alter table ${this.database}.${this.table} change column ${columnName} ${newColumnName} ${this.column.COLUMN_TYPE}`
+            Utility.queryPromise(connection, sql).then((rows) => {
+                DatabaseCache.getParentTreeItem(this, ModelType.COLUMN).getChildren(true).then(()=>{
+                    Global.sqlTreeProvider.refresh()
+                    DatabaseCache.storeCurrentCache()
+                })
+            })
+
+        })
+    }
+
 }

@@ -10,7 +10,8 @@ import { MySQLTreeDataProvider } from "./provider/mysqlTreeDataProvider";
 import { SqlResultDocumentContentProvider } from "./provider/sqlResultDocumentContentProvider";
 import { CompletionProvider } from "./provider/CompletionProvider";
 import { DatabaseCache } from "./common/DatabaseCache";
-import { OutputChannel } from "./common/outputChannel";
+import { Global } from "./common/global";
+import { ColumnNode } from "./model/columnNode";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -23,6 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
     const treeview= vscode.window.createTreeView("mysql",{
         treeDataProvider:mysqlTreeDataProvider
     })
+    Global.sqlTreeProvider=mysqlTreeDataProvider
     treeview.onDidCollapseElement(event=>{
         DatabaseCache.storeElementState(event.element,vscode.TreeItemCollapsibleState.Collapsed)
     })
@@ -35,16 +37,22 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider("sqlresult", new SqlResultDocumentContentProvider(context)));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.refresh", (node: INode) => {
-        OutputChannel.appendLine(JSON.stringify(node))
-        OutputChannel.appendLine((<vscode.TreeItem>node).collapsibleState)
-        // DatabaseCache.evictAllCache()
-        // mysqlTreeDataProvider.init()
-        // mysqlTreeDataProvider.refresh()
+        DatabaseCache.evictAllCache()
+        mysqlTreeDataProvider.init()
+        mysqlTreeDataProvider.refresh()
     }));
 
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.addConnection", () => {
         mysqlTreeDataProvider.addConnection();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.changeTableName", (tableNode: TableNode) => {
+        tableNode.changeTableName()
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.changeColumnName", (columnNode: ColumnNode) => {
+        columnNode.changeColumnName()
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.deleteConnection", (connectionNode: ConnectionNode) => {

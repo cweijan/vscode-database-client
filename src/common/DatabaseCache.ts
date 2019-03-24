@@ -10,9 +10,11 @@ export class DatabaseCache {
 
     private static context: ExtensionContext;
     static databaseNodes: DatabaseNode[] = [];
+    private static datbaseMap={};
+    private static tableMap={};
     private static databaseNodeMapTableNode = {};
     private static tableNodeMapColumnNode = {};
-    private static collpaseState;
+    private static collpaseState: { key?: TreeItemCollapsibleState };
 
     static evictAllCache(): any {
         if (this.context == null) throw new Error("DatabaseCache is not init!")
@@ -36,6 +38,22 @@ export class DatabaseCache {
         })
 
         return tableNodeList;
+    }
+
+
+    static getParentTreeItem(iNode: INode, type: string): INode {
+
+        let databaseNode: DatabaseNode=<DatabaseNode>iNode;
+        if (type == ModelType.TABLE && (databaseNode = this.datbaseMap[`${databaseNode.host}_${databaseNode.port}_${databaseNode.user}_${databaseNode.database}`])) {
+            return databaseNode
+        }
+
+        let tableNode: TableNode=<TableNode>iNode;
+        if (type == ModelType.COLUMN && (tableNode = this.tableMap[`${tableNode.host}_${tableNode.port}_${tableNode.user}_${tableNode.database}_${tableNode.table}`])) {
+            return tableNode
+        }
+
+        return null;
     }
 
     static getElementState(element?: INode) {
@@ -74,13 +92,25 @@ export class DatabaseCache {
 
     }
 
+    static async initDatabaseNodes(databaseNodes: DatabaseNode[]) {
+        if (!databaseNodes) {
+            databaseNodes = []
+        }
+        this.databaseNodes = databaseNodes
+        await this.databaseNodes.forEach(databaseNode => {
+            this.datbaseMap[`${databaseNode.host}_${databaseNode.port}_${databaseNode.user}_${databaseNode.database}`]
+        })
+    }
+
     static obtainStoreCache() {
         if (this.context == null) throw new Error("DatabaseCache is not init!")
         let cached = false
         if (this.context.globalState.get(CacheKey.DatabaseCacheKey)) {
             const databaseProxyList: DatabaseProxy[] = this.context.globalState.get(CacheKey.DatabaseCacheKey)
             databaseProxyList.forEach(d => {
-                this.databaseNodes.push(new DatabaseNode(d.host, d.user, d.password, d.port, d.database, d.certPath))
+                const databasenode = new DatabaseNode(d.host, d.user, d.password, d.port, d.database, d.certPath)
+                this.databaseNodes.push(databasenode)
+                this.datbaseMap[`${d.host}_${d.port}_${d.user}_${d.database}`] = databasenode
             })
         }
         if (this.context.globalState.get(CacheKey.DatabaseTableCacheKey)) {
@@ -90,7 +120,9 @@ export class DatabaseCache {
                     this.databaseNodeMapTableNode[dn] = []
                 }
                 t[dn].forEach(tableProxy => {
-                    this.databaseNodeMapTableNode[dn].push(new TableNode(tableProxy.host, tableProxy.user, tableProxy.password, tableProxy.port, tableProxy.database, tableProxy.table, tableProxy.certPath))
+                    const tableNode=new TableNode(tableProxy.host, tableProxy.user, tableProxy.password, tableProxy.port, tableProxy.database, tableProxy.table, tableProxy.certPath)
+                    this.databaseNodeMapTableNode[dn].push(tableNode)
+                    this.tableMap[`${tableProxy.host}_${tableProxy.port}_${tableProxy.user}_${tableProxy.database}_${tableProxy.table}`]=tableNode
                 })
 
             })
@@ -102,7 +134,7 @@ export class DatabaseCache {
                     this.tableNodeMapColumnNode[tn] = []
                 }
                 c[tn].forEach(columnProxy => {
-                    this.tableNodeMapColumnNode[tn].push(new ColumnNode(columnProxy.host, columnProxy.user, columnProxy.password, columnProxy.port, columnProxy.database, columnProxy.column))
+                    this.tableNodeMapColumnNode[tn].push(new ColumnNode(columnProxy.host, columnProxy.user, columnProxy.password, columnProxy.port, columnProxy.database,columnProxy.table,columnProxy.certPath, columnProxy.column))
                 })
 
             })
@@ -123,7 +155,6 @@ export class DatabaseCache {
     }
 
     static storeCurrentCache() {
-        OutputChannel.appendLine("store")
         if (this.context == null) throw new Error("DatabaseCache is not init!")
         this.context.globalState.update(CacheKey.DatabaseCacheKey, this.databaseNodes)
         this.context.globalState.update(CacheKey.DatabaseTableCacheKey, this.databaseNodeMapTableNode)
@@ -150,6 +181,9 @@ export class DatabaseCache {
 
     static setTableListOfDatabase(databaseName: string, tableNodeList: TableNode[]) {
         this.databaseNodeMapTableNode[databaseName] = tableNodeList
+        tableNodeList.forEach(tableNode=>{
+            this.tableMap[`${tableNode.host}_${tableNode.port}_${tableNode.user}_${tableNode.database}_${tableNode.table}`]=tableNode
+        })
     }
 
     static setColumnListOfTable(tableName: string, columnList: ColumnNode[]) {
@@ -173,5 +207,6 @@ class TableProxy {
 
 class ColumnProxy {
     host: string; user: string; password: string;
-    port: string; database: string; column: any
+    port: string; database: string;  table: string;
+    certPath: string;column: any
 }

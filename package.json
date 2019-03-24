@@ -2,8 +2,8 @@
 	"name": "vscode-mysql-manager",
 	"displayName": "MySQL",
 	"description": "MySQL management tool",
-	"version": "1.3.0",
-	"publisher": "formulahendry",
+	"version": "1.3.1",
+	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -20,13 +20,13 @@
 		"RDBMS"
 	],
 	"bugs": {
-		"url": "https://github.com/formulahendry/vscode-mysql/issues",
-		"email": "formulahendry@gmail.com"
+		"url": "https://github.com/cweijan/vscode-mysql/issues",
+		"email": "cweijan@163.com"
 	},
-	"homepage": "https://github.com/formulahendry/vscode-mysql/blob/master/README.md",
+	"homepage": "https://github.com/cweijan/vscode-mysql/blob/master/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/formulahendry/vscode-mysql.git"
+		"url": "https://github.com/cweijan/vscode-mysql.git"
 	},
 	"activationEvents": [
 		"onView:mysql",
@@ -47,7 +47,11 @@
 			{
 				"command": "mysql.refresh",
 				"title": "Refresh",
-				"category": "MySQL"
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
 			},
 			{
 				"command": "mysql.addConnection",
@@ -97,6 +101,24 @@
 				"command": "mysql.copy.update",
 				"title": "Update SQL Template",
 				"category": "MySQL"
+			},
+			{
+				"command": "mysql.changeTableName",
+				"title": "change table name",
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/edit.svg",
+					"dark": "resources/dark/edit.svg"
+				}
+			},
+			{
+				"command": "mysql.changeColumnName",
+				"title": "change column name",
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/edit.svg",
+					"dark": "resources/dark/edit.svg"
+				}
 			}
 		],
 		"keybindings": [
@@ -119,6 +141,11 @@
 					"command": "mysql.addConnection",
 					"when": "view == mysql",
 					"group": "navigation@1"
+				},
+				{
+					"command": "mysql.refresh",
+					"when": "view == mysql",
+					"group": "navigation@0"
 				}
 			],
 			"view/item/context": [
@@ -153,6 +180,11 @@
 					"group": "mysql@0"
 				},
 				{
+					"command": "mysql.changeTableName",
+					"when": "view == mysql && viewItem == table",
+					"group": "inline"
+				},
+				{
 					"command": "mysql.copy.insert",
 					"when": "view == mysql && viewItem == table",
 					"group": "mysql@1"
@@ -176,6 +208,11 @@
 					"command": "mysql.refresh",
 					"when": "view == mysql && viewItem == table",
 					"group": "mysql@4"
+				},
+				{
+					"command": "mysql.changeColumnName",
+					"when": "view == mysql && viewItem == column",
+					"group": "inline"
 				}
 			]
 		},

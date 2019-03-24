@@ -1,5 +1,4 @@
 "use strict";
-import * as asciitable from "asciitable";
 import * as fs from "fs";
 import * as mysql from "mysql";
 import * as vscode from "vscode";
@@ -7,9 +6,6 @@ import { IConnection } from "../model/connection";
 import { AppInsightsClient } from "./appInsightsClient";
 import { Global } from "./global";
 import { OutputChannel } from "./outputChannel";
-import { SourceInfo } from "_debugger";
-import { cursorTo } from "readline";
-import { SSL_OP_NO_QUERY_MTU } from "constants";
 
 export class Utility {
     public static readonly maxTableCount = Utility.getConfiguration().get<number>("maxTableCount");
@@ -20,8 +16,10 @@ export class Utility {
 
     public static queryPromise<T>(connection, sql: string): Promise<T> {
         return new Promise((resolve, reject) => {
+            OutputChannel.appendLine(`Execute SQL:${sql}`)
             connection.query(sql, (err, rows) => {
                 if (err) {
+                    OutputChannel.appendLine(err)
                     reject("Error: " + err.message);
                 } else {
                     resolve(rows);

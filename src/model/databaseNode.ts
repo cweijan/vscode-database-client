@@ -1,5 +1,3 @@
-import * as fs from "fs";
-import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
 import { AppInsightsClient } from "../common/appInsightsClient";
@@ -14,13 +12,13 @@ import { ModelType } from "../common/constants";
 export class DatabaseNode implements INode {
     identify: string;
     type: string = ModelType.DATABASE;
-    constructor(private readonly host: string, private readonly user: string,
-        private readonly password: string, private readonly port: string,private readonly database: string,
+    constructor(readonly host: string, readonly user: string,
+        private readonly password: string, readonly port: string, readonly database: string,
         private readonly certPath: string) {
     }
 
     public getTreeItem(): vscode.TreeItem {
-        this.identify=`${this.host}_${this.port}_${this.user}_${this.database}`
+        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}`
         return {
             label: this.database,
             collapsibleState: DatabaseCache.getElementState(this),

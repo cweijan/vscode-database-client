@@ -1,5 +1,3 @@
-import * as fs from "fs";
-import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
 import { AppInsightsClient } from "../common/appInsightsClient";
@@ -51,7 +49,7 @@ export class ConnectionNode implements INode {
                 databaseNodes = databases.map<DatabaseNode>((database) => {
                     return new DatabaseNode(this.host, this.user, this.password, this.port, database.Database, this.certPath);
                 })
-                DatabaseCache.databaseNodes = databaseNodes
+                DatabaseCache.initDatabaseNodes(databaseNodes)
 
                 return databaseNodes;
             })

@@ -1,4 +1,3 @@
-import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
 import { AppInsightsClient } from "../common/appInsightsClient";
@@ -12,18 +11,19 @@ import { DatabaseCache } from "../common/DatabaseCache";
 import { ModelType } from "../common/constants";
 
 export class TableNode implements INode {
+
     identify: string;
     type: string = ModelType.TABLE;
 
-    constructor(private readonly host: string, private readonly user: string, private readonly password: string,
-        private readonly port: string, private readonly database: string, readonly table: string,
+    constructor(readonly host: string, readonly user: string, private readonly password: string,
+        readonly port: string, readonly database: string, readonly table: string,
         private readonly certPath: string) {
     }
 
     public getTreeItem(): vscode.TreeItem {
-        this.identify=`${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`
+        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`
         let item = new vscode.TreeItem(this.table);
-        item.collapsibleState =DatabaseCache.getElementState(this)
+        item.collapsibleState = DatabaseCache.getElementState(this)
         item.contextValue = "table"
         item.iconPath = path.join(__filename, "..", "..", "..", "resources", "table.svg")
         item.command = {
@@ -52,7 +52,7 @@ export class TableNode implements INode {
                     return columnNodes;
                 }
                 columnNodes = columns.map<ColumnNode>((column) => {
-                    return new ColumnNode(this.host, this.user, this.password, this.port, this.database, column);
+                    return new ColumnNode(this.host, this.user, this.password, this.port, this.database,this.table,this.certPath, column);
                 })
                 DatabaseCache.setColumnListOfTable(this.table, columnNodes)
 
@@ -61,6 +61,31 @@ export class TableNode implements INode {
             .catch((err) => {
                 return [new InfoNode(err)];
             });
+    }
+
+    public changeTableName() {
+
+        const connection = Utility.createConnection({
+            host: this.host,
+            user: this.user,
+            password: this.password,
+            port: this.port,
+            database: this.database,
+            certPath: this.certPath,
+        });
+
+        vscode.window.showInputBox({ value: this.table, placeHolder: 'newTableName', prompt: `You will changed ${this.database}.${this.table} to new table name!` }).then(newTableName => {
+            if (!newTableName) return
+            const sql = `alter table ${this.database}.${this.table} rename ${newTableName}`
+            Utility.queryPromise(connection, sql).then((rows) => {
+                DatabaseCache.getParentTreeItem(this, ModelType.TABLE).getChildren(true).then(()=>{
+                    Global.sqlTreeProvider.refresh()
+                    DatabaseCache.storeCurrentCache()
+                })
+            })
+
+        })
+
     }
 
     public async selectSqlTemplate(run: Boolean) {

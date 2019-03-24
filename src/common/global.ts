@@ -2,9 +2,11 @@
 import * as keytarType from "keytar";
 import * as vscode from "vscode";
 import { IConnection } from "../model/connection";
+import { MySQLTreeDataProvider } from "../provider/mysqlTreeDataProvider";
 
 export class Global {
     public static keytar: typeof keytarType = getCoreNodeModule(`keytar`);
+    public static sqlTreeProvider:MySQLTreeDataProvider;
 
     static get activeConnection(): IConnection {
         return Global._activeConnection;
