@@ -9,18 +9,21 @@ import { ColumnNode } from "./columnNode";
 import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
 import { DatabaseCache } from "../common/DatabaseCache";
+import { ModelType } from "../common/constants";
 
 export class TableNode implements INode {
+    identify: string;
+    type: string = ModelType.TABLE;
 
     constructor(private readonly host: string, private readonly user: string, private readonly password: string,
-        private readonly port: string, private readonly database: string, private readonly table: string,
+        private readonly port: string, private readonly database: string, readonly table: string,
         private readonly certPath: string) {
     }
 
     public getTreeItem(): vscode.TreeItem {
-       
+        this.identify=`${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`
         let item = new vscode.TreeItem(this.table);
-        item.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
+        item.collapsibleState =DatabaseCache.getElementState(this)
         item.contextValue = "table"
         item.iconPath = path.join(__filename, "..", "..", "..", "resources", "table.svg")
         item.command = {
@@ -31,7 +34,7 @@ export class TableNode implements INode {
         return item;
     }
 
-    public async getChildren(isRresh:boolean=false): Promise<INode[]> {
+    public async getChildren(isRresh: boolean = false): Promise<INode[]> {
         const connection = Utility.createConnection({
             host: this.host,
             user: this.user,
@@ -43,7 +46,7 @@ export class TableNode implements INode {
 
         return Utility.queryPromise<any[]>(connection, `SELECT * FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
             .then((columns) => {
-                
+
                 let columnNodes = DatabaseCache.getColumnListOfTable(this.table)
                 if (columnNodes && columnNodes.length > 0 && !isRresh) {
                     return columnNodes;
@@ -52,7 +55,7 @@ export class TableNode implements INode {
                     return new ColumnNode(this.host, this.user, this.password, this.port, this.database, column);
                 })
                 DatabaseCache.setColumnListOfTable(this.table, columnNodes)
-                
+
                 return columnNodes;
             })
             .catch((err) => {

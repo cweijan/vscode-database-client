@@ -67,13 +67,13 @@ export class Utility {
                 if (rows.some(((row) => Array.isArray(row)))) {
                     rows.forEach((row, index) => {
                         if (Array.isArray(row)) {
-                            Utility.showQueryResult(row, "Results " + (index + 1));
+                            Utility.showQueryResult(row);
                         } else {
                             OutputChannel.appendLine(JSON.stringify(row));
                         }
                     });
                 } else {
-                    Utility.showQueryResult(rows, "Results");
+                    Utility.showQueryResult(rows);
                 }
 
             } else {
@@ -112,21 +112,24 @@ export class Utility {
         return uri.with({ query: data });
     }
 
-    private static showQueryResult(data, title: string) {
+    private static showQueryResult(data) {
 
+        const panel = vscode.window.createWebviewPanel(
+            'catCoding',
+            'Cat Coding',
+            vscode.ViewColumn.One,
+            {}
+          );
 
-        // let current = vscode.window.activeTextEditor
-        // let viewColumn=vscode.ViewColumn.One
-        
-        // if(current.document.uri.toString().startsWith("output:extension-output")){
-        //     viewColumn=vscode.ViewColumn.Active
-        // }
-        
-        vscode.commands.executeCommand(
-            "vscode.previewHtml",Utility.getPreviewUri(JSON.stringify(data)),
-            vscode.ViewColumn.One, title).then(() => {}, (e) => {
-                OutputChannel.appendLine(e);
-            });
+          vscode.commands.executeCommand('vscode.open', Utility.getPreviewUri(JSON.stringify(data))).then(text=>{
+              OutputChannel.appendLine(text)
+          })
+          
+
+        // const uri = Utility.getPreviewUri(JSON.stringify(data))
+        // vscode.commands.executeCommand('markdown.showPreview', uri)
+        // vscode.commands.executeCommand('m2arkdown.preview.refresh', uri);
+
     }
 
     private static async hasActiveConnection(): Promise<boolean> {

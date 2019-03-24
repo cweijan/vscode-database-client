@@ -8,25 +8,28 @@ import { Utility } from "../common/utility";
 import { InfoNode } from "./infoNode";
 import { INode } from "./INode";
 import { TableNode } from "./tableNode";
-import { OutputChannel } from "../common/outputChannel";
 import { DatabaseCache } from "../common/DatabaseCache";
+import { ModelType } from "../common/constants";
 
 export class DatabaseNode implements INode {
+    identify: string;
+    type: string = ModelType.DATABASE;
     constructor(private readonly host: string, private readonly user: string,
-        private readonly password: string, private readonly port: string, private readonly database: string,
+        private readonly password: string, private readonly port: string,private readonly database: string,
         private readonly certPath: string) {
     }
 
     public getTreeItem(): vscode.TreeItem {
+        this.identify=`${this.host}_${this.port}_${this.user}_${this.database}`
         return {
             label: this.database,
-            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+            collapsibleState: DatabaseCache.getElementState(this),
             contextValue: "database",
             iconPath: path.join(__filename, "..", "..", "..", "resources", "database.svg"),
         };
     }
 
-    public async getChildren(isRresh:boolean=false): Promise<INode[]> {
+    public async getChildren(isRresh: boolean = false): Promise<INode[]> {
         const connection = Utility.createConnection({
             host: this.host,
             user: this.user,
@@ -56,9 +59,7 @@ export class DatabaseNode implements INode {
     }
 
     public async newQuery() {
-        OutputChannel.appendLine("test")
         AppInsightsClient.sendEvent("newQuery", { viewItem: "database" });
-        OutputChannel.appendLine("test2")
         Utility.createSQLTextDocument();
 
         Global.activeConnection = {

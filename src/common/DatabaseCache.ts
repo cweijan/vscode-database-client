@@ -1,27 +1,29 @@
 import { DatabaseNode } from "../model/databaseNode";
 import { TableNode } from "../model/tableNode";
 import { ColumnNode } from "../model/columnNode";
-import { ExtensionContext } from "vscode";
-import { Constants } from "./constants";
+import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
+import { CacheKey, ModelType } from "./constants";
 import { OutputChannel } from "./outputChannel";
+import { INode } from "../model/INode";
 
 export class DatabaseCache {
 
-    private static context;
-
-    static evictAllCache(): any {
-        if(this.context==null)throw new Error("DatabaseCache is not init!")
-        this.context.globalState.update(Constants.DatabaseCacheKey, undefined)
-        this.context.globalState.update(Constants.DatabaseColumnCacheKey, undefined)
-        this.context.globalState.update(Constants.DatabaseTableCacheKey, undefined)
-        this.databaseNodes = [];
-        this.databaseNodeMapTableNode = {};
-        this.tableNodeMapColumnNode = {};
-    }
-
+    private static context: ExtensionContext;
     static databaseNodes: DatabaseNode[] = [];
     private static databaseNodeMapTableNode = {};
     private static tableNodeMapColumnNode = {};
+    private static collpaseState;
+
+    static evictAllCache(): any {
+        if (this.context == null) throw new Error("DatabaseCache is not init!")
+        this.context.globalState.update(CacheKey.DatabaseCacheKey, undefined)
+        this.context.globalState.update(CacheKey.DatabaseColumnCacheKey, undefined)
+        this.context.globalState.update(CacheKey.DatabaseTableCacheKey, undefined)
+        this.databaseNodes = [];
+        this.databaseNodeMapTableNode = {};
+        this.tableNodeMapColumnNode = {};
+
+    }
 
     static getTableNodeList(): TableNode[] {
         let tableNodeList = [];
@@ -36,37 +38,73 @@ export class DatabaseCache {
         return tableNodeList;
     }
 
+    static getElementState(element?: INode) {
+
+        if (element.type == ModelType.COLUMN || element.type == ModelType.INFO) {
+            return TreeItemCollapsibleState.None
+        }
+
+        if (!this.collpaseState || Object.keys(this.collpaseState).length == 0) {
+            this.collpaseState = this.context.globalState.get(CacheKey.CollapseSate)
+        }
+
+        if (!this.collpaseState) {
+            this.collpaseState = {};
+        }
+
+        if (this.collpaseState[element.identify]) {
+            return this.collpaseState[element.identify]
+        } else {
+            return TreeItemCollapsibleState.Collapsed
+        }
+
+    }
+
+    static storeElementState(element?: INode, collapseState?: TreeItemCollapsibleState) {
+
+        if (!element || !collapseState) {
+            this.context.globalState.update(CacheKey.CollapseSate, this.collpaseState)
+        }
+
+        if (element.type == ModelType.COLUMN || element.type == ModelType.INFO) {
+            return;
+        }
+
+        this.collpaseState[element.identify] = collapseState
+
+    }
+
     static obtainStoreCache() {
-        if(this.context==null)throw new Error("DatabaseCache is not init!")
+        if (this.context == null) throw new Error("DatabaseCache is not init!")
         let cached = false
-        if (this.context.globalState.get(Constants.DatabaseCacheKey)) {
-            const databaseProxyList :DatabaseProxy[]= this.context.globalState.get(Constants.DatabaseCacheKey)
+        if (this.context.globalState.get(CacheKey.DatabaseCacheKey)) {
+            const databaseProxyList: DatabaseProxy[] = this.context.globalState.get(CacheKey.DatabaseCacheKey)
             databaseProxyList.forEach(d => {
                 this.databaseNodes.push(new DatabaseNode(d.host, d.user, d.password, d.port, d.database, d.certPath))
             })
         }
-        if (this.context.globalState.get(Constants.DatabaseTableCacheKey)) {
-            const t: { [datbaseName: string]: TableProxy[] } = this.context.globalState.get(Constants.DatabaseTableCacheKey)
+        if (this.context.globalState.get(CacheKey.DatabaseTableCacheKey)) {
+            const t: { [datbaseName: string]: TableProxy[] } = this.context.globalState.get(CacheKey.DatabaseTableCacheKey)
             Object.keys(t).forEach(dn => {
                 if (!this.databaseNodeMapTableNode[dn]) {
                     this.databaseNodeMapTableNode[dn] = []
                 }
-                t[dn].forEach(tableProxy=>{
-                    this.databaseNodeMapTableNode[dn].push(new TableNode(tableProxy.host, tableProxy.user, tableProxy.password, tableProxy.port, tableProxy.database, tableProxy.table, tableProxy.certPath))                    
+                t[dn].forEach(tableProxy => {
+                    this.databaseNodeMapTableNode[dn].push(new TableNode(tableProxy.host, tableProxy.user, tableProxy.password, tableProxy.port, tableProxy.database, tableProxy.table, tableProxy.certPath))
                 })
 
             })
         }
-        if (this.context.globalState.get(Constants.DatabaseColumnCacheKey)) {
-            const c:{ [tableName: string]: ColumnProxy[] } = this.context.globalState.get(Constants.DatabaseColumnCacheKey)
+        if (this.context.globalState.get(CacheKey.DatabaseColumnCacheKey)) {
+            const c: { [tableName: string]: ColumnProxy[] } = this.context.globalState.get(CacheKey.DatabaseColumnCacheKey)
             Object.keys(c).forEach(tn => {
                 if (!this.tableNodeMapColumnNode[tn]) {
                     this.tableNodeMapColumnNode[tn] = []
                 }
-                c[tn].forEach(columnProxy=>{
+                c[tn].forEach(columnProxy => {
                     this.tableNodeMapColumnNode[tn].push(new ColumnNode(columnProxy.host, columnProxy.user, columnProxy.password, columnProxy.port, columnProxy.database, columnProxy.column))
                 })
-                
+
             })
         }
 
@@ -79,14 +117,17 @@ export class DatabaseCache {
 
     static initCache(context: ExtensionContext) {
         this.context = context;
+        setInterval(() => {
+            this.storeElementState()
+        }, 30000)
     }
 
     static storeCurrentCache() {
         OutputChannel.appendLine("store")
-        if(this.context==null)throw new Error("DatabaseCache is not init!")
-        this.context.globalState.update(Constants.DatabaseCacheKey, this.databaseNodes)
-        this.context.globalState.update(Constants.DatabaseTableCacheKey, this.databaseNodeMapTableNode)
-        this.context.globalState.update(Constants.DatabaseColumnCacheKey, this.tableNodeMapColumnNode)
+        if (this.context == null) throw new Error("DatabaseCache is not init!")
+        this.context.globalState.update(CacheKey.DatabaseCacheKey, this.databaseNodes)
+        this.context.globalState.update(CacheKey.DatabaseTableCacheKey, this.databaseNodeMapTableNode)
+        this.context.globalState.update(CacheKey.DatabaseColumnCacheKey, this.tableNodeMapColumnNode)
     }
 
     static getTableListOfDatabase(databaseName: string): TableNode[] {
