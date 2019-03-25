@@ -1,11 +1,12 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { INode } from "./INode";
-import { ModelType } from "../common/constants";
-import { Utility } from "../database/utility";
+import { ModelType } from "../common/Constants";
+import { QueryUnit } from "../database/QueryUnit";
 import { DatabaseCache } from "../database/DatabaseCache";
-import { OutputChannel } from "../common/outputChannel";
-import { Global } from "../common/global";
+import { Global } from "../common/Global";
+import { IConnection } from "./connection";
+import { ConnectionManager } from "../database/ConnectionManager";
 
 class ColumnTreeItem extends vscode.TreeItem {
     columnName: string;
@@ -13,13 +14,13 @@ class ColumnTreeItem extends vscode.TreeItem {
     document: string;
 }
 
-export class ColumnNode implements INode {
+export class ColumnNode implements INode, IConnection {
 
     identify: string;
     type: string = ModelType.COLUMN;
-    constructor(private readonly host: string, private readonly user: string, private readonly password: string,
-        private readonly port: string, private readonly database: string,private readonly table:string,
-        private readonly certPath: string, private readonly column: any) {
+    constructor(readonly host: string, readonly user: string, readonly password: string,
+        readonly port: string, readonly database: string, private readonly table: string,
+        readonly certPath: string, private readonly column: any) {
     }
 
     public getTreeItem(): ColumnTreeItem {
@@ -39,21 +40,13 @@ export class ColumnNode implements INode {
     }
 
     changeColumnName(): any {
-        const connection = Utility.createConnection({
-            host: this.host,
-            user: this.user,
-            password: this.password,
-            port: this.port,
-            database: this.database,
-            certPath: this.certPath,
-        });
-
-        const columnName=this.column.COLUMN_NAME
+        
+        const columnName = this.column.COLUMN_NAME
         vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(newColumnName => {
             if (!newColumnName) return
             const sql = `alter table ${this.database}.${this.table} change column ${columnName} ${newColumnName} ${this.column.COLUMN_TYPE}`
-            Utility.queryPromise(connection, sql).then((rows) => {
-                DatabaseCache.getParentTreeItem(this, ModelType.COLUMN).getChildren(true).then(()=>{
+            QueryUnit.queryPromise(ConnectionManager.getConnection(this), sql).then((rows) => {
+                DatabaseCache.getParentTreeItem(this, ModelType.COLUMN).getChildren(true).then(() => {
                     Global.sqlTreeProvider.refresh()
                     DatabaseCache.storeCurrentCache()
                 })

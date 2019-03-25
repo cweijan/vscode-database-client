@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { INode } from "./INode";
-import { ModelType } from "../common/constants";
+import { ModelType } from "../common/Constants";
 
 export class InfoNode implements INode {
     identify: string;

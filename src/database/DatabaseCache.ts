@@ -2,7 +2,7 @@ import { DatabaseNode } from "../model/databaseNode";
 import { TableNode } from "../model/tableNode";
 import { ColumnNode } from "../model/columnNode";
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
-import { CacheKey, ModelType } from "../common/constants";
+import { CacheKey, ModelType } from "../common/Constants";
 import { OutputChannel } from "../common/outputChannel";
 import { INode } from "../model/INode";
 
@@ -10,8 +10,8 @@ export class DatabaseCache {
 
     private static context: ExtensionContext;
     static databaseNodes: DatabaseNode[] = [];
-    private static datbaseMap={};
-    private static tableMap={};
+    private static datbaseMap = {};
+    private static tableMap = {};
     private static databaseNodeMapTableNode = {};
     private static tableNodeMapColumnNode = {};
     private static collpaseState: { key?: TreeItemCollapsibleState };
@@ -43,12 +43,12 @@ export class DatabaseCache {
 
     static getParentTreeItem(iNode: INode, type: string): INode {
 
-        let databaseNode: DatabaseNode=<DatabaseNode>iNode;
+        let databaseNode: DatabaseNode = <DatabaseNode>iNode;
         if (type == ModelType.TABLE && (databaseNode = this.datbaseMap[`${databaseNode.host}_${databaseNode.port}_${databaseNode.user}_${databaseNode.database}`])) {
             return databaseNode
         }
 
-        let tableNode: TableNode=<TableNode>iNode;
+        let tableNode: TableNode = <TableNode>iNode;
         if (type == ModelType.COLUMN && (tableNode = this.tableMap[`${tableNode.host}_${tableNode.port}_${tableNode.user}_${tableNode.database}_${tableNode.table}`])) {
             return tableNode
         }
@@ -72,6 +72,8 @@ export class DatabaseCache {
 
         if (this.collpaseState[element.identify]) {
             return this.collpaseState[element.identify]
+        } else if (element.type == ModelType.CONNECTION) {
+            return TreeItemCollapsibleState.Expanded
         } else {
             return TreeItemCollapsibleState.Collapsed
         }
@@ -120,9 +122,9 @@ export class DatabaseCache {
                     this.databaseNodeMapTableNode[dn] = []
                 }
                 t[dn].forEach(tableProxy => {
-                    const tableNode=new TableNode(tableProxy.host, tableProxy.user, tableProxy.password, tableProxy.port, tableProxy.database, tableProxy.table, tableProxy.certPath)
+                    const tableNode = new TableNode(tableProxy.host, tableProxy.user, tableProxy.password, tableProxy.port, tableProxy.database, tableProxy.table, tableProxy.certPath)
                     this.databaseNodeMapTableNode[dn].push(tableNode)
-                    this.tableMap[`${tableProxy.host}_${tableProxy.port}_${tableProxy.user}_${tableProxy.database}_${tableProxy.table}`]=tableNode
+                    this.tableMap[`${tableProxy.host}_${tableProxy.port}_${tableProxy.user}_${tableProxy.database}_${tableProxy.table}`] = tableNode
                 })
 
             })
@@ -134,7 +136,7 @@ export class DatabaseCache {
                     this.tableNodeMapColumnNode[tn] = []
                 }
                 c[tn].forEach(columnProxy => {
-                    this.tableNodeMapColumnNode[tn].push(new ColumnNode(columnProxy.host, columnProxy.user, columnProxy.password, columnProxy.port, columnProxy.database,columnProxy.table,columnProxy.certPath, columnProxy.column))
+                    this.tableNodeMapColumnNode[tn].push(new ColumnNode(columnProxy.host, columnProxy.user, columnProxy.password, columnProxy.port, columnProxy.database, columnProxy.table, columnProxy.certPath, columnProxy.column))
                 })
 
             })
@@ -182,8 +184,8 @@ export class DatabaseCache {
 
     static setTableListOfDatabase(databaseName: string, tableNodeList: TableNode[]) {
         this.databaseNodeMapTableNode[databaseName] = tableNodeList
-        tableNodeList.forEach(tableNode=>{
-            this.tableMap[`${tableNode.host}_${tableNode.port}_${tableNode.user}_${tableNode.database}_${tableNode.table}`]=tableNode
+        tableNodeList.forEach(tableNode => {
+            this.tableMap[`${tableNode.host}_${tableNode.port}_${tableNode.user}_${tableNode.database}_${tableNode.table}`] = tableNode
         })
     }
 
@@ -208,6 +210,6 @@ class TableProxy {
 
 class ColumnProxy {
     host: string; user: string; password: string;
-    port: string; database: string;  table: string;
-    certPath: string;column: any
+    port: string; database: string; table: string;
+    certPath: string; column: any
 }

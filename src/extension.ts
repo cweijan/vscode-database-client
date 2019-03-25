@@ -1,7 +1,7 @@
 "use strict";
 import * as vscode from "vscode";
 import { AppInsightsClient } from "./common/appInsightsClient";
-import { Utility } from "./database/utility";
+import { QueryUnit } from "./database/QueryUnit";
 import { ConnectionNode } from "./model/ConnectionNode";
 import { DatabaseNode } from "./model/databaseNode";
 import { INode } from "./model/INode";
@@ -10,10 +10,11 @@ import { MySQLTreeDataProvider } from "./provider/mysqlTreeDataProvider";
 import { SqlResultDocumentContentProvider } from "./provider/sqlResultDocumentContentProvider";
 import { CompletionProvider } from "./provider/CompletionProvider";
 import { DatabaseCache } from "./database/DatabaseCache";
-import { Global } from "./common/global";
+import { Global } from "./common/Global";
 import { ColumnNode } from "./model/columnNode";
-import { OutputChannel } from "./common/outputChannel";
 import { SqlViewManager } from "./database/SqlViewManager";
+import { ConnectionManager } from "./database/ConnectionManager";
+import { IConnection } from "./model/connection";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -46,6 +47,13 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
 
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.addDatabase", (connectionNode: ConnectionNode) => {
+        connectionNode.createDatabase()
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.deleteDatabase", (databaseNode: DatabaseNode) => {
+        databaseNode.deleteDatatabase()
+    }));
+
     context.subscriptions.push(vscode.commands.registerCommand("mysql.addConnection", () => {
         mysqlTreeDataProvider.addConnection();
     }));
@@ -71,14 +79,13 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.runQuery", () => {
-        Utility.runQuery();
+        QueryUnit.runQuery();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.newQuery", (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
         databaseOrConnectionNode.newQuery();
-        Utility.webviewPanel.webview.postMessage({command:'mysql.newQuery'})
     }));
-    
+
     context.subscriptions.push(vscode.commands.registerCommand("mysql.template.sql", (tableNode: TableNode, run: Boolean) => {
         tableNode.selectSqlTemplate(run);
 

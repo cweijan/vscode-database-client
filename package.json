@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-manager",
 	"displayName": "MySQL",
 	"description": "MySQL management tool",
-	"version": "1.4.1",
+	"version": "1.5.0",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
@@ -65,6 +65,20 @@
 			{
 				"command": "mysql.deleteConnection",
 				"title": "Delete Connection",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.addDatabase",
+				"title": "Add Database",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				},
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.deleteDatabase",
+				"title": "Delete Database",
 				"category": "MySQL"
 			},
 			{
@@ -191,7 +205,12 @@
 				{
 					"command": "mysql.newQuery",
 					"when": "view == mysql && viewItem == connection",
-					"group": "inline"
+					"group": "inline@1"
+				},
+				{
+					"command": "mysql.addDatabase",
+					"when": "view == mysql && viewItem == connection",
+					"group": "inline@0"
 				},
 				{
 					"command": "mysql.newQuery",
@@ -207,6 +226,11 @@
 					"command": "mysql.refresh",
 					"when": "view == mysql && viewItem == database",
 					"group": "mysql"
+				},
+				{
+					"command": "mysql.deleteDatabase",
+					"when": "view == mysql && viewItem == database",
+					"group": "mysql@5"
 				},
 				{
 					"command": "mysql.template.sql",

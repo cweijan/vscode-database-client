@@ -1,9 +1,10 @@
 "user strict";
 
 export class Constants {
-    public static ExtensionId = "formulahendry.vscode-mysql";
+    public static ExtensionId = "cweijan.vscode-mysql";
     public static GlobalStateMySQLConectionsKey = "mysql.connections";
-    
+    /** 10分钟 */
+    public static EXPIRE_TIME=10*60*1000;
 }
 
 export class CacheKey{
@@ -20,5 +21,4 @@ export class ModelType{
     public static TABLE="table"
     public static COLUMN="column"
     public static INFO="info";
-    
 }

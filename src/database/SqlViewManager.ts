@@ -27,7 +27,7 @@ export class SqlViewManager {
     }
 
 
-    public static showQueueResult(data:any,title:string){
+    public static showQueryResult(data:any,title:string){
 
         this.createWebviewPanel({
             viewId: "queryResult",

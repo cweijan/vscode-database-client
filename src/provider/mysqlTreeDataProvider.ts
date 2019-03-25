@@ -1,8 +1,8 @@
 import * as uuidv1 from "uuid/v1";
 import * as vscode from "vscode";
 import { AppInsightsClient } from "../common/appInsightsClient";
-import { Constants } from "../common/constants";
-import { Global } from "../common/global";
+import { Constants } from "../common/Constants";
+import { Global } from "../common/Global";
 import { IConnection } from "../model/connection";
 import { ConnectionNode } from "../model/ConnectionNode";
 import { INode } from "../model/INode";
@@ -106,15 +106,6 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
             for (const id of Object.keys(connections)) {
                 const password = await Global.keytar.getPassword(Constants.ExtensionId, id);
                 ConnectionNodes.push(new ConnectionNode(id, connections[id].host, connections[id].user, password, connections[id].port, connections[id].certPath));
-                if (!Global.activeConnection) {
-                    Global.activeConnection = {
-                        host: connections[id].host,
-                        user: connections[id].user,
-                        password,
-                        port: connections[id].port,
-                        certPath: connections[id].certPath,
-                    };
-                }
             }
         }
         return ConnectionNodes;

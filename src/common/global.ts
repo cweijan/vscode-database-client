@@ -6,16 +6,8 @@ import { MySQLTreeDataProvider } from "../provider/mysqlTreeDataProvider";
 
 export class Global {
     public static keytar: typeof keytarType = getCoreNodeModule(`keytar`);
-    public static sqlTreeProvider:MySQLTreeDataProvider;
-
-    static get activeConnection(): IConnection {
-        return Global._activeConnection;
-    }
-
-    static set activeConnection(newActiveConnection: IConnection) {
-        this._activeConnection = newActiveConnection;
-        Global.updateStatusBarItems(newActiveConnection);
-    }
+    public static sqlTreeProvider: MySQLTreeDataProvider;
+    private static mysqlStatusBarItem: vscode.StatusBarItem;
 
     public static updateStatusBarItems(activeConnection: IConnection) {
         if (Global.mysqlStatusBarItem) {
@@ -26,9 +18,6 @@ export class Global {
             Global.mysqlStatusBarItem.show();
         }
     }
-
-    private static _activeConnection: IConnection;
-    private static mysqlStatusBarItem: vscode.StatusBarItem;
 
     private static getStatusBarItemText(activeConnection: IConnection): string {
         return `$(server) ${activeConnection.host}` + (activeConnection.database ? ` $(database) ${activeConnection.database}` : "");
