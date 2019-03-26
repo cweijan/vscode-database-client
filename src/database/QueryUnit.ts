@@ -41,7 +41,7 @@ export class QueryUnit {
             return;
         } else {
             connectionOptions.multipleStatements = true;
-            connection = ConnectionManager.getConnection(connectionOptions)
+            connection =await ConnectionManager.getConnection(connectionOptions)
         }
 
         if (!sql) {

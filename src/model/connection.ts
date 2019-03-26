@@ -1,7 +1,7 @@
 export interface IConnection {
     readonly host: string;
     readonly user: string;
-    readonly password?: string;
+     password?: string;
     readonly port: string;
     readonly database?: string;
     multipleStatements?: boolean;

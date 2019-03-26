@@ -36,7 +36,7 @@ export class DatabaseNode implements INode, IConnection {
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
 
-        return QueryUnit.queryPromise<any[]>(ConnectionManager.getConnection(this), `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' LIMIT ${QueryUnit.maxTableCount}`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' LIMIT ${QueryUnit.maxTableCount}`)
             .then((tables) => {
                 let tableNodes = DatabaseCache.getTableListOfDatabase(this.database)
                 if (tableNodes && tableNodes.length > 1 && !isRresh) {
@@ -87,9 +87,9 @@ export class DatabaseNode implements INode, IConnection {
     }
 
     deleteDatatabase() {
-        vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input y to confirm.' }).then(inputContent => {
+        vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(ConnectionManager.getConnection(this), `delete database ${this.database}`).then(() => {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `delete database ${this.database}`).then(() => {
                     Global.sqlTreeProvider.refresh()
                     DatabaseCache.storeCurrentCache()
                     vscode.window.showInformationMessage(`Delete database ${this.database} success!`)

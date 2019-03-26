@@ -45,33 +45,11 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
         return element.getChildren();
     }
 
-    public async addConnection() {
+    public async addConnection(connectionOptions: IConnection) {
         AppInsightsClient.sendEvent("addConnection.start");
-        const host = await vscode.window.showInputBox({ prompt: "The hostname of the database", placeHolder: "host", ignoreFocusOut: true, value: "localhost" });
-        if (!host) {
-            return;
-        }
 
-        const user = await vscode.window.showInputBox({ prompt: "The MySQL user to authenticate as", placeHolder: "user", ignoreFocusOut: true, value: "root" });
-        if (!user) {
-            return;
-        }
-
-        const password = await vscode.window.showInputBox({ prompt: "The password of the MySQL user", placeHolder: "password", ignoreFocusOut: true, password: true });
-        if (password === undefined) {
-            return;
-        }
-
-        const port = await vscode.window.showInputBox({ prompt: "The port number to connect to", placeHolder: "port", ignoreFocusOut: true, value: "3306" });
-        if (!port) {
-            return;
-        }
-
-        // const certPath = await vscode.window.showInputBox({ prompt: "[Optional] SSL certificate path. Leave empty to ignore", placeHolder: "certificate file path", ignoreFocusOut: true });
-        // if (certPath === undefined) {
-        //     return;
-        // }
-        const certPath = ''
+        const password=connectionOptions.password
+        delete connectionOptions.password
 
         let connections = this.context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
 
@@ -80,12 +58,8 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
         }
 
         const id = uuidv1();
-        connections[id] = {
-            host,
-            user,
-            port,
-            certPath,
-        };
+        
+        connections[id] = connectionOptions;
 
         if (password) {
             await Global.keytar.setPassword(Constants.ExtensionId, id, password);

@@ -26,7 +26,8 @@ export class ConnectionNode implements INode, IConnection {
     public getTreeItem(): vscode.TreeItem {
         this.identify = `${this.host}_${this.port}_${this.user}`
         return {
-            label: this.host,
+            label: this.identify,
+            id:this.host,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: "connection",
             iconPath: path.join(__filename, "..", "..", "..", "resources", "server.png")
@@ -35,7 +36,7 @@ export class ConnectionNode implements INode, IConnection {
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
 
-        return QueryUnit.queryPromise<any[]>(ConnectionManager.getConnection(this), "SHOW DATABASES")
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "SHOW DATABASES")
             .then((databases) => {
                 let databaseNodes = DatabaseCache.databaseNodes
                 if (databaseNodes && databaseNodes.length > 0 && !isRresh) {
@@ -61,8 +62,8 @@ export class ConnectionNode implements INode, IConnection {
     }
 
     public createDatabase() {
-        vscode.window.showInputBox({ placeHolder: 'Input you want to create new database name.' }).then(inputContent => {
-            QueryUnit.queryPromise(ConnectionManager.getConnection(this), `create database ${inputContent} default character set = 'utf8' `).then(() => {
+        vscode.window.showInputBox({ placeHolder: 'Input you want to create new database name.' }).then(async inputContent => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `create database ${inputContent} default character set = 'utf8' `).then(() => {
                 Global.sqlTreeProvider.refresh()
                 DatabaseCache.storeCurrentCache()
                 vscode.window.showInformationMessage(`create database ${inputContent} success!`)

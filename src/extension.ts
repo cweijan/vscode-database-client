@@ -13,8 +13,6 @@ import { DatabaseCache } from "./database/DatabaseCache";
 import { Global } from "./common/Global";
 import { ColumnNode } from "./model/columnNode";
 import { SqlViewManager } from "./database/SqlViewManager";
-import { ConnectionManager } from "./database/ConnectionManager";
-import { IConnection } from "./model/connection";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -55,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.addConnection", () => {
-        mysqlTreeDataProvider.addConnection();
+        SqlViewManager.showConnectPage(mysqlTreeDataProvider)
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.changeTableName", (tableNode: TableNode) => {

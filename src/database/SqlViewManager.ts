@@ -3,6 +3,8 @@ import { WebviewPanel } from "vscode";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { OutputChannel } from "../common/outputChannel";
+import { ConnectionManager } from "./ConnectionManager";
+import { MySQLTreeDataProvider } from "../provider/mysqlTreeDataProvider";
 
 export class ViewOption {
     viewPath: string;
@@ -27,14 +29,37 @@ export class SqlViewManager {
     }
 
 
-    public static showQueryResult(data:any,title:string){
+    public static showQueryResult(data: any, title: string) {
 
         this.createWebviewPanel({
-            viewId: "queryResult",
+            viewId: "cweijan.mysql.queryResult",
             viewPath: "result",
             viewTitle: title
-        }).then(webviewPanel=>{
-            webviewPanel.webview.postMessage({data:data})
+        }).then(webviewPanel => {
+            webviewPanel.webview.postMessage({ data: data })
+        })
+    }
+
+    public static showConnectPage(mysqlTreeDataProvider: MySQLTreeDataProvider) {
+
+        this.createWebviewPanel({
+            viewId: "cweijan.mysql.connect",
+            viewPath: "connect",
+            viewTitle: "connect"
+        }).then(webviewPanel => {
+            webviewPanel.webview.onDidReceiveMessage((params) => {
+                if (params.type === 'CONNECT_TO_SQL_SERVER') {
+                    ConnectionManager.getConnection(params.connectionOption).then(() => {
+                        mysqlTreeDataProvider.addConnection(params.connectionOption);
+                        webviewPanel.dispose();
+                    }).catch((err: Error) => {
+                        webviewPanel.webview.postMessage({
+                            type: 'CONNECTION_ERROR',
+                            err
+                        });
+                    })
+                }
+            });
         })
     }
 

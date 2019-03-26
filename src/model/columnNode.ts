@@ -39,13 +39,13 @@ export class ColumnNode implements INode, IConnection {
         return [];
     }
 
-    changeColumnName(): any {
+    public async changeColumnName() {
         
         const columnName = this.column.COLUMN_NAME
-        vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(newColumnName => {
+        vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(async newColumnName => {
             if (!newColumnName) return
             const sql = `alter table ${this.database}.${this.table} change column ${columnName} ${newColumnName} ${this.column.COLUMN_TYPE}`
-            QueryUnit.queryPromise(ConnectionManager.getConnection(this), sql).then((rows) => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.getParentTreeItem(this, ModelType.COLUMN).getChildren(true).then(() => {
                     Global.sqlTreeProvider.refresh()
                     DatabaseCache.storeCurrentCache()

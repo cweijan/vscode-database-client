@@ -38,12 +38,12 @@ export class TableNode implements INode, IConnection {
                 arguments: [this, true]
             }
         };
-        
+
     }
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
 
-        return QueryUnit.queryPromise<any[]>(ConnectionManager.getConnection(this), `SELECT * FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT * FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
             .then((columns) => {
 
                 let columnNodes = DatabaseCache.getColumnListOfTable(this.table)
@@ -62,11 +62,11 @@ export class TableNode implements INode, IConnection {
             });
     }
 
-    dropTable() {
+    public dropTable() {
 
-        vscode.window.showInputBox({ prompt: `Are you want to drop table ${this.table} ?     `, placeHolder: 'Input y to confirm.' }).then(inputContent => {
+        vscode.window.showInputBox({ prompt: `Are you want to drop table ${this.table} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(ConnectionManager.getConnection(this), `drop table ${this.database}.${this.table}`).then(() => {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `drop table ${this.database}.${this.table}`).then(() => {
                     Global.sqlTreeProvider.refresh()
                     DatabaseCache.storeCurrentCache()
                     vscode.window.showInformationMessage(`Delete table ${this.table} success!`)
@@ -79,9 +79,9 @@ export class TableNode implements INode, IConnection {
 
     truncateTable() {
 
-        vscode.window.showInputBox({ prompt: `Are you want to clear table ${this.table} all data ?          `, placeHolder: 'Input y to confirm.' }).then(inputContent => {
+        vscode.window.showInputBox({ prompt: `Are you want to clear table ${this.table} all data ?          `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(ConnectionManager.getConnection(this), `truncate table ${this.database}.${this.table}`).then(() => {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `truncate table ${this.database}.${this.table}`).then(() => {
                     vscode.window.showInformationMessage(`Clear table ${this.table} all data success!`)
                 })
             }
@@ -92,10 +92,10 @@ export class TableNode implements INode, IConnection {
 
     public changeTableName() {
 
-        vscode.window.showInputBox({ value: this.table, placeHolder: 'newTableName', prompt: `You will changed ${this.database}.${this.table} to new table name!` }).then(newTableName => {
+        vscode.window.showInputBox({ value: this.table, placeHolder: 'newTableName', prompt: `You will changed ${this.database}.${this.table} to new table name!` }).then(async newTableName => {
             if (!newTableName) return
             const sql = `alter table ${this.database}.${this.table} rename ${newTableName}`
-            QueryUnit.queryPromise(ConnectionManager.getConnection(this), sql).then((rows) => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.getParentTreeItem(this, ModelType.TABLE).getChildren(true).then(() => {
                     Global.sqlTreeProvider.refresh()
                     DatabaseCache.storeCurrentCache()
