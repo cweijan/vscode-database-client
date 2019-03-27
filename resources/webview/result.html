@@ -4,45 +4,51 @@
     <title>result</title>
     <link rel="stylesheet" href="${webviewPath}/test.css">
     <script src="${webviewPath}/js/vue.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            text-align: center
+        }
+
+        table,
+        td,
+        th {
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+
+        th {
+            background: #444
+        }
+    </style>
 </head>
 
 <body>
     <div id="app">
-        <div v-for="str in list" v-text="str"><br></div>
-        <span class="test">hello</span>
+        <table>
+            <tr>
+                <th v-for="value,key in rows[0]" v-text="key"></th>
+            </tr>
+            <tr v-for="row,key,index in rows">
+                <td v-for="value in row" v-text="value"></td>
+            </tr>
+        </table>
     </div>
 </body>
 <script>
-    const vue=new Vue({
-        el:'#app',
-        data:{
-            list:["test",'hehe']
-        }
-    })
     const vscode = acquireVsCodeApi();
-    document.write("test")
-    document.write("${webviewPath}/style.css")
-    console.log('test')
-    vscode.postMessage({
-        command: 'webview.table.change',
-        text: "test text"
+    const previousState = vscode.getState();
+    const vue = new Vue({
+        el: '#app',
+        data: {
+            rows: previousState?previousState.rows:[]
+        }
     })
 
     window.addEventListener('message', event => {
-        // vscode.setState({ count });
-        // vscode.getState()
-        const message = event.data; // The JSON data our extension sent
-        vue.list.push(message)
-        // console.log(message)
-        // document.write(message)
-
-        // switch (message.command) {
-        //     case 'mysql.newQuery':
-        //         count = Math.ceil(count * 0.5);
-        //         counter.textContent = count;
-        //         document.write(count)
-        //         break;
-        // }
+        vue.rows=event.data.data
+        vscode.setState({ rows:vue.rows });
+        document.write(previousState+":"+count)
     });
 </script>
 

@@ -1,13 +1,11 @@
 "use strict";
 import * as vscode from "vscode";
-import { AppInsightsClient } from "./common/appInsightsClient";
 import { QueryUnit } from "./database/QueryUnit";
 import { ConnectionNode } from "./model/ConnectionNode";
 import { DatabaseNode } from "./model/databaseNode";
 import { INode } from "./model/INode";
 import { TableNode } from "./model/tableNode";
 import { MySQLTreeDataProvider } from "./provider/mysqlTreeDataProvider";
-import { SqlResultDocumentContentProvider } from "./provider/sqlResultDocumentContentProvider";
 import { CompletionProvider } from "./provider/CompletionProvider";
 import { DatabaseCache } from "./database/DatabaseCache";
 import { Global } from "./common/Global";
@@ -15,8 +13,6 @@ import { ColumnNode } from "./model/columnNode";
 import { SqlViewManager } from "./database/SqlViewManager";
 
 export function activate(context: vscode.ExtensionContext) {
-
-    AppInsightsClient.sendEvent("loadExtension");
 
     DatabaseCache.initCache(context)
 
@@ -35,8 +31,6 @@ export function activate(context: vscode.ExtensionContext) {
     })
 
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider('sql',new CompletionProvider(),' ','.'))
-
-    context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider("sqlresult", new SqlResultDocumentContentProvider(context)));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.refresh", (node: INode) => {
         DatabaseCache.evictAllCache()

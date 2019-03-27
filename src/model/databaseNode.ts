@@ -1,7 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import mysqldump from 'mysqldump'
-import { AppInsightsClient } from "../common/appInsightsClient";
 import { Global } from "../common/Global";
 import { QueryUnit } from "../database/QueryUnit";
 import { InfoNode } from "./infoNode";
@@ -101,7 +100,6 @@ export class DatabaseNode implements INode, IConnection {
 
     public async newQuery() {
 
-        AppInsightsClient.sendEvent("newQuery", { viewItem: "database" });
         QueryUnit.createSQLTextDocument();
 
     }

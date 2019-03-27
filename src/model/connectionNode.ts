@@ -1,6 +1,5 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { AppInsightsClient } from "../common/appInsightsClient";
 import { Constants, ModelType } from "../common/Constants";
 import { Global } from "../common/Global";
 import { QueryUnit } from "../database/QueryUnit";
@@ -56,7 +55,6 @@ export class ConnectionNode implements INode, IConnection {
     }
 
     public async newQuery() {
-        AppInsightsClient.sendEvent("newQuery", { viewItem: "connection" });
         QueryUnit.createSQLTextDocument();
 
     }
@@ -72,12 +70,9 @@ export class ConnectionNode implements INode, IConnection {
     }
 
     public async deleteConnection(context: vscode.ExtensionContext, mysqlTreeDataProvider: MySQLTreeDataProvider) {
-        AppInsightsClient.sendEvent("deleteConnection");
         const connections = context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
         delete connections[this.id];
         await context.globalState.update(Constants.GlobalStateMySQLConectionsKey, connections);
-
-        await Global.keytar.deletePassword(Constants.ExtensionId, this.id);
 
         mysqlTreeDataProvider.refresh();
     }

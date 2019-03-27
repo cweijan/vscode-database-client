@@ -1,7 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import mysqldump from 'mysqldump'
-import { AppInsightsClient } from "../common/appInsightsClient";
 import { Global } from "../common/Global";
 import { QueryUnit } from "../database/QueryUnit";
 import { ColumnNode } from "./columnNode";
@@ -107,7 +106,6 @@ export class TableNode implements INode, IConnection {
     }
 
     public async selectSqlTemplate(run: Boolean) {
-        AppInsightsClient.sendEvent("selectSqlTemplate");
         const sql = `SELECT * FROM ${this.database}.${this.table} LIMIT 1000;`;
 
         if (run) {

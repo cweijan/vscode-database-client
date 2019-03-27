@@ -1,6 +1,4 @@
-import * as uuidv1 from "uuid/v1";
 import * as vscode from "vscode";
-import { AppInsightsClient } from "../common/appInsightsClient";
 import { Constants } from "../common/Constants";
 import { Global } from "../common/Global";
 import { IConnection } from "../model/connection";
@@ -46,10 +44,6 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     }
 
     public async addConnection(connectionOptions: IConnection) {
-        AppInsightsClient.sendEvent("addConnection.start");
-
-        const password=connectionOptions.password
-        delete connectionOptions.password
 
         let connections = this.context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
 
@@ -57,16 +51,10 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
             connections = {};
         }
 
-        const id = uuidv1();
+        connections[`${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`] = connectionOptions;
         
-        connections[id] = connectionOptions;
-
-        if (password) {
-            await Global.keytar.setPassword(Constants.ExtensionId, id, password);
-        }
         await this.context.globalState.update(Constants.GlobalStateMySQLConectionsKey, connections);
         this.refresh();
-        AppInsightsClient.sendEvent("addConnection.end");
     }
 
     public refresh(element?: INode): void {
@@ -74,12 +62,11 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     }
 
     public async getConnectionNodes(): Promise<ConnectionNode[]> {
-        const connections = this.context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
         const ConnectionNodes = [];
+        const connections = this.context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
         if (connections) {
-            for (const id of Object.keys(connections)) {
-                const password = await Global.keytar.getPassword(Constants.ExtensionId, id);
-                ConnectionNodes.push(new ConnectionNode(id, connections[id].host, connections[id].user, password, connections[id].port, connections[id].certPath));
+            for (const key of Object.keys(connections)) {
+                ConnectionNodes.push(new ConnectionNode(key, connections[key].host, connections[key].user, connections[key].password, connections[key].port, connections[key].certPath));
             }
         }
         return ConnectionNodes;

@@ -1,7 +1,6 @@
 "use strict";
 import * as vscode from "vscode";
 import { IConnection } from "../model/connection";
-import { AppInsightsClient } from "../common/appInsightsClient";
 import { OutputChannel } from "../common/outputChannel";
 import { SqlViewManager } from "./SqlViewManager";
 import { ConnectionManager } from "./ConnectionManager";
@@ -28,16 +27,13 @@ export class QueryUnit {
     }
 
     public static async runQuery(sql?: string, connectionOptions?: IConnection) {
-        AppInsightsClient.sendEvent("runQuery.start");
         if (!sql && !vscode.window.activeTextEditor) {
             vscode.window.showWarningMessage("No SQL file selected");
-            AppInsightsClient.sendEvent("runQuery.noFile");
             return;
         }
         let connection:any;
         if (!connectionOptions && !(connection = await ConnectionManager.getLastActiveConnection())) {
             vscode.window.showWarningMessage("No MySQL Server or Database selected");
-            AppInsightsClient.sendEvent("runQuery.noMySQL");
             return;
         } else {
             connectionOptions.multipleStatements = true;
@@ -59,13 +55,13 @@ export class QueryUnit {
                 if (rows.some(((row) => Array.isArray(row)))) {
                     rows.forEach((row, index) => {
                         if (Array.isArray(row)) {
-                            SqlViewManager.showQueryResult(row, '');
+                            SqlViewManager.showQueryResult(row, 'result');
                         } else {
                             OutputChannel.appendLine(JSON.stringify(row));
                         }
                     });
                 } else {
-                    SqlViewManager.showQueryResult(rows, '');
+                    SqlViewManager.showQueryResult(rows, 'result');
                 }
 
             } else {
@@ -74,9 +70,7 @@ export class QueryUnit {
 
             if (err) {
                 OutputChannel.appendLine(err);
-                AppInsightsClient.sendEvent("runQuery.end", { Result: "Fail", ErrorMessage: err });
             } else {
-                AppInsightsClient.sendEvent("runQuery.end", { Result: "Success" });
             }
         });
     }

@@ -2,15 +2,15 @@
 	"name": "vscode-mysql-manager",
 	"displayName": "MySQL",
 	"description": "MySQL management tool",
-	"version": "1.5.1",
+	"version": "1.5.2",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
 		"vscode": "^1.30.0"
 	},
 	"categories": [
-		"Languages",
-		"Azure"
+		"Programming Languages",
+		"Keymaps"
 	],
 	"keywords": [
 		"SQL",
@@ -29,9 +29,7 @@
 		"url": "https://github.com/cweijan/vscode-mysql.git"
 	},
 	"activationEvents": [
-		"onView:mysql",
-		"onCommand:mysql.addConnection",
-		"onCommand:mysql.runQuery"
+		"*"
 	],
 	"main": "./out/extension",
 	"contributes": {
@@ -315,7 +313,6 @@
 		"tslint": "tslint -t verbose src/**/*.ts"
 	},
 	"devDependencies": {
-		"@types/keytar": "^4.0.1",
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^7.0.43",
 		"tslint": "^5.8.0",
@@ -323,11 +320,8 @@
 		"vscode": "^1.1.33"
 	},
 	"dependencies": {
-		"applicationinsights": "^1.0.0",
-		"asciitable": "0.0.7",
 		"mysql": "^2.15.0",
-		"mysqldump": "^2.2.1",
-		"uuid": "^3.1.0"
+		"mysqldump": "^2.2.1"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",

@@ -31,12 +31,19 @@ export class SqlViewManager {
 
     public static showQueryResult(data: any, title: string) {
 
+        if (this.resultWebviewPanel) {
+            this.resultWebviewPanel.webview.postMessage({ data })
+            return;
+        }
+
         this.createWebviewPanel({
             viewId: "cweijan.mysql.queryResult",
             viewPath: "result",
             viewTitle: title
         }).then(webviewPanel => {
-            webviewPanel.webview.postMessage({ data: data })
+            this.resultWebviewPanel = webviewPanel
+            webviewPanel.webview.postMessage({ data })
+            webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined })
         })
     }
 
