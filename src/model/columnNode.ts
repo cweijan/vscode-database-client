@@ -4,9 +4,9 @@ import { INode } from "./INode";
 import { ModelType } from "../common/Constants";
 import { QueryUnit } from "../database/QueryUnit";
 import { DatabaseCache } from "../database/DatabaseCache";
-import { Global } from "../common/Global";
-import { IConnection } from "./connection";
+import { IConnection } from "./Connection";
 import { ConnectionManager } from "../database/ConnectionManager";
+import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 
 class ColumnTreeItem extends vscode.TreeItem {
     columnName: string;
@@ -30,7 +30,7 @@ export class ColumnNode implements INode, IConnection {
             document: `${this.column.COLUMN_COMMENT}`,
             label: `${this.column.COLUMN_NAME} : ${this.column.COLUMN_TYPE}     ${this.column.COLUMN_COMMENT}`,
             collapsibleState: vscode.TreeItemCollapsibleState.None,
-            contextValue: "column",
+            contextValue: ModelType.COLUMN,
             iconPath: path.join(__filename, "..", "..", "..", "resources", this.column.COLUMN_KEY === "PRI" ? "b_primary.png" : "b_props.png"),
         };
     }
@@ -39,7 +39,7 @@ export class ColumnNode implements INode, IConnection {
         return [];
     }
 
-    public async changeColumnName() {
+    public async changeColumnName( mysqlTreeDataProvider: MySQLTreeDataProvider) {
         
         const columnName = this.column.COLUMN_NAME
         vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(async newColumnName => {
@@ -47,7 +47,7 @@ export class ColumnNode implements INode, IConnection {
             const sql = `alter table ${this.database}.${this.table} change column ${columnName} ${newColumnName} ${this.column.COLUMN_TYPE}`
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.getParentTreeItem(this, ModelType.COLUMN).getChildren(true).then(() => {
-                    Global.sqlTreeProvider.refresh()
+                    mysqlTreeDataProvider.refresh()
                     DatabaseCache.storeCurrentCache()
                 })
             })

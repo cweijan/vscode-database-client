@@ -2,14 +2,14 @@
 import * as vscode from "vscode";
 import { QueryUnit } from "./database/QueryUnit";
 import { ConnectionNode } from "./model/ConnectionNode";
-import { DatabaseNode } from "./model/databaseNode";
+import { DatabaseNode } from "./model/DatabaseNode";
 import { INode } from "./model/INode";
-import { TableNode } from "./model/tableNode";
-import { MySQLTreeDataProvider } from "./provider/mysqlTreeDataProvider";
+import { TableNode } from "./model/TableNode";
+import { MySQLTreeDataProvider } from "./provider/MysqlTreeDataProvider";
 import { CompletionProvider } from "./provider/CompletionProvider";
 import { DatabaseCache } from "./database/DatabaseCache";
 import { Global } from "./common/Global";
-import { ColumnNode } from "./model/columnNode";
+import { ColumnNode } from "./model/ColumnNode";
 import { SqlViewManager } from "./database/SqlViewManager";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -18,11 +18,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     SqlViewManager.initExtesnsionPath(context.extensionPath)
     
-    const mysqlTreeDataProvider = new MySQLTreeDataProvider(context);
+    const sqlTreeProvider = new MySQLTreeDataProvider(context);
     const treeview= vscode.window.createTreeView("mysql",{
-        treeDataProvider:mysqlTreeDataProvider
+        treeDataProvider:sqlTreeProvider
     })
-    Global.sqlTreeProvider=mysqlTreeDataProvider
     treeview.onDidCollapseElement(event=>{
         DatabaseCache.storeElementState(event.element,vscode.TreeItemCollapsibleState.Collapsed)
     })
@@ -34,24 +33,24 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.refresh", (node: INode) => {
         DatabaseCache.evictAllCache()
-        mysqlTreeDataProvider.init()
-        mysqlTreeDataProvider.refresh()
+        sqlTreeProvider.init()
+        sqlTreeProvider.refresh()
     }));
 
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.addDatabase", (connectionNode: ConnectionNode) => {
-        connectionNode.createDatabase()
+        connectionNode.createDatabase(sqlTreeProvider)
     }));
     context.subscriptions.push(vscode.commands.registerCommand("mysql.deleteDatabase", (databaseNode: DatabaseNode) => {
-        databaseNode.deleteDatatabase()
+        databaseNode.deleteDatatabase(sqlTreeProvider)
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.addConnection", () => {
-        SqlViewManager.showConnectPage(mysqlTreeDataProvider)
+        SqlViewManager.showConnectPage(sqlTreeProvider)
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.changeTableName", (tableNode: TableNode) => {
-        tableNode.changeTableName()
+        tableNode.changeTableName(sqlTreeProvider)
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.table.truncate", (tableNode: TableNode) => {
@@ -59,15 +58,15 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.table.drop", (tableNode: TableNode) => {
-        tableNode.dropTable()
+        tableNode.dropTable(sqlTreeProvider)
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.changeColumnName", (columnNode: ColumnNode) => {
-        columnNode.changeColumnName()
+        columnNode.changeColumnName(sqlTreeProvider)
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.deleteConnection", (connectionNode: ConnectionNode) => {
-        connectionNode.deleteConnection(context, mysqlTreeDataProvider);
+        connectionNode.deleteConnection(context, sqlTreeProvider);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.runQuery", () => {

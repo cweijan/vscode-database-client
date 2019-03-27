@@ -2,9 +2,9 @@ import { WebviewPanel } from "vscode";
 "use strict";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { OutputChannel } from "../common/outputChannel";
+import { Console } from "../common/OutputChannel";
 import { ConnectionManager } from "./ConnectionManager";
-import { MySQLTreeDataProvider } from "../provider/mysqlTreeDataProvider";
+import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 
 export class ViewOption {
     viewPath: string;
@@ -75,7 +75,7 @@ export class SqlViewManager {
         return new Promise((resolve, reject) => {
             fs.readFile(`${this.extensionPath}/resources/webview/${viewOption.viewPath}.html`, 'utf8', async (err, data) => {
                 if (err) {
-                    OutputChannel.appendLine(err)
+                    Console.log(err)
                     reject(err)
                     return;
                 }

@@ -1,16 +1,16 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import mysqldump from 'mysqldump'
-import { Global } from "../common/Global";
 import { QueryUnit } from "../database/QueryUnit";
-import { ColumnNode } from "./columnNode";
-import { InfoNode } from "./infoNode";
+import { ColumnNode } from "./ColumnNode";
+import { InfoNode } from "./InfoNode";
 import { INode } from "./INode";
 import { DatabaseCache } from "../database/DatabaseCache";
 import { ModelType } from "../common/Constants";
-import { IConnection } from "./connection";
-import { OutputChannel } from "../common/outputChannel";
+import { IConnection } from "./Connection";
+import { Console } from "../common/OutputChannel";
 import { ConnectionManager } from "../database/ConnectionManager";
+import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 
 
 export class TableNode implements INode, IConnection {
@@ -29,7 +29,7 @@ export class TableNode implements INode, IConnection {
         return {
             label: this.table,
             collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: "table",
+            contextValue: ModelType.TABLE,
             iconPath: path.join(__filename, "..", "..", "..", "resources", "table.svg"),
             command: {
                 command: "mysql.template.sql",
@@ -61,12 +61,12 @@ export class TableNode implements INode, IConnection {
             });
     }
 
-    public dropTable() {
+    public dropTable(sqlTreeProvider: MySQLTreeDataProvider) {
 
         vscode.window.showInputBox({ prompt: `Are you want to drop table ${this.table} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `drop table ${this.database}.${this.table}`).then(() => {
-                    Global.sqlTreeProvider.refresh()
+                    sqlTreeProvider.refresh()
                     DatabaseCache.storeCurrentCache()
                     vscode.window.showInformationMessage(`Delete table ${this.table} success!`)
                 })
@@ -89,14 +89,14 @@ export class TableNode implements INode, IConnection {
 
     }
 
-    public changeTableName() {
+    public changeTableName(sqlTreeProvider: MySQLTreeDataProvider) {
 
         vscode.window.showInputBox({ value: this.table, placeHolder: 'newTableName', prompt: `You will changed ${this.database}.${this.table} to new table name!` }).then(async newTableName => {
             if (!newTableName) return
             const sql = `alter table ${this.database}.${this.table} rename ${newTableName}`
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.getParentTreeItem(this, ModelType.TABLE).getChildren(true).then(() => {
-                    Global.sqlTreeProvider.refresh()
+                    sqlTreeProvider.refresh()
                     DatabaseCache.storeCurrentCache()
                 })
             })
@@ -161,7 +161,7 @@ export class TableNode implements INode, IConnection {
 
     public backupData(exportPath: string) {
 
-        OutputChannel.appendLine(`Doing backup ${this.host}_${this.database}_${this.table}...`)
+        Console.log(`Doing backup ${this.host}_${this.database}_${this.table}...`)
         mysqldump({
             connection: {
                 host: this.host,
@@ -187,7 +187,7 @@ export class TableNode implements INode, IConnection {
         }).catch((err) => {
             vscode.window.showErrorMessage(`Backup ${this.host}_${this.database}_${this.table} fail!\n${err}`)
         })
-        OutputChannel.appendLine("backup end.")
+        Console.log("backup end.")
 
     }
 

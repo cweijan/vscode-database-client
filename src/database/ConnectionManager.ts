@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as mysql from "mysql";
-import { IConnection } from "../model/connection";
+import { IConnection } from "../model/Connection";
 import { Constants } from "../common/Constants";
-import { OutputChannel } from "../common/outputChannel";
+import { Console } from "../common/OutputChannel";
 import { Global } from "../common/Global";
 
 export class ConnectionManager {
@@ -41,7 +41,7 @@ export class ConnectionManager {
             this.connectionMap[key].conneciton.end()
             this.connectionMap[key] = undefined
         } else if (!this.connectionMap[key]) {
-            OutputChannel.appendLine("create new " + key);
+            Console.log("create new " + key);
             this.connectionMap[key] = {
                 conneciton: this.createConnection(connectionOptions),
                 expireTime: new Date()
@@ -64,7 +64,7 @@ export class ConnectionManager {
                     resolve(this.lastActiveConnection);
                 } else {
                     this.connectionMap[key]=undefined
-                    OutputChannel.appendLine(`${err.stack}\n${err.message}`)
+                    Console.log(`${err.stack}\n${err.message}`)
                     reject(err.message);
                 }
             });

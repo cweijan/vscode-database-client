@@ -1,10 +1,9 @@
 "use strict";
 import * as vscode from "vscode";
-import { IConnection } from "../model/connection";
-import { MySQLTreeDataProvider } from "../provider/mysqlTreeDataProvider";
+import { IConnection } from "../model/Connection";
 
 export class Global {
-    public static sqlTreeProvider: MySQLTreeDataProvider;
+    
     private static mysqlStatusBarItem: vscode.StatusBarItem;
 
     public static updateStatusBarItems(activeConnection: IConnection) {
@@ -20,19 +19,4 @@ export class Global {
     private static getStatusBarItemText(activeConnection: IConnection): string {
         return `$(server) ${activeConnection.host}` + (activeConnection.database ? ` $(database) ${activeConnection.database}` : "");
     }
-}
-
-/**
- * Returns a node module installed with VSCode, or null if it fails.
- */
-function getCoreNodeModule(moduleName: string) {
-    try {
-        return require(`${vscode.env.appRoot}/node_modules.asar/${moduleName}`);
-    } catch (err) { }
-
-    try {
-        return require(`${vscode.env.appRoot}/node_modules/${moduleName}`);
-    } catch (err) { }
-
-    return null;
 }

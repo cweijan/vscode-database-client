@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
-import { Constants } from "../common/Constants";
-import { Global } from "../common/Global";
-import { IConnection } from "../model/connection";
+import { Constants, CacheKey } from "../common/Constants";
+import { IConnection } from "../model/Connection";
 import { ConnectionNode } from "../model/ConnectionNode";
 import { INode } from "../model/INode";
 import { DatabaseCache } from "../database/DatabaseCache";
@@ -45,7 +44,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
 
     public async addConnection(connectionOptions: IConnection) {
 
-        let connections = this.context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
+        let connections = this.context.globalState.get<{ [key: string]: IConnection }>(CacheKey.ConectionsKey);
 
         if (!connections) {
             connections = {};
@@ -53,7 +52,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
 
         connections[`${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`] = connectionOptions;
         
-        await this.context.globalState.update(Constants.GlobalStateMySQLConectionsKey, connections);
+        await this.context.globalState.update(CacheKey.ConectionsKey, connections);
         this.refresh();
     }
 
@@ -63,7 +62,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
 
     public async getConnectionNodes(): Promise<ConnectionNode[]> {
         const ConnectionNodes = [];
-        const connections = this.context.globalState.get<{ [key: string]: IConnection }>(Constants.GlobalStateMySQLConectionsKey);
+        const connections = this.context.globalState.get<{ [key: string]: IConnection }>(CacheKey.ConectionsKey);
         if (connections) {
             for (const key of Object.keys(connections)) {
                 ConnectionNodes.push(new ConnectionNode(key, connections[key].host, connections[key].user, connections[key].password, connections[key].port, connections[key].certPath));

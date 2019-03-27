@@ -1,16 +1,16 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import mysqldump from 'mysqldump'
-import { Global } from "../common/Global";
 import { QueryUnit } from "../database/QueryUnit";
-import { InfoNode } from "./infoNode";
+import { InfoNode } from "./InfoNode";
 import { INode } from "./INode";
-import { TableNode } from "./tableNode";
+import { TableNode } from "./TableNode";
 import { DatabaseCache } from "../database/DatabaseCache";
 import { ModelType } from "../common/Constants";
-import { OutputChannel } from "../common/outputChannel";
-import { IConnection } from "./connection";
+import { Console } from "../common/OutputChannel";
+import { IConnection } from "./Connection";
 import { ConnectionManager } from "../database/ConnectionManager";
+import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 
 export class DatabaseNode implements INode, IConnection {
 
@@ -27,7 +27,7 @@ export class DatabaseNode implements INode, IConnection {
         return {
             label: this.database,
             collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: "database",
+            contextValue: ModelType.DATABASE,
             iconPath: path.join(__filename, "..", "..", "..", "resources", "database.svg")
         }
 
@@ -56,7 +56,7 @@ export class DatabaseNode implements INode, IConnection {
 
     public backupData(exportPath: string) {
 
-        OutputChannel.appendLine(`Doing backup ${this.host}_${this.database}...`)
+        Console.log(`Doing backup ${this.host}_${this.database}...`)
         mysqldump({
             connection: {
                 host: this.host,
@@ -81,15 +81,15 @@ export class DatabaseNode implements INode, IConnection {
         }).catch((err) => {
             vscode.window.showErrorMessage(`Backup ${this.host}_${this.database} fail!\n${err}`)
         })
-        OutputChannel.appendLine("backup end.")
+        Console.log("backup end.")
 
     }
 
-    deleteDatatabase() {
+    deleteDatatabase( sqlTreeProvider: MySQLTreeDataProvider) {
         vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `delete database ${this.database}`).then(() => {
-                    Global.sqlTreeProvider.refresh()
+                    sqlTreeProvider.refresh()
                     DatabaseCache.storeCurrentCache()
                     vscode.window.showInformationMessage(`Delete database ${this.database} success!`)
                 })

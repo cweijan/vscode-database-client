@@ -1,13 +1,12 @@
 "user strict";
 
 export class Constants {
-    public static ExtensionId = "cweijan.vscode-mysql";
-    public static GlobalStateMySQLConectionsKey = "mysql.connections";
-    /** 10分钟 */
+    /** 数据库连接过期时间:10分钟 */
     public static EXPIRE_TIME=10*60*1000;
 }
 
 export class CacheKey{
+    public static ConectionsKey = "mysql.connections";
     public static DatabaseCacheKey = "mysql.database.cache.database";
     public static DatabaseTableCacheKey = "mysql.database.cache.table";
     public static DatabaseColumnCacheKey = "mysql.database.cache.column";

@@ -1,7 +1,7 @@
 "use strict";
 import * as vscode from "vscode";
-import { IConnection } from "../model/connection";
-import { OutputChannel } from "../common/outputChannel";
+import { IConnection } from "../model/Connection";
+import { Console } from "../common/OutputChannel";
 import { SqlViewManager } from "./SqlViewManager";
 import { ConnectionManager } from "./ConnectionManager";
 
@@ -14,10 +14,10 @@ export class QueryUnit {
 
     public static queryPromise<T>(connection, sql: string): Promise<T> {
         return new Promise((resolve, reject) => {
-            OutputChannel.appendLine(`Execute SQL:${sql}`)
+            Console.log(`Execute SQL:${sql}`)
             connection.query(sql, (err, rows) => {
                 if (err) {
-                    OutputChannel.appendLine(err)
+                    Console.log(err)
                     reject("Error: " + err.message);
                 } else {
                     resolve(rows);
@@ -57,7 +57,7 @@ export class QueryUnit {
                         if (Array.isArray(row)) {
                             SqlViewManager.showQueryResult(row, 'result');
                         } else {
-                            OutputChannel.appendLine(JSON.stringify(row));
+                            Console.log(JSON.stringify(row));
                         }
                     });
                 } else {
@@ -65,11 +65,11 @@ export class QueryUnit {
                 }
 
             } else {
-                OutputChannel.appendLine(JSON.stringify(rows));
+                Console.log(JSON.stringify(rows));
             }
 
             if (err) {
-                OutputChannel.appendLine(err);
+                Console.log(err);
             } else {
             }
         });
