@@ -25,12 +25,18 @@
 
 <body>
     <div id="app">
+        <select v-model='mode'>
+            <option value="0">只读</option>
+            <option value="1">写入</option>
+        </select>
         <table>
             <tr>
                 <th v-for="value,key in rows[0]" v-text="key"></th>
             </tr>
             <tr v-for="row,key,index in rows">
-                <td v-for="value in row" v-text="value"></td>
+                <td v-for="value in row" >
+                    <span v-text="value" :contenteditable="mode==1?'true':'false'"></span>
+                </td>
             </tr>
         </table>
     </div>
@@ -41,14 +47,15 @@
     const vue = new Vue({
         el: '#app',
         data: {
-            rows: previousState?previousState.rows:[]
+            rows: previousState ? previousState.rows : [],
+            mode: 0
         }
     })
 
     window.addEventListener('message', event => {
-        vue.rows=event.data.data
-        vscode.setState({ rows:vue.rows });
-        document.write(previousState+":"+count)
+        vue.rows = event.data.data
+        vscode.setState({ rows: vue.rows });
+        document.write(previousState + ":" + count)
     });
 </script>
 

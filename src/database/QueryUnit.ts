@@ -35,7 +35,7 @@ export class QueryUnit {
         if (!connectionOptions && !(connection = await ConnectionManager.getLastActiveConnection())) {
             vscode.window.showWarningMessage("No MySQL Server or Database selected");
             return;
-        } else {
+        } else if(connectionOptions){
             connectionOptions.multipleStatements = true;
             connection =await ConnectionManager.getConnection(connectionOptions)
         }
