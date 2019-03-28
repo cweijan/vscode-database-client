@@ -31,13 +31,13 @@ export class QueryUnit {
             vscode.window.showWarningMessage("No SQL file selected");
             return;
         }
-        let connection:any;
+        let connection: any;
         if (!connectionOptions && !(connection = await ConnectionManager.getLastActiveConnection())) {
             vscode.window.showWarningMessage("No MySQL Server or Database selected");
             return;
-        } else if(connectionOptions){
+        } else if (connectionOptions) {
             connectionOptions.multipleStatements = true;
-            connection =await ConnectionManager.getConnection(connectionOptions)
+            connection = await ConnectionManager.getConnection(connectionOptions)
         }
 
         if (!sql) {
@@ -50,22 +50,22 @@ export class QueryUnit {
             }
         }
 
-        connection.query(sql, (err, rows) => {
-            if (Array.isArray(rows)) {
-                if (rows.some(((row) => Array.isArray(row)))) {
-                    rows.forEach((row, index) => {
-                        if (Array.isArray(row)) {
-                            SqlViewManager.showQueryResult(row, 'result');
-                        } else {
-                            Console.log(JSON.stringify(row));
-                        }
-                    });
+        connection.query(sql, (err, data) => {
+            if (Array.isArray(data)) {
+                if (data.some(((row) => Array.isArray(row)))) {
+                    // rows.forEach((row, index) => {
+                    //     if (Array.isArray(row)) {
+                    //         SqlViewManager.showQueryResult(row, 'result');
+                    //     } else {
+                    //         Console.log(JSON.stringify(row));
+                    //     }
+                    // });
                 } else {
-                    SqlViewManager.showQueryResult(rows, 'result');
+                    SqlViewManager.showQueryResult({ sql, data});
                 }
 
             } else {
-                Console.log(JSON.stringify(rows));
+                Console.log(JSON.stringify(data));
             }
 
             if (err) {

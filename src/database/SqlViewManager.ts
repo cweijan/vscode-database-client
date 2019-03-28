@@ -7,9 +7,11 @@ import { ConnectionManager } from "./ConnectionManager";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 
 export class ViewOption {
-    viewPath: string;
-    viewTitle: string;
-    viewId: string;
+    viewPath?: string;
+    viewTitle?: string;
+    sql?: string;
+    data?: any;
+    splitResultView?: boolean = false;
     /**
      * receive webview send message 
      */
@@ -17,7 +19,6 @@ export class ViewOption {
 
     disposeListener?: (message: any) => {}
 }
-
 
 export class SqlViewManager {
     static resultWebviewPanel: WebviewPanel
@@ -28,21 +29,20 @@ export class SqlViewManager {
         this.extensionPath = extensionPath
     }
 
-
-    public static showQueryResult(data: any, title: string) {
+    public static showQueryResult(viewOption: ViewOption) {
 
         if (this.resultWebviewPanel) {
-            this.resultWebviewPanel.webview.postMessage({ data })
+            //TODO 这里需要根据splitResultView对窗口进行调整
+            this.resultWebviewPanel.webview.postMessage( viewOption)
             return;
         }
 
-        this.createWebviewPanel({
-            viewId: "cweijan.mysql.queryResult",
-            viewPath: "result",
-            viewTitle: title
-        }).then(webviewPanel => {
+        viewOption.viewPath = "result"
+        viewOption.viewTitle = "result"
+
+        this.createWebviewPanel(viewOption).then(webviewPanel => {
             this.resultWebviewPanel = webviewPanel
-            webviewPanel.webview.postMessage({ data })
+            webviewPanel.webview.postMessage(viewOption)
             webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined })
         })
     }
@@ -50,7 +50,6 @@ export class SqlViewManager {
     public static showConnectPage(mysqlTreeDataProvider: MySQLTreeDataProvider) {
 
         this.createWebviewPanel({
-            viewId: "cweijan.mysql.connect",
             viewPath: "connect",
             viewTitle: "connect"
         }).then(webviewPanel => {
@@ -72,6 +71,8 @@ export class SqlViewManager {
 
     private static createWebviewPanel(viewOption: ViewOption): Promise<WebviewPanel> {
 
+        let columnType = viewOption.splitResultView ? vscode.ViewColumn.Two : vscode.ViewColumn.One
+
         return new Promise((resolve, reject) => {
             fs.readFile(`${this.extensionPath}/resources/webview/${viewOption.viewPath}.html`, 'utf8', async (err, data) => {
                 if (err) {
@@ -80,9 +81,9 @@ export class SqlViewManager {
                     return;
                 }
                 const webviewPanel = await vscode.window.createWebviewPanel(
-                    viewOption.viewId,
+                    "mysql.sql.result",
                     viewOption.viewTitle,
-                    vscode.ViewColumn.One,
+                    columnType,
                     { enableScripts: true }
                 );
                 webviewPanel.webview.html = data.replace(/\$\{webviewPath\}/gi,

@@ -25,17 +25,21 @@
 
 <body>
     <div id="app">
-        <select v-model='mode'>
+        <div>
+            Query Result
+        </div>
+        <div v-text="result.sql"></div>
+        <select v-model='result.mode'>
             <option value="0">只读</option>
-            <option value="1">写入</option>
+            <option value="1">可写</option>
         </select>
         <table>
             <tr>
-                <th v-for="value,key in rows[0]" v-text="key"></th>
+                <th v-for="value,key in result.rows[0]" v-text="key"></th>
             </tr>
-            <tr v-for="row,key,index in rows">
-                <td v-for="value in row" >
-                    <span v-text="value" :contenteditable="mode==1?'true':'false'"></span>
+            <tr v-for="row,key,index in result.rows">
+                <td v-for="value in row">
+                    <span v-text="value" :contenteditable="result.mode==1?'true':'false'"></span>
                 </td>
             </tr>
         </table>
@@ -47,14 +51,18 @@
     const vue = new Vue({
         el: '#app',
         data: {
-            rows: previousState ? previousState.rows : [],
-            mode: 0
+            result: previousState ? previousState.result : {
+                mode: 0,
+                rows: [],
+                sql: ''
+            }
         }
     })
 
     window.addEventListener('message', event => {
-        vue.rows = event.data.data
-        vscode.setState({ rows: vue.rows });
+        vue.result.rows = event.data.data
+        vue.result.sql = event.data.sql
+        vscode.setState({ result: vue.result });
         document.write(previousState + ":" + count)
     });
 </script>
