@@ -35,6 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
         DatabaseCache.evictAllCache()
         sqlTreeProvider.init()
         sqlTreeProvider.refresh()
+        DatabaseCache.storeCurrentCache()
     }));
 
 

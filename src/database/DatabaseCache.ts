@@ -110,9 +110,9 @@ export class DatabaseCache {
         if (this.context == null) throw new Error("DatabaseCache is not init!")
         let cached = false
         if (this.context.globalState.get(CacheKey.DatabaseCacheKey)) {
+            cached = true
             const c: { [datbaseName: string]: DatabaseProxy[] } = this.context.globalState.get(CacheKey.DatabaseCacheKey)
             const databaseProxyList: DatabaseProxy[] = this.context.globalState.get(CacheKey.DatabaseCacheKey)
-            if (databaseProxyList.length > 1) cached = true
             Object.keys(c).forEach(cn => {
                 if (!this.connectionNodeMapDatabaseNode[cn]) {
                     this.connectionNodeMapDatabaseNode[cn] = []
@@ -124,6 +124,7 @@ export class DatabaseCache {
             })
         }
         if (this.context.globalState.get(CacheKey.DatabaseTableCacheKey)) {
+            cached = true
             const t: { [datbaseName: string]: TableProxy[] } = this.context.globalState.get(CacheKey.DatabaseTableCacheKey)
             Object.keys(t).forEach(dn => {
                 if (!this.databaseNodeMapTableNode[dn]) {
@@ -136,6 +137,7 @@ export class DatabaseCache {
             })
         }
         if (this.context.globalState.get(CacheKey.DatabaseColumnCacheKey)) {
+            cached = true
             const c: { [tableName: string]: ColumnProxy[] } = this.context.globalState.get(CacheKey.DatabaseColumnCacheKey)
             Object.keys(c).forEach(tn => {
                 if (!this.tableNodeMapColumnNode[tn]) {

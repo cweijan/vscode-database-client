@@ -33,7 +33,7 @@ export class ConnectionNode implements INode, IConnection {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
-
+        this.identify = `${this.host}_${this.port}_${this.user}`
         let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.identify)
         if (databaseNodes && !isRresh) {
             return databaseNodes

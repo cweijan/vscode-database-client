@@ -42,6 +42,7 @@ export class TableNode implements INode, IConnection {
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
 
+        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`
         let columnNodes = DatabaseCache.getColumnListOfTable(this.identify)
         if (columnNodes && !isRresh) {
             return columnNodes;
