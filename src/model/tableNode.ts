@@ -42,17 +42,16 @@ export class TableNode implements INode, IConnection {
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
 
+        let columnNodes = DatabaseCache.getColumnListOfTable(this.identify)
+        if (columnNodes && !isRresh) {
+            return columnNodes;
+        }
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT * FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
             .then((columns) => {
-
-                let columnNodes = DatabaseCache.getColumnListOfTable(this.table)
-                if (columnNodes && columnNodes.length > 0 && !isRresh) {
-                    return columnNodes;
-                }
                 columnNodes = columns.map<ColumnNode>((column) => {
                     return new ColumnNode(this.host, this.user, this.password, this.port, this.database, this.table, this.certPath, column);
                 })
-                DatabaseCache.setColumnListOfTable(this.table, columnNodes)
+                DatabaseCache.setColumnListOfTable(this.identify, columnNodes)
 
                 return columnNodes;
             })
@@ -61,15 +60,32 @@ export class TableNode implements INode, IConnection {
             });
     }
 
+
+    public changeTableName(sqlTreeProvider: MySQLTreeDataProvider) {
+
+        vscode.window.showInputBox({ value: this.table, placeHolder: 'newTableName', prompt: `You will changed ${this.database}.${this.table} to new table name!` }).then(async newTableName => {
+            if (!newTableName) return
+            const sql = `alter table ${this.database}.${this.table} rename ${newTableName}`
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
+                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`)
+                sqlTreeProvider.refresh()
+            })
+
+        })
+
+    }
+
     public dropTable(sqlTreeProvider: MySQLTreeDataProvider) {
 
         vscode.window.showInputBox({ prompt: `Are you want to drop table ${this.table} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `drop table ${this.database}.${this.table}`).then(() => {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE ${this.database}.${this.table}`).then(() => {
+                    DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`)
                     sqlTreeProvider.refresh()
-                    DatabaseCache.storeCurrentCache()
                     vscode.window.showInformationMessage(`Delete table ${this.table} success!`)
                 })
+            } else {
+                vscode.window.showInformationMessage(`Cancel delete table ${this.table}!`)
             }
         })
 
@@ -89,21 +105,6 @@ export class TableNode implements INode, IConnection {
 
     }
 
-    public changeTableName(sqlTreeProvider: MySQLTreeDataProvider) {
-
-        vscode.window.showInputBox({ value: this.table, placeHolder: 'newTableName', prompt: `You will changed ${this.database}.${this.table} to new table name!` }).then(async newTableName => {
-            if (!newTableName) return
-            const sql = `alter table ${this.database}.${this.table} rename ${newTableName}`
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
-                DatabaseCache.getParentTreeItem(this, ModelType.TABLE).getChildren(true).then(() => {
-                    sqlTreeProvider.refresh()
-                    DatabaseCache.storeCurrentCache()
-                })
-            })
-
-        })
-
-    }
 
     public async selectSqlTemplate(run: Boolean) {
         const sql = `SELECT * FROM ${this.database}.${this.table} LIMIT 1000;`;

@@ -25,7 +25,7 @@ export class ConnectionNode implements INode, IConnection {
         this.identify = `${this.host}_${this.port}_${this.user}`
         return {
             label: this.identify,
-            id:this.host,
+            id: this.host,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.CONNECTION,
             iconPath: path.join(__filename, "..", "..", "..", "resources", "server.png")
@@ -34,17 +34,17 @@ export class ConnectionNode implements INode, IConnection {
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
 
+        let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.identify)
+        if (databaseNodes && !isRresh) {
+            return databaseNodes
+        }
+
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "SHOW DATABASES")
             .then((databases) => {
-                let databaseNodes = DatabaseCache.databaseNodes
-                if (databaseNodes && databaseNodes.length > 0 && !isRresh) {
-                    return databaseNodes
-                }
-
                 databaseNodes = databases.map<DatabaseNode>((database) => {
                     return new DatabaseNode(this.host, this.user, this.password, this.port, database.Database, this.certPath);
                 })
-                DatabaseCache.initDatabaseNodes(databaseNodes)
+                DatabaseCache.setDataBaseListOfConnection(this.identify, databaseNodes)
 
                 return databaseNodes;
             })
@@ -61,8 +61,8 @@ export class ConnectionNode implements INode, IConnection {
     public createDatabase(sqlTreeProvider: MySQLTreeDataProvider) {
         vscode.window.showInputBox({ placeHolder: 'Input you want to create new database name.' }).then(async inputContent => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `create database ${inputContent} default character set = 'utf8' `).then(() => {
+                DatabaseCache.clearDatabaseCache(this.identify)
                 sqlTreeProvider.refresh()
-                DatabaseCache.storeCurrentCache()
                 vscode.window.showInformationMessage(`create database ${inputContent} success!`)
             })
         })

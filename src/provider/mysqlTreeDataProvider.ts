@@ -10,6 +10,9 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     public readonly onDidChangeTreeData: vscode.Event<INode> = this._onDidChangeTreeData.event;
 
     constructor(private context: vscode.ExtensionContext) {
+        setInterval(()=>{
+            DatabaseCache.storeCurrentCache()
+        },10000)
         this.init()
     }
 
@@ -25,9 +28,6 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
                 })
             })
         })
-        setTimeout(()=>{
-            DatabaseCache.storeCurrentCache()
-        },10000)
     }
 
     public getTreeItem(element: INode): Promise<vscode.TreeItem> | vscode.TreeItem {

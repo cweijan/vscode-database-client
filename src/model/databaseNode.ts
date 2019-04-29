@@ -35,18 +35,17 @@ export class DatabaseNode implements INode, IConnection {
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
 
+        let tableNodes = DatabaseCache.getTableListOfDatabase(this.identify)
+        if (tableNodes && !isRresh) {
+            return tableNodes
+        }
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' LIMIT ${QueryUnit.maxTableCount}`)
             .then((tables) => {
-                let tableNodes = DatabaseCache.getTableListOfDatabase(this.database)
-                if (tableNodes && tableNodes.length > 1 && !isRresh) {
-                    return tableNodes
-                }
-
                 tableNodes = tables.map<TableNode>((table) => {
                     let tableNode = new TableNode(this.host, this.user, this.password, this.port, this.database, table.TABLE_NAME, this.certPath)
                     return tableNode;
                 })
-                DatabaseCache.setTableListOfDatabase(this.database, tableNodes)
+                DatabaseCache.setTableListOfDatabase(this.identify, tableNodes)
                 return tableNodes;
             })
             .catch((err) => {
@@ -88,11 +87,13 @@ export class DatabaseNode implements INode, IConnection {
     deleteDatatabase( sqlTreeProvider: MySQLTreeDataProvider) {
         vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `delete database ${this.database}`).then(() => {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE ${this.database}`).then(() => {
+                    DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`)
                     sqlTreeProvider.refresh()
-                    DatabaseCache.storeCurrentCache()
                     vscode.window.showInformationMessage(`Delete database ${this.database} success!`)
                 })
+            }else{
+                vscode.window.showInformationMessage(`Cancel delete database ${this.database}!`)
             }
         })
     }

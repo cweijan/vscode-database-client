@@ -8,9 +8,7 @@ import { INode } from "../model/INode";
 export class DatabaseCache {
 
     private static context: ExtensionContext;
-    static databaseNodes: DatabaseNode[] = [];
-    private static datbaseMap = {};
-    private static tableMap = {};
+    private static connectionNodeMapDatabaseNode = {};
     private static databaseNodeMapTableNode = {};
     private static tableNodeMapColumnNode = {};
     private static collpaseState: { key?: TreeItemCollapsibleState };
@@ -20,12 +18,30 @@ export class DatabaseCache {
         this.context.globalState.update(CacheKey.DatabaseCacheKey, undefined)
         this.context.globalState.update(CacheKey.DatabaseColumnCacheKey, undefined)
         this.context.globalState.update(CacheKey.DatabaseTableCacheKey, undefined)
-        this.databaseNodes = [];
+        this.connectionNodeMapDatabaseNode = [];
         this.databaseNodeMapTableNode = {};
         this.tableNodeMapColumnNode = {};
-
     }
 
+/**
+     * support to complection manager
+     */
+    static getDatabaseNodeList(): DatabaseNode[] {
+        let databaseNodeList = [];
+
+        Object.keys(this.connectionNodeMapDatabaseNode).forEach(key => {
+            let tempList = this.connectionNodeMapDatabaseNode[key]
+            if (tempList) {
+                databaseNodeList = databaseNodeList.concat(tempList)
+            }
+        })
+
+        return databaseNodeList;
+    }
+
+    /**
+     * support to complection manager
+     */
     static getTableNodeList(): TableNode[] {
         let tableNodeList = [];
 
@@ -39,22 +55,10 @@ export class DatabaseCache {
         return tableNodeList;
     }
 
-
-    static getParentTreeItem(iNode: INode, type: string): INode {
-
-        let databaseNode: DatabaseNode = <DatabaseNode>iNode;
-        if (type == ModelType.TABLE && (databaseNode = this.datbaseMap[`${databaseNode.host}_${databaseNode.port}_${databaseNode.user}_${databaseNode.database}`])) {
-            return databaseNode
-        }
-
-        let tableNode: TableNode = <TableNode>iNode;
-        if (type == ModelType.COLUMN && (tableNode = this.tableMap[`${tableNode.host}_${tableNode.port}_${tableNode.user}_${tableNode.database}_${tableNode.table}`])) {
-            return tableNode
-        }
-
-        return null;
-    }
-
+    /**
+     * get element current collapseState or default collapseState
+     * @param element 
+     */
     static getElementState(element?: INode) {
 
         if (element.type == ModelType.COLUMN || element.type == ModelType.INFO) {
@@ -79,6 +83,12 @@ export class DatabaseCache {
 
     }
 
+
+    /**
+     * update tree node collapseState
+     * @param element 
+     * @param collapseState 
+     */
     static storeElementState(element?: INode, collapseState?: TreeItemCollapsibleState) {
 
         if (!element || !collapseState) {
@@ -93,25 +103,24 @@ export class DatabaseCache {
 
     }
 
-    static async initDatabaseNodes(databaseNodes: DatabaseNode[]) {
-        if (!databaseNodes) {
-            databaseNodes = []
-        }
-        this.databaseNodes = databaseNodes
-        await this.databaseNodes.forEach(databaseNode => {
-            this.datbaseMap[`${databaseNode.host}_${databaseNode.port}_${databaseNode.user}_${databaseNode.database}`]
-        })
-    }
-
+    /**
+     * recovery all data
+     */
     static obtainStoreCache() {
         if (this.context == null) throw new Error("DatabaseCache is not init!")
         let cached = false
         if (this.context.globalState.get(CacheKey.DatabaseCacheKey)) {
+            const c: { [datbaseName: string]: DatabaseProxy[] } = this.context.globalState.get(CacheKey.DatabaseCacheKey)
             const databaseProxyList: DatabaseProxy[] = this.context.globalState.get(CacheKey.DatabaseCacheKey)
-            databaseProxyList.forEach(d => {
-                const databasenode = new DatabaseNode(d.host, d.user, d.password, d.port, d.database, d.certPath)
-                this.databaseNodes.push(databasenode)
-                this.datbaseMap[`${d.host}_${d.port}_${d.user}_${d.database}`] = databasenode
+            if (databaseProxyList.length > 1) cached = true
+            Object.keys(c).forEach(cn => {
+                if (!this.connectionNodeMapDatabaseNode[cn]) {
+                    this.connectionNodeMapDatabaseNode[cn] = []
+                }
+                c[cn].forEach(tableProxy => {
+                    const databaseNode = new DatabaseNode(tableProxy.host, tableProxy.user, tableProxy.password, tableProxy.port, tableProxy.database, tableProxy.certPath)
+                    this.connectionNodeMapDatabaseNode[cn].push(databaseNode)
+                })
             })
         }
         if (this.context.globalState.get(CacheKey.DatabaseTableCacheKey)) {
@@ -123,9 +132,7 @@ export class DatabaseCache {
                 t[dn].forEach(tableProxy => {
                     const tableNode = new TableNode(tableProxy.host, tableProxy.user, tableProxy.password, tableProxy.port, tableProxy.database, tableProxy.table, tableProxy.certPath)
                     this.databaseNodeMapTableNode[dn].push(tableNode)
-                    this.tableMap[`${tableProxy.host}_${tableProxy.port}_${tableProxy.user}_${tableProxy.database}_${tableProxy.table}`] = tableNode
                 })
-
             })
         }
         if (this.context.globalState.get(CacheKey.DatabaseColumnCacheKey)) {
@@ -141,55 +148,113 @@ export class DatabaseCache {
             })
         }
 
-        if (this.databaseNodes.length > 1) {
-            cached = true
-        }
-
         return cached
     }
 
+    /**
+     * cache init, Mainly initializing context object
+     * @param context 
+     */
     static initCache(context: ExtensionContext) {
         this.context = context;
+        //每30秒保存当前折叠状态
         setInterval(() => {
             this.storeElementState()
         }, 30000)
     }
 
+    /**
+     * store sql tree data
+     */
     static storeCurrentCache() {
         if (this.context == null) throw new Error("DatabaseCache is not init!")
-        this.context.globalState.update(CacheKey.DatabaseCacheKey, this.databaseNodes)
+        this.context.globalState.update(CacheKey.DatabaseCacheKey, this.connectionNodeMapDatabaseNode)
         this.context.globalState.update(CacheKey.DatabaseTableCacheKey, this.databaseNodeMapTableNode)
         this.context.globalState.update(CacheKey.DatabaseColumnCacheKey, this.tableNodeMapColumnNode)
     }
 
+    /**
+     * clear database data for connection
+     * @param connectionIdentify 
+     */
+    static clearDatabaseCache(connectionIdentify?: string) {
+        if (connectionIdentify) {
+            delete this.connectionNodeMapDatabaseNode[connectionIdentify]
+        } else {
+            this.connectionNodeMapDatabaseNode = {}
+        }
+    }
+
+    /**
+     * clear table data for database
+     * @param databaseIdentify 
+     */
+    static clearTableCache(databaseIdentify?: string) {
+        if (databaseIdentify) {
+            delete this.databaseNodeMapTableNode[databaseIdentify]
+        } else {
+            this.databaseNodeMapTableNode = {}
+        }
+    }
+
+    /**
+     * claer column data for table
+     * @param tableIdentify 
+     */
+    static clearColumnCache(tableIdentify?: string) {
+        if (tableIdentify) {
+            delete this.tableNodeMapColumnNode[tableIdentify]
+        } else {
+            this.tableNodeMapColumnNode = {}
+        }
+    }
+
+    /**
+     * get connectino tree data
+     * @param connectcionIdentify 
+     */
+    static getDatabaseListOfConnection(connectcionIdentify: string): DatabaseNode[] {
+        if (this.connectionNodeMapDatabaseNode[connectcionIdentify]) {
+            return this.connectionNodeMapDatabaseNode[connectcionIdentify]
+        } else {
+            return null
+        }
+    }
+
+    /**
+     * get database tree data
+     * @param databaseName 
+     */
     static getTableListOfDatabase(databaseName: string): TableNode[] {
         if (this.databaseNodeMapTableNode[databaseName]) {
             return this.databaseNodeMapTableNode[databaseName]
         } else {
-            return []
+            return null
         }
     }
 
+    /**
+     * get table tree data
+     * @param tableName 
+     */
     static getColumnListOfTable(tableName: string): ColumnNode[] {
         if (this.tableNodeMapColumnNode[tableName]) {
-
             return this.tableNodeMapColumnNode[tableName]
         } else {
-            return []
+            return null
         }
-
-
     }
 
-    static setTableListOfDatabase(databaseName: string, tableNodeList: TableNode[]) {
-        this.databaseNodeMapTableNode[databaseName] = tableNodeList
-        tableNodeList.forEach(tableNode => {
-            this.tableMap[`${tableNode.host}_${tableNode.port}_${tableNode.user}_${tableNode.database}_${tableNode.table}`] = tableNode
-        })
+    static setDataBaseListOfConnection(connectionIdentify: string, DatabaseNodeList: DatabaseNode[]) {
+        this.connectionNodeMapDatabaseNode[connectionIdentify] = DatabaseNodeList
     }
 
-    static setColumnListOfTable(tableName: string, columnList: ColumnNode[]) {
-        this.tableNodeMapColumnNode[tableName] = columnList
+    static setTableListOfDatabase(databaseIdentify: string, tableNodeList: TableNode[]) {
+        this.databaseNodeMapTableNode[databaseIdentify] = tableNodeList
+    }
+
+    static setColumnListOfTable(tableIdentify: string, columnList: ColumnNode[]) {
+        this.tableNodeMapColumnNode[tableIdentify] = columnList
     }
 
 

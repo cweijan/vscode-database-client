@@ -44,12 +44,12 @@ export class CompletionManager {
 
     private generateDatabaseComplectionItem(): vscode.CompletionItem[] {
 
-        return DatabaseCache.databaseNodes.map<vscode.CompletionItem>(databaseNode => {
+        let databaseNodes = DatabaseCache.getDatabaseNodeList()
+        return databaseNodes.map<vscode.CompletionItem>(databaseNode => {
             let completionItem = new vscode.CompletionItem(databaseNode.getTreeItem().label)
-            completionItem.kind = vscode.CompletionItemKind.Class
+            completionItem.kind = vscode.CompletionItemKind.Function
             return completionItem
         })
-
     }
 
     generateColumnComplectionItem(inputWord: string): vscode.CompletionItem[] {

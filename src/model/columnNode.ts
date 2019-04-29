@@ -46,10 +46,8 @@ export class ColumnNode implements INode, IConnection {
             if (!newColumnName) return
             const sql = `alter table ${this.database}.${this.table} change column ${columnName} ${newColumnName} ${this.column.COLUMN_TYPE}`
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
-                DatabaseCache.getParentTreeItem(this, ModelType.COLUMN).getChildren(true).then(() => {
-                    mysqlTreeDataProvider.refresh()
-                    DatabaseCache.storeCurrentCache()
-                })
+                DatabaseCache.clearColumnCache(`${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`)
+                mysqlTreeDataProvider.refresh()
             })
 
         })
