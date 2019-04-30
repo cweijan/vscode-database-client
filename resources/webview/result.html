@@ -29,10 +29,10 @@
             Query Result
         </div>
         <div v-text="result.sql"></div>
-        <select v-model='result.mode'>
+        <!-- <select v-model='result.mode'>
             <option value="0">只读</option>
             <option value="1">可写</option>
-        </select>
+        </select> -->
         <table>
             <tr>
                 <th v-for="value,key in result.rows[0]" v-text="key"></th>
