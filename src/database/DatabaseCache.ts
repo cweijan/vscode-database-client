@@ -168,11 +168,13 @@ export class DatabaseCache {
     /**
      * store sql tree data
      */
-    static storeCurrentCache() {
+    static storeCurrentCache(storeColumn:Boolean=false) {
         if (this.context == null) throw new Error("DatabaseCache is not init!")
         this.context.globalState.update(CacheKey.DatabaseCacheKey, this.connectionNodeMapDatabaseNode)
         this.context.globalState.update(CacheKey.DatabaseTableCacheKey, this.databaseNodeMapTableNode)
-        this.context.globalState.update(CacheKey.DatabaseColumnCacheKey, this.tableNodeMapColumnNode)
+        if(storeColumn){
+            this.context.globalState.update(CacheKey.DatabaseColumnCacheKey, this.tableNodeMapColumnNode)
+        }
     }
 
     /**
@@ -225,11 +227,11 @@ export class DatabaseCache {
 
     /**
      * get database tree data
-     * @param databaseName 
+     * @param databaseIdentify 
      */
-    static getTableListOfDatabase(databaseName: string): TableNode[] {
-        if (this.databaseNodeMapTableNode[databaseName]) {
-            return this.databaseNodeMapTableNode[databaseName]
+    static getTableListOfDatabase(databaseIdentify: string): TableNode[] {
+        if (this.databaseNodeMapTableNode[databaseIdentify]) {
+            return this.databaseNodeMapTableNode[databaseIdentify]
         } else {
             return null
         }
@@ -237,11 +239,11 @@ export class DatabaseCache {
 
     /**
      * get table tree data
-     * @param tableName 
+     * @param tableIdentify 
      */
-    static getColumnListOfTable(tableName: string): ColumnNode[] {
-        if (this.tableNodeMapColumnNode[tableName]) {
-            return this.tableNodeMapColumnNode[tableName]
+    static getColumnListOfTable(tableIdentify: string): ColumnNode[] {
+        if (this.tableNodeMapColumnNode[tableIdentify]) {
+            return this.tableNodeMapColumnNode[tableIdentify]
         } else {
             return null
         }

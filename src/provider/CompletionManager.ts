@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { DatabaseCache } from "../database/DatabaseCache";
+import { State } from "../common/State";
 
 export class CompletionManager {
 
@@ -53,7 +54,9 @@ export class CompletionManager {
     }
 
     generateColumnComplectionItem(inputWord: string): vscode.CompletionItem[] {
-        return DatabaseCache.getColumnListOfTable(inputWord).map<vscode.CompletionItem>(columnNode => {
+        let d=State.currentDatabase;
+        if(!inputWord || !d)return []
+        return DatabaseCache.getColumnListOfTable(`${d.host}_${d.port}_${d.user}_${d.database}_${inputWord}`).map<vscode.CompletionItem>(columnNode => {
             let completionItem = new vscode.CompletionItem(columnNode.getTreeItem().columnName)
             completionItem.detail=columnNode.getTreeItem().detail
             completionItem.documentation=columnNode.getTreeItem().document
@@ -65,8 +68,9 @@ export class CompletionManager {
 
     private generateTableComplectionItem(word?: string): vscode.CompletionItem[] {
         let tableNodes = DatabaseCache.getTableNodeList()
-        if (word) {
-            tableNodes = DatabaseCache.getTableListOfDatabase(word)
+        let c=State.currentConnection;
+        if (word && c) {
+            tableNodes = DatabaseCache.getTableListOfDatabase(`${c.host}_${c.port}_${c.user}_${word}`)
         }
         return tableNodes.map<vscode.CompletionItem>(tableNode => {
             let completionItem = new vscode.CompletionItem(tableNode.getTreeItem().label)

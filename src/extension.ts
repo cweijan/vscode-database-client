@@ -11,6 +11,7 @@ import { DatabaseCache } from "./database/DatabaseCache";
 import { Global } from "./common/Global";
 import { ColumnNode } from "./model/ColumnNode";
 import { SqlViewManager } from "./database/SqlViewManager";
+import { State } from "./common/State";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -28,6 +29,8 @@ export function activate(context: vscode.ExtensionContext) {
         DatabaseCache.storeElementState(event.element, vscode.TreeItemCollapsibleState.Collapsed)
     })
     treeview.onDidExpandElement(event => {
+        if (event.element instanceof ConnectionNode) State.currentConnection = event.element
+        if (event.element instanceof DatabaseNode) State.currentDatabase = event.element
         DatabaseCache.storeElementState(event.element, vscode.TreeItemCollapsibleState.Expanded)
     })
 
