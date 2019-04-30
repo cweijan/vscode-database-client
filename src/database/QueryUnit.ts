@@ -14,7 +14,7 @@ export class QueryUnit {
 
     public static queryPromise<T>(connection, sql: string): Promise<T> {
         return new Promise((resolve, reject) => {
-            Console.log(`Execute SQL:${sql}`)
+            // Console.log(`Execute SQL:${sql}`)
             connection.query(sql, (err, rows) => {
                 if (err) {
                     Console.log(err)

@@ -3,26 +3,16 @@ import { Constants, CacheKey } from "../common/Constants";
 import { IConnection } from "../model/Connection";
 import { ConnectionNode } from "../model/ConnectionNode";
 import { INode } from "../model/INode";
-import { DatabaseCache } from "../database/DatabaseCache";
-import { State } from "../common/State";
 
 export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     public _onDidChangeTreeData: vscode.EventEmitter<INode> = new vscode.EventEmitter<INode>();
     public readonly onDidChangeTreeData: vscode.Event<INode> = this._onDidChangeTreeData.event;
 
     constructor(private context: vscode.ExtensionContext) {
-        setInterval(()=>{
-            //save current data case per 30 minute
-            DatabaseCache.storeCurrentCache(false)
-        },30*60*1000)
         this.init()
     }
 
     async init() {
-        if (DatabaseCache.obtainStoreCache()) {
-            return;
-        }
-
         (await this.getConnectionNodes()).forEach(async connectionNode => {
             (await connectionNode.getChildren(true)).forEach(async databaseNode => {
                 (await databaseNode.getChildren(true)).forEach(tableNode => {
@@ -70,7 +60,6 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
                 connectionNodes.push(new ConnectionNode(key, connections[key].host, connections[key].user, connections[key].password, connections[key].port, connections[key].certPath));
             }
         }
-        if(connectionNodes.length>0)State.currentConnection=connectionNodes[0];
         return connectionNodes;
     }
 }

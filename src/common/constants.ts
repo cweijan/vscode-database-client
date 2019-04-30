@@ -7,9 +7,6 @@ export class Constants {
 
 export class CacheKey{
     public static ConectionsKey = "mysql.connections";
-    public static DatabaseCacheKey = "mysql.database.cache.database";
-    public static DatabaseTableCacheKey = "mysql.database.cache.table";
-    public static DatabaseColumnCacheKey = "mysql.database.cache.column";
     public static CollapseSate = "mysql.database.cache.collapseState";
 
 }

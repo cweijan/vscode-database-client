@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import { DatabaseCache } from "../database/DatabaseCache";
-import { State } from "../common/State";
+import { DatabaseNode } from "../model/DatabaseNode";
+import { ColumnNode } from "../model/ColumnNode";
+import { TableNode } from "../model/TableNode";
 
 export class CompletionManager {
 
@@ -53,27 +55,36 @@ export class CompletionManager {
         })
     }
 
-    generateColumnComplectionItem(inputWord: string): vscode.CompletionItem[] {
-        let d=State.currentDatabase;
-        if(!inputWord || !d)return []
-        return DatabaseCache.getColumnListOfTable(`${d.host}_${d.port}_${d.user}_${d.database}_${inputWord}`).map<vscode.CompletionItem>(columnNode => {
-            let completionItem = new vscode.CompletionItem(columnNode.getTreeItem().columnName)
-            completionItem.detail=columnNode.getTreeItem().detail
-            completionItem.documentation=columnNode.getTreeItem().document
+    private generateTableComplectionItem(inputWord?: string): vscode.CompletionItem[] {
 
+        let tableNodes:TableNode[] =[]
+        if (inputWord) {
+            DatabaseCache.getDatabaseNodeList().forEach(databaseNode => {
+                if (databaseNode.database == inputWord) tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.identify)
+            })
+        }else{
+            tableNodes = DatabaseCache.getTableNodeList()
+        }
+        
+        return tableNodes.map<vscode.CompletionItem>(tableNode => {
+            let completionItem = new vscode.CompletionItem(tableNode.getTreeItem().label)
             completionItem.kind = vscode.CompletionItemKind.Function
             return completionItem
         })
     }
 
-    private generateTableComplectionItem(word?: string): vscode.CompletionItem[] {
-        let tableNodes = DatabaseCache.getTableNodeList()
-        let c=State.currentConnection;
-        if (word && c) {
-            tableNodes = DatabaseCache.getTableListOfDatabase(`${c.host}_${c.port}_${c.user}_${word}`)
-        }
-        return tableNodes.map<vscode.CompletionItem>(tableNode => {
-            let completionItem = new vscode.CompletionItem(tableNode.getTreeItem().label)
+    generateColumnComplectionItem(inputWord: string): vscode.CompletionItem[] {
+
+        if (!inputWord) return []
+        let columnNodes: ColumnNode[] = []
+        DatabaseCache.getTableNodeList().forEach(tableNode => {
+            if (tableNode.table == inputWord) columnNodes = DatabaseCache.getColumnListOfTable(tableNode.identify)
+        })
+
+        return columnNodes.map<vscode.CompletionItem>(columnNode => {
+            let completionItem = new vscode.CompletionItem(columnNode.getTreeItem().columnName)
+            completionItem.detail = columnNode.getTreeItem().detail
+            completionItem.documentation = columnNode.getTreeItem().document
             completionItem.kind = vscode.CompletionItemKind.Function
             return completionItem
         })

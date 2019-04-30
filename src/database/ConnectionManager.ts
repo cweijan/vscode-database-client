@@ -41,7 +41,7 @@ export class ConnectionManager {
             this.connectionMap[key].conneciton.end()
             this.connectionMap[key] = undefined
         } else if (!this.connectionMap[key]) {
-            Console.log("create new " + key);
+            // Console.log("create new " + key);
             this.connectionMap[key] = {
                 conneciton: this.createConnection(connectionOptions),
                 expireTime: new Date()
