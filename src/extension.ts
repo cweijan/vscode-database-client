@@ -17,19 +17,21 @@ export function activate(context: vscode.ExtensionContext) {
     DatabaseCache.initCache(context)
 
     SqlViewManager.initExtesnsionPath(context.extensionPath)
-    
+
+    const sqlFiltertTreeProvider = new MySQLTreeDataProvider(context);
+    // vscode.window.registerTreeDataProvider("github.cweijan.mysql.filter", sqlFiltertTreeProvider)
     const sqlTreeProvider = new MySQLTreeDataProvider(context);
-    const treeview= vscode.window.createTreeView("mysql",{
-        treeDataProvider:sqlTreeProvider
+    const treeview = vscode.window.createTreeView("github.cweijan.mysql", {
+        treeDataProvider: sqlTreeProvider
     })
-    treeview.onDidCollapseElement(event=>{
-        DatabaseCache.storeElementState(event.element,vscode.TreeItemCollapsibleState.Collapsed)
+    treeview.onDidCollapseElement(event => {
+        DatabaseCache.storeElementState(event.element, vscode.TreeItemCollapsibleState.Collapsed)
     })
-    treeview.onDidExpandElement(event=>{
-        DatabaseCache.storeElementState(event.element,vscode.TreeItemCollapsibleState.Expanded)
+    treeview.onDidExpandElement(event => {
+        DatabaseCache.storeElementState(event.element, vscode.TreeItemCollapsibleState.Expanded)
     })
 
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider('sql',new CompletionProvider(),' ','.'))
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.'))
 
     context.subscriptions.push(vscode.commands.registerCommand("mysql.refresh", (node: INode) => {
         DatabaseCache.evictAllCache()
@@ -83,8 +85,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("mysql.data.export", (iNode: TableNode|DatabaseNode) => {
-        vscode.window.showOpenDialog({canSelectMany:false,openLabel:"Select export file path",canSelectFiles:false,canSelectFolders:true}).then(folderPath=>{
+    context.subscriptions.push(vscode.commands.registerCommand("mysql.data.export", (iNode: TableNode | DatabaseNode) => {
+        vscode.window.showOpenDialog({ canSelectMany: false, openLabel: "Select export file path", canSelectFiles: false, canSelectFolders: true }).then(folderPath => {
             iNode.backupData(folderPath[0].fsPath)
         })
     }));
