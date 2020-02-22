@@ -61,7 +61,7 @@ export class QueryUnit {
                     //     }
                     // });
                 } else {
-                    SqlViewManager.showQueryResult({ sql, data});
+                    SqlViewManager.showQueryResult({ sql, data, splitResultView: true });
                 }
 
             } else {

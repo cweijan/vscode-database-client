@@ -11,7 +11,7 @@ export class ViewOption {
     viewTitle?: string;
     sql?: string;
     data?: any;
-    splitResultView?: boolean = false;
+    splitResultView: boolean = false;
     /**
      * receive webview send message 
      */
@@ -33,7 +33,8 @@ export class SqlViewManager {
 
         if (this.resultWebviewPanel) {
             //TODO 这里需要根据splitResultView对窗口进行调整
-            this.resultWebviewPanel.webview.postMessage( viewOption)
+            this.resultWebviewPanel.webview.postMessage(viewOption)
+            this.resultWebviewPanel.reveal(vscode.ViewColumn.Two, true);
             return;
         }
 
@@ -44,14 +45,19 @@ export class SqlViewManager {
             this.resultWebviewPanel = webviewPanel
             webviewPanel.webview.postMessage(viewOption)
             webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined })
+
+            // vscode.commands.executeCommand('setContext', "httpResponsePreviewFocus", true);
         })
+
+
     }
 
     public static showConnectPage(mysqlTreeDataProvider: MySQLTreeDataProvider) {
 
         this.createWebviewPanel({
             viewPath: "connect",
-            viewTitle: "connect"
+            viewTitle: "connect",
+            splitResultView: false
         }).then(webviewPanel => {
             webviewPanel.webview.onDidReceiveMessage((params) => {
                 if (params.type === 'CONNECT_TO_SQL_SERVER') {
