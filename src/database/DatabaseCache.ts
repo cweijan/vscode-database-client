@@ -21,8 +21,8 @@ export class DatabaseCache {
     }
 
     /**
-         * support to complection manager
-         */
+     * support to complection manager
+     */
     static getDatabaseNodeList(): DatabaseNode[] {
         let databaseNodeList = [];
 

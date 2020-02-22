@@ -1,3 +1,6 @@
+## 1.5.3 (2020/2/22)
+- Focus query result panel when query
+
 ## 0.3.0 (2018-03-12)
 * Show query result as HTML table
 

@@ -1,7 +1,7 @@
 "user strict";
 
 export class Constants {
-    /** 数据库连接过期时间:10分钟 */
+    /** db connection alive time :10minute */
     public static EXPIRE_TIME=10*60*1000;
 }
 

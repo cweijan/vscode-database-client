@@ -32,7 +32,6 @@ export class SqlViewManager {
     public static showQueryResult(viewOption: ViewOption) {
 
         if (this.resultWebviewPanel) {
-            //TODO 这里需要根据splitResultView对窗口进行调整
             this.resultWebviewPanel.webview.postMessage(viewOption)
             this.resultWebviewPanel.reveal(vscode.ViewColumn.Two, true);
             return;
@@ -45,8 +44,6 @@ export class SqlViewManager {
             this.resultWebviewPanel = webviewPanel
             webviewPanel.webview.postMessage(viewOption)
             webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined })
-
-            // vscode.commands.executeCommand('setContext', "httpResponsePreviewFocus", true);
         })
 
 
