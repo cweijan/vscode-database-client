@@ -39,7 +39,7 @@ export class ProcedureNode implements INode, IConnection {
         QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SHOW CREATE PROCEDURE ${this.database}.${this.name}`)
             .then((procedDtail) => {
                 procedDtail = procedDtail[0]
-                QueryUnit.createSQLTextDocument(`DELIMITER $$\n\nDROP PROCEDURE IF EXISTS ${procedDtail['Procedure']}$$ \n\n${procedDtail['Create Procedure']}$$\n\nDELIMITER ;`);
+                QueryUnit.showSQLTextDocument(`DELIMITER $$\n\nDROP PROCEDURE IF EXISTS ${procedDtail['Procedure']}$$ \n\n${procedDtail['Create Procedure']}$$\n\nDELIMITER ;`);
             });
     }
 
