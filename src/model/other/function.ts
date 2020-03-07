@@ -71,7 +71,7 @@ export class FunctionNode implements INode, IConnection {
             if (inputContent.toLocaleLowerCase() == 'y') {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE ${this.database}.${this.name}`).then(() => {
                     DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`)
-                    sqlTreeProvider.refresh()
+                    MySQLTreeDataProvider.refresh()
                     vscode.window.showInformationMessage(`Delete table ${this.name} success!`)
                 })
             } else {

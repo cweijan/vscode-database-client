@@ -39,7 +39,7 @@ export class ColumnNode implements INode, IConnection {
         return [];
     }
 
-    public async changeColumnName( mysqlTreeDataProvider: MySQLTreeDataProvider) {
+    public async changeColumnName() {
         
         const columnName = this.column.COLUMN_NAME
         vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(async newColumnName => {
@@ -47,7 +47,7 @@ export class ColumnNode implements INode, IConnection {
             const sql = `alter table ${this.database}.${this.table} change column ${columnName} ${newColumnName} ${this.column.COLUMN_TYPE}`
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearColumnCache(`${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`)
-                mysqlTreeDataProvider.refresh()
+                MySQLTreeDataProvider.refresh()
             })
 
         })

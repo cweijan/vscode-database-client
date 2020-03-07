@@ -7,9 +7,12 @@ import { INode } from "../model/INode";
 export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     public _onDidChangeTreeData: vscode.EventEmitter<INode> = new vscode.EventEmitter<INode>();
     public readonly onDidChangeTreeData: vscode.Event<INode> = this._onDidChangeTreeData.event;
+    public static instance:MySQLTreeDataProvider
 
     constructor(private context: vscode.ExtensionContext) {
+        MySQLTreeDataProvider.instance=this
         this.init()
+
     }
 
     async init() {
@@ -20,7 +23,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
                 })
             })
         })
-        this.refresh()
+        MySQLTreeDataProvider.refresh()
     }
 
     public getTreeItem(element: INode): Promise<vscode.TreeItem> | vscode.TreeItem {
@@ -46,11 +49,11 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
         connections[`${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`] = connectionOptions;
         
         await this.context.globalState.update(CacheKey.ConectionsKey, connections);
-        this.refresh();
+        MySQLTreeDataProvider.refresh();
     }
 
-    public refresh(element?: INode): void {
-        this._onDidChangeTreeData.fire(element);
+    public static refresh(element?: INode): void {
+        this.instance._onDidChangeTreeData.fire(element);
     }
 
     public async getConnectionNodes(): Promise<ConnectionNode[]> {

@@ -60,21 +60,21 @@ export class ConnectionNode implements INode, IConnection {
         ConnectionManager.getConnection(this)
     }
 
-    public createDatabase(sqlTreeProvider: MySQLTreeDataProvider) {
+    public createDatabase() {
         vscode.window.showInputBox({ placeHolder: 'Input you want to create new database name.' }).then(async inputContent => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `create database ${inputContent} default character set = 'utf8' `).then(() => {
                 DatabaseCache.clearDatabaseCache(this.identify)
-                sqlTreeProvider.refresh()
+                MySQLTreeDataProvider.refresh()
                 vscode.window.showInformationMessage(`create database ${inputContent} success!`)
             })
         })
     }
 
-    public async deleteConnection(context: vscode.ExtensionContext, mysqlTreeDataProvider: MySQLTreeDataProvider) {
+    public async deleteConnection(context: vscode.ExtensionContext) {
         const connections = context.globalState.get<{ [key: string]: IConnection }>(CacheKey.ConectionsKey);
         delete connections[this.id];
         await context.globalState.update(CacheKey.ConectionsKey, connections);
 
-        mysqlTreeDataProvider.refresh();
+        MySQLTreeDataProvider.refresh();
     }
 }

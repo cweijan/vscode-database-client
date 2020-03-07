@@ -49,7 +49,7 @@ export class SqlViewManager {
 
     }
 
-    public static showConnectPage(mysqlTreeDataProvider: MySQLTreeDataProvider) {
+    public static showConnectPage(mysqlTreeDataProvider) {
 
         this.createWebviewPanel({
             viewPath: "connect",

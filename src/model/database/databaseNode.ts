@@ -77,12 +77,12 @@ export class DatabaseNode implements INode, IConnection {
 
     }
 
-    deleteDatatabase(sqlTreeProvider: MySQLTreeDataProvider) {
+    deleteDatatabase() {
         vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE ${this.database}`).then(() => {
                     DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`)
-                    sqlTreeProvider.refresh()
+                    MySQLTreeDataProvider.refresh()
                     vscode.window.showInformationMessage(`Delete database ${this.database} success!`)
                 })
             } else {

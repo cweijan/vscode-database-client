@@ -62,27 +62,27 @@ export class TableNode implements INode, IConnection {
     }
 
 
-    public changeTableName(sqlTreeProvider: MySQLTreeDataProvider) {
+    public changeTableName() {
 
         vscode.window.showInputBox({ value: this.table, placeHolder: 'newTableName', prompt: `You will changed ${this.database}.${this.table} to new table name!` }).then(async newTableName => {
             if (!newTableName) return
             const sql = `alter table ${this.database}.${this.table} rename ${newTableName}`
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`)
-                sqlTreeProvider.refresh()
+                MySQLTreeDataProvider.refresh()
             })
 
         })
 
     }
 
-    public dropTable(sqlTreeProvider: MySQLTreeDataProvider) {
+    public dropTable() {
 
         vscode.window.showInputBox({ prompt: `Are you want to drop table ${this.table} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE ${this.database}.${this.table}`).then(() => {
                     DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`)
-                    sqlTreeProvider.refresh()
+                    MySQLTreeDataProvider.refresh()
                     vscode.window.showInformationMessage(`Delete table ${this.table} success!`)
                 })
             } else {

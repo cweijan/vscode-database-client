@@ -40,28 +40,28 @@ export function activate(context: vscode.ExtensionContext) {
             sqlTreeProvider.init()
         }),
         vscode.commands.registerCommand("mysql.addDatabase", (connectionNode: ConnectionNode) => {
-            connectionNode.createDatabase(sqlTreeProvider)
+            connectionNode.createDatabase()
         }),
         vscode.commands.registerCommand("mysql.deleteDatabase", (databaseNode: DatabaseNode) => {
-            databaseNode.deleteDatatabase(sqlTreeProvider)
+            databaseNode.deleteDatatabase()
         }),
         vscode.commands.registerCommand("mysql.addConnection", () => {
             SqlViewManager.showConnectPage(sqlTreeProvider)
         }),
         vscode.commands.registerCommand("mysql.changeTableName", (tableNode: TableNode) => {
-            tableNode.changeTableName(sqlTreeProvider)
+            tableNode.changeTableName()
         }),
         vscode.commands.registerCommand("mysql.table.truncate", (tableNode: TableNode) => {
             tableNode.truncateTable()
         }),
         vscode.commands.registerCommand("mysql.table.drop", (tableNode: TableNode) => {
-            tableNode.dropTable(sqlTreeProvider)
+            tableNode.dropTable()
         }),
         vscode.commands.registerCommand("mysql.changeColumnName", (columnNode: ColumnNode) => {
-            columnNode.changeColumnName(sqlTreeProvider)
+            columnNode.changeColumnName()
         }),
         vscode.commands.registerCommand("mysql.deleteConnection", (connectionNode: ConnectionNode) => {
-            connectionNode.deleteConnection(context, sqlTreeProvider);
+            connectionNode.deleteConnection(context);
         }),
         vscode.commands.registerCommand("mysql.runQuery", () => {
             QueryUnit.runQuery();
