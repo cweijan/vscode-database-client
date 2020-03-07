@@ -1,3 +1,8 @@
+## 1.5.4 (2020/3/7)
+- Fix change database fail
+- Query result page beautify
+- Sql assistant enhance
+
 ## 1.5.3 (2020/2/22)
 - Focus query result panel when query
 

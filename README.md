@@ -4,6 +4,10 @@
 
 MySQL management tool Plus
 
+
+> This plugin forked from [MySQL (Jun Han)](https://marketplace.visualstudio.com/items?itemName=formulahendry.vscode-mysql).
+>
+> you can see changes in the [changelog](/CHANGELOG.md)
 ## Features
 
 * Manage MySQL Connections 
@@ -32,7 +36,3 @@ MySQL management tool Plus
 <!-- ## Settings
 
 * `vscode-mysql.maxTableCount`: The maximum table count shown in the tree view. (Default is **500**) -->
-
-## Change Log
-
-See Change Log [here](CHANGELOG.md)
