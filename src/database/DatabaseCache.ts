@@ -1,7 +1,7 @@
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
 import { CacheKey, ModelType } from "../common/Constants";
 import { ColumnNode } from "../model/table/columnNode";
-import { DatabaseNode } from "../model/DatabaseNode";
+import { DatabaseNode } from "../model/database/databaseNode";
 import { INode } from "../model/INode";
 import { TableNode } from "../model/table/tableNode";
 

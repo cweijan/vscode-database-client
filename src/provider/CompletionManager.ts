@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { DatabaseCache } from "../database/DatabaseCache";
-import { DatabaseNode } from "../model/DatabaseNode";
+import { DatabaseNode } from "../model/database/databaseNode";
 import { ColumnNode } from "../model/table/columnNode";
 import { TableNode } from "../model/table/tableNode";
 import { INode } from "../model/INode";

@@ -16,6 +16,8 @@ export class CacheKey{
 export class ModelType{
     public static CONNECTION="connection"
     public static DATABASE="database"
+    public static USER_GROUP="userGroup"
+    public static USER="user"
     public static TABLE="table"
     public static COLUMN="column"
     public static INFO="info";

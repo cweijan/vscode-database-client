@@ -2,7 +2,7 @@
 import * as vscode from "vscode";
 import { QueryUnit } from "./database/QueryUnit";
 import { ConnectionNode } from "./model/ConnectionNode";
-import { DatabaseNode } from "./model/DatabaseNode";
+import { DatabaseNode } from "./model/database/databaseNode";
 import { INode } from "./model/INode";
 import { TableNode } from "./model/table/tableNode";
 import { MySQLTreeDataProvider } from "./provider/MysqlTreeDataProvider";

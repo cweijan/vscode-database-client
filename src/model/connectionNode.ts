@@ -1,14 +1,15 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { ModelType, CacheKey, Constants } from "../common/Constants";
+import { CacheKey, Constants, ModelType } from "../common/Constants";
+import { ConnectionManager } from "../database/ConnectionManager";
+import { DatabaseCache } from "../database/DatabaseCache";
 import { QueryUnit } from "../database/QueryUnit";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 import { IConnection } from "./Connection";
-import { DatabaseNode } from "./DatabaseNode";
+import { DatabaseNode } from "./database/databaseNode";
+import { UserGroup } from "./database/userGroup";
 import { InfoNode } from "./InfoNode";
 import { INode } from "./INode";
-import { DatabaseCache } from "../database/DatabaseCache";
-import { ConnectionManager } from "../database/ConnectionManager";
 
 export class ConnectionNode implements INode, IConnection {
 
@@ -44,6 +45,7 @@ export class ConnectionNode implements INode, IConnection {
                 databaseNodes = databases.map<DatabaseNode>((database) => {
                     return new DatabaseNode(this.host, this.user, this.password, this.port, database.Database, this.certPath);
                 })
+                databaseNodes.unshift(new UserGroup(this.host, this.user, this.password, this.port,'mysql', this.certPath))
                 DatabaseCache.setDataBaseListOfConnection(this.identify, databaseNodes)
 
                 return databaseNodes;
