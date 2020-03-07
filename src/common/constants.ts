@@ -20,6 +20,7 @@ export class ModelType{
     public static COLUMN="column"
     public static INFO="info";
     public static TABLE_GROUP="tableGroup";
+    public static VIEW="view";
     public static VIEW_GROUP="viewGroup";
     public static TRIGGER_GROUP="triggerGroup";
     public static PROCEDURE_GROUP="procedureGroup";

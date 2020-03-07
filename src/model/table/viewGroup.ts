@@ -8,6 +8,7 @@ import { ConnectionManager } from "../../database/ConnectionManager";
 import { TableNode } from "./tableNode";
 import { IConnection } from "../Connection";
 import { Constants, ModelType } from "../../common/Constants";
+import { ViewNode } from "./viewNode";
 
 export class ViewGroup implements INode, IConnection {
     type: string; identify: string;
@@ -36,7 +37,7 @@ export class ViewGroup implements INode, IConnection {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT TABLE_NAME FROM information_schema.VIEWS  WHERE TABLE_SCHEMA = '${this.database}' LIMIT ${QueryUnit.maxTableCount}`)
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
-                    return new TableNode(this.host, this.user, this.password, this.port, this.database, table.TABLE_NAME, this.certPath)
+                    return new ViewNode(this.host, this.user, this.password, this.port, this.database, table.TABLE_NAME, this.certPath)
                 })
                 DatabaseCache.setTableListOfDatabase(this.identify, tableNodes)
                 if (tableNodes.length == 0) {
