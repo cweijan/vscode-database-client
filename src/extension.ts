@@ -13,6 +13,7 @@ import { SqlViewManager } from "./database/SqlViewManager";
 import { ProcedureNode } from "./model/other/Procedure";
 import { FunctionNode } from "./model/other/function";
 import { TriggerNode } from "./model/other/Trigger";
+import { UserNode } from "./model/database/userGroup";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -93,6 +94,10 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         vscode.commands.registerCommand("mysql.show.trigger", (triggerNode: TriggerNode) => {
             triggerNode.showSource();
+        })
+        ,
+        vscode.commands.registerCommand("mysql.user.sql", (userNode: UserNode) => {
+            userNode.selectSqlTemplate();
         })
     );
 
