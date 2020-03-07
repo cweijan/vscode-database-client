@@ -84,7 +84,7 @@ export class QueryUnit {
     private static sqlDocument: vscode.TextEditor;
     public static async showSQLTextDocument(sql: string = "") {
 
-        if (this.sqlDocument && !this.sqlDocument.document.isClosed ) {
+        if (this.sqlDocument && !this.sqlDocument.document.isClosed && !this.sqlDocument['_disposed'] && this.sqlDocument.document.isUntitled ) {
             this.sqlDocument.edit((editBuilder) => {
                 let lastLine = this.sqlDocument.document.lineCount-1;
                 editBuilder.replace(new vscode.Range(new vscode.Position(0, 0), new vscode.Position(lastLine, this.sqlDocument.document.lineAt(lastLine).text.length)), sql);
