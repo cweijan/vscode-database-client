@@ -7,7 +7,7 @@ import { Global } from "../common/Global";
 
 export class ConnectionManager {
 
-    private static connectionMap = {}
+    private static connectionCache = {}
     private static lastConnectionOption: IConnection;
     private static lastActiveConnection: any;
 
@@ -21,11 +21,11 @@ export class ConnectionManager {
             return undefined;
         }
 
-        if (this.lastActiveConnection && ((new Date().getTime() - this.lastActiveConnection.expireTime) < Constants.EXPIRE_TIME)) {
+        if (this.lastActiveConnection && this.lastActiveConnection.state == 'authenticated') {
             return this.lastActiveConnection
         }
 
-        return this.createConnection(Object.assign({ multipleStatements: true }, this.lastConnectionOption))
+        return this.getConnection(Object.assign({ multipleStatements: true }, this.lastConnectionOption))
 
     }
 
@@ -35,35 +35,35 @@ export class ConnectionManager {
 
         const key = `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}_${connectionOptions.password}_${connectionOptions.database}`
 
-        let usePoll = false
-        if (this.connectionMap[key] &&
-            ((new Date().getTime() - this.connectionMap[key].expireTime) > Constants.EXPIRE_TIME)) {
-            this.connectionMap[key].conneciton.end()
-            this.connectionMap[key] = undefined
-        } else if (!this.connectionMap[key]) {
-            // Console.log("create new " + key);
-            this.connectionMap[key] = {
-                conneciton: this.createConnection(connectionOptions),
-                expireTime: new Date()
+        let useCache = false
+
+        if (!this.connectionCache[key] ||
+            (this.connectionCache[key] && this.connectionCache[key].conneciton.state != 'authenticated')) {
+
+            this.connectionCache[key] = {
+                connectionOptions: connectionOptions,
+                conneciton: this.createConnection(connectionOptions)
             };
         } else {
-            usePoll = true;
+            useCache = true;
         }
 
-
         return new Promise((resolve, reject) => {
-            if (usePoll) {
-                this.lastActiveConnection = this.connectionMap[key].conneciton
-                resolve(this.connectionMap[key].conneciton)
+            if (useCache) {
+                this.lastConnectionOption = this.connectionCache[key].connectionOptions
+                this.lastActiveConnection = this.connectionCache[key].conneciton
+                Global.updateStatusBarItems(this.lastConnectionOption);
+                resolve(this.connectionCache[key].conneciton)
                 return;
             }
-            this.connectionMap[key].conneciton.connect((err: Error) => {
+            this.connectionCache[key].conneciton.connect((err: Error) => {
                 if (!err) {
-                    Global.updateStatusBarItems(connectionOptions);
-                    this.lastActiveConnection = this.connectionMap[key].conneciton
+                    this.lastConnectionOption = connectionOptions
+                    this.lastActiveConnection = this.connectionCache[key].conneciton
+                    Global.updateStatusBarItems(this.lastConnectionOption);
                     resolve(this.lastActiveConnection);
                 } else {
-                    this.connectionMap[key]=undefined
+                    this.connectionCache[key] = undefined
                     Console.log(`${err.stack}\n${err.message}`)
                     reject(err.message);
                 }
@@ -74,7 +74,7 @@ export class ConnectionManager {
 
 
     public static createConnection(connectionOptions: IConnection): any {
-        const newConnectionOptions: any = Object.assign({ useConnectionPooling: true }, connectionOptions);
+        const newConnectionOptions: any = Object.assign({ useConnectionPooling: true, connectTimeout: Constants.EXPIRE_TIME }, connectionOptions);
         if (connectionOptions.certPath && fs.existsSync(connectionOptions.certPath)) {
             newConnectionOptions.ssl = {
                 ca: fs.readFileSync(connectionOptions.certPath),

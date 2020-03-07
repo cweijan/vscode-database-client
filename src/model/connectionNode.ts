@@ -55,7 +55,7 @@ export class ConnectionNode implements INode, IConnection {
 
     public async newQuery() {
         QueryUnit.createSQLTextDocument();
-
+        ConnectionManager.getConnection(this)
     }
 
     public createDatabase(sqlTreeProvider: MySQLTreeDataProvider) {

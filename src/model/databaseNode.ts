@@ -54,6 +54,7 @@ export class DatabaseNode implements INode, IConnection {
             });
     }
 
+    
     public backupData(exportPath: string) {
 
         Console.log(`Doing backup ${this.host}_${this.database}...`)
@@ -103,6 +104,7 @@ export class DatabaseNode implements INode, IConnection {
     public async newQuery() {
 
         QueryUnit.createSQLTextDocument();
+        ConnectionManager.getConnection(this)
 
     }
 }
