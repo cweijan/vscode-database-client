@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { Constants, CacheKey } from "../common/Constants";
+import { CacheKey } from "../common/Constants";
 import { IConnection } from "../model/Connection";
 import { ConnectionNode } from "../model/ConnectionNode";
 import { INode } from "../model/INode";
@@ -13,13 +13,14 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     }
 
     async init() {
-        (await this.getConnectionNodes()).forEach(async connectionNode => {
+        await (await this.getConnectionNodes()).forEach(async connectionNode => {
             (await connectionNode.getChildren(true)).forEach(async databaseNode => {
-                (await databaseNode.getChildren(true)).forEach(tableNode => {
+                (await databaseNode.getChildren(true)).forEach(async tableNode => {
                     tableNode.getChildren(true)
                 })
             })
         })
+        this.refresh()
     }
 
     public getTreeItem(element: INode): Promise<vscode.TreeItem> | vscode.TreeItem {
