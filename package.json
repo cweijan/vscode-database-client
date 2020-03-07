@@ -33,6 +33,13 @@
 	],
 	"main": "./out/extension",
 	"contributes": {
+		"grammars": [
+			{
+			  "language": "sql",
+			  "scopeName": "source.sql",
+			  "path": "./syntaxes/mysql.tmLanguage.json"
+			}
+		],
 		"viewsContainers": {
 			"activitybar": [
 				{

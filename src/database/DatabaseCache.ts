@@ -1,9 +1,9 @@
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
 import { CacheKey, ModelType } from "../common/Constants";
-import { ColumnNode } from "../model/ColumnNode";
+import { ColumnNode } from "../model/table/columnNode";
 import { DatabaseNode } from "../model/DatabaseNode";
 import { INode } from "../model/INode";
-import { TableNode } from "../model/TableNode";
+import { TableNode } from "../model/table/tableNode";
 
 export class DatabaseCache {
 
@@ -44,7 +44,7 @@ export class DatabaseCache {
 
         Object.keys(this.databaseNodeMapTableNode).forEach(key => {
             let tempList = this.databaseNodeMapTableNode[key]
-            if (tempList) {
+            if (tempList && (tempList[0] instanceof TableNode)) {
                 tableNodeList = tableNodeList.concat(tempList)
             }
         })
@@ -72,7 +72,7 @@ export class DatabaseCache {
 
         if (this.collpaseState[element.identify]) {
             return this.collpaseState[element.identify]
-        } else if (element.type == ModelType.CONNECTION) {
+        } else if (element.type == ModelType.CONNECTION || element.type == ModelType.TABLE_GROUP) {
             return TreeItemCollapsibleState.Expanded
         } else {
             return TreeItemCollapsibleState.Collapsed
@@ -157,7 +157,7 @@ export class DatabaseCache {
      * get database tree data
      * @param databaseIdentify 
      */
-    static getTableListOfDatabase(databaseIdentify: string): TableNode[] {
+    static getTableListOfDatabase(databaseIdentify: string): INode[] {
         if (this.databaseNodeMapTableNode[databaseIdentify]) {
             return this.databaseNodeMapTableNode[databaseIdentify]
         } else {
@@ -181,7 +181,7 @@ export class DatabaseCache {
         this.connectionNodeMapDatabaseNode[connectionIdentify] = DatabaseNodeList
     }
 
-    static setTableListOfDatabase(databaseIdentify: string, tableNodeList: TableNode[]) {
+    static setTableListOfDatabase(databaseIdentify: string, tableNodeList: INode[]) {
         this.databaseNodeMapTableNode[databaseIdentify] = tableNodeList
     }
 

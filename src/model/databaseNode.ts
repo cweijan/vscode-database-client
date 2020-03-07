@@ -4,13 +4,18 @@ import mysqldump from 'mysqldump'
 import { QueryUnit } from "../database/QueryUnit";
 import { InfoNode } from "./InfoNode";
 import { INode } from "./INode";
-import { TableNode } from "./TableNode";
+import { TableNode } from "./table/tableNode";
 import { DatabaseCache } from "../database/DatabaseCache";
-import { ModelType } from "../common/Constants";
+import { ModelType, Constants } from "../common/Constants";
 import { Console } from "../common/OutputChannel";
 import { IConnection } from "./Connection";
 import { ConnectionManager } from "../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
+import { TableGroup } from "./table/tableGroup";
+import { ViewGroup } from "./table/viewGroup";
+import { FunctionGroup } from "./other/functionGroup";
+import { ProcedureGroup } from "./other/procedureGroup";
+import { TriggerGroup } from "./other/triggerGroup";
 
 export class DatabaseNode implements INode, IConnection {
 
@@ -28,33 +33,21 @@ export class DatabaseNode implements INode, IConnection {
             label: this.database,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.DATABASE,
-            iconPath: path.join(__filename, "..", "..", "..", "resources", "database.svg")
+            iconPath: path.join(Constants.RES_PATH, "database.svg")
         }
 
     }
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
 
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}`
-        let tableNodes = DatabaseCache.getTableListOfDatabase(this.identify)
-        if (tableNodes && !isRresh) {
-            return tableNodes
-        }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' LIMIT ${QueryUnit.maxTableCount}`)
-            .then((tables) => {
-                tableNodes = tables.map<TableNode>((table) => {
-                    let tableNode = new TableNode(this.host, this.user, this.password, this.port, this.database, table.TABLE_NAME, this.certPath)
-                    return tableNode;
-                })
-                DatabaseCache.setTableListOfDatabase(this.identify, tableNodes)
-                return tableNodes;
-            })
-            .catch((err) => {
-                return [new InfoNode(err)];
-            });
+        return [new TableGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
+        new ViewGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
+        new ProcedureGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
+        new FunctionGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
+        new TriggerGroup(this.host, this.user, this.password, this.port, this.database, this.certPath)]
     }
 
-    
+
     public backupData(exportPath: string) {
 
         Console.log(`Doing backup ${this.host}_${this.database}...`)
@@ -86,7 +79,7 @@ export class DatabaseNode implements INode, IConnection {
 
     }
 
-    deleteDatatabase( sqlTreeProvider: MySQLTreeDataProvider) {
+    deleteDatatabase(sqlTreeProvider: MySQLTreeDataProvider) {
         vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE ${this.database}`).then(() => {
@@ -94,7 +87,7 @@ export class DatabaseNode implements INode, IConnection {
                     sqlTreeProvider.refresh()
                     vscode.window.showInformationMessage(`Delete database ${this.database} success!`)
                 })
-            }else{
+            } else {
                 vscode.window.showInformationMessage(`Cancel delete database ${this.database}!`)
             }
         })

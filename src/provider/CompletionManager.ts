@@ -1,8 +1,9 @@
 import * as vscode from "vscode";
 import { DatabaseCache } from "../database/DatabaseCache";
 import { DatabaseNode } from "../model/DatabaseNode";
-import { ColumnNode } from "../model/ColumnNode";
-import { TableNode } from "../model/TableNode";
+import { ColumnNode } from "../model/table/columnNode";
+import { TableNode } from "../model/table/tableNode";
+import { INode } from "../model/INode";
 
 export class CompletionManager {
 
@@ -58,7 +59,7 @@ export class CompletionManager {
 
     private generateTableComplectionItem(inputWord?: string): vscode.CompletionItem[] {
 
-        let tableNodes: TableNode[] = []
+        let tableNodes: INode[] = []
         if (inputWord) {
             DatabaseCache.getDatabaseNodeList().forEach(databaseNode => {
                 if (databaseNode.database == inputWord) tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.identify)
@@ -67,7 +68,7 @@ export class CompletionManager {
             tableNodes = DatabaseCache.getTableNodeList()
         }
 
-        var tempList = [...new Set(tableNodes.map(tableNode => {
+        var tempList = [...new Set(tableNodes.map((tableNode:TableNode) => {
             return tableNode.getTreeItem().label;
         }))]
 

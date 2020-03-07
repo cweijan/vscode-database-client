@@ -1,12 +1,12 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { INode } from "./INode";
-import { ModelType } from "../common/Constants";
-import { QueryUnit } from "../database/QueryUnit";
-import { DatabaseCache } from "../database/DatabaseCache";
-import { IConnection } from "./Connection";
-import { ConnectionManager } from "../database/ConnectionManager";
-import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
+import { INode } from "../INode";
+import { ModelType, Constants } from "../../common/Constants";
+import { QueryUnit } from "../../database/QueryUnit";
+import { DatabaseCache } from "../../database/DatabaseCache";
+import { IConnection } from "../Connection";
+import { ConnectionManager } from "../../database/ConnectionManager";
+import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 
 class ColumnTreeItem extends vscode.TreeItem {
     columnName: string;
@@ -31,7 +31,7 @@ export class ColumnNode implements INode, IConnection {
             label: `${this.column.COLUMN_NAME} : ${this.column.COLUMN_TYPE}     ${this.column.COLUMN_COMMENT}`,
             collapsibleState: vscode.TreeItemCollapsibleState.None,
             contextValue: ModelType.COLUMN,
-            iconPath: path.join(__filename, "..", "..", "..", "resources", this.column.COLUMN_KEY === "PRI" ? "b_primary.png" : "b_props.png"),
+            iconPath: path.join(Constants.RES_PATH,  this.column.COLUMN_KEY === "PRI" ? "b_primary.png" : "b_props.png"),
         };
     }
 

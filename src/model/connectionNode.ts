@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { ModelType, CacheKey } from "../common/Constants";
+import { ModelType, CacheKey, Constants } from "../common/Constants";
 import { QueryUnit } from "../database/QueryUnit";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 import { IConnection } from "./Connection";
@@ -28,7 +28,7 @@ export class ConnectionNode implements INode, IConnection {
             id: this.host,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.CONNECTION,
-            iconPath: path.join(__filename, "..", "..", "..", "resources", "server.png")
+            iconPath: path.join(Constants.RES_PATH, "server.png")
         };
     }
 
