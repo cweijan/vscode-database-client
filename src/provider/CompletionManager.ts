@@ -6,18 +6,19 @@ import { TableNode } from "../model/TableNode";
 
 export class CompletionManager {
 
-    private keywordList: string[] = ["SELECT", "UPDATE", "DELETE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER"]
+    private keywordList: string[] = ["SELECT", "UPDATE", "DELETE","TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER","CREATE","DROP","FUNCTION","PROCEDURE","TRIGGER"]
     private keywordComplectionItems: vscode.CompletionItem[] = []
 
     getComplectionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {
 
         let completionItems = []
 
-        const prePostion = new vscode.Position(position.line, position.character - 1);
+        const prePostion = position.character == 0 ? position : new vscode.Position(position.line, position.character - 1);
         const preChart = document.getText(new vscode.Range(prePostion, position))
         if (preChart != "." && preChart != " ") {
             completionItems = completionItems.concat(this.keywordComplectionItems)
         }
+        if ((position.character == 0) ) return completionItems
 
         let wordRange = document.getWordRangeAtPosition(prePostion)
         const inputWord = document.getText(wordRange)
@@ -50,23 +51,23 @@ export class CompletionManager {
         let databaseNodes = DatabaseCache.getDatabaseNodeList()
         return databaseNodes.map<vscode.CompletionItem>(databaseNode => {
             let completionItem = new vscode.CompletionItem(databaseNode.getTreeItem().label)
-            completionItem.kind = vscode.CompletionItemKind.Function
+            completionItem.kind = vscode.CompletionItemKind.Struct
             return completionItem
         })
     }
 
     private generateTableComplectionItem(inputWord?: string): vscode.CompletionItem[] {
 
-        let tableNodes:TableNode[] =[]
+        let tableNodes: TableNode[] = []
         if (inputWord) {
             DatabaseCache.getDatabaseNodeList().forEach(databaseNode => {
                 if (databaseNode.database == inputWord) tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.identify)
             })
-        }else{
+        } else {
             tableNodes = DatabaseCache.getTableNodeList()
         }
-        
-        var tempList=[...new Set(tableNodes.map(tableNode=>{
+
+        var tempList = [...new Set(tableNodes.map(tableNode => {
             return tableNode.getTreeItem().label;
         }))]
 
