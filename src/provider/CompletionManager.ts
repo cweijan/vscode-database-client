@@ -66,8 +66,12 @@ export class CompletionManager {
             tableNodes = DatabaseCache.getTableNodeList()
         }
         
-        return tableNodes.map<vscode.CompletionItem>(tableNode => {
-            let completionItem = new vscode.CompletionItem(tableNode.getTreeItem().label)
+        var tempList=[...new Set(tableNodes.map(tableNode=>{
+            return tableNode.getTreeItem().label;
+        }))]
+
+        return tempList.map<vscode.CompletionItem>(tableName => {
+            let completionItem = new vscode.CompletionItem(tableName)
             completionItem.kind = vscode.CompletionItemKind.Function
             return completionItem
         })
