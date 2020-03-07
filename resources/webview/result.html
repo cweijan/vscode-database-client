@@ -20,15 +20,37 @@
         th {
             background: #444
         }
+
+        .title {
+            font-weight: bold;
+            text-align: center;
+            font-size: 20px;
+        }
+        .hint{
+            padding-left: 5px;
+            padding-right: 5px;
+            background: white;
+            font-size: 17px;
+            color: #444;
+            display: inline-block;
+        }
+        .sql{
+            color: #5e5eFF;
+        }
     </style>
 </head>
 
 <body>
     <div id="app">
-        <div>
+        <div class="title">
             Query Result
         </div>
-        <div v-text="result.sql"></div>
+        <div class="hint">
+            <span>executeTime : </span><span v-text="updateTime"></span><br />
+            <div class="sql-background">
+            <span>sql : </span><span v-text="result.sql" class="sql"></span><br />
+        </div>
+        </div>
         <!-- <select v-model='result.mode'>
             <option value="0">只读</option>
             <option value="1">可写</option>
@@ -45,7 +67,47 @@
         </table>
     </div>
 </body>
+
 <script>
+    var formatNow = function (formatStr) {
+        var date = new Date();
+        var zeroize = function (value, length) {
+            if (!length) {
+                length = 2;
+            }
+            value = new String(value);
+            for (var i = 0, zeros = ''; i < (length - value.length); i++) {
+                zeros += '0';
+            }
+            return zeros + value;
+        };
+        return formatStr.replace(/"[^"]*"|'[^']*'|\b(?:d{1,4}|M{1,4}|yy(?:yy)?|([hHmstT])\1?|[lLZ])\b/g, function ($0) {
+            switch ($0) {
+                case 'd': return date.getDate();
+                case 'dd': return zeroize(date.getDate());
+                case 'ddd': return ['Sun', 'Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat'][date.getDay()];
+                case 'dddd': return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getDay()];
+                case 'M': return date.getMonth() + 1;
+                case 'MM': return zeroize(date.getMonth() + 1);
+                case 'MMM': return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()];
+                case 'MMMM': return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][date.getMonth()];
+                case 'yy': return new String(date.getFullYear()).substr(2);
+                case 'yyyy': return date.getFullYear();
+                case 'h': return date.getHours() % 12 || 12;
+                case 'hh': return zeroize(date.getHours() % 12 || 12);
+                case 'H': return date.getHours();
+                case 'HH': return zeroize(date.getHours());
+                case 'm': return date.getMinutes();
+                case 'mm': return zeroize(date.getMinutes());
+                case 's': return date.getSeconds();
+                case 'ss': return zeroize(date.getSeconds());
+                case 'l': return date.getMilliseconds();
+                case 'll': return zeroize(date.getMilliseconds());
+                case 'tt': return date.getHours() < 12 ? 'am' : 'pm';
+                case 'TT': return date.getHours() < 12 ? 'AM' : 'PM';
+            }
+        });
+    }
     const vscode = acquireVsCodeApi();
     const previousState = vscode.getState();
     const vue = new Vue({
@@ -55,13 +117,15 @@
                 mode: 0,
                 rows: [],
                 sql: ''
-            }
+            },
+            updateTime: formatNow('yyyy-MM-dd HH:mm:ss')
         }
     })
 
     window.addEventListener('message', event => {
         vue.result.rows = event.data.data
         vue.result.sql = event.data.sql
+        vue.updateTime = formatNow('yyyy-MM-dd HH:mm:ss')
         vscode.setState({ result: vue.result });
         document.write(previousState + ":" + count)
     });
