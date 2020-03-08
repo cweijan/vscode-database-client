@@ -2,10 +2,10 @@
 	"name": "SQL",
 	"scopeName": "source.sql",
 	"patterns": [
-     {
-      "match": "TRIGGER|DEFINER|FOR|EACH|CURSOR|VIEW|IDENTIFIED|PRIVILEGES|FLUSH",
-      "name": "keyword.mysql"
-    },
+		{
+			"match": "(?i)\\b(TRIGGER|DEFINER|FOR|EACH|CURSOR|VIEW|IDENTIFIED|PRIVILEGES|FLUSH|SHOW|INDEX|CHANGE|COMMENT|COLUMN|ADD|UNIQUE)\\b",
+			"name": "keyword.mysql"
+		},
 		{
 			"match": "((?<!@)@)\\b(\\w+)\\b",
 			"name": "text.variable"

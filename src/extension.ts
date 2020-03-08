@@ -54,6 +54,9 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.changeTableName", (tableNode: TableNode) => {
             tableNode.changeTableName()
         }),
+        vscode.commands.registerCommand("mysql.index.template", (tableNode: TableNode) => {
+            tableNode.indexTemplate()
+        }),
         vscode.commands.registerCommand("mysql.table.truncate", (tableNode: TableNode) => {
             tableNode.truncateTable()
         }),

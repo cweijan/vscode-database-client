@@ -45,3 +45,4 @@ MySQL management tool Plus
 ## Future Plain
 - Beautify query result page.
 - Edit data alive on query result page.
+- Record sql execute history.

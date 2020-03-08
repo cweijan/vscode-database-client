@@ -22,12 +22,21 @@ export class ColumnNode implements INode, IConnection {
         readonly certPath: string, private readonly column: any) {
     }
 
+    private getIndex(columnKey:string){
+        switch(columnKey){
+            case 'UNI':return "UniqueKey"
+            case 'MUL':return "IndexKey"
+            case 'PRI':return "PrimaryKey"
+        }
+        return '';
+    }
+
     public getTreeItem(): ColumnTreeItem {
         return {
             columnName: `${this.column.COLUMN_NAME}`,
             detail: `${this.column.COLUMN_TYPE}`,
             document: `${this.column.COLUMN_COMMENT}`,
-            label: `${this.column.COLUMN_NAME} : ${this.column.COLUMN_TYPE}     ${this.column.COLUMN_COMMENT}`,
+            label: `${this.column.COLUMN_NAME} : ${this.column.COLUMN_TYPE}  ${this.getIndex(this.column.COLUMN_KEY)}   ${this.column.COLUMN_COMMENT}`,
             collapsibleState: vscode.TreeItemCollapsibleState.None,
             contextValue: ModelType.COLUMN,
             iconPath: path.join(Constants.RES_PATH,  this.column.COLUMN_KEY === "PRI" ? "b_primary.png" : "b_props.png"),
@@ -59,7 +68,7 @@ export class ColumnNode implements INode, IConnection {
 
     addColumnTemplate() {
         ConnectionManager.getConnection(this, true)
-        QueryUnit.createSQLTextDocument(`ALTER TABLE ${this.database}.${this.table} ADD COLUMN name type NOT NULL comment '';`);
+        QueryUnit.createSQLTextDocument(`ALTER TABLE ${this.database}.${this.table} ADD COLUMN columnName columnType NOT NULL comment '';`);
     }
     updateColumnTemplate() {
         ConnectionManager.getConnection(this, true)

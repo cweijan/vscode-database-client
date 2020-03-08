@@ -47,7 +47,7 @@ export class TableNode implements INode, IConnection {
         if (columnNodes && !isRresh) {
             return columnNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT * FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT COLUMN_NAME,COLUMN_TYPE,COLUMN_COMMENT,COLUMN_TYPE,COLUMN_KEY FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column) => {
                     return new ColumnNode(this.host, this.user, this.password, this.port, this.database, this.table, this.certPath, column);
@@ -103,6 +103,16 @@ export class TableNode implements INode, IConnection {
             }
         })
 
+
+    }
+
+    indexTemplate() {
+        ConnectionManager.getConnection(this, true)
+        QueryUnit.showSQLTextDocument(`-- ALTER TABLE ${this.database}.${this.table} DROP INDEX [indexName];
+-- ALTER TABLE ${this.database}.${this.table} ADD [UNIQUE|KEY|PRIMARY KEY] INDEX ([column]);`)
+        setTimeout(() => {
+            QueryUnit.runQuery(`SELECT column_name,table_schema,index_name,non_unique FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${this.database}' and table_name='${this.table}';`, this)
+        }, 10);
 
     }
 

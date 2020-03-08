@@ -158,6 +158,11 @@
 				}
 			},
 			{
+				"command": "mysql.index.template",
+				"title": "Index Manage Template",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.changeColumnName",
 				"title": "change column name",
 				"category": "MySQL",
@@ -226,7 +231,6 @@
 					"dark": "resources/dark/add.svg"
 				}
 			},
-			
 			{
 				"command": "mysql.delete.user",
 				"title": "Drop User",
@@ -337,7 +341,8 @@
 					"command": "mysql.delete.user",
 					"when": "view == github.cweijan.mysql && viewItem == user",
 					"group": "1_mysql@1"
-				},{
+				},
+				{
 					"command": "mysql.change.user",
 					"when": "view == github.cweijan.mysql && viewItem == user",
 					"group": "1_mysql@1"
@@ -375,7 +380,12 @@
 				{
 					"command": "mysql.changeTableName",
 					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "1_inline"
+					"group": "1_inline@0"
+				},
+				{
+					"command": "mysql.index.template",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline@1"
 				},
 				{
 					"command": "mysql.copy.insert",

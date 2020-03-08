@@ -51,9 +51,9 @@ export class QueryUnit {
                 sql = activeTextEditor.document.getText(selection);
             }
         }
-
+        sql = sql.replace(/--.+/ig, '');
         connection.query(sql, (err, data) => {
-            let isDDL=sql.match(this.ddlPattern);
+            let isDDL = sql.match(this.ddlPattern);
             if (Array.isArray(data) && !isDDL) {
                 SqlViewManager.showQueryResult({ sql, data, splitResultView: true });
             } else {
