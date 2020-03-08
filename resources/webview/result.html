@@ -5,28 +5,13 @@
     <link rel="stylesheet" href="${webviewPath}/test.css">
     <script src="${webviewPath}/js/vue.js"></script>
     <style>
-        table {
-            border-collapse: collapse;
-            text-align: center
-        }
-
-        table,
-        td,
-        th {
-            border: 1px solid #ccc;
-            padding: 5px;
-        }
-
-        th {
-            background: #444
-        }
-
         .title {
             font-weight: bold;
             text-align: center;
             font-size: 20px;
         }
-        .hint{
+
+        .hint {
             padding-left: 5px;
             padding-right: 5px;
             background: white;
@@ -34,8 +19,43 @@
             color: #444;
             display: inline-block;
         }
-        .sql{
+
+        .sql {
             color: #5e5eFF;
+        }
+
+        .table {
+            display: table;
+            text-align: center;
+        }
+
+        .tr {
+            display: table-row;
+        }
+
+        .th {
+            background: #444;
+            padding: 5px;
+        }
+
+        .td,
+        .th {
+            
+            border: 1px solid #ccc;
+            display: table-cell;
+        }
+
+        .data-container {
+            min-width: 60px;
+            max-width: 200px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .data-container span{
+            padding: 5px;
+            display: inline-block;
+            height: 100%;
+            width: 100%;
         }
     </style>
 </head>
@@ -48,23 +68,25 @@
         <div class="hint">
             <span>executeTime : </span><span v-text="updateTime"></span><br />
             <div class="sql-background">
-            <span>sql : </span><span v-text="result.sql" class="sql"></span><br />
-        </div>
+                <span>sql : </span><span v-text="result.sql" class="sql"></span><br />
+            </div>
         </div>
         <!-- <select v-model='result.mode'>
             <option value="0">只读</option>
             <option value="1">可写</option>
         </select> -->
-        <table>
-            <tr>
-                <th v-for="value,key in result.rows[0]" v-text="key"></th>
-            </tr>
-            <tr v-for="row,key,index in result.rows">
-                <td v-for="value in row">
-                    <span v-text="value" :contenteditable="result.mode==1?'true':'false'"></span>
-                </td>
-            </tr>
-        </table>
+        <div class="table">
+            <div class="tr">
+                <div class="th" v-for="value,key in result.rows[0]" v-text="key"></div>
+            </div>
+            <div class="tr" v-for="row,key,index in result.rows">
+                <div class="td" v-for="value in row">
+                    <div class="data-container">
+                        <span v-text="value" :contenteditable="result.mode==1?'true':'false'"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 
@@ -114,7 +136,7 @@
         el: '#app',
         data: {
             result: previousState ? previousState.result : {
-                mode: 0,
+                mode: 1,
                 rows: [],
                 sql: ''
             },
