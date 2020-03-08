@@ -4,6 +4,7 @@ import { IConnection } from "../model/Connection";
 import { Console } from "../common/OutputChannel";
 import { SqlViewManager } from "./SqlViewManager";
 import { ConnectionManager } from "./ConnectionManager";
+import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 
 export class QueryUnit {
     public static readonly maxTableCount = QueryUnit.getConfiguration().get<number>("maxTableCount");
@@ -26,6 +27,7 @@ export class QueryUnit {
         });
     }
 
+    private static ddlPattern = /(alter|create|drop)/ig;
     public static async runQuery(sql?: string, connectionOptions?: IConnection) {
         if (!sql && !vscode.window.activeTextEditor) {
             vscode.window.showWarningMessage("No SQL file selected");
@@ -52,25 +54,14 @@ export class QueryUnit {
 
         connection.query(sql, (err, data) => {
             if (Array.isArray(data)) {
-                if (data.some(((row) => Array.isArray(row)))) {
-                    // rows.forEach((row, index) => {
-                    //     if (Array.isArray(row)) {
-                    //         SqlViewManager.showQueryResult(row, 'result');
-                    //     } else {
-                    //         Console.log(JSON.stringify(row));
-                    //     }
-                    // });
-                } else {
-                    SqlViewManager.showQueryResult({ sql, data, splitResultView: true });
-                }
-
+                SqlViewManager.showQueryResult({ sql, data, splitResultView: true });
             } else {
                 Console.log(JSON.stringify(data));
             }
-
             if (err) {
                 Console.log(err);
-            } else {
+            } else if (sql.match(this.ddlPattern)) {
+                MySQLTreeDataProvider.instance.init()
             }
         });
     }
@@ -84,9 +75,9 @@ export class QueryUnit {
     private static sqlDocument: vscode.TextEditor;
     public static async showSQLTextDocument(sql: string = "") {
 
-        if (this.sqlDocument && !this.sqlDocument.document.isClosed && !this.sqlDocument['_disposed'] && this.sqlDocument.document.isUntitled ) {
+        if (this.sqlDocument && !this.sqlDocument.document.isClosed && !this.sqlDocument['_disposed'] && this.sqlDocument.document.isUntitled) {
             this.sqlDocument.edit((editBuilder) => {
-                let lastLine = this.sqlDocument.document.lineCount-1;
+                let lastLine = this.sqlDocument.document.lineCount - 1;
                 editBuilder.replace(new vscode.Range(new vscode.Position(0, 0), new vscode.Position(lastLine, this.sqlDocument.document.lineAt(lastLine).text.length)), sql);
             })
         } else {

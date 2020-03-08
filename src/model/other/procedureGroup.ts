@@ -50,5 +50,13 @@ export class ProcedureGroup implements INode, IConnection {
             });
     }
 
+    createTemplate() {
+        QueryUnit.createSQLTextDocument(`CREATE
+/*[DEFINER = { user | CURRENT_USER }]*/
+PROCEDURE [name]()
+BEGIN
+
+END;`)
+    }
 
 }

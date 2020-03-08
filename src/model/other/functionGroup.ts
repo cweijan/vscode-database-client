@@ -49,5 +49,13 @@ export class FunctionGroup implements INode, IConnection {
             });
     }
 
+    createTemplate() {
+        QueryUnit.createSQLTextDocument(`CREATE
+/*[DEFINER = { user | CURRENT_USER }]*/
+FUNCTION [name]() RETURNS [TYPE]
+BEGIN
+    return [value];
+END;`)
+    }
 
 }

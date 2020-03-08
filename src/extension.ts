@@ -14,6 +14,9 @@ import { ProcedureNode } from "./model/other/Procedure";
 import { FunctionNode } from "./model/other/function";
 import { TriggerNode } from "./model/other/Trigger";
 import { UserNode } from "./model/database/userGroup";
+import { FunctionGroup } from "./model/other/functionGroup";
+import { TriggerGroup } from "./model/other/triggerGroup";
+import { ProcedureGroup } from "./model/other/procedureGroup";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -21,8 +24,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     SqlViewManager.initExtesnsionPath(context.extensionPath)
 
-    const sqlFiltertTreeProvider = new MySQLTreeDataProvider(context);
-    // vscode.window.registerTreeDataProvider("github.cweijan.mysql.filter", sqlFiltertTreeProvider)
     const sqlTreeProvider = new MySQLTreeDataProvider(context);
     const treeview = vscode.window.createTreeView("github.cweijan.mysql", {
         treeDataProvider: sqlTreeProvider
@@ -46,7 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
             databaseNode.deleteDatatabase()
         }),
         vscode.commands.registerCommand("mysql.addConnection", () => {
-            SqlViewManager.showConnectPage(sqlTreeProvider)
+            SqlViewManager.showConnectPage()
         }),
         vscode.commands.registerCommand("mysql.changeTableName", (tableNode: TableNode) => {
             tableNode.changeTableName()
@@ -94,10 +95,18 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         vscode.commands.registerCommand("mysql.show.trigger", (triggerNode: TriggerNode) => {
             triggerNode.showSource();
-        })
-        ,
+        }),
         vscode.commands.registerCommand("mysql.user.sql", (userNode: UserNode) => {
             userNode.selectSqlTemplate();
+        }) ,
+        vscode.commands.registerCommand("mysql.template.procedure", (procedureGroup: ProcedureGroup) => {
+            procedureGroup.createTemplate();
+        }),
+        vscode.commands.registerCommand("mysql.template.trigger", (triggerGroup: TriggerGroup) => {
+            triggerGroup.createTemplate();
+        }),
+        vscode.commands.registerCommand("mysql.template.function", (functionGroup: FunctionGroup) => {
+            functionGroup.createTemplate();
         })
     );
 

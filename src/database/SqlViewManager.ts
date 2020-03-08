@@ -49,7 +49,7 @@ export class SqlViewManager {
 
     }
 
-    public static showConnectPage(mysqlTreeDataProvider) {
+    public static showConnectPage() {
 
         this.createWebviewPanel({
             viewPath: "connect",
@@ -59,7 +59,7 @@ export class SqlViewManager {
             webviewPanel.webview.onDidReceiveMessage((params) => {
                 if (params.type === 'CONNECT_TO_SQL_SERVER') {
                     ConnectionManager.getConnection(params.connectionOption).then(() => {
-                        mysqlTreeDataProvider.addConnection(params.connectionOption);
+                        MySQLTreeDataProvider.instance.addConnection(params.connectionOption);
                         webviewPanel.dispose();
                     }).catch((err: Error) => {
                         webviewPanel.webview.postMessage({

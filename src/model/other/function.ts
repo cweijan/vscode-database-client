@@ -39,7 +39,7 @@ export class FunctionNode implements INode, IConnection {
         QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SHOW CREATE FUNCTION ${this.database}.${this.name}`)
         .then((procedDtail) => {
             procedDtail = procedDtail[0]
-            QueryUnit.showSQLTextDocument(`DELIMITER $$\n\nDROP FUNCTION IF EXISTS ${procedDtail['Function']}$$ \n\n${procedDtail['Create Function']}$$\n\nDELIMITER ;`);
+            QueryUnit.showSQLTextDocument(`DROP FUNCTION IF EXISTS ${procedDtail['Function']}; \n\n${procedDtail['Create Function']}`);
         });
     }
 

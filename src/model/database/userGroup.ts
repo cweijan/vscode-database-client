@@ -59,7 +59,6 @@ export class UserNode implements INode, IConnection {
         this.identify = `${this.host}_${this.port}_${this.name}`
         return {
             label: this.name,
-            collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.USER,
             iconPath: path.join(Constants.RES_PATH, "user.svg"),
             command: {

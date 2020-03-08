@@ -38,7 +38,7 @@ export class TriggerNode implements INode, IConnection {
         QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SHOW CREATE TRIGGER ${this.database}.${this.name}`)
         .then((procedDtail) => {
             procedDtail = procedDtail[0]
-            QueryUnit.showSQLTextDocument(`DELIMITER $$\n\nDROP TRIGGER IF EXISTS ${procedDtail['Trigger']}$$ \n\n${procedDtail['SQL Original Statement']}$$\n\nDELIMITER ;`);
+            QueryUnit.showSQLTextDocument(`\n\nDROP TRIGGER IF EXISTS ${procedDtail['Trigger']}; \n\n${procedDtail['SQL Original Statement']}`);
         });
     }
 
