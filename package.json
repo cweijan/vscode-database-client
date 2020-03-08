@@ -167,6 +167,21 @@
 				}
 			},
 			{
+				"command": "mysql.column.add",
+				"title": "Add Column Template",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.column.update",
+				"title": "Modify Column Template",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.column.drop",
+				"title": "Drop column Template",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.template.view",
 				"title": "Create New View",
 				"category": "MySQL",
@@ -211,9 +226,15 @@
 					"dark": "resources/dark/add.svg"
 				}
 			},
+			
 			{
 				"command": "mysql.delete.user",
 				"title": "Drop User",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.change.user",
+				"title": "Change User Password",
 				"category": "MySQL"
 			},
 			{
@@ -316,6 +337,10 @@
 					"command": "mysql.delete.user",
 					"when": "view == github.cweijan.mysql && viewItem == user",
 					"group": "1_mysql@1"
+				},{
+					"command": "mysql.change.user",
+					"when": "view == github.cweijan.mysql && viewItem == user",
+					"group": "1_mysql@1"
 				},
 				{
 					"command": "mysql.newQuery",
@@ -391,6 +416,21 @@
 					"command": "mysql.changeColumnName",
 					"when": "view == github.cweijan.mysql && viewItem == column",
 					"group": "inline"
+				},
+				{
+					"command": "mysql.column.add",
+					"when": "view == github.cweijan.mysql && viewItem == column",
+					"group": "1_mysql@0"
+				},
+				{
+					"command": "mysql.column.update",
+					"when": "view == github.cweijan.mysql && viewItem == column",
+					"group": "2_mysql@0"
+				},
+				{
+					"command": "mysql.column.drop",
+					"when": "view == github.cweijan.mysql && viewItem == column",
+					"group": "3_mysql@0"
 				},
 				{
 					"command": "mysql.template.view",

@@ -3,7 +3,7 @@
 	"scopeName": "source.sql",
 	"patterns": [
      {
-      "match": "TRIGGER|DEFINER|FOR|EACH|CURSOR|VIEW|IDENTIFIED",
+      "match": "TRIGGER|DEFINER|FOR|EACH|CURSOR|VIEW|IDENTIFIED|PRIVILEGES|FLUSH",
       "name": "keyword.mysql"
     },
 		{

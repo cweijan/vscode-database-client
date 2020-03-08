@@ -5,11 +5,14 @@
 MySQL management tool Plus
 
 
-> This plugin forked from [MySQL (Jun Han)](https://marketplace.visualstudio.com/items?itemName=formulahendry.vscode-mysql)
+> This plugin forked from [MySQL](https://marketplace.visualstudio.com/items?itemName=formulahendry.vscode-mysql)
 > 
 > Many amazing improvements have been made
+> 
+> Welcome to contribute in [repository](https://github.com/cweijan/vscode-mysql)
 >
 > You can see changes in the [changelog](/CHANGELOG.md)
+
 ## Features
 
 * Manage MySQL Connections 

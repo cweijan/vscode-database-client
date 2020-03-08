@@ -96,7 +96,11 @@ export class UserNode implements INode, IConnection {
                 vscode.window.showInformationMessage(`Cancel drop user ${this.name}!`)
             }
         })
+    }
 
+    changePasswordTemplate() {
+        ConnectionManager.getConnection(this, true)
+        QueryUnit.createSQLTextDocument(`update mysql.user set password=PASSWORD("newPassword") where User='${this.name}';\nFLUSH PRIVILEGES;\n-- since mysql version 5.7, password column need change to authentication_string=PASSWORD("test")`);
     }
 
 }

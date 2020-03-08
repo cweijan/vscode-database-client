@@ -63,6 +63,15 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.changeColumnName", (columnNode: ColumnNode) => {
             columnNode.changeColumnName()
         }),
+        vscode.commands.registerCommand("mysql.column.add", (columnNode: ColumnNode) => {
+            columnNode.addColumnTemplate()
+        }),
+        vscode.commands.registerCommand("mysql.column.update", (columnNode: ColumnNode) => {
+            columnNode.updateColumnTemplate()
+        }),
+        vscode.commands.registerCommand("mysql.column.drop", (columnNode: ColumnNode) => {
+            columnNode.dropColumnTemplate()
+        }),
         vscode.commands.registerCommand("mysql.deleteConnection", (connectionNode: ConnectionNode) => {
             connectionNode.deleteConnection(context);
         }),
@@ -130,7 +139,10 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         vscode.commands.registerCommand("mysql.delete.trigger", (triggerNode: TriggerNode) => {
             triggerNode.drop()
-        })
+        })  ,
+        vscode.commands.registerCommand("mysql.change.user", (userNode: UserNode) => {
+            userNode.changePasswordTemplate()
+        })  
     );
 
 }

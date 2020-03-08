@@ -33,7 +33,7 @@ export class TableGroup implements INode, IConnection {
         if (tableNodes && !isRresh) {
             return tableNodes
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' LIMIT ${QueryUnit.maxTableCount}`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' and TABLE_TYPE='BASE TABLE' LIMIT ${QueryUnit.maxTableCount} ;`)
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new TableNode(this.host, this.user, this.password, this.port, this.database, table.TABLE_NAME, this.certPath)

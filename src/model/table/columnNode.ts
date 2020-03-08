@@ -15,7 +15,6 @@ class ColumnTreeItem extends vscode.TreeItem {
 }
 
 export class ColumnNode implements INode, IConnection {
-
     identify: string;
     type: string = ModelType.COLUMN;
     constructor(readonly host: string, readonly user: string, readonly password: string,
@@ -32,6 +31,11 @@ export class ColumnNode implements INode, IConnection {
             collapsibleState: vscode.TreeItemCollapsibleState.None,
             contextValue: ModelType.COLUMN,
             iconPath: path.join(Constants.RES_PATH,  this.column.COLUMN_KEY === "PRI" ? "b_primary.png" : "b_props.png"),
+            command: {
+                command: "mysql.column.update",
+                title: "Update Column Statement",
+                arguments: [this, true]
+            }
         };
     }
 
@@ -44,7 +48,7 @@ export class ColumnNode implements INode, IConnection {
         const columnName = this.column.COLUMN_NAME
         vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(async newColumnName => {
             if (!newColumnName) return
-            const sql = `alter table ${this.database}.${this.table} change column ${columnName} ${newColumnName} ${this.column.COLUMN_TYPE}`
+            const sql = `alter table ${this.database}.${this.table} change column ${columnName} ${newColumnName} ${this.column.COLUMN_TYPE} comment '${this.column.COLUMN_COMMENT}'`
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearColumnCache(`${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`)
                 MySQLTreeDataProvider.refresh()
@@ -52,5 +56,19 @@ export class ColumnNode implements INode, IConnection {
 
         })
     }
+
+    addColumnTemplate() {
+        ConnectionManager.getConnection(this, true)
+        QueryUnit.createSQLTextDocument(`ALTER TABLE ${this.database}.${this.table} ADD COLUMN name type NOT NULL comment '';`);
+    }
+    updateColumnTemplate() {
+        ConnectionManager.getConnection(this, true)
+        QueryUnit.showSQLTextDocument(`ALTER TABLE ${this.database}.${this.table} CHANGE ${this.column.COLUMN_NAME} ${this.column.COLUMN_NAME} ${this.column.COLUMN_TYPE} NOT NULL comment '${this.column.COLUMN_COMMENT}';`);
+    }
+    dropColumnTemplate() {
+        ConnectionManager.getConnection(this, true)
+        QueryUnit.createSQLTextDocument(`ALTER TABLE ${this.database}.${this.table} DROP COLUMN ${this.column.COLUMN_NAME};`);
+    }
+    
 
 }
