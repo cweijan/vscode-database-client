@@ -52,10 +52,11 @@ export class QueryUnit {
             }
         }
         sql = sql.replace(/--.+/ig, '');
+        let executeTime=new Date().getTime()
         connection.query(sql, (err, data) => {
             let isDDL = sql.match(this.ddlPattern);
             if (Array.isArray(data) && !isDDL) {
-                SqlViewManager.showQueryResult({ sql, data, splitResultView: true });
+                SqlViewManager.showQueryResult({ sql, data, splitResultView: true ,costTime:new Date().getTime()-executeTime});
             } else {
                 Console.log(`execute sql success:${sql}`)
             }

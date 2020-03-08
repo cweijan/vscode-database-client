@@ -1,3 +1,6 @@
+## 1.6.1 (2020/3/9)
+- Beautify query result page.
+
 ## 1.6.0 (2020/3/8)
 - Fix refresh not update treeview
 - Support operate user、trigger、view、procedure、function

@@ -9,7 +9,7 @@ import { ModelType } from "../common/Constants";
 
 export class CompletionManager {
 
-    private keywordList: string[] = ["SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "PROCEDURE", "TRIGGER","INDEX","CHANGE","COMMENT","COLUMN","ADD",'SHOW',"PRIVILEGES","IDENTIFIED","VIEW","CURSOR"]
+    private keywordList: string[] = ["SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "PROCEDURE", "TRIGGER","INDEX","CHANGE","COMMENT","COLUMN","ADD",'SHOW',"PRIVILEGES","IDENTIFIED","VIEW","CURSOR","EXPLAIN"]
     private keywordComplectionItems: vscode.CompletionItem[] = []
 
     getComplectionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {

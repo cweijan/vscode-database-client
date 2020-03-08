@@ -14,6 +14,7 @@ export class ViewOption {
     sql?: string;
     data?: any;
     splitResultView: boolean = false;
+    costTime?:number;
     /**
      * receive webview send message 
      */

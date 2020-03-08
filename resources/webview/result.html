@@ -26,6 +26,7 @@
             overflow: hidden !important;
             text-overflow: unset !important;
             white-space: nowrap !important;
+            user-select: text !important;
         }
     </style>
 </head>
@@ -37,26 +38,21 @@
             </el-input>
             <div class="toolbar">
                 <span>executeTime : </span><span v-text="updateTime"></span>
+                <span>costTime : </span><span v-text="result.costTime"></span>ms
                 <el-button type="danger" @click='execute' round>Execute</el-button>
-                <el-button type="primary" round>ExportData</el-button>
             </div>
+            <el-row>
+                <el-button type="warning" @click="deleteTemplate" round>Delete Template</el-button>
+                <el-input v-model="search" style="width:200px" placeholder="Type to search" />
+              </el-row>
         </div>
-        <el-table
+        <el-table id="dataTable" v-loading='loading'
             :data="result.rows.filter(data => !search || JSON.stringify(data).toLowerCase().includes(search.toLowerCase()))"
             style="width: 100%" border @cell-click="celledit">
-            <el-table-column :label="key" v-for="(value,key) in result.rows[0]" :key="key" width="140" sortable
-                show-overflow-tooltip="true" align="center">
+            <el-table-column :label="key" v-for="(value,key) in result.rows[0]" :key="key" 
+                show-overflow-tooltip align="center">
                 <template slot-scope="scope">
                     <span>{{scope.row[key]}}</span>
-                </template>
-            </el-table-column>
-            <el-table-column fixed="right" label="Operations" width="120">
-                <template slot="header" slot-scope="scope">
-                    <el-input v-model="search" size="mini" placeholder="Type to search" />
-                </template>
-                <template slot-scope="scope">
-                    <el-button @click="save" type="text" size="small">Save</el-button>
-                    <el-button @click="deleteConfirm" type="text" size="small">Delete</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -110,10 +106,12 @@
         data: {
             result: previousState ? previousState.result : {
                 rows: [],
-                sql: ''
+                sql: '',
+                costTime:0
             },
             updateTime: formatNow('yyyy-MM-dd HH:mm:ss'),
-            search: ''
+            search: '',
+            loading:false
         },
         methods: {
             celledit(row, column, cell, event) {
@@ -125,30 +123,12 @@
                     type: 'execute',
                     sql: this.result.sql
                 });
+                if(!this.result.sql.match(/^(alter|create|drop|delete|update|insert)/ig)){
+                    this.loading=true;
+                }
             },
-            save() {
-                this.$confirm('Do you want to save change?', 'Warning', {
-                    confirmButtonText: 'OK',
-                    cancelButtonText: 'Cancel',
-                    type: 'Save'
-                }).then(() => {
-                    this.$message({
-                        type: 'success',
-                        message: 'Delete completed'
-                    });
-                })
-            },
-            deleteConfirm() {
-                this.$confirm('Do you want to delete data line?', 'Warning', {
-                    confirmButtonText: 'OK',
-                    cancelButtonText: 'Cancel',
-                    type: 'Save'
-                }).then(() => {
-                    this.$message({
-                        type: 'success',
-                        message: 'Delete completed'
-                    });
-                })
+            deleteTemplate() {
+                this.result.sql=`DELETE FROM [table] WHERE id= `;
             }
         }
     })
@@ -156,6 +136,8 @@
     window.addEventListener('message', event => {
         vue.result.rows = event.data.data
         vue.result.sql = event.data.sql
+        vue.result.costTime = event.data.costTime
+        vue.loading=false
         vue.updateTime = formatNow('yyyy-MM-dd HH:mm:ss')
         vscode.setState({ result: vue.result });
         document.write(previousState + ":" + count)

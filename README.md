@@ -43,6 +43,4 @@ MySQL management tool Plus
 * `vscode-mysql.maxTableCount`: The maximum table count shown in the tree view. (Default is **500**) -->
 
 ## Future Plain
-- Beautify query result page.
-- Edit data alive on query result page.
 - Record sql execute history.
