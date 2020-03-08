@@ -2,91 +2,64 @@
 
 <head>
     <title>result</title>
-    <link rel="stylesheet" href="${webviewPath}/test.css">
+    <link rel="stylesheet" href="${webviewPath}/css/element.css">
     <script src="${webviewPath}/js/vue.js"></script>
+    <script src="${webviewPath}/js/element.js"></script>
     <style>
-        .title {
-            font-weight: bold;
-            text-align: center;
-            font-size: 20px;
+        body {
+            background-color: #F7F7F7;
         }
 
         .hint {
-            padding-left: 5px;
-            padding-right: 5px;
-            background: white;
+            padding: 5px;
             font-size: 17px;
             color: #444;
             display: inline-block;
+            margin-top: 8px;
         }
 
-        .sql {
-            color: #5e5eFF;
+        .toolbar {
+            margin: 5px;
         }
 
-        .table {
-            display: table;
-            text-align: center;
-        }
-
-        .tr {
-            display: table-row;
-        }
-
-        .th {
-            background: #444;
-            padding: 5px;
-        }
-
-        .td,
-        .th {
-            
-            border: 1px solid #ccc;
-            display: table-cell;
-        }
-
-        .data-container {
-            min-width: 60px;
-            max-width: 200px;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        .data-container span{
-            padding: 5px;
-            display: inline-block;
-            height: 100%;
-            width: 100%;
+        .cell {
+            overflow: hidden !important;
+            text-overflow: unset !important;
+            white-space: nowrap !important;
         }
     </style>
 </head>
 
 <body>
     <div id="app">
-        <div class="title">
-            Query Result
-        </div>
         <div class="hint">
-            <span>executeTime : </span><span v-text="updateTime"></span><br />
-            <div class="sql-background">
-                <span>sql : </span><span v-text="result.sql" class="sql"></span><br />
+            <el-input type="textarea" autosize v-model="result.sql" style="width: 600px;">
+            </el-input>
+            <div class="toolbar">
+                <span>executeTime : </span><span v-text="updateTime"></span>
+                <el-button type="danger" @click='execute' round>Execute</el-button>
+                <el-button type="primary" round>ExportData</el-button>
             </div>
         </div>
-        <!-- <select v-model='result.mode'>
-            <option value="0">只读</option>
-            <option value="1">可写</option>
-        </select> -->
-        <div class="table">
-            <div class="tr">
-                <div class="th" v-for="value,key in result.rows[0]" v-text="key"></div>
-            </div>
-            <div class="tr" v-for="row,key,index in result.rows">
-                <div class="td" v-for="value in row">
-                    <div class="data-container">
-                        <span v-text="value" :contenteditable="result.mode==1?'true':'false'"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <el-table
+            :data="result.rows.filter(data => !search || JSON.stringify(data).toLowerCase().includes(search.toLowerCase()))"
+            style="width: 100%" border @cell-click="celledit">
+            <el-table-column :label="key" v-for="(value,key) in result.rows[0]" :key="key" width="140" sortable
+                show-overflow-tooltip="true" align="center">
+                <template slot-scope="scope">
+                    <span>{{scope.row[key]}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column fixed="right" label="Operations" width="120">
+                <template slot="header" slot-scope="scope">
+                    <el-input v-model="search" size="mini" placeholder="Type to search" />
+                </template>
+                <template slot-scope="scope">
+                    <el-button @click="save" type="text" size="small">Save</el-button>
+                    <el-button @click="deleteConfirm" type="text" size="small">Delete</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
     </div>
 </body>
 
@@ -136,11 +109,47 @@
         el: '#app',
         data: {
             result: previousState ? previousState.result : {
-                mode: 1,
                 rows: [],
                 sql: ''
             },
-            updateTime: formatNow('yyyy-MM-dd HH:mm:ss')
+            updateTime: formatNow('yyyy-MM-dd HH:mm:ss'),
+            search: ''
+        },
+        methods: {
+            celledit(row, column, cell, event) {
+                cell.contentEditable = true;
+                cell.focus()
+            },
+            execute() {
+                vscode.postMessage({
+                    type: 'execute',
+                    sql: this.result.sql
+                });
+            },
+            save() {
+                this.$confirm('Do you want to save change?', 'Warning', {
+                    confirmButtonText: 'OK',
+                    cancelButtonText: 'Cancel',
+                    type: 'Save'
+                }).then(() => {
+                    this.$message({
+                        type: 'success',
+                        message: 'Delete completed'
+                    });
+                })
+            },
+            deleteConfirm() {
+                this.$confirm('Do you want to delete data line?', 'Warning', {
+                    confirmButtonText: 'OK',
+                    cancelButtonText: 'Cancel',
+                    type: 'Save'
+                }).then(() => {
+                    this.$message({
+                        type: 'success',
+                        message: 'Delete completed'
+                    });
+                })
+            }
         }
     })
 

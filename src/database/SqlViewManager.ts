@@ -5,6 +5,8 @@ import * as vscode from "vscode";
 import { Console } from "../common/OutputChannel";
 import { ConnectionManager } from "./ConnectionManager";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
+import { OperateType } from "../common/Constants";
+import { QueryUnit } from "./QueryUnit";
 
 export class ViewOption {
     viewPath?: string;
@@ -44,6 +46,11 @@ export class SqlViewManager {
             this.resultWebviewPanel = webviewPanel
             webviewPanel.webview.postMessage(viewOption)
             webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined })
+            webviewPanel.webview.onDidReceiveMessage((params) => {
+                if(params.type==OperateType.execute){
+                    QueryUnit.runQuery(params.sql)
+                }
+            })
         })
 
 

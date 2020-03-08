@@ -31,3 +31,13 @@ export class ModelType{
     public static FUNCTION_GROUP="functionGroup";
     public static FUNCTION="function";
 }
+
+
+export class OperateType{
+    static execute='execute';
+    static previous=2;
+    static next=3;
+    static save=4;
+    static delete=5;
+    static export=6;
+}
