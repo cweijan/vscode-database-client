@@ -25,6 +25,9 @@ export class ModelType{
     public static VIEW="view";
     public static VIEW_GROUP="viewGroup";
     public static TRIGGER_GROUP="triggerGroup";
+    public static TRIGGER="trigger";
     public static PROCEDURE_GROUP="procedureGroup";
+    public static PROCEDURE="procedure";
     public static FUNCTION_GROUP="functionGroup";
+    public static FUNCTION="function";
 }

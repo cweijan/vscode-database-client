@@ -50,5 +50,13 @@ export class ViewGroup implements INode, IConnection {
             });
     }
 
-
+    createTemplate() {
+        ConnectionManager.getConnection(this, true)
+        QueryUnit.createSQLTextDocument(`CREATE
+/* [DEFINER = { user | CURRENT_USER }]*/
+VIEW [name]
+AS
+(SELECT * FROM ...);`)
+    }
+    
 }

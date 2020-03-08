@@ -27,7 +27,7 @@ export class QueryUnit {
         });
     }
 
-    private static ddlPattern = /(alter|create|drop)/ig;
+    private static ddlPattern = /^(alter|create|drop)/ig;
     public static async runQuery(sql?: string, connectionOptions?: IConnection) {
         if (!sql && !vscode.window.activeTextEditor) {
             vscode.window.showWarningMessage("No SQL file selected");
@@ -53,14 +53,15 @@ export class QueryUnit {
         }
 
         connection.query(sql, (err, data) => {
-            if (Array.isArray(data)) {
+            let isDDL=sql.match(this.ddlPattern);
+            if (Array.isArray(data) && !isDDL) {
                 SqlViewManager.showQueryResult({ sql, data, splitResultView: true });
             } else {
-                Console.log(JSON.stringify(data));
+                Console.log(`execute sql success:${sql}`)
             }
             if (err) {
                 Console.log(err);
-            } else if (sql.match(this.ddlPattern)) {
+            } else if (isDDL) {
                 MySQLTreeDataProvider.instance.init()
             }
         });

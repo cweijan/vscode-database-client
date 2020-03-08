@@ -52,6 +52,7 @@ export class TriggerGroup implements INode, IConnection {
 
 
     createTemplate() {
+        ConnectionManager.getConnection(this, true)
         QueryUnit.createSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
 TRIGGER [name]() [BEFORE/AFTER] [INSERT/UPDATE/DELETE]

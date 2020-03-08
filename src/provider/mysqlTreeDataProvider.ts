@@ -3,6 +3,7 @@ import { CacheKey } from "../common/Constants";
 import { IConnection } from "../model/Connection";
 import { ConnectionNode } from "../model/ConnectionNode";
 import { INode } from "../model/INode";
+import { ConnectionManager } from "../database/ConnectionManager";
 
 export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     public _onDidChangeTreeData: vscode.EventEmitter<INode> = new vscode.EventEmitter<INode>();
@@ -15,6 +16,9 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
 
     }
 
+    /**
+     * reload treeview context
+     */
     async init() {
         await (await this.getConnectionNodes()).forEach(async connectionNode => {
             (await connectionNode.getChildren(true)).forEach(async databaseNode => {
@@ -52,6 +56,9 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
         MySQLTreeDataProvider.refresh();
     }
 
+    /**
+     * refresh treeview context
+     */
     public static refresh(element?: INode): void {
         this.instance._onDidChangeTreeData.fire(element);
     }

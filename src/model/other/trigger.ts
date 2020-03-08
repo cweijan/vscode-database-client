@@ -10,7 +10,7 @@ import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 
 export class TriggerNode implements INode, IConnection {
     identify: string;
-    type: string = ModelType.TABLE;
+    type: string = ModelType.TRIGGER;
 
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, readonly name: string,
@@ -23,7 +23,7 @@ export class TriggerNode implements INode, IConnection {
         return {
             label: this.name,
             // collapsibleState: DatabaseCache.getElementState(this),
-            // contextValue: ModelType.TABLE,
+            contextValue: ModelType.TRIGGER,
             iconPath: path.join(Constants.RES_PATH, "trigger.svg"),
             command: {
                 command: "mysql.show.trigger",
@@ -35,7 +35,7 @@ export class TriggerNode implements INode, IConnection {
     }
 
     async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SHOW CREATE TRIGGER ${this.database}.${this.name}`)
+        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this,true), `SHOW CREATE TRIGGER ${this.database}.${this.name}`)
         .then((procedDtail) => {
             procedDtail = procedDtail[0]
             QueryUnit.showSQLTextDocument(`\n\nDROP TRIGGER IF EXISTS ${procedDtail['Trigger']}; \n\n${procedDtail['SQL Original Statement']}`);
@@ -44,37 +44,20 @@ export class TriggerNode implements INode, IConnection {
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
         return [];
-        // this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`
-        // let columnNodes = DatabaseCache.getColumnListOfTable(this.identify)
-        // if (columnNodes && !isRresh) {
-        //     return columnNodes;
-        // }
-        // return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT * FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
-        //     .then((columns) => {
-        //         columnNodes = columns.map<ColumnNode>((column) => {
-        //             return new ColumnNode(this.host, this.user, this.password, this.port, this.database, this.table, this.certPath, column);
-        //         })
-        //         DatabaseCache.setColumnListOfTable(this.identify, columnNodes)
-
-        //         return columnNodes;
-        //     })
-        //     .catch((err) => {
-        //         return [new InfoNode(err)];
-        //     });
     }
 
 
-    public dropTable(sqlTreeProvider: MySQLTreeDataProvider) {
+    public drop() {
 
-        vscode.window.showInputBox({ prompt: `Are you want to drop table ${this.name} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
+        vscode.window.showInputBox({ prompt: `Are you want to drop trigger ${this.name} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE ${this.database}.${this.name}`).then(() => {
-                    DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`)
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP trigger ${this.database}.${this.name}`).then(() => {
+                    DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.TRIGGER_GROUP}`)
                     MySQLTreeDataProvider.refresh()
-                    vscode.window.showInformationMessage(`Delete table ${this.name} success!`)
+                    vscode.window.showInformationMessage(`Drop trigger ${this.name} success!`)
                 })
             } else {
-                vscode.window.showInformationMessage(`Cancel delete table ${this.name}!`)
+                vscode.window.showInformationMessage(`Cancel drop trigger ${this.name}!`)
             }
         })
 

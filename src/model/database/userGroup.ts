@@ -8,6 +8,7 @@ import { IConnection } from "../Connection";
 import { InfoNode } from "../InfoNode";
 import { INode } from "../INode";
 import { DatabaseNode } from "./databaseNode";
+import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 
 export class UserGroup extends DatabaseNode {
 
@@ -45,6 +46,11 @@ export class UserGroup extends DatabaseNode {
             });
     }
 
+    createTemplate() {
+        ConnectionManager.getConnection(this, true)
+        QueryUnit.createSQLTextDocument(`CREATE USER 'username'@'host' IDENTIFIED BY 'password';`)
+    }
+
 }
 
 
@@ -76,6 +82,21 @@ export class UserNode implements INode, IConnection {
     public async selectSqlTemplate() {
         const sql = `SELECT USER 0USER,HOST 1HOST,Super_priv,Select_priv,Insert_priv,Update_priv,Delete_priv,Create_priv,Drop_priv,Index_priv,Alter_priv FROM mysql.user where user='${this.name}';`;
         QueryUnit.runQuery(sql, this);
+    }
+
+    public drop() {
+        ConnectionManager.getConnection(this,true)
+        vscode.window.showInputBox({ prompt: `Are you want to drop user ${this.user} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
+            if (inputContent.toLocaleLowerCase() == 'y') {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP user ${this.name}`).then(() => {
+                    MySQLTreeDataProvider.refresh()
+                    vscode.window.showInformationMessage(`Drop user ${this.name} success!`)
+                })
+            } else {
+                vscode.window.showInformationMessage(`Cancel drop user ${this.name}!`)
+            }
+        })
+
     }
 
 }

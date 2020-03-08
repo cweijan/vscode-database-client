@@ -29,7 +29,7 @@ export class ConnectionManager {
 
     }
 
-    public static getConnection(connectionOptions: IConnection): Promise<any> {
+    public static getConnection(connectionOptions: IConnection,changeActive:Boolean=false): Promise<any> {
 
         if (!connectionOptions.multipleStatements) connectionOptions.multipleStatements = true
 
@@ -50,17 +50,21 @@ export class ConnectionManager {
 
         return new Promise((resolve, reject) => {
             if (useCache) {
-                this.lastConnectionOption = this.connectionCache[key].connectionOptions
-                this.lastActiveConnection = this.connectionCache[key].conneciton
-                Global.updateStatusBarItems(this.lastConnectionOption);
+                if(changeActive || this.lastActiveConnection==undefined){
+                    this.lastConnectionOption = this.connectionCache[key].connectionOptions
+                    this.lastActiveConnection = this.connectionCache[key].conneciton
+                    Global.updateStatusBarItems(this.lastConnectionOption);
+                }
                 resolve(this.connectionCache[key].conneciton)
                 return;
             }
             this.connectionCache[key].conneciton.connect((err: Error) => {
                 if (!err) {
-                    this.lastConnectionOption = connectionOptions
-                    this.lastActiveConnection = this.connectionCache[key].conneciton
-                    Global.updateStatusBarItems(this.lastConnectionOption);
+                    if(changeActive || this.lastActiveConnection==undefined){
+                        this.lastConnectionOption = connectionOptions
+                        this.lastActiveConnection = this.connectionCache[key].conneciton
+                        Global.updateStatusBarItems(this.lastConnectionOption);
+                    }
                     resolve(this.lastActiveConnection);
                 } else {
                     this.connectionCache[key] = undefined

@@ -11,7 +11,7 @@ import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 export class FunctionNode implements INode, IConnection {
 
     identify: string;
-    type: string = ModelType.TABLE;
+    type: string = ModelType.FUNCTION;
 
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, readonly name: string,
@@ -24,7 +24,7 @@ export class FunctionNode implements INode, IConnection {
         return {
             label: this.name,
             // collapsibleState: DatabaseCache.getElementState(this),
-            // contextValue: ModelType.TABLE,
+            contextValue: ModelType.FUNCTION,
             iconPath: path.join(Constants.RES_PATH, "function.svg"),
             command: {
                 command: "mysql.show.function",
@@ -36,7 +36,7 @@ export class FunctionNode implements INode, IConnection {
     }
 
     async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SHOW CREATE FUNCTION ${this.database}.${this.name}`)
+        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this,true), `SHOW CREATE FUNCTION ${this.database}.${this.name}`)
         .then((procedDtail) => {
             procedDtail = procedDtail[0]
             QueryUnit.showSQLTextDocument(`DROP FUNCTION IF EXISTS ${procedDtail['Function']}; \n\n${procedDtail['Create Function']}`);
@@ -45,37 +45,20 @@ export class FunctionNode implements INode, IConnection {
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
         return [];
-        // this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`
-        // let columnNodes = DatabaseCache.getColumnListOfTable(this.identify)
-        // if (columnNodes && !isRresh) {
-        //     return columnNodes;
-        // }
-        // return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT * FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
-        //     .then((columns) => {
-        //         columnNodes = columns.map<ColumnNode>((column) => {
-        //             return new ColumnNode(this.host, this.user, this.password, this.port, this.database, this.table, this.certPath, column);
-        //         })
-        //         DatabaseCache.setColumnListOfTable(this.identify, columnNodes)
-
-        //         return columnNodes;
-        //     })
-        //     .catch((err) => {
-        //         return [new InfoNode(err)];
-        //     });
     }
 
 
-    public dropTable(sqlTreeProvider: MySQLTreeDataProvider) {
+    public drop() {
 
-        vscode.window.showInputBox({ prompt: `Are you want to drop table ${this.name} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
+        vscode.window.showInputBox({ prompt: `Are you want to drop function ${this.name} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
             if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE ${this.database}.${this.name}`).then(() => {
-                    DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`)
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function ${this.database}.${this.name}`).then(() => {
+                    DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.FUNCTION_GROUP}`)
                     MySQLTreeDataProvider.refresh()
-                    vscode.window.showInformationMessage(`Delete table ${this.name} success!`)
+                    vscode.window.showInformationMessage(`Drop function ${this.name} success!`)
                 })
             } else {
-                vscode.window.showInformationMessage(`Cancel delete table ${this.name}!`)
+                vscode.window.showInformationMessage(`Cancel drop function ${this.name}!`)
             }
         })
 

@@ -4,10 +4,12 @@ import { DatabaseNode } from "../model/database/databaseNode";
 import { ColumnNode } from "../model/table/columnNode";
 import { TableNode } from "../model/table/tableNode";
 import { INode } from "../model/INode";
+import { Util } from "../common/util";
+import { ModelType } from "../common/Constants";
 
 export class CompletionManager {
 
-    private keywordList: string[] = ["SELECT", "UPDATE", "DELETE","TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER","CREATE","DROP","FUNCTION","PROCEDURE","TRIGGER"]
+    private keywordList: string[] = ["SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "PROCEDURE", "TRIGGER"]
     private keywordComplectionItems: vscode.CompletionItem[] = []
 
     getComplectionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {
@@ -19,7 +21,7 @@ export class CompletionManager {
         if (preChart != "." && preChart != " ") {
             completionItems = completionItems.concat(this.keywordComplectionItems)
         }
-        if ((position.character == 0) ) return completionItems
+        if ((position.character == 0)) return completionItems
 
         let wordRange = document.getWordRangeAtPosition(prePostion)
         const inputWord = document.getText(wordRange)
@@ -68,13 +70,28 @@ export class CompletionManager {
             tableNodes = DatabaseCache.getTableNodeList()
         }
 
-        var tempList = [...new Set(tableNodes.map((tableNode:TableNode) => {
-            return tableNode.getTreeItem().label;
-        }))]
+        return tableNodes.map<vscode.CompletionItem>((tableNode: TableNode) => {
+            let treeItem = tableNode.getTreeItem();
+            let completionItem = new vscode.CompletionItem(treeItem.label)
+            switch (tableNode.type) {
+                case ModelType.TABLE:
+                    completionItem.kind = vscode.CompletionItemKind.Function;
+                    break;
+                case ModelType.VIEW:
+                    completionItem.kind = vscode.CompletionItemKind.Module;
+                    break;
+                case ModelType.PROCEDURE:
+                    completionItem.kind = vscode.CompletionItemKind.Reference;
+                    break;
+                case ModelType.FUNCTION:
+                    completionItem.kind = vscode.CompletionItemKind.Method;
+                    break;
+                case ModelType.TRIGGER:
+                    completionItem.kind = vscode.CompletionItemKind.Event;
+                    break;
+            }
 
-        return tempList.map<vscode.CompletionItem>(tableName => {
-            let completionItem = new vscode.CompletionItem(tableName)
-            completionItem.kind = vscode.CompletionItemKind.Function
+
             return completionItem
         })
     }

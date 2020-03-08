@@ -95,7 +95,7 @@ export class DatabaseNode implements INode, IConnection {
     public async newQuery() {
 
         QueryUnit.createSQLTextDocument();
-        ConnectionManager.getConnection(this)
+        ConnectionManager.getConnection(this, true)
 
     }
 }

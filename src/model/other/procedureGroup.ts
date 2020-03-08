@@ -51,6 +51,7 @@ export class ProcedureGroup implements INode, IConnection {
     }
 
     createTemplate() {
+        ConnectionManager.getConnection(this, true)
         QueryUnit.createSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
 PROCEDURE [name]()

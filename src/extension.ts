@@ -13,10 +13,12 @@ import { SqlViewManager } from "./database/SqlViewManager";
 import { ProcedureNode } from "./model/other/Procedure";
 import { FunctionNode } from "./model/other/function";
 import { TriggerNode } from "./model/other/Trigger";
-import { UserNode } from "./model/database/userGroup";
+import { UserNode, UserGroup } from "./model/database/userGroup";
 import { FunctionGroup } from "./model/other/functionGroup";
 import { TriggerGroup } from "./model/other/triggerGroup";
 import { ProcedureGroup } from "./model/other/procedureGroup";
+import { ViewGroup } from "./model/table/viewGroup";
+import { ViewNode } from "./model/table/viewNode";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -102,11 +104,32 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.template.procedure", (procedureGroup: ProcedureGroup) => {
             procedureGroup.createTemplate();
         }),
+        vscode.commands.registerCommand("mysql.template.view", (viewGroup: ViewGroup) => {
+            viewGroup.createTemplate();
+        }),
         vscode.commands.registerCommand("mysql.template.trigger", (triggerGroup: TriggerGroup) => {
             triggerGroup.createTemplate();
         }),
         vscode.commands.registerCommand("mysql.template.function", (functionGroup: FunctionGroup) => {
             functionGroup.createTemplate();
+        }),
+        vscode.commands.registerCommand("mysql.template.user", (userGroup: UserGroup) => {
+            userGroup.createTemplate();
+        }),
+        vscode.commands.registerCommand("mysql.delete.user", (userNode: UserNode) => {
+            userNode.drop()
+        }),
+        vscode.commands.registerCommand("mysql.delete.view", (viewNode: ViewNode) => {
+            viewNode.drop()
+        }),
+        vscode.commands.registerCommand("mysql.delete.procedure", (procedureNode: ProcedureNode) => {
+            procedureNode.drop()
+        }),
+        vscode.commands.registerCommand("mysql.delete.function", (functionNode: FunctionNode) => {
+            functionNode.drop()
+        }),
+        vscode.commands.registerCommand("mysql.delete.trigger", (triggerNode: TriggerNode) => {
+            triggerNode.drop()
         })
     );
 

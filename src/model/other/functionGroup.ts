@@ -50,6 +50,7 @@ export class FunctionGroup implements INode, IConnection {
     }
 
     createTemplate() {
+        ConnectionManager.getConnection(this, true)
         QueryUnit.createSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
 FUNCTION [name]() RETURNS [TYPE]

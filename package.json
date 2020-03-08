@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-manager",
 	"displayName": "MySQL",
 	"description": "MySQL management tool",
-	"version": "1.5.4",
+	"version": "1.6.0",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
@@ -35,9 +35,9 @@
 	"contributes": {
 		"grammars": [
 			{
-			  "language": "sql",
-			  "scopeName": "source.sql",
-			  "path": "./syntaxes/mysql.tmLanguage.json"
+				"language": "sql",
+				"scopeName": "source.sql",
+				"path": "./syntaxes/mysql.tmLanguage.json"
 			}
 		],
 		"viewsContainers": {
@@ -165,6 +165,76 @@
 					"light": "resources/light/edit.svg",
 					"dark": "resources/dark/edit.svg"
 				}
+			},
+			{
+				"command": "mysql.template.view",
+				"title": "Create New View",
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
+			},
+			{
+				"command": "mysql.template.procedure",
+				"title": "Create New Procedure",
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
+			},
+			{
+				"command": "mysql.template.trigger",
+				"title": "Create New Trigger",
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
+			},
+			{
+				"command": "mysql.template.function",
+				"title": "Create New Function",
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
+			},
+			{
+				"command": "mysql.template.user",
+				"title": "Create New User",
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
+			},
+			{
+				"command": "mysql.delete.user",
+				"title": "Drop User",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.delete.view",
+				"title": "Drop View",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.delete.procedure",
+				"title": "Drop Procedure",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.delete.function",
+				"title": "Drop Function",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.delete.trigger",
+				"title": "Drop Trigger",
+				"category": "MySQL"
 			}
 		],
 		"keybindings": [
@@ -228,6 +298,26 @@
 					"group": "inline@0"
 				},
 				{
+					"command": "mysql.template.user",
+					"when": "view == github.cweijan.mysql && viewItem == userGroup",
+					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.refresh",
+					"when": "view == github.cweijan.mysql && viewItem == userGroup",
+					"group": "1_mysql@2"
+				},
+				{
+					"command": "mysql.template.user",
+					"when": "view == github.cweijan.mysql && viewItem == userGroup",
+					"group": "inline"
+				},
+				{
+					"command": "mysql.delete.user",
+					"when": "view == github.cweijan.mysql && viewItem == user",
+					"group": "1_mysql@1"
+				},
+				{
 					"command": "mysql.newQuery",
 					"when": "view == github.cweijan.mysql && viewItem == database",
 					"group": "inline"
@@ -246,6 +336,11 @@
 					"command": "mysql.deleteDatabase",
 					"when": "view == github.cweijan.mysql && viewItem == database",
 					"group": "4_mysql@5"
+				},
+				{
+					"command": "mysql.data.export",
+					"when": "view == github.cweijan.mysql && viewItem == database",
+					"group": "mysql@5"
 				},
 				{
 					"command": "mysql.template.sql",
@@ -288,11 +383,6 @@
 					"group": "mysql@5"
 				},
 				{
-					"command": "mysql.data.export",
-					"when": "view == github.cweijan.mysql && viewItem == database",
-					"group": "mysql@5"
-				},
-				{
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "3_mysql@4"
@@ -301,6 +391,86 @@
 					"command": "mysql.changeColumnName",
 					"when": "view == github.cweijan.mysql && viewItem == column",
 					"group": "inline"
+				},
+				{
+					"command": "mysql.template.view",
+					"when": "view == github.cweijan.mysql && viewItem == viewGroup",
+					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.refresh",
+					"when": "view == github.cweijan.mysql && viewItem == viewGroup",
+					"group": "1_mysql@2"
+				},
+				{
+					"command": "mysql.template.view",
+					"when": "view == github.cweijan.mysql && viewItem == viewGroup",
+					"group": "inline"
+				},
+				{
+					"command": "mysql.delete.view",
+					"when": "view == github.cweijan.mysql && viewItem == view",
+					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.template.procedure",
+					"when": "view == github.cweijan.mysql && viewItem == procedureGroup",
+					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.refresh",
+					"when": "view == github.cweijan.mysql && viewItem == procedureGroup",
+					"group": "1_mysql@2"
+				},
+				{
+					"command": "mysql.template.procedure",
+					"when": "view == github.cweijan.mysql && viewItem == procedureGroup",
+					"group": "inline"
+				},
+				{
+					"command": "mysql.delete.procedure",
+					"when": "view == github.cweijan.mysql && viewItem == procedure",
+					"group": "2_mysql@1"
+				},
+				{
+					"command": "mysql.template.function",
+					"when": "view == github.cweijan.mysql && viewItem == functionGroup",
+					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.refresh",
+					"when": "view == github.cweijan.mysql && viewItem == functionGroup",
+					"group": "1_mysql@2"
+				},
+				{
+					"command": "mysql.template.function",
+					"when": "view == github.cweijan.mysql && viewItem == functionGroup",
+					"group": "inline"
+				},
+				{
+					"command": "mysql.delete.function",
+					"when": "view == github.cweijan.mysql && viewItem == function",
+					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.template.trigger",
+					"when": "view == github.cweijan.mysql && viewItem == triggerGroup",
+					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.refresh",
+					"when": "view == github.cweijan.mysql && viewItem == triggerGroup",
+					"group": "1_mysql@2"
+				},
+				{
+					"command": "mysql.template.trigger",
+					"when": "view == github.cweijan.mysql && viewItem == triggerGroup",
+					"group": "inline"
+				},
+				{
+					"command": "mysql.delete.trigger",
+					"when": "view == github.cweijan.mysql && viewItem == trigger",
+					"group": "1_mysql@1"
 				}
 			]
 		},

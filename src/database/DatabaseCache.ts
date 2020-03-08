@@ -157,12 +157,15 @@ export class DatabaseCache {
      * get database tree data
      * @param databaseIdentify 
      */
+    private static tableTypeList = [ModelType.TABLE_GROUP, ModelType.VIEW_GROUP, ModelType.FUNCTION_GROUP, ModelType.TRIGGER_GROUP, ModelType.PROCEDURE_GROUP];
     static getTableListOfDatabase(databaseIdentify: string): INode[] {
-        if (this.databaseNodeMapTableNode[databaseIdentify]) {
-            return this.databaseNodeMapTableNode[databaseIdentify]
-        } else {
-            return null
-        }
+        let result = [];
+        this.tableTypeList.forEach(tableType => {
+            let tableList = this.databaseNodeMapTableNode[databaseIdentify +"_"+ tableType]
+            if (tableList) result=result.concat(tableList)
+        });
+        if (result.length == 0) return null;
+        return result;
     }
 
     /**

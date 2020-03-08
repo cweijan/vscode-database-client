@@ -83,10 +83,10 @@ export class TableNode implements INode, IConnection {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE ${this.database}.${this.table}`).then(() => {
                     DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`)
                     MySQLTreeDataProvider.refresh()
-                    vscode.window.showInformationMessage(`Delete table ${this.table} success!`)
+                    vscode.window.showInformationMessage(`Drop table ${this.table} success!`)
                 })
             } else {
-                vscode.window.showInformationMessage(`Cancel delete table ${this.table}!`)
+                vscode.window.showInformationMessage(`Cancel drop table ${this.table}!`)
             }
         })
 
