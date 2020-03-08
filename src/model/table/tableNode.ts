@@ -121,6 +121,7 @@ export class TableNode implements INode, IConnection {
         const sql = `SELECT * FROM ${this.database}.${this.table} LIMIT 1000;`;
 
         if (run) {
+            ConnectionManager.getConnection(this,true)
             QueryUnit.runQuery(sql, this);
         } else {
             QueryUnit.createSQLTextDocument(sql);
