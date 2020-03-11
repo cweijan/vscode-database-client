@@ -41,7 +41,7 @@ export class SqlViewManager {
         }
 
         viewOption.viewPath = "result"
-        viewOption.viewTitle = "result"
+        viewOption.viewTitle = "Query"
 
         this.createWebviewPanel(viewOption).then(webviewPanel => {
             this.resultWebviewPanel = webviewPanel
@@ -95,7 +95,7 @@ export class SqlViewManager {
                     "mysql.sql.result",
                     viewOption.viewTitle,
                     columnType,
-                    { enableScripts: true }
+                    { enableScripts: true,retainContextWhenHidden:true }
                 );
                 webviewPanel.webview.html = data.replace(/\$\{webviewPath\}/gi,
                     vscode.Uri.file(`${this.extensionPath}/resources/webview`)

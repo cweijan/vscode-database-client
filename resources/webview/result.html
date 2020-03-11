@@ -8,6 +8,7 @@
     <style>
         body {
             background-color: #F7F7F7;
+            font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
         }
 
         .hint {
@@ -16,10 +17,6 @@
             color: #444;
             display: inline-block;
             margin-top: 8px;
-        }
-
-        .toolbar {
-            margin: 5px;
         }
 
         .cell {
@@ -34,25 +31,27 @@
 <body>
     <div id="app">
         <div class="hint">
-            <el-input type="textarea" autosize v-model="result.sql" style="width: 600px;">
-            </el-input>
-            <div class="toolbar">
-                <span>executeTime : </span><span v-text="updateTime"></span>
-                <span>costTime : </span><span v-text="result.costTime"></span>ms
+            <el-row style="margin-bottom: 10px;">
+                <el-input type="textarea" autosize v-model="result.sql" style="width: 600px;"></el-input>
                 <el-button type="danger" @click='execute' round>Execute</el-button>
-            </div>
+            </el-row>
             <el-row>
-                <el-button type="warning" @click="deleteTemplate" round>Delete Template</el-button>
-                <el-input v-model="search" style="width:200px" placeholder="Type to search" />
-              </el-row>
+                <el-cow>
+                    <el-input v-model="search" style="width:200px" placeholder="Type to search" />
+                </el-cow>
+                <el-cow>
+                    <span>costTime: </span><span v-text="result.costTime"></span>ms,
+                    <span>row: {{result.rows.length}}, Col: {{columnCount}}</span>
+                </el-cow>
+            </el-row>
         </div>
-        <el-table id="dataTable" v-loading='loading'
+        <el-table id="dataTable" v-loading='loading' size='small' highlight-current-row='true'
             :data="result.rows.filter(data => !search || JSON.stringify(data).toLowerCase().includes(search.toLowerCase()))"
             style="width: 100%" border @cell-click="celledit">
-            <el-table-column :label="key" v-for="(value,key) in result.rows[0]" :key="key" 
-                show-overflow-tooltip align="center">
+            <el-table-column :label="key" v-for="(value,key) in result.rows[0]" :key="key" show-overflow-tooltip
+                align="center">
                 <template slot-scope="scope">
-                    <span>{{scope.row[key]}}</span>
+                    <span v-html='dataformat(scope.row[key])'></span>
                 </template>
             </el-table-column>
         </el-table>
@@ -60,45 +59,6 @@
 </body>
 
 <script>
-    var formatNow = function (formatStr) {
-        var date = new Date();
-        var zeroize = function (value, length) {
-            if (!length) {
-                length = 2;
-            }
-            value = new String(value);
-            for (var i = 0, zeros = ''; i < (length - value.length); i++) {
-                zeros += '0';
-            }
-            return zeros + value;
-        };
-        return formatStr.replace(/"[^"]*"|'[^']*'|\b(?:d{1,4}|M{1,4}|yy(?:yy)?|([hHmstT])\1?|[lLZ])\b/g, function ($0) {
-            switch ($0) {
-                case 'd': return date.getDate();
-                case 'dd': return zeroize(date.getDate());
-                case 'ddd': return ['Sun', 'Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat'][date.getDay()];
-                case 'dddd': return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getDay()];
-                case 'M': return date.getMonth() + 1;
-                case 'MM': return zeroize(date.getMonth() + 1);
-                case 'MMM': return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()];
-                case 'MMMM': return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][date.getMonth()];
-                case 'yy': return new String(date.getFullYear()).substr(2);
-                case 'yyyy': return date.getFullYear();
-                case 'h': return date.getHours() % 12 || 12;
-                case 'hh': return zeroize(date.getHours() % 12 || 12);
-                case 'H': return date.getHours();
-                case 'HH': return zeroize(date.getHours());
-                case 'm': return date.getMinutes();
-                case 'mm': return zeroize(date.getMinutes());
-                case 's': return date.getSeconds();
-                case 'ss': return zeroize(date.getSeconds());
-                case 'l': return date.getMilliseconds();
-                case 'll': return zeroize(date.getMilliseconds());
-                case 'tt': return date.getHours() < 12 ? 'am' : 'pm';
-                case 'TT': return date.getHours() < 12 ? 'AM' : 'PM';
-            }
-        });
-    }
     const vscode = acquireVsCodeApi();
     const previousState = vscode.getState();
     const vue = new Vue({
@@ -107,28 +67,39 @@
             result: previousState ? previousState.result : {
                 rows: [],
                 sql: '',
-                costTime:0
+                costTime: 0
             },
-            updateTime: formatNow('yyyy-MM-dd HH:mm:ss'),
             search: '',
-            loading:false
+            loading: false
         },
         methods: {
             celledit(row, column, cell, event) {
-                cell.contentEditable = true;
-                cell.focus()
+                // cell.contentEditable = true;
+                // cell.focus()
             },
             execute() {
                 vscode.postMessage({
                     type: 'execute',
                     sql: this.result.sql
                 });
-                if(!this.result.sql.match(/^(alter|create|drop|delete|update|insert)/ig)){
-                    this.loading=true;
+                if (!this.result.sql.match(/^(alter|create|drop|delete|update|insert)/ig)) {
+                    this.loading = true;
                 }
             },
             deleteTemplate() {
-                this.result.sql=`DELETE FROM [table] WHERE id= `;
+                this.result.sql = `DELETE FROM [table] WHERE id= `;
+            },
+            dataformat(origin) {
+                if (origin == undefined || origin == null) {
+                    return "<b>(NULL)</b>";
+                }
+                return origin;
+            }
+        },
+        computed: {
+            columnCount() {
+                if (this.result.rows == undefined || this.result.rows[0] == undefined) return 0;
+                return Object.keys(this.result.rows[0]).length;
             }
         }
     })
@@ -137,9 +108,9 @@
         vue.result.rows = event.data.data
         vue.result.sql = event.data.sql
         vue.result.costTime = event.data.costTime
-        vue.loading=false
-        vue.updateTime = formatNow('yyyy-MM-dd HH:mm:ss')
-        vscode.setState({ result: vue.result });
+        vue.loading = false
+        // instead by retainContextWhenHidden=true
+        // vscode.setState({ result: vue.result });
         document.write(previousState + ":" + count)
     });
 </script>
