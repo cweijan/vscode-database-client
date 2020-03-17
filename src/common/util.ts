@@ -1,3 +1,6 @@
+
+import { Position, TextDocument } from "vscode";
+
 export class Util {
     /**
      * trim array, got from SO.
@@ -11,4 +14,10 @@ export class Util {
             return seen.has(temp) ? false : seen.add(temp);
         });
     }
+
+    static getDocumentLastPosition(document: TextDocument): Position {
+        let lastLine = document.lineCount - 1;
+        return new Position(lastLine, document.lineAt(lastLine).text.length);
+    }
+
 }

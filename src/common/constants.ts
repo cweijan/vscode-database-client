@@ -13,6 +13,14 @@ export class CacheKey{
 
 }
 
+
+export class Cursor{
+    static FIRST_POSITION=new vscode.Position(0, 0);
+    static getRangeStartTo(end:vscode.Position):vscode.Range{
+        return new vscode.Range(this.FIRST_POSITION,end);
+    }
+}
+
 export class ModelType{
     public static CONNECTION="connection"
     public static DATABASE="database"

@@ -1,10 +1,12 @@
 "use strict";
 import * as vscode from "vscode";
-import { IConnection } from "../model/Connection";
+import { Cursor } from "../common/Constants";
 import { Console } from "../common/OutputChannel";
-import { SqlViewManager } from "./SqlViewManager";
-import { ConnectionManager } from "./ConnectionManager";
+import { Util } from "../common/util";
+import { IConnection } from "../model/Connection";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
+import { ConnectionManager } from "./ConnectionManager";
+import { SqlViewManager } from "./SqlViewManager";
 
 export class QueryUnit {
     public static readonly maxTableCount = QueryUnit.getConfiguration().get<number>("maxTableCount");
@@ -46,26 +48,47 @@ export class QueryUnit {
             const activeTextEditor = vscode.window.activeTextEditor;
             const selection = activeTextEditor.selection;
             if (selection.isEmpty) {
-                sql = activeTextEditor.document.getText();
+                sql = this.obtainSql(activeTextEditor);
             } else {
                 sql = activeTextEditor.document.getText(selection);
             }
         }
         sql = sql.replace(/--.+/ig, '');
-        let executeTime=new Date().getTime()
+        let executeTime = new Date().getTime()
         connection.query(sql, (err, data) => {
             let isDDL = sql.match(this.ddlPattern);
             if (Array.isArray(data) && !isDDL) {
-                SqlViewManager.showQueryResult({ sql, data, splitResultView: true ,costTime:new Date().getTime()-executeTime});
+                SqlViewManager.showQueryResult({ sql, data, splitResultView: true, costTime: new Date().getTime() - executeTime });
             } else {
                 Console.log(`execute sql success:${sql}`)
             }
             if (err) {
+                //TODO trans output to query page
                 Console.log(err);
             } else if (isDDL) {
                 MySQLTreeDataProvider.instance.init()
             }
         });
+    }
+
+
+    private static batchPattern = /(TRIGGER|PROCEDURE|FUNCTION)/ig
+    private static obtainSql(activeTextEditor: vscode.TextEditor): string {
+
+        var content = activeTextEditor.document.getText()
+        if (content.match(this.batchPattern)) return content;
+
+        var sqlList = content.split(";");
+        var doc_cursor = activeTextEditor.document.getText(Cursor.getRangeStartTo(activeTextEditor.selection.active)).length;
+        var index = 0;
+        for (let sql of sqlList) {
+            index += (sql.length + 1)
+            if (doc_cursor < index) {
+                return sql.trim() + ";";
+            }
+        }
+
+        return '';
     }
 
     public static async createSQLTextDocument(sql: string = "") {
@@ -79,8 +102,7 @@ export class QueryUnit {
 
         if (this.sqlDocument && !this.sqlDocument.document.isClosed && !this.sqlDocument['_disposed'] && this.sqlDocument.document.isUntitled) {
             this.sqlDocument.edit((editBuilder) => {
-                let lastLine = this.sqlDocument.document.lineCount - 1;
-                editBuilder.replace(new vscode.Range(new vscode.Position(0, 0), new vscode.Position(lastLine, this.sqlDocument.document.lineAt(lastLine).text.length)), sql);
+                editBuilder.replace(Cursor.getRangeStartTo(Util.getDocumentLastPosition(this.sqlDocument.document)), sql);
             })
         } else {
             const textDocument = await vscode.workspace.openTextDocument({ content: sql, language: "sql" });
