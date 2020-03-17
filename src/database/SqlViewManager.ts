@@ -14,7 +14,7 @@ export class ViewOption {
     sql?: string;
     data?: any;
     splitResultView: boolean = false;
-    costTime?:number;
+    costTime?: number;
     /**
      * receive webview send message 
      */
@@ -35,9 +35,14 @@ export class SqlViewManager {
     public static showQueryResult(viewOption: ViewOption) {
 
         if (this.resultWebviewPanel) {
-            this.resultWebviewPanel.webview.postMessage(viewOption)
-            this.resultWebviewPanel.reveal(vscode.ViewColumn.Two, true);
-            return;
+            if (this.resultWebviewPanel.visible) {
+                this.resultWebviewPanel.webview.postMessage(viewOption)
+                this.resultWebviewPanel.reveal(vscode.ViewColumn.Two, true);
+                return;
+            } else {
+                this.resultWebviewPanel.dispose()
+            }
+
         }
 
         viewOption.viewPath = "result"
@@ -48,7 +53,7 @@ export class SqlViewManager {
             webviewPanel.webview.postMessage(viewOption)
             webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined })
             webviewPanel.webview.onDidReceiveMessage((params) => {
-                if(params.type==OperateType.execute){
+                if (params.type == OperateType.execute) {
                     QueryUnit.runQuery(params.sql)
                 }
             })
@@ -94,8 +99,8 @@ export class SqlViewManager {
                 const webviewPanel = await vscode.window.createWebviewPanel(
                     "mysql.sql.result",
                     viewOption.viewTitle,
-                    columnType,
-                    { enableScripts: true,retainContextWhenHidden:true }
+                    {viewColumn:columnType,preserveFocus:true},
+                    { enableScripts: true, retainContextWhenHidden: true }
                 );
                 webviewPanel.webview.html = data.replace(/\$\{webviewPath\}/gi,
                     vscode.Uri.file(`${this.extensionPath}/resources/webview`)
