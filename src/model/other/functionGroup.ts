@@ -33,10 +33,10 @@ export class FunctionGroup implements INode, IConnection {
         if (tableNodes && !isRresh) {
             return tableNodes
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT specific_name FROM mysql.proc WHERE db = '${this.database}' and type='FUNCTION'`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT ROUTINE_NAME FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${this.database}' and ROUTINE_TYPE='FUNCTION'`)
             .then((tables) => {
                 tableNodes = tables.map<FunctionNode>((table) => {
-                    return new FunctionNode(this.host, this.user, this.password, this.port, this.database, table.specific_name, this.certPath)
+                    return new FunctionNode(this.host, this.user, this.password, this.port, this.database, table.ROUTINE_NAME, this.certPath)
                 })
                 DatabaseCache.setTableListOfDatabase(this.identify, tableNodes)
                 if (tableNodes.length == 0) {

@@ -1,13 +1,12 @@
 import * as path from "path";
 import * as vscode from "vscode";
+import { Constants, ModelType } from "../../common/Constants";
+import { ConnectionManager } from "../../database/ConnectionManager";
+import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
+import { IConnection } from "../Connection";
 import { InfoNode } from "../InfoNode";
 import { INode } from "../INode";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { TableNode } from "../table/tableNode";
-import { IConnection } from "../Connection";
-import { Constants, ModelType } from "../../common/Constants";
 import { ProcedureNode } from "./Procedure";
 
 export class ProcedureGroup implements INode, IConnection {
@@ -34,10 +33,10 @@ export class ProcedureGroup implements INode, IConnection {
         if (tableNodes && !isRresh) {
             return tableNodes
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT specific_name FROM mysql.proc WHERE db = '${this.database}' and type='PROCEDURE'`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT ROUTINE_NAME FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${this.database}' and ROUTINE_TYPE='PROCEDURE'`)
             .then((tables) => {
                 tableNodes = tables.map<INode>((table) => {
-                    return new ProcedureNode(this.host, this.user, this.password, this.port, this.database, table.specific_name, this.certPath)
+                    return new ProcedureNode(this.host, this.user, this.password, this.port, this.database, table.ROUTINE_NAME, this.certPath)
                 })
                 DatabaseCache.setTableListOfDatabase(this.identify, tableNodes)
                 if (tableNodes.length == 0) {
