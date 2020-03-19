@@ -1,3 +1,6 @@
+## 1.6.36 (2020/3/19)
+- Fix many mysql connection error.
+
 ## 1.6.35 (2020/3/18)
 - get sql divisiton with semicolon on editor
 - fix mysql 8.0 get function|procedure info fail.
