@@ -18,7 +18,7 @@ MySQL management tool Plus
 * Manage MySQL Connections 
 * List MySQL User、Database、Table、Procedure、Trigger、Function、TableColumn
 * Run MySQL Query
-* Sql code assistant
+* Sql code assistant(Syntax,Format)
 
 ## Usage
 
@@ -44,3 +44,4 @@ MySQL management tool Plus
 
 ## Future Plain
 - Record sql execute history.
+- table inference

@@ -19,6 +19,7 @@ import { TriggerGroup } from "./model/other/triggerGroup";
 import { ProcedureGroup } from "./model/other/procedureGroup";
 import { ViewGroup } from "./model/table/viewGroup";
 import { ViewNode } from "./model/table/viewNode";
+import { SqlFormatProvider } from "./provider/SqlFormatProvider";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -38,6 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
     })
 
     context.subscriptions.push(
+        vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormatProvider()),
         vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.'),
         vscode.commands.registerCommand("mysql.refresh", (node: INode) => {
             sqlTreeProvider.init()
@@ -112,7 +114,7 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         vscode.commands.registerCommand("mysql.user.sql", (userNode: UserNode) => {
             userNode.selectSqlTemplate();
-        }) ,
+        }),
         vscode.commands.registerCommand("mysql.template.procedure", (procedureGroup: ProcedureGroup) => {
             procedureGroup.createTemplate();
         }),
@@ -142,10 +144,10 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         vscode.commands.registerCommand("mysql.delete.trigger", (triggerNode: TriggerNode) => {
             triggerNode.drop()
-        })  ,
+        }),
         vscode.commands.registerCommand("mysql.change.user", (userNode: UserNode) => {
             userNode.changePasswordTemplate()
-        })  
+        })
     );
 
 }

@@ -557,7 +557,8 @@
 	},
 	"dependencies": {
 		"mysql": "^2.15.0",
-		"mysqldump": "^2.2.1"
+		"mysqldump": "^2.2.1",
+		"sql-formatter": "^2.3.3"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",
