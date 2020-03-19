@@ -56,18 +56,21 @@ export class QueryUnit {
         sql = sql.replace(/--.+/ig, '');
         let executeTime = new Date().getTime()
         connection.query(sql, (err, data) => {
-            let isDDL = sql.match(this.ddlPattern);
-            if (Array.isArray(data) && !isDDL) {
+            if (err) {
+                //TODO trans output to query page
+                Console.log(err);
+                return;
+            }
+            if (sql.match(this.ddlPattern)) {
+                MySQLTreeDataProvider.instance.init()
+                return;
+            }
+            if (Array.isArray(data)) {
                 SqlViewManager.showQueryResult({ sql, data, splitResultView: true, costTime: new Date().getTime() - executeTime });
             } else {
                 Console.log(`execute sql success:${sql}`)
             }
-            if (err) {
-                //TODO trans output to query page
-                Console.log(err);
-            } else if (isDDL) {
-                MySQLTreeDataProvider.instance.init()
-            }
+
         });
     }
 
