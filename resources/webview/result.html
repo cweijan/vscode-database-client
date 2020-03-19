@@ -33,11 +33,13 @@
         <div class="hint">
             <el-row style="margin-bottom: 10px;">
                 <el-input type="textarea" autosize v-model="result.sql" style="width: 600px;"></el-input>
-                <el-button type="danger" @click='execute' round>Execute</el-button>
             </el-row>
             <el-row>
                 <el-cow>
                     <el-input v-model="search" style="width:200px" placeholder="Type to search" />
+                </el-cow>
+                <el-cow>
+                    <el-button type="danger" @click='execute' >Execute</el-button>
                 </el-cow>
                 <el-cow>
                     <span>costTime: </span><span v-text="result.costTime"></span>ms,

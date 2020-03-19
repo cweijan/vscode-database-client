@@ -2,8 +2,6 @@ import * as vscode from "vscode";
 import * as path from "path";
 
 export class Constants {
-    /** db connection alive time :10minute */
-    public static EXPIRE_TIME=10*60*1000;
     public static RES_PATH=path.join(vscode.extensions.getExtension('cweijan.vscode-mysql-manager').extensionPath,"resources");
 }
 

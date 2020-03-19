@@ -3,7 +3,7 @@ export interface IConnection {
     readonly user: string;
      password?: string;
     readonly port: string;
-    readonly database?: string;
+    database?: string;
     multipleStatements?: boolean;
     readonly certPath: string;
     

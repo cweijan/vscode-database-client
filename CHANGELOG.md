@@ -1,3 +1,7 @@
+## 1.6.35 (2020/3/18)
+- get sql divisiton with semicolon on editor
+- fix mysql 8.0 get function|procedure info fail.
+
 ## 1.6.2 (2020/3/9)
 - Beautify query result page.
 

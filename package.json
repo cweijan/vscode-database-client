@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-manager",
 	"displayName": "MySQL",
 	"description": "MySQL management tool",
-	"version": "1.6.34",
+	"version": "1.6.35",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
