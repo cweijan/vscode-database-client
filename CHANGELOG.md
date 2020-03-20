@@ -1,8 +1,9 @@
-## 1.6.37 
+## 1.6.37(2020/3/20)
 - Table name inference
 - Sql formatter
 - Record History
 - Import sql file
+- Hover table to get info
 
 ## 1.6.36 (2020/3/19)
 - Fix many mysql connection error.

@@ -20,7 +20,7 @@ export class HistoryManager {
             if (!fs.existsSync(gsPath)) {
                 fs.mkdirSync(gsPath)
             }
-            fs.appendFileSync(gsPath + '/history.sql', `/* ${this.getNowDate()} [${costTime} ms] */ ${sql}\n`, { encoding: 'utf8' });
+            fs.appendFileSync(gsPath + '/history.sql', `/* ${this.getNowDate()} [${costTime} ms] */ ${sql.replace(/[\r\n]/g," ")}\n`, { encoding: 'utf8' });
 
         })
     }

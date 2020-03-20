@@ -12,7 +12,7 @@ export class TableHoverProvider implements HoverProvider {
         for (const tableNode of DatabaseCache.getTableNodeList()) {
             if (tableNode.table == tableName) {
                 let columnNodes = (await tableNode.getChildren()) as ColumnNode[]
-                let hoverContent=`table: ${tableName}`;
+                let hoverContent=`${tableNode.database}.${tableName}:`;
                 for (const columnNode of columnNodes) {
                     hoverContent+=`
 ${columnNode.column.COLUMN_NAME} ${columnNode.column.COLUMN_TYPE} ${columnNode.column.COLUMN_COMMENT?'comment '+columnNode.column.COLUMN_COMMENT:''} `

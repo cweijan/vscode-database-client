@@ -41,7 +41,3 @@ MySQL management tool Plus
 <!-- ## Settings
 
 * `vscode-mysql.maxTableCount`: The maximum table count shown in the tree view. (Default is **500**) -->
-
-## Future Plain
-- Ssl connect.
-- Bookmark sql.
