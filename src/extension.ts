@@ -21,6 +21,7 @@ import { ViewNode } from "./model/table/viewNode";
 import { SqlFormatProvider } from "./provider/SqlFormatProvider";
 import { HistoryManager } from "./extension/HistoryManager";
 import { CommandKey } from "./common/Constants";
+import { TableHoverProvider } from "./provider/TableHoverProvider";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -42,6 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormatProvider()),
+        vscode.languages.registerHoverProvider('sql',new TableHoverProvider()),
         vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.'),
         vscode.commands.registerCommand(CommandKey.Refresh, () => {
             mysqlTreeDataProvider.init()

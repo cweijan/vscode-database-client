@@ -26,13 +26,13 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         if (inputWord && preChart == '.') {
             let subComplectionItems = this.generateTableComplectionItem(inputWord)
             if (subComplectionItems.length == 0) {
-                subComplectionItems = await this.generateColumnComplectionItem(inputWord)
+                subComplectionItems = await CompletionProvider.generateColumnComplectionItem(inputWord)
                 if (subComplectionItems.length == 0) {
                     let tableReg = new RegExp("\\w+(?=\\s*\\b" + inputWord + "\\b)", 'ig')
                     let currentSql = document.getText();
                     let result = tableReg.exec(currentSql)
                     for (; result != null && subComplectionItems.length == 0;) {
-                        subComplectionItems = await this.generateColumnComplectionItem(result[0])
+                        subComplectionItems = await CompletionProvider.generateColumnComplectionItem(result[0])
                         result = tableReg.exec(currentSql)
                     }
                 }
@@ -114,7 +114,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         })
     }
 
-    async generateColumnComplectionItem(inputWord: string): Promise<vscode.CompletionItem[]> {
+    static async generateColumnComplectionItem(inputWord: string): Promise<vscode.CompletionItem[]> {
 
         if (!inputWord) return []
         let columnNodes: ColumnNode[] = []

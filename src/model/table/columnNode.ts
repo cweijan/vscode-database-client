@@ -19,7 +19,7 @@ export class ColumnNode implements INode, IConnection {
     type: string = ModelType.COLUMN;
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, private readonly table: string,
-        readonly certPath: string, private readonly column: any) {
+        readonly certPath: string, public readonly column: any) {
     }
 
     private getIndex(columnKey:string){
