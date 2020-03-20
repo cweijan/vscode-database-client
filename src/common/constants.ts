@@ -11,6 +11,10 @@ export class CacheKey{
 
 }
 
+export class CommandKey{
+    static RecordHistory="mysql.hisotry.record"
+    static Refresh="mysql.refresh"
+}
 
 export class Cursor{
     static FIRST_POSITION=new vscode.Position(0, 0);

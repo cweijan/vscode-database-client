@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as mysql from "mysql";
 import { IConnection } from "../model/Connection";
-import { Constants } from "../common/Constants";
 import { Console } from "../common/OutputChannel";
 import { Global } from "../common/Global";
 import { QueryUnit } from "./QueryUnit";

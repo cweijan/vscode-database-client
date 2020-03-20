@@ -3,7 +3,6 @@ import { CacheKey } from "../common/Constants";
 import { IConnection } from "../model/Connection";
 import { ConnectionNode } from "../model/ConnectionNode";
 import { INode } from "../model/INode";
-import { ConnectionManager } from "../database/ConnectionManager";
 import { DatabaseCache } from "../database/DatabaseCache";
 
 export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {

@@ -59,6 +59,12 @@
 		},
 		"commands": [
 			{
+				"command": "mysql.hisotry.open",
+				"title": "Open History",
+				"category": "MySQL",
+				"icon": "resources/history.svg"
+			},
+			{
 				"command": "mysql.refresh",
 				"title": "Refresh",
 				"category": "MySQL",
@@ -292,6 +298,11 @@
 				},
 				{
 					"command": "mysql.refresh",
+					"when": "view == github.cweijan.mysql",
+					"group": "navigation@1"
+				},
+				{
+					"command": "mysql.hisotry.open",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@0"
 				}

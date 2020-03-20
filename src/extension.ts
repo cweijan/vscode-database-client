@@ -3,7 +3,6 @@ import * as vscode from "vscode";
 import { QueryUnit } from "./database/QueryUnit";
 import { ConnectionNode } from "./model/ConnectionNode";
 import { DatabaseNode } from "./model/database/databaseNode";
-import { INode } from "./model/INode";
 import { TableNode } from "./model/table/tableNode";
 import { MySQLTreeDataProvider } from "./provider/MysqlTreeDataProvider";
 import { CompletionProvider } from "./provider/CompletionProvider";
@@ -20,16 +19,19 @@ import { ProcedureGroup } from "./model/other/procedureGroup";
 import { ViewGroup } from "./model/table/viewGroup";
 import { ViewNode } from "./model/table/viewNode";
 import { SqlFormatProvider } from "./provider/SqlFormatProvider";
+import { HistoryManager } from "./extension/HistoryManager";
+import { CommandKey } from "./common/Constants";
 
 export function activate(context: vscode.ExtensionContext) {
 
+
     DatabaseCache.initCache(context)
-
     SqlViewManager.initExtesnsionPath(context.extensionPath)
+    var historyManager = new HistoryManager(context)
 
-    const sqlTreeProvider = new MySQLTreeDataProvider(context);
+    var mysqlTreeDataProvider=new MySQLTreeDataProvider(context);
     const treeview = vscode.window.createTreeView("github.cweijan.mysql", {
-        treeDataProvider: sqlTreeProvider
+        treeDataProvider: mysqlTreeDataProvider
     })
     treeview.onDidCollapseElement(event => {
         DatabaseCache.storeElementState(event.element, vscode.TreeItemCollapsibleState.Collapsed)
@@ -41,8 +43,14 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormatProvider()),
         vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.'),
-        vscode.commands.registerCommand("mysql.refresh", (node: INode) => {
-            sqlTreeProvider.init()
+        vscode.commands.registerCommand(CommandKey.Refresh, () => {
+            mysqlTreeDataProvider.init()
+        }),
+        vscode.commands.registerCommand("mysql.hisotry.open", () => {
+            historyManager.showHistory()
+        }),
+        vscode.commands.registerCommand(CommandKey.RecordHistory, (sql: string) => {
+            historyManager.recordHistory(sql)
         }),
         vscode.commands.registerCommand("mysql.addDatabase", (connectionNode: ConnectionNode) => {
             connectionNode.createDatabase()

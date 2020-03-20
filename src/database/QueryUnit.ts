@@ -1,10 +1,9 @@
 "use strict";
 import * as vscode from "vscode";
-import { Cursor } from "../common/Constants";
+import { Cursor, CommandKey } from "../common/Constants";
 import { Console } from "../common/OutputChannel";
 import { Util } from "../common/util";
 import { IConnection } from "../model/Connection";
-import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 import { ConnectionManager } from "./ConnectionManager";
 import { SqlViewManager } from "./SqlViewManager";
 
@@ -44,7 +43,9 @@ export class QueryUnit {
             connection = await ConnectionManager.getConnection(connectionOptions)
         }
 
+        let fromEditor = false;
         if (!sql) {
+            fromEditor = true;
             const activeTextEditor = vscode.window.activeTextEditor;
             const selection = activeTextEditor.selection;
             if (selection.isEmpty) {
@@ -61,8 +62,10 @@ export class QueryUnit {
                 Console.log(err);
                 return;
             }
+            if (fromEditor)
+                vscode.commands.executeCommand(CommandKey.RecordHistory, sql)
             if (sql.match(this.ddlPattern)) {
-                MySQLTreeDataProvider.instance.init()
+                vscode.commands.executeCommand(CommandKey.Refresh)
                 return;
             }
             if (Array.isArray(data)) {
@@ -70,7 +73,6 @@ export class QueryUnit {
             } else {
                 Console.log(`execute sql success:${sql}`)
             }
-
         });
     }
 
