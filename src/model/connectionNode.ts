@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { CacheKey, Constants, ModelType } from "../common/Constants";
+import { Console } from "../common/OutputChannel";
 import { ConnectionManager } from "../database/ConnectionManager";
 import { DatabaseCache } from "../database/DatabaseCache";
 import { QueryUnit } from "../database/QueryUnit";
@@ -10,6 +11,7 @@ import { DatabaseNode } from "./database/databaseNode";
 import { UserGroup } from "./database/userGroup";
 import { InfoNode } from "./InfoNode";
 import { INode } from "./INode";
+
 
 export class ConnectionNode implements INode, IConnection {
 
@@ -77,4 +79,12 @@ export class ConnectionNode implements INode, IConnection {
 
         MySQLTreeDataProvider.refresh();
     }
+
+    importData(fsPath: string) {
+        Console.log(`Doing import ${this.host}:${this.port}...`)
+        ConnectionManager.getConnection(this).then(connection => {
+            QueryUnit.runFile(connection,fsPath)
+        })
+    }
+
 }

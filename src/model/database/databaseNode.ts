@@ -1,5 +1,6 @@
 import mysqldump from 'mysqldump';
 import * as path from "path";
+
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/Constants";
 import { Console } from "../../common/OutputChannel";
@@ -45,6 +46,12 @@ export class DatabaseNode implements INode, IConnection {
         new TriggerGroup(this.host, this.user, this.password, this.port, this.database, this.certPath)]
     }
 
+    importData(fsPath: string) {
+        Console.log(`Doing import ${this.host}:${this.port}_${this.database}...`)
+        ConnectionManager.getConnection(this).then(connection => {
+            QueryUnit.runFile(connection,fsPath)
+        })
+    }
 
     public backupData(exportPath: string) {
 

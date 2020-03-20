@@ -1,5 +1,6 @@
 "use strict";
 import * as vscode from "vscode";
+import * as fs from "fs";
 import { Cursor, CommandKey } from "../common/Constants";
 import { Console } from "../common/OutputChannel";
 import { Util } from "../common/util";
@@ -8,6 +9,7 @@ import { ConnectionManager } from "./ConnectionManager";
 import { SqlViewManager } from "./SqlViewManager";
 
 export class QueryUnit {
+
     public static readonly maxTableCount = QueryUnit.getConfiguration().get<number>("maxTableCount");
 
     public static getConfiguration(): vscode.WorkspaceConfiguration {
@@ -62,9 +64,9 @@ export class QueryUnit {
                 Console.log(err);
                 return;
             }
-            var costTime=new Date().getTime() - executeTime
+            var costTime = new Date().getTime() - executeTime
             if (fromEditor)
-                vscode.commands.executeCommand(CommandKey.RecordHistory, sql,costTime)
+                vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime)
             if (sql.match(this.ddlPattern)) {
                 vscode.commands.executeCommand(CommandKey.Refresh)
                 return;
@@ -117,4 +119,41 @@ export class QueryUnit {
         return this.sqlDocument;
     }
 
+    static runFile(connection: any, fsPath: string) {
+        var stats = fs.statSync(fsPath)
+        var startTime = new Date()
+        var fileSize = stats["size"]
+        let success = true;
+        if (fileSize > 1024 * 1024 * 100) {
+            success = this.executeByLine(connection, fsPath)
+        } else {
+            var fileContent = fs.readFileSync(fsPath, 'utf8')
+            connection.query(fileContent, (err, data) => {
+                if (err) {
+                    Console.log(err)
+                    success = false;
+                }
+            })
+        }
+        if (success)
+            Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`)
+
+    }
+
+    private static executeByLine(connection: any, fsPath: string) {
+        var readline = require('readline');
+        var rl = readline.createInterface({
+            input: fs.createReadStream(fsPath.replace("\\", "/")),
+            terminal: false
+        });
+        rl.on('line', (chunk) => {
+            let sql = chunk.toString('utf8');
+            connection.query(sql, (err, sets, fields) => {
+                if (err) Console.log(`execute sql ${sql} fail,${err}`)
+            });
+        });
+        return true;
+    }
+
 }
+

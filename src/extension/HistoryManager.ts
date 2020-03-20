@@ -1,7 +1,5 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { Console } from "../common/OutputChannel";
-import { QueryUnit } from "../database/QueryUnit";
 export class HistoryManager {
 
     constructor(private context: vscode.ExtensionContext) {
@@ -9,11 +7,10 @@ export class HistoryManager {
 
     showHistory() {
         var historyPath = this.context.globalStoragePath + '/history.sql'
-        if (fs.existsSync(historyPath)) {
-            QueryUnit.showSQLTextDocument(fs.readFileSync(historyPath, { encoding: 'utf8' }))
-        } else {
-            Console.log("history is empty.")
-        }
+        var openPath = vscode.Uri.file(historyPath);
+        vscode.workspace.openTextDocument(openPath).then(doc => {
+            vscode.window.showTextDocument(doc);
+        });
     }
 
     recordHistory(sql: string, costTime: number) {
@@ -42,7 +39,7 @@ export class HistoryManager {
         }
 
         return date.getFullYear() + "-" + month + "-" + strDate + " "
-            + this.pad(date.getHours(), 2) + ":" + this.pad(date.getMinutes(),2) + ":" + this.pad(date.getSeconds(),2);
+            + this.pad(date.getHours(), 2) + ":" + this.pad(date.getMinutes(), 2) + ":" + this.pad(date.getSeconds(), 2);
     }
 
     pad(n: any, width: number, z?: any): number {

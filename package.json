@@ -98,7 +98,7 @@
 			},
 			{
 				"command": "mysql.deleteDatabase",
-				"title": "Delete Database",
+				"title": "Drop Database",
 				"category": "MySQL"
 			},
 			{
@@ -127,6 +127,11 @@
 			{
 				"command": "mysql.template.delete",
 				"title": "Delete SQL Template",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.data.import",
+				"title": "Import Data",
 				"category": "MySQL"
 			},
 			{
@@ -319,6 +324,11 @@
 					"group": "2_mysql@1"
 				},
 				{
+					"command": "mysql.data.import",
+					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"group": "3_mysql@1"
+				},
+				{
 					"command": "mysql.deleteConnection",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "mysql@2"
@@ -382,6 +392,11 @@
 					"command": "mysql.data.export",
 					"when": "view == github.cweijan.mysql && viewItem == database",
 					"group": "mysql@5"
+				},
+				{
+					"command": "mysql.data.import",
+					"when": "view == github.cweijan.mysql && viewItem == database",
+					"group": "mysql@6"
 				},
 				{
 					"command": "mysql.template.sql",
@@ -567,6 +582,7 @@
 		"vscode": "^1.1.33"
 	},
 	"dependencies": {
+		"execsql": "0.0.3",
 		"mysql": "^2.15.0",
 		"mysqldump": "^2.2.1",
 		"sql-formatter": "^2.3.3"

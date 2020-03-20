@@ -97,6 +97,11 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.template.sql", (tableNode: TableNode, run: Boolean) => {
             tableNode.selectSqlTemplate(run);
         }),
+        vscode.commands.registerCommand("mysql.data.import", (iNode:  DatabaseNode|ConnectionNode) => {
+            vscode.window.showOpenDialog({filters:{ 'Sql': ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then(filePath => {
+                iNode.importData(filePath[0].fsPath)
+            })
+        }),
         vscode.commands.registerCommand("mysql.data.export", (iNode: TableNode | DatabaseNode) => {
             vscode.window.showOpenDialog({ canSelectMany: false, openLabel: "Select export file path", canSelectFiles: false, canSelectFolders: true }).then(folderPath => {
                 iNode.backupData(folderPath[0].fsPath)

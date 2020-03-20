@@ -1,5 +1,10 @@
 {
     "extends": "tslint:recommended",
+    "linterOptions": {
+        "exclude": [
+            "node_modules/**"
+        ]
+    },
     "rules": {
         "variable-name": [
             true,
