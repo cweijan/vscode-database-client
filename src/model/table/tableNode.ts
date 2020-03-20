@@ -21,11 +21,10 @@ export class TableNode implements INode, IConnection {
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, readonly table: string,
         readonly certPath: string) {
+        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`
     }
 
     public getTreeItem(): vscode.TreeItem {
-
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`
         return {
             label: this.table,
             collapsibleState: DatabaseCache.getElementState(this),
@@ -41,8 +40,6 @@ export class TableNode implements INode, IConnection {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
-
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`
         let columnNodes = DatabaseCache.getColumnListOfTable(this.identify)
         if (columnNodes && !isRresh) {
             return columnNodes;
@@ -121,7 +118,7 @@ export class TableNode implements INode, IConnection {
         const sql = `SELECT * FROM ${this.database}.${this.table} LIMIT 1000;`;
 
         if (run) {
-            ConnectionManager.getConnection(this,true)
+            ConnectionManager.getConnection(this, true)
             QueryUnit.runQuery(sql, this);
         } else {
             QueryUnit.createSQLTextDocument(sql);
