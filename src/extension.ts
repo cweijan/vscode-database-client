@@ -49,8 +49,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.hisotry.open", () => {
             historyManager.showHistory()
         }),
-        vscode.commands.registerCommand(CommandKey.RecordHistory, (sql: string) => {
-            historyManager.recordHistory(sql)
+        vscode.commands.registerCommand(CommandKey.RecordHistory, (sql: string,costTime:number) => {
+            historyManager.recordHistory(sql,costTime)
         }),
         vscode.commands.registerCommand("mysql.addDatabase", (connectionNode: ConnectionNode) => {
             connectionNode.createDatabase()

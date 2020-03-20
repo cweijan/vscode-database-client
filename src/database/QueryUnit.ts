@@ -62,14 +62,15 @@ export class QueryUnit {
                 Console.log(err);
                 return;
             }
+            var costTime=new Date().getTime() - executeTime
             if (fromEditor)
-                vscode.commands.executeCommand(CommandKey.RecordHistory, sql)
+                vscode.commands.executeCommand(CommandKey.RecordHistory, sql,costTime)
             if (sql.match(this.ddlPattern)) {
                 vscode.commands.executeCommand(CommandKey.Refresh)
                 return;
             }
             if (Array.isArray(data)) {
-                SqlViewManager.showQueryResult({ sql, data, splitResultView: true, costTime: new Date().getTime() - executeTime });
+                SqlViewManager.showQueryResult({ sql, data, splitResultView: true, costTime: costTime });
             } else {
                 Console.log(`execute sql success:${sql}`)
             }
