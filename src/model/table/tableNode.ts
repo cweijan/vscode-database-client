@@ -115,7 +115,7 @@ export class TableNode implements INode, IConnection {
 
 
     public async selectSqlTemplate(run: Boolean) {
-        const sql = `SELECT * FROM ${this.database}.${this.table} LIMIT 1000;`;
+        const sql = `SELECT * FROM ${this.database}.${this.table} LIMIT ${Constants.DEFAULT_SIZE};`;
 
         if (run) {
             ConnectionManager.getConnection(this, true)

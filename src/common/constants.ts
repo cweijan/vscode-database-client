@@ -3,6 +3,7 @@ import * as path from "path";
 
 export class Constants {
     public static RES_PATH=path.join(vscode.extensions.getExtension('cweijan.vscode-mysql-manager').extensionPath,"resources");
+    public static DEFAULT_SIZE=200;
 }
 
 export class CacheKey{

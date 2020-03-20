@@ -45,3 +45,4 @@ MySQL management tool Plus
 ## Future Plain
 - Ssl connect.
 - Bookmark sql.
+- Hover Info.

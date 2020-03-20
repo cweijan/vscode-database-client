@@ -2,6 +2,7 @@
 - Table name inference
 - Sql formatter
 - Record History
+- Import sql file
 
 ## 1.6.36 (2020/3/19)
 - Fix many mysql connection error.

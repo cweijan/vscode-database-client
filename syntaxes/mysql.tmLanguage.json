@@ -7,6 +7,10 @@
 			"name": "keyword.mysql"
 		},
 		{
+			"match": "(?i)\\b(DATE_ADD|DATE_SUB|CURRENT_DATE|DATE_FORMAT|CAST|CHAR_LENGTH|avg|checksum_agg|count|count_big|grouping|grouping_id|max|min|sum|stdev|stdevp|var|varp)\\b",
+			"name": "support.function.aggregate.sql"
+		},
+		{
 			"match": "((?<!@)@)\\b(\\w+)\\b",
 			"name": "text.variable"
 		},
@@ -187,10 +191,6 @@
 		{
 			"match": "\\|\\|",
 			"name": "keyword.operator.concatenator.sql"
-		},
-		{
-			"match": "(?i)\\b(avg|checksum_agg|count|count_big|grouping|grouping_id|max|min|sum|stdev|stdevp|var|varp)\\b",
-			"name": "support.function.aggregate.sql"
 		},
 		{
 			"match": "(?i)\\b(cast|convert|parse|try_cast|try_convert|try_parse)\\b",

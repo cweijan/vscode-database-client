@@ -80,7 +80,7 @@ export class QueryUnit {
     }
 
 
-    private static batchPattern = /(TRIGGER|PROCEDURE|FUNCTION)/ig
+    private static batchPattern = /\s+(TRIGGER|PROCEDURE|FUNCTION)\s+/ig
     private static obtainSql(activeTextEditor: vscode.TextEditor): string {
 
         var content = activeTextEditor.document.getText()
