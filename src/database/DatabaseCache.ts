@@ -168,6 +168,15 @@ export class DatabaseCache {
         return result;
     }
 
+    static getTable(databaseIdentify:string,tableName:String):TableNode{
+        let tableList = this.databaseNodeMapTableNode[databaseIdentify +"_"+ ModelType.TABLE_GROUP]
+        if(!tableList)return null;
+        for (const tableNode of tableList) {
+            if(tableNode.table==tableName)return tableNode;
+        }
+        return null;
+    }
+
     /**
      * get table tree data
      * @param tableIdentify 

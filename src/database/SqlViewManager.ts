@@ -1,20 +1,21 @@
-import { WebviewPanel } from "vscode";
-"use strict";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { Console } from "../common/OutputChannel";
-import { ConnectionManager } from "./ConnectionManager";
-import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
+import { WebviewPanel } from "vscode";
 import { OperateType } from "../common/Constants";
+import { Console } from "../common/OutputChannel";
+import { IConnection } from "../model/Connection";
+import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
+import { ConnectionManager } from "./ConnectionManager";
+import { DatabaseCache } from "./DatabaseCache";
 import { QueryUnit } from "./QueryUnit";
+import { ColumnNode } from "../model/table/columnNode";
+"use strict";
 
 export class ViewOption {
     viewPath?: string;
     viewTitle?: string;
-    sql?: string;
-    data?: any;
     splitResultView: boolean = false;
-    costTime?: number;
+    extra?: any;
     /**
      * receive webview send message 
      */
@@ -28,15 +29,24 @@ export class SqlViewManager {
     static tableEditWebviewPanel: WebviewPanel
     static tableCreateWebviewPanel: WebviewPanel
     static extensionPath: string
-    public static initExtesnsionPath(extensionPath: string) {
+    static initExtesnsionPath(extensionPath: string) {
         this.extensionPath = extensionPath
     }
 
-    public static showQueryResult(viewOption: ViewOption) {
 
+    static async showQueryResult(viewOption: ViewOption, opt: IConnection) {
+
+        let tableName = this.getTable(viewOption.extra)
+        let tableNode = DatabaseCache.getTable(`${opt.host}_${opt.port}_${opt.user}_${opt.database}`, tableName)
+        if (tableNode) {
+            let columnList = (await tableNode.getChildren()).map((columnNode: ColumnNode) => {
+                return columnNode.column.COLUMN_NAME
+            })
+            viewOption.extra['columnList']=columnList
+        }
         if (this.resultWebviewPanel) {
             if (this.resultWebviewPanel.visible) {
-                this.resultWebviewPanel.webview.postMessage(viewOption)
+                this.resultWebviewPanel.webview.postMessage(viewOption.extra)
                 this.resultWebviewPanel.reveal(vscode.ViewColumn.Two, true);
                 return;
             } else {
@@ -50,7 +60,7 @@ export class SqlViewManager {
 
         this.createWebviewPanel(viewOption).then(webviewPanel => {
             this.resultWebviewPanel = webviewPanel
-            webviewPanel.webview.postMessage(viewOption)
+            webviewPanel.webview.postMessage(viewOption.extra)
             webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined })
             webviewPanel.webview.onDidReceiveMessage((params) => {
                 if (params.type == OperateType.execute) {
@@ -62,7 +72,25 @@ export class SqlViewManager {
 
     }
 
-    public static showConnectPage() {
+    private static getTable(extra: any):string {
+        if(!extra)return null;
+        let sql=extra.sql;
+        let baseMatch;
+        if (sql && (baseMatch = (sql + " ").match(/select\s+\*\s+from\s*(.+?)(?=[\s;])/i)) && !sql.match(/\bjoin\b/ig)) {
+            let expectTable: string = baseMatch[1];
+            let temp: string[], table;
+            if (expectTable.includes("`")) {
+                temp = expectTable.split("`");
+                table = temp[temp.length - 2];
+            } else {
+                temp = expectTable.split(".")
+                table = temp[temp.length - 1]
+            }
+            return table;
+        }
+    }
+
+    static showConnectPage() {
 
         this.createWebviewPanel({
             viewPath: "connect",
@@ -99,7 +127,7 @@ export class SqlViewManager {
                 const webviewPanel = await vscode.window.createWebviewPanel(
                     "mysql.sql.result",
                     viewOption.viewTitle,
-                    {viewColumn:columnType,preserveFocus:true},
+                    { viewColumn: columnType, preserveFocus: true },
                     { enableScripts: true, retainContextWhenHidden: true }
                 );
                 webviewPanel.webview.html = data.replace(/\$\{webviewPath\}/gi,

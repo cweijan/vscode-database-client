@@ -37,9 +37,14 @@ export class QueryUnit {
             return;
         }
         let connection: any;
-        if (!connectionOptions && !(connection = await ConnectionManager.getLastActiveConnection())) {
-            vscode.window.showWarningMessage("No MySQL Server or Database selected");
-            return;
+        if (!connectionOptions) {
+            if (!(connection = await ConnectionManager.getLastActiveConnection())) {
+                vscode.window.showWarningMessage("No MySQL Server or Database selected");
+                return;
+            } else {
+                connectionOptions = ConnectionManager.getLastConnectionOption()
+            }
+
         } else if (connectionOptions) {
             connectionOptions.multipleStatements = true;
             connection = await ConnectionManager.getConnection(connectionOptions)
@@ -72,7 +77,7 @@ export class QueryUnit {
                 return;
             }
             if (Array.isArray(data)) {
-                SqlViewManager.showQueryResult({ sql, data, splitResultView: true, costTime: costTime });
+                SqlViewManager.showQueryResult({ splitResultView: true, extra: { sql, data, costTime } }, connectionOptions);
             } else {
                 Console.log(`execute sql success:${sql}`)
             }

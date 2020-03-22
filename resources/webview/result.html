@@ -8,7 +8,7 @@
     <style>
         body {
             background-color: #F7F7F7;
-            font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
         }
 
         .hint {
@@ -39,24 +39,32 @@
                     <el-input v-model="search" style="width:200px" placeholder="Type to search" />
                 </el-cow>
                 <el-cow>
-                    <el-button type="danger" @click='execute' >Execute</el-button>
+                    <el-button type="danger" @click='execute'>Execute</el-button>
                 </el-cow>
                 <el-cow>
                     <span>costTime: </span><span v-text="result.costTime"></span>ms,
-                    <span>row: {{result.rows.length}}, Col: {{columnCount}}</span>
+                    <span>row: {{result.data.length}}, Col: {{columnCount}}</span>
                 </el-cow>
             </el-row>
         </div>
-        <el-table id="dataTable" v-loading='loading' size='small' highlight-current-row='true'
-            :data="result.rows.filter(data => !search || JSON.stringify(data).toLowerCase().includes(search.toLowerCase()))"
-            style="width: 100%" border @cell-click="celledit">
-            <el-table-column :label="key" v-for="(value,key) in result.rows[0]" :key="key" show-overflow-tooltip
-                align="center">
-                <template slot-scope="scope">
-                    <span v-html='dataformat(scope.row[key])'></span>
-                </template>
-            </el-table-column>
-        </el-table>
+        <div :style="'width:' + tableWidth + 'px;overflow:scroll'">
+            <el-table id="dataTable" v-loading='loading' size='small'
+                :data="result.data.filter(data => !search || JSON.stringify(data).toLowerCase().includes(search.toLowerCase()))"
+                border @cell-click="celledit">
+                <el-table-column :label="column" v-for="(column) in result.columnList" :key="column" align="center"
+                    v-if="result.columnList" :width="computeWidth(column)">
+                    <template slot-scope="scope">
+                        <span v-html='dataformat(scope.row[column])'></span>
+                    </template>
+                </el-table-column>
+                <el-table-column :label="key" v-for="(value,key) in result.data[0]" :key="key" align="center"
+                    v-if="!result.columnList" :width="computeWidth(key)">
+                    <template slot-scope="scope">
+                        <span v-html='dataformat(scope.row[key])'></span>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
     </div>
 </body>
 
@@ -67,16 +75,40 @@
         el: '#app',
         data: {
             result: previousState ? previousState.result : {
-                rows: [],
+                data: [],
                 sql: '',
-                costTime: 0
+                costTime: 0,
+                widthCache: {},
+                tableWidth: null
             },
             search: '',
             loading: false
         },
         methods: {
+            updateWidth() {
+                let width = 0;
+                for (const key in this.widthCache) {
+                    width = width + parseInt(this.widthCache[key])
+                }
+                this.tableWidth = width;
+            },
+            computeWidth(key, index) {
+
+                if (this.widthCache[key]) return this.widthCache[key];
+                if (!index) index = 0
+                if (!this.result.data[index] || index > 10) return 60;
+                var value = this.result.data[index][key];
+                var dynamic = value ? ((value + "").length) * 10 : ((key + "").length) * 10;
+                if (dynamic > 600) dynamic = 600;
+                if (dynamic < 60) dynamic = 60;
+                var nextDynamic = this.computeWidth(key, ++index)
+                if (dynamic < nextDynamic) dynamic = nextDynamic;
+                this.widthCache[key] = dynamic;
+                this.updateWidth()
+                return dynamic;
+            },
             celledit(row, column, cell, event) {
-                // cell.contentEditable = true;
+                cell.contentEditable = true;
                 // cell.focus()
             },
             execute() {
@@ -100,20 +132,18 @@
         },
         computed: {
             columnCount() {
-                if (this.result.rows == undefined || this.result.rows[0] == undefined) return 0;
-                return Object.keys(this.result.rows[0]).length;
+                if (this.result.data == undefined || this.result.data[0] == undefined) return 0;
+                return Object.keys(this.result.data[0]).length;
             }
         }
     })
 
     window.addEventListener('message', event => {
-        vue.result.rows = event.data.data
-        vue.result.sql = event.data.sql
-        vue.result.costTime = event.data.costTime
+        vue.result = event.data
         vue.loading = false
+        vue.widthCache = {}
         // instead by retainContextWhenHidden=true
         // vscode.setState({ result: vue.result });
-        document.write(previousState + ":" + count)
     });
 </script>
 

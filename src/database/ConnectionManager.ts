@@ -7,70 +7,49 @@ import { QueryUnit } from "./QueryUnit";
 
 export class ConnectionManager {
 
-    private static connectionCache = {}
     private static lastConnectionOption: IConnection;
-    private static lastActiveConnection: any;
+    private static activeConnection: any;
 
-    public static updateLastActiveConnection(connectionOptions: IConnection): any {
-        this.lastConnectionOption = connectionOptions
+    public static getLastConnectionOption() {
+        return this.lastConnectionOption
     }
 
     public static getLastActiveConnection() {
 
-        if (!this.lastConnectionOption) {
+        if (!this.activeConnection) {
             return undefined;
         }
 
-        if (this.lastActiveConnection && this.lastActiveConnection.state == 'authenticated') {
-            return this.lastActiveConnection
-        }
+
         return this.getConnection(Object.assign({ multipleStatements: true }, this.lastConnectionOption))
 
     }
 
     public static getConnection(connectionOptions: IConnection, changeActive: Boolean = false): Promise<any> {
 
-        if (!connectionOptions.multipleStatements) connectionOptions.multipleStatements = true
-
-        const key = `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}_${connectionOptions.password}`
+        connectionOptions.multipleStatements = true
+        this.lastConnectionOption = connectionOptions
+        if (changeActive) Global.updateStatusBarItems(connectionOptions);
 
         return new Promise((resolve, reject) => {
-
-            if (this.connectionCache[key] && this.connectionCache[key].conneciton.state == 'authenticated') {
+            let connection = this.activeConnection
+            if (connection && connection.state == 'authenticated') {
                 if (connectionOptions.database) {
-                    QueryUnit.queryPromise(this.connectionCache[key].conneciton, `use \`${connectionOptions.database}\``).then(() => {
-                        if (changeActive || this.lastActiveConnection == undefined) {
-                            this.lastConnectionOption = this.connectionCache[key].connectionOptions
-                            this.lastActiveConnection = this.connectionCache[key].conneciton
-                            Global.updateStatusBarItems(connectionOptions);
-                        }
-                        resolve(this.connectionCache[key].conneciton)
+                    QueryUnit.queryPromise(connection, `use \`${connectionOptions.database}\``).then(() => {
+                        resolve(connection)
                     }).catch(error => {
                         reject(error)
                     })
                 } else {
-                    if (changeActive || this.lastActiveConnection == undefined) {
-                        this.lastConnectionOption = this.connectionCache[key].connectionOptions
-                        this.lastActiveConnection = this.connectionCache[key].conneciton
-                        Global.updateStatusBarItems(connectionOptions);
-                    }
-                    resolve(this.connectionCache[key].conneciton)
+                    resolve(connection)
                 }
             } else {
-                this.connectionCache[key] = {
-                    connectionOptions: connectionOptions,
-                    conneciton: this.createConnection(connectionOptions)
-                };
-                this.connectionCache[key].conneciton.connect((err: Error) => {
+                this.activeConnection = this.createConnection(connectionOptions);
+                this.activeConnection.connect((err: Error) => {
                     if (!err) {
-                        if (changeActive || this.lastActiveConnection == undefined) {
-                            this.lastConnectionOption = connectionOptions
-                            this.lastActiveConnection = this.connectionCache[key].conneciton
-                            Global.updateStatusBarItems(connectionOptions);
-                        }
-                        resolve(this.lastActiveConnection);
+                        resolve(this.activeConnection);
                     } else {
-                        this.connectionCache[key] = undefined
+                        this.activeConnection = undefined
                         Console.log(`${err.stack}\n${err.message}`)
                         reject(err.message);
                     }
