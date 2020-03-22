@@ -36,7 +36,7 @@ export class ProcedureNode implements INode, IConnection {
     }
 
     async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this,true), `SHOW CREATE PROCEDURE ${this.database}.${this.name}`)
+        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this,true), `SHOW CREATE PROCEDURE \`${this.database}\`.\`${this.name}\``)
             .then((procedDtail) => {
                 procedDtail = procedDtail[0]
                 QueryUnit.showSQLTextDocument(`DROP PROCEDURE IF EXISTS ${procedDtail['Procedure']}; \n\n${procedDtail['Create Procedure']}`);
@@ -51,8 +51,9 @@ export class ProcedureNode implements INode, IConnection {
     public drop() {
 
         vscode.window.showInputBox({ prompt: `Are you want to drop procedure ${this.name} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
+            if(!inputContent)return;
             if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP procedure ${this.database}.${this.name}`).then(() => {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP procedure \`${this.database}\`.\`${this.name}\``).then(() => {
                     DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.PROCEDURE_GROUP}`)
                     MySQLTreeDataProvider.refresh()
                     vscode.window.showInformationMessage(`Drop procedure ${this.name} success!`)

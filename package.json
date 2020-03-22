@@ -156,12 +156,12 @@
 			},
 			{
 				"command": "mysql.table.drop",
-				"title": "Delete table",
+				"title": "Drop table",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.changeTableName",
-				"title": "change table name",
+				"title": "Change Table Name",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/edit.svg",
@@ -175,7 +175,7 @@
 			},
 			{
 				"command": "mysql.changeColumnName",
-				"title": "change column name",
+				"title": "Change Column Name",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/edit.svg",
@@ -196,6 +196,15 @@
 				"command": "mysql.column.drop",
 				"title": "Drop column Template",
 				"category": "MySQL"
+			},
+			{
+				"command": "mysql.template.table",
+				"title": "Create New Table",
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
 			},
 			{
 				"command": "mysql.template.view",
@@ -427,6 +436,21 @@
 					"command": "mysql.copy.update",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_mysql@2"
+				},
+				{
+					"command": "mysql.template.table",
+					"when": "view == github.cweijan.mysql && viewItem == tableGroup",
+					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.refresh",
+					"when": "view == github.cweijan.mysql && viewItem == tableGroup",
+					"group": "1_mysql@2"
+				},
+				{
+					"command": "mysql.template.table",
+					"when": "view == github.cweijan.mysql && viewItem == tableGroup",
+					"group": "inline"
 				},
 				{
 					"command": "mysql.table.drop",

@@ -49,5 +49,11 @@ export class TableGroup implements INode, IConnection {
             });
     }
 
-
+    createTemplate() {
+        ConnectionManager.getConnection(this, true)
+        QueryUnit.createSQLTextDocument(`CREATE TABLE tableName(  
+  id long NOT NULL primary key AUTO_INCREMENT,
+  column varchar(length)
+);`)
+    }
 }

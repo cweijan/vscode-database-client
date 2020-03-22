@@ -53,7 +53,7 @@ export class ProcedureGroup implements INode, IConnection {
         ConnectionManager.getConnection(this, true)
         QueryUnit.createSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
-PROCEDURE [name]()
+PROCEDURE \`name\`()
 BEGIN
 
 END;`)

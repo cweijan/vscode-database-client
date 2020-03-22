@@ -87,6 +87,7 @@ export class UserNode implements INode, IConnection {
     public drop() {
         ConnectionManager.getConnection(this,true)
         vscode.window.showInputBox({ prompt: `Are you want to drop user ${this.user} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
+            if(!inputContent)return;
             if (inputContent.toLocaleLowerCase() == 'y') {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP user ${this.name}`).then(() => {
                     MySQLTreeDataProvider.refresh()

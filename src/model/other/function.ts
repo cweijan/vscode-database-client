@@ -36,7 +36,7 @@ export class FunctionNode implements INode, IConnection {
     }
 
     async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this,true), `SHOW CREATE FUNCTION ${this.database}.${this.name}`)
+        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this,true), `SHOW CREATE FUNCTION \`${this.database}\`.\`${this.name}\``)
         .then((procedDtail) => {
             procedDtail = procedDtail[0]
             QueryUnit.showSQLTextDocument(`DROP FUNCTION IF EXISTS ${procedDtail['Function']}; \n\n${procedDtail['Create Function']}`);
@@ -51,8 +51,9 @@ export class FunctionNode implements INode, IConnection {
     public drop() {
 
         vscode.window.showInputBox({ prompt: `Are you want to drop function ${this.name} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
+            if(!inputContent)return;
             if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function ${this.database}.${this.name}`).then(() => {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function \`${this.database}\`.\`${this.name}\``).then(() => {
                     DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.FUNCTION_GROUP}`)
                     MySQLTreeDataProvider.refresh()
                     vscode.window.showInformationMessage(`Drop function ${this.name} success!`)

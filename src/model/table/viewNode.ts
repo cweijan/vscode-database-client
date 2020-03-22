@@ -29,8 +29,9 @@ export class ViewNode extends TableNode{
     public drop() {
 
         vscode.window.showInputBox({ prompt: `Are you want to drop view ${this.table} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
+            if(!inputContent)return;
             if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP view ${this.database}.${this.table}`).then(() => {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP view \`${this.database}\`.\`${this.table}\``).then(() => {
                     DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`)
                     MySQLTreeDataProvider.refresh()
                     vscode.window.showInformationMessage(`Drop view ${this.table} success!`)

@@ -54,7 +54,7 @@ export class ViewGroup implements INode, IConnection {
         ConnectionManager.getConnection(this, true)
         QueryUnit.createSQLTextDocument(`CREATE
 /* [DEFINER = { user | CURRENT_USER }]*/
-VIEW [name]
+VIEW \`name\`
 AS
 (SELECT * FROM ...);`)
     }

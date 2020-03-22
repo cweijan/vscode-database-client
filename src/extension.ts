@@ -22,6 +22,7 @@ import { SqlFormatProvider } from "./provider/SqlFormatProvider";
 import { HistoryManager } from "./extension/HistoryManager";
 import { CommandKey } from "./common/Constants";
 import { TableHoverProvider } from "./provider/TableHoverProvider";
+import { TableGroup } from "./model/table/tableGroup";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -129,6 +130,9 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         vscode.commands.registerCommand("mysql.user.sql", (userNode: UserNode) => {
             userNode.selectSqlTemplate();
+        }),
+        vscode.commands.registerCommand("mysql.template.table", (tableGroup: TableGroup) => {
+            tableGroup.createTemplate();
         }),
         vscode.commands.registerCommand("mysql.template.procedure", (procedureGroup: ProcedureGroup) => {
             procedureGroup.createTemplate();

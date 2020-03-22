@@ -35,7 +35,7 @@ export class TriggerNode implements INode, IConnection {
     }
 
     async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this,true), `SHOW CREATE TRIGGER ${this.database}.${this.name}`)
+        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this,true), `SHOW CREATE TRIGGER \`${this.database}\`.\`${this.name}\``)
         .then((procedDtail) => {
             procedDtail = procedDtail[0]
             QueryUnit.showSQLTextDocument(`\n\nDROP TRIGGER IF EXISTS ${procedDtail['Trigger']}; \n\n${procedDtail['SQL Original Statement']}`);
@@ -50,8 +50,9 @@ export class TriggerNode implements INode, IConnection {
     public drop() {
 
         vscode.window.showInputBox({ prompt: `Are you want to drop trigger ${this.name} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
+            if(!inputContent)return;
             if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP trigger ${this.database}.${this.name}`).then(() => {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP trigger \`${this.database}\`.\`${this.name}\``).then(() => {
                     DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.TRIGGER_GROUP}`)
                     MySQLTreeDataProvider.refresh()
                     vscode.window.showInformationMessage(`Drop trigger ${this.name} success!`)

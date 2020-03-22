@@ -38,7 +38,7 @@ export class ConnectionManager {
 
             if (this.connectionCache[key] && this.connectionCache[key].conneciton.state == 'authenticated') {
                 if (connectionOptions.database) {
-                    QueryUnit.queryPromise(this.connectionCache[key].conneciton, `use ${connectionOptions.database}`).then(() => {
+                    QueryUnit.queryPromise(this.connectionCache[key].conneciton, `use \`${connectionOptions.database}\``).then(() => {
                         if (changeActive || this.lastActiveConnection == undefined) {
                             this.lastConnectionOption = this.connectionCache[key].connectionOptions
                             this.lastActiveConnection = this.connectionCache[key].conneciton
