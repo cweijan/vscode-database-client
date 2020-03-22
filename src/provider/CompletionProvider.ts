@@ -10,12 +10,12 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     constructor() {
         this.initDefaultComplectionItem()
     }
-    private keywordList: string[] = [ "SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE",  "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN"]
-    private functionList: string[] = ["decimal","char", "varchar", "CHAR_LENGTH", "CONCAT", "NOW", "DATE_ADD", "DATE_SUB", "MAX", "COUNT", "MIN", "SUM", "AVG", "LENGTH", "IF", "IFNULL", "MD5", "SHA", "CURRENT_DATE", "DATE_FORMAT", "CAST"]
+    private keywordList: string[] = ["SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN"]
+    private functionList: string[] = ["decimal", "char", "varchar", "CHAR_LENGTH", "CONCAT", "NOW", "DATE_ADD", "DATE_SUB", "MAX", "COUNT", "MIN", "SUM", "AVG", "LENGTH", "IF", "IFNULL", "MD5", "SHA", "CURRENT_DATE", "DATE_FORMAT", "CAST"]
     private defaultComplectionItems: vscode.CompletionItem[] = []
-    private tableKeywordList: string[] = ["AUTO_INCREMENT","NULL","NOT","PRIMARY", "CURRENT_TIME","DEFAULT","COMMENT","UNIQUE","KEY"]
+    private tableKeywordList: string[] = ["AUTO_INCREMENT", "NULL", "NOT", "PRIMARY", "CURRENT_TIME", "DEFAULT", "COMMENT", "UNIQUE", "KEY"]
     private tableKeywordComplectionItems: vscode.CompletionItem[] = []
-    private typeList: string[] = ["INTEGER","smallint","tinyint","MEDIUMINT","bigint","numeric","bit","long", "int", "float", "double","TEXT","SET", "blob", "timestamp", "date","time","YEAR", "datetime"]
+    private typeList: string[] = ["INTEGER", "smallint", "tinyint", "MEDIUMINT", "bigint", "numeric", "bit", "long", "int", "float", "double", "TEXT", "SET", "blob", "timestamp", "date", "time", "YEAR", "datetime"]
     private typeComplectionItems: vscode.CompletionItem[] = []
 
     private initDefaultComplectionItem() {
@@ -42,22 +42,28 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         })
     }
 
-    private createReg=/CREATE TABLE/ig;
-    private programReg=/(FUNCTION|PROCEDURE)/ig;
+    private createReg = /CREATE TABLE/ig;
+    private programReg = /(FUNCTION|PROCEDURE)/ig;
+    /**
+     * Main function
+     * @param document 
+     * @param position 
+     */
     async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.CompletionItem[]> {
 
-        var sql=QueryUnit.obtainSql(vscode.window.activeTextEditor)
-        if(sql && sql.match(this.createReg)){
+        var sql = QueryUnit.obtainSql(vscode.window.activeTextEditor)
+        if (sql && sql.match(this.createReg)) {
             return this.typeComplectionItems.concat(this.tableKeywordComplectionItems);
         }
-        
-        let completionItems = []
-        if(sql && sql.match(this.programReg)){
-            completionItems=this.typeComplectionItems
-        }
+
+        let completionItems = [];
 
         const prePostion = position.character == 0 ? position : new vscode.Position(position.line, position.character - 1);
         const preChart = document.getText(new vscode.Range(prePostion, position))
+
+        if (preChart != "." && sql && sql.match(this.programReg)) {
+            completionItems = this.typeComplectionItems
+        }
         if (preChart != "." && preChart != " ") {
             completionItems = completionItems.concat(this.defaultComplectionItems)
         }
@@ -101,6 +107,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         })
     }
 
+    private blockDbReg = /(mysql|performance_schema|information_schema)/ig
     private generateTableComplectionItem(inputWord?: string): vscode.CompletionItem[] {
 
         let tableNodes: INode[] = []
@@ -109,7 +116,9 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
                 if (databaseNode.database == inputWord) tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.identify)
             })
         } else {
-            tableNodes = DatabaseCache.getTableNodeList()
+            tableNodes = DatabaseCache.getTableNodeList().filter(databaseNode => {
+                return !databaseNode.database.match(this.blockDbReg)
+            })
         }
 
         return tableNodes.map<vscode.CompletionItem>((tableNode: TableNode) => {
