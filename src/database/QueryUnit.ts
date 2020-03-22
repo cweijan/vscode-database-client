@@ -81,7 +81,7 @@ export class QueryUnit {
 
 
     private static batchPattern = /\s+(TRIGGER|PROCEDURE|FUNCTION)\s+/ig
-    private static obtainSql(activeTextEditor: vscode.TextEditor): string {
+    static obtainSql(activeTextEditor: vscode.TextEditor): string {
 
         var content = activeTextEditor.document.getText()
         if (content.match(this.batchPattern)) return content;

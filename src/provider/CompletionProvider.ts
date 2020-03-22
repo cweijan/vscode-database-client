@@ -4,15 +4,57 @@ import { DatabaseCache } from "../database/DatabaseCache";
 import { INode } from "../model/INode";
 import { ColumnNode } from "../model/table/columnNode";
 import { TableNode } from "../model/table/tableNode";
+import { QueryUnit } from "../database/QueryUnit";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
-
     constructor() {
         this.initDefaultComplectionItem()
     }
+    private keywordList: string[] = [ "SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE",  "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN"]
+    private functionList: string[] = ["decimal","char", "varchar", "CHAR_LENGTH", "CONCAT", "NOW", "DATE_ADD", "DATE_SUB", "MAX", "COUNT", "MIN", "SUM", "AVG", "LENGTH", "IF", "IFNULL", "MD5", "SHA", "CURRENT_DATE", "DATE_FORMAT", "CAST"]
+    private defaultComplectionItems: vscode.CompletionItem[] = []
+    private tableKeywordList: string[] = ["AUTO_INCREMENT","NULL","NOT","PRIMARY", "CURRENT_TIME","DEFAULT","COMMENT","UNIQUE","KEY"]
+    private tableKeywordComplectionItems: vscode.CompletionItem[] = []
+    private typeList: string[] = ["INTEGER","smallint","tinyint","MEDIUMINT","bigint","numeric","bit","long", "int", "float", "double","TEXT","SET", "blob", "timestamp", "date","time","YEAR", "datetime"]
+    private typeComplectionItems: vscode.CompletionItem[] = []
+
+    private initDefaultComplectionItem() {
+        this.keywordList.forEach(keyword => {
+            let keywordComplectionItem = new vscode.CompletionItem(keyword + " ")
+            keywordComplectionItem.kind = vscode.CompletionItemKind.Property
+            this.defaultComplectionItems.push(keywordComplectionItem)
+        })
+        this.functionList.forEach(keyword => {
+            let functionComplectionItem = new vscode.CompletionItem(keyword + " ")
+            functionComplectionItem.kind = vscode.CompletionItemKind.Function
+            functionComplectionItem.insertText = new vscode.SnippetString(keyword + "($1)")
+            this.defaultComplectionItems.push(functionComplectionItem)
+        })
+        this.tableKeywordList.forEach(keyword => {
+            let keywordComplectionItem = new vscode.CompletionItem(keyword + " ")
+            keywordComplectionItem.kind = vscode.CompletionItemKind.Property
+            this.tableKeywordComplectionItems.push(keywordComplectionItem)
+        })
+        this.typeList.forEach(columnType => {
+            let columnTypeComplectionItem = new vscode.CompletionItem(columnType + " ")
+            columnTypeComplectionItem.kind = vscode.CompletionItemKind.TypeParameter
+            this.typeComplectionItems.push(columnTypeComplectionItem)
+        })
+    }
+
+    private createReg=/CREATE TABLE/ig;
+    private programReg=/(FUNCTION|PROCEDURE)/ig;
     async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.CompletionItem[]> {
 
+        var sql=QueryUnit.obtainSql(vscode.window.activeTextEditor)
+        if(sql && sql.match(this.createReg)){
+            return this.typeComplectionItems.concat(this.tableKeywordComplectionItems);
+        }
+        
         let completionItems = []
+        if(sql && sql.match(this.programReg)){
+            completionItems=this.typeComplectionItems
+        }
 
         const prePostion = position.character == 0 ? position : new vscode.Position(position.line, position.character - 1);
         const preChart = document.getText(new vscode.Range(prePostion, position))
@@ -47,25 +89,6 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     resolveCompletionItem?(item: vscode.CompletionItem): vscode.ProviderResult<vscode.CompletionItem> {
 
         return item;
-    }
-
-    private keywordList: string[] = ["SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION","CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COMMENT", "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN"]
-    private functionList: string[] = ["CHAR_LENGTH","CONCAT","NOW","DATE_ADD","DATE_SUB","MAX","COUNT","MIN","SUM","AVG","LENGTH","IF","IFNULL","MD5","SHA","CURRENT_TIME","CURRENT_DATE","DATE_FORMAT","CAST"]
-    private defaultComplectionItems: vscode.CompletionItem[] = []
-
-    private initDefaultComplectionItem() {
-        this.keywordList.forEach(keyword => {
-            let keywordComplectionItem = new vscode.CompletionItem(keyword + " ")
-            keywordComplectionItem.kind = vscode.CompletionItemKind.Property
-            this.defaultComplectionItems.push(keywordComplectionItem)
-        })
-        this.functionList.forEach(keyword => {
-            let functionComplectionItem = new vscode.CompletionItem(keyword + " ")
-            functionComplectionItem.kind = vscode.CompletionItemKind.Function
-            functionComplectionItem.insertText = new vscode.SnippetString(keyword + "($1)")
-            this.defaultComplectionItems.push(functionComplectionItem)
-
-        })
     }
 
     private generateDatabaseComplectionItem(): vscode.CompletionItem[] {
