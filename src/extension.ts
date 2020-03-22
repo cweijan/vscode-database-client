@@ -23,6 +23,7 @@ import { HistoryManager } from "./extension/HistoryManager";
 import { CommandKey } from "./common/Constants";
 import { TableHoverProvider } from "./provider/TableHoverProvider";
 import { TableGroup } from "./model/table/tableGroup";
+import { MysqlSetting } from "./extension/MysqlSetting";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -49,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(CommandKey.Refresh, () => {
             mysqlTreeDataProvider.init()
         }),
-        vscode.commands.registerCommand("mysql.hisotry.open", () => {
+        vscode.commands.registerCommand("mysql.history.open", () => {
             historyManager.showHistory()
         }),
         vscode.commands.registerCommand(CommandKey.RecordHistory, (sql: string,costTime:number) => {
@@ -136,6 +137,9 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         vscode.commands.registerCommand("mysql.template.procedure", (procedureGroup: ProcedureGroup) => {
             procedureGroup.createTemplate();
+        }),
+        vscode.commands.registerCommand("mysql.setting.open", (procedureGroup: ProcedureGroup) => {
+            MysqlSetting.open();
         }),
         vscode.commands.registerCommand("mysql.template.view", (viewGroup: ViewGroup) => {
             viewGroup.createTemplate();

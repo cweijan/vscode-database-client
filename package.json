@@ -59,10 +59,16 @@
 		},
 		"commands": [
 			{
-				"command": "mysql.hisotry.open",
+				"command": "mysql.history.open",
 				"title": "Open History",
 				"category": "MySQL",
 				"icon": "resources/history.svg"
+			},
+			{
+				"command": "mysql.setting.open",
+				"title": "Open Setting",
+				"category": "MySQL",
+				"icon": "resources/settings.svg"
 			},
 			{
 				"command": "mysql.refresh",
@@ -316,7 +322,13 @@
 					"group": "navigation@1"
 				},
 				{
-					"command": "mysql.hisotry.open",
+					"command": "mysql.setting.open",
+					"title": "Open Setting",
+					"when": "view == github.cweijan.mysql",
+					"group": "navigation@-1"
+				},
+				{
+					"command": "mysql.history.open",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@0"
 				}

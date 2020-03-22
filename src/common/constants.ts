@@ -13,7 +13,7 @@ export class CacheKey{
 }
 
 export class CommandKey{
-    static RecordHistory="mysql.hisotry.record"
+    static RecordHistory="mysql.history.record"
     static Refresh="mysql.refresh"
 }
 
