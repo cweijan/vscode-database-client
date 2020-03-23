@@ -39,10 +39,17 @@ export class SqlViewManager {
         let tableName = this.getTable(viewOption.extra)
         let tableNode = DatabaseCache.getTable(`${opt.host}_${opt.port}_${opt.user}_${opt.database}`, tableName)
         if (tableNode) {
+            let primaryKey: string;
             let columnList = (await tableNode.getChildren()).map((columnNode: ColumnNode) => {
+                if (columnNode.column.COLUMN_KEY === "PRI") {
+                    primaryKey = columnNode.column.COLUMN_NAME
+                }
                 return columnNode.column.COLUMN_NAME
             })
-            viewOption.extra['columnList']=columnList
+            viewOption.extra['primaryKey'] = primaryKey
+            viewOption.extra['columnList'] = columnList
+            viewOption.extra['database'] = opt.database
+            viewOption.extra['table'] = tableName
         }
         if (this.resultWebviewPanel) {
             if (this.resultWebviewPanel.visible) {
@@ -72,9 +79,9 @@ export class SqlViewManager {
 
     }
 
-    private static getTable(extra: any):string {
-        if(!extra)return null;
-        let sql=extra.sql;
+    private static getTable(extra: any): string {
+        if (!extra) return null;
+        let sql = extra.sql;
         let baseMatch;
         if (sql && (baseMatch = (sql + " ").match(/select\s+\*\s+from\s*(.+?)(?=[\s;])/i)) && !sql.match(/\bjoin\b/ig)) {
             let expectTable: string = baseMatch[1];
