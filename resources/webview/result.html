@@ -194,6 +194,7 @@ where \`${event.data.primaryKey}\`='#2'
         // instead by retainContextWhenHidden=true
         // vscode.setState({ result: vue.result });
     });
+    vscode.postMessage({ type: 'init'})
 </script>
 
 </html>

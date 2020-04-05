@@ -37,6 +37,7 @@ export class SqlViewManager {
     static async showQueryResult(viewOption: ViewOption, opt: IConnection) {
 
         let tableName = this.getTable(viewOption.extra)
+        // load table infomation
         let tableNode = DatabaseCache.getTable(`${opt.host}_${opt.port}_${opt.user}_${opt.database}`, tableName)
         if (tableNode) {
             let primaryKey: string;
@@ -51,6 +52,7 @@ export class SqlViewManager {
             viewOption.extra['database'] = opt.database
             viewOption.extra['table'] = tableName
         }
+        // update result webview
         if (this.resultWebviewPanel) {
             if (this.resultWebviewPanel.visible) {
                 this.resultWebviewPanel.webview.postMessage(viewOption.extra)
@@ -62,16 +64,20 @@ export class SqlViewManager {
 
         }
 
+        // init result webview
         viewOption.viewPath = "result"
         viewOption.viewTitle = "Query"
-
-        this.createWebviewPanel(viewOption).then(webviewPanel => {
+        this.createWebviewPanel(viewOption).then(async webviewPanel => {
             this.resultWebviewPanel = webviewPanel
-            webviewPanel.webview.postMessage(viewOption.extra)
             webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined })
             webviewPanel.webview.onDidReceiveMessage((params) => {
-                if (params.type == OperateType.execute) {
-                    QueryUnit.runQuery(params.sql)
+                switch (params.type) {
+                    case OperateType.init:
+                        webviewPanel.webview.postMessage(viewOption.extra)
+                        break;
+                    case OperateType.execute:
+                        QueryUnit.runQuery(params.sql)
+                        break;
                 }
             })
         })

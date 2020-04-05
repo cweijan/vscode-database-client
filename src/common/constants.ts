@@ -46,6 +46,7 @@ export class ModelType{
 
 export class OperateType{
     static execute='execute';
+    static init='init';
     static previous=2;
     static next=3;
     static save=4;
