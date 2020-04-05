@@ -58,6 +58,14 @@ export class TableNode implements INode, IConnection {
             });
     }
 
+    public addColumnTemplate() {
+        ConnectionManager.getConnection(this, true)
+        QueryUnit.createSQLTextDocument(`ALTER TABLE
+    \`${this.database}\`.\`${this.table}\` 
+ADD 
+    COLUMN [column] [type] NOT NULL comment '';`);
+    }
+
 
     public changeTableName() {
 
@@ -133,9 +141,9 @@ export class TableNode implements INode, IConnection {
             .getChildren()
             .then((children: INode[]) => {
                 const childrenNames = children.map((child: any) => child.column.COLUMN_NAME);
-                let sql = `insert into ${this.database}.{this.table}\n`
+                let sql = `insert into \n\t${this.database}.${this.table} `
                 sql += `(${childrenNames.toString().replace(/,/g, ", ")})\n`
-                sql += "values\n"
+                sql += "values\n\t"
                 sql += `('${childrenNames.toString().replace(/,/g, ", ")}');`
                 QueryUnit.createSQLTextDocument(sql);
             });
@@ -149,8 +157,8 @@ export class TableNode implements INode, IConnection {
 
                 const where = keysNames.map((name: string) => `${name} = ${name}`);
 
-                let sql = `delete from ${this.database}.${this.table} \n`;
-                sql += `where ${where.toString().replace(/,/g, "\n   and ")}`
+                let sql = `delete from \n\t${this.database}.${this.table} \n`;
+                sql += `where \n\t${where.toString().replace(/,/g, "\n   and ")}`
                 QueryUnit.createSQLTextDocument(sql)
             });
     }
@@ -165,8 +173,8 @@ export class TableNode implements INode, IConnection {
                 const sets = childrenNames.map((name: string) => `${name} = ${name}`);
                 const where = keysNames.map((name: string) => `${name} = '${name}'`);
 
-                let sql = `update ${this.database}.${this.table} \nset ${sets.toString().replace(/,/g, "\n  , ")}\n`;
-                sql += `where ${where.toString().replace(/,/g, "\n   and ")}`
+                let sql = `update \n\t${this.database}.${this.table} \nset \n\t${sets.toString().replace(/,/g, ",\n   ")}\n`;
+                sql += `where \n\t${where.toString().replace(/,/g, "\n   and ")}`
                 QueryUnit.createSQLTextDocument(sql)
             });
     }

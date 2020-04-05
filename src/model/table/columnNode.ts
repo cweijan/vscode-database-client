@@ -66,17 +66,13 @@ export class ColumnNode implements INode, IConnection {
         })
     }
 
-    addColumnTemplate() {
-        ConnectionManager.getConnection(this, true)
-        QueryUnit.createSQLTextDocument(`ALTER TABLE \`${this.database}\`.\`${this.table}\` ADD COLUMN columnName columnType NOT NULL comment '';`);
-    }
     updateColumnTemplate() {
         ConnectionManager.getConnection(this, true)
-        QueryUnit.showSQLTextDocument(`ALTER TABLE \`${this.database}\`.\`${this.table}\` CHANGE \`${this.column.COLUMN_NAME}\` \`${this.column.COLUMN_NAME}\` ${this.column.COLUMN_TYPE} NOT NULL comment '${this.column.COLUMN_COMMENT}';`);
+        QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t\`${this.database}\`.\`${this.table}\` CHANGE \`${this.column.COLUMN_NAME}\` \`${this.column.COLUMN_NAME}\` ${this.column.COLUMN_TYPE} NOT NULL comment '${this.column.COLUMN_COMMENT}';`);
     }
     dropColumnTemplate() {
         ConnectionManager.getConnection(this, true)
-        QueryUnit.createSQLTextDocument(`ALTER TABLE \`${this.database}\`.\`${this.table}\` DROP COLUMN \`${this.column.COLUMN_NAME}\`;`);
+        QueryUnit.createSQLTextDocument(`ALTER TABLE \n\t\`${this.database}\`.\`${this.table}\` DROP COLUMN \`${this.column.COLUMN_NAME}\`;`);
     }
     
 

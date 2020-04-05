@@ -80,8 +80,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.changeColumnName", (columnNode: ColumnNode) => {
             columnNode.changeColumnName()
         }),
-        vscode.commands.registerCommand("mysql.column.add", (columnNode: ColumnNode) => {
-            columnNode.addColumnTemplate()
+        vscode.commands.registerCommand("mysql.column.add", (tableNode: TableNode) => {
+            tableNode.addColumnTemplate()
         }),
         vscode.commands.registerCommand("mysql.column.update", (columnNode: ColumnNode) => {
             columnNode.updateColumnTemplate()
