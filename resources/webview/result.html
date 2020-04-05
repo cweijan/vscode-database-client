@@ -106,7 +106,7 @@
             tableWidth: null,
             widthCache: {},
             search: '',
-            loading: false,
+            loading: true,
             update: {
                 sql: null,
                 where: 'w',
@@ -182,15 +182,27 @@
     })
 
     window.addEventListener('message', event => {
-        vue.result = event.data
-        if (event.data.primaryKey && event.data.database && event.data.table) {
-            vue.update.sql = `update \`${event.data.database}\`.\`${event.data.table}\`
+        
+        let data=event.data;
+        if (data.primaryKey && data.database && data.table) {
+            vue.update.sql = `update \`${data.database}\`.\`${data.table}\`
 set #1
-where \`${event.data.primaryKey}\`='#2'
-`
+where \`${data.primaryKey}\`='#2' `
         }
-        vue.loading = false
-        vue.widthCache = {}
+        if(data.sql){
+            vue.result.sql=data.sql;
+            vue.result.costTime=0;
+            vue.loading = true
+        }
+        if(data.costTime){
+            vue.result.costTime=data.costTime
+        }
+        if(data.data!=null){
+            vue.result.data=data.data;
+            vue.widthCache = {}
+            vue.loading = false
+        }
+        
         // instead by retainContextWhenHidden=true
         // vscode.setState({ result: vue.result });
     });

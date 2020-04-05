@@ -32,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
     SqlViewManager.initExtesnsionPath(context.extensionPath)
     var historyManager = new HistoryManager(context)
 
-    var mysqlTreeDataProvider=new MySQLTreeDataProvider(context);
+    var mysqlTreeDataProvider = new MySQLTreeDataProvider(context);
     const treeview = vscode.window.createTreeView("github.cweijan.mysql", {
         treeDataProvider: mysqlTreeDataProvider
     })
@@ -45,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormatProvider()),
-        vscode.languages.registerHoverProvider('sql',new TableHoverProvider()),
+        vscode.languages.registerHoverProvider('sql', new TableHoverProvider()),
         vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.'),
         vscode.commands.registerCommand(CommandKey.Refresh, () => {
             mysqlTreeDataProvider.init()
@@ -53,8 +53,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.history.open", () => {
             historyManager.showHistory()
         }),
-        vscode.commands.registerCommand(CommandKey.RecordHistory, (sql: string,costTime:number) => {
-            historyManager.recordHistory(sql,costTime)
+        vscode.commands.registerCommand(CommandKey.RecordHistory, (sql: string, costTime: number) => {
+            historyManager.recordHistory(sql, costTime)
         }),
         vscode.commands.registerCommand("mysql.addDatabase", (connectionNode: ConnectionNode) => {
             connectionNode.createDatabase()
@@ -92,8 +92,9 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.deleteConnection", (connectionNode: ConnectionNode) => {
             connectionNode.deleteConnection(context);
         }),
-        vscode.commands.registerCommand("mysql.runQuery", () => {
-            QueryUnit.runQuery();
+        vscode.commands.registerCommand("mysql.runQuery", (sql) => {
+            if (typeof sql != 'string') sql = null
+            QueryUnit.runQuery(sql);
         }),
         vscode.commands.registerCommand("mysql.newQuery", (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
             databaseOrConnectionNode.newQuery();
@@ -101,8 +102,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.template.sql", (tableNode: TableNode, run: Boolean) => {
             tableNode.selectSqlTemplate(run);
         }),
-        vscode.commands.registerCommand("mysql.data.import", (iNode:  DatabaseNode|ConnectionNode) => {
-            vscode.window.showOpenDialog({filters:{ 'Sql': ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then(filePath => {
+        vscode.commands.registerCommand("mysql.data.import", (iNode: DatabaseNode | ConnectionNode) => {
+            vscode.window.showOpenDialog({ filters: { 'Sql': ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then(filePath => {
                 iNode.importData(filePath[0].fsPath)
             })
         }),

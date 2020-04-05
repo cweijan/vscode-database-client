@@ -62,7 +62,11 @@ export class QueryUnit {
             }
         }
         sql = sql.replace(/--.+/ig, '');
-        let executeTime = new Date().getTime()
+        const executeTime = new Date().getTime()
+        const isDDL = sql.match(this.ddlPattern)
+        if (!isDDL) {
+            SqlViewManager.showQueryResult({ splitResultView: true, extra: { sql } }, connectionOptions);
+        }
         connection.query(sql, (err, data) => {
             if (err) {
                 //TODO trans output to query page
@@ -72,7 +76,7 @@ export class QueryUnit {
             var costTime = new Date().getTime() - executeTime
             if (fromEditor)
                 vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime)
-            if (sql.match(this.ddlPattern)) {
+            if (isDDL) {
                 vscode.commands.executeCommand(CommandKey.Refresh)
                 return;
             }

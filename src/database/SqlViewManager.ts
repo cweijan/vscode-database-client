@@ -7,7 +7,6 @@ import { IConnection } from "../model/Connection";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 import { ConnectionManager } from "./ConnectionManager";
 import { DatabaseCache } from "./DatabaseCache";
-import { QueryUnit } from "./QueryUnit";
 import { ColumnNode } from "../model/table/columnNode";
 "use strict";
 
@@ -25,17 +24,18 @@ export class ViewOption {
 }
 
 export class SqlViewManager {
-    static resultWebviewPanel: WebviewPanel
-    static tableEditWebviewPanel: WebviewPanel
-    static tableCreateWebviewPanel: WebviewPanel
+
     static extensionPath: string
     static initExtesnsionPath(extensionPath: string) {
         this.extensionPath = extensionPath
     }
 
-
-    static async showQueryResult(viewOption: ViewOption, opt: IConnection) {
-
+    private static resultWebviewPanel: WebviewPanel
+    private static sendData: any;
+    private static creating = false;
+    public static async showQueryResult(viewOption: ViewOption, opt: IConnection) {
+        this.sendData = viewOption.extra
+        if (this.creating) return;
         let tableName = this.getTable(viewOption.extra)
         // load table infomation
         let tableNode = DatabaseCache.getTable(`${opt.host}_${opt.port}_${opt.user}_${opt.database}`, tableName)
@@ -67,16 +67,18 @@ export class SqlViewManager {
         // init result webview
         viewOption.viewPath = "result"
         viewOption.viewTitle = "Query"
+        this.creating = true;
         this.createWebviewPanel(viewOption).then(async webviewPanel => {
             this.resultWebviewPanel = webviewPanel
-            webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined })
+            this.creating = false;
+            webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined; this.creating = false; })
             webviewPanel.webview.onDidReceiveMessage((params) => {
                 switch (params.type) {
                     case OperateType.init:
-                        webviewPanel.webview.postMessage(viewOption.extra)
+                        webviewPanel.webview.postMessage(SqlViewManager.sendData)
                         break;
                     case OperateType.execute:
-                        QueryUnit.runQuery(params.sql)
+                        vscode.commands.executeCommand('mysql.runQuery', params.sql)
                         break;
                 }
             })
