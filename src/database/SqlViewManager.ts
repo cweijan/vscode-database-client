@@ -34,8 +34,7 @@ export class SqlViewManager {
     private static sendData: any;
     private static creating = false;
     public static async showQueryResult(viewOption: ViewOption, opt: IConnection) {
-        this.sendData = viewOption.extra
-        if (this.creating) return;
+        
         let tableName = this.getTable(viewOption.extra)
         // load table infomation
         let tableNode = DatabaseCache.getTable(`${opt.host}_${opt.port}_${opt.user}_${opt.database}`, tableName)
@@ -52,6 +51,8 @@ export class SqlViewManager {
             viewOption.extra['database'] = opt.database
             viewOption.extra['table'] = tableName
         }
+        this.sendData = viewOption.extra
+        if (this.creating) return;
         // update result webview
         if (this.resultWebviewPanel) {
             if (this.resultWebviewPanel.visible) {

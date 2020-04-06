@@ -124,7 +124,7 @@
                 for (const key in this.widthCache) {
                     width = width + parseInt(this.widthCache[key])
                 }
-                this.tableWidth = width;
+                this.tableWidth = width+60;
             },
             computeWidth(key, index) {
 
@@ -199,7 +199,7 @@ where \`${data.primaryKey}\`='#2' `
         }
         if(data.data!=null){
             vue.widthCache = {}
-            vue.result.data=data.data;
+            vue.result=data;
             vue.loading = false
         }
         
