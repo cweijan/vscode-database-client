@@ -8,7 +8,7 @@ import { QueryUnit } from "./QueryUnit";
 export class ConnectionManager {
 
     private static lastConnectionOption: IConnection;
-    private static activeConnection: any;
+    private static activeConnection={};
 
     public static getLastConnectionOption() {
         return this.lastConnectionOption
@@ -30,9 +30,10 @@ export class ConnectionManager {
         connectionOptions.multipleStatements = true
         this.lastConnectionOption = connectionOptions
         if (changeActive) Global.updateStatusBarItems(connectionOptions);
+        const key = `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}_${connectionOptions.password}`
 
         return new Promise((resolve, reject) => {
-            let connection = this.activeConnection
+            let connection = this.activeConnection[key]
             if (connection && connection.state == 'authenticated') {
                 if (connectionOptions.database) {
                     QueryUnit.queryPromise(connection, `use \`${connectionOptions.database}\``).then(() => {
@@ -44,8 +45,8 @@ export class ConnectionManager {
                     resolve(connection)
                 }
             } else {
-                this.activeConnection = this.createConnection(connectionOptions);
-                this.activeConnection.connect((err: Error) => {
+                this.activeConnection[key] = this.createConnection(connectionOptions);
+                this.activeConnection[key].connect((err: Error) => {
                     if (!err) {
                         resolve(this.activeConnection);
                     } else {
