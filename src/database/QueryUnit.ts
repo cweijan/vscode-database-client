@@ -7,6 +7,7 @@ import { Util } from "../common/util";
 import { IConnection } from "../model/Connection";
 import { ConnectionManager } from "./ConnectionManager";
 import { SqlViewManager } from "./SqlViewManager";
+import { resolve } from "url";
 
 export class QueryUnit {
 
@@ -31,61 +32,72 @@ export class QueryUnit {
     }
 
     private static ddlPattern = /^(alter|create|drop)/ig;
-    public static async runQuery(sql?: string, connectionOptions?: IConnection) {
-        if (!sql && !vscode.window.activeTextEditor) {
-            vscode.window.showWarningMessage("No SQL file selected");
-            return;
-        }
-        let connection: any;
-        if (!connectionOptions) {
-            if (!(connection = await ConnectionManager.getLastActiveConnection())) {
-                vscode.window.showWarningMessage("No MySQL Server or Database selected");
+    private static dmlPattern = /^(insert|update|delete)/ig;
+    public static runQuery(sql?: string, connectionOptions?: IConnection): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
+            if (!sql && !vscode.window.activeTextEditor) {
+                vscode.window.showWarningMessage("No SQL file selected");
                 return;
-            } else {
-                connectionOptions = ConnectionManager.getLastConnectionOption()
+            }
+            let connection: any;
+            if (!connectionOptions) {
+                if (!(connection = await ConnectionManager.getLastActiveConnection())) {
+                    vscode.window.showWarningMessage("No MySQL Server or Database selected");
+                    return;
+                } else {
+                    connectionOptions = ConnectionManager.getLastConnectionOption()
+                }
+
+            } else if (connectionOptions) {
+                connectionOptions.multipleStatements = true;
+                connection = await ConnectionManager.getConnection(connectionOptions)
             }
 
-        } else if (connectionOptions) {
-            connectionOptions.multipleStatements = true;
-            connection = await ConnectionManager.getConnection(connectionOptions)
-        }
+            let fromEditor = false;
+            if (!sql) {
+                fromEditor = true;
+                const activeTextEditor = vscode.window.activeTextEditor;
+                const selection = activeTextEditor.selection;
+                if (selection.isEmpty) {
+                    sql = this.obtainSql(activeTextEditor);
+                } else {
+                    sql = activeTextEditor.document.getText(selection);
+                }
+            }
+            sql = sql.replace(/--.+/ig, '').trim();
+            const executeTime = new Date().getTime()
+            const isDDL = sql.match(this.ddlPattern)
+            const isDML = sql.match(this.dmlPattern)
+            if (isDDL==null && isDML==null) {
+                SqlViewManager.showQueryResult({ splitResultView: true, extra: { sql } }, connectionOptions);
+            }
+            connection.query(sql, (err, data) => {
+                if (err) {
+                    //TODO trans output to query page
+                    Console.log(err);
+                    return;
+                }
+                var costTime = new Date().getTime() - executeTime
+                if (fromEditor)
+                    vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime)
+                if (isDDL) {
+                    vscode.commands.executeCommand(CommandKey.Refresh)
+                    resolve(true)
+                    return;
+                }
+                if (isDML) {
+                    //TODO 需要获取受影响条数
+                    resolve(true)
+                    return;
+                }
+                if (Array.isArray(data)) {
+                    SqlViewManager.showQueryResult({ splitResultView: true, extra: { sql, data, costTime } }, connectionOptions);
+                } else {
+                    Console.log(`execute sql success:${sql}`)
+                }
 
-        let fromEditor = false;
-        if (!sql) {
-            fromEditor = true;
-            const activeTextEditor = vscode.window.activeTextEditor;
-            const selection = activeTextEditor.selection;
-            if (selection.isEmpty) {
-                sql = this.obtainSql(activeTextEditor);
-            } else {
-                sql = activeTextEditor.document.getText(selection);
-            }
-        }
-        sql = sql.replace(/--.+/ig, '');
-        const executeTime = new Date().getTime()
-        const isDDL = sql.match(this.ddlPattern)
-        if (!isDDL) {
-            SqlViewManager.showQueryResult({ splitResultView: true, extra: { sql } }, connectionOptions);
-        }
-        connection.query(sql, (err, data) => {
-            if (err) {
-                //TODO trans output to query page
-                Console.log(err);
-                return;
-            }
-            var costTime = new Date().getTime() - executeTime
-            if (fromEditor)
-                vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime)
-            if (isDDL) {
-                vscode.commands.executeCommand(CommandKey.Refresh)
-                return;
-            }
-            if (Array.isArray(data)) {
-                SqlViewManager.showQueryResult({ splitResultView: true, extra: { sql, data, costTime } }, connectionOptions);
-            } else {
-                Console.log(`execute sql success:${sql}`)
-            }
-        });
+            });
+        })
     }
 
 

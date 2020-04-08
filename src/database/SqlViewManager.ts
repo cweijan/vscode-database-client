@@ -1,13 +1,14 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
-import { OperateType } from "../common/Constants";
+import { OperateType, MessageType } from "../common/Constants";
 import { Console } from "../common/OutputChannel";
 import { IConnection } from "../model/Connection";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 import { ConnectionManager } from "./ConnectionManager";
 import { DatabaseCache } from "./DatabaseCache";
 import { ColumnNode } from "../model/table/columnNode";
+import { QueryUnit } from "./QueryUnit";
 "use strict";
 
 export class ViewOption {
@@ -34,7 +35,7 @@ export class SqlViewManager {
     private static sendData: any;
     private static creating = false;
     public static async showQueryResult(viewOption: ViewOption, opt: IConnection) {
-        
+
         let tableName = this.getTable(viewOption.extra)
         // load table infomation
         let tableNode = DatabaseCache.getTable(`${opt.host}_${opt.port}_${opt.user}_${opt.database}`, tableName)
@@ -51,6 +52,7 @@ export class SqlViewManager {
             viewOption.extra['database'] = opt.database
             viewOption.extra['table'] = tableName
         }
+        viewOption.extra['type'] = MessageType.data
         this.sendData = viewOption.extra
         if (this.creating) return;
         // update result webview
@@ -79,7 +81,12 @@ export class SqlViewManager {
                         webviewPanel.webview.postMessage(SqlViewManager.sendData)
                         break;
                     case OperateType.execute:
-                        vscode.commands.executeCommand('mysql.runQuery', params.sql)
+                        QueryUnit.runQuery(params.sql).then(isDDL => {
+                            if (isDDL) {
+                                SqlViewManager.sendData['type']=MessageType.opt
+                                webviewPanel.webview.postMessage(SqlViewManager.sendData)
+                            }
+                        })
                         break;
                 }
             })

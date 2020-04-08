@@ -54,7 +54,7 @@
     <div id="app">
         <div class="hint">
             <el-row style="margin-bottom: 10px;">
-                <el-input type="textarea" autosize v-model="result.sql" style="width: 600px;"></el-input>
+                <el-input type="textarea" autosize v-model="activeSql" style="width: 600px;"></el-input>
             </el-row>
             <el-row>
                 <el-cow>
@@ -83,7 +83,8 @@
                         <el-button v-if="result.primaryKey&&scope.row[result.primaryKey]" @click="openEdit(scope.row)"
                             type="text" size="small">Edit</el-button>
                         <el-button v-if="result.primaryKey&&scope.row[result.primaryKey]"
-                            @click="deleteConfirm(scope.row[result.primaryKey])" type="text" size="small">Delete</el-button>
+                            @click="deleteConfirm(scope.row[result.primaryKey])" type="text" size="small">Delete
+                        </el-button>
                     </template>
                 </el-table-column>
                 <!-- table view -->
@@ -100,7 +101,7 @@
                         <span v-html='dataformat(scope.row[key])'></span>
                     </template>
                 </el-table-column>
-               
+
             </el-table>
         </div>
         <el-dialog title="Tips" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
@@ -123,7 +124,6 @@
             result: previousState ? previousState.result : {
                 data: [],
                 sql: '',
-                lastSql: '',
                 costTime: 0
             },
             tableWidth: null,
@@ -131,6 +131,8 @@
             search: '',
             dialogVisible: false,
             loading: true,
+            activeSql: null,
+            optSql: null,
             update: {
                 sql: null,
                 where: 'w',
@@ -148,9 +150,8 @@
                     cancelButtonText: 'Cancel',
                     type: 'warning'
                 }).then(() => {
-                    const deleteSql=`delete from ${this.result.table} where ${this.result.primaryKey}='${primaryValue}'`;
-                    this.$message({ type: 'success', message: deleteSql });
-                    // this.$message({ type: 'success', message: 'Delete completed' });
+                    this.optSql = `delete from ${this.result.table} where ${this.result.primaryKey}='${primaryValue}'`;
+                    this.execute(this.optSql)
                 }).catch(() => {
                     this.$message({ type: 'info', message: 'Delete canceled' });
                 });
@@ -185,14 +186,18 @@
                     // this.update.sql=row[this.result.primaryKey]
                 }
             },
-            execute() {
+            refresh(){
+                if(this.result){
+                    this.execute(this.result.sql)
+                }
+            },
+            execute(sql) {
+                if (!sql ) sql = this.activeSql
                 vscode.postMessage({
                     type: 'execute',
-                    sql: this.result.sql
+                    sql: sql
                 });
-                if (!this.result.sql.match(/^(alter|create|drop|delete|update|insert)/ig)) {
-                    this.loading = true;
-                }
+                this.loading = true;
             },
             deleteTemplate() {
                 this.result.sql = `DELETE FROM [table] WHERE id= `;
@@ -217,9 +222,7 @@
         }
     })
 
-    window.addEventListener('message', event => {
-
-        let data = event.data;
+    const handlerData = (data) => {
         if (data.primaryKey && data.database && data.table) {
             vue.update.sql = `update \`${data.database}\`.\`${data.table}\`
 set #1
@@ -227,7 +230,7 @@ where \`${data.primaryKey}\`='#2' `
         }
         if (data.sql) {
             vue.result.sql = data.sql;
-            vue.result.lastSql = data.sql;
+            vue.activeSql = data.sql;
             vue.result.costTime = 0;
             vue.loading = true
         }
@@ -242,6 +245,26 @@ where \`${data.primaryKey}\`='#2' `
 
         // instead by retainContextWhenHidden=true
         // vscode.setState({ result: vue.result });
+    }
+
+    const optDone = () => {
+        vue.$message({ type: 'success', message: `execute ${vue.optSql} success!` });
+        vue.refresh()
+    }
+
+    window.addEventListener('message', event => {
+        let type = event.data.type
+        vue.loading = false;
+        switch (event.data.type) {
+            case "data":
+                handlerData(event.data)
+                break;
+            case "opt":
+                optDone()
+                break;
+            default:
+            vue.$message({ type: 'success', message: JSON.stringify(event.data) });
+        }
     });
     vscode.postMessage({ type: 'init' })
 </script>

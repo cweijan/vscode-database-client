@@ -44,6 +44,14 @@ export class ModelType{
 }
 
 
+export class MessageType{
+    static data='data';
+    /**
+     * dml and ddl
+     */
+    static opt='opt';
+}
+
 export class OperateType{
     static execute='execute';
     static init='init';
