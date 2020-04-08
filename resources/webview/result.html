@@ -25,25 +25,28 @@
             white-space: nowrap !important;
             user-select: text !important;
         }
-        /*定义滚动条样式（高宽及背景）*/ 
-        ::-webkit-scrollbar { 
+
+        /*定义滚动条样式（高宽及背景）*/
+        ::-webkit-scrollbar {
             /* 滚动条宽度， width：对应竖滚动条的宽度  height：对应横滚动条的高度*/
             /* width: 6px;   
             background: #007acc; */
-        } 
-        /*定义滚动条轨道（凹槽）样式*/ 
-        ::-webkit-scrollbar-track { 
-             /* 较少使用 */
+        }
+
+        /*定义滚动条轨道（凹槽）样式*/
+        ::-webkit-scrollbar-track {
+            /* 较少使用 */
             /* -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);   
             border-radius: 3px;  */
-        } 
-        /*定义滑块 样式*/ 
-        ::-webkit-scrollbar-thumb { 
-             /* 滚动条滑块长度 */
+        }
+
+        /*定义滑块 样式*/
+        ::-webkit-scrollbar-thumb {
+            /* 滚动条滑块长度 */
             /* border-radius: 3px; 
             height: 100px;   
             background-color: #ccc;  */
-}
+        }
     </style>
 </head>
 
@@ -73,21 +76,40 @@
         <div :style="'width:' + tableWidth + 'px;overflow:scroll'">
             <el-table id="dataTable" v-loading='loading' size='small'
                 :data="result.data.filter(data => !search || JSON.stringify(data).toLowerCase().includes(search.toLowerCase()))"
-                border @cell-click="celledit" @change="generateWhere">
-                <el-table-column :label="column" v-for="(column) in result.columnList" :key="column" align="center" @change="generateWhere"
-                    v-if="result.columnList" :width="computeWidth(column)">
+                border @cell-click="celledit">
+                <!-- tool bar -->
+                <el-table-column fixed="left" label="Operations" width="120">
                     <template slot-scope="scope">
-                        <span v-html='dataformat(scope.row[column])' @change="generateWhere"></span>
+                        <el-button v-if="result.primaryKey&&scope.row[result.primaryKey]" @click="openEdit(scope.row)"
+                            type="text" size="small">Edit</el-button>
+                        <el-button v-if="result.primaryKey&&scope.row[result.primaryKey]"
+                            @click="deleteConfirm(scope.row[result.primaryKey])" type="text" size="small">Delete</el-button>
                     </template>
                 </el-table-column>
+                <!-- table view -->
+                <el-table-column :label="column" v-for="(column) in result.columnList" :key="column" align="center"
+                    v-if="result.columnList" :width="computeWidth(column)">
+                    <template slot-scope="scope">
+                        <span v-html='dataformat(scope.row[column])'></span>
+                    </template>
+                </el-table-column>
+                <!-- sql view -->
                 <el-table-column :label="key" v-for="(value,key) in result.data[0]" :key="key" align="center"
                     v-if="!result.columnList" :width="computeWidth(key)">
                     <template slot-scope="scope">
                         <span v-html='dataformat(scope.row[key])'></span>
                     </template>
                 </el-table-column>
+               
             </el-table>
         </div>
+        <el-dialog title="Tips" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
+            <span>This is a message</span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
+            </span>
+        </el-dialog>
     </div>
 </body>
 
@@ -101,11 +123,13 @@
             result: previousState ? previousState.result : {
                 data: [],
                 sql: '',
+                lastSql: '',
                 costTime: 0
             },
             tableWidth: null,
             widthCache: {},
             search: '',
+            dialogVisible: false,
             loading: true,
             update: {
                 sql: null,
@@ -115,16 +139,28 @@
 
         },
         methods: {
-            generateWhere(currentRow, oldCurrentRow) {
-                if (!this.update.sql) return;
-                this.udpate.sql="hello"
+            openEdit(row) {
+                this.dialogVisible = true;
+            },
+            deleteConfirm(primaryValue) {
+                this.$confirm('Are you sure you want to delete this data?', 'Warning', {
+                    confirmButtonText: 'OK',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning'
+                }).then(() => {
+                    const deleteSql=`delete from ${this.result.table} where ${this.result.primaryKey}='${primaryValue}'`;
+                    this.$message({ type: 'success', message: deleteSql });
+                    // this.$message({ type: 'success', message: 'Delete completed' });
+                }).catch(() => {
+                    this.$message({ type: 'info', message: 'Delete canceled' });
+                });
             },
             updateWidth() {
                 let width = 0;
                 for (const key in this.widthCache) {
                     width = width + parseInt(this.widthCache[key])
                 }
-                this.tableWidth = width+60;
+                this.tableWidth = width + 60;
             },
             computeWidth(key, index) {
 
@@ -182,31 +218,32 @@
     })
 
     window.addEventListener('message', event => {
-        
-        let data=event.data;
+
+        let data = event.data;
         if (data.primaryKey && data.database && data.table) {
             vue.update.sql = `update \`${data.database}\`.\`${data.table}\`
 set #1
 where \`${data.primaryKey}\`='#2' `
         }
-        if(data.sql){
-            vue.result.sql=data.sql;
-            vue.result.costTime=0;
+        if (data.sql) {
+            vue.result.sql = data.sql;
+            vue.result.lastSql = data.sql;
+            vue.result.costTime = 0;
             vue.loading = true
         }
-        if(data.costTime){
-            vue.result.costTime=data.costTime
+        if (data.costTime) {
+            vue.result.costTime = data.costTime
         }
-        if(data.data!=null){
+        if (data.data != null) {
             vue.widthCache = {}
-            vue.result=data;
+            vue.result = data;
             vue.loading = false
         }
-        
+
         // instead by retainContextWhenHidden=true
         // vscode.setState({ result: vue.result });
     });
-    vscode.postMessage({ type: 'init'})
+    vscode.postMessage({ type: 'init' })
 </script>
 
 </html>
