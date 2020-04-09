@@ -14,6 +14,7 @@ import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 
 
 export class TableNode implements INode, IConnection {
+   
 
     identify: string;
     type: string = ModelType.TABLE;
@@ -66,6 +67,13 @@ ADD
     COLUMN [column] [type] NOT NULL comment '';`);
     }
 
+
+    async showSource() {
+        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this,true), `SHOW CREATE TABLE \`${this.database}\`.\`${this.table}\``)
+        .then((procedDtail) => {
+            QueryUnit.showSQLTextDocument(procedDtail[0]['Create Table']);
+        });
+    }
 
     public changeTableName() {
 

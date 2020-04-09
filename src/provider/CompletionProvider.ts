@@ -15,7 +15,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     private defaultComplectionItems: vscode.CompletionItem[] = []
     private tableKeywordList: string[] = ["AUTO_INCREMENT", "NULL", "NOT", "PRIMARY", "CURRENT_TIME", "DEFAULT", "COMMENT", "UNIQUE", "KEY"]
     private tableKeywordComplectionItems: vscode.CompletionItem[] = []
-    private typeList: string[] = ["INTEGER", "smallint", "tinyint", "MEDIUMINT", "bigint", "numeric", "bit", "long", "int", "float", "double", "TEXT", "SET", "blob", "timestamp", "date", "time", "YEAR", "datetime"]
+    private typeList: string[] = ["INTEGER","char","varchar", "smallint", "tinyint", "MEDIUMINT", "bigint", "numeric", "bit", "long", "int", "float", "double", "TEXT", "SET", "blob", "timestamp", "date", "time", "YEAR", "datetime"]
     private typeComplectionItems: vscode.CompletionItem[] = []
 
     private initDefaultComplectionItem() {

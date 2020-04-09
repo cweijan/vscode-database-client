@@ -194,6 +194,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.table.source",
+				"title": "Show table source",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.column.update",
 				"title": "Modify Column",
 				"category": "MySQL"
@@ -434,11 +439,15 @@
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@1"
 				},
-				
 				{
 					"command": "mysql.column.add",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@2"
+				},
+				{
+					"command": "mysql.table.source",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline@3"
 				},
 				{
 					"command": "mysql.copy.insert",

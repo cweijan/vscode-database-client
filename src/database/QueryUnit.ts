@@ -87,14 +87,13 @@ export class QueryUnit {
                 }
                 if (isDML) {
                     //TODO 需要获取受影响条数
+                    Console.log(`execute sql success:${sql}`)
                     resolve(true)
                     return;
                 }
                 if (Array.isArray(data)) {
                     SqlViewManager.showQueryResult({ splitResultView: true, extra: { sql, data, costTime } }, connectionOptions);
-                } else {
-                    Console.log(`execute sql success:${sql}`)
-                }
+                } 
 
             });
         })

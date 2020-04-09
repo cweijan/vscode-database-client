@@ -77,6 +77,9 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.table.drop", (tableNode: TableNode) => {
             tableNode.dropTable()
         }),
+        vscode.commands.registerCommand("mysql.table.source", (tableNode: TableNode) => {
+            if(tableNode) tableNode.showSource()
+        }),
         vscode.commands.registerCommand("mysql.changeColumnName", (columnNode: ColumnNode) => {
             columnNode.changeColumnName()
         }),
