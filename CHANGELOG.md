@@ -1,3 +1,7 @@
+## 1.7.0 (2020/4/10)
+- Support Insert,Update,Delete in reuslt page.
+- Refactoring event message.
+
 ## 1.6.37(2020/3/20)
 - Table name inference
 - Sql formatter
