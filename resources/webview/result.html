@@ -61,7 +61,7 @@
                     <el-input v-model="table.search" style="width:200px" placeholder="Type to search" />
                 </el-cow>
                 <el-cow>
-                    <el-button type="primary" @click='execute'>Execute</el-button>
+                    <el-button type="primary" @click='execute(toolbar.sql)'>Execute</el-button>
                 </el-cow>
                 <el-cow>
                     <span>costTime: </span><span v-text="result.costTime"></span>ms,
@@ -132,7 +132,6 @@
                 database: null,
                 table: null
             },
-            optSql: null,
             table: {
                 search: '',
                 loading: true,
@@ -162,9 +161,9 @@
                     }
                 }
                 if (change) {
-                    this.optSql = `update ${this.result.table} set ${change.replace(/,$/, "")} where ${this.result.primaryKey}=${this.update.primary}`
-                    this.execute(this.optSql)
-                    this.editor.visible=false
+                    const updateSql = `update ${this.result.table} set ${change.replace(/,$/, "")} where ${this.result.primaryKey}=${this.update.primary}`
+                    this.execute(updateSql)
+                    this.editor.visible = false
                 } else {
                     this.$message("Not any change, update fail!")
 
@@ -184,10 +183,10 @@
                     cancelButtonText: 'Cancel',
                     type: 'warning'
                 }).then(() => {
-                    this.optSql = `delete from ${this.result.table} where ${this.result.primaryKey}='${primaryValue}'`;
-                    this.execute(this.optSql)
+                    const deleteSql = `delete from ${this.result.table} where ${this.result.primaryKey}='${primaryValue}'`;
+                    this.execute(deleteSql)
                 }).catch(() => {
-                    this.$message({ type: 'info', message: 'Delete canceled' });
+                    this.$message({ type: 'info', message: 'Update canceled' });
                 });
             },
             updateWidth() {
@@ -228,7 +227,7 @@
                 }
             },
             execute(sql) {
-                if (!sql) sql = this.toolbar.sql
+                if (!sql) return;
                 vscode.postMessage({
                     type: 'execute',
                     sql: sql
@@ -269,38 +268,32 @@
     })
 
     const handlerData = (data) => {
-        if (data.sql) {
-            vue.result.sql = data.sql;
-            vue.toolbar.sql = data.sql;
-            vue.result.costTime = 0;
-            vue.table.loading = true
-        }
-        if (data.costTime) {
-            vue.result.costTime = data.costTime
-        }
-        if (data.data != null) {
-            vue.table.widthItem = {}
-            vue.result = data;
-            vue.table.loading = false
-        }
-        // instead by retainContextWhenHidden=true
-        // vscode.setState({ result: vue.result });
+        vue.result.sql = data.sql;
+        vue.toolbar.sql = data.sql;
+        vue.table.widthItem = {}
+        vue.result = data;
+        vue.table.loading = false
+        // vscode.setState({ result: vue.result }); is instead by retainContextWhenHidden=true
     }
 
-    const optDone = () => {
-        vue.$message({ type: 'success', message: `EXECUTE ${vue.optSql} SUCCESS!` });
+    const handlerDML = (res) => {
+        vue.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
         vue.refresh()
     }
 
     window.addEventListener('message', event => {
-        let type = event.data.type
         vue.table.loading = false;
+        let response = event.data.res;
         switch (event.data.type) {
-            case "data":
-                handlerData(event.data)
+            case "RUN":
+                vue.toolbar.sql = response.sql;
+                vue.table.loading = true;
                 break;
-            case "opt":
-                optDone()
+            case "DATA":
+                handlerData(response)
+                break;
+            case "DML":
+                handlerDML(response)
                 break;
             default:
                 vue.$message({ type: 'success', message: JSON.stringify(event.data) });

@@ -8,7 +8,7 @@ import { MySQLTreeDataProvider } from "./provider/MysqlTreeDataProvider";
 import { CompletionProvider } from "./provider/CompletionProvider";
 import { DatabaseCache } from "./database/DatabaseCache";
 import { ColumnNode } from "./model/table/columnNode";
-import { SqlViewManager } from "./database/SqlViewManager";
+import { SqlViewManager } from "./common/SqlViewManager";
 import { ProcedureNode } from "./model/other/Procedure";
 import { FunctionNode } from "./model/other/function";
 import { TriggerNode } from "./model/other/Trigger";

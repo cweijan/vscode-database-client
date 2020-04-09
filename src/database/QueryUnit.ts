@@ -1,13 +1,13 @@
 "use strict";
-import * as vscode from "vscode";
 import * as fs from "fs";
-import { Cursor, CommandKey } from "../common/Constants";
+import * as vscode from "vscode";
+import { CommandKey, Cursor, MessageType } from "../common/Constants";
 import { Console } from "../common/OutputChannel";
 import { Util } from "../common/util";
 import { IConnection } from "../model/Connection";
+import { QueryPage } from "../view/result/query";
 import { ConnectionManager } from "./ConnectionManager";
-import { SqlViewManager } from "./SqlViewManager";
-import { resolve } from "url";
+import { ErrorResponse, DataResponse, RunResponse, DMLResponse } from "../view/result/queryResponse";
 
 export class QueryUnit {
 
@@ -68,12 +68,12 @@ export class QueryUnit {
             const executeTime = new Date().getTime()
             const isDDL = sql.match(this.ddlPattern)
             const isDML = sql.match(this.dmlPattern)
-            if (isDDL==null && isDML==null) {
-                SqlViewManager.showQueryResult({ splitResultView: true, extra: { sql } }, connectionOptions);
+            if (isDDL == null && isDML == null) {
+                QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
             }
             connection.query(sql, (err, data) => {
                 if (err) {
-                    //TODO trans output to query page
+                    QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse })
                     Console.log(err);
                     return;
                 }
@@ -86,14 +86,13 @@ export class QueryUnit {
                     return;
                 }
                 if (isDML) {
-                    //TODO 需要获取受影响条数
-                    Console.log(`EXECUTE SQL:\n\t${sql}\nSUCCESS!`)
+                    QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse })
                     resolve(true)
                     return;
                 }
                 if (Array.isArray(data)) {
-                    SqlViewManager.showQueryResult({ splitResultView: true, extra: { sql, data, costTime } }, connectionOptions);
-                } 
+                    QueryPage.send({ type: MessageType.DATA, connection: connectionOptions, res: { sql, costTime, data } as DataResponse });
+                }
 
             });
         })
