@@ -27,6 +27,7 @@ export class QueryPage {
         }
         this.sendData = queryParam
         if (this.creating) return;
+        // TODO support delimiter : const _sql = sql.toString().replace(/DELIMITER ;?;/gm, '').replace(/;;/gm, ';')
 
         // update result webview
         if (this.resultWebviewPanel) {

@@ -33,69 +33,64 @@ export class QueryUnit {
 
     private static ddlPattern = /^(alter|create|drop)/ig;
     private static dmlPattern = /^(insert|update|delete)/ig;
-    public static runQuery(sql?: string, connectionOptions?: IConnection): Promise<boolean> {
-        return new Promise(async (resolve, reject) => {
-            if (!sql && !vscode.window.activeTextEditor) {
-                vscode.window.showWarningMessage("No SQL file selected");
+    public static async runQuery(sql?: string, connectionOptions?: IConnection): Promise<null> {
+        if (!sql && !vscode.window.activeTextEditor) {
+            vscode.window.showWarningMessage("No SQL file selected");
+            return;
+        }
+        let connection: any;
+        if (!connectionOptions) {
+            if (!(connection = await ConnectionManager.getLastActiveConnection())) {
+                vscode.window.showWarningMessage("No MySQL Server or Database selected");
+                return;
+            } else {
+                connectionOptions = ConnectionManager.getLastConnectionOption()
+            }
+
+        } else if (connectionOptions) {
+            connectionOptions.multipleStatements = true;
+            connection = await ConnectionManager.getConnection(connectionOptions)
+        }
+
+        let fromEditor = false;
+        if (!sql) {
+            fromEditor = true;
+            const activeTextEditor = vscode.window.activeTextEditor;
+            const selection = activeTextEditor.selection;
+            if (selection.isEmpty) {
+                sql = this.obtainSql(activeTextEditor);
+            } else {
+                sql = activeTextEditor.document.getText(selection);
+            }
+        }
+        sql = sql.replace(/--.+/ig, '').trim();
+        const executeTime = new Date().getTime()
+        const isDDL = sql.match(this.ddlPattern)
+        const isDML = sql.match(this.dmlPattern)
+        if (isDDL == null && isDML == null) {
+            QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
+        }
+        connection.query(sql, (err, data) => {
+            if (err) {
+                QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse })
                 return;
             }
-            let connection: any;
-            if (!connectionOptions) {
-                if (!(connection = await ConnectionManager.getLastActiveConnection())) {
-                    vscode.window.showWarningMessage("No MySQL Server or Database selected");
-                    return;
-                } else {
-                    connectionOptions = ConnectionManager.getLastConnectionOption()
-                }
-
-            } else if (connectionOptions) {
-                connectionOptions.multipleStatements = true;
-                connection = await ConnectionManager.getConnection(connectionOptions)
+            var costTime = new Date().getTime() - executeTime
+            if (fromEditor)
+                vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime)
+            if (isDDL) {
+                vscode.commands.executeCommand(CommandKey.Refresh)
+                return;
+            }
+            if (isDML) {
+                QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse })
+                return;
+            }
+            if (Array.isArray(data)) {
+                QueryPage.send({ type: MessageType.DATA, connection: connectionOptions, res: { sql, costTime, data } as DataResponse });
             }
 
-            let fromEditor = false;
-            if (!sql) {
-                fromEditor = true;
-                const activeTextEditor = vscode.window.activeTextEditor;
-                const selection = activeTextEditor.selection;
-                if (selection.isEmpty) {
-                    sql = this.obtainSql(activeTextEditor);
-                } else {
-                    sql = activeTextEditor.document.getText(selection);
-                }
-            }
-            sql = sql.replace(/--.+/ig, '').trim();
-            const executeTime = new Date().getTime()
-            const isDDL = sql.match(this.ddlPattern)
-            const isDML = sql.match(this.dmlPattern)
-            if (isDDL == null && isDML == null) {
-                QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
-            }
-            connection.query(sql, (err, data) => {
-                if (err) {
-                    QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse })
-                    Console.log(err);
-                    return;
-                }
-                var costTime = new Date().getTime() - executeTime
-                if (fromEditor)
-                    vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime)
-                if (isDDL) {
-                    vscode.commands.executeCommand(CommandKey.Refresh)
-                    resolve(true)
-                    return;
-                }
-                if (isDML) {
-                    QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse })
-                    resolve(true)
-                    return;
-                }
-                if (Array.isArray(data)) {
-                    QueryPage.send({ type: MessageType.DATA, connection: connectionOptions, res: { sql, costTime, data } as DataResponse });
-                }
-
-            });
-        })
+        });
     }
 
 

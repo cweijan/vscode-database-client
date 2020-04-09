@@ -58,6 +58,11 @@
             </el-row>
             <el-row>
                 <el-cow>
+                    <el-button type="info" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest"
+                        v-if="result.table">
+                    </el-button>
+                </el-cow>
+                <el-cow>
                     <el-input v-model="table.search" style="width:200px" placeholder="Type to search" />
                 </el-cow>
                 <el-cow>
@@ -65,7 +70,7 @@
                 </el-cow>
                 <el-cow>
                     <span>costTime: </span><span v-text="result.costTime"></span>ms,
-                    <span>row: {{result.data.length}}, Col: {{columnCount}}</span>
+                    <span v-if="result.table">row: {{result.data.length}}, Col: {{columnCount}}</span>
                 </el-cow>
             </el-row>
             <!-- <el-row style="margin-bottom: 10px;">
@@ -73,7 +78,7 @@
                     style="width: 600px;"></el-input>
             </el-row> -->
         </div>
-        <div :style="'width:' + table.width + 'px;overflow:scroll'">
+        <div :style="'width:' + table.width + 'px;overflow:scroll'" v-if="result.table">
             <el-table id="dataTable" v-loading='table.loading' size='small'
                 :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
                 border @cell-click="celledit">
@@ -102,7 +107,7 @@
 
             </el-table>
         </div>
-        <el-dialog title="Line Date Edit" :visible.sync="editor.visible" width="70%" :before-close="handleClose">
+        <el-dialog :title="editorTilte" :visible.sync="editor.visible" width="70%" :before-close="handleClose">
             <el-form label-width="120px">
                 <el-form-item :label="column" :key="column" v-for="column in result.columnList">
                     <el-input v-model="update.currentNew[column]"></el-input>
@@ -110,7 +115,10 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editor.visible = false">Cancel</el-button>
-                <el-button type="primary" @click="confirmUpdate">Confirm</el-button>
+                <el-button v-if="update.primary!=null" type="primary" :loading="editor.loading" @click="confirmUpdate">
+                    Update</el-button>
+                <el-button v-if="update.primary==null" type="primary" :loading="editor.loading" @click="confirmInsert">
+                    Insert</el-button>
             </span>
         </el-dialog>
     </div>
@@ -143,6 +151,7 @@
             },
             editor: {
                 visible: false,
+                loading: false
             },
             update: {
                 current: {},
@@ -151,6 +160,28 @@
             }
         },
         methods: {
+            insertRequest() {
+                this.editor.visible = true;
+                this.update.primary = null;
+                this.update.currentNew = {};
+            },
+            confirmInsert() {
+                let columns = "";
+                let values = "";
+                for (const key in this.update.currentNew) {
+                    const newEle = this.update.currentNew[key];
+                    if (newEle) {
+                        columns += `${key},`;
+                        values += `'${newEle}',`;
+                    }
+                }
+                if (values) {
+                    const insertSql = `insert into ${this.result.table}(${columns.replace(/,$/, "")}) values(${values.replace(/,$/, "")})`
+                    this.execute(insertSql)
+                } else {
+                    this.$message("Not any input, update fail!")
+                }
+            },
             confirmUpdate() {
                 let change = "";
                 for (const key in this.update.currentNew) {
@@ -163,10 +194,8 @@
                 if (change) {
                     const updateSql = `update ${this.result.table} set ${change.replace(/,$/, "")} where ${this.result.primaryKey}=${this.update.primary}`
                     this.execute(updateSql)
-                    this.editor.visible = false
                 } else {
                     this.$message("Not any change, update fail!")
-
                 }
             },
             openEdit(row) {
@@ -201,7 +230,6 @@
 
             },
             computeWidth(key, index) {
-
                 if (this.table.widthItem[key]) return this.table.widthItem[key];
                 if (!index) index = 0
                 if (!this.result.data[index] || index > 10) return 60;
@@ -263,7 +291,13 @@
             columnCount() {
                 if (this.result.data == undefined || this.result.data[0] == undefined) return 0;
                 return Object.keys(this.result.data[0]).length;
-            }
+            },
+            editorTilte() {
+                if (this.update.primary == null) {
+                    return 'Insert To ' + this.result.table
+                }
+                return 'Edit ' + this.result.table + ' : ' + this.result.primaryKey + '=' + this.update.primary
+            },
         }
     })
 
@@ -277,8 +311,17 @@
     }
 
     const handlerDML = (res) => {
+        // TODO 回显优化
+        vue.editor.loading = false;
+        vue.editor.visible = false;
         vue.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
         vue.refresh()
+    }
+
+    const handlerError = (res) => {
+        vue.editor.loading = false;
+        vue.editor.visible = false;
+        vue.$message(JSON.stringify(res))
     }
 
     window.addEventListener('message', event => {
@@ -296,7 +339,7 @@
                 handlerDML(response)
                 break;
             default:
-                vue.$message({ type: 'success', message: JSON.stringify(event.data) });
+                vue.$message(JSON.stringify(event.data));
         }
     });
     vscode.postMessage({ type: 'init' })

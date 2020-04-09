@@ -6,7 +6,7 @@ export class DataResponse {
     sql: string;
     costTime: number;
     primaryKey: string;
-    // 需要增加类型
+    // TODO 需要增加类型,用于对数据进行转换,以及是否为NULL
     columnList: Array<string>;
     database?: string;
     table: string | null;
