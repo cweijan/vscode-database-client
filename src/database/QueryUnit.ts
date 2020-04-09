@@ -87,7 +87,7 @@ export class QueryUnit {
                 }
                 if (isDML) {
                     //TODO 需要获取受影响条数
-                    Console.log(`execute sql success:${sql}`)
+                    Console.log(`EXECUTE SQL:\n\t${sql}\nSUCCESS!`)
                     resolve(true)
                     return;
                 }

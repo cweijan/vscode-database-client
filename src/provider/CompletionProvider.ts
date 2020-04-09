@@ -10,12 +10,12 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     constructor() {
         this.initDefaultComplectionItem()
     }
-    private keywordList: string[] = ["SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN"]
+    private keywordList: string[] = ["JOIN","SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN"]
     private functionList: string[] = ["decimal", "char", "varchar", "CHAR_LENGTH", "CONCAT", "NOW", "DATE_ADD", "DATE_SUB", "MAX", "COUNT", "MIN", "SUM", "AVG", "LENGTH", "IF", "IFNULL", "MD5", "SHA", "CURRENT_DATE", "DATE_FORMAT", "CAST"]
     private defaultComplectionItems: vscode.CompletionItem[] = []
     private tableKeywordList: string[] = ["AUTO_INCREMENT", "NULL", "NOT", "PRIMARY", "CURRENT_TIME", "DEFAULT", "COMMENT", "UNIQUE", "KEY"]
     private tableKeywordComplectionItems: vscode.CompletionItem[] = []
-    private typeList: string[] = ["INTEGER","char","varchar", "smallint", "tinyint", "MEDIUMINT", "bigint", "numeric", "bit", "long", "int", "float", "double", "TEXT", "SET", "blob", "timestamp", "date", "time", "YEAR", "datetime"]
+    private typeList: string[] = ["INTEGER", "char", "varchar", "smallint", "tinyint", "MEDIUMINT", "bigint", "numeric", "bit", "int", "float", "double", "TEXT", "SET", "blob", "timestamp", "date", "time", "YEAR", "datetime"]
     private typeComplectionItems: vscode.CompletionItem[] = []
 
     private initDefaultComplectionItem() {
@@ -76,11 +76,11 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
             if (subComplectionItems.length == 0) {
                 subComplectionItems = await CompletionProvider.generateColumnComplectionItem(inputWord)
                 if (subComplectionItems.length == 0) {
-                    let tableReg = new RegExp("\\w+(?=\\s*\\b" + inputWord + "\\b)", 'ig')
+                    let tableReg = new RegExp("`{0,1}(\\w|-)+`{0,1}(?=\\s*\\b" + inputWord + "\\b)", 'ig')
                     let currentSql = document.getText();
                     let result = tableReg.exec(currentSql)
                     for (; result != null && subComplectionItems.length == 0;) {
-                        subComplectionItems = await CompletionProvider.generateColumnComplectionItem(result[0])
+                        subComplectionItems = await CompletionProvider.generateColumnComplectionItem(result[0].replace(/`/ig,""))
                         result = tableReg.exec(currentSql)
                     }
                 }

@@ -436,7 +436,7 @@
 					},
 					"comment": "this is faster than the next begin/end rule since sub-pattern will match till end-of-line and SQL files tend to have very long lines.",
 					"match": "(`)[^`\\\\]*(`)",
-					"name": "string.quoted.other.backtick.sql"
+					"name": "support.function.table.sql"
 				},
 				{
 					"begin": "`",
@@ -451,7 +451,7 @@
 							"name": "punctuation.definition.string.end.sql"
 						}
 					},
-					"name": "string.quoted.other.backtick.sql",
+					"name": "support.function.table.sql",
 					"patterns": [
 						{
 							"include": "#string_escape"

@@ -78,11 +78,11 @@
                 :data="result.data.filter(data => !search || JSON.stringify(data).toLowerCase().includes(search.toLowerCase()))"
                 border @cell-click="celledit">
                 <!-- tool bar -->
-                <el-table-column fixed="left" label="Operations" width="120">
+                <el-table-column fixed="left" label="Operations" width="120" v-if="result.primaryKey">
                     <template slot-scope="scope">
-                        <el-button v-if="result.primaryKey&&scope.row[result.primaryKey]" @click="openEdit(scope.row)"
+                        <el-button @click="openEdit(scope.row)"
                             type="text" size="small">Edit</el-button>
-                        <el-button v-if="result.primaryKey&&scope.row[result.primaryKey]"
+                        <el-button
                             @click="deleteConfirm(scope.row[result.primaryKey])" type="text" size="small">Delete
                         </el-button>
                     </template>
