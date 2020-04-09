@@ -13,12 +13,14 @@ export class DataResponse {
     data: any[]
 }
 export class ErrorResponse {
-    sql: string;
+    sql:string;
+    costTime: number;
     message: string;
 }
 
 export class DMLResponse {
-    sql: string;
+    sql:string;
     costTime: number;
+    message?: string;
     affectedRows:number;
 }

@@ -25,6 +25,15 @@
             white-space: nowrap !important;
             user-select: text !important;
         }
+        .info-panel{
+            color: #444;
+            font-size: 16px;
+            background-color: white;
+            border:1px solid #dcdfe6;
+            border-radius: 5px;
+            padding: 10px;
+            margin-left:6px;
+        }
 
         /*定义滚动条样式（高宽及背景）*/
         ::-webkit-scrollbar {
@@ -66,17 +75,16 @@
                     <el-input v-model="table.search" style="width:200px" placeholder="Type to search" />
                 </el-cow>
                 <el-cow>
-                    <el-button type="primary" @click='execute(toolbar.sql)'>Execute</el-button>
+                    <el-button type="primary" @click='execute(toolbar.sql);info.visible = false;'>Execute</el-button>
                 </el-cow>
                 <el-cow>
-                    <span>costTime: </span><span v-text="result.costTime"></span>ms,
-                    <span v-if="result.table">row: {{result.data.length}}, Col: {{columnCount}}</span>
+                    <span>costTime: </span><span v-text="toolbar.costTime"></span>ms
+                    <span v-if="result.table">,row: {{result.data.length}}, Col: {{columnCount}}</span>
                 </el-cow>
             </el-row>
-            <!-- <el-row style="margin-bottom: 10px;">
-                <el-input type="textarea" readonly autosize :value="updateSql" v-if="update.where"
-                    style="width: 600px;"></el-input>
-            </el-row> -->
+        </div>
+        <div v-if="info.visible">
+            <div class="info-panel" v-html="info.message"></div>
         </div>
         <div :style="'width:' + table.width + 'px;overflow:scroll'" v-if="result.table">
             <el-table id="dataTable" v-loading='table.loading' size='small'
@@ -134,7 +142,6 @@
             result: {
                 data: [],
                 sql: '',
-                costTime: 0,
                 primaryKey: null,
                 columnList: null,
                 database: null,
@@ -148,10 +155,17 @@
             },
             toolbar: {
                 sql: null,
+                costTime: 0,
+                isRefrsh: false
             },
             editor: {
                 visible: false,
                 loading: false
+            },
+            info: {
+                sql: null,
+                message: null,
+                visible: false
             },
             update: {
                 current: {},
@@ -176,7 +190,7 @@
                     }
                 }
                 if (values) {
-                    const insertSql = `insert into ${this.result.table}(${columns.replace(/,$/, "")}) values(${values.replace(/,$/, "")})`
+                    const insertSql = `INSERT INTO ${this.result.table}(${columns.replace(/,$/, "")}) VALUES(${values.replace(/,$/, "")})`
                     this.execute(insertSql)
                 } else {
                     this.$message("Not any input, update fail!")
@@ -192,7 +206,7 @@
                     }
                 }
                 if (change) {
-                    const updateSql = `update ${this.result.table} set ${change.replace(/,$/, "")} where ${this.result.primaryKey}=${this.update.primary}`
+                    const updateSql = `UPDATE ${this.result.table} SET ${change.replace(/,$/, "")} WHERE ${this.result.primaryKey}=${this.update.primary}`
                     this.execute(updateSql)
                 } else {
                     this.$message("Not any change, update fail!")
@@ -212,7 +226,7 @@
                     cancelButtonText: 'Cancel',
                     type: 'warning'
                 }).then(() => {
-                    const deleteSql = `delete from ${this.result.table} where ${this.result.primaryKey}='${primaryValue}'`;
+                    const deleteSql = `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}='${primaryValue}'`;
                     this.execute(deleteSql)
                 }).catch(() => {
                     this.$message({ type: 'info', message: 'Update canceled' });
@@ -250,7 +264,8 @@
                 }
             },
             refresh() {
-                if (this.result) {
+                if (this.result.sql) {
+                    this.toolbar.isRefrsh = true;
                     this.execute(this.result.sql)
                 }
             },
@@ -302,31 +317,37 @@
     })
 
     const handlerData = (data) => {
+        
         vue.result.sql = data.sql;
         vue.toolbar.sql = data.sql;
         vue.table.widthItem = {}
         vue.result = data;
         vue.table.loading = false
+        if (vue.toolbar.isRefrsh) {
+            vue.toolbar.isRefrsh = false;
+        } else {
+            vue.info.visible = false;
+        }
         // vscode.setState({ result: vue.result }); is instead by retainContextWhenHidden=true
     }
 
-    const handlerDML = (res) => {
+    const handlerDml = (res) => {
         // TODO 回显优化
         vue.editor.loading = false;
         vue.editor.visible = false;
-        vue.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
+        vue.info.visible = true;
+        vue.info.message = res.message
+        // vue.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
         vue.refresh()
-    }
-
-    const handlerError = (res) => {
-        vue.editor.loading = false;
-        vue.editor.visible = false;
-        vue.$message(JSON.stringify(res))
     }
 
     window.addEventListener('message', event => {
         vue.table.loading = false;
         let response = event.data.res;
+        if (response.costTime) {
+            vue.toolbar.costTime = response.costTime
+        }
+        
         switch (event.data.type) {
             case "RUN":
                 vue.toolbar.sql = response.sql;
@@ -336,7 +357,8 @@
                 handlerData(response)
                 break;
             case "DML":
-                handlerDML(response)
+            case "ERROR":
+                handlerDml(response)
                 break;
             default:
                 vue.$message(JSON.stringify(event.data));

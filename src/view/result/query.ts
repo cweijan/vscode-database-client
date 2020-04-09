@@ -6,7 +6,7 @@ import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
 import { IConnection } from "../../model/Connection";
 import { ColumnNode } from "../../model/table/columnNode";
-import { DataResponse } from "./queryResponse";
+import { DataResponse, ErrorResponse, DMLResponse } from "./queryResponse";
 
 export class QueryParam<T> {
     type: MessageType;
@@ -22,9 +22,19 @@ export class QueryPage {
     private static sendData: any;
     private static creating = false;
     public static async send(queryParam: QueryParam<any>) {
-        if(queryParam.type==MessageType.DATA){
-            await this.loadTableInfo(queryParam)
+
+        switch (queryParam.type) {
+            case MessageType.DATA:
+                await this.loadTableInfo(queryParam)
+                break;
+            case MessageType.DML:
+                queryParam.res.message=`EXECUTE SUCCESS:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>AffectedRows : ${queryParam.res.affectedRows}`
+                break;
+            case MessageType.ERROR:
+                queryParam.res.message=`EXECUTE Fail:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>message :<br&nbsp;&nbsp;>${queryParam.res.message}`
+                break;
         }
+
         this.sendData = queryParam
         if (this.creating) return;
         // TODO support delimiter : const _sql = sql.toString().replace(/DELIMITER ;?;/gm, '').replace(/;;/gm, ';')
