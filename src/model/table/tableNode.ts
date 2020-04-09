@@ -148,11 +148,11 @@ ADD
         this
             .getChildren()
             .then((children: INode[]) => {
-                const childrenNames = children.map((child: any) => child.column.COLUMN_NAME);
-                let sql = `insert into \n\t${this.database}.${this.table} `
-                sql += `(${childrenNames.toString().replace(/,/g, ", ")})\n`
-                sql += "values\n\t"
-                sql += `('${childrenNames.toString().replace(/,/g, ", ")}');`
+                const childrenNames = children.map((child: any) => "\n    "+child.column.COLUMN_NAME);
+                let sql = `insert into \n  \`${this.database}\`.${this.table} `
+                sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  )\n`
+                sql += "values\n  "
+                sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  );`
                 QueryUnit.createSQLTextDocument(sql);
             });
     }
@@ -165,8 +165,8 @@ ADD
 
                 const where = keysNames.map((name: string) => `${name} = ${name}`);
 
-                let sql = `delete from \n\t${this.database}.${this.table} \n`;
-                sql += `where \n\t${where.toString().replace(/,/g, "\n   and ")}`
+                let sql = `delete from \n  \`${this.database}\`.${this.table} \n`;
+                sql += `where \n  ${where.toString().replace(/,/g, "\n  and")}`
                 QueryUnit.createSQLTextDocument(sql)
             });
     }
@@ -181,8 +181,8 @@ ADD
                 const sets = childrenNames.map((name: string) => `${name} = ${name}`);
                 const where = keysNames.map((name: string) => `${name} = '${name}'`);
 
-                let sql = `update \n\t${this.database}.${this.table} \nset \n\t${sets.toString().replace(/,/g, ",\n   ")}\n`;
-                sql += `where \n\t${where.toString().replace(/,/g, "\n   and ")}`
+                let sql = `update \n  \`${this.database}\`.${this.table} \nset \n  ${sets.toString().replace(/,/g, ",\n  ")}\n`;
+                sql += `where \n  ${where.toString().replace(/,/g, "\n  and ")}`
                 QueryUnit.createSQLTextDocument(sql)
             });
     }
