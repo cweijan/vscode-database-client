@@ -54,11 +54,11 @@
     <div id="app">
         <div class="hint">
             <el-row style="margin-bottom: 10px;">
-                <el-input type="textarea" autosize v-model="activeSql" style="width: 600px;"></el-input>
+                <el-input type="textarea" autosize v-model="toolbar.sql" style="width: 600px;"></el-input>
             </el-row>
             <el-row>
                 <el-cow>
-                    <el-input v-model="search" style="width:200px" placeholder="Type to search" />
+                    <el-input v-model="table.search" style="width:200px" placeholder="Type to search" />
                 </el-cow>
                 <el-cow>
                     <el-button type="primary" @click='execute'>Execute</el-button>
@@ -73,14 +73,14 @@
                     style="width: 600px;"></el-input>
             </el-row> -->
         </div>
-        <div :style="'width:' + tableWidth + 'px;overflow:scroll'">
-            <el-table id="dataTable" v-loading='loading' size='small'
-                :data="result.data.filter(data => !search || JSON.stringify(data).toLowerCase().includes(search.toLowerCase()))"
+        <div :style="'width:' + table.width + 'px;overflow:scroll'">
+            <el-table id="dataTable" v-loading='table.loading' size='small'
+                :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
                 border @cell-click="celledit">
                 <!-- tool bar -->
                 <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey">
                     <template slot-scope="scope">
-                        <el-button @click="openEdit(scope.row,scope.$index)" type="text" size="small">Edit</el-button>
+                        <el-button @click="openEdit(scope.row)" type="text" size="small">Edit</el-button>
                         <el-button @click="deleteConfirm(scope.row[result.primaryKey])" type="text" size="small">Delete
                         </el-button>
                     </template>
@@ -102,14 +102,14 @@
 
             </el-table>
         </div>
-        <el-dialog title="Line Date Edit" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
-            <el-form label-width="80px" :model="update.currentNew">
+        <el-dialog title="Line Date Edit" :visible.sync="editor.visible" width="70%" :before-close="handleClose">
+            <el-form label-width="120px">
                 <el-form-item :label="column" :key="column" v-for="column in result.columnList">
-                    <el-input :model="update.currentNew[column]"></el-input>
+                    <el-input v-model="update.currentNew[column]"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">Cancel</el-button>
+                <el-button @click="editor.visible = false">Cancel</el-button>
                 <el-button type="primary" @click="confirmUpdate">Confirm</el-button>
             </span>
         </el-dialog>
@@ -123,39 +123,60 @@
     const vue = new Vue({
         el: '#app',
         data: {
-            result: previousState ? previousState.result : {
+            result: {
                 data: [],
                 sql: '',
-                costTime: 0
+                costTime: 0,
+                primaryKey: null,
+                columnList: null,
+                database: null,
+                table: null
             },
-            tableWidth: null,
-            widthCache: {},
-            search: '',
-            dialogVisible: false,
-            loading: true,
-            activeSql: null,
             optSql: null,
+            table: {
+                search: '',
+                loading: true,
+                width: null,
+                widthItem: {}
+            },
+            toolbar: {
+                sql: null,
+            },
+            editor: {
+                visible: false,
+            },
             update: {
-                primary: null,
-                rowNum: -1,
-                currentNew: {}
+                current: {},
+                currentNew: {},
+                primary: null
             }
-
         },
         methods: {
-            confirmUpdate(){
-                // const updateSql = `update \`${data.database}\`.\`${data.table}\`
-                // set #1
-                // where \`${data.primaryKey}\`='#2' `
-                // this.dialogVisible = false
-                this.update.currentNew = this.result.row[this.update.rowNum]
+            confirmUpdate() {
+                let change = "";
+                for (const key in this.update.currentNew) {
+                    const oldEle = this.update.current[key];
+                    const newEle = this.update.currentNew[key];
+                    if (oldEle != newEle) {
+                        change += `${key}='${newEle}',`
+                    }
+                }
+                if (change) {
+                    this.optSql = `update ${this.result.table} set ${change.replace(/,$/, "")} where ${this.result.primaryKey}=${this.update.primary}`
+                    this.execute(this.optSql)
+                    this.editor.visible=false
+                } else {
+                    this.$message("Not any change, update fail!")
+
+                }
             },
-            openEdit(row, index) {
-                this.dialogVisible = true;
-                this.update.rowNum = index
-                this.update.primary = row[this.result.primaryKey]
-                //TODO maybe need clone
-                this.update.currentNew = this.result.row[this.update.rowNum]
+            openEdit(row) {
+                this.editor.visible = true;
+                this.update = {
+                    current: row,
+                    currentNew: this.deepClone(row),
+                    primary: row[this.result.primaryKey]
+                }
             },
             deleteConfirm(primaryValue) {
                 this.$confirm('Are you sure you want to delete this data?', 'Warning', {
@@ -171,18 +192,18 @@
             },
             updateWidth() {
                 let width = 0;
-                for (const key in this.widthCache) {
-                    width = width + parseInt(this.widthCache[key])
+                for (const key in this.table.widthItem) {
+                    width = width + parseInt(this.table.widthItem[key])
                 }
                 if (this.result.primaryKey) {
                     width += 60;
                 }
-                this.tableWidth = width + 60;
+                this.table.width = width + 60;
 
             },
             computeWidth(key, index) {
 
-                if (this.widthCache[key]) return this.widthCache[key];
+                if (this.table.widthItem[key]) return this.table.widthItem[key];
                 if (!index) index = 0
                 if (!this.result.data[index] || index > 10) return 60;
                 var value = this.result.data[index][key];
@@ -191,7 +212,7 @@
                 if (dynamic < 60) dynamic = 60;
                 var nextDynamic = this.computeWidth(key, ++index)
                 if (dynamic < nextDynamic) dynamic = nextDynamic;
-                this.widthCache[key] = dynamic;
+                this.table.widthItem[key] = dynamic;
                 this.updateWidth()
                 return dynamic;
             },
@@ -207,12 +228,12 @@
                 }
             },
             execute(sql) {
-                if (!sql) sql = this.activeSql
+                if (!sql) sql = this.toolbar.sql
                 vscode.postMessage({
                     type: 'execute',
                     sql: sql
                 });
-                this.loading = true;
+                this.table.loading = true;
             },
             deleteTemplate() {
                 this.result.sql = `DELETE FROM [table] WHERE id= `;
@@ -222,6 +243,21 @@
                     return "<b>(NULL)</b>";
                 }
                 return origin;
+            },
+            deepClone(obj) {
+                let objClone = Array.isArray(obj) ? [] : {};
+                if (obj && typeof obj === "object") {
+                    for (let key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            if (obj[key] && typeof obj[key] === "object") {
+                                objClone[key] = this.deepClone(obj[key]);
+                            } else {
+                                objClone[key] = obj[key];
+                            }
+                        }
+                    }
+                }
+                return objClone;
             }
         },
         computed: {
@@ -235,17 +271,17 @@
     const handlerData = (data) => {
         if (data.sql) {
             vue.result.sql = data.sql;
-            vue.activeSql = data.sql;
+            vue.toolbar.sql = data.sql;
             vue.result.costTime = 0;
-            vue.loading = true
+            vue.table.loading = true
         }
         if (data.costTime) {
             vue.result.costTime = data.costTime
         }
         if (data.data != null) {
-            vue.widthCache = {}
+            vue.table.widthItem = {}
             vue.result = data;
-            vue.loading = false
+            vue.table.loading = false
         }
         // instead by retainContextWhenHidden=true
         // vscode.setState({ result: vue.result });
@@ -258,7 +294,7 @@
 
     window.addEventListener('message', event => {
         let type = event.data.type
-        vue.loading = false;
+        vue.table.loading = false;
         switch (event.data.type) {
             case "data":
                 handlerData(event.data)
