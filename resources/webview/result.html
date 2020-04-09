@@ -78,12 +78,10 @@
                 :data="result.data.filter(data => !search || JSON.stringify(data).toLowerCase().includes(search.toLowerCase()))"
                 border @cell-click="celledit">
                 <!-- tool bar -->
-                <el-table-column fixed="left" label="Operations" width="120" v-if="result.primaryKey">
+                <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey">
                     <template slot-scope="scope">
-                        <el-button @click="openEdit(scope.row)"
-                            type="text" size="small">Edit</el-button>
-                        <el-button
-                            @click="deleteConfirm(scope.row[result.primaryKey])" type="text" size="small">Delete
+                        <el-button @click="openEdit(scope.row,scope.$index)" type="text" size="small">Edit</el-button>
+                        <el-button @click="deleteConfirm(scope.row[result.primaryKey])" type="text" size="small">Delete
                         </el-button>
                     </template>
                 </el-table-column>
@@ -104,11 +102,15 @@
 
             </el-table>
         </div>
-        <el-dialog title="Tips" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
-            <span>This is a message</span>
+        <el-dialog title="Line Date Edit" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
+            <el-form label-width="80px" :model="update.currentNew">
+                <el-form-item :label="column" :key="column" v-for="column in result.columnList">
+                    <el-input :model="update.currentNew[column]"></el-input>
+                </el-form-item>
+            </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">Cancel</el-button>
-                <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
+                <el-button type="primary" @click="confirmUpdate">Confirm</el-button>
             </span>
         </el-dialog>
     </div>
@@ -134,15 +136,26 @@
             activeSql: null,
             optSql: null,
             update: {
-                sql: null,
-                where: 'w',
-                primary: 'p'
+                primary: null,
+                rowNum: -1,
+                currentNew: {}
             }
 
         },
         methods: {
-            openEdit(row) {
+            confirmUpdate(){
+                // const updateSql = `update \`${data.database}\`.\`${data.table}\`
+                // set #1
+                // where \`${data.primaryKey}\`='#2' `
+                // this.dialogVisible = false
+                this.update.currentNew = this.result.row[this.update.rowNum]
+            },
+            openEdit(row, index) {
                 this.dialogVisible = true;
+                this.update.rowNum = index
+                this.update.primary = row[this.result.primaryKey]
+                //TODO maybe need clone
+                this.update.currentNew = this.result.row[this.update.rowNum]
             },
             deleteConfirm(primaryValue) {
                 this.$confirm('Are you sure you want to delete this data?', 'Warning', {
@@ -161,7 +174,11 @@
                 for (const key in this.widthCache) {
                     width = width + parseInt(this.widthCache[key])
                 }
+                if (this.result.primaryKey) {
+                    width += 60;
+                }
                 this.tableWidth = width + 60;
+
             },
             computeWidth(key, index) {
 
@@ -180,19 +197,17 @@
             },
             celledit(row, column, cell, event) {
                 cell.contentEditable = true;
-                // cell.focus()
                 if (this.result.primaryKey) {
                     this.update.primary = row[this.result.primaryKey]
-                    // this.update.sql=row[this.result.primaryKey]
                 }
             },
-            refresh(){
-                if(this.result){
+            refresh() {
+                if (this.result) {
                     this.execute(this.result.sql)
                 }
             },
             execute(sql) {
-                if (!sql ) sql = this.activeSql
+                if (!sql) sql = this.activeSql
                 vscode.postMessage({
                     type: 'execute',
                     sql: sql
@@ -213,21 +228,11 @@
             columnCount() {
                 if (this.result.data == undefined || this.result.data[0] == undefined) return 0;
                 return Object.keys(this.result.data[0]).length;
-            }, updateSql() {
-                if (this.update.sql && this.update.where) {
-                    return this.update.sql.replace('#1', this.update.where).replace('#2', this.update.primary)
-                }
-                return null;
             }
         }
     })
 
     const handlerData = (data) => {
-        if (data.primaryKey && data.database && data.table) {
-            vue.update.sql = `update \`${data.database}\`.\`${data.table}\`
-set #1
-where \`${data.primaryKey}\`='#2' `
-        }
         if (data.sql) {
             vue.result.sql = data.sql;
             vue.activeSql = data.sql;
@@ -242,13 +247,12 @@ where \`${data.primaryKey}\`='#2' `
             vue.result = data;
             vue.loading = false
         }
-
         // instead by retainContextWhenHidden=true
         // vscode.setState({ result: vue.result });
     }
 
     const optDone = () => {
-        vue.$message({ type: 'success', message: `execute ${vue.optSql} success!` });
+        vue.$message({ type: 'success', message: `EXECUTE ${vue.optSql} SUCCESS!` });
         vue.refresh()
     }
 
@@ -263,7 +267,7 @@ where \`${data.primaryKey}\`='#2' `
                 optDone()
                 break;
             default:
-            vue.$message({ type: 'success', message: JSON.stringify(event.data) });
+                vue.$message({ type: 'success', message: JSON.stringify(event.data) });
         }
     });
     vscode.postMessage({ type: 'init' })
