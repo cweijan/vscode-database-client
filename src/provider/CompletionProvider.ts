@@ -10,7 +10,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     constructor() {
         this.initDefaultComplectionItem()
     }
-    private keywordList: string[] = ["JOIN","SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN"]
+    private keywordList: string[] = ["JOIN", "SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN"]
     private functionList: string[] = ["decimal", "char", "varchar", "CHAR_LENGTH", "CONCAT", "NOW", "DATE_ADD", "DATE_SUB", "MAX", "COUNT", "MIN", "SUM", "AVG", "LENGTH", "IF", "IFNULL", "MD5", "SHA", "CURRENT_DATE", "DATE_FORMAT", "CAST"]
     private defaultComplectionItems: vscode.CompletionItem[] = []
     private tableKeywordList: string[] = ["AUTO_INCREMENT", "NULL", "NOT", "PRIMARY", "CURRENT_TIME", "DEFAULT", "COMMENT", "UNIQUE", "KEY"]
@@ -71,6 +71,16 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
         let wordRange = document.getWordRangeAtPosition(prePostion)
         const inputWord = document.getText(wordRange)
+
+        let currentSql = QueryUnit.obtainCursorSql(document, position)
+        let wordMatch = currentSql.match(/\w+/ig)
+        let preWord: string;
+        if (wordRange == null || preChart.trim() == "") {
+            preWord = wordMatch[wordMatch.length - 1]
+        } else if (wordMatch.length > 1) {
+            preWord = wordMatch[wordMatch.length - 2]
+        }
+
         if (inputWord && preChart == '.') {
             let subComplectionItems = this.generateTableComplectionItem(inputWord)
             if (subComplectionItems.length == 0) {
@@ -80,13 +90,13 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
                     let currentSql = document.getText();
                     let result = tableReg.exec(currentSql)
                     for (; result != null && subComplectionItems.length == 0;) {
-                        subComplectionItems = await CompletionProvider.generateColumnComplectionItem(result[0].replace(/`/ig,""))
+                        subComplectionItems = await CompletionProvider.generateColumnComplectionItem(result[0].replace(/`/ig, ""))
                         result = tableReg.exec(currentSql)
                     }
                 }
             }
             completionItems = completionItems.concat(subComplectionItems)
-        } else {
+        } else if (preWord && preWord.match(/into|from|update|table|join/ig)) {
             completionItems = completionItems.concat(this.generateDatabaseComplectionItem(), this.generateTableComplectionItem())
         }
 
@@ -101,10 +111,21 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
         let databaseNodes = DatabaseCache.getDatabaseNodeList()
         return databaseNodes.map<vscode.CompletionItem>(databaseNode => {
-            let completionItem = new vscode.CompletionItem(databaseNode.getTreeItem().label)
+            const label = databaseNode.getTreeItem().label;
+            let completionItem = new vscode.CompletionItem(label)
             completionItem.kind = vscode.CompletionItemKind.Struct
+            completionItem.insertText = this.wrap(label)
             return completionItem
         })
+    }
+
+    private wrap(origin: string): string {
+
+        if (origin != null && origin.match(/\b(-)\b/ig)) {
+            return `\`${origin}\``
+        }
+
+        return origin;
     }
 
     private blockDbReg = /(mysql|performance_schema|information_schema)/ig
@@ -123,7 +144,9 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
         return tableNodes.map<vscode.CompletionItem>((tableNode: TableNode) => {
             let treeItem = tableNode.getTreeItem();
-            let completionItem = new vscode.CompletionItem(treeItem.label)
+            const label = treeItem.label;
+            let completionItem = new vscode.CompletionItem(label)
+            completionItem.insertText = this.wrap(label)
             switch (tableNode.type) {
                 case ModelType.TABLE:
                     completionItem.kind = vscode.CompletionItemKind.Function;

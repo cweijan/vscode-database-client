@@ -78,8 +78,8 @@
                     <el-button type="primary" @click='execute(toolbar.sql);info.visible = false;'>Execute</el-button>
                 </el-cow>
                 <el-cow>
-                    <span>costTime: </span><span v-text="toolbar.costTime"></span>ms
-                    <span v-if="result.table">,row: {{result.data.length}}, Col: {{columnCount}}</span>
+                    <span>CostTime: </span><span v-text="toolbar.costTime"></span>ms
+                    <span v-if="result.table">, Row: {{result.data.length}}, Col: {{columnCount}}</span>
                 </el-cow>
             </el-row>
         </div>

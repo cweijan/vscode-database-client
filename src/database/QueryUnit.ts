@@ -100,8 +100,14 @@ export class QueryUnit {
         var content = activeTextEditor.document.getText()
         if (content.match(this.batchPattern)) return content;
 
+        return this.obtainCursorSql(activeTextEditor.document, activeTextEditor.selection.active,content)
+
+    }
+
+    static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string) {
+        if (!content) content = document.getText(new vscode.Range(new vscode.Position(0,0),current))
         var sqlList = content.split(";");
-        var doc_cursor = activeTextEditor.document.getText(Cursor.getRangeStartTo(activeTextEditor.selection.active)).length;
+        var doc_cursor = document.getText(Cursor.getRangeStartTo(current)).length;
         var index = 0;
         for (let sql of sqlList) {
             index += (sql.length + 1)
