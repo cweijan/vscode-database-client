@@ -1,17 +1,15 @@
 # MySQL
 
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) [![Build Status](https://travis-ci.org/formulahendry/vscode-mysql.svg?branch=master)](https://travis-ci.org/formulahendry/vscode-mysql)
+[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) [![Build Status](https://travis-ci.org/cweijan/vscode-mysql.svg?branch=master)](https://travis-ci.org/cweijan/vscode-mysql)
 
 MySQL management tool Plus
 
 
-> This plugin forked from [MySQL](https://marketplace.visualstudio.com/items?itemName=formulahendry.vscode-mysql)
+> This plugin base of [MySQL](https://marketplace.visualstudio.com/items?itemName=formulahendry.vscode-mysql)
 > 
 > Many amazing improvements have been made
 > 
 > Welcome to contribute in [repository](https://github.com/cweijan/vscode-mysql)
->
-> You can see changes in the [changelog](/CHANGELOG.md)
 
 ## Features
 

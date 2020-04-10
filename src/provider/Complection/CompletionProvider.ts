@@ -18,7 +18,6 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
     private initDefaultComplectionItem() {
         // The chain is orderly
-        // TODO 增加在Where和ON语句下的表检测
         this.fullChain = [
             new TableCreateChain(),
             new TypeKeywordChain(),

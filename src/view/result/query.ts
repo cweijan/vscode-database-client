@@ -6,7 +6,7 @@ import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
 import { IConnection } from "../../model/Connection";
 import { ColumnNode } from "../../model/table/columnNode";
-import { DataResponse, ErrorResponse, DMLResponse } from "./queryResponse";
+import { DataResponse } from "./queryResponse";
 
 export class QueryParam<T> {
     type: MessageType;
@@ -31,13 +31,12 @@ export class QueryPage {
                 queryParam.res.message=`EXECUTE SUCCESS:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>AffectedRows : ${queryParam.res.affectedRows}, CostTime : ${queryParam.res.costTime}ms`
                 break;
             case MessageType.ERROR:
-                queryParam.res.message=`EXECUTE Fail:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>message :<br>&nbsp;&nbsp;${queryParam.res.message}`
+                queryParam.res.message=`EXECUTE FAIL:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>Message :<br><br>&nbsp;&nbsp;${queryParam.res.message}`
                 break;
         }
 
         this.sendData = queryParam
         if (this.creating) return;
-        // TODO support delimiter : const _sql = sql.toString().replace(/DELIMITER ;?;/gm, '').replace(/;;/gm, ';')
 
         // update result webview
         if (this.resultWebviewPanel) {

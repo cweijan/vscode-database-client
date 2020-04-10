@@ -28,7 +28,7 @@
 
         .info-panel {
             color: #444;
-            font-size: 16px;
+            font-size: 14px;
             background-color: white;
             border: 1px solid #dcdfe6;
             border-radius: 5px;
@@ -84,24 +84,27 @@
                 </el-cow>
             </el-row>
         </div>
-        <div v-if="info.visible">
-            <div class="info-panel" v-html="info.message"></div>
+        <div v-if="info.visible ">
+            <div v-if="info.error" class="info-panel" style="color:red" v-html="info.message"></div>
+            <div v-if="!info.error" class="info-panel" style="color: green;" v-html="info.message"></div>
         </div>
         <div :style="'width:' + table.width + 'px;overflow:scroll'" v-if="result.data">
-            <el-table id="dataTable" v-loading='table.loading' size='small'
+            <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort"
                 :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
                 border @cell-click="celledit">
                 <!-- tool bar -->
                 <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey">
                     <template slot-scope="scope">
-                        <el-button @click="openEdit(scope.row)" type="text" size="small">Edit</el-button>
-                        <el-button @click="deleteConfirm(scope.row[result.primaryKey])" type="text" size="small">Delete
+                        <el-button @click="openEdit(scope.row)" type="primary" size="small" icon="el-icon-edit" circle>
+                        </el-button>
+                        <el-button @click="deleteConfirm(scope.row[result.primaryKey])" type="danger" size="small"
+                            icon="el-icon-delete" circle>
                         </el-button>
                     </template>
                 </el-table-column>
                 <!-- table view -->
                 <el-table-column :label="column" v-for="(column) in result.columnList" :key="column" align="center"
-                    v-if="result.columnList" :width="computeWidth(column)">
+                    sortable v-if="result.columnList" :width="computeWidth(column)">
                     <template slot-scope="scope">
                         <span v-html='dataformat(scope.row[column])'></span>
                     </template>
@@ -166,7 +169,8 @@
             info: {
                 sql: null,
                 message: null,
-                visible: false
+                visible: false,
+                error: false
             },
             update: {
                 current: {},
@@ -175,6 +179,14 @@
             }
         },
         methods: {
+            sort(row) {
+                let order = row.order == 'ascending' ? "asc" : "desc"
+                let sortSql = this.result.sql
+                .replace(";","")
+                .replace(/order by .+? (desc|asc)?/ig, "")
+                .replace(/\s?(limit.+)?$/i,` ORDER BY ${row.column.label} ${order} \$1 `)
+                this.execute(sortSql)
+            },
             insertRequest() {
                 this.editor.visible = true;
                 this.update.primary = null;
@@ -332,14 +344,12 @@
         // vscode.setState({ result: vue.result }); is instead by retainContextWhenHidden=true
     }
 
-    const handlerDml = (res) => {
-        // TODO 回显优化
+    const handlerCommon = (res) => {
         vue.editor.loading = false;
         vue.editor.visible = false;
         vue.info.visible = true;
         vue.info.message = res.message
         // vue.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
-        vue.refresh()
     }
 
     window.addEventListener('message', event => {
@@ -358,8 +368,13 @@
                 handlerData(response)
                 break;
             case "DML":
+                handlerCommon(response)
+                vue.info.error = false
+                vue.refresh()
+                break;
             case "ERROR":
-                handlerDml(response)
+                handlerCommon(response)
+                vue.info.error = true
                 break;
             default:
                 vue.$message(JSON.stringify(event.data));
