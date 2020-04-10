@@ -5,7 +5,7 @@ import { ConnectionNode } from "./model/ConnectionNode";
 import { DatabaseNode } from "./model/database/databaseNode";
 import { TableNode } from "./model/table/tableNode";
 import { MySQLTreeDataProvider } from "./provider/MysqlTreeDataProvider";
-import { CompletionProvider } from "./provider/CompletionProvider";
+import { CompletionProvider } from "./provider/Complection/CompletionProvider";
 import { DatabaseCache } from "./database/DatabaseCache";
 import { ColumnNode } from "./model/table/columnNode";
 import { SqlViewManager } from "./common/SqlViewManager";

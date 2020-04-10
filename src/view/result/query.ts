@@ -87,9 +87,9 @@ export class QueryPage {
             })
             queryParam.res.primaryKey = primaryKey
             queryParam.res.columnList = columnList
-            queryParam.res.database = conn.database
-            queryParam.res.table = tableName
         }
+        queryParam.res.table = tableName
+        queryParam.res.database = conn.database
     }
 
     private static getTable(sql: string): string {

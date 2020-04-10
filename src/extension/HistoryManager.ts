@@ -6,7 +6,7 @@ export class HistoryManager {
     }
 
     showHistory() {
-        var historyPath = this.context.globalStoragePath + '/history.sql'
+        var historyPath = this.context['globalStoragePath'] + '/history.sql'
         var openPath = vscode.Uri.file(historyPath);
         vscode.workspace.openTextDocument(openPath).then(doc => {
             vscode.window.showTextDocument(doc);
@@ -16,7 +16,7 @@ export class HistoryManager {
     recordHistory(sql: string, costTime: number) {
         if (!sql) return;
         return new Promise(() => {
-            var gsPath = this.context.globalStoragePath
+            var gsPath = this.context['globalStoragePath']
             if (!fs.existsSync(gsPath)) {
                 fs.mkdirSync(gsPath)
             }
