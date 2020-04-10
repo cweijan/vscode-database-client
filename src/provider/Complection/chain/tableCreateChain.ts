@@ -23,7 +23,7 @@ export class TableCreateChain implements ComplectionChain {
     }
 
     public stop(): boolean {
-        return true;
+        return false;
     }
 
 }

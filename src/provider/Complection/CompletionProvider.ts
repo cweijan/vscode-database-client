@@ -6,6 +6,8 @@ import { TableChain } from "./chain/tableChain";
 import { TableCreateChain } from "./chain/TableCreateChain";
 import { TypeKeywordChain } from "./chain/typeKeywordChain";
 import { ComplectionChain, ComplectionContext } from "./complectionContext";
+import { TableDetecherChain } from "./chain/tableDetecherChain";
+import { FunctionChain } from "./chain/functionChain";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
     constructor() {
@@ -23,6 +25,8 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
             new DatabaseChain(),
             new TableChain(),
             new ColumnChain(),
+            new FunctionChain(),
+            new TableDetecherChain(),
             new KeywordChain(),
         ];
     }

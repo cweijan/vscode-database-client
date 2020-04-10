@@ -25,14 +25,15 @@
             white-space: nowrap !important;
             user-select: text !important;
         }
-        .info-panel{
+
+        .info-panel {
             color: #444;
             font-size: 16px;
             background-color: white;
-            border:1px solid #dcdfe6;
+            border: 1px solid #dcdfe6;
             border-radius: 5px;
             padding: 10px;
-            margin-left:6px;
+            margin-left: 6px;
         }
 
         /*定义滚动条样式（高宽及背景）*/
@@ -68,7 +69,7 @@
             <el-row>
                 <el-cow>
                     <el-button type="info" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest"
-                        v-if="result.table">
+                        v-if="result.primaryKey">
                     </el-button>
                 </el-cow>
                 <el-cow>
@@ -317,7 +318,7 @@
     })
 
     const handlerData = (data) => {
-        
+
         vue.result.sql = data.sql;
         vue.toolbar.sql = data.sql;
         vue.table.widthItem = {}
@@ -347,7 +348,7 @@
         if (response.costTime) {
             vue.toolbar.costTime = response.costTime
         }
-        
+
         switch (event.data.type) {
             case "RUN":
                 vue.toolbar.sql = response.sql;
