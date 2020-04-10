@@ -33,13 +33,13 @@ export class ColumnNode implements INode, IConnection {
 
     public getTreeItem(): ColumnTreeItem {
         return {
-            columnName: `${this.column.COLUMN_NAME}`,
-            detail: `${this.column.COLUMN_TYPE}`,
-            document: `${this.column.COLUMN_COMMENT}`,
-            label: `${this.column.COLUMN_NAME} : ${this.column.COLUMN_TYPE}  ${this.getIndex(this.column.COLUMN_KEY)}   ${this.column.COLUMN_COMMENT}`,
+            columnName: `${this.column.name}`,
+            detail: `${this.column.type}`,
+            document: `${this.column.comment}`,
+            label: `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)}   ${this.column.comment}`,
             collapsibleState: vscode.TreeItemCollapsibleState.None,
             contextValue: ModelType.COLUMN,
-            iconPath: path.join(Constants.RES_PATH,  this.column.COLUMN_KEY === "PRI" ? "b_primary.png" : "b_props.png"),
+            iconPath: path.join(Constants.RES_PATH,  this.column.key === "PRI" ? "b_primary.png" : "b_props.png"),
             command: {
                 command: "mysql.column.update",
                 title: "Update Column Statement",
@@ -54,10 +54,10 @@ export class ColumnNode implements INode, IConnection {
 
     public async changeColumnName() {
         
-        const columnName = this.column.COLUMN_NAME
+        const columnName = this.column.name
         vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(async newColumnName => {
             if (!newColumnName) return
-            const sql = `alter table \`${this.database}\`.\`${this.table}\` change column \`${columnName}\` \`${newColumnName}\` ${this.column.COLUMN_TYPE} comment '${this.column.COLUMN_COMMENT}'`
+            const sql = `alter table \`${this.database}\`.\`${this.table}\` change column \`${columnName}\` \`${newColumnName}\` ${this.column.type} comment '${this.column.comment}'`
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearColumnCache(`${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`)
                 MySQLTreeDataProvider.refresh()
@@ -68,11 +68,11 @@ export class ColumnNode implements INode, IConnection {
 
     updateColumnTemplate() {
         ConnectionManager.getConnection(this, true)
-        QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t\`${this.database}\`.\`${this.table}\` CHANGE \`${this.column.COLUMN_NAME}\` \`${this.column.COLUMN_NAME}\` ${this.column.COLUMN_TYPE} NOT NULL comment '${this.column.COLUMN_COMMENT}';`);
+        QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t\`${this.database}\`.\`${this.table}\` CHANGE \`${this.column.name}\` \`${this.column.name}\` ${this.column.type} NOT NULL comment '${this.column.comment}';`);
     }
     dropColumnTemplate() {
         ConnectionManager.getConnection(this, true)
-        QueryUnit.createSQLTextDocument(`ALTER TABLE \n\t\`${this.database}\`.\`${this.table}\` DROP COLUMN \`${this.column.COLUMN_NAME}\`;`);
+        QueryUnit.createSQLTextDocument(`ALTER TABLE \n\t\`${this.database}\`.\`${this.table}\` DROP COLUMN \`${this.column.name}\`;`);
     }
     
 

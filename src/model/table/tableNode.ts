@@ -45,7 +45,7 @@ export class TableNode implements INode, IConnection {
         if (columnNodes && !isRresh) {
             return columnNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT COLUMN_NAME,COLUMN_TYPE,COLUMN_COMMENT,COLUMN_TYPE,COLUMN_KEY FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT COLUMN_NAME name,COLUMN_TYPE type,COLUMN_COMMENT comment,COLUMN_KEY \`key\`,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column) => {
                     return new ColumnNode(this.host, this.user, this.password, this.port, this.database, this.table, this.certPath, column);
@@ -126,7 +126,7 @@ ADD
         QueryUnit.showSQLTextDocument(`-- ALTER TABLE \`${this.database}\`.\`${this.table}\` DROP INDEX [indexName];
 -- ALTER TABLE \`${this.database}\`.\`${this.table}\` ADD [UNIQUE|KEY|PRIMARY KEY] INDEX ([column]);`)
         setTimeout(() => {
-            QueryUnit.runQuery(`SELECT column_name,table_schema,index_name,non_unique FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${this.database}' and table_name='${this.table}';`, this)
+            QueryUnit.runQuery(`SELECT name,table_schema,index_name,non_unique FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${this.database}' and table_name='${this.table}';`, this)
         }, 10);
 
     }
@@ -148,7 +148,7 @@ ADD
         this
             .getChildren()
             .then((children: INode[]) => {
-                const childrenNames = children.map((child: any) => "\n    "+child.column.COLUMN_NAME);
+                const childrenNames = children.map((child: any) => "\n    "+child.column.name);
                 let sql = `insert into \n  \`${this.database}\`.${this.table} `
                 sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  )\n`
                 sql += "values\n  "
@@ -161,7 +161,7 @@ ADD
         this
             .getChildren()
             .then((children: INode[]) => {
-                const keysNames = children.filter((child: any) => child.column.COLUMN_KEY).map((child: any) => child.column.COLUMN_NAME);
+                const keysNames = children.filter((child: any) => child.column.key).map((child: any) => child.column.name);
 
                 const where = keysNames.map((name: string) => `${name} = ${name}`);
 
@@ -175,8 +175,8 @@ ADD
         this
             .getChildren()
             .then((children: INode[]) => {
-                const keysNames = children.filter((child: any) => child.column.COLUMN_KEY).map((child: any) => child.column.COLUMN_NAME);
-                const childrenNames = children.filter((child: any) => !child.column.COLUMN_KEY).map((child: any) => child.column.COLUMN_NAME);
+                const keysNames = children.filter((child: any) => child.column.key).map((child: any) => child.column.name);
+                const childrenNames = children.filter((child: any) => !child.column.key).map((child: any) => child.column.name);
 
                 const sets = childrenNames.map((name: string) => `${name} = ${name}`);
                 const where = keysNames.map((name: string) => `${name} = '${name}'`);

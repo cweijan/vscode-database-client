@@ -109,12 +109,12 @@
                     </template>
                 </el-table-column>
                 <!-- table view -->
-                <el-table-column :label="column" v-for="column in result.columnList" :key="column" align="center"
-                    sortable v-if="result.columnList" :width="computeWidth(column)">
+                <el-table-column :label="column.name" v-for="column in result.columnList" :key="column.name"
+                    align="center" sortable v-if="result.columnList" :width="computeWidth(column.name)">
                     <template slot-scope="scope">
-                        <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[column]"
-                            @blur="filter($event,column)"></el-input>
-                        <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[column])'></span>
+                        <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[column.name]"
+                            @blur="filter($event,column.name)"></el-input>
+                        <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[column.name])'></span>
                     </template>
                 </el-table-column>
                 <!-- sql view -->
@@ -127,10 +127,16 @@
 
             </el-table>
         </div>
-        <el-dialog :title="editorTilte" :visible.sync="editor.visible" width="70%" :before-close="handleClose">
-            <el-form label-width="120px">
-                <el-form-item :label="column" :key="column" v-for="column in result.columnList">
-                    <el-input v-model="update.currentNew[column]"></el-input>
+        <el-dialog :title="editorTilte" :visible.sync="editor.visible" width="90%" top="3vh" size="small">
+            <el-form :rules="info.rule" :ref="infoForm">
+                <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
+                    <template>
+                        <span>
+                            {{column.name}} : {{column.type}} : <span style="color: red;">{{column.key}}</span>
+                        </span>
+                        <el-input v-model="update.currentNew[column.name]"></el-input>
+                    </template>
+
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -179,7 +185,8 @@
                 sql: null,
                 message: null,
                 visible: false,
-                error: false
+                error: false,
+                rule: {}
             },
             update: {
                 current: {},
@@ -192,7 +199,7 @@
 
                 let inputvalue = "" + event.target.value
 
-                let filterSql = this.result.sql.replace(/\n/, " ").replace(";", "")
+                let filterSql = this.result.sql.replace(/\n/, " ").replace(";", " ") + " "
 
                 let existsCheck = new RegExp(`(WHERE|AND)?\\s*${column}\\s*=\\s*.+?\\s`, 'igm');
 
@@ -232,6 +239,7 @@
                 this.editor.visible = true;
                 this.update.primary = null;
                 this.update.currentNew = {};
+                // this.$refs['infoForm'].resetFields();
             },
             confirmInsert() {
                 let columns = "";
@@ -267,12 +275,27 @@
                 }
             },
             openEdit(row) {
+                this.$nextTick(() => {
+                    //获取不到, 貌似要从mounted的时候获取
+                    // this.$refs['infoForm'].resetFields();
+                })
                 this.editor.visible = true;
                 this.update = {
                     current: row,
                     currentNew: this.deepClone(row),
                     primary: row[this.result.primaryKey]
                 }
+            },
+            uploadRole() {
+                if (this.result.columnList == null) return;
+                let rule = {};
+                for (let column of this.result.columnList) {
+                    rule[column.name] = {
+                        required: (column.nullable == "NO") && (column.key != "PRI"),
+                        max: column.maxLength
+                    }
+                }
+                this.info.rule = rule
             },
             deleteConfirm(primaryValue) {
                 this.$confirm('Are you sure you want to delete this data?', 'Warning', {
@@ -385,6 +408,7 @@
             vue.toolbar.filter = {}
         }
         if (vue.result.columnList) {
+            vue.uploadRole()
             // add filter row
             vue.result.data.unshift({ isFilter: true, content: '' })
         }

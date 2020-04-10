@@ -81,10 +81,10 @@ export class QueryPage {
         if (tableNode) {
             let primaryKey: string;
             let columnList = (await tableNode.getChildren()).map((columnNode: ColumnNode) => {
-                if (columnNode.column.COLUMN_KEY === "PRI") {
-                    primaryKey = columnNode.column.COLUMN_NAME
+                if (columnNode.column.key === "PRI") {
+                    primaryKey = columnNode.column.name
                 }
-                return columnNode.column.COLUMN_NAME
+                return columnNode.column
             })
             queryParam.res.primaryKey = primaryKey
             queryParam.res.columnList = columnList

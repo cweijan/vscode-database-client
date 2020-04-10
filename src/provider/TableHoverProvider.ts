@@ -14,7 +14,7 @@ export class TableHoverProvider implements HoverProvider {
                 let hoverContent = `${tableNode.database}.${tableName}:`;
                 for (const columnNode of columnNodes) {
                     hoverContent += `
-${columnNode.column.COLUMN_NAME} ${columnNode.column.COLUMN_TYPE} ${columnNode.column.COLUMN_COMMENT ? "comment " + columnNode.column.COLUMN_COMMENT : ""} `;
+${columnNode.column.name} ${columnNode.column.type} ${columnNode.column.comment ? "comment " + columnNode.column.comment : ""} `;
                 }
                 const markdownStr = new vscode.MarkdownString();
                 markdownStr.appendCodeblock(hoverContent, "sql");

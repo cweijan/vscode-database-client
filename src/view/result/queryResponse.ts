@@ -7,20 +7,31 @@ export class DataResponse {
     costTime: number;
     primaryKey: string;
     // TODO 需要增加类型,用于对数据进行转换,以及是否为NULL
-    columnList: Array<string>;
+    columnList: Array<Column>;
     database?: string;
     table: string | null;
     data: any[]
 }
 export class ErrorResponse {
-    sql:string;
+    sql: string;
     costTime: number;
     message: string;
 }
 
 export class DMLResponse {
-    sql:string;
+    sql: string;
     costTime: number;
     message?: string;
-    affectedRows:number;
+    affectedRows: number;
+}
+
+export class Column {
+    
+    // "YES" and  "NO" 
+    public nullable: string;
+    public type :string;
+    public comment: string;
+    public key: string;
+    public maxLength: number;
+
 }
