@@ -28,10 +28,10 @@ export class QueryPage {
                 await this.loadTableInfo(queryParam)
                 break;
             case MessageType.DML:
-                queryParam.res.message=`EXECUTE SUCCESS:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>AffectedRows : ${queryParam.res.affectedRows}, CostTime : ${queryParam.res.costTime}ms`
+                queryParam.res.message = `EXECUTE SUCCESS:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>AffectedRows : ${queryParam.res.affectedRows}, CostTime : ${queryParam.res.costTime}ms`
                 break;
             case MessageType.ERROR:
-                queryParam.res.message=`EXECUTE FAIL:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>Message :<br><br>&nbsp;&nbsp;${queryParam.res.message}`
+                queryParam.res.message = `EXECUTE FAIL:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>Message :<br><br>&nbsp;&nbsp;${queryParam.res.message}`
                 break;
         }
 
@@ -72,10 +72,12 @@ export class QueryPage {
     }
     private static async loadTableInfo(queryParam: QueryParam<DataResponse>) {
         let conn = queryParam.connection
-        let tableName = this.getTable(queryParam.res.sql)
+        let info = this.getTable(queryParam.res.sql)
+        const tableName = info.table
+        const database = info.database
         if (tableName == null || conn == null) return;
         // load table infomation
-        let tableNode = DatabaseCache.getTable(`${conn.host}_${conn.port}_${conn.user}_${conn.database}`, tableName)
+        let tableNode = DatabaseCache.getTable(`${conn.host}_${conn.port}_${conn.user}_${database ? database : conn.database}`, tableName)
         if (tableNode) {
             let primaryKey: string;
             let columnList = (await tableNode.getChildren()).map((columnNode: ColumnNode) => {
@@ -91,21 +93,24 @@ export class QueryPage {
         queryParam.res.database = conn.database
     }
 
-    private static getTable(sql: string): string {
+    private static getTable(sql: string): TableInfo {
         if (!sql) return null;
-        let baseMatch;
+        let tableInfo = new TableInfo()
+        let baseMatch: string[];
         if (sql && (baseMatch = (sql + " ").match(/select\s+\*\s+from\s*(.+?)(?=[\s;])/i)) && !sql.match(/\bjoin\b/ig)) {
-            let expectTable: string = baseMatch[1];
-            let temp: string[], table;
-            if (expectTable.includes("`")) {
-                temp = expectTable.split("`");
-                table = temp[temp.length - 2];
-            } else {
-                temp = expectTable.split(".")
-                table = temp[temp.length - 1]
+            let expectTable: string = baseMatch[1].replace(/`/g, "");
+            let temp: string[] = expectTable.split(".")
+            if (temp.length == 2) {
+                tableInfo.database = temp[0]
+                tableInfo.table = temp[1]
             }
-            return table;
+            return tableInfo;
         }
     }
 
+}
+
+class TableInfo {
+    public database: string;
+    public table: string;
 }
