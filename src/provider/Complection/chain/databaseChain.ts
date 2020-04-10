@@ -3,7 +3,7 @@ import {DatabaseCache} from "../../../database/DatabaseCache";
 import {ComplectionChain, ComplectionContext} from "../complectionContext";
 
 function wrap(origin: string): string {
-    if (origin != null && origin.match(/\b(-)\b/ig)) {
+    if (origin != null && origin.match(/\b(-|\.)\b/ig)) {
         return `\`${origin}\``;
     }
     return origin;
@@ -28,7 +28,7 @@ export class DatabaseChain implements ComplectionChain {
         return databaseNodes.map<vscode.CompletionItem>((databaseNode) => {
             const label = databaseNode.getTreeItem().label;
             const completionItem = new vscode.CompletionItem(label);
-            completionItem.kind = vscode.CompletionItemKind.Struct;
+            completionItem.kind = vscode.CompletionItemKind.Folder;
             completionItem.insertText = wrap(label);
             return completionItem;
         });

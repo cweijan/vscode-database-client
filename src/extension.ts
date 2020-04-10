@@ -46,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormatProvider()),
         vscode.languages.registerHoverProvider('sql', new TableHoverProvider()),
-        vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.'),
+        vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.',">","<","=","("),
         vscode.commands.registerCommand(CommandKey.Refresh, () => {
             mysqlTreeDataProvider.init()
         }),

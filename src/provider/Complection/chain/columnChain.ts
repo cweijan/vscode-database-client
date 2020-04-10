@@ -9,11 +9,16 @@ export class ColumnChain implements ComplectionChain {
 
         if (complectionContext.preChart === ".") {
             let subComplectionItems = await this.generateColumnComplectionItem(complectionContext.preWord);
-            const tableReg = new RegExp("`{0,1}(\\w|-)+`{0,1}(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
-            let result = tableReg.exec(complectionContext.currentSql);
+            const tableReg = new RegExp("\\b(from|join)\\b\\s*`{0,1}(\\w|\.|-)+`{0,1}(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
+            let result = tableReg.exec(complectionContext.currentSqlFull);
             for (; result != null && subComplectionItems.length === 0;) {
-                subComplectionItems = await this.generateColumnComplectionItem(result[0].replace(/`/ig, ""));
-                result = tableReg.exec(complectionContext.currentSql);
+                subComplectionItems = await this.generateColumnComplectionItem(
+                    result[0].trim().replace(/(\w|\s)*\./, "").replace(/`/ig, "")
+                );
+                if (subComplectionItems.length > 0) {
+                    break;
+                }
+                result = tableReg.exec(complectionContext.currentSqlFull);
             }
             return subComplectionItems;
         }
@@ -43,7 +48,7 @@ export class ColumnChain implements ComplectionChain {
             const completionItem = new vscode.CompletionItem(columnNode.getTreeItem().columnName);
             completionItem.detail = columnNode.getTreeItem().detail;
             completionItem.documentation = columnNode.getTreeItem().document;
-            completionItem.kind = vscode.CompletionItemKind.Function;
+            completionItem.kind = vscode.CompletionItemKind.Field;
             return completionItem;
         });
     }

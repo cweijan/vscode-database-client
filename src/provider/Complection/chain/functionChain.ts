@@ -13,7 +13,18 @@ export class FunctionChain implements ComplectionChain {
         });
     }
     public getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] {
-        return this.functionComplectionItems;
+        if (
+            (complectionContext.preWord && complectionContext.preWord.match(/\b(select|HAVING|where|and|,|=|<|>)\b/ig))
+            ||
+            (complectionContext.currentWord && complectionContext.currentWord.match(/(<|>|,|=)$/))
+        ) {
+
+            let tableMatch = /(from|join)\s*(\w+)/ig
+
+            return this.functionComplectionItems;
+        }
+
+        return null;
     }
 
     public stop(): boolean {
