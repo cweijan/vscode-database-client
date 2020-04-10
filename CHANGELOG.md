@@ -1,3 +1,7 @@
+## 1.7.1 (2020/4/11)
+- Support sort、filter in result page.
+- Enhance sql intelliCode.
+
 ## 1.7.0 (2020/4/10)
 - Support Insert,Update,Delete in reuslt page.
 - Refactoring event message.
