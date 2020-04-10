@@ -21,7 +21,7 @@ export class TypeKeywordChain implements ComplectionChain {
             this.needStop = true;
             return this.typeComplectionItems;
         }
-        if (sql && sql.match(/(FUNCTION|PROCEDURE)/ig)) {
+        if (sql && sql.match(/\b(FUNCTION|PROCEDURE)\b/ig)) {
             this.needStop = false;
             return this.typeComplectionItems;
         }

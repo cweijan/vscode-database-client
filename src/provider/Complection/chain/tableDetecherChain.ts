@@ -5,7 +5,7 @@ export class TableDetecherChain implements ComplectionChain {
 
     public getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] | Promise<vscode.CompletionItem[]> {
 
-        const tableMatch = new RegExp('(from|join)\\s*((\\w|\\.)+)( *)?(\\w+)?', 'ig');
+        const tableMatch = new RegExp('\b(from|join)\b\\s*((\\w|\\.)+)( *)?(\\w+)?', 'ig');
         if (
             (complectionContext.preWord && complectionContext.preWord.match(/\b(select|HAVING|\(|on|where|and|,|=|<|>)\b/ig))
             ||

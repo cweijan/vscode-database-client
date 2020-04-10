@@ -48,7 +48,7 @@ export class TableChain implements ComplectionChain {
             tableNodes = DatabaseCache.getTableNodeList().filter((tableNode) => {
                 const included = tableNames.includes(tableNode.table);
                 tableNames.push(tableNode.table);
-                return !included && !tableNode.database.match(/(mysql|performance_schema|information_schema|sys)/ig);
+                return !included && !tableNode.database.match(/\b(mysql|performance_schema|information_schema|sys)\b/ig);
             });
         }
 
