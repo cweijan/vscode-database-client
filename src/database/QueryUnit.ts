@@ -112,7 +112,7 @@ export class QueryUnit {
         for (let sql of sqlList) {
             index += (sql.length + 1)
             if (doc_cursor < index) {
-                return sql.trim() + ";";
+                return sql.trim();
             }
         }
 
