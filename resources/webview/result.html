@@ -95,18 +95,26 @@
                 <!-- tool bar -->
                 <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey">
                     <template slot-scope="scope">
-                        <el-button @click="openEdit(scope.row)" type="primary" size="small" icon="el-icon-edit" circle>
-                        </el-button>
-                        <el-button @click="deleteConfirm(scope.row[result.primaryKey])" type="danger" size="small"
-                            icon="el-icon-delete" circle>
-                        </el-button>
+                        <div v-if="scope.row.isFilter" style="text-align: center;">
+                            Filter
+                        </div>
+                        <div v-if="scope.row[result.primaryKey]">
+                            <el-button @click="openEdit(scope.row)" type="primary" size="small" icon="el-icon-edit"
+                                circle>
+                            </el-button>
+                            <el-button @click="deleteConfirm(scope.row[result.primaryKey])" type="danger" size="small"
+                                icon="el-icon-delete" circle>
+                            </el-button>
+                        </div>
                     </template>
                 </el-table-column>
                 <!-- table view -->
-                <el-table-column :label="column" v-for="(column) in result.columnList" :key="column" align="center"
+                <el-table-column :label="column" v-for="column in result.columnList" :key="column" align="center"
                     sortable v-if="result.columnList" :width="computeWidth(column)">
                     <template slot-scope="scope">
-                        <span v-html='dataformat(scope.row[column])'></span>
+                        <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[column]"
+                            @blur="filter($event,column)"></el-input>
+                        <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[column])'></span>
                     </template>
                 </el-table-column>
                 <!-- sql view -->
@@ -160,7 +168,8 @@
             toolbar: {
                 sql: null,
                 costTime: 0,
-                isRefrsh: false
+                isRefrsh: false,
+                filter: {}
             },
             editor: {
                 visible: false,
@@ -179,13 +188,45 @@
             }
         },
         methods: {
+            filter(event, column) {
+
+                let inputvalue = "" + event.target.value
+
+                let filterSql = this.result.sql.replace(/\n/, " ").replace(";", "")
+
+                let existsCheck = new RegExp(`(WHERE|AND)?\\s*${column}\\s*=\\s*.+?\\s`, 'igm');
+
+                if (inputvalue) {
+                    inputValue = "" + inputvalue
+                    if (existsCheck.exec(filterSql)) {
+                        // condition present
+                        filterSql = filterSql.replace(existsCheck, `$1 ${column}='${inputValue}' `)
+                    } else if (filterSql.match(/\bwhere\b/ig) && inputvalue) {
+                        //have where
+                        filterSql = filterSql.replace(/\b(where)\b/ig, `\$1 ${column}='${inputvalue}' AND `)
+                    } else if (inputvalue) {
+                        //have not where
+                        filterSql = filterSql.replace(new RegExp(`(from\\s*.+?)\\s`, 'ig'), `\$1 WHERE ${column}='${inputvalue}' `)
+                    }
+                } else {
+                    // empty value, clear filter
+                    let beforeAndCheck = new RegExp(`${column}\\s*=\\s*.+?\\s*AND`, 'igm');
+                    if (beforeAndCheck.exec(filterSql)) {
+                        filterSql = filterSql.replace(beforeAndCheck, "")
+                    } else {
+                        filterSql = filterSql.replace(existsCheck, " ")
+                    }
+                }
+
+                this.execute(filterSql + ";")
+            },
             sort(row) {
                 let order = row.order == 'ascending' ? "asc" : "desc"
                 let sortSql = this.result.sql
-                .replace(";","")
-                .replace(/order by .+? (desc|asc)?/ig, "")
-                .replace(/\s?(limit.+)?$/i,` ORDER BY ${row.column.label} ${order} \$1 `)
-                this.execute(sortSql)
+                    .replace(/\n/, " ").replace(";", "")
+                    .replace(/order by .+? (desc|asc)?/ig, "")
+                    .replace(/\s?(limit.+)?$/i, ` ORDER BY ${row.column.label} ${order} \$1 `)
+                this.execute(sortSql + ";")
             },
             insertRequest() {
                 this.editor.visible = true;
@@ -271,6 +312,9 @@
                 return dynamic;
             },
             celledit(row, column, cell, event) {
+                if (row.isFilter) {
+                    return;
+                }
                 cell.contentEditable = true;
                 if (this.result.primaryKey) {
                     this.update.primary = row[this.result.primaryKey]
@@ -336,6 +380,14 @@
         vue.table.widthItem = {}
         vue.result = data;
         vue.table.loading = false
+        if (!data.sql.match(/\bwhere\b/ig)) {
+            // clear filter
+            vue.toolbar.filter = {}
+        }
+        if (vue.result.columnList) {
+            // add filter row
+            vue.result.data.unshift({ isFilter: true, content: '' })
+        }
         if (vue.toolbar.isRefrsh) {
             vue.toolbar.isRefrsh = false;
         } else {
