@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
-import {ColumnChain} from "./chain/columnChain";
-import {DatabaseChain} from "./chain/databaseChain";
-import {KeywordChain} from "./chain/keywordChain";
-import {TableChain} from "./chain/tableChain";
-import {TableCreateChain} from "./chain/TableCreateChain";
-import {TypeKeywordChain} from "./chain/typeKeywordChain";
-import {ComplectionChain, ComplectionContext} from "./complectionContext";
+import { ColumnChain } from "./chain/columnChain";
+import { DatabaseChain } from "./chain/databaseChain";
+import { KeywordChain } from "./chain/keywordChain";
+import { TableChain } from "./chain/tableChain";
+import { TableCreateChain } from "./chain/TableCreateChain";
+import { TypeKeywordChain } from "./chain/typeKeywordChain";
+import { ComplectionChain, ComplectionContext } from "./complectionContext";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
     constructor() {
@@ -16,6 +16,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
     private initDefaultComplectionItem() {
         // The chain is orderly
+        // TODO 增加在Where和ON语句下的表检测
         this.fullChain = [
             new TableCreateChain(),
             new TypeKeywordChain(),
@@ -34,11 +35,11 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.CompletionItem[]> {
 
         const context = ComplectionContext.build(document, position);
-        const completionItemList = [];
+        let completionItemList = [];
         for (const chain of this.fullChain) {
-            const tempComplection = chain.getComplection(context);
+            const tempComplection = await chain.getComplection(context);
             if (tempComplection != null) {
-                completionItemList.concat(tempComplection);
+                completionItemList = completionItemList.concat(tempComplection);
                 if (chain.stop()) {
                     break;
                 }

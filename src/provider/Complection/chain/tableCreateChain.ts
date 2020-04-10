@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class TableCreateChain implements ComplectionChain {
+
     private tableKeywordList: string[] = ["AUTO_INCREMENT", "NULL", "NOT", "PRIMARY", "CURRENT_TIME", "DEFAULT", "COMMENT", "UNIQUE", "KEY"];
     private tableKeywordComplectionItems: vscode.CompletionItem[] = [];
 

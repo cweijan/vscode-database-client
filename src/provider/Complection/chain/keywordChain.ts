@@ -1,7 +1,9 @@
 import * as vscode from "vscode";
-import { ComplectionChain, ComplectionContext } from "../complectionContext";
+import {ComplectionChain, ComplectionContext} from "../complectionContext";
 
 export class KeywordChain implements ComplectionChain {
+
+    // TODO 需要再细分, 分为ON和WHERE才能使用的条件
     private keywordList: string[] = ["JOIN", "SELECT", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN"];
     private functionList: string[] = ["decimal", "char", "varchar", "CHAR_LENGTH", "CONCAT", "NOW", "DATE_ADD", "DATE_SUB", "MAX", "COUNT", "MIN", "SUM", "AVG", "LENGTH", "IF", "IFNULL", "MD5", "SHA", "CURRENT_DATE", "DATE_FORMAT", "CAST"];
     private defaultComplectionItems: vscode.CompletionItem[] = [];

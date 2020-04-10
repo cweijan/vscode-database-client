@@ -86,7 +86,7 @@
         <div v-if="info.visible">
             <div class="info-panel" v-html="info.message"></div>
         </div>
-        <div :style="'width:' + table.width + 'px;overflow:scroll'" v-if="result.table">
+        <div :style="'width:' + table.width + 'px;overflow:scroll'" v-if="result.data">
             <el-table id="dataTable" v-loading='table.loading' size='small'
                 :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
                 border @cell-click="celledit">

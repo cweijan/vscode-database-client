@@ -4,7 +4,9 @@ import { ColumnNode } from "../../../model/table/columnNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class ColumnChain implements ComplectionChain {
+
     public async getComplection(complectionContext: ComplectionContext): Promise<vscode.CompletionItem[]> {
+
         if (complectionContext.preChart === ".") {
             let subComplectionItems = await this.generateColumnComplectionItem(complectionContext.preWord);
             const tableReg = new RegExp("`{0,1}(\\w|-)+`{0,1}(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
@@ -15,6 +17,7 @@ export class ColumnChain implements ComplectionChain {
             }
             return subComplectionItems;
         }
+
         return null;
     }
 

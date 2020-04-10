@@ -10,6 +10,7 @@ function wrap(origin: string): string {
 }
 
 export class DatabaseChain implements ComplectionChain {
+
     public getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] {
         if (complectionContext.preWord && complectionContext.preWord.match(/into|from|update|table|join/ig)) {
             return this.generateDatabaseComplectionItem();
@@ -32,5 +33,6 @@ export class DatabaseChain implements ComplectionChain {
             return completionItem;
         });
     }
+
 }
 

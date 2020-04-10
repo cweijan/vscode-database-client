@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
-import {ModelType} from "../../../common/Constants";
-import {DatabaseCache} from "../../../database/DatabaseCache";
-import {INode} from "../../../model/INode";
-import {TableNode} from "../../../model/table/tableNode";
-import {ComplectionChain, ComplectionContext} from "../complectionContext";
+import { ModelType } from "../../../common/Constants";
+import { DatabaseCache } from "../../../database/DatabaseCache";
+import { INode } from "../../../model/INode";
+import { TableNode } from "../../../model/table/tableNode";
+import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 function wrap(origin: string): string {
     if (origin != null && origin.match(/\b(-)\b/ig)) {
@@ -13,9 +13,16 @@ function wrap(origin: string): string {
 }
 
 export class TableChain implements ComplectionChain {
+
     public getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] {
         if (complectionContext.preChart == ".") {
-            return this.generateTableComplectionItem(complectionContext.preWord);
+            const temp = this.generateTableComplectionItem(complectionContext.preWord);
+            if (temp.length == 0) {
+                return null;
+            } else {
+                return this.generateTableComplectionItem(complectionContext.preWord);
+            }
+
         }
         if (complectionContext.preWord && complectionContext.preWord.match(/\b(into|from|update|table|join)\b/ig)) {
             return this.generateTableComplectionItem();
