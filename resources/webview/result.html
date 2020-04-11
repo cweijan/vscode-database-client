@@ -104,7 +104,7 @@
                 :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
                 border @cell-click="celledit">
                 <!-- tool bar -->
-                <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey">
+                <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey" align="center">
                     <template slot-scope="scope">
                         <div v-if="scope.row.isFilter" style="text-align: center;">
                             <el-button @click="resetFilter" type="warning" size="small" icon="el-icon-refresh" circle>
