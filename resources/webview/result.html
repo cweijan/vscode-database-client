@@ -58,15 +58,22 @@
             height: 100px;   
             background-color: #ccc;  */
         }
+
+        .el-table .edit-row{
+            background: oldlace;
+        }
+
     </style>
 </head>
 
 <body>
     <div id="app">
         <div class="hint">
+            <!-- sql input -->
             <el-row style="margin-bottom: 10px;">
                 <el-input type="textarea" autosize v-model="toolbar.sql" style="width: 600px;"></el-input>
             </el-row>
+            <!-- tool panel -->
             <el-row>
                 <el-cow>
                     <el-button type="info" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest"
@@ -84,13 +91,16 @@
                     <span v-if="result.table">, Row: {{result.data.length}}, Col: {{columnCount}}</span>
                 </el-cow>
             </el-row>
+            <!-- info panel -->
+            <div v-if="info.visible ">
+                <div v-if="info.error" class="info-panel" style="color:red" v-html="info.message"></div>
+                <div v-if="!info.error" class="info-panel" style="color: green;" v-html="info.message"></div>
+            </div>
         </div>
-        <div v-if="info.visible ">
-            <div v-if="info.error" class="info-panel" style="color:red" v-html="info.message"></div>
-            <div v-if="!info.error" class="info-panel" style="color: green;" v-html="info.message"></div>
-        </div>
+        <!-- talbe result -->
         <div :style="'width:' + table.width + 'px;overflow:scroll'" v-if="result.data">
             <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort"
+                :row-class-name="tableRowClassName"
                 :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
                 border @cell-click="celledit">
                 <!-- tool bar -->
@@ -110,16 +120,18 @@
                         </div>
                     </template>
                 </el-table-column>
-                <!-- table view -->
+                <!-- table view with table column -->
                 <el-table-column :label="column.name" v-for="column in result.columnList" :key="column.name"
-                    align="center" sortable v-if="result.columnList" :width="computeWidth(column.name,0,toolbar.filter[column.name])">
+                    align="center" sortable v-if="result.columnList"
+                    :width="computeWidth(column.name,0,toolbar.filter[column.name])">
                     <template slot-scope="scope">
                         <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[column.name]"
-                            @blur="filter($event,column.name)" v-on:keyup.enter.native="filter($event,column.name)" ></el-input>
+                            @blur="filter($event,column.name)" v-on:keyup.enter.native="filter($event,column.name)">
+                        </el-input>
                         <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[column.name])'></span>
                     </template>
                 </el-table-column>
-                <!-- sql view -->
+                <!-- table view without tale column -->
                 <el-table-column :label="key" v-for="(value,key) in result.data[0]" :key="key" align="center"
                     v-if="!result.columnList" :width="computeWidth(key,0,toolbar.filter[column.name])">
                     <template slot-scope="scope">
@@ -198,7 +210,7 @@
         },
         methods: {
             filter(event, column) {
-                
+
                 let inputvalue = "" + event.target.value
 
                 let filterSql = this.result.sql.replace(/\n/, " ").replace(";", " ") + " "
@@ -316,6 +328,13 @@
                     this.$message({ type: 'info', message: 'Update canceled' });
                 });
             },
+            tableRowClassName({ row, rowIndex }) {
+                if (!this.result.primaryKey || !this.update.primary) return ''
+                if (row[this.result.primaryKey]==this.update.primary){
+                    return 'edit-row';
+                }
+                return '';
+            },
             updateWidth() {
                 let width = 0;
                 for (const key in this.table.widthItem) {
@@ -327,11 +346,11 @@
                 this.table.width = width + 60;
 
             },
-            computeWidth(key, index,value) {
+            computeWidth(key, index, value) {
                 if (this.table.widthItem[key]) return this.table.widthItem[key];
                 if (!index) index = 0
                 if (!this.result.data[index] || index > 10) return 60;
-                if(!value){
+                if (!value) {
                     value = this.result.data[index][key];
                 }
                 var dynamic = value ? ((value + "").length) * 10 : ((key + "").length) * 10;
@@ -362,7 +381,7 @@
                 if (!sql) return;
                 vscode.postMessage({
                     type: 'execute',
-                    sql: sql.replace(/ +/ig," ")
+                    sql: sql.replace(/ +/ig, " ")
                 });
                 this.table.loading = true;
             },
@@ -400,7 +419,7 @@
                 if (this.update.primary == null) {
                     return 'Insert To ' + this.result.table
                 }
-                return 'Edit ' + this.result.table + ' : ' + this.result.primaryKey + '=' + this.update.primary
+                return 'Edit For ' + this.result.table + ' : ' + this.result.primaryKey + '=' + this.update.primary
             },
         }
     })
@@ -466,9 +485,9 @@
         }
     });
     vscode.postMessage({ type: 'init' })
-    setInterval(()=>{
+    setInterval(() => {
         // vue.updateWidth()
-    },100)
+    }, 100)
 </script>
 
 </html>
