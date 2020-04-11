@@ -2,7 +2,7 @@
 
 [![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) 
 
-MySQL Click For Visual Studio Code
+MySQL Client For Visual Studio Code
 
 
 > This plugin inspired for [MySQL](https://github.com/formulahendry/vscode-mysql)
@@ -11,30 +11,30 @@ MySQL Click For Visual Studio Code
 
 ## Features
 
-* Manage MySQL Connections 
-* List MySQL User、Database、Table、Procedure、Trigger、Function
-* Sql Assistant ( Syntax, Formatter, Complection )
-* Run MySQL Query
+* [Connect To MySQL Server](#Connection)
+* Overview User、Database、Table、Procedure、Trigger、Function
+* [Sql Assistant ( Syntax, Formatter, Complection )](#exeucte-sql)
+* [Run MySQL Query](#exeucte-sql)
 * CRUD Table Data
-* Backup/Import Sql
+* [Backup/Import](#Backup/Import) Data to Sql
 
 ## Connection
 
-* Click "MYSQL" in Explorer, then click the `+` button.
+* Click MYSQL Panel, then click the `+` button.
 
 ![connection](images/connection.jpg)
 
 ## View Table
 
-* Click table to open query page and load data
+* Click Table To Open Query page and Load data
 ![query](images/QueryTable.jpg)
 
 ## Exeucte Sql
 
+![newquery](images/newquery.jpg)
 * In MySQL Pannel, Click `New Query` button.
 * This will change active database.
-![newquery](images/newquery.jpg)
-
+* Now you can enjoy intelli sql code in editor.
 * Click run button Or press `F9` 
 ![run](images/run.jpg)
 

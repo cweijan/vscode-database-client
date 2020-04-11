@@ -1,7 +1,7 @@
 {
-	"name": "vscode-mysql-manager",
+	"name": "vscode-mysql-client",
 	"displayName": "MySQL",
-	"description": "MySQL management tool",
+	"description": "MySQL Client",
 	"version": "1.7.1",
 	"publisher": "cweijan",
 	"icon": "logo.png",
