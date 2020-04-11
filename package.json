@@ -1,8 +1,8 @@
 {
 	"name": "vscode-mysql-client",
-	"displayName": "MySQL Client",
-	"description": "MySQL client for vscode, provide the most convenient operation for mysql manager",
-	"version": "1.7.11",
+	"displayName": "MySQL",
+	"description": "MySQL Client for vscode",
+	"version": "1.7.14",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
