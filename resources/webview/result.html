@@ -24,6 +24,7 @@
             text-overflow: unset !important;
             white-space: nowrap !important;
             user-select: text !important;
+            padding: 1px !important;
         }
 
         .info-panel {
@@ -96,13 +97,14 @@
                 <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey">
                     <template slot-scope="scope">
                         <div v-if="scope.row.isFilter" style="text-align: center;">
-                            Filter
+                            <el-button @click="resetFilter" type="warning" size="small" icon="el-icon-refresh" circle>
+                            </el-button>
                         </div>
                         <div v-if="scope.row[result.primaryKey]">
                             <el-button @click="openEdit(scope.row)" type="primary" size="small" icon="el-icon-edit"
                                 circle>
                             </el-button>
-                            <el-button @click="deleteConfirm(scope.row[result.primaryKey])" type="danger" size="small"
+                            <el-button @click="deleteConfirm(scope.row[result.primaryKey])" type="primary" size="small"
                                 icon="el-icon-delete" circle>
                             </el-button>
                         </div>
@@ -110,16 +112,16 @@
                 </el-table-column>
                 <!-- table view -->
                 <el-table-column :label="column.name" v-for="column in result.columnList" :key="column.name"
-                    align="center" sortable v-if="result.columnList" :width="computeWidth(column.name)">
+                    align="center" sortable v-if="result.columnList" :width="computeWidth(column.name,0,toolbar.filter[column.name])">
                     <template slot-scope="scope">
                         <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[column.name]"
-                            @blur="filter($event,column.name)"></el-input>
+                            @blur="filter($event,column.name)" v-on:keyup.enter.native="filter($event,column.name)" ></el-input>
                         <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[column.name])'></span>
                     </template>
                 </el-table-column>
                 <!-- sql view -->
                 <el-table-column :label="key" v-for="(value,key) in result.data[0]" :key="key" align="center"
-                    v-if="!result.columnList" :width="computeWidth(key)">
+                    v-if="!result.columnList" :width="computeWidth(key,0,toolbar.filter[column.name])">
                     <template slot-scope="scope">
                         <span v-html='dataformat(scope.row[key])'></span>
                     </template>
@@ -196,7 +198,7 @@
         },
         methods: {
             filter(event, column) {
-
+                
                 let inputvalue = "" + event.target.value
 
                 let filterSql = this.result.sql.replace(/\n/, " ").replace(";", " ") + " "
@@ -226,6 +228,11 @@
                 }
 
                 this.execute(filterSql + ";")
+            },
+            resetFilter() {
+                this.execute(
+                    this.result.sql.replace(/where.+?\b(order|limit|group)\b/ig, "$1")
+                )
             },
             sort(row) {
                 let order = row.order == 'ascending' ? "asc" : "desc"
@@ -320,11 +327,13 @@
                 this.table.width = width + 60;
 
             },
-            computeWidth(key, index) {
+            computeWidth(key, index,value) {
                 if (this.table.widthItem[key]) return this.table.widthItem[key];
                 if (!index) index = 0
                 if (!this.result.data[index] || index > 10) return 60;
-                var value = this.result.data[index][key];
+                if(!value){
+                    value = this.result.data[index][key];
+                }
                 var dynamic = value ? ((value + "").length) * 10 : ((key + "").length) * 10;
                 if (dynamic > 600) dynamic = 600;
                 if (dynamic < 60) dynamic = 60;
@@ -353,7 +362,7 @@
                 if (!sql) return;
                 vscode.postMessage({
                     type: 'execute',
-                    sql: sql
+                    sql: sql.replace(/ +/ig," ")
                 });
                 this.table.loading = true;
             },
@@ -457,6 +466,9 @@
         }
     });
     vscode.postMessage({ type: 'init' })
+    setInterval(()=>{
+        // vue.updateWidth()
+    },100)
 </script>
 
 </html>
