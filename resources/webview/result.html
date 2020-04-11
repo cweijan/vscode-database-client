@@ -133,7 +133,7 @@
                 </el-table-column>
                 <!-- table view without tale column -->
                 <el-table-column :label="key" v-for="(value,key) in result.data[0]" :key="key" align="center"
-                    v-if="!result.columnList" :width="computeWidth(key,0,toolbar.filter[column.name])">
+                    v-if="!result.columnList" :width="computeWidth(key,0,toolbar.filter[key])">
                     <template slot-scope="scope">
                         <span v-html='dataformat(scope.row[key])'></span>
                     </template>
