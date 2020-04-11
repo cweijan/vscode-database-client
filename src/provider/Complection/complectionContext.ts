@@ -25,7 +25,7 @@ export class ComplectionContext {
         const prePostion = position.character === 0 ? position : new vscode.Position(position.line, position.character - 1);
         const preChart = position.character === 0 ? null : document.getText(new vscode.Range(prePostion, position));
 
-        const wordMatch = currentSql.match(/(\w|-|\_)+/g);
+        const wordMatch = currentSql.match(/(\w|-|\_|\*)+/g);
         if (wordMatch) {
             if ((preChart == null || preChart == " " || preChart == ".") && wordMatch.length >= 1) {
                 context.preWord = wordMatch[wordMatch.length - 1]
