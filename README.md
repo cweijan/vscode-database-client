@@ -1,6 +1,6 @@
-# MySQL
+# MySQL Client
 
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-manager.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-manager) 
+[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-client.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client) 
 
 MySQL Client For Visual Studio Code
 
@@ -31,11 +31,11 @@ MySQL Client For Visual Studio Code
 
 ## Exeucte Sql
 
-![newquery](images/newquery.jpg)
 * In MySQL Pannel, Click `New Query` button.
+![newquery](images/newquery.jpg)
 * This will change active database.
-* Now you can enjoy intelli sql code in editor.
-* Click run button Or press `F9` 
+* Now Tou can enjoy Intelli SQL code in Editor.
+* Click Run Button or Press `F9` to Execute.
 ![run](images/run.jpg)
 
 
