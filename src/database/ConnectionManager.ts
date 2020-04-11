@@ -48,9 +48,9 @@ export class ConnectionManager {
                 this.activeConnection[key] = this.createConnection(connectionOptions);
                 this.activeConnection[key].connect((err: Error) => {
                     if (!err) {
-                        resolve(this.activeConnection);
+                        resolve(this.activeConnection[key]);
                     } else {
-                        this.activeConnection = undefined
+                        this.activeConnection = {}
                         Console.log(`${err.stack}\n${err.message}`)
                         reject(err.message);
                     }

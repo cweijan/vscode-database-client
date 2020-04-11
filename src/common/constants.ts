@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 
 export class Constants {
-    public static RES_PATH = path.join(vscode.extensions.getExtension('cweijan.vscode-mysql-manager').extensionPath, "resources");
+    public static RES_PATH = path.join(vscode.extensions.getExtension('cweijan.vscode-mysql-client').extensionPath, "resources");
     public static DEFAULT_SIZE = 100;
 }
 

@@ -73,6 +73,7 @@ export class QueryPage {
     private static async loadTableInfo(queryParam: QueryParam<DataResponse>) {
         let conn = queryParam.connection
         let info = this.getTable(queryParam.res.sql)
+        if (!info) return;
         const tableName = info.table
         const database = info.database
         if (tableName == null || conn == null) return;
