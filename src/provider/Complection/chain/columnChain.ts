@@ -9,7 +9,7 @@ export class ColumnChain implements ComplectionChain {
 
         if (complectionContext.preChart === ".") {
             let subComplectionItems = await this.generateColumnComplectionItem(complectionContext.preWord);
-            const tableReg = new RegExp("\\b(from|join)\\b\\s*`{0,1}(\\w|\.|-)+`{0,1}(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
+            const tableReg = new RegExp("\\b(from|join)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
             let result = tableReg.exec(complectionContext.currentSqlFull);
             for (; result != null && subComplectionItems.length === 0;) {
                 subComplectionItems = await this.generateColumnComplectionItem(
@@ -30,15 +30,15 @@ export class ColumnChain implements ComplectionChain {
         return true;
     }
 
-    private async generateColumnComplectionItem(inputWord: string): Promise<vscode.CompletionItem[]> {
+    private async generateColumnComplectionItem(tableName: string): Promise<vscode.CompletionItem[]> {
 
-        if (!inputWord) {
+        if (!tableName) {
             return [];
         }
         let columnNodes: ColumnNode[] = [];
 
         for (const tableNode of DatabaseCache.getTableNodeList()) {
-            if (tableNode.table === inputWord) {
+            if (tableNode.table === tableName) {
                 columnNodes = (await tableNode.getChildren()) as ColumnNode[];
                 break;
             }
