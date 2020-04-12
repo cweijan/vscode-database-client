@@ -7,16 +7,16 @@ export class Util {
      * @param origin origin array
      * @param attr duplicate check attribute
      */
-    static trim<T>(origin: T[], attr: string): T[] {
-        let seen = new Set();
-        return origin.filter(item => {
-            let temp = item[attr];
+    public static trim<T>(origin: T[], attr: string): T[] {
+        const seen = new Set();
+        return origin.filter((item) => {
+            const temp = item[attr];
             return seen.has(temp) ? false : seen.add(temp);
         });
     }
 
-    static getDocumentLastPosition(document: TextDocument): Position {
-        let lastLine = document.lineCount - 1;
+    public static getDocumentLastPosition(document: TextDocument): Position {
+        const lastLine = document.lineCount - 1;
         return new Position(lastLine, document.lineAt(lastLine).text.length);
     }
 

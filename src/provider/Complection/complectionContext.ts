@@ -19,7 +19,7 @@ export class ComplectionContext {
 
         const context = new ComplectionContext();
         const currentSql = QueryUnit.obtainCursorSql(document, position).trim();
-        if (!currentSql) return context;
+        if (!currentSql) { return context; }
         context.currentSqlFull = QueryUnit.obtainCursorSql(document, position, document.getText()).trim();
 
         const prePostion = position.character === 0 ? position : new vscode.Position(position.line, position.character - 1);
@@ -28,14 +28,15 @@ export class ComplectionContext {
         const wordMatch = currentSql.match(/(\w|-|\_|\*)+/g);
         if (wordMatch) {
             if ((preChart == null || preChart == " " || preChart == ".") && wordMatch.length >= 1) {
-                context.preWord = wordMatch[wordMatch.length - 1]
+                context.preWord = wordMatch[wordMatch.length - 1];
             } else {
-                context.preWord = wordMatch[wordMatch.length - 2]
+                context.preWord = wordMatch[wordMatch.length - 2];
             }
         }
-        const codeMatch = currentSql.match(/(\w|=|<|>|\()+$/)
-        if (codeMatch)
-            context.currentWord = codeMatch[0]
+        const codeMatch = currentSql.match(/(\w|=|<|>|\()+$/);
+        if (codeMatch) {
+            context.currentWord = codeMatch[0];
+        }
 
         context.preChart = preChart;
         context.currentSql = currentSql.trim();

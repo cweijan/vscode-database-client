@@ -7,12 +7,12 @@ import { ConnectionManager } from "../../database/ConnectionManager";
 import { QueryUnit } from "../../database/QueryUnit";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 
-export class ViewNode extends TableNode{
-    type:string=ModelType.VIEW;
+export class ViewNode extends TableNode {
+    public type: string = ModelType.VIEW;
 
     public getTreeItem(): vscode.TreeItem {
 
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`
+        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`;
         return {
             label: this.table,
             collapsibleState: DatabaseCache.getElementState(this),
@@ -21,25 +21,25 @@ export class ViewNode extends TableNode{
             command: {
                 command: "mysql.template.sql",
                 title: "Run Select Statement",
-                arguments: [this, true]
-            }
+                arguments: [this, true],
+            },
         };
     }
 
     public drop() {
 
-        vscode.window.showInputBox({ prompt: `Are you want to drop view ${this.table} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
-            if(!inputContent)return;
+        vscode.window.showInputBox({ prompt: `Are you want to drop view ${this.table} ?     `, placeHolder: 'Input y to confirm.' }).then(async (inputContent) => {
+            if (!inputContent) { return; }
             if (inputContent.toLocaleLowerCase() == 'y') {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP view \`${this.database}\`.\`${this.table}\``).then(() => {
-                    DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`)
-                    MySQLTreeDataProvider.refresh()
-                    vscode.window.showInformationMessage(`Drop view ${this.table} success!`)
-                })
+                    DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`);
+                    MySQLTreeDataProvider.refresh();
+                    vscode.window.showInformationMessage(`Drop view ${this.table} success!`);
+                });
             } else {
-                vscode.window.showInformationMessage(`Cancel drop view ${this.table}!`)
+                vscode.window.showInformationMessage(`Cancel drop view ${this.table}!`);
             }
-        })
+        });
 
     }
 

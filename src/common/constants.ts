@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 
 export class Constants {
+    public static CONFIG_PREFIX="vscode-mysql"
     public static RES_PATH = path.join(vscode.extensions.getExtension('cweijan.vscode-mysql-client').extensionPath, "resources");
     public static DEFAULT_SIZE = 100;
 }
@@ -9,12 +10,16 @@ export class Constants {
 export class CacheKey {
     public static ConectionsKey = "mysql.connections";
     public static CollapseSate = "mysql.database.cache.collapseState";
+}
+
+export enum ConfigKey {
+    MAX_TABLE_COUNT = "maxTableCount",
 
 }
 
 export class CommandKey {
-    static RecordHistory = "mysql.history.record"
-    static Refresh = "mysql.refresh"
+    static RecordHistory = "mysql.history.record";
+    static Refresh = "mysql.refresh";
 }
 
 export class Cursor {
@@ -25,12 +30,12 @@ export class Cursor {
 }
 
 export class ModelType {
-    public static CONNECTION = "connection"
-    public static DATABASE = "database"
-    public static USER_GROUP = "userGroup"
-    public static USER = "user"
-    public static TABLE = "table"
-    public static COLUMN = "column"
+    public static CONNECTION = "connection";
+    public static DATABASE = "database";
+    public static USER_GROUP = "userGroup";
+    public static USER = "user";
+    public static TABLE = "table";
+    public static COLUMN = "column";
     public static INFO = "info";
     public static TABLE_GROUP = "tableGroup";
     public static VIEW = "view";

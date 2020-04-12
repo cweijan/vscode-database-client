@@ -11,17 +11,17 @@ export class TableDetecherChain implements ComplectionChain {
             ||
             (complectionContext.currentWord && complectionContext.currentWord.match(/(<|>|,|=)$/))
         ) {
-            let completionItem = []
-            let result = tableMatch.exec(complectionContext.currentSqlFull)
+            const completionItem = [];
+            let result = tableMatch.exec(complectionContext.currentSqlFull);
             while (result != null) {
                 const alias = result[5];
                 if (alias) {
-                    completionItem.push(new vscode.CompletionItem(alias, vscode.CompletionItemKind.Interface))
+                    completionItem.push(new vscode.CompletionItem(alias, vscode.CompletionItemKind.Interface));
                 } else {
-                    const tableName = result[2].replace(/\w*?\./, "")
-                    completionItem.push(new vscode.CompletionItem(tableName, vscode.CompletionItemKind.Interface))
+                    const tableName = result[2].replace(/\w*?\./, "");
+                    completionItem.push(new vscode.CompletionItem(tableName, vscode.CompletionItemKind.Interface));
                 }
-                result = tableMatch.exec(complectionContext.currentSqlFull)
+                result = tableMatch.exec(complectionContext.currentSqlFull);
             }
 
             return completionItem;

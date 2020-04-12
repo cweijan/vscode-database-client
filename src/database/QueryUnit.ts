@@ -1,28 +1,25 @@
 "use strict";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { CommandKey, Cursor, MessageType } from "../common/Constants";
+import { CommandKey, Cursor, MessageType, ConfigKey } from "../common/Constants";
 import { Console } from "../common/OutputChannel";
 import { Util } from "../common/util";
 import { IConnection } from "../model/Connection";
 import { QueryPage } from "../view/result/query";
 import { ConnectionManager } from "./ConnectionManager";
 import { ErrorResponse, DataResponse, RunResponse, DMLResponse } from "../view/result/queryResponse";
+import { Global } from "../common/Global";
 
 export class QueryUnit {
 
-    public static readonly maxTableCount = QueryUnit.getConfiguration().get<number>("maxTableCount");
-
-    public static getConfiguration(): vscode.WorkspaceConfiguration {
-        return vscode.workspace.getConfiguration("vscode-mysql");
-    }
+    public static readonly maxTableCount = Global.getConfig<number>(ConfigKey.MAX_TABLE_COUNT);
 
     public static queryPromise<T>(connection, sql: string): Promise<T> {
         return new Promise((resolve, reject) => {
             // Console.log(`Execute SQL:${sql}`)
             connection.query(sql, (err, rows) => {
                 if (err) {
-                    Console.log(err)
+                    Console.log(err);
                     reject("Error: " + err.message);
                 } else {
                     resolve(rows);
@@ -44,12 +41,12 @@ export class QueryUnit {
                 vscode.window.showWarningMessage("No MySQL Server or Database selected");
                 return;
             } else {
-                connectionOptions = ConnectionManager.getLastConnectionOption()
+                connectionOptions = ConnectionManager.getLastConnectionOption();
             }
 
         } else if (connectionOptions) {
             connectionOptions.multipleStatements = true;
-            connection = await ConnectionManager.getConnection(connectionOptions)
+            connection = await ConnectionManager.getConnection(connectionOptions);
         }
 
         let fromEditor = false;
@@ -64,26 +61,27 @@ export class QueryUnit {
             }
         }
         sql = sql.replace(/--.+/ig, '').trim();
-        const executeTime = new Date().getTime()
-        const isDDL = sql.match(this.ddlPattern)
-        const isDML = sql.match(this.dmlPattern)
+        const executeTime = new Date().getTime();
+        const isDDL = sql.match(this.ddlPattern);
+        const isDML = sql.match(this.dmlPattern);
         if (isDDL == null && isDML == null) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
         connection.query(sql, (err, data) => {
             if (err) {
-                QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse })
+                QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
                 return;
             }
-            var costTime = new Date().getTime() - executeTime
-            if (fromEditor)
-                vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime)
+            const costTime = new Date().getTime() - executeTime;
+            if (fromEditor) {
+                vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime);
+            }
             if (isDDL) {
-                vscode.commands.executeCommand(CommandKey.Refresh)
+                vscode.commands.executeCommand(CommandKey.Refresh);
                 return;
             }
             if (isDML) {
-                QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse })
+                QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
                 return;
             }
             if (Array.isArray(data)) {
@@ -94,24 +92,24 @@ export class QueryUnit {
     }
 
 
-    private static batchPattern = /\s+(TRIGGER|PROCEDURE|FUNCTION)\s+/ig
-    static obtainSql(activeTextEditor: vscode.TextEditor): string {
+    private static batchPattern = /\s+(TRIGGER|PROCEDURE|FUNCTION)\s+/ig;
+    public static obtainSql(activeTextEditor: vscode.TextEditor): string {
 
-        var content = activeTextEditor.document.getText()
-        if (content.match(this.batchPattern)) return content;
+        const content = activeTextEditor.document.getText();
+        if (content.match(this.batchPattern)) { return content; }
 
-        return this.obtainCursorSql(activeTextEditor.document, activeTextEditor.selection.active,content)
+        return this.obtainCursorSql(activeTextEditor.document, activeTextEditor.selection.active, content);
 
     }
 
-    static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string) {
-        if (!content) content = document.getText(new vscode.Range(new vscode.Position(0,0),current))
-        var sqlList = content.split(";");
-        var doc_cursor = document.getText(Cursor.getRangeStartTo(current)).length;
-        var index = 0;
-        for (let sql of sqlList) {
-            index += (sql.length + 1)
-            if (doc_cursor < index) {
+    public static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string) {
+        if (!content) { content = document.getText(new vscode.Range(new vscode.Position(0, 0), current)); }
+        const sqlList = content.split(";");
+        const docCursor = document.getText(Cursor.getRangeStartTo(current)).length;
+        let index = 0;
+        for (const sql of sqlList) {
+            index += (sql.length + 1);
+            if (docCursor < index) {
                 return sql.trim();
             }
         }
@@ -131,45 +129,46 @@ export class QueryUnit {
         if (this.sqlDocument && !this.sqlDocument.document.isClosed && !this.sqlDocument['_disposed'] && this.sqlDocument.document.isUntitled) {
             this.sqlDocument.edit((editBuilder) => {
                 editBuilder.replace(Cursor.getRangeStartTo(Util.getDocumentLastPosition(this.sqlDocument.document)), sql);
-            })
+            });
         } else {
             const textDocument = await vscode.workspace.openTextDocument({ content: sql, language: "sql" });
-            this.sqlDocument = await vscode.window.showTextDocument(textDocument)
+            this.sqlDocument = await vscode.window.showTextDocument(textDocument);
         }
         return this.sqlDocument;
     }
 
-    static runFile(connection: any, fsPath: string) {
-        var stats = fs.statSync(fsPath)
-        var startTime = new Date()
-        var fileSize = stats["size"]
+    public static runFile(connection: any, fsPath: string) {
+        const stats = fs.statSync(fsPath);
+        const startTime = new Date();
+        const fileSize = stats["size"];
         let success = true;
         if (fileSize > 1024 * 1024 * 100) {
-            success = this.executeByLine(connection, fsPath)
+            success = this.executeByLine(connection, fsPath);
         } else {
-            var fileContent = fs.readFileSync(fsPath, 'utf8')
+            const fileContent = fs.readFileSync(fsPath, 'utf8');
             connection.query(fileContent, (err, data) => {
                 if (err) {
-                    Console.log(err)
+                    Console.log(err);
                     success = false;
                 }
-            })
+            });
         }
-        if (success)
-            Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`)
+        if (success) {
+            Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
+        }
 
     }
 
     private static executeByLine(connection: any, fsPath: string) {
-        var readline = require('readline');
-        var rl = readline.createInterface({
+        const readline = require('readline');
+        const rl = readline.createInterface({
             input: fs.createReadStream(fsPath.replace("\\", "/")),
-            terminal: false
+            terminal: false,
         });
         rl.on('line', (chunk) => {
-            let sql = chunk.toString('utf8');
+            const sql = chunk.toString('utf8');
             connection.query(sql, (err, sets, fields) => {
-                if (err) Console.log(`execute sql ${sql} fail,${err}`)
+                if (err) { Console.log(`execute sql ${sql} fail,${err}`); }
             });
         });
         return true;

@@ -5,24 +5,24 @@ export class HistoryManager {
     constructor(private context: vscode.ExtensionContext) {
     }
 
-    showHistory() {
-        var historyPath = this.context['globalStoragePath'] + '/history.sql'
-        var openPath = vscode.Uri.file(historyPath);
-        vscode.workspace.openTextDocument(openPath).then(doc => {
+    public showHistory() {
+        const historyPath = this.context['globalStoragePath'] + '/history.sql';
+        const openPath = vscode.Uri.file(historyPath);
+        vscode.workspace.openTextDocument(openPath).then((doc) => {
             vscode.window.showTextDocument(doc);
         });
     }
 
-    recordHistory(sql: string, costTime: number) {
-        if (!sql) return;
+    public recordHistory(sql: string, costTime: number) {
+        if (!sql) { return; }
         return new Promise(() => {
-            var gsPath = this.context['globalStoragePath']
+            const gsPath = this.context['globalStoragePath'];
             if (!fs.existsSync(gsPath)) {
-                fs.mkdirSync(gsPath)
+                fs.mkdirSync(gsPath);
             }
-            fs.appendFileSync(gsPath + '/history.sql', `/* ${this.getNowDate()} [${costTime} ms] */ ${sql.replace(/[\r\n]/g," ")}\n`, { encoding: 'utf8' });
+            fs.appendFileSync(gsPath + '/history.sql', `/* ${this.getNowDate()} [${costTime} ms] */ ${sql.replace(/[\r\n]/g, " ")}\n`, { encoding: 'utf8' });
 
-        })
+        });
     }
 
     private getNowDate(): string {
@@ -42,7 +42,7 @@ export class HistoryManager {
             + this.pad(date.getHours(), 2) + ":" + this.pad(date.getMinutes(), 2) + ":" + this.pad(date.getSeconds(), 2);
     }
 
-    pad(n: any, width: number, z?: any): number {
+    public pad(n: any, width: number, z?: any): number {
         z = z || '0';
         n = n + '';
         return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;

@@ -15,7 +15,7 @@
         ],
         "max-line-length": [
             true,
-            200
+            500
         ],
         "no-empty": false,
         "object-literal-sort-keys": false,
@@ -31,7 +31,7 @@
         "one-variable-per-declaration": false,
         "indent": false,
         "no-conditional-assignment": false,
-        "max-classes-per-file":false
-
+        "max-classes-per-file": false,
+        "align": false
     }
 }

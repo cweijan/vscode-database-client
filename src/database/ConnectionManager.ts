@@ -8,10 +8,10 @@ import { QueryUnit } from "./QueryUnit";
 export class ConnectionManager {
 
     private static lastConnectionOption: IConnection;
-    private static activeConnection={};
+    private static activeConnection= {};
 
     public static getLastConnectionOption() {
-        return this.lastConnectionOption
+        return this.lastConnectionOption;
     }
 
     public static getLastActiveConnection() {
@@ -21,28 +21,28 @@ export class ConnectionManager {
         }
 
 
-        return this.getConnection(Object.assign({ multipleStatements: true }, this.lastConnectionOption))
+        return this.getConnection(Object.assign({ multipleStatements: true }, this.lastConnectionOption));
 
     }
 
-    public static getConnection(connectionOptions: IConnection, changeActive: Boolean = false): Promise<any> {
+    public static getConnection(connectionOptions: IConnection, changeActive: boolean = false): Promise<any> {
 
-        connectionOptions.multipleStatements = true
-        this.lastConnectionOption = connectionOptions
-        if (changeActive) Global.updateStatusBarItems(connectionOptions);
-        const key = `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}_${connectionOptions.password}`
+        connectionOptions.multipleStatements = true;
+        this.lastConnectionOption = connectionOptions;
+        if (changeActive) { Global.updateStatusBarItems(connectionOptions); }
+        const key = `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}_${connectionOptions.password}`;
 
         return new Promise((resolve, reject) => {
-            let connection = this.activeConnection[key]
+            const connection = this.activeConnection[key];
             if (connection && connection.state == 'authenticated') {
                 if (connectionOptions.database) {
                     QueryUnit.queryPromise(connection, `use \`${connectionOptions.database}\``).then(() => {
-                        resolve(connection)
-                    }).catch(error => {
-                        reject(error)
-                    })
+                        resolve(connection);
+                    }).catch((error) => {
+                        reject(error);
+                    });
                 } else {
-                    resolve(connection)
+                    resolve(connection);
                 }
             } else {
                 this.activeConnection[key] = this.createConnection(connectionOptions);
@@ -50,8 +50,8 @@ export class ConnectionManager {
                     if (!err) {
                         resolve(this.activeConnection[key]);
                     } else {
-                        this.activeConnection = {}
-                        Console.log(`${err.stack}\n${err.message}`)
+                        this.activeConnection = {};
+                        Console.log(`${err.stack}\n${err.message}`);
                         reject(err.message);
                     }
                 });

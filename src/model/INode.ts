@@ -2,9 +2,9 @@ import * as vscode from "vscode";
 
 export interface INode {
     /** identify node type in extension package.json */
-    type: string
+    type: string;
     /** identify node type in extension source */
-    identify: string
+    identify: string;
 
     getTreeItem(): Promise<vscode.TreeItem> | vscode.TreeItem;
 

@@ -18,8 +18,8 @@ import { ViewGroup } from "../table/viewGroup";
 
 export class DatabaseNode implements INode, IConnection {
 
-    identify: string;
-    type: string = ModelType.DATABASE;
+    public identify: string;
+    public type: string = ModelType.DATABASE;
     constructor(readonly host: string, readonly user: string,
         readonly password: string, readonly port: string, readonly database: string,
         readonly certPath: string) {
@@ -27,13 +27,13 @@ export class DatabaseNode implements INode, IConnection {
 
     public getTreeItem(): vscode.TreeItem {
 
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}`
+        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}`;
         return {
             label: this.database,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.DATABASE,
-            iconPath: path.join(Constants.RES_PATH, "database.svg")
-        }
+            iconPath: path.join(Constants.RES_PATH, "database.svg"),
+        };
 
     }
 
@@ -43,67 +43,67 @@ export class DatabaseNode implements INode, IConnection {
         new ViewGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
         new ProcedureGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
         new FunctionGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
-        new TriggerGroup(this.host, this.user, this.password, this.port, this.database, this.certPath)]
+        new TriggerGroup(this.host, this.user, this.password, this.port, this.database, this.certPath)];
     }
 
-    importData(fsPath: string) {
-        Console.log(`Doing import ${this.host}:${this.port}_${this.database}...`)
-        ConnectionManager.getConnection(this).then(connection => {
-            QueryUnit.runFile(connection,fsPath)
-        })
+    public importData(fsPath: string) {
+        Console.log(`Doing import ${this.host}:${this.port}_${this.database}...`);
+        ConnectionManager.getConnection(this).then((connection) => {
+            QueryUnit.runFile(connection, fsPath);
+        });
     }
 
     public backupData(exportPath: string) {
 
-        Console.log(`Doing backup ${this.host}_${this.database}...`)
+        Console.log(`Doing backup ${this.host}_${this.database}...`);
         mysqldump({
             connection: {
                 host: this.host,
                 user: this.user,
                 password: this.password,
                 database: this.database,
-                port: parseInt(this.port)
+                port: parseInt(this.port),
             },
             dump: {
                 schema: {
                     table: {
                         ifNotExist: false,
                         dropIfExist: true,
-                        charset: false
+                        charset: false,
                     },
-                    engine: false
-                }
+                    engine: false,
+                },
             },
-            dumpToFile: `${exportPath}\\${this.database}_${this.host}.sql`
+            dumpToFile: `${exportPath}\\${this.database}_${this.host}.sql`,
         }).then(() => {
-            vscode.window.showInformationMessage(`Backup ${this.host}_${this.database} success!`)
+            vscode.window.showInformationMessage(`Backup ${this.host}_${this.database} success!`);
         }).catch((err) => {
-            vscode.window.showErrorMessage(`Backup ${this.host}_${this.database} fail!\n${err}`)
-        })
-        Console.log("backup end.")
+            vscode.window.showErrorMessage(`Backup ${this.host}_${this.database} fail!\n${err}`);
+        });
+        Console.log("backup end.");
 
     }
 
-    deleteDatatabase() {
-        vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
-            if(!inputContent)return;
+    public deleteDatatabase() {
+        vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input y to confirm.' }).then(async (inputContent) => {
+            if (!inputContent) { return; }
             if (inputContent.toLocaleLowerCase() == 'y') {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE \`${this.database}\``).then(() => {
-                    DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`)
-                    MySQLTreeDataProvider.refresh()
-                    vscode.window.showInformationMessage(`Delete database ${this.database} success!`)
-                })
+                    DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`);
+                    MySQLTreeDataProvider.refresh();
+                    vscode.window.showInformationMessage(`Delete database ${this.database} success!`);
+                });
             } else {
-                vscode.window.showInformationMessage(`Cancel delete database ${this.database}!`)
+                vscode.window.showInformationMessage(`Cancel delete database ${this.database}!`);
             }
-        })
+        });
     }
 
 
     public async newQuery() {
 
         QueryUnit.createSQLTextDocument();
-        ConnectionManager.getConnection(this, true)
+        ConnectionManager.getConnection(this, true);
 
     }
 }

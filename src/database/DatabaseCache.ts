@@ -13,8 +13,8 @@ export class DatabaseCache {
     private static tableNodeMapColumnNode = {};
     private static collpaseState: { key?: TreeItemCollapsibleState };
 
-    static evictAllCache(): any {
-        if (this.context == null) throw new Error("DatabaseCache is not init!")
+    public static evictAllCache(): any {
+        if (this.context == null) { throw new Error("DatabaseCache is not init!"); }
         this.connectionNodeMapDatabaseNode = [];
         this.databaseNodeMapTableNode = {};
         this.tableNodeMapColumnNode = {};
@@ -23,15 +23,15 @@ export class DatabaseCache {
     /**
      * support to complection manager
      */
-    static getDatabaseNodeList(): DatabaseNode[] {
+    public static getDatabaseNodeList(): DatabaseNode[] {
         let databaseNodeList = [];
 
-        Object.keys(this.connectionNodeMapDatabaseNode).forEach(key => {
-            let tempList = this.connectionNodeMapDatabaseNode[key]
+        Object.keys(this.connectionNodeMapDatabaseNode).forEach((key) => {
+            const tempList = this.connectionNodeMapDatabaseNode[key];
             if (tempList) {
-                databaseNodeList = databaseNodeList.concat(tempList)
+                databaseNodeList = databaseNodeList.concat(tempList);
             }
-        })
+        });
 
         return databaseNodeList;
     }
@@ -39,15 +39,15 @@ export class DatabaseCache {
     /**
      * support to complection manager
      */
-    static getTableNodeList(): TableNode[] {
+    public static getTableNodeList(): TableNode[] {
         let tableNodeList = [];
 
-        Object.keys(this.databaseNodeMapTableNode).forEach(key => {
-            let tempList = this.databaseNodeMapTableNode[key]
+        Object.keys(this.databaseNodeMapTableNode).forEach((key) => {
+            const tempList = this.databaseNodeMapTableNode[key];
             if (tempList && (tempList[0] instanceof TableNode)) {
-                tableNodeList = tableNodeList.concat(tempList)
+                tableNodeList = tableNodeList.concat(tempList);
             }
-        })
+        });
 
         return tableNodeList;
     }
@@ -56,14 +56,14 @@ export class DatabaseCache {
      * get element current collapseState or default collapseState
      * @param element 
      */
-    static getElementState(element?: INode) {
+    public static getElementState(element?: INode) {
 
         if (element.type == ModelType.COLUMN || element.type == ModelType.INFO) {
-            return TreeItemCollapsibleState.None
+            return TreeItemCollapsibleState.None;
         }
 
         if (!this.collpaseState || Object.keys(this.collpaseState).length == 0) {
-            this.collpaseState = this.context.globalState.get(CacheKey.CollapseSate)
+            this.collpaseState = this.context.globalState.get(CacheKey.CollapseSate);
         }
 
         if (!this.collpaseState) {
@@ -71,11 +71,11 @@ export class DatabaseCache {
         }
 
         if (this.collpaseState[element.identify]) {
-            return this.collpaseState[element.identify]
+            return this.collpaseState[element.identify];
         } else if (element.type == ModelType.CONNECTION || element.type == ModelType.TABLE_GROUP) {
-            return TreeItemCollapsibleState.Expanded
+            return TreeItemCollapsibleState.Expanded;
         } else {
-            return TreeItemCollapsibleState.Collapsed
+            return TreeItemCollapsibleState.Collapsed;
         }
 
     }
@@ -86,14 +86,14 @@ export class DatabaseCache {
      * @param element 
      * @param collapseState 
      */
-    static storeElementState(element?: INode, collapseState?: TreeItemCollapsibleState) {
+    public static storeElementState(element?: INode, collapseState?: TreeItemCollapsibleState) {
 
         if (element.type == ModelType.COLUMN || element.type == ModelType.INFO) {
             return;
         }
 
-        this.collpaseState[element.identify] = collapseState
-        this.context.globalState.update(CacheKey.CollapseSate, this.collpaseState)
+        this.collpaseState[element.identify] = collapseState;
+        this.context.globalState.update(CacheKey.CollapseSate, this.collpaseState);
 
     }
 
@@ -101,7 +101,7 @@ export class DatabaseCache {
      * cache init, Mainly initializing context object
      * @param context 
      */
-    static initCache(context: ExtensionContext) {
+    public static initCache(context: ExtensionContext) {
         this.context = context;
     }
 
@@ -109,11 +109,11 @@ export class DatabaseCache {
      * clear database data for connection
      * @param connectionIdentify 
      */
-    static clearDatabaseCache(connectionIdentify?: string) {
+    public static clearDatabaseCache(connectionIdentify?: string) {
         if (connectionIdentify) {
-            delete this.connectionNodeMapDatabaseNode[connectionIdentify]
+            delete this.connectionNodeMapDatabaseNode[connectionIdentify];
         } else {
-            this.connectionNodeMapDatabaseNode = {}
+            this.connectionNodeMapDatabaseNode = {};
         }
     }
 
@@ -121,11 +121,11 @@ export class DatabaseCache {
      * clear table data for database
      * @param databaseIdentify 
      */
-    static clearTableCache(databaseIdentify?: string) {
+    public static clearTableCache(databaseIdentify?: string) {
         if (databaseIdentify) {
-            delete this.databaseNodeMapTableNode[databaseIdentify]
+            delete this.databaseNodeMapTableNode[databaseIdentify];
         } else {
-            this.databaseNodeMapTableNode = {}
+            this.databaseNodeMapTableNode = {};
         }
     }
 
@@ -133,11 +133,11 @@ export class DatabaseCache {
      * claer column data for table
      * @param tableIdentify 
      */
-    static clearColumnCache(tableIdentify?: string) {
+    public static clearColumnCache(tableIdentify?: string) {
         if (tableIdentify) {
-            delete this.tableNodeMapColumnNode[tableIdentify]
+            delete this.tableNodeMapColumnNode[tableIdentify];
         } else {
-            this.tableNodeMapColumnNode = {}
+            this.tableNodeMapColumnNode = {};
         }
     }
 
@@ -145,11 +145,11 @@ export class DatabaseCache {
      * get connectino tree data
      * @param connectcionIdentify 
      */
-    static getDatabaseListOfConnection(connectcionIdentify: string): DatabaseNode[] {
+    public static getDatabaseListOfConnection(connectcionIdentify: string): DatabaseNode[] {
         if (this.connectionNodeMapDatabaseNode[connectcionIdentify]) {
-            return this.connectionNodeMapDatabaseNode[connectcionIdentify]
+            return this.connectionNodeMapDatabaseNode[connectcionIdentify];
         } else {
-            return null
+            return null;
         }
     }
 
@@ -158,21 +158,21 @@ export class DatabaseCache {
      * @param databaseIdentify 
      */
     private static tableTypeList = [ModelType.TABLE_GROUP, ModelType.VIEW_GROUP, ModelType.FUNCTION_GROUP, ModelType.TRIGGER_GROUP, ModelType.PROCEDURE_GROUP];
-    static getTableListOfDatabase(databaseIdentify: string): INode[] {
+    public static getTableListOfDatabase(databaseIdentify: string): INode[] {
         let result = [];
-        this.tableTypeList.forEach(tableType => {
-            let tableList = this.databaseNodeMapTableNode[databaseIdentify +"_"+ tableType]
-            if (tableList) result=result.concat(tableList)
+        this.tableTypeList.forEach((tableType) => {
+            const tableList = this.databaseNodeMapTableNode[databaseIdentify + "_" + tableType];
+            if (tableList) { result = result.concat(tableList); }
         });
-        if (result.length == 0) return null;
+        if (result.length == 0) { return null; }
         return result;
     }
 
-    static getTable(databaseIdentify:string,tableName:String):TableNode{
-        let tableList = this.databaseNodeMapTableNode[databaseIdentify +"_"+ ModelType.TABLE_GROUP]
-        if(!tableList)return null;
+    public static getTable(databaseIdentify: string, tableName: string): TableNode {
+        const tableList = this.databaseNodeMapTableNode[databaseIdentify + "_" + ModelType.TABLE_GROUP];
+        if (!tableList) { return null; }
         for (const tableNode of tableList) {
-            if(tableNode.table==tableName)return tableNode;
+            if (tableNode.table == tableName) { return tableNode; }
         }
         return null;
     }
@@ -181,24 +181,24 @@ export class DatabaseCache {
      * get table tree data
      * @param tableIdentify 
      */
-    static getColumnListOfTable(tableIdentify: string): ColumnNode[] {
+    public static getColumnListOfTable(tableIdentify: string): ColumnNode[] {
         if (this.tableNodeMapColumnNode[tableIdentify]) {
-            return this.tableNodeMapColumnNode[tableIdentify]
+            return this.tableNodeMapColumnNode[tableIdentify];
         } else {
-            return null
+            return null;
         }
     }
 
-    static setDataBaseListOfConnection(connectionIdentify: string, DatabaseNodeList: DatabaseNode[]) {
-        this.connectionNodeMapDatabaseNode[connectionIdentify] = DatabaseNodeList
+    public static setDataBaseListOfConnection(connectionIdentify: string, DatabaseNodeList: DatabaseNode[]) {
+        this.connectionNodeMapDatabaseNode[connectionIdentify] = DatabaseNodeList;
     }
 
-    static setTableListOfDatabase(databaseIdentify: string, tableNodeList: INode[]) {
-        this.databaseNodeMapTableNode[databaseIdentify] = tableNodeList
+    public static setTableListOfDatabase(databaseIdentify: string, tableNodeList: INode[]) {
+        this.databaseNodeMapTableNode[databaseIdentify] = tableNodeList;
     }
 
-    static setColumnListOfTable(tableIdentify: string, columnList: ColumnNode[]) {
-        this.tableNodeMapColumnNode[tableIdentify] = columnList
+    public static setColumnListOfTable(tableIdentify: string, columnList: ColumnNode[]) {
+        this.tableNodeMapColumnNode[tableIdentify] = columnList;
     }
 
 

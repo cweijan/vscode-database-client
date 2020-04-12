@@ -19,7 +19,7 @@ export class FunctionChain implements ComplectionChain {
             (complectionContext.currentWord && complectionContext.currentWord.match(/(<|>|,|=)$/))
         ) {
 
-            let tableMatch = /(from|join)\s*(\w+)/ig
+            const tableMatch = /(from|join)\s*(\w+)/ig;
 
             return this.functionComplectionItems;
         }

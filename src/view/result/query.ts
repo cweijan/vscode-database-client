@@ -9,13 +9,13 @@ import { ColumnNode } from "../../model/table/columnNode";
 import { DataResponse } from "./queryResponse";
 
 export class QueryParam<T> {
-    type: MessageType;
-    connection?: IConnection;
-    res: T;
+    public type: MessageType;
+    public connection?: IConnection;
+    public res: T;
 }
 
 export class QueryPage {
-    private static resultWebviewPanel: WebviewPanel
+    private static resultWebviewPanel: WebviewPanel;
     /**
      * ensure send newest message.
      */
@@ -25,85 +25,85 @@ export class QueryPage {
 
         switch (queryParam.type) {
             case MessageType.DATA:
-                await this.loadTableInfo(queryParam)
+                await this.loadTableInfo(queryParam);
                 break;
             case MessageType.DML:
-                queryParam.res.message = `EXECUTE SUCCESS:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>AffectedRows : ${queryParam.res.affectedRows}, CostTime : ${queryParam.res.costTime}ms`
+                queryParam.res.message = `EXECUTE SUCCESS:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>AffectedRows : ${queryParam.res.affectedRows}, CostTime : ${queryParam.res.costTime}ms`;
                 break;
             case MessageType.ERROR:
-                queryParam.res.message = `EXECUTE FAIL:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>Message :<br><br>&nbsp;&nbsp;${queryParam.res.message}`
+                queryParam.res.message = `EXECUTE FAIL:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>Message :<br><br>&nbsp;&nbsp;${queryParam.res.message}`;
                 break;
         }
 
-        this.sendData = queryParam
-        if (this.creating) return;
+        this.sendData = queryParam;
+        if (this.creating) { return; }
 
         // update result webview
         if (this.resultWebviewPanel) {
             if (this.resultWebviewPanel.visible) {
-                this.resultWebviewPanel.webview.postMessage(QueryPage.sendData)
+                this.resultWebviewPanel.webview.postMessage(QueryPage.sendData);
                 this.resultWebviewPanel.reveal(vscode.ViewColumn.Two, true);
                 return;
             } else {
-                this.resultWebviewPanel.dispose()
+                this.resultWebviewPanel.dispose();
             }
         }
 
         // init result webview
         this.creating = true;
         SqlViewManager.createWebviewPanel({
-            splitResultView: true, viewPath: "result", viewTitle: "Query"
-        }).then(async webviewPanel => {
-            this.resultWebviewPanel = webviewPanel
+            splitResultView: true, viewPath: "result", viewTitle: "Query",
+        }).then(async (webviewPanel) => {
+            this.resultWebviewPanel = webviewPanel;
             this.creating = false;
-            webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined; this.creating = false; })
+            webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined; this.creating = false; });
             webviewPanel.webview.onDidReceiveMessage((params) => {
                 switch (params.type) {
                     case OperateType.init:
-                        webviewPanel.webview.postMessage(QueryPage.sendData)
+                        webviewPanel.webview.postMessage(QueryPage.sendData);
                         break;
                     case OperateType.execute:
-                        QueryUnit.runQuery(params.sql)
+                        QueryUnit.runQuery(params.sql);
                         break;
                 }
-            })
-        })
+            });
+        });
 
     }
     private static async loadTableInfo(queryParam: QueryParam<DataResponse>) {
-        let conn = queryParam.connection
-        let info = this.getTable(queryParam.res.sql)
-        if (!info) return;
-        const tableName = info.table
-        const database = info.database
-        if (tableName == null || conn == null) return;
+        const conn = queryParam.connection;
+        const info = this.getTable(queryParam.res.sql);
+        if (!info) { return; }
+        const tableName = info.table;
+        const database = info.database;
+        if (tableName == null || conn == null) { return; }
         // load table infomation
-        let tableNode = DatabaseCache.getTable(`${conn.host}_${conn.port}_${conn.user}_${database ? database : conn.database}`, tableName)
+        const tableNode = DatabaseCache.getTable(`${conn.host}_${conn.port}_${conn.user}_${database ? database : conn.database}`, tableName);
         if (tableNode) {
             let primaryKey: string;
-            let columnList = (await tableNode.getChildren()).map((columnNode: ColumnNode) => {
+            const columnList = (await tableNode.getChildren()).map((columnNode: ColumnNode) => {
                 if (columnNode.column.key === "PRI") {
-                    primaryKey = columnNode.column.name
+                    primaryKey = columnNode.column.name;
                 }
-                return columnNode.column
-            })
-            queryParam.res.primaryKey = primaryKey
-            queryParam.res.columnList = columnList
+                return columnNode.column;
+            });
+            queryParam.res.primaryKey = primaryKey;
+            queryParam.res.columnList = columnList;
         }
-        queryParam.res.table = tableName
-        queryParam.res.database = conn.database
+        queryParam.res.table = tableName;
+        queryParam.res.database = conn.database;
     }
 
     private static getTable(sql: string): TableInfo {
-        if (!sql) return null;
-        let tableInfo = new TableInfo()
+        if (!sql) { return null; }
+        const tableInfo = new TableInfo();
         let baseMatch: string[];
         if (sql && (baseMatch = (sql + " ").match(/select\s+\*\s+from\s*(.+?)(?=[\s;])/i)) && !sql.match(/\bjoin\b/ig)) {
-            let expectTable: string = baseMatch[1].replace(/`/g, "");
-            let temp: string[] = expectTable.split(".")
+            const expectTable: string = baseMatch[1].replace(/`/g, "");
+            const temp: string[] = expectTable.split(".");
             if (temp.length == 2) {
-                tableInfo.database = temp[0]
-                tableInfo.table = temp[1]
+                tableInfo.database = temp[0];
+                tableInfo.table = temp[1];
             }
             return tableInfo;
         }
