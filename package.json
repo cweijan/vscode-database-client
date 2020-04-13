@@ -56,7 +56,7 @@
 					"name": "MySQL"
 				}
 			]
-		},
+		}, 
 		"commands": [
 			{
 				"command": "mysql.history.open",
@@ -317,6 +317,11 @@
 			],
 			"view/title": [
 				{
+					"command": "mysql.newQuery",
+					"when": "view == github.cweijan.mysql",
+					"group": "navigation@3"
+				},
+				{
 					"command": "mysql.addConnection",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@2"
@@ -325,12 +330,6 @@
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@1"
-				},
-				{
-					"command": "mysql.setting.open",
-					"title": "Open Setting",
-					"when": "view == github.cweijan.mysql",
-					"group": "navigation@-1"
 				},
 				{
 					"command": "mysql.history.open",
@@ -607,7 +606,6 @@
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
 		"tslint": "tslint -t verbose src/**/*.ts"
 	},
 	"devDependencies": {

@@ -11,6 +11,7 @@ import { IConnection } from "../Connection";
 import { Console } from "../../common/OutputChannel";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { Util } from "../../common/util";
 
 
 export class TableNode implements INode, IConnection {
@@ -62,7 +63,7 @@ export class TableNode implements INode, IConnection {
     public addColumnTemplate() {
         ConnectionManager.getConnection(this, true);
         QueryUnit.createSQLTextDocument(`ALTER TABLE
-    \`${this.database}\`.\`${this.table}\` 
+    ${Util.wrap(this.database)}.${Util.wrap(this.table)} 
 ADD 
     COLUMN [column] [type] NOT NULL comment '';`);
     }
@@ -133,7 +134,7 @@ ADD
 
 
     public async selectSqlTemplate(run: boolean) {
-        const sql = `SELECT * FROM \`${this.database}\`.\`${this.table}\` LIMIT ${Constants.DEFAULT_SIZE};`;
+        const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${Constants.DEFAULT_SIZE};`;
 
         if (run) {
             ConnectionManager.getConnection(this, true);
@@ -149,7 +150,7 @@ ADD
             .getChildren()
             .then((children: INode[]) => {
                 const childrenNames = children.map((child: any) => "\n    " + child.column.name);
-                let sql = `insert into \n  \`${this.database}\`.${this.table} `;
+                let sql = `insert into \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} `;
                 sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  )\n`;
                 sql += "values\n  ";
                 sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  );`;
@@ -165,7 +166,7 @@ ADD
 
                 const where = keysNames.map((name: string) => `${name} = ${name}`);
 
-                let sql = `delete from \n  \`${this.database}\`.${this.table} \n`;
+                let sql = `delete from \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and")}`;
                 QueryUnit.createSQLTextDocument(sql);
             });
@@ -181,7 +182,7 @@ ADD
                 const sets = childrenNames.map((name: string) => `${name} = ${name}`);
                 const where = keysNames.map((name: string) => `${name} = '${name}'`);
 
-                let sql = `update \n  \`${this.database}\`.${this.table} \nset \n  ${sets.toString().replace(/,/g, ",\n  ")}\n`;
+                let sql = `update \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \nset \n  ${sets.toString().replace(/,/g, ",\n  ")}\n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and ")}`;
                 QueryUnit.createSQLTextDocument(sql);
             });

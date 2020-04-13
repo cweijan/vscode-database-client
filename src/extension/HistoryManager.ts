@@ -5,10 +5,13 @@ export class HistoryManager {
     constructor(private context: vscode.ExtensionContext) {
     }
 
-    public showHistory() {
-        const historyPath = this.context['globalStoragePath'] + '/history.sql';
-        const openPath = vscode.Uri.file(historyPath);
-        vscode.workspace.openTextDocument(openPath).then((doc) => {
+    showHistory() {
+        var historyPath = this.context['globalStoragePath'] + '/history.sql'
+        if (!fs.existsSync(historyPath)) {
+            fs.appendFileSync(historyPath, "")
+        }
+        var openPath = vscode.Uri.file(historyPath);
+        vscode.workspace.openTextDocument(openPath).then(doc => {
             vscode.window.showTextDocument(doc);
         });
     }
@@ -16,7 +19,7 @@ export class HistoryManager {
     public recordHistory(sql: string, costTime: number) {
         if (!sql) { return; }
         return new Promise(() => {
-            const gsPath = this.context['globalStoragePath'];
+            var gsPath = this.context['globalStoragePath']
             if (!fs.existsSync(gsPath)) {
                 fs.mkdirSync(gsPath);
             }

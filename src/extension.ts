@@ -24,6 +24,7 @@ import { CommandKey } from "./common/Constants";
 import { TableHoverProvider } from "./provider/TableHoverProvider";
 import { TableGroup } from "./model/table/tableGroup";
 import { MysqlSetting } from "./extension/MysqlSetting";
+import { ConnectionManager } from "./database/ConnectionManager";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -100,7 +101,11 @@ export function activate(context: vscode.ExtensionContext) {
             QueryUnit.runQuery(sql);
         }),
         vscode.commands.registerCommand("mysql.newQuery", (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
-            databaseOrConnectionNode.newQuery();
+            if(databaseOrConnectionNode){
+                databaseOrConnectionNode.newQuery();
+            }else{
+                ConnectionManager.tryOpenQuery()
+            }
         }),
         vscode.commands.registerCommand("mysql.template.sql", (tableNode: TableNode, run: boolean) => {
             tableNode.selectSqlTemplate(run);

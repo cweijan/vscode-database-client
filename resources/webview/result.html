@@ -100,14 +100,14 @@
         <!-- talbe result -->
         <div :style="'width:' + table.width + 'px;overflow:scroll'" v-if="result.data">
             <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort"
-                :row-class-name="tableRowClassName"
+                :row-class-name="tableRowClassName" ref="dataTable"
                 :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
                 border @cell-click="celledit">
                 <!-- tool bar -->
                 <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey" align="center">
                     <template slot-scope="scope">
                         <div v-if="scope.row.isFilter" style="text-align: center;">
-                            <el-button @click="resetFilter" type="warning" size="small" icon="el-icon-refresh" circle>
+                            Filter : <el-button @click="resetFilter" type="warning" size="small" icon="el-icon-refresh" circle title="Reset">
                             </el-button>
                         </div>
                         <div v-if="scope.row[result.primaryKey]">
@@ -434,6 +434,7 @@
         if (!data.sql.match(/\bwhere\b/ig)) {
             // clear filter
             vue.toolbar.filter = {}
+            vue.$refs.dataTable.clearSort()
         }
         if (vue.result.columnList) {
             vue.uploadRole()

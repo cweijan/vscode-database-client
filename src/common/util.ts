@@ -2,6 +2,22 @@
 import { Position, TextDocument } from "vscode";
 
 export class Util {
+
+    /**
+     * wrap origin with ` if is unusual identifier
+     * @param origin any string
+     */
+    public static wrap(origin: string) {
+        if (origin == null) return origin;
+
+        if (origin.match(/\b[-\.]\b/ig)
+            || origin.match(/^if|key|name|user|desc|length$/i)) {
+            return `\`${origin}\``;
+        }
+
+        return origin;
+    }
+
     /**
      * trim array, got from SO.
      * @param origin origin array

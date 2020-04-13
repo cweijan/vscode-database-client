@@ -8,7 +8,7 @@ import { QueryUnit } from "./QueryUnit";
 export class ConnectionManager {
 
     private static lastConnectionOption: IConnection;
-    private static activeConnection= {};
+    private static activeConnection = {};
 
     public static getLastConnectionOption() {
         return this.lastConnectionOption;
@@ -73,6 +73,17 @@ export class ConnectionManager {
         this.lastConnectionOption = newConnectionOptions;
         return mysql.createConnection(newConnectionOptions);
 
+    }
+
+
+    public static tryOpenQuery() {
+        if (!this.lastConnectionOption) {
+            Console.log("Not active connection found!")
+        } else {
+            //TODO open selelct 
+            QueryUnit.createSQLTextDocument();
+            ConnectionManager.getConnection(this.lastConnectionOption)
+        }
     }
 
 }

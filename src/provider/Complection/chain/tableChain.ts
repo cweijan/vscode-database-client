@@ -4,13 +4,7 @@ import { DatabaseCache } from "../../../database/DatabaseCache";
 import { INode } from "../../../model/INode";
 import { TableNode } from "../../../model/table/tableNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
-
-function wrap(origin: string): string {
-    if (origin != null && origin.match(/\b(-)\b/ig)) {
-        return `\`${origin}\``;
-    }
-    return origin;
-}
+import { Util } from "../../../common/util";
 
 export class TableChain implements ComplectionChain {
 
@@ -56,7 +50,7 @@ export class TableChain implements ComplectionChain {
             const treeItem = tableNode.getTreeItem();
             const label = treeItem.label;
             const completionItem = new vscode.CompletionItem(label);
-            completionItem.insertText = wrap(label);
+            completionItem.insertText = Util.wrap(label);
             switch (tableNode.type) {
                 case ModelType.TABLE:
                     completionItem.kind = vscode.CompletionItemKind.Function;

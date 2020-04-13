@@ -13,7 +13,9 @@ export class ColumnChain implements ComplectionChain {
             let result = tableReg.exec(complectionContext.currentSqlFull);
             for (; result != null && subComplectionItems.length === 0;) {
                 subComplectionItems = await this.generateColumnComplectionItem(
-                    result[0].trim().replace(/(\w|\s)*\./, "").replace(/`/ig, ""),
+                    result[0].replace(/\bfrom|join\b/, "")
+                        .replace(/(\w|\s)*\./, "")
+                        .replace(/`/ig, "").trim(),
                 );
                 if (subComplectionItems.length > 0) {
                     break;
