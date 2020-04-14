@@ -80,6 +80,9 @@
                         v-if="result.primaryKey">
                     </el-button>
                 </el-cow>
+                <el-cow v-if="result.table">
+                    {{result.table}}
+                </el-cow>
                 <el-cow>
                     <el-input v-model="table.search" style="width:200px" placeholder="Type to search" />
                 </el-cow>
@@ -107,7 +110,7 @@
                 <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey" align="center">
                     <template slot-scope="scope">
                         <div v-if="scope.row.isFilter" style="text-align: center;">
-                            Filter : <el-button @click="resetFilter" type="warning" size="small" icon="el-icon-refresh" circle title="Reset">
+                            Reset : <el-button @click="resetFilter" type="warning" size="small" icon="el-icon-refresh" circle title="Reset">
                             </el-button>
                         </div>
                         <div v-if="scope.row[result.primaryKey]">
@@ -125,7 +128,7 @@
                     align="center" sortable v-if="result.columnList"
                     :width="computeWidth(column.name,0,toolbar.filter[column.name])">
                     <template slot-scope="scope">
-                        <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[column.name]"
+                        <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[column.name]" placeholder="filter"
                             @blur="filter($event,column.name)" v-on:keyup.enter.native="filter($event,column.name)">
                         </el-input>
                         <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[column.name])'></span>

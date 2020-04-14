@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-client",
 	"displayName": "MySQL",
 	"description": "MySQL Client for vscode",
-	"version": "1.7.14",
+	"version": "1.7.15",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
@@ -317,17 +317,17 @@
 			],
 			"view/title": [
 				{
-					"command": "mysql.newQuery",
+					"command": "mysql.addConnection",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@3"
 				},
 				{
-					"command": "mysql.addConnection",
+					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@2"
 				},
 				{
-					"command": "mysql.refresh",
+					"command": "mysql.newQuery",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@1"
 				},

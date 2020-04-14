@@ -2,6 +2,7 @@
 import * as vscode from "vscode";
 import { QueryUnit } from "./database/QueryUnit";
 import { ConnectionNode } from "./model/ConnectionNode";
+import { ConnectionManager } from "./database/ConnectionManager";
 import { DatabaseNode } from "./model/database/databaseNode";
 import { TableNode } from "./model/table/tableNode";
 import { MySQLTreeDataProvider } from "./provider/MysqlTreeDataProvider";
@@ -24,7 +25,6 @@ import { CommandKey } from "./common/Constants";
 import { TableHoverProvider } from "./provider/TableHoverProvider";
 import { TableGroup } from "./model/table/tableGroup";
 import { MysqlSetting } from "./extension/MysqlSetting";
-import { ConnectionManager } from "./database/ConnectionManager";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -101,10 +101,10 @@ export function activate(context: vscode.ExtensionContext) {
             QueryUnit.runQuery(sql);
         }),
         vscode.commands.registerCommand("mysql.newQuery", (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
-            if(databaseOrConnectionNode){
+            if (databaseOrConnectionNode) {
                 databaseOrConnectionNode.newQuery();
-            }else{
-                ConnectionManager.tryOpenQuery()
+            } else {
+                ConnectionNode.tryOpenQuery();
             }
         }),
         vscode.commands.registerCommand("mysql.template.sql", (tableNode: TableNode, run: boolean) => {

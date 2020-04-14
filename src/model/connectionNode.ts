@@ -15,40 +15,40 @@ import { INode } from "./INode";
 
 export class ConnectionNode implements INode, IConnection {
 
-    identify: string;
-    database?: string;
-    multipleStatements?: boolean;
-    type: string = ModelType.CONNECTION;
+    public identify: string;
+    public database?: string;
+    public multipleStatements?: boolean;
+    public type: string = ModelType.CONNECTION;
     constructor(readonly id: string, readonly host: string, readonly user: string,
         readonly password: string, readonly port: string,
         readonly certPath: string) {
     }
 
     public getTreeItem(): vscode.TreeItem {
-        this.identify = `${this.host}_${this.port}_${this.user}`
+        this.identify = `${this.host}_${this.port}_${this.user}`;
         return {
             label: this.identify,
             id: this.host,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.CONNECTION,
-            iconPath: path.join(Constants.RES_PATH, "server.png")
+            iconPath: path.join(Constants.RES_PATH, "server.png"),
         };
     }
 
     public async getChildren(isRresh: boolean = false): Promise<INode[]> {
-        this.identify = `${this.host}_${this.port}_${this.user}`
-        let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.identify)
+        this.identify = `${this.host}_${this.port}_${this.user}`;
+        let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.identify);
         if (databaseNodes && !isRresh) {
-            return databaseNodes
+            return databaseNodes;
         }
 
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "SHOW DATABASES")
             .then((databases) => {
                 databaseNodes = databases.map<DatabaseNode>((database) => {
                     return new DatabaseNode(this.host, this.user, this.password, this.port, database.Database, this.certPath);
-                })
-                databaseNodes.unshift(new UserGroup(this.host, this.user, this.password, this.port,'mysql', this.certPath))
-                DatabaseCache.setDataBaseListOfConnection(this.identify, databaseNodes)
+                });
+                databaseNodes.unshift(new UserGroup(this.host, this.user, this.password, this.port, 'mysql', this.certPath));
+                DatabaseCache.setDataBaseListOfConnection(this.identify, databaseNodes);
 
                 return databaseNodes;
             })
@@ -59,18 +59,18 @@ export class ConnectionNode implements INode, IConnection {
 
     public async newQuery() {
         QueryUnit.createSQLTextDocument();
-        ConnectionManager.getConnection(this)
+        ConnectionManager.getConnection(this);
     }
 
     public createDatabase() {
-        vscode.window.showInputBox({ placeHolder: 'Input you want to create new database name.' }).then(async inputContent => {
-            if(!inputContent)return;
+        vscode.window.showInputBox({ placeHolder: 'Input you want to create new database name.' }).then(async (inputContent) => {
+            if (!inputContent) { return; }
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `create database \`${inputContent}\` default character set = 'utf8' `).then(() => {
-                DatabaseCache.clearDatabaseCache(this.identify)
-                MySQLTreeDataProvider.refresh()
-                vscode.window.showInformationMessage(`create database ${inputContent} success!`)
-            })
-        })
+                DatabaseCache.clearDatabaseCache(this.identify);
+                MySQLTreeDataProvider.refresh();
+                vscode.window.showInformationMessage(`create database ${inputContent} success!`);
+            });
+        });
     }
 
     public async deleteConnection(context: vscode.ExtensionContext) {
@@ -81,11 +81,30 @@ export class ConnectionNode implements INode, IConnection {
         MySQLTreeDataProvider.refresh();
     }
 
-    importData(fsPath: string) {
-        Console.log(`Doing import ${this.host}:${this.port}...`)
-        ConnectionManager.getConnection(this).then(connection => {
-            QueryUnit.runFile(connection,fsPath)
-        })
+    public importData(fsPath: string) {
+        Console.log(`Doing import ${this.host}:${this.port}...`);
+        ConnectionManager.getConnection(this).then((connection) => {
+            QueryUnit.runFile(connection, fsPath);
+        });
+    }
+
+    public static async tryOpenQuery() {
+        const lcp = ConnectionManager.getLastConnectionOption();
+        if (!lcp) {
+            Console.log("Not active connection found!");
+        } else {
+            await QueryUnit.showSQLTextDocument();
+            const key = `${lcp.host}_${lcp.port}_${lcp.user}`;
+            const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
+            await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" }).then(async (dbName) => {
+                if (dbName) {
+                    await ConnectionManager.getConnection({
+                        host: lcp.host, port: lcp.port, password: lcp.password,
+                        user: lcp.user, database: dbName, certPath: null,
+                    }, true);
+                }
+            });
+        }
     }
 
 }

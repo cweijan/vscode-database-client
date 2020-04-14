@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as mysql from "mysql";
-import { IConnection } from "../model/Connection";
-import { Console } from "../common/OutputChannel";
 import { Global } from "../common/Global";
+import { Console } from "../common/OutputChannel";
+import { IConnection } from "../model/Connection";
 import { QueryUnit } from "./QueryUnit";
 
 export class ConnectionManager {
@@ -76,14 +76,5 @@ export class ConnectionManager {
     }
 
 
-    public static tryOpenQuery() {
-        if (!this.lastConnectionOption) {
-            Console.log("Not active connection found!")
-        } else {
-            //TODO open selelct 
-            QueryUnit.createSQLTextDocument();
-            ConnectionManager.getConnection(this.lastConnectionOption)
-        }
-    }
 
 }
