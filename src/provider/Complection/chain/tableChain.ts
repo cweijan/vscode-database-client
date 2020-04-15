@@ -5,6 +5,7 @@ import { Node } from "../../../model/interface/node";
 import { TableNode } from "../../../model/table/tableNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Util } from "../../../common/util";
+import { ConnectionManager } from "../../../database/ConnectionManager";
 
 export class TableChain implements ComplectionChain {
 
@@ -32,6 +33,10 @@ export class TableChain implements ComplectionChain {
 
         let tableNodes: Node[] = [];
         const tableNames: string[] = [];
+        const lcp = ConnectionManager.getLastConnectionOption();
+        if (!inputWord && lcp && lcp.database) {
+            inputWord = lcp.database
+        }
         if (inputWord) {
             DatabaseCache.getDatabaseNodeList().forEach((databaseNode) => {
                 if (databaseNode.database === inputWord) {
