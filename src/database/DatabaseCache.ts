@@ -2,7 +2,7 @@ import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
 import { CacheKey, ModelType } from "../common/Constants";
 import { ColumnNode } from "../model/table/columnNode";
 import { DatabaseNode } from "../model/database/databaseNode";
-import { INode } from "../model/INode";
+import { Node } from "../model/interface/node";
 import { TableNode } from "../model/table/tableNode";
 
 export class DatabaseCache {
@@ -56,7 +56,7 @@ export class DatabaseCache {
      * get element current collapseState or default collapseState
      * @param element 
      */
-    public static getElementState(element?: INode) {
+    public static getElementState(element?: Node) {
 
         if (element.type == ModelType.COLUMN || element.type == ModelType.INFO) {
             return TreeItemCollapsibleState.None;
@@ -86,7 +86,7 @@ export class DatabaseCache {
      * @param element 
      * @param collapseState 
      */
-    public static storeElementState(element?: INode, collapseState?: TreeItemCollapsibleState) {
+    public static storeElementState(element?: Node, collapseState?: TreeItemCollapsibleState) {
 
         if (element.type == ModelType.COLUMN || element.type == ModelType.INFO) {
             return;
@@ -158,7 +158,7 @@ export class DatabaseCache {
      * @param databaseIdentify 
      */
     private static tableTypeList = [ModelType.TABLE_GROUP, ModelType.VIEW_GROUP, ModelType.FUNCTION_GROUP, ModelType.TRIGGER_GROUP, ModelType.PROCEDURE_GROUP];
-    public static getTableListOfDatabase(databaseIdentify: string): INode[] {
+    public static getTableListOfDatabase(databaseIdentify: string): Node[] {
         let result = [];
         this.tableTypeList.forEach((tableType) => {
             const tableList = this.databaseNodeMapTableNode[databaseIdentify + "_" + tableType];
@@ -193,7 +193,7 @@ export class DatabaseCache {
         this.connectionNodeMapDatabaseNode[connectionIdentify] = DatabaseNodeList;
     }
 
-    public static setTableListOfDatabase(databaseIdentify: string, tableNodeList: INode[]) {
+    public static setTableListOfDatabase(databaseIdentify: string, tableNodeList: Node[]) {
         this.databaseNodeMapTableNode[databaseIdentify] = tableNodeList;
     }
 

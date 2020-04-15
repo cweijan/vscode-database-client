@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
 import { CacheKey } from "../common/Constants";
-import { IConnection } from "../model/Connection";
+import { ConnectionInfo } from "../model/interface/connection";
 import { ConnectionNode } from "../model/ConnectionNode";
-import { INode } from "../model/INode";
+import { Node } from "../model/interface/node";
 import { DatabaseCache } from "../database/DatabaseCache";
 
-export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
-    public _onDidChangeTreeData: vscode.EventEmitter<INode> = new vscode.EventEmitter<INode>();
-    public readonly onDidChangeTreeData: vscode.Event<INode> = this._onDidChangeTreeData.event;
+export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
+    public _onDidChangeTreeData: vscode.EventEmitter<Node> = new vscode.EventEmitter<Node>();
+    public readonly onDidChangeTreeData: vscode.Event<Node> = this._onDidChangeTreeData.event;
     public static instance:MySQLTreeDataProvider
 
     constructor(private context: vscode.ExtensionContext) {
@@ -31,11 +31,11 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
         MySQLTreeDataProvider.refresh()
     }
 
-    public getTreeItem(element: INode): Promise<vscode.TreeItem> | vscode.TreeItem {
+    public getTreeItem(element: Node): Promise<vscode.TreeItem> | vscode.TreeItem {
         return element.getTreeItem();
     }
 
-    public getChildren(element?: INode): Thenable<INode[]> | INode[] {
+    public getChildren(element?: Node): Thenable<Node[]> | Node[] {
         if (!element) {
             return this.getConnectionNodes();
         }
@@ -43,9 +43,9 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
         return element.getChildren();
     }
 
-    public async addConnection(connectionOptions: IConnection) {
+    public async addConnection(connectionOptions: ConnectionInfo) {
 
-        let connections = this.context.globalState.get<{ [key: string]: IConnection }>(CacheKey.ConectionsKey);
+        let connections = this.context.globalState.get<{ [key: string]: ConnectionInfo }>(CacheKey.ConectionsKey);
 
         if (!connections) {
             connections = {};
@@ -60,13 +60,13 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<INode> {
     /**
      * refresh treeview context
      */
-    public static refresh(element?: INode): void {
+    public static refresh(element?: Node): void {
         this.instance._onDidChangeTreeData.fire(element);
     }
 
     public async getConnectionNodes(): Promise<ConnectionNode[]> {
         const connectionNodes = [];
-        const connections = this.context.globalState.get<{ [key: string]: IConnection }>(CacheKey.ConectionsKey);
+        const connections = this.context.globalState.get<{ [key: string]: ConnectionInfo }>(CacheKey.ConectionsKey);
         if (connections) {
             for (const key of Object.keys(connections)) {
                 connectionNodes.push(new ConnectionNode(key, connections[key].host, connections[key].user, connections[key].password, connections[key].port, connections[key].certPath));

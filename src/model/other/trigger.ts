@@ -1,14 +1,14 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { QueryUnit } from "../../database/QueryUnit";
-import { INode } from "../INode";
+import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ModelType, Constants } from "../../common/Constants";
-import { IConnection } from "../Connection";
+import { ConnectionInfo } from "../interface/connection";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 
-export class TriggerNode implements INode, IConnection {
+export class TriggerNode implements Node, ConnectionInfo {
     identify: string;
     type: string = ModelType.TRIGGER;
 
@@ -42,7 +42,7 @@ export class TriggerNode implements INode, IConnection {
         });
     }
 
-    public async getChildren(isRresh: boolean = false): Promise<INode[]> {
+    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         return [];
     }
 

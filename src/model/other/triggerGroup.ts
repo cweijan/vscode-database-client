@@ -2,15 +2,15 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { QueryUnit } from "../../database/QueryUnit";
 import { InfoNode } from "../InfoNode";
-import { INode } from "../INode";
+import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { TableNode } from "../table/tableNode";
-import { IConnection } from "../Connection";
+import { ConnectionInfo } from "../interface/connection";
 import { Constants, ModelType } from "../../common/Constants";
 import { TriggerNode } from "./Trigger";
 
-export class TriggerGroup implements INode, IConnection {
+export class TriggerGroup implements Node, ConnectionInfo {
     public type: string; public identify: string;
     constructor(readonly host: string, readonly user: string,
         readonly password: string, readonly port: string, readonly database: string,
@@ -28,7 +28,7 @@ export class TriggerGroup implements INode, IConnection {
         };
     }
 
-    public async getChildren(isRresh: boolean = false): Promise<INode[]> {
+    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
         let tableNodes = DatabaseCache.getTableListOfDatabase(this.identify);
         if (tableNodes && !isRresh) {

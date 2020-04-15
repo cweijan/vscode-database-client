@@ -4,13 +4,13 @@ import { MessageType, OperateType } from "../../common/Constants";
 import { SqlViewManager } from "../../common/SqlViewManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { IConnection } from "../../model/Connection";
+import { ConnectionInfo } from "../../model/interface/connection";
 import { ColumnNode } from "../../model/table/columnNode";
 import { DataResponse } from "./queryResponse";
 
 export class QueryParam<T> {
     public type: MessageType;
-    public connection?: IConnection;
+    public connection?: ConnectionInfo;
     public res: T;
 }
 

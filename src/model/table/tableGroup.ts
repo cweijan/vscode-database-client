@@ -2,14 +2,14 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { QueryUnit } from "../../database/QueryUnit";
 import { InfoNode } from "../InfoNode";
-import { INode } from "../INode";
+import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { TableNode } from "./tableNode";
-import { IConnection } from "../Connection";
+import { ConnectionInfo } from "../interface/connection";
 import { Constants, ModelType } from "../../common/Constants";
 
-export class TableGroup implements INode, IConnection {
+export class TableGroup implements Node, ConnectionInfo {
     public type: string; public identify: string;
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, readonly certPath: string) {
@@ -27,7 +27,7 @@ export class TableGroup implements INode, IConnection {
         };
     }
 
-    public async getChildren(isRresh: boolean = false): Promise<INode[]> {
+    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
         let tableNodes = DatabaseCache.getTableListOfDatabase(this.identify);
         if (tableNodes && !isRresh) {

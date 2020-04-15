@@ -4,17 +4,18 @@ import mysqldump from 'mysqldump';
 import { QueryUnit } from "../../database/QueryUnit";
 import { ColumnNode } from "./columnNode";
 import { InfoNode } from "../InfoNode";
-import { INode } from "../INode";
+import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ModelType, Constants } from "../../common/Constants";
-import { IConnection } from "../Connection";
+import { ConnectionInfo } from "../interface/connection";
 import { Console } from "../../common/OutputChannel";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 import { Util } from "../../common/util";
+import { CopyAble } from "../interface/copyAble";
 
 
-export class TableNode implements INode, IConnection {
+export class TableNode implements Node, ConnectionInfo, CopyAble {
 
 
     public identify: string;
@@ -41,7 +42,7 @@ export class TableNode implements INode, IConnection {
 
     }
 
-    public async getChildren(isRresh: boolean = false): Promise<INode[]> {
+    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         let columnNodes = DatabaseCache.getColumnListOfTable(this.identify);
         if (columnNodes && !isRresh) {
             return columnNodes;
@@ -148,7 +149,7 @@ ADD
     public insertSqlTemplate() {
         this
             .getChildren()
-            .then((children: INode[]) => {
+            .then((children: Node[]) => {
                 const childrenNames = children.map((child: any) => "\n    " + child.column.name);
                 let sql = `insert into \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} `;
                 sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  )\n`;
@@ -161,7 +162,7 @@ ADD
     public deleteSqlTemplate(): any {
         this
             .getChildren()
-            .then((children: INode[]) => {
+            .then((children: Node[]) => {
                 const keysNames = children.filter((child: any) => child.column.key).map((child: any) => child.column.name);
 
                 const where = keysNames.map((name: string) => `${name} = ${name}`);
@@ -175,7 +176,7 @@ ADD
     public updateSqlTemplate() {
         this
             .getChildren()
-            .then((children: INode[]) => {
+            .then((children: Node[]) => {
                 const keysNames = children.filter((child: any) => child.column.key).map((child: any) => child.column.name);
                 const childrenNames = children.filter((child: any) => !child.column.key).map((child: any) => child.column.name);
 
@@ -220,5 +221,8 @@ ADD
 
     }
 
+    public copyName(): void {
+        Util.copyToBoard(this.table);
+    }
 
 }

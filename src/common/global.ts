@@ -1,13 +1,13 @@
 "use strict";
 import * as vscode from "vscode";
-import { IConnection } from "../model/Connection";
+import { ConnectionInfo } from "../model/interface/connection";
 import { Constants } from "./Constants";
 
 export class Global {
 
     private static mysqlStatusBarItem: vscode.StatusBarItem;
 
-    public static updateStatusBarItems(activeConnection: IConnection) {
+    public static updateStatusBarItems(activeConnection: ConnectionInfo) {
         if (Global.mysqlStatusBarItem) {
             Global.mysqlStatusBarItem.text = Global.getStatusBarItemText(activeConnection);
         } else {
@@ -17,7 +17,7 @@ export class Global {
         }
     }
 
-    private static getStatusBarItemText(activeConnection: IConnection): string {
+    private static getStatusBarItemText(activeConnection: ConnectionInfo): string {
         return `$(server) ${activeConnection.host}` + (activeConnection.database ? ` $(database) ${activeConnection.database}` : "");
     }
 

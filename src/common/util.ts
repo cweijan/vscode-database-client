@@ -1,5 +1,6 @@
 
 import { Position, TextDocument } from "vscode";
+import * as vscode from "vscode";
 
 export class Util {
 
@@ -34,6 +35,12 @@ export class Util {
     public static getDocumentLastPosition(document: TextDocument): Position {
         const lastLine = document.lineCount - 1;
         return new Position(lastLine, document.lineAt(lastLine).text.length);
+    }
+
+    public static copyToBoard(content: string) {
+        vscode.env.clipboard.writeText(content).then(() => {
+            vscode.window.showInformationMessage(`Copy ${content} to clipboard success!`);
+        });
     }
 
 }

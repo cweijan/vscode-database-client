@@ -6,14 +6,14 @@ import { ConnectionManager } from "../database/ConnectionManager";
 import { DatabaseCache } from "../database/DatabaseCache";
 import { QueryUnit } from "../database/QueryUnit";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
-import { IConnection } from "./Connection";
+import { IConnection } from "./interface/connection";
 import { DatabaseNode } from "./database/databaseNode";
 import { UserGroup } from "./database/userGroup";
 import { InfoNode } from "./InfoNode";
-import { INode } from "./INode";
+import { Node } from "./interface/node";
 
 
-export class ConnectionNode implements INode, IConnection {
+export class ConnectionNode implements Node, IConnection {
 
     public identify: string;
     public database?: string;
@@ -35,7 +35,7 @@ export class ConnectionNode implements INode, IConnection {
         };
     }
 
-    public async getChildren(isRresh: boolean = false): Promise<INode[]> {
+    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         this.identify = `${this.host}_${this.port}_${this.user}`;
         let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.identify);
         if (databaseNodes && !isRresh) {

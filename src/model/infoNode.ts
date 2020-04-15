@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import { INode } from "./INode";
+import { Node } from "./interface/node";
 import { ModelType } from "../common/Constants";
 
-export class InfoNode implements INode {
+export class InfoNode implements Node {
     identify: string;
     type: string=ModelType.INFO;
     constructor(private readonly label: string) {
@@ -14,7 +14,7 @@ export class InfoNode implements INode {
         };
     }
 
-    public async getChildren(): Promise<INode[]>{
+    public async getChildren(): Promise<Node[]>{
         return [];
     }
 }

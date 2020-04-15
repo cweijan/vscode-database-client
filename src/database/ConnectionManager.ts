@@ -2,12 +2,12 @@ import * as fs from "fs";
 import * as mysql from "mysql";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
-import { IConnection } from "../model/Connection";
+import { ConnectionInfo } from "../model/interface/connection";
 import { QueryUnit } from "./QueryUnit";
 
 export class ConnectionManager {
 
-    private static lastConnectionOption: IConnection;
+    private static lastConnectionOption: ConnectionInfo;
     private static activeConnection: { [key: string]: mysql.Connection } = {};
 
     public static getLastConnectionOption() {
@@ -25,7 +25,7 @@ export class ConnectionManager {
 
     }
 
-    public static getConnection(connectionOptions: IConnection, changeActive: boolean = false): Promise<mysql.Connection> {
+    public static getConnection(connectionOptions: ConnectionInfo, changeActive: boolean = false): Promise<mysql.Connection> {
 
         connectionOptions.multipleStatements = true;
         this.lastConnectionOption = connectionOptions;
@@ -62,7 +62,7 @@ export class ConnectionManager {
     }
 
 
-    public static createConnection(connectionOptions: IConnection): mysql.Connection {
+    public static createConnection(connectionOptions: ConnectionInfo): mysql.Connection {
         const newConnectionOptions: any = Object.assign({ useConnectionPooling: true }, connectionOptions);
         if (connectionOptions.certPath && fs.existsSync(connectionOptions.certPath)) {
             newConnectionOptions.ssl = {

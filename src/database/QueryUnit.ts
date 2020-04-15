@@ -6,7 +6,7 @@ import { CommandKey, ConfigKey, Cursor, MessageType } from "../common/Constants"
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
 import { Util } from "../common/util";
-import { IConnection } from "../model/Connection";
+import { ConnectionInfo } from "../model/interface/connection";
 import { QueryPage } from "../view/result/query";
 import { DataResponse, DMLResponse, ErrorResponse, RunResponse } from "../view/result/queryResponse";
 import { ConnectionManager } from "./ConnectionManager";
@@ -32,7 +32,7 @@ export class QueryUnit {
 
     private static ddlPattern = /^(alter|create|drop)/ig;
     private static dmlPattern = /^(insert|update|delete)/ig;
-    public static async runQuery(sql?: string, connectionOptions?: IConnection): Promise<null> {
+    public static async runQuery(sql?: string, connectionOptions?: ConnectionInfo): Promise<null> {
         if (!sql && !vscode.window.activeTextEditor) {
             vscode.window.showWarningMessage("No SQL file selected");
             return;

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { ModelType } from "../../../common/Constants";
 import { DatabaseCache } from "../../../database/DatabaseCache";
-import { INode } from "../../../model/INode";
+import { Node } from "../../../model/interface/node";
 import { TableNode } from "../../../model/table/tableNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Util } from "../../../common/util";
@@ -30,7 +30,7 @@ export class TableChain implements ComplectionChain {
 
     private generateTableComplectionItem(inputWord?: string): vscode.CompletionItem[] {
 
-        let tableNodes: INode[] = [];
+        let tableNodes: Node[] = [];
         const tableNames: string[] = [];
         if (inputWord) {
             DatabaseCache.getDatabaseNodeList().forEach((databaseNode) => {

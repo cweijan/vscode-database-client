@@ -8,15 +8,17 @@ import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
-import { IConnection } from "../Connection";
-import { INode } from "../INode";
+import { ConnectionInfo } from "../interface/connection";
+import { CopyAble } from "../interface/copyAble";
+import { Node } from "../interface/node";
 import { FunctionGroup } from "../other/functionGroup";
 import { ProcedureGroup } from "../other/procedureGroup";
 import { TriggerGroup } from "../other/triggerGroup";
 import { TableGroup } from "../table/tableGroup";
 import { ViewGroup } from "../table/viewGroup";
+import { Util } from '../../common/util';
 
-export class DatabaseNode implements INode, IConnection {
+export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
 
     public identify: string;
     public type: string = ModelType.DATABASE;
@@ -37,7 +39,7 @@ export class DatabaseNode implements INode, IConnection {
 
     }
 
-    public async getChildren(isRresh: boolean = false): Promise<INode[]> {
+    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
         return [new TableGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
         new ViewGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
@@ -106,4 +108,9 @@ export class DatabaseNode implements INode, IConnection {
         ConnectionManager.getConnection(this, true);
 
     }
+
+    public copyName() {
+        Util.copyToBoard(this.database)
+    }
+
 }

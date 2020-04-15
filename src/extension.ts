@@ -25,6 +25,7 @@ import { CommandKey } from "./common/Constants";
 import { TableHoverProvider } from "./provider/TableHoverProvider";
 import { TableGroup } from "./model/table/tableGroup";
 import { MysqlSetting } from "./extension/MysqlSetting";
+import { CopyAble } from "./model/interface/copyAble";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -109,6 +110,9 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         vscode.commands.registerCommand("mysql.template.sql", (tableNode: TableNode, run: boolean) => {
             tableNode.selectSqlTemplate(run);
+        }),
+        vscode.commands.registerCommand("mysql.name.copy", (copyAble: CopyAble) => {
+            copyAble.copyName();
         }),
         vscode.commands.registerCommand("mysql.data.import", (iNode: DatabaseNode | ConnectionNode) => {
             vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {

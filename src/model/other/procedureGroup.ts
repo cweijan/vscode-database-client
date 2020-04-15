@@ -4,12 +4,12 @@ import { Constants, ModelType } from "../../common/Constants";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { IConnection } from "../Connection";
+import { ConnectionInfo } from "../interface/connection";
 import { InfoNode } from "../InfoNode";
-import { INode } from "../INode";
+import { Node } from "../interface/node";
 import { ProcedureNode } from "./Procedure";
 
-export class ProcedureGroup implements INode, IConnection {
+export class ProcedureGroup implements Node, ConnectionInfo {
     public type: string; public identify: string;
     constructor(readonly host: string, readonly user: string,
         readonly password: string, readonly port: string, readonly database: string,
@@ -27,7 +27,7 @@ export class ProcedureGroup implements INode, IConnection {
         };
     }
 
-    public async getChildren(isRresh: boolean = false): Promise<INode[]> {
+    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
         let tableNodes = DatabaseCache.getTableListOfDatabase(this.identify);
         if (tableNodes && !isRresh) {
@@ -35,7 +35,7 @@ export class ProcedureGroup implements INode, IConnection {
         }
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT ROUTINE_NAME FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${this.database}' and ROUTINE_TYPE='PROCEDURE'`)
             .then((tables) => {
-                tableNodes = tables.map<INode>((table) => {
+                tableNodes = tables.map<Node>((table) => {
                     return new ProcedureNode(this.host, this.user, this.password, this.port, this.database, table.ROUTINE_NAME, this.certPath);
                 });
                 DatabaseCache.setTableListOfDatabase(this.identify, tableNodes);

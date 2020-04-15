@@ -80,6 +80,11 @@
 				}
 			},
 			{
+				"command": "mysql.name.copy",
+				"title": "Copy Name",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.addConnection",
 				"title": "Add Connection",
 				"icon": {
@@ -389,14 +394,19 @@
 					"group": "inline"
 				},
 				{
-					"command": "mysql.delete.user",
+					"command": "mysql.change.user",
+					"when": "view == github.cweijan.mysql && viewItem == user",
+					"group": "1_mysql@0"
+				},
+				{
+					"command": "mysql.name.copy",
 					"when": "view == github.cweijan.mysql && viewItem == user",
 					"group": "1_mysql@1"
 				},
 				{
-					"command": "mysql.change.user",
+					"command": "mysql.delete.user",
 					"when": "view == github.cweijan.mysql && viewItem == user",
-					"group": "1_mysql@1"
+					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.newQuery",
@@ -411,7 +421,12 @@
 				{
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == database",
-					"group": "3_mysql"
+					"group": "3_mysql@0"
+				},
+				{
+					"command": "mysql.name.copy",
+					"when": "view == github.cweijan.mysql && viewItem == database",
+					"group": "3_mysql@1"
 				},
 				{
 					"command": "mysql.deleteDatabase",
@@ -452,6 +467,11 @@
 					"command": "mysql.table.source",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@3"
+				},
+				{
+					"command": "mysql.name.copy",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline@4"
 				},
 				{
 					"command": "mysql.copy.insert",
@@ -509,9 +529,14 @@
 					"group": "inline"
 				},
 				{
-					"command": "mysql.column.drop",
+					"command": "mysql.name.copy",
 					"when": "view == github.cweijan.mysql && viewItem == column",
 					"group": "3_mysql@0"
+				},
+				{
+					"command": "mysql.column.drop",
+					"when": "view == github.cweijan.mysql && viewItem == column",
+					"group": "3_mysql@1"
 				},
 				{
 					"command": "mysql.template.view",

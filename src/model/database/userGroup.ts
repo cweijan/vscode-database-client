@@ -4,11 +4,13 @@ import { Constants, ModelType } from "../../common/Constants";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { IConnection } from "../Connection";
+import { ConnectionInfo } from "../interface/connection";
 import { InfoNode } from "../InfoNode";
-import { INode } from "../INode";
+import { Node } from "../interface/node";
 import { DatabaseNode } from "./databaseNode";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { CopyAble } from "../interface/copyAble";
+import { Util } from "../../common/util";
 
 export class UserGroup extends DatabaseNode {
 
@@ -32,7 +34,7 @@ export class UserGroup extends DatabaseNode {
 
     }
 
-    public async getChildren(isRresh: boolean = false): Promise<INode[]> {
+    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         let userNodes = [];
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT DISTINCT USER FROM mysql.user;`)
             .then((tables) => {
@@ -54,12 +56,15 @@ export class UserGroup extends DatabaseNode {
 }
 
 
-export class UserNode implements INode, IConnection {
+export class UserNode implements Node, ConnectionInfo, CopyAble {
     public type: string;
     public identify: string;
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly name: string,
         readonly certPath: string) {
+    }
+    public copyName(): void {
+        Util.copyToBoard(this.name)
     }
     public getTreeItem(): vscode.TreeItem {
         this.identify = `${this.host}_${this.port}_${this.name}`;
@@ -75,7 +80,7 @@ export class UserNode implements INode, IConnection {
         };
     }
 
-    public async getChildren(isRresh: boolean = false): Promise<INode[]> {
+    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         return [];
     }
 
@@ -101,7 +106,16 @@ export class UserNode implements INode, IConnection {
 
     public changePasswordTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.createSQLTextDocument(`update mysql.user set password=PASSWORD("newPassword") where User='${this.name}';\nFLUSH PRIVILEGES;\n-- since mysql version 5.7, password column need change to authentication_string=PASSWORD("test")`);
+        QueryUnit.createSQLTextDocument(`
+update
+    mysql.user
+set
+    password = PASSWORD("newPassword")
+where
+    User = '${this.name}';
+FLUSH PRIVILEGES;
+-- since mysql version 5.7, password column need change to authentication_string=PASSWORD("test")`
+            .replace(/^\s/, ""));
     }
 
 }

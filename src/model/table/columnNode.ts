@@ -1,12 +1,14 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { INode } from "../INode";
+import { Node } from "../interface/node";
 import { ModelType, Constants } from "../../common/Constants";
 import { QueryUnit } from "../../database/QueryUnit";
 import { DatabaseCache } from "../../database/DatabaseCache";
-import { IConnection } from "../Connection";
+import { ConnectionInfo } from "../interface/connection";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { CopyAble } from "../interface/copyAble";
+import { Util } from "../../common/util";
 
 class ColumnTreeItem extends vscode.TreeItem {
     public columnName: string;
@@ -14,12 +16,15 @@ class ColumnTreeItem extends vscode.TreeItem {
     public document: string;
 }
 
-export class ColumnNode implements INode, IConnection {
+export class ColumnNode implements Node, ConnectionInfo, CopyAble {
     public identify: string;
     public type: string = ModelType.COLUMN;
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, private readonly table: string,
         readonly certPath: string, public readonly column: any) {
+    }
+    public copyName(): void {
+        Util.copyToBoard(this.column.name)
     }
 
     private getIndex(columnKey: string) {
@@ -48,7 +53,7 @@ export class ColumnNode implements INode, IConnection {
         };
     }
 
-    public async getChildren(): Promise<INode[]> {
+    public async getChildren(): Promise<Node[]> {
         return [];
     }
 
