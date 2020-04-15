@@ -6,14 +6,15 @@ import { ConnectionManager } from "../database/ConnectionManager";
 import { DatabaseCache } from "../database/DatabaseCache";
 import { QueryUnit } from "../database/QueryUnit";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
-import { IConnection } from "./interface/connection";
+import { ConnectionInfo } from "./interface/connection";
 import { DatabaseNode } from "./database/databaseNode";
 import { UserGroup } from "./database/userGroup";
 import { InfoNode } from "./InfoNode";
 import { Node } from "./interface/node";
+import { FileManager } from "../extension/FileManager";
 
 
-export class ConnectionNode implements Node, IConnection {
+export class ConnectionNode implements Node, ConnectionInfo {
 
     public identify: string;
     public database?: string;
@@ -58,8 +59,8 @@ export class ConnectionNode implements Node, IConnection {
     }
 
     public async newQuery() {
-        QueryUnit.createSQLTextDocument();
         ConnectionManager.getConnection(this);
+        ConnectionNode.tryOpenQuery()
     }
 
     public createDatabase() {
@@ -74,7 +75,7 @@ export class ConnectionNode implements Node, IConnection {
     }
 
     public async deleteConnection(context: vscode.ExtensionContext) {
-        const connections = context.globalState.get<{ [key: string]: IConnection }>(CacheKey.ConectionsKey);
+        const connections = context.globalState.get<{ [key: string]: ConnectionInfo }>(CacheKey.ConectionsKey);
         delete connections[this.id];
         await context.globalState.update(CacheKey.ConectionsKey, connections);
 
@@ -93,8 +94,8 @@ export class ConnectionNode implements Node, IConnection {
         if (!lcp) {
             Console.log("Not active connection found!");
         } else {
-            await QueryUnit.showSQLTextDocument();
             const key = `${lcp.host}_${lcp.port}_${lcp.user}`;
+            await FileManager.show(`${key}.sql`);
             const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
             await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" }).then(async (dbName) => {
                 if (dbName) {

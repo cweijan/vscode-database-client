@@ -1,34 +1,16 @@
-import * as fs from "fs";
-import * as vscode from "vscode";
+import { FileManager } from "./FileManager";
 export class HistoryManager {
 
-    constructor(private context: vscode.ExtensionContext) {
+    public static showHistory() {
+        FileManager.show('history.sql')
     }
 
-    public showHistory() {
-        const historyPath = this.context['globalStoragePath'] + '/history.sql';
-        if (!fs.existsSync(historyPath)) {
-            fs.appendFileSync(historyPath, "");
-        }
-        const openPath = vscode.Uri.file(historyPath);
-        vscode.workspace.openTextDocument(openPath).then((doc) => {
-            vscode.window.showTextDocument(doc);
-        });
-    }
-
-    public recordHistory(sql: string, costTime: number) {
+    public static recordHistory(sql: string, costTime: number) {
         if (!sql) { return; }
-        return new Promise(() => {
-            const gsPath = this.context['globalStoragePath'];
-            if (!fs.existsSync(gsPath)) {
-                fs.mkdirSync(gsPath);
-            }
-            fs.appendFileSync(gsPath + '/history.sql', `/* ${this.getNowDate()} [${costTime} ms] */ ${sql.replace(/[\r\n]/g, " ")}\n`, { encoding: 'utf8' });
-
-        });
+        FileManager.record('history.sql', `/* ${this.getNowDate()} [${costTime} ms] */ ${sql.replace(/[\r\n]/g, " ")}\n`);
     }
 
-    private getNowDate(): string {
+    private static getNowDate(): string {
         const date = new Date();
         let month: string | number = date.getMonth() + 1;
         let strDate: string | number = date.getDate();
@@ -45,7 +27,7 @@ export class HistoryManager {
             + this.pad(date.getHours(), 2) + ":" + this.pad(date.getMinutes(), 2) + ":" + this.pad(date.getSeconds(), 2);
     }
 
-    public pad(n: any, width: number, z?: any): number {
+    public static pad(n: any, width: number, z?: any): number {
         z = z || '0';
         n = n + '';
         return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;

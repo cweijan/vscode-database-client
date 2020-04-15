@@ -10,7 +10,6 @@ import { ConnectionInfo } from "../model/interface/connection";
 import { QueryPage } from "../view/result/query";
 import { DataResponse, DMLResponse, ErrorResponse, RunResponse } from "../view/result/queryResponse";
 import { ConnectionManager } from "./ConnectionManager";
-const { once } = require('events');
 
 export class QueryUnit {
 
@@ -120,8 +119,9 @@ export class QueryUnit {
     }
 
     public static async createSQLTextDocument(sql: string = "") {
-        const textDocument = await vscode.workspace.openTextDocument({ content: sql, language: "sql" });
-        return vscode.window.showTextDocument(textDocument);
+        return vscode.window.showTextDocument(
+            await vscode.workspace.openTextDocument({ content: sql, language: "sql" })
+        );
     }
 
 
@@ -133,8 +133,9 @@ export class QueryUnit {
                 editBuilder.replace(Cursor.getRangeStartTo(Util.getDocumentLastPosition(this.sqlDocument.document)), sql);
             });
         } else {
-            const textDocument = await vscode.workspace.openTextDocument({ content: sql, language: "sql" });
-            this.sqlDocument = await vscode.window.showTextDocument(textDocument);
+            this.sqlDocument = await vscode.window.showTextDocument(
+                await vscode.workspace.openTextDocument({ content: sql, language: "sql" })
+            );
         }
         return this.sqlDocument;
     }
@@ -153,9 +154,9 @@ export class QueryUnit {
             const fileContent = fs.readFileSync(fsPath, 'utf8');
             const sqlList = fileContent.split(";")
             for (let sql of sqlList) {
-                if (!(sql = sql.trim())) continue;
+                if (!(sql = sql.trim())) { continue };
                 // TODO break when break;
-                await new Promise(resolve => {
+                await new Promise((resolve) => {
                     connection.query(sql, (err, data) => {
                         if (err) {
                             Console.log(`Execute sql fail:\n ${err.sql}\n code: ${err.sqlState} message : ${err.message}`)

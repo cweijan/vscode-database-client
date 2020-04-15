@@ -17,6 +17,7 @@ import { TriggerGroup } from "../other/triggerGroup";
 import { TableGroup } from "../table/tableGroup";
 import { ViewGroup } from "../table/viewGroup";
 import { Util } from '../../common/util';
+import { FileManager } from '../../extension/FileManager';
 
 export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
 
@@ -104,7 +105,8 @@ export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
 
     public async newQuery() {
 
-        QueryUnit.createSQLTextDocument();
+        FileManager.show(`${this.identify}-query.sql`)
+        // QueryUnit.createSQLTextDocument();
         ConnectionManager.getConnection(this, true);
 
     }

@@ -17,6 +17,7 @@
             true,
             500
         ],
+        "trailing-comma":false,
         "semicolon":false,
         "no-empty": false,
         "object-literal-sort-keys": false,

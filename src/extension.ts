@@ -1,8 +1,8 @@
 "use strict";
+// Don't change import order, it will occur circular reference
 import * as vscode from "vscode";
 import { QueryUnit } from "./database/QueryUnit";
 import { ConnectionNode } from "./model/ConnectionNode";
-import { ConnectionManager } from "./database/ConnectionManager";
 import { DatabaseNode } from "./model/database/databaseNode";
 import { TableNode } from "./model/table/tableNode";
 import { MySQLTreeDataProvider } from "./provider/MysqlTreeDataProvider";
@@ -26,14 +26,15 @@ import { TableHoverProvider } from "./provider/TableHoverProvider";
 import { TableGroup } from "./model/table/tableGroup";
 import { MysqlSetting } from "./extension/MysqlSetting";
 import { CopyAble } from "./model/interface/copyAble";
+import { FileManager } from "./extension/FileManager";
 
 export function activate(context: vscode.ExtensionContext) {
 
 
     DatabaseCache.initCache(context);
     SqlViewManager.initExtesnsionPath(context.extensionPath);
-    const historyManager = new HistoryManager(context);
 
+    FileManager.init(context)
     const mysqlTreeDataProvider = new MySQLTreeDataProvider(context);
     const treeview = vscode.window.createTreeView("github.cweijan.mysql", {
         treeDataProvider: mysqlTreeDataProvider,
@@ -53,10 +54,10 @@ export function activate(context: vscode.ExtensionContext) {
             mysqlTreeDataProvider.init();
         }),
         vscode.commands.registerCommand("mysql.history.open", () => {
-            historyManager.showHistory();
+            HistoryManager.showHistory();
         }),
         vscode.commands.registerCommand(CommandKey.RecordHistory, (sql: string, costTime: number) => {
-            historyManager.recordHistory(sql, costTime);
+            HistoryManager.recordHistory(sql, costTime);
         }),
         vscode.commands.registerCommand("mysql.addDatabase", (connectionNode: ConnectionNode) => {
             connectionNode.createDatabase();
