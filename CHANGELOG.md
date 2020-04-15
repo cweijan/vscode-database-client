@@ -1,3 +1,9 @@
+## 1.7.2 (2020/4/15)
+- Support copy database、table、column name
+- Support show error message when importing data occur error.
+- Remeber sql history for database
+- Ui improve
+
 ## 1.7.1 (2020/4/11)
 - Support sort、filter in result page.
 - Enhance sql intelliCode.
