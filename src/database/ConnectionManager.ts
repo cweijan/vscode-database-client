@@ -8,7 +8,7 @@ import { QueryUnit } from "./QueryUnit";
 export class ConnectionManager {
 
     private static lastConnectionOption: IConnection;
-    private static activeConnection = {};
+    private static activeConnection: { [key: string]: mysql.Connection } = {};
 
     public static getLastConnectionOption() {
         return this.lastConnectionOption;
@@ -25,7 +25,7 @@ export class ConnectionManager {
 
     }
 
-    public static getConnection(connectionOptions: IConnection, changeActive: boolean = false): Promise<any> {
+    public static getConnection(connectionOptions: IConnection, changeActive: boolean = false): Promise<mysql.Connection> {
 
         connectionOptions.multipleStatements = true;
         this.lastConnectionOption = connectionOptions;
@@ -62,7 +62,7 @@ export class ConnectionManager {
     }
 
 
-    public static createConnection(connectionOptions: IConnection): any {
+    public static createConnection(connectionOptions: IConnection): mysql.Connection {
         const newConnectionOptions: any = Object.assign({ useConnectionPooling: true }, connectionOptions);
         if (connectionOptions.certPath && fs.existsSync(connectionOptions.certPath)) {
             newConnectionOptions.ssl = {

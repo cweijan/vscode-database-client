@@ -1,14 +1,16 @@
 "use strict";
 import * as fs from "fs";
+import { Connection } from "mysql";
 import * as vscode from "vscode";
-import { CommandKey, Cursor, MessageType, ConfigKey } from "../common/Constants";
+import { CommandKey, ConfigKey, Cursor, MessageType } from "../common/Constants";
+import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
 import { Util } from "../common/util";
 import { IConnection } from "../model/Connection";
 import { QueryPage } from "../view/result/query";
+import { DataResponse, DMLResponse, ErrorResponse, RunResponse } from "../view/result/queryResponse";
 import { ConnectionManager } from "./ConnectionManager";
-import { ErrorResponse, DataResponse, RunResponse, DMLResponse } from "../view/result/queryResponse";
-import { Global } from "../common/Global";
+const { once } = require('events');
 
 export class QueryUnit {
 
@@ -137,29 +139,44 @@ export class QueryUnit {
         return this.sqlDocument;
     }
 
-    public static runFile(connection: any, fsPath: string) {
+    public static async runFile(connection: Connection, fsPath: string) {
         const stats = fs.statSync(fsPath);
         const startTime = new Date();
         const fileSize = stats["size"];
-        let success = true;
         if (fileSize > 1024 * 1024 * 100) {
-            success = this.executeByLine(connection, fsPath);
+            vscode.window.showErrorMessage(`Import sql exceed max limit 100M!`)
+            return;
+            // if (await this.executeByLine(connection, fsPath)) {
+            //     Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
+            // }
         } else {
             const fileContent = fs.readFileSync(fsPath, 'utf8');
-            connection.query(fileContent, (err, data) => {
-                if (err) {
-                    Console.log(err);
-                    success = false;
-                }
-            });
-        }
-        if (success) {
+            const sqlList = fileContent.split(";")
+            for (let sql of sqlList) {
+                if (!(sql = sql.trim())) continue;
+                // TODO break when break;
+                await new Promise(resolve => {
+                    connection.query(sql, (err, data) => {
+                        if (err) {
+                            Console.log(`Execute sql fail:\n ${err.sql}\n code: ${err.sqlState} message : ${err.message}`)
+                        } else {
+                            resolve();
+                        }
+                    });
+                })
+            }
             Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
         }
+        vscode.commands.executeCommand(CommandKey.Refresh)
 
     }
 
-    private static executeByLine(connection: any, fsPath: string) {
+    /**
+     * TODO: have problem, fail
+     * @param connection 
+     * @param fsPath 
+     */
+    private static async executeByLine(connection: any, fsPath: string) {
         const readline = require('readline');
         const rl = readline.createInterface({
             input: fs.createReadStream(fsPath.replace("\\", "/")),

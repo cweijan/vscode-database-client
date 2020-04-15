@@ -56,7 +56,7 @@
 					"name": "MySQL"
 				}
 			]
-		}, 
+		},
 		"commands": [
 			{
 				"command": "mysql.history.open",
@@ -95,7 +95,7 @@
 			},
 			{
 				"command": "mysql.addDatabase",
-				"title": "Add Database",
+				"title": "New Database",
 				"icon": {
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
@@ -347,6 +347,11 @@
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "2_mysql@1"
+				},
+				{
+					"command": "mysql.addDatabase",
+					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"group": "2_mysql@0"
 				},
 				{
 					"command": "mysql.data.import",
@@ -610,6 +615,7 @@
 	},
 	"devDependencies": {
 		"@types/mocha": "^2.2.42",
+		"@types/mysql": "^2.15.9",
 		"@types/node": "^7.0.43",
 		"tslint": "^5.8.0",
 		"typescript": "^3.3.1",
