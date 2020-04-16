@@ -105,7 +105,7 @@ export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
 
     public async newQuery() {
 
-        FileManager.show(`${this.identify}-query.sql`)
+        FileManager.show(`${this.identify}.sql`)
         // QueryUnit.createSQLTextDocument();
         ConnectionManager.getConnection(this, true);
 
