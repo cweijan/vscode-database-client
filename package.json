@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-client",
 	"displayName": "MySQL",
 	"description": "MySQL Client for vscode",
-	"version": "1.7.2",
+	"version": "1.7.21",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
@@ -639,7 +639,6 @@
 		"tslint": "tslint -t verbose src/**/*.ts"
 	},
 	"devDependencies": {
-		"@types/mocha": "^2.2.42",
 		"@types/mysql": "^2.15.9",
 		"@types/node": "^7.0.43",
 		"tslint": "^5.8.0",
