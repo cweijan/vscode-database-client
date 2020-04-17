@@ -88,7 +88,7 @@ export class QueryUnit {
                 return;
             }
             if (Array.isArray(data)) {
-                QueryPage.send({ type: MessageType.DATA, connection: connectionOptions, res: { sql, costTime, data } as DataResponse });
+                QueryPage.send({ type: MessageType.DATA, connection: connectionOptions, res: { sql, costTime, data, fields } as DataResponse });
             }
 
         });

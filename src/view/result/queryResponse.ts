@@ -1,3 +1,5 @@
+import * as mysql from "mysql";
+
 export class RunResponse {
     public sql: string;
 }
@@ -10,6 +12,7 @@ export class DataResponse {
     public database?: string;
     public table: string | null;
     public data: any[];
+    public fields: mysql.FieldInfo[];
 }
 export class ErrorResponse {
     public sql: string;

@@ -25,7 +25,7 @@ export class QueryPage {
 
         switch (queryParam.type) {
             case MessageType.DATA:
-                await this.loadTableInfo(queryParam);
+                await this.loadColumnList(queryParam);
                 break;
             case MessageType.DML:
             case MessageType.DDL:
@@ -71,12 +71,12 @@ export class QueryPage {
         });
 
     }
-    private static async loadTableInfo(queryParam: QueryParam<DataResponse>) {
+    private static async loadColumnList(queryParam: QueryParam<DataResponse>) {
+        const fields = queryParam.res.fields;
         const conn = queryParam.connection;
-        const info = this.getTable(queryParam.res.sql);
-        if (!info) { return; }
-        const tableName = info.table;
-        const database = info.database;
+        if (!fields || fields.length == 0) { return; }
+        const tableName = fields[0].orgTable;
+        const database = fields[0].db;
         if (tableName == null || conn == null) { return; }
         // load table infomation
         const tableNode = DatabaseCache.getTable(`${conn.host}_${conn.port}_${conn.user}_${database ? database : conn.database}`, tableName);
