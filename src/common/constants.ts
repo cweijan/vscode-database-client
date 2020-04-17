@@ -8,8 +8,8 @@ export class Constants {
 }
 
 export enum Pattern {
-    TABLE_PATTERN = "\\b(from|join|update)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}",
-    UPDATE_PATTERN = "\\b(update)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}"
+    TABLE_PATTERN = "\\b(from|join|update|into)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}",
+    DML_PATTERN = "\\b(update|into)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}"
 }
 
 export class CacheKey {

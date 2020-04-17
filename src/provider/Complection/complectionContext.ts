@@ -27,7 +27,7 @@ export class ComplectionContext {
 
         const wordMatch = currentSql.match(/(\w|-|\_|\*)+/g);
         if (wordMatch) {
-            if ((preChart == null || preChart == " " || preChart == ".") && wordMatch.length >= 1) {
+            if ((preChart == null || preChart.match(/[\. \(\)\[\]\'\"]/)) && wordMatch.length >= 1) {
                 context.preWord = wordMatch[wordMatch.length - 1];
             } else {
                 context.preWord = wordMatch[wordMatch.length - 2];

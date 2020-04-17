@@ -28,8 +28,8 @@ export class ColumnChain implements ComplectionChain {
             return subComplectionItems;
         }
 
-        const tableName = Util.getTableName(complectionContext.currentSql, Pattern.UPDATE_PATTERN)
-        if (tableName && complectionContext.currentSql.match(/\bset\b/i)) {
+        const tableName = Util.getTableName(complectionContext.currentSql, Pattern.DML_PATTERN)
+        if (tableName) {
             this.needStop = false;
             return await this.generateColumnComplectionItem(tableName);
         }

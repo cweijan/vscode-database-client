@@ -7,9 +7,9 @@ export class Util {
 
     public static getTableName(sql: string, tablePattern: Pattern): string {
 
-        const tableMatch = new RegExp(tablePattern).exec(sql)
+        const tableMatch = new RegExp(tablePattern, 'img').exec(sql)
         if (tableMatch) {
-            return tableMatch[0].replace(/\bfrom|join|update\b/i, "") // remove keyword
+            return tableMatch[0].replace(/\bfrom|join|update|into\b/i, "") // remove keyword
                 .replace(/(\w|\s)*\./, "") // remove table name
                 .replace(/`/ig, "").trim() // remove `
         }
