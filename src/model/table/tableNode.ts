@@ -13,6 +13,7 @@ import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 import { Util } from "../../common/util";
 import { CopyAble } from "../interface/copyAble";
+import format = require('date-format');
 
 
 export class TableNode implements Node, ConnectionInfo, CopyAble {
@@ -211,7 +212,7 @@ ADD
                     engine: false,
                 },
             },
-            dumpToFile: `${exportPath}\\${this.database}.${this.table}_${this.host}.sql`,
+            dumpToFile: `${exportPath}\\${this.database}_${this.table}_${format('yyyy-MM-dd_hhmmss', new Date())}.sql`,
         }).then(() => {
             vscode.window.showInformationMessage(`Backup ${this.host}_${this.database}_${this.table} success!`);
         }).catch((err) => {

@@ -646,6 +646,7 @@
 		"vscode": "^1.1.33"
 	},
 	"dependencies": {
+		"date-format": "^3.0.0",
 		"mysql": "^2.15.0",
 		"mysqldump": "^2.2.1",
 		"sql-formatter": "^2.3.3"

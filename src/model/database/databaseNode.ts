@@ -18,6 +18,7 @@ import { TableGroup } from "../table/tableGroup";
 import { ViewGroup } from "../table/viewGroup";
 import { Util } from '../../common/util';
 import { FileManager } from '../../extension/FileManager';
+import format = require('date-format');
 
 export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
 
@@ -77,7 +78,7 @@ export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
                     engine: false,
                 },
             },
-            dumpToFile: `${exportPath}\\${this.database}_${this.host}.sql`,
+            dumpToFile: `${exportPath}\\${this.database}_${format('yyyy-MM-dd_hhmmss', new Date())}.sql`,
         }).then(() => {
             vscode.window.showInformationMessage(`Backup ${this.host}_${this.database} success!`);
         }).catch((err) => {
