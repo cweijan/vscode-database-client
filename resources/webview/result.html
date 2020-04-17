@@ -476,6 +476,7 @@
                 handlerData(response)
                 break;
             case "DML":
+            case "DDL":
                 handlerCommon(response)
                 vue.info.error = false
                 vue.refresh()

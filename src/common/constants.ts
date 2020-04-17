@@ -23,8 +23,8 @@ export enum ConfigKey {
 }
 
 export class CommandKey {
-    static RecordHistory = "mysql.history.record";
-    static Refresh = "mysql.refresh";
+    public static RecordHistory = "mysql.history.record";
+    public static Refresh = "mysql.refresh";
 }
 
 export class Cursor {
@@ -57,6 +57,7 @@ export class ModelType {
 export enum MessageType {
     DATA = 'DATA',
     DML = 'DML',
+    DDL = 'DDL',
     ERROR = "ERROR",
     RUN = "RUN"
 }

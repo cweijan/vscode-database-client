@@ -28,6 +28,7 @@ export class QueryPage {
                 await this.loadTableInfo(queryParam);
                 break;
             case MessageType.DML:
+            case MessageType.DDL:
                 queryParam.res.message = `EXECUTE SUCCESS:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>AffectedRows : ${queryParam.res.affectedRows}, CostTime : ${queryParam.res.costTime}ms`;
                 break;
             case MessageType.ERROR:

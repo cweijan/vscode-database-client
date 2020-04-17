@@ -9,6 +9,7 @@ import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 import { CopyAble } from "../interface/copyAble";
 import { Util } from "../../common/util";
+const wrap = Util.wrap;
 
 class ColumnTreeItem extends vscode.TreeItem {
     public columnName: string;
@@ -62,7 +63,7 @@ export class ColumnNode implements Node, ConnectionInfo, CopyAble {
         const columnName = this.column.name;
         vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(async (newColumnName) => {
             if (!newColumnName) { return; }
-            const sql = `alter table \`${this.database}\`.\`${this.table}\` change column \`${columnName}\` \`${newColumnName}\` ${this.column.type} comment '${this.column.comment}'`;
+            const sql = `alter table ${wrap(this.database)}.${wrap(this.table)} change column ${wrap(columnName)} ${wrap(newColumnName)} ${this.column.type} comment '${this.column.comment}'`;
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearColumnCache(`${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`);
                 MySQLTreeDataProvider.refresh();
@@ -73,11 +74,12 @@ export class ColumnNode implements Node, ConnectionInfo, CopyAble {
 
     public updateColumnTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t\`${this.database}\`.\`${this.table}\` CHANGE \`${this.column.name}\` \`${this.column.name}\` ${this.column.type} NOT NULL comment '${this.column.comment}';`);
+        QueryUnit.showSQLTextDocument(`ALTER TABLE 
+    ${wrap(this.database)}.${wrap(this.table)} CHANGE ${wrap(this.column.name)} ${wrap(this.column.name)} ${this.column.type}${this.column.nullable ? "" : " NOT NULL"}${this.column.comment ? " comment " + this.column.comment : ""};`);
     }
     public dropColumnTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.createSQLTextDocument(`ALTER TABLE \n\t\`${this.database}\`.\`${this.table}\` DROP COLUMN \`${this.column.name}\`;`);
+        QueryUnit.createSQLTextDocument(`ALTER TABLE \n\t${wrap(this.database)}.${wrap(this.table)} DROP COLUMN ${wrap(this.column.name)};`);
     }
 
 

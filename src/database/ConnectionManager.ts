@@ -14,7 +14,7 @@ export class ConnectionManager {
         return this.lastConnectionOption;
     }
 
-    public static getLastActiveConnection() {
+    public static getLastActiveConnection(): Promise<mysql.Connection> {
 
         if (!this.activeConnection) {
             return undefined;

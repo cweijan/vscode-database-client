@@ -30,7 +30,7 @@ export class FileManager {
             if (!fs.existsSync(gsPath)) {
                 fs.mkdirSync(gsPath);
             }
-            fs.appendFileSync(`${content}\n`, { encoding: 'utf8' });
+            fs.appendFileSync(fileName, `${content}\n`, { encoding: 'utf8' });
 
         });
     }

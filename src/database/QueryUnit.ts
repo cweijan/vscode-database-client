@@ -1,8 +1,9 @@
 "use strict";
 import * as fs from "fs";
+import * as mysql from "mysql";
 import { Connection } from "mysql";
 import * as vscode from "vscode";
-import { CommandKey, ConfigKey, Cursor, MessageType } from "../common/Constants";
+import { CommandKey, ConfigKey, Cursor, MessageType, Constants } from "../common/Constants";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
 import { Util } from "../common/util";
@@ -36,7 +37,7 @@ export class QueryUnit {
             vscode.window.showWarningMessage("No SQL file selected");
             return;
         }
-        let connection: any;
+        let connection: mysql.Connection;
         if (!connectionOptions) {
             if (!(connection = await ConnectionManager.getLastActiveConnection())) {
                 vscode.window.showWarningMessage("No MySQL Server or Database selected");
@@ -68,7 +69,7 @@ export class QueryUnit {
         if (isDDL == null && isDML == null) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
-        connection.query(sql, (err, data) => {
+        connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
             if (err) {
                 QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
                 return;
@@ -78,6 +79,7 @@ export class QueryUnit {
                 vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime);
             }
             if (isDDL) {
+                QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
                 vscode.commands.executeCommand(CommandKey.Refresh);
                 return;
             }
