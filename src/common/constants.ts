@@ -2,9 +2,14 @@ import * as vscode from "vscode";
 import * as path from "path";
 
 export class Constants {
-    public static CONFIG_PREFIX="vscode-mysql"
+    public static CONFIG_PREFIX = "vscode-mysql"
     public static RES_PATH = path.join(vscode.extensions.getExtension('cweijan.vscode-mysql-client').extensionPath, "resources");
     public static DEFAULT_SIZE = 100;
+}
+
+export enum Pattern {
+    TABLE_PATTERN = "\\b(from|join|update)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}",
+    UPDATE_PATTERN = "\\b(update)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}"
 }
 
 export class CacheKey {

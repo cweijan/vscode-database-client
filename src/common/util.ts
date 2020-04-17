@@ -1,15 +1,28 @@
 
 import { Position, TextDocument } from "vscode";
 import * as vscode from "vscode";
+import { Pattern } from "./Constants";
 
 export class Util {
+
+    public static getTableName(sql: string, tablePattern: Pattern): string {
+
+        const tableMatch = new RegExp(tablePattern).exec(sql)
+        if (tableMatch) {
+            return tableMatch[0].replace(/\bfrom|join|update\b/i, "") // remove keyword
+                .replace(/(\w|\s)*\./, "") // remove table name
+                .replace(/`/ig, "").trim() // remove `
+        }
+
+        return null;
+    }
 
     /**
      * wrap origin with ` if is unusual identifier
      * @param origin any string
      */
     public static wrap(origin: string) {
-        if (origin == null) return origin;
+        if (origin == null) { return origin; }
 
         if (origin.match(/\b[-\.]\b/ig)
             || origin.match(/^if|key|name|user|desc|length$/i)) {

@@ -2,34 +2,44 @@ import * as vscode from "vscode";
 import { DatabaseCache } from "../../../database/DatabaseCache";
 import { ColumnNode } from "../../../model/table/columnNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
+import { Util } from "../../../common/util";
+import { Pattern } from "../../../common/Constants";
 
 export class ColumnChain implements ComplectionChain {
 
+    private tablePatternStr = "\\b(from|join|update)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}";
+    private needStop = true;
     public async getComplection(complectionContext: ComplectionContext): Promise<vscode.CompletionItem[]> {
 
         if (complectionContext.preChart === ".") {
             let subComplectionItems = await this.generateColumnComplectionItem(complectionContext.preWord);
-            const tableReg = new RegExp("\\b(from|join)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
+            const tableReg = new RegExp(this.tablePatternStr + "(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
             let result = tableReg.exec(complectionContext.currentSqlFull);
             for (; result != null && subComplectionItems.length === 0;) {
                 subComplectionItems = await this.generateColumnComplectionItem(
-                    result[0].replace(/\bfrom|join\b/, "")
-                        .replace(/(\w|\s)*\./, "")
-                        .replace(/`/ig, "").trim(),
+                    Util.getTableName(result[0], Pattern.TABLE_PATTERN)
                 );
                 if (subComplectionItems.length > 0) {
                     break;
                 }
+                this.needStop = true;
                 result = tableReg.exec(complectionContext.currentSqlFull);
             }
             return subComplectionItems;
         }
 
+        const tableName = Util.getTableName(complectionContext.currentSql, Pattern.UPDATE_PATTERN)
+        if (tableName && complectionContext.currentSql.match(/\bset\b/i)) {
+            this.needStop = false;
+            return await this.generateColumnComplectionItem(tableName);
+        }
+
+
         return null;
     }
 
     public stop(): boolean {
-        return true;
+        return this.needStop;
     }
 
     private async generateColumnComplectionItem(tableName: string): Promise<vscode.CompletionItem[]> {
