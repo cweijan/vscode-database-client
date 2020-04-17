@@ -1,3 +1,9 @@
+## 1.7.30 (2020/4/17)
+- Switch active database using open query.
+- support insert or update in any query result page.
+- intellij insert|update code.
+- fix bugs.
+
 ## 1.7.2 (2020/4/15)
 - Support copy database、table、column name
 - Support show error message when importing data occur error.

@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-client",
 	"displayName": "MySQL",
 	"description": "MySQL Client for vscode",
-	"version": "1.7.21",
+	"version": "1.7.30",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
@@ -123,7 +123,7 @@
 			},
 			{
 				"command": "mysql.newQuery",
-				"title": "New Query",
+				"title": "Open Query",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/query.svg",
