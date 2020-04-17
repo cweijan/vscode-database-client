@@ -1,5 +1,7 @@
 import * as fs from "fs";
+import * as path from "path";
 import * as mysql from "mysql";
+import * as vscode from "vscode";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
 import { ConnectionInfo } from "../model/interface/connection";
@@ -20,6 +22,17 @@ export class ConnectionManager {
             return undefined;
         }
 
+        if (vscode.window.activeTextEditor) {
+            const fileName = vscode.window.activeTextEditor.document.fileName;
+            if (fileName.includes('cweijan.vscode-mysql-client')) {
+
+                const queryName = path.basename(fileName, path.extname(fileName))
+                const [host, port, user, database] = queryName.split('_')
+                return this.getConnection({
+                    multipleStatements: true, host, port, user, database, certPath: null
+                }, true)
+            }
+        }
 
         return this.getConnection(Object.assign({ multipleStatements: true }, this.lastConnectionOption));
 
@@ -30,7 +43,7 @@ export class ConnectionManager {
         connectionOptions.multipleStatements = true;
         this.lastConnectionOption = connectionOptions;
         if (changeActive) { Global.updateStatusBarItems(connectionOptions); }
-        const key = `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}_${connectionOptions.password}`;
+        const key = `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`;
 
         return new Promise((resolve, reject) => {
             const connection = this.activeConnection[key];
