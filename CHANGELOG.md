@@ -1,7 +1,8 @@
-## 1.7.30 (2020/4/17)
+## 1.7.31 (2020/4/17)
 - Switch active database using open query.
 - support insert or update in any query result page.
 - intellij insert|update code.
+- show comment when edit.
 - fix bugs.
 
 ## 1.7.2 (2020/4/15)
