@@ -140,7 +140,8 @@
                     <template>
                         <span>
                             {{column.name}} : {{column.type}} : <span
-                                style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' Required'}}</span>
+                                style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' Required'}}</span>&nbsp;
+                                {{column.comment?column.comment:''}}
                         </span>
                         <el-input v-model="update.currentNew[column.name]"></el-input>
                     </template>
