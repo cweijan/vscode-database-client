@@ -145,7 +145,7 @@
             </el-table>
         </div>
         <el-dialog :title="editorTilte" :visible.sync="editor.visible" width="90%" top="3vh" size="small">
-            <el-form :rules="info.rule" :ref="infoForm">
+            <el-form :rules="info.rule" :ref="infoForm" :model="update.currentNew">
                 <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
                     <template>
                         <span>
