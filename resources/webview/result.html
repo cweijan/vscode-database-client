@@ -59,10 +59,9 @@
             background-color: #ccc;  */
         }
 
-        .el-table .edit-row{
+        .el-table .edit-row {
             background: oldlace;
         }
-
     </style>
 </head>
 
@@ -96,8 +95,8 @@
             </el-row>
             <!-- info panel -->
             <div v-if="info.visible ">
-                <div v-if="info.error" class="info-panel" style="color:red" v-text="info.message"></div>
-                <div v-if="!info.error" class="info-panel" style="color: green;" v-text="info.message"></div>
+                <div v-if="info.error" class="info-panel" style="color:red" v-html="info.message"></div>
+                <div v-if="!info.error" class="info-panel" style="color: green;" v-html="info.message"></div>
             </div>
         </div>
         <!-- talbe result -->
@@ -110,7 +109,8 @@
                 <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey" align="center">
                     <template slot-scope="scope">
                         <div v-if="scope.row.isFilter" style="text-align: center;">
-                            Reset : <el-button @click="resetFilter" type="warning" size="small" icon="el-icon-refresh" circle title="Reset">
+                            Reset : <el-button @click="resetFilter" type="warning" size="small" icon="el-icon-refresh"
+                                circle title="Reset">
                             </el-button>
                         </div>
                         <div v-if="scope.row[result.primaryKey]">
@@ -123,9 +123,8 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column :label="field.name" v-for="field in result.fields" :key="field.name"
-                    align="center" sortable v-if="result.columnList"
-                    :width="computeWidth(field.name,0,toolbar.filter[field.name])">
+                <el-table-column :label="field.name" v-for="field in result.fields" :key="field.name" align="center"
+                    sortable v-if="result.columnList" :width="computeWidth(field.name,0,toolbar.filter[field.name])">
                     <template slot-scope="scope">
                         <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[field.name]" placeholder="filter"
                             @blur="filter($event,field.name)" v-on:keyup.enter.native="filter($event,field.name)">
@@ -140,7 +139,8 @@
                 <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
                     <template>
                         <span>
-                            {{column.name}} : {{column.type}} : <span style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' Required'}}</span>
+                            {{column.name}} : {{column.type}} : <span
+                                style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' Required'}}</span>
                         </span>
                         <el-input v-model="update.currentNew[column.name]"></el-input>
                     </template>
@@ -262,7 +262,7 @@
                     const newEle = this.update.currentNew[key];
                     if (newEle) {
                         columns += `${key},`;
-                        values += `'${newEle}',`;
+                        values += `'${newEle.replace(/'/g, "\\'")}',`;
                     }
                 }
                 if (values) {
@@ -278,7 +278,7 @@
                     const oldEle = this.update.current[key];
                     const newEle = this.update.currentNew[key];
                     if (oldEle != newEle) {
-                        change += `${key}='${newEle}',`
+                        change += `${key}='${newEle.replace(/'/g, "\\'")}',`
                     }
                 }
                 if (change) {
@@ -325,7 +325,7 @@
             },
             tableRowClassName({ row, rowIndex }) {
                 if (!this.result.primaryKey || !this.update.primary) return ''
-                if (row[this.result.primaryKey]==this.update.primary){
+                if (row[this.result.primaryKey] == this.update.primary) {
                     return 'edit-row';
                 }
                 return '';
