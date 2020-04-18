@@ -9,11 +9,11 @@ export class FileManager {
     public static show(fileName: string) {
         if (!this.context) { vscode.window.showErrorMessage("FileManager is not init!") }
         if (!fileName) { return; }
-        const historyPath = `${this.context['globalStoragePath']}/${fileName}`;
-        if (!fs.existsSync(historyPath)) {
-            fs.appendFileSync(historyPath, "");
+        const recordPath = `${this.context['globalStoragePath']}/${fileName}`;
+        if (!fs.existsSync(recordPath)) {
+            fs.appendFileSync(recordPath, "");
         }
-        const openPath = vscode.Uri.file(historyPath);
+        const openPath = vscode.Uri.file(recordPath);
         return new Promise((resolve) => {
             vscode.workspace.openTextDocument(openPath).then(async (doc) => {
                 resolve(await vscode.window.showTextDocument(doc));
@@ -26,11 +26,11 @@ export class FileManager {
         if (!this.context) { vscode.window.showErrorMessage("FileManager is not init!") }
         if (!fileName || !content) { return; }
         return new Promise(() => {
-            const gsPath = this.context['globalStoragePath'];
-            if (!fs.existsSync(gsPath)) {
-                fs.mkdirSync(gsPath);
+            const recordPath = `${this.context['globalStoragePath']}/${fileName}`;
+            if (!fs.existsSync(recordPath)) {
+                fs.mkdirSync(recordPath);
             }
-            fs.appendFileSync(fileName, `${content}\n`, { encoding: 'utf8' });
+            fs.appendFileSync(recordPath, `${content}`, { encoding: 'utf8' });
 
         });
     }
