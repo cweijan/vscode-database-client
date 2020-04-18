@@ -1,3 +1,6 @@
+## 1.7.32 (2020/4/18)
+- Fix legacy bug: connect to same host fail.
+
 ## 1.7.31 (2020/4/17)
 - Switch active database using open query.
 - support insert or update in any query result page.
