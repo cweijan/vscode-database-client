@@ -29,7 +29,7 @@ export class ConnectionNode implements Node, ConnectionInfo {
         this.identify = `${this.host}_${this.port}_${this.user}`;
         return {
             label: this.identify,
-            id: this.host,
+            id: this.identify,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.CONNECTION,
             iconPath: path.join(Constants.RES_PATH, "server.png"),

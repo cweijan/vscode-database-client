@@ -16,14 +16,14 @@ export class FunctionNode implements Node, ConnectionInfo {
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, readonly name: string,
         readonly certPath: string) {
+        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.name}`;
     }
 
     public getTreeItem(): vscode.TreeItem {
 
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.name}`;
         return {
             label: this.name,
-            // collapsibleState: DatabaseCache.getElementState(this),
+            id: this.identify,
             contextValue: ModelType.FUNCTION,
             iconPath: path.join(Constants.RES_PATH, "function.svg"),
             command: {

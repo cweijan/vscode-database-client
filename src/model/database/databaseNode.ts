@@ -34,6 +34,7 @@ export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
         this.identify = `${this.host}_${this.port}_${this.user}_${this.database}`;
         return {
             label: this.database,
+            id: this.identify,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.DATABASE,
             iconPath: path.join(Constants.RES_PATH, "database.svg"),

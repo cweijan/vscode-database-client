@@ -50,7 +50,7 @@ export class UserGroup extends DatabaseNode {
 
     public createTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.createSQLTextDocument(`CREATE USER 'username'@'host' IDENTIFIED BY 'password';`);
+        QueryUnit.createSQLTextDocument(`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`);
     }
 
 }

@@ -5,7 +5,6 @@ import { InfoNode } from "../InfoNode";
 import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
-import { TableNode } from "../table/tableNode";
 import { ConnectionInfo } from "../interface/connection";
 import { Constants, ModelType } from "../../common/Constants";
 import { TriggerNode } from "./Trigger";
@@ -22,6 +21,7 @@ export class TriggerGroup implements Node, ConnectionInfo {
     public getTreeItem(): vscode.TreeItem {
         return {
             label: "TRIGGER",
+            id: this.identify,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.TRIGGER_GROUP,
             iconPath: path.join(Constants.RES_PATH, "trigger.svg"),

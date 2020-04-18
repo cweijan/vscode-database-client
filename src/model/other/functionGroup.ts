@@ -21,6 +21,7 @@ export class FunctionGroup implements Node, ConnectionInfo {
     public getTreeItem(): vscode.TreeItem {
         return {
             label: "FUNCTION",
+            id: this.identify,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.FUNCTION_GROUP,
             iconPath: path.join(Constants.RES_PATH, "function.svg"),
