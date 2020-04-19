@@ -34,7 +34,7 @@ export class TableGroup implements Node, ConnectionInfo {
             return tableNodes;
         }
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this),
-            `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' and TABLE_TYPE<>'VIEW' LIMIT ${QueryUnit.maxTableCount} ;`)
+            `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' and TABLE_TYPE<>'VIEW' order by table_name LIMIT ${QueryUnit.maxTableCount} ;`)
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new TableNode(this.host, this.user, this.password, this.port, this.database, table.TABLE_NAME, this.certPath);
