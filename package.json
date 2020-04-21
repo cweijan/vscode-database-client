@@ -161,6 +161,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.db.active",
+				"title": "Change Active Database",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.table.truncate",
 				"title": "Truncate Table",
 				"category": "MySQL"
@@ -310,7 +315,12 @@
 				{
 					"command": "mysql.runQuery",
 					"when": "editorLangId == sql",
-					"group": "navigation"
+					"group": "navigation@0"
+				},
+				{
+					"command": "mysql.db.active",
+					"when": "editorLangId == sql",
+					"group": "navigation@1"
 				}
 			],
 			"editor/title": [

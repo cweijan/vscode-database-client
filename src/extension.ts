@@ -74,6 +74,9 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.index.template", (tableNode: TableNode) => {
             tableNode.indexTemplate();
         }),
+        vscode.commands.registerCommand("mysql.db.active", () => {
+            mysqlTreeDataProvider.activeDb();
+        }),
         vscode.commands.registerCommand("mysql.table.truncate", (tableNode: TableNode) => {
             tableNode.truncateTable();
         }),

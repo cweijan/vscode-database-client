@@ -23,10 +23,10 @@ export class ConnectionNode implements Node, ConnectionInfo {
     constructor(readonly id: string, readonly host: string, readonly user: string,
         readonly password: string, readonly port: string,
         readonly certPath: string) {
+            this.identify = `${this.host}_${this.port}_${this.user}`;
     }
 
     public getTreeItem(): vscode.TreeItem {
-        this.identify = `${this.host}_${this.port}_${this.user}`;
         return {
             label: this.identify,
             id: this.identify,
@@ -37,7 +37,6 @@ export class ConnectionNode implements Node, ConnectionInfo {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        this.identify = `${this.host}_${this.port}_${this.user}`;
         let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.identify);
         if (databaseNodes && !isRresh) {
             return databaseNodes;
