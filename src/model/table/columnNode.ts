@@ -79,7 +79,7 @@ export class ColumnNode implements Node, ConnectionInfo, CopyAble {
     }
     public dropColumnTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.createSQLTextDocument(`ALTER TABLE \n\t${wrap(this.database)}.${wrap(this.table)} DROP COLUMN ${wrap(this.column.name)};`);
+        QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t${wrap(this.database)}.${wrap(this.table)} DROP COLUMN ${wrap(this.column.name)};`);
     }
 
 

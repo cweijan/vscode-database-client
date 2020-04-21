@@ -50,7 +50,7 @@ export class UserGroup extends DatabaseNode {
 
     public createTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.createSQLTextDocument(`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`);
+        QueryUnit.showSQLTextDocument(`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`);
     }
 
 }
@@ -101,7 +101,7 @@ export class UserNode implements Node, ConnectionInfo, CopyAble {
 
     public changePasswordTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.createSQLTextDocument(`
+        QueryUnit.showSQLTextDocument(`
 update
     mysql.user
 set

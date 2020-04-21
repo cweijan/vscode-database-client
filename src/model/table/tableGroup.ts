@@ -52,7 +52,7 @@ export class TableGroup implements Node, ConnectionInfo {
 
     public createTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.createSQLTextDocument(`CREATE TABLE tableName(  
+        QueryUnit.showSQLTextDocument(`CREATE TABLE tableName(  
   id int NOT NULL primary key AUTO_INCREMENT,
   column varchar(length)
 );`);

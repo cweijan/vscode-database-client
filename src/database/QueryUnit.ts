@@ -11,6 +11,7 @@ import { ConnectionInfo } from "../model/interface/connection";
 import { QueryPage } from "../view/result/query";
 import { DataResponse, DMLResponse, ErrorResponse, RunResponse } from "../view/result/queryResponse";
 import { ConnectionManager } from "./ConnectionManager";
+import { FileManager, FileModel } from "../extension/FileManager";
 
 export class QueryUnit {
 
@@ -145,25 +146,13 @@ export class QueryUnit {
         return '';
     }
 
-    public static async createSQLTextDocument(sql: string = "") {
-        return vscode.window.showTextDocument(
-            await vscode.workspace.openTextDocument({ content: sql, language: "sql" })
-        );
-    }
-
-
     private static sqlDocument: vscode.TextEditor;
     public static async showSQLTextDocument(sql: string = "") {
 
-        if (this.sqlDocument && !this.sqlDocument.document.isClosed && !this.sqlDocument['_disposed'] && this.sqlDocument.document.isUntitled) {
-            this.sqlDocument.edit((editBuilder) => {
-                editBuilder.replace(Cursor.getRangeStartTo(Util.getDocumentLastPosition(this.sqlDocument.document)), sql);
-            });
-        } else {
-            this.sqlDocument = await vscode.window.showTextDocument(
-                await vscode.workspace.openTextDocument({ content: sql, language: "sql" })
-            );
-        }
+        this.sqlDocument = await vscode.window.showTextDocument(
+            await vscode.workspace.openTextDocument(await FileManager.record("template.sql", sql, FileModel.WRITE))
+        );
+
         return this.sqlDocument;
     }
 

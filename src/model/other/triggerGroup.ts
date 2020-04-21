@@ -53,7 +53,7 @@ export class TriggerGroup implements Node, ConnectionInfo {
 
     public createTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.createSQLTextDocument(`CREATE
+        QueryUnit.showSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
 TRIGGER \`name\` BEFORE/AFTER INSERT/UPDATE/DELETE
 ON \`table\`

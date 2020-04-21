@@ -23,16 +23,24 @@ export class FileManager {
 
     }
 
-    public static record(fileName: string, content: string) {
+    public static record(fileName: string, content: string, model?: FileModel) {
         if (!this.storagePath) { vscode.window.showErrorMessage("FileManager is not init!") }
         if (!fileName || !content) { return; }
-        return new Promise(() => {
+        return new Promise((resolve) => {
             const recordPath = `${this.storagePath}/${fileName}`;
             if (!fs.existsSync(this.storagePath)) {
                 fs.mkdirSync(this.storagePath);
             }
-            fs.appendFileSync(recordPath, `${content}`, { encoding: 'utf8' });
-
+            if (model == FileModel.WRITE) {
+                fs.writeFileSync(recordPath, `${content}`, { encoding: 'utf8' });
+            } else {
+                fs.appendFileSync(recordPath, `${content}`, { encoding: 'utf8' });
+            }
+            resolve(recordPath)
         });
     }
+}
+
+export enum FileModel {
+    WRITE, APPEND
 }

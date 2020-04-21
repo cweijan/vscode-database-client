@@ -27,8 +27,8 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
     async init() {
         await (await this.getConnectionNodes()).forEach(async (connectionNode) => {
             (await connectionNode.getChildren(true)).forEach(async (databaseNode) => {
-                (await databaseNode.getChildren(true)).forEach(async (tableNode) => {
-                    tableNode.getChildren(true)
+                (await databaseNode.getChildren(true)).forEach(async (groupNode) => {
+                    groupNode.getChildren(true)
                 })
             })
         })

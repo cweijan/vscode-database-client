@@ -64,7 +64,7 @@ export class TableNode implements Node, ConnectionInfo, CopyAble {
 
     public addColumnTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.createSQLTextDocument(`ALTER TABLE
+        QueryUnit.showSQLTextDocument(`ALTER TABLE
     ${Util.wrap(this.database)}.${Util.wrap(this.table)} 
 ADD 
     COLUMN [column] [type] NOT NULL comment '';`);
@@ -133,7 +133,7 @@ ADD
             ConnectionManager.getConnection(this, true);
             QueryUnit.runQuery(sql, this);
         } else {
-            QueryUnit.createSQLTextDocument(sql);
+            QueryUnit.showSQLTextDocument(sql);
         }
 
     }
@@ -147,7 +147,7 @@ ADD
                 sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  )\n`;
                 sql += "values\n  ";
                 sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  );`;
-                QueryUnit.createSQLTextDocument(sql);
+                QueryUnit.showSQLTextDocument(sql);
             });
     }
 
@@ -161,7 +161,7 @@ ADD
 
                 let sql = `delete from \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and")}`;
-                QueryUnit.createSQLTextDocument(sql);
+                QueryUnit.showSQLTextDocument(sql);
             });
     }
 
@@ -177,7 +177,7 @@ ADD
 
                 let sql = `update \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \nset \n  ${sets.toString().replace(/,/g, ",\n  ")}\n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and ")}`;
-                QueryUnit.createSQLTextDocument(sql);
+                QueryUnit.showSQLTextDocument(sql);
             });
     }
 

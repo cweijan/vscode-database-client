@@ -52,7 +52,7 @@ export class FunctionGroup implements Node, ConnectionInfo {
 
     public createTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.createSQLTextDocument(`CREATE
+        QueryUnit.showSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
 FUNCTION \`name\`() RETURNS [TYPE
 BEGIN
