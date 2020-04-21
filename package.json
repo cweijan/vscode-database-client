@@ -278,6 +278,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.grant.user",
+				"title": "Grant Privileges",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.change.user",
 				"title": "Change User Password",
 				"category": "MySQL"
@@ -405,6 +410,11 @@
 				},
 				{
 					"command": "mysql.change.user",
+					"when": "view == github.cweijan.mysql && viewItem == user",
+					"group": "1_mysql@-1"
+				},
+				{
+					"command": "mysql.grant.user",
 					"when": "view == github.cweijan.mysql && viewItem == user",
 					"group": "1_mysql@0"
 				},

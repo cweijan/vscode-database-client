@@ -57,6 +57,7 @@ export class UserGroup extends DatabaseNode {
 
 
 export class UserNode implements Node, ConnectionInfo, CopyAble {
+
     public type: string;
     public identify: string;
     constructor(readonly host: string, readonly user: string, readonly password: string,
@@ -97,6 +98,12 @@ export class UserNode implements Node, ConnectionInfo, CopyAble {
                 vscode.window.showInformationMessage(`Drop user ${this.name} success!`);
             });
         })
+    }
+
+    public grandTemplate() {
+        QueryUnit.showSQLTextDocument(`
+GRANT ALL PRIVILEGES ON *.* to '${this.name}'@'%'
+`.replace(/^\s/, ""));
     }
 
     public changePasswordTemplate() {

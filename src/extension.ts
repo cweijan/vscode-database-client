@@ -188,6 +188,9 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("mysql.change.user", (userNode: UserNode) => {
             userNode.changePasswordTemplate();
         }),
+        vscode.commands.registerCommand("mysql.grant.user", (userNode: UserNode) => {
+            userNode.grandTemplate();
+        }),
     );
 
 }

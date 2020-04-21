@@ -43,9 +43,11 @@ export class ConnectionManager {
 
                 const queryName = path.basename(fileName, path.extname(fileName))
                 const [host, port, user, database] = queryName.split('_')
-                return this.getConnection({
-                    multipleStatements: true, host, port, user, database, certPath: null
-                }, true)
+                if (database != null) {
+                    return this.getConnection({
+                        multipleStatements: true, host, port, user, database, certPath: null
+                    }, true)
+                }
             }
         }
 
