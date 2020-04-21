@@ -16,13 +16,14 @@ export class QueryUnit {
 
     public static readonly maxTableCount = Global.getConfig<number>(ConfigKey.MAX_TABLE_COUNT);
 
-    public static queryPromise<T>(connection, sql: string): Promise<T> {
+    public static queryPromise<T>(connection: mysql.Connection, sql: string): Promise<T> {
         return new Promise((resolve, reject) => {
             // Console.log(`Execute SQL:${sql}`)
             connection.query(sql, (err, rows) => {
                 if (err) {
+                    Console.log(`Execute sql fail : ${sql}`);
                     Console.log(err);
-                    reject("Error: " + err.message);
+                    reject(err);
                 } else {
                     resolve(rows);
                 }
@@ -69,6 +70,13 @@ export class QueryUnit {
         if (isDDL == null && isDML == null) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
+        const sqlList: string[] = sql.split(";").filter((s) => s.trim() != '').map((s) => s.trim())
+
+        if (sqlList.length > 1) {
+            this.runBatch(connection, sqlList)
+            QueryPage.send({ type: MessageType.MESSAGE, res: { msg: "Batch execute sql success!" } });
+            return;
+        }
         connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
             if (err) {
                 QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
@@ -92,6 +100,19 @@ export class QueryUnit {
             }
 
         });
+    }
+    private static runBatch(connection: mysql.Connection, sqlList: string[]) {
+        connection.beginTransaction(async () => {
+            try {
+                for (const sql of sqlList) {
+                    await this.queryPromise(connection, sql)
+                }
+                connection.commit()
+            } catch (err) {
+                connection.rollback()
+            }
+        })
+
     }
 
 

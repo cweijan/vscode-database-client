@@ -63,7 +63,8 @@ export enum MessageType {
     DML = 'DML',
     DDL = 'DDL',
     ERROR = "ERROR",
-    RUN = "RUN"
+    RUN = "RUN",
+    MESSAGE = "MESSAGE",
 }
 
 

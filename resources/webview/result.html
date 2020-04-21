@@ -111,14 +111,16 @@
                         <div v-if="scope.row.isFilter" style="text-align: center;">
                             <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
                                 <el-checkbox-group v-model="toolbar.showColumns">
-                                    <el-checkbox v-for="(column) in result.columnList" :label="column.name" :key="column.name">
+                                    <el-checkbox v-for="(column) in result.columnList" :label="column.name"
+                                        :key="column.name">
                                         {{column.name}}
                                     </el-checkbox>
                                 </el-checkbox-group>
-                                <el-button icon="el-icon-search" circle title="Select columns to show" size="small" slot="reference"></el-button>
+                                <el-button icon="el-icon-search" circle title="Select columns to show" size="small"
+                                    slot="reference"></el-button>
                             </el-popover>
-                            <el-button @click="resetFilter" title="Reset filter" type="warning" size="small" icon="el-icon-refresh"
-                                circle title="Reset">
+                            <el-button @click="resetFilter" title="Reset filter" type="warning" size="small"
+                                icon="el-icon-refresh" circle title="Reset">
                             </el-button>
                         </div>
                         <div v-if="scope.row[result.primaryKey]">
@@ -495,6 +497,9 @@
             case "ERROR":
                 handlerCommon(response)
                 vue.info.error = true
+                break;
+            case "MESSAGE":
+                vue.$message(response.msg)
                 break;
             default:
                 vue.$message(JSON.stringify(event.data));

@@ -162,7 +162,7 @@
 			},
 			{
 				"command": "mysql.table.truncate",
-				"title": "Clear Table Data",
+				"title": "Truncate Table",
 				"category": "MySQL"
 			},
 			{
@@ -449,6 +449,11 @@
 					"group": "1_mysql@0"
 				},
 				{
+					"command": "mysql.name.copy",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline@-1"
+				},
+				{
 					"command": "mysql.changeTableName",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@0"
@@ -468,11 +473,7 @@
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@3"
 				},
-				{
-					"command": "mysql.name.copy",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "1_inline@4"
-				},
+				
 				{
 					"command": "mysql.copy.insert",
 					"when": "view == github.cweijan.mysql && viewItem == table",

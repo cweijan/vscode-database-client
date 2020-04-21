@@ -10,6 +10,9 @@ import { DataResponse } from "./queryResponse";
 
 export class QueryParam<T> {
     public type: MessageType;
+    /**
+     * using in loadColumnList
+     */
     public connection?: ConnectionInfo;
     public res: T;
 }
@@ -71,6 +74,7 @@ export class QueryPage {
         });
 
     }
+
     private static async loadColumnList(queryParam: QueryParam<DataResponse>) {
         const fields = queryParam.res.fields;
         const conn = queryParam.connection;
@@ -93,21 +97,6 @@ export class QueryPage {
         }
         queryParam.res.table = tableName;
         queryParam.res.database = conn.database;
-    }
-
-    private static getTable(sql: string): TableInfo {
-        if (!sql) { return null; }
-        const tableInfo = new TableInfo();
-        let baseMatch: string[];
-        if (sql && (baseMatch = (sql + " ").match(/select\s+\*\s+from\s*(.+?)(?=[\s;])/i)) && !sql.match(/\bjoin\b/ig)) {
-            const expectTable: string = baseMatch[1].replace(/`/g, "");
-            const temp: string[] = expectTable.split(".");
-            if (temp.length == 2) {
-                tableInfo.database = temp[0];
-                tableInfo.table = temp[1];
-            }
-            return tableInfo;
-        }
     }
 
 }
