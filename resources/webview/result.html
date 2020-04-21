@@ -74,24 +74,24 @@
             </el-row>
             <!-- tool panel -->
             <el-row>
-                <el-cow>
+                <w>
+                    <el-input v-model="table.search" style="width:200px" placeholder="Type to search" />
+                </w>
+                <w>
+                    <el-button type="primary" @click='execute(toolbar.sql);info.visible = false;'>Execute</el-button>
+                    <span v-if="result.table">
+                        {{result.table}}
+                    </span>
+                </w>
+            </el-row>
+            <el-row v-if="result.table">
+                <el-col>
                     <el-button type="info" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest"
                         v-if="result.primaryKey">
                     </el-button>
-                </el-cow>
-                <el-cow v-if="result.table">
-                    {{result.table}}
-                </el-cow>
-                <el-cow>
-                    <el-input v-model="table.search" style="width:200px" placeholder="Type to search" />
-                </el-cow>
-                <el-cow>
-                    <el-button type="primary" @click='execute(toolbar.sql);info.visible = false;'>Execute</el-button>
-                </el-cow>
-                <el-cow>
                     <span>CostTime: </span><span v-text="toolbar.costTime"></span>ms
                     <span v-if="result.table">, Row: {{result.data.length}}, Col: {{columnCount}}</span>
-                </el-cow>
+                </el-col>
             </el-row>
             <!-- info panel -->
             <div v-if="info.visible ">
@@ -109,7 +109,15 @@
                 <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey" align="center">
                     <template slot-scope="scope">
                         <div v-if="scope.row.isFilter" style="text-align: center;">
-                            Reset : <el-button @click="resetFilter" type="warning" size="small" icon="el-icon-refresh"
+                            <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
+                                <el-checkbox-group v-model="toolbar.showColumns">
+                                    <el-checkbox v-for="(column) in result.columnList" :label="column.name" :key="column.name">
+                                        {{column.name}}
+                                    </el-checkbox>
+                                </el-checkbox-group>
+                                <el-button icon="el-icon-search" circle title="Select columns to show" size="small" slot="reference"></el-button>
+                            </el-popover>
+                            <el-button @click="resetFilter" title="Reset filter" type="warning" size="small" icon="el-icon-refresh"
                                 circle title="Reset">
                             </el-button>
                         </div>
@@ -123,8 +131,10 @@
                         </div>
                     </template>
                 </el-table-column>
+                <!-- data  -->
                 <el-table-column :label="field.name" v-for="field in result.fields" :key="field.name" align="center"
-                    sortable v-if="result.columnList" :width="computeWidth(field.name,0,toolbar.filter[field.name])">
+                    sortable v-if="result.columnList && toolbar.showColumns.includes(field.name)"
+                    :width="computeWidth(field.name,0,toolbar.filter[field.name])">
                     <template slot-scope="scope">
                         <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[field.name]" placeholder="filter"
                             @blur="filter($event,field.name)" v-on:keyup.enter.native="filter($event,field.name)">
@@ -135,13 +145,13 @@
             </el-table>
         </div>
         <el-dialog :title="editorTilte" :visible.sync="editor.visible" width="90%" top="3vh" size="small">
-            <el-form :ref="infoForm" :model="update.currentNew">
+            <el-form ref="infoForm" :model="update.currentNew">
                 <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
                     <template>
                         <span>
                             {{column.name}} : {{column.type}} : <span
                                 style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' Required'}}</span>&nbsp;
-                                {{column.comment?column.comment:''}}
+                            {{column.comment?column.comment:''}}
                         </span>
                         <el-input v-model="update.currentNew[column.name]"></el-input>
                     </template>
@@ -184,7 +194,8 @@
                 sql: null,
                 costTime: 0,
                 isRefrsh: false,
-                filter: {}
+                filter: {},
+                showColumns: []
             },
             editor: {
                 visible: false,
@@ -404,7 +415,13 @@
                     }
                 }
                 return objClone;
+            }, initShowColumn(columnList) {
+                this.toolbar.showColumns = []
+                for (let i = 0; i < columnList.length; i++) {
+                    this.toolbar.showColumns.push(columnList[i].name);
+                }
             }
+
         },
         computed: {
             columnCount() {
@@ -436,6 +453,7 @@
             vue.uploadRole()
             // add filter row
             vue.result.data.unshift({ isFilter: true, content: '' })
+            vue.initShowColumn(vue.result.columnList)
         }
         if (vue.toolbar.isRefrsh) {
             vue.toolbar.isRefrsh = false;
