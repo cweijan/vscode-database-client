@@ -6,7 +6,7 @@
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
-		"vscode": "^1.30.0"
+		"vscode": "^1.35.0"
 	},
 	"categories": [
 		"Programming Languages",
@@ -643,7 +643,7 @@
 		"@types/node": "^7.0.43",
 		"tslint": "^5.8.0",
 		"typescript": "^3.3.1",
-		"vscode": "^1.1.33"
+		"vscode": "^1.1.36"
 	},
 	"dependencies": {
 		"date-format": "^3.0.0",

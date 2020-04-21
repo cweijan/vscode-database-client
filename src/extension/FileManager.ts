@@ -2,14 +2,15 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 
 export class FileManager {
-    private static context: vscode.ExtensionContext;
+    private static storagePath: string;
     public static init(context: vscode.ExtensionContext) {
-        this.context = context;
+        this.storagePath = context.globalStoragePath;
     }
+
     public static show(fileName: string) {
-        if (!this.context) { vscode.window.showErrorMessage("FileManager is not init!") }
+        if (!this.storagePath) { vscode.window.showErrorMessage("FileManager is not init!") }
         if (!fileName) { return; }
-        const recordPath = `${this.context['globalStoragePath']}/${fileName}`;
+        const recordPath = `${this.storagePath}/${fileName}`;
         if (!fs.existsSync(recordPath)) {
             fs.appendFileSync(recordPath, "");
         }
@@ -23,12 +24,12 @@ export class FileManager {
     }
 
     public static record(fileName: string, content: string) {
-        if (!this.context) { vscode.window.showErrorMessage("FileManager is not init!") }
+        if (!this.storagePath) { vscode.window.showErrorMessage("FileManager is not init!") }
         if (!fileName || !content) { return; }
         return new Promise(() => {
-            const recordPath = `${this.context['globalStoragePath']}/${fileName}`;
-            if (!fs.existsSync(recordPath)) {
-                fs.mkdirSync(recordPath);
+            const recordPath = `${this.storagePath}/${fileName}`;
+            if (!fs.existsSync(this.storagePath)) {
+                fs.mkdirSync(this.storagePath);
             }
             fs.appendFileSync(recordPath, `${content}`, { encoding: 'utf8' });
 
