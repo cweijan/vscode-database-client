@@ -97,7 +97,9 @@ export class QueryUnit {
             }
             if (Array.isArray(data)) {
                 QueryPage.send({ type: MessageType.DATA, connection: connectionOptions, res: { sql, costTime, data, fields } as DataResponse });
+                return;
             }
+            QueryPage.send({ type: MessageType.MESSAGE, res: { msg: `Execute sql success : ${sql}`, costTime } });
 
         });
     }
