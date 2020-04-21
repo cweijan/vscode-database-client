@@ -10,18 +10,18 @@ import { Constants, ModelType } from "../../common/Constants";
 import { TriggerNode } from "./Trigger";
 
 export class TriggerGroup implements Node, ConnectionInfo {
-    public type: string; public identify: string;
+    public type: string; public id: string;
     constructor(readonly host: string, readonly user: string,
         readonly password: string, readonly port: string, readonly database: string,
         readonly certPath: string) {
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.TRIGGER_GROUP}`;
+        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.TRIGGER_GROUP}`;
     }
 
 
     public getTreeItem(): vscode.TreeItem {
         return {
             label: "TRIGGER",
-            id: this.identify,
+            id: this.id,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.TRIGGER_GROUP,
             iconPath: path.join(Constants.RES_PATH, "trigger.svg"),
@@ -30,7 +30,7 @@ export class TriggerGroup implements Node, ConnectionInfo {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let tableNodes = DatabaseCache.getTableListOfDatabase(this.identify);
+        let tableNodes = DatabaseCache.getTableListOfDatabase(this.id);
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
@@ -39,7 +39,7 @@ export class TriggerGroup implements Node, ConnectionInfo {
                 tableNodes = tables.map<TriggerNode>((table) => {
                     return new TriggerNode(this.host, this.user, this.password, this.port, this.database, table.TRIGGER_NAME, this.certPath);
                 });
-                DatabaseCache.setTableListOfDatabase(this.identify, tableNodes);
+                DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {
                     return [new InfoNode("This database has no trigger")];
                 }

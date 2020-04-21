@@ -13,7 +13,7 @@ export class ViewNode extends TableNode {
 
     public getTreeItem(): vscode.TreeItem {
 
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`;
+        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`;
         return {
             label: this.table,
             collapsibleState: DatabaseCache.getElementState(this),

@@ -18,7 +18,7 @@ class ColumnTreeItem extends vscode.TreeItem {
 }
 
 export class ColumnNode implements Node, ConnectionInfo, CopyAble {
-    public identify: string;
+    public id: string;
     public type: string = ModelType.COLUMN;
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, private readonly table: string,

@@ -14,7 +14,7 @@ import { Util } from "../../common/util";
 
 export class UserGroup extends DatabaseNode {
 
-    public identify: string;
+    public id: string;
     public type: string = ModelType.DATABASE;
     constructor(readonly host: string, readonly user: string,
         readonly password: string, readonly port: string, readonly database: string,
@@ -24,7 +24,7 @@ export class UserGroup extends DatabaseNode {
 
     public getTreeItem(): vscode.TreeItem {
 
-        this.identify = `${this.host}_${this.port}_${this.user}_${ModelType.USER_GROUP}`;
+        this.id = `${this.host}_${this.port}_${this.user}_${ModelType.USER_GROUP}`;
         return {
             label: "USER",
             collapsibleState: DatabaseCache.getElementState(this),
@@ -59,7 +59,7 @@ export class UserGroup extends DatabaseNode {
 export class UserNode implements Node, ConnectionInfo, CopyAble {
 
     public type: string;
-    public identify: string;
+    public id: string;
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly name: string,
         readonly certPath: string) {
@@ -68,7 +68,7 @@ export class UserNode implements Node, ConnectionInfo, CopyAble {
         Util.copyToBoard(this.name)
     }
     public getTreeItem(): vscode.TreeItem {
-        this.identify = `${this.host}_${this.port}_${this.name}`;
+        this.id = `${this.host}_${this.port}_${this.name}`;
         return {
             label: this.name,
             contextValue: ModelType.USER,

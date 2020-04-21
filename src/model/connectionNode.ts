@@ -17,20 +17,20 @@ import { Util } from "../common/util";
 
 export class ConnectionNode implements Node, ConnectionInfo {
 
-    public identify: string;
+    public id: string;
     public database?: string;
     public multipleStatements?: boolean;
     public type: string = ModelType.CONNECTION;
-    constructor(readonly id: string, readonly host: string, readonly user: string,
+    constructor(readonly host: string, readonly user: string,
         readonly password: string, readonly port: string,
         readonly certPath: string) {
-        this.identify = `${this.host}_${this.port}_${this.user}`;
+        this.id = `${this.host}_${this.port}_${this.user}`;
     }
 
     public getTreeItem(): vscode.TreeItem {
         return {
-            label: this.identify,
-            id: this.identify,
+            label: this.id,
+            id: this.id,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.CONNECTION,
             iconPath: path.join(Constants.RES_PATH, "server.png"),
@@ -38,7 +38,7 @@ export class ConnectionNode implements Node, ConnectionInfo {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.identify);
+        let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.id);
         if (databaseNodes && !isRresh) {
             return databaseNodes;
         }
@@ -49,7 +49,7 @@ export class ConnectionNode implements Node, ConnectionInfo {
                     return new DatabaseNode(this.host, this.user, this.password, this.port, database.Database, this.certPath);
                 });
                 databaseNodes.unshift(new UserGroup(this.host, this.user, this.password, this.port, 'mysql', this.certPath));
-                DatabaseCache.setDataBaseListOfConnection(this.identify, databaseNodes);
+                DatabaseCache.setDataBaseListOfConnection(this.id, databaseNodes);
 
                 return databaseNodes;
             })
@@ -67,7 +67,7 @@ export class ConnectionNode implements Node, ConnectionInfo {
         vscode.window.showInputBox({ placeHolder: 'Input you want to create new database name.' }).then(async (inputContent) => {
             if (!inputContent) { return; }
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `create database \`${inputContent}\` default character set = 'utf8' `).then(() => {
-                DatabaseCache.clearDatabaseCache(this.identify);
+                DatabaseCache.clearDatabaseCache(this.id);
                 MySQLTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`create database ${inputContent} success!`);
             });

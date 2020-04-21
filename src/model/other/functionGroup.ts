@@ -10,18 +10,18 @@ import { Constants, ModelType } from "../../common/Constants";
 import { FunctionNode } from "./function";
 
 export class FunctionGroup implements Node, ConnectionInfo {
-    public type: string; public identify: string;
+    public type: string; public id: string;
     constructor(readonly host: string, readonly user: string,
         readonly password: string, readonly port: string, readonly database: string,
         readonly certPath: string) {
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.FUNCTION_GROUP}`;
+        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.FUNCTION_GROUP}`;
     }
 
 
     public getTreeItem(): vscode.TreeItem {
         return {
             label: "FUNCTION",
-            id: this.identify,
+            id: this.id,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.FUNCTION_GROUP,
             iconPath: path.join(Constants.RES_PATH, "function.svg"),
@@ -30,7 +30,7 @@ export class FunctionGroup implements Node, ConnectionInfo {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let tableNodes = DatabaseCache.getTableListOfDatabase(this.identify);
+        let tableNodes = DatabaseCache.getTableListOfDatabase(this.id);
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
@@ -39,7 +39,7 @@ export class FunctionGroup implements Node, ConnectionInfo {
                 tableNodes = tables.map<FunctionNode>((table) => {
                     return new FunctionNode(this.host, this.user, this.password, this.port, this.database, table.ROUTINE_NAME, this.certPath);
                 });
-                DatabaseCache.setTableListOfDatabase(this.identify, tableNodes);
+                DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {
                     return [new InfoNode("This database has no function")];
                 }

@@ -11,20 +11,20 @@ import { Util } from "../../common/util";
 
 export class FunctionNode implements Node, ConnectionInfo {
 
-    public identify: string;
+    public id: string;
     public type: string = ModelType.FUNCTION;
 
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, readonly name: string,
         readonly certPath: string) {
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.name}`;
+        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${this.name}`;
     }
 
     public getTreeItem(): vscode.TreeItem {
 
         return {
             label: this.name,
-            id: this.identify,
+            id: this.id,
             contextValue: ModelType.FUNCTION,
             iconPath: path.join(Constants.RES_PATH, "function.svg"),
             command: {

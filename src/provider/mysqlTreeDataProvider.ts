@@ -74,7 +74,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
         const connections = this.context.globalState.get<{ [key: string]: ConnectionInfo }>(CacheKey.ConectionsKey);
         if (connections) {
             for (const key of Object.keys(connections)) {
-                connectionNodes.push(new ConnectionNode(key, connections[key].host, connections[key].user, connections[key].password, connections[key].port, connections[key].certPath));
+                connectionNodes.push(new ConnectionNode( connections[key].host, connections[key].user, connections[key].password, connections[key].port, connections[key].certPath));
             }
         }
         return connectionNodes;
@@ -89,8 +89,8 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
             const dbIdList: string[] = [];
             const dbIdMap = new Map<string, DatabaseNode>();
             for (const dbNode of DatabaseCache.getDatabaseNodeList()) {
-                dbIdList.push(dbNode.identify)
-                dbIdMap.set(dbNode.identify, dbNode)
+                dbIdList.push(dbNode.id)
+                dbIdMap.set(dbNode.id, dbNode)
             }
             if (dbIdList) {
                 vscode.window.showQuickPick(dbIdList).then(async (dbId) => {

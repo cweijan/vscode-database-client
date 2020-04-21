@@ -11,19 +11,19 @@ import { Util } from "../../common/util";
 
 
 export class ProcedureNode implements Node, ConnectionInfo {
-    identify: string;
+    id: string;
     type: string = ModelType.PROCEDURE;
 
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, readonly name: string,
         readonly certPath: string) {
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.name}`
+        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${this.name}`
     }
 
     public getTreeItem(): vscode.TreeItem {
         return {
             label: this.name,
-            id: this.identify,
+            id: this.id,
             contextValue: ModelType.PROCEDURE,
             iconPath: path.join(Constants.RES_PATH, "procedure.svg"),
             command: {

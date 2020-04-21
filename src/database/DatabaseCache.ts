@@ -70,8 +70,8 @@ export class DatabaseCache {
             this.collpaseState = {};
         }
 
-        if (this.collpaseState[element.identify]) {
-            return this.collpaseState[element.identify];
+        if (this.collpaseState[element.id]) {
+            return this.collpaseState[element.id];
         } else if (element.type == ModelType.CONNECTION || element.type == ModelType.TABLE_GROUP) {
             return TreeItemCollapsibleState.Expanded;
         } else {
@@ -92,7 +92,7 @@ export class DatabaseCache {
             return;
         }
 
-        this.collpaseState[element.identify] = collapseState;
+        this.collpaseState[element.id] = collapseState;
         this.context.globalState.update(CacheKey.CollapseSate, this.collpaseState);
 
     }
@@ -107,11 +107,11 @@ export class DatabaseCache {
 
     /**
      * clear database data for connection
-     * @param connectionIdentify 
+     * @param connectionid 
      */
-    public static clearDatabaseCache(connectionIdentify?: string) {
-        if (connectionIdentify) {
-            delete this.connectionNodeMapDatabaseNode[connectionIdentify];
+    public static clearDatabaseCache(connectionid?: string) {
+        if (connectionid) {
+            delete this.connectionNodeMapDatabaseNode[connectionid];
         } else {
             this.connectionNodeMapDatabaseNode = {};
         }
@@ -119,11 +119,11 @@ export class DatabaseCache {
 
     /**
      * clear table data for database
-     * @param databaseIdentify 
+     * @param databaseid 
      */
-    public static clearTableCache(databaseIdentify?: string) {
-        if (databaseIdentify) {
-            delete this.databaseNodeMapTableNode[databaseIdentify];
+    public static clearTableCache(databaseid?: string) {
+        if (databaseid) {
+            delete this.databaseNodeMapTableNode[databaseid];
         } else {
             this.databaseNodeMapTableNode = {};
         }
@@ -131,11 +131,11 @@ export class DatabaseCache {
 
     /**
      * claer column data for table
-     * @param tableIdentify 
+     * @param tableid 
      */
-    public static clearColumnCache(tableIdentify?: string) {
-        if (tableIdentify) {
-            delete this.tableNodeMapColumnNode[tableIdentify];
+    public static clearColumnCache(tableid?: string) {
+        if (tableid) {
+            delete this.tableNodeMapColumnNode[tableid];
         } else {
             this.tableNodeMapColumnNode = {};
         }
@@ -143,11 +143,11 @@ export class DatabaseCache {
 
     /**
      * get connectino tree data
-     * @param connectcionIdentify 
+     * @param connectcionid 
      */
-    public static getDatabaseListOfConnection(connectcionIdentify: string): DatabaseNode[] {
-        if (this.connectionNodeMapDatabaseNode[connectcionIdentify]) {
-            return this.connectionNodeMapDatabaseNode[connectcionIdentify];
+    public static getDatabaseListOfConnection(connectcionid: string): DatabaseNode[] {
+        if (this.connectionNodeMapDatabaseNode[connectcionid]) {
+            return this.connectionNodeMapDatabaseNode[connectcionid];
         } else {
             return null;
         }
@@ -155,21 +155,21 @@ export class DatabaseCache {
 
     /**
      * get database tree data
-     * @param databaseIdentify 
+     * @param databaseid 
      */
     private static tableTypeList = [ModelType.TABLE_GROUP, ModelType.VIEW_GROUP, ModelType.FUNCTION_GROUP, ModelType.TRIGGER_GROUP, ModelType.PROCEDURE_GROUP];
-    public static getTableListOfDatabase(databaseIdentify: string): Node[] {
+    public static getTableListOfDatabase(databaseid: string): Node[] {
         let result = [];
         this.tableTypeList.forEach((tableType) => {
-            const tableList = this.databaseNodeMapTableNode[databaseIdentify + "_" + tableType];
+            const tableList = this.databaseNodeMapTableNode[databaseid + "_" + tableType];
             if (tableList) { result = result.concat(tableList); }
         });
         if (result.length == 0) { return null; }
         return result;
     }
 
-    public static getTable(databaseIdentify: string, tableName: string): TableNode {
-        const tableList = this.databaseNodeMapTableNode[databaseIdentify + "_" + ModelType.TABLE_GROUP];
+    public static getTable(databaseid: string, tableName: string): TableNode {
+        const tableList = this.databaseNodeMapTableNode[databaseid + "_" + ModelType.TABLE_GROUP];
         if (!tableList) { return null; }
         for (const tableNode of tableList) {
             if (tableNode.table == tableName) { return tableNode; }
@@ -179,26 +179,26 @@ export class DatabaseCache {
 
     /**
      * get table tree data
-     * @param tableIdentify 
+     * @param tableid 
      */
-    public static getColumnListOfTable(tableIdentify: string): ColumnNode[] {
-        if (this.tableNodeMapColumnNode[tableIdentify]) {
-            return this.tableNodeMapColumnNode[tableIdentify];
+    public static getColumnListOfTable(tableid: string): ColumnNode[] {
+        if (this.tableNodeMapColumnNode[tableid]) {
+            return this.tableNodeMapColumnNode[tableid];
         } else {
             return null;
         }
     }
 
-    public static setDataBaseListOfConnection(connectionIdentify: string, DatabaseNodeList: DatabaseNode[]) {
-        this.connectionNodeMapDatabaseNode[connectionIdentify] = DatabaseNodeList;
+    public static setDataBaseListOfConnection(connectionid: string, DatabaseNodeList: DatabaseNode[]) {
+        this.connectionNodeMapDatabaseNode[connectionid] = DatabaseNodeList;
     }
 
-    public static setTableListOfDatabase(databaseIdentify: string, tableNodeList: Node[]) {
-        this.databaseNodeMapTableNode[databaseIdentify] = tableNodeList;
+    public static setTableListOfDatabase(databaseid: string, tableNodeList: Node[]) {
+        this.databaseNodeMapTableNode[databaseid] = tableNodeList;
     }
 
-    public static setColumnListOfTable(tableIdentify: string, columnList: ColumnNode[]) {
-        this.tableNodeMapColumnNode[tableIdentify] = columnList;
+    public static setColumnListOfTable(tableid: string, columnList: ColumnNode[]) {
+        this.tableNodeMapColumnNode[tableid] = columnList;
     }
 
 

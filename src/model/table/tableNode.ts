@@ -19,13 +19,13 @@ import format = require('date-format');
 export class TableNode implements Node, ConnectionInfo, CopyAble {
 
 
-    public identify: string;
+    public id: string;
     public type: string = ModelType.TABLE;
 
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, readonly table: string,
         readonly certPath: string) {
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`;
+        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`;
     }
 
     public getTreeItem(): vscode.TreeItem {
@@ -44,7 +44,7 @@ export class TableNode implements Node, ConnectionInfo, CopyAble {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        let columnNodes = DatabaseCache.getColumnListOfTable(this.identify);
+        let columnNodes = DatabaseCache.getColumnListOfTable(this.id);
         if (columnNodes && !isRresh) {
             return columnNodes;
         }
@@ -53,7 +53,7 @@ export class TableNode implements Node, ConnectionInfo, CopyAble {
                 columnNodes = columns.map<ColumnNode>((column) => {
                     return new ColumnNode(this.host, this.user, this.password, this.port, this.database, this.table, this.certPath, column);
                 });
-                DatabaseCache.setColumnListOfTable(this.identify, columnNodes);
+                DatabaseCache.setColumnListOfTable(this.id, columnNodes);
 
                 return columnNodes;
             })

@@ -22,7 +22,7 @@ import format = require('date-format');
 
 export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
 
-    public identify: string;
+    public id: string;
     public type: string = ModelType.DATABASE;
     constructor(readonly host: string, readonly user: string,
         readonly password: string, readonly port: string, readonly database: string,
@@ -31,10 +31,10 @@ export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
 
     public getTreeItem(): vscode.TreeItem {
 
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}`;
+        this.id = `${this.host}_${this.port}_${this.user}_${this.database}`;
         return {
             label: this.database,
-            id: this.identify,
+            id: this.id,
             collapsibleState: DatabaseCache.getElementState(this),
             contextValue: ModelType.DATABASE,
             iconPath: path.join(Constants.RES_PATH, "database.svg"),
@@ -104,7 +104,7 @@ export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
 
     public async newQuery() {
 
-        FileManager.show(`${this.identify}.sql`)
+        FileManager.show(`${this.id}.sql`)
         // QueryUnit.createSQLTextDocument();
         ConnectionManager.getConnection(this, true);
 

@@ -11,11 +11,11 @@ import { Constants, ModelType } from "../../common/Constants";
 import { ViewNode } from "./viewNode";
 
 export class ViewGroup implements Node, ConnectionInfo {
-    public type: string; public identify: string;
+    public type: string; public id: string;
     constructor(readonly host: string, readonly user: string,
                 readonly password: string, readonly port: string, readonly database: string,
                 readonly certPath: string) {
-        this.identify = `${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.VIEW_GROUP}`;
+        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.VIEW_GROUP}`;
     }
 
 
@@ -30,7 +30,7 @@ export class ViewGroup implements Node, ConnectionInfo {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let tableNodes = DatabaseCache.getTableListOfDatabase(this.identify);
+        let tableNodes = DatabaseCache.getTableListOfDatabase(this.id);
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
@@ -40,7 +40,7 @@ export class ViewGroup implements Node, ConnectionInfo {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new ViewNode(this.host, this.user, this.password, this.port, this.database, table.TABLE_NAME, this.certPath);
                 });
-                DatabaseCache.setTableListOfDatabase(this.identify, tableNodes);
+                DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {
                     return [new InfoNode("This database has no view")];
                 }

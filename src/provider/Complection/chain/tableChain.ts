@@ -41,7 +41,7 @@ export class TableChain implements ComplectionChain {
         if (inputWord) {
             DatabaseCache.getDatabaseNodeList().forEach((databaseNode) => {
                 if (databaseNode.database === inputWord) {
-                    tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.identify);
+                    tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.id);
                 }
             });
         } else {

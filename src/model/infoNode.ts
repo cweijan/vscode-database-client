@@ -3,7 +3,7 @@ import { Node } from "./interface/node";
 import { ModelType } from "../common/Constants";
 
 export class InfoNode implements Node {
-    identify: string;
+    id: string;
     type: string=ModelType.INFO;
     constructor(private readonly label: string) {
     }

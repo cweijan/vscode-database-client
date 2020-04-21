@@ -4,6 +4,7 @@ import { ColumnNode } from "../../../model/table/columnNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Util } from "../../../common/util";
 import { Pattern } from "../../../common/Constants";
+import { ConnectionManager } from "../../../database/ConnectionManager";
 
 export class ColumnChain implements ComplectionChain {
 
@@ -49,8 +50,12 @@ export class ColumnChain implements ComplectionChain {
         }
         let columnNodes: ColumnNode[] = [];
 
+
+        const lcp = ConnectionManager.getLastConnectionOption()
+        const id = `${lcp.host}_${lcp.port}_${lcp.user}_${lcp.database}_${tableName}`;
+
         for (const tableNode of DatabaseCache.getTableNodeList()) {
-            if (tableNode.table === tableName) {
+            if (tableNode.id === id) {
                 columnNodes = (await tableNode.getChildren()) as ColumnNode[];
                 break;
             }
