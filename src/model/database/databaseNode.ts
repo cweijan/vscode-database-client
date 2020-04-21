@@ -27,11 +27,10 @@ export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
     constructor(readonly host: string, readonly user: string,
         readonly password: string, readonly port: string, readonly database: string,
         readonly certPath: string) {
+        this.id = `${this.host}_${this.port}_${this.user}_${this.database}`;
     }
 
     public getTreeItem(): vscode.TreeItem {
-
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}`;
         return {
             label: this.database,
             id: this.id,

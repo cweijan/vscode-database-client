@@ -35,17 +35,20 @@ export class TableChain implements ComplectionChain {
         let tableNodes: Node[] = [];
         const tableNames: string[] = [];
         const lcp = ConnectionManager.getLastConnectionOption();
+        if (!lcp) { return []; }
         if (!inputWord && lcp && lcp.database) {
             inputWord = lcp.database
         }
         if (inputWord) {
-            DatabaseCache.getDatabaseNodeList().forEach((databaseNode) => {
+            const connectcionid = `${lcp.host}_${lcp.port}_${lcp.user}`;
+            DatabaseCache.getDatabaseListOfConnection(connectcionid).forEach((databaseNode) => {
                 if (databaseNode.database === inputWord) {
                     tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.id);
                 }
             });
         } else {
-            tableNodes = DatabaseCache.getTableNodeList().filter((tableNode) => {
+            const databaseid = `${lcp.host}_${lcp.port}_${lcp.user}_${lcp.database}`;
+            tableNodes = DatabaseCache.getTableListOfDatabase(databaseid).filter((tableNode: TableNode) => {
                 const included = tableNames.includes(tableNode.table);
                 tableNames.push(tableNode.table);
                 return !included && !tableNode.database.match(/\b(mysql|performance_schema|information_schema|sys)\b/ig);

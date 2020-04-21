@@ -52,6 +52,7 @@ export class ColumnChain implements ComplectionChain {
 
 
         const lcp = ConnectionManager.getLastConnectionOption()
+        if (!lcp) { return []; }
         const id = `${lcp.host}_${lcp.port}_${lcp.user}_${lcp.database}_${tableName}`;
 
         for (const tableNode of DatabaseCache.getTableNodeList()) {
