@@ -6,6 +6,7 @@ import { ModelType, Constants } from "../../common/Constants";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { QueryUnit } from "../../database/QueryUnit";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { Util } from "../../common/util";
 
 export class ViewNode extends TableNode {
     public type: string = ModelType.VIEW;
@@ -28,18 +29,13 @@ export class ViewNode extends TableNode {
 
     public drop() {
 
-        vscode.window.showInputBox({ prompt: `Are you want to drop view ${this.table} ?     `, placeHolder: 'Input y to confirm.' }).then(async (inputContent) => {
-            if (!inputContent) { return; }
-            if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP view \`${this.database}\`.\`${this.table}\``).then(() => {
-                    DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`);
-                    MySQLTreeDataProvider.refresh();
-                    vscode.window.showInformationMessage(`Drop view ${this.table} success!`);
-                });
-            } else {
-                vscode.window.showInformationMessage(`Cancel drop view ${this.table}!`);
-            }
-        });
+        Util.confirm(`Are you want to drop view ${this.table} ? `, async () => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP view \`${this.database}\`.\`${this.table}\``).then(() => {
+                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`);
+                MySQLTreeDataProvider.refresh();
+                vscode.window.showInformationMessage(`Drop view ${this.table} success!`);
+            });
+        })
 
     }
 

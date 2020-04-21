@@ -7,6 +7,7 @@ import { ModelType, Constants } from "../../common/Constants";
 import { ConnectionInfo } from "../interface/connection";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { Util } from "../../common/util";
 
 export class FunctionNode implements Node, ConnectionInfo {
 
@@ -50,18 +51,13 @@ export class FunctionNode implements Node, ConnectionInfo {
 
     public drop() {
 
-        vscode.window.showInputBox({ prompt: `Are you want to drop function ${this.name} ?     `, placeHolder: 'Input y to confirm.' }).then(async (inputContent) => {
-            if (!inputContent) { return; }
-            if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function \`${this.database}\`.\`${this.name}\``).then(() => {
-                    DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.FUNCTION_GROUP}`);
-                    MySQLTreeDataProvider.refresh();
-                    vscode.window.showInformationMessage(`Drop function ${this.name} success!`);
-                });
-            } else {
-                vscode.window.showInformationMessage(`Cancel drop function ${this.name}!`);
-            }
-        });
+        Util.confirm(`Are you want to drop function ${this.name} ?`, async () => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function \`${this.database}\`.\`${this.name}\``).then(() => {
+                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.FUNCTION_GROUP}`);
+                MySQLTreeDataProvider.refresh();
+                vscode.window.showInformationMessage(`Drop function ${this.name} success!`);
+            });
+        })
 
     }
 

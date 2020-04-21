@@ -7,6 +7,7 @@ import { ModelType, Constants } from "../../common/Constants";
 import { ConnectionInfo } from "../interface/connection";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { Util } from "../../common/util";
 
 
 export class ProcedureNode implements Node, ConnectionInfo {
@@ -49,17 +50,12 @@ export class ProcedureNode implements Node, ConnectionInfo {
 
     public drop() {
 
-        vscode.window.showInputBox({ prompt: `Are you want to drop procedure ${this.name} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
-            if (!inputContent) return;
-            if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP procedure \`${this.database}\`.\`${this.name}\``).then(() => {
-                    DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.PROCEDURE_GROUP}`)
-                    MySQLTreeDataProvider.refresh()
-                    vscode.window.showInformationMessage(`Drop procedure ${this.name} success!`)
-                })
-            } else {
-                vscode.window.showInformationMessage(`Cancel drop procedure ${this.name}!`)
-            }
+        Util.confirm(`Are you want to drop procedure ${this.name} ? `, async () => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP procedure \`${this.database}\`.\`${this.name}\``).then(() => {
+                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.PROCEDURE_GROUP}`)
+                MySQLTreeDataProvider.refresh()
+                vscode.window.showInformationMessage(`Drop procedure ${this.name} success!`)
+            })
         })
 
     }

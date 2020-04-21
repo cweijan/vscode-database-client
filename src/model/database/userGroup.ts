@@ -90,18 +90,13 @@ export class UserNode implements Node, ConnectionInfo, CopyAble {
     }
 
     public drop() {
-        ConnectionManager.getConnection(this, true);
-        vscode.window.showInputBox({ prompt: `Are you want to drop user ${this.user} ?     `, placeHolder: 'Input y to confirm.' }).then(async (inputContent) => {
-            if (!inputContent) { return; }
-            if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP user ${this.name}`).then(() => {
-                    MySQLTreeDataProvider.refresh();
-                    vscode.window.showInformationMessage(`Drop user ${this.name} success!`);
-                });
-            } else {
-                vscode.window.showInformationMessage(`Cancel drop user ${this.name}!`);
-            }
-        });
+
+        Util.confirm(`Are you want to drop user ${this.user} ?`, async () => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP user ${this.name}`).then(() => {
+                MySQLTreeDataProvider.refresh();
+                vscode.window.showInformationMessage(`Drop user ${this.name} success!`);
+            });
+        })
     }
 
     public changePasswordTemplate() {

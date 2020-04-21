@@ -7,6 +7,7 @@ import { ModelType, Constants } from "../../common/Constants";
 import { ConnectionInfo } from "../interface/connection";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { Util } from "../../common/util";
 
 export class TriggerNode implements Node, ConnectionInfo {
     identify: string;
@@ -48,17 +49,12 @@ export class TriggerNode implements Node, ConnectionInfo {
 
     public drop() {
 
-        vscode.window.showInputBox({ prompt: `Are you want to drop trigger ${this.name} ?     `, placeHolder: 'Input y to confirm.' }).then(async inputContent => {
-            if (!inputContent) return;
-            if (inputContent.toLocaleLowerCase() == 'y') {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP trigger \`${this.database}\`.\`${this.name}\``).then(() => {
-                    DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.TRIGGER_GROUP}`)
-                    MySQLTreeDataProvider.refresh()
-                    vscode.window.showInformationMessage(`Drop trigger ${this.name} success!`)
-                })
-            } else {
-                vscode.window.showInformationMessage(`Cancel drop trigger ${this.name}!`)
-            }
+        Util.confirm(`Are you want to drop trigger ${this.name} ?`, async () => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP trigger \`${this.database}\`.\`${this.name}\``).then(() => {
+                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.TRIGGER_GROUP}`)
+                MySQLTreeDataProvider.refresh()
+                vscode.window.showInformationMessage(`Drop trigger ${this.name} success!`)
+            })
         })
 
     }

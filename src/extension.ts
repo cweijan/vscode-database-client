@@ -63,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
             connectionNode.createDatabase();
         }),
         vscode.commands.registerCommand("mysql.deleteDatabase", (databaseNode: DatabaseNode) => {
-            databaseNode.deleteDatatabase();
+            databaseNode.dropDatatabase();
         }),
         vscode.commands.registerCommand("mysql.addConnection", () => {
             SqlViewManager.showConnectPage();

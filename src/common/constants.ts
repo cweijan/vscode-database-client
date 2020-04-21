@@ -34,6 +34,10 @@ export class Cursor {
     }
 }
 
+export enum Confirm {
+    YES = "YES", NO = "NO"
+}
+
 export class ModelType {
     public static CONNECTION = "connection";
     public static DATABASE = "database";

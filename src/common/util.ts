@@ -1,7 +1,7 @@
 
 import { Position, TextDocument } from "vscode";
 import * as vscode from "vscode";
-import { Pattern } from "./Constants";
+import { Pattern, Confirm } from "./Constants";
 
 export class Util {
 
@@ -54,6 +54,14 @@ export class Util {
         vscode.env.clipboard.writeText(content).then(() => {
             vscode.window.showInformationMessage(`Copy ${content} to clipboard success!`);
         });
+    }
+
+    public static confirm(placeHolder: string, callback: () => void) {
+        vscode.window.showQuickPick([Confirm.YES, Confirm.NO], { placeHolder }).then((res) => {
+            if (res == Confirm.YES) {
+                callback() 
+            }
+        })
     }
 
 }
