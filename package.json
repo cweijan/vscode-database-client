@@ -517,12 +517,7 @@
 				{
 					"command": "mysql.data.export",
 					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "mysql@5"
-				},
-				{
-					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "3_mysql@4"
+					"group": "2_mysql@5"
 				},
 				{
 					"command": "mysql.changeColumnName",

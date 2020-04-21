@@ -70,7 +70,7 @@ export class QueryUnit {
         if (isDDL == null && isDML == null) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
-        const sqlList: string[] = sql.split(";").filter((s) => s.trim() != '').map((s) => s.trim())
+        const sqlList: string[] = sql.split(";").filter((s) => s.trim() != '')
 
         if (sqlList.length > 1) {
             this.runBatch(connection, sqlList)
@@ -104,7 +104,9 @@ export class QueryUnit {
     private static runBatch(connection: mysql.Connection, sqlList: string[]) {
         connection.beginTransaction(async () => {
             try {
-                for (const sql of sqlList) {
+                for (let sql of sqlList) {
+                    sql = sql.trim()
+                    if (!sql) { continue }
                     await this.queryPromise(connection, sql)
                 }
                 connection.commit()
@@ -166,7 +168,7 @@ export class QueryUnit {
     public static async runFile(connection: Connection, fsPath: string) {
         const stats = fs.statSync(fsPath);
         const startTime = new Date();
-        const fileSize = stats["size"];
+        const fileSize = stats.size;
         if (fileSize > 1024 * 1024 * 100) {
             vscode.window.showErrorMessage(`Import sql exceed max limit 100M!`)
             return;
@@ -176,19 +178,7 @@ export class QueryUnit {
         } else {
             const fileContent = fs.readFileSync(fsPath, 'utf8');
             const sqlList = fileContent.split(";")
-            for (let sql of sqlList) {
-                if (!(sql = sql.trim())) { continue };
-                // TODO break when break;
-                await new Promise((resolve) => {
-                    connection.query(sql, (err, data) => {
-                        if (err) {
-                            Console.log(`Execute sql fail:\n ${err.sql}\n code: ${err.sqlState} message : ${err.message}`)
-                        } else {
-                            resolve();
-                        }
-                    });
-                })
-            }
+            this.runBatch(connection, sqlList)
             Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
         }
         vscode.commands.executeCommand(CommandKey.Refresh)
