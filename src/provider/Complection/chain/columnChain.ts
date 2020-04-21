@@ -30,7 +30,7 @@ export class ColumnChain implements ComplectionChain {
 
         const tableName = Util.getTableName(complectionContext.currentSql, Pattern.DML_PATTERN)
         if (tableName) {
-            this.needStop = false;
+            this.needStop = complectionContext.currentSql.match(/\binsert\b/ig) != null;
             return await this.generateColumnComplectionItem(tableName);
         }
 
