@@ -16,6 +16,21 @@ export class ConnectionManager {
         return this.lastConnectionOption;
     }
 
+    public static removeConnection(id: string) {
+
+        const lcp = this.lastConnectionOption;
+        const key = `${lcp.host}_${lcp.port}_${lcp.user}`;
+        if (key == id) {
+            delete this.lastConnectionOption
+        }
+        const activeConnect = this.activeConnection[id];
+        if (activeConnect) {
+            this.activeConnection[id] = null
+            activeConnect.end()
+        }
+
+    }
+
     public static getLastActiveConnection(): Promise<mysql.Connection> {
 
         if (!this.activeConnection) {

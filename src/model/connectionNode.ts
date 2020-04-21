@@ -12,6 +12,7 @@ import { UserGroup } from "./database/userGroup";
 import { InfoNode } from "./InfoNode";
 import { Node } from "./interface/node";
 import { FileManager } from "../extension/FileManager";
+import { Util } from "../common/util";
 
 
 export class ConnectionNode implements Node, ConnectionInfo {
@@ -23,7 +24,7 @@ export class ConnectionNode implements Node, ConnectionInfo {
     constructor(readonly id: string, readonly host: string, readonly user: string,
         readonly password: string, readonly port: string,
         readonly certPath: string) {
-            this.identify = `${this.host}_${this.port}_${this.user}`;
+        this.identify = `${this.host}_${this.port}_${this.user}`;
     }
 
     public getTreeItem(): vscode.TreeItem {
@@ -42,7 +43,7 @@ export class ConnectionNode implements Node, ConnectionInfo {
             return databaseNodes;
         }
 
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "SHOW DATABASES")
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "show databases")
             .then((databases) => {
                 databaseNodes = databases.map<DatabaseNode>((database) => {
                     return new DatabaseNode(this.host, this.user, this.password, this.port, database.Database, this.certPath);
@@ -74,11 +75,16 @@ export class ConnectionNode implements Node, ConnectionInfo {
     }
 
     public async deleteConnection(context: vscode.ExtensionContext) {
-        const connections = context.globalState.get<{ [key: string]: ConnectionInfo }>(CacheKey.ConectionsKey);
-        delete connections[this.id];
-        await context.globalState.update(CacheKey.ConectionsKey, connections);
 
-        MySQLTreeDataProvider.refresh();
+        Util.confirm(`Are you want to Delete Connection ${this.id} ? `, async () => {
+            const connections = context.globalState.get<{ [key: string]: ConnectionInfo }>(CacheKey.ConectionsKey);
+            ConnectionManager.removeConnection(this.id)
+            DatabaseCache.clearDatabaseCache(this.id)
+            delete connections[this.id];
+            await context.globalState.update(CacheKey.ConectionsKey, connections);
+            MySQLTreeDataProvider.refresh();
+        })
+
     }
 
     public importData(fsPath: string) {
