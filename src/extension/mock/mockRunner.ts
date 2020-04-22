@@ -103,6 +103,8 @@ export class MockRunner {
                 return "@integer(0," + length + ")";
             case "char":
                 return "@character('lower')";
+            case "text":
+                return "@sentence()"
             case "varchar":
                 return "@string('lower',5)"
                 // return "@cword(5)"
