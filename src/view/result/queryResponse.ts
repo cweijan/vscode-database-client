@@ -4,6 +4,11 @@ export class RunResponse {
     public sql: string;
 }
 
+export class MessageResponse {
+    public message: string;
+    public success: boolean;
+}
+
 export class DataResponse {
     public sql: string;
     public costTime: number;

@@ -498,7 +498,11 @@
                 vue.info.error = true
                 break;
             case "MESSAGE":
-                vue.$message(response.msg)
+                if(response.success){
+                    vue.$message.success(response.message)
+                }else{
+                    vue.$message.error(response.message)
+                }
                 break;
             default:
                 vue.$message(JSON.stringify(event.data));

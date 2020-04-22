@@ -9,9 +9,10 @@ import { Console } from "../common/OutputChannel";
 import { Util } from "../common/util";
 import { ConnectionInfo } from "../model/interface/connection";
 import { QueryPage } from "../view/result/query";
-import { DataResponse, DMLResponse, ErrorResponse, RunResponse } from "../view/result/queryResponse";
+import { DataResponse, DMLResponse, ErrorResponse, RunResponse, MessageResponse } from "../view/result/queryResponse";
 import { ConnectionManager } from "./ConnectionManager";
 import { FileManager, FileModel } from "../extension/FileManager";
+import { resolve } from "url";
 
 export class QueryUnit {
 
@@ -74,8 +75,8 @@ export class QueryUnit {
         const sqlList: string[] = sql.split(";").filter((s) => s.trim() != '')
 
         if (sqlList.length > 1) {
-            this.runBatch(connection, sqlList)
-            QueryPage.send({ type: MessageType.MESSAGE, res: { msg: "Batch execute sql success!" } });
+            const success = await this.runBatch(connection, sqlList)
+            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Batch execute sql ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
             return;
         }
         connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
@@ -105,17 +106,21 @@ export class QueryUnit {
         });
     }
     private static runBatch(connection: mysql.Connection, sqlList: string[]) {
-        connection.beginTransaction(async () => {
-            try {
-                for (let sql of sqlList) {
-                    sql = sql.trim()
-                    if (!sql) { continue }
-                    await this.queryPromise(connection, sql)
+        return new Promise((resolve) => {
+            connection.beginTransaction(async () => {
+                try {
+                    for (let sql of sqlList) {
+                        sql = sql.trim()
+                        if (!sql) { continue }
+                        await this.queryPromise(connection, sql)
+                    }
+                    connection.commit()
+                    resolve(true)
+                } catch (err) {
+                    connection.rollback()
+                    resolve(false)
                 }
-                connection.commit()
-            } catch (err) {
-                connection.rollback()
-            }
+            })
         })
 
     }
