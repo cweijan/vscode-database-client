@@ -27,7 +27,7 @@ export class SqlViewManager {
     public static showConnectPage() {
 
         this.createWebviewPanel({
-            viewPath: "connect",
+            viewPath: "pages/connect/connect",
             viewTitle: "connect",
             splitResultView: false,
         }).then((webviewPanel) => {

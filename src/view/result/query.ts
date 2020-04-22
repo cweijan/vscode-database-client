@@ -56,7 +56,7 @@ export class QueryPage {
         // init result webview
         this.creating = true;
         SqlViewManager.createWebviewPanel({
-            splitResultView: true, viewPath: "result", viewTitle: "Query",
+            splitResultView: true, viewPath: "pages/result/index", viewTitle: "Query",
         }).then(async (webviewPanel) => {
             this.resultWebviewPanel = webviewPanel;
             this.creating = false;
