@@ -1,0 +1,32 @@
+<div class="hint">
+    <!-- sql input -->
+    <el-row style="margin-bottom: 10px;">
+        <el-input type="textarea" autosize v-model="toolbar.sql" style="width: 600px;"></el-input>
+    </el-row>
+    <!-- tool panel -->
+    <el-row>
+        <w>
+            <el-input v-model="table.search" style="width:200px" placeholder="Type to search" />
+        </w>
+        <w>
+            <el-button type="primary" @click='execute(toolbar.sql);info.visible = false;'>Execute</el-button>
+            <span v-if="result.table">
+                {{result.table}}
+            </span>
+        </w>
+    </el-row>
+    <el-row v-if="result.table">
+        <el-col>
+            <el-button type="info" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest"
+                v-if="result.primaryKey">
+            </el-button>
+            <span>CostTime: </span><span v-text="toolbar.costTime"></span>ms
+            <span v-if="result.table">, Row: {{result.data.length}}, Col: {{columnCount}}</span>
+        </el-col>
+    </el-row>
+    <!-- info panel -->
+    <div v-if="info.visible ">
+        <div v-if="info.error" class="info-panel" style="color:red" v-html="info.message"></div>
+        <div v-if="!info.error" class="info-panel" style="color: green;" v-html="info.message"></div>
+    </div>
+</div>

@@ -2,103 +2,15 @@
 
 <head>
     <title>result</title>
-    <link rel="stylesheet" href="css/element.css">
-    <script src="js/vue.js"></script>
-    <script src="js/element.js"></script>
-    <style>
-        body {
-            background-color: #F7F7F7;
-            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
-        }
-
-        .hint {
-            padding: 5px;
-            font-size: 17px;
-            color: #444;
-            display: inline-block;
-            margin-top: 8px;
-        }
-
-        .cell {
-            overflow: hidden !important;
-            text-overflow: unset !important;
-            white-space: nowrap !important;
-            user-select: text !important;
-            padding: 1px !important;
-        }
-
-        .info-panel {
-            color: #444;
-            font-size: 14px;
-            background-color: white;
-            border: 1px solid #dcdfe6;
-            border-radius: 5px;
-            padding: 10px;
-            margin-left: 6px;
-        }
-
-        /*定义滚动条样式（高宽及背景）*/
-        ::-webkit-scrollbar {
-            /* 滚动条宽度， width：对应竖滚动条的宽度  height：对应横滚动条的高度*/
-            /* width: 6px;   
-            background: #007acc; */
-        }
-
-        /*定义滚动条轨道（凹槽）样式*/
-        ::-webkit-scrollbar-track {
-            /* 较少使用 */
-            /* -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);   
-            border-radius: 3px;  */
-        }
-
-        /*定义滑块 样式*/
-        ::-webkit-scrollbar-thumb {
-            /* 滚动条滑块长度 */
-            /* border-radius: 3px; 
-            height: 100px;   
-            background-color: #ccc;  */
-        }
-
-        .el-table .edit-row {
-            background: oldlace;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/element.css">
+    <link rel="stylesheet" href="/css/result.css">
+    <script src="/js/vue.js"></script>
+    <script src="/js/element.js"></script>
 </head>
 
 <body>
     <div id="app">
-        <div class="hint">
-            <!-- sql input -->
-            <el-row style="margin-bottom: 10px;">
-                <el-input type="textarea" autosize v-model="toolbar.sql" style="width: 600px;"></el-input>
-            </el-row>
-            <!-- tool panel -->
-            <el-row>
-                <w>
-                    <el-input v-model="table.search" style="width:200px" placeholder="Type to search" />
-                </w>
-                <w>
-                    <el-button type="primary" @click='execute(toolbar.sql);info.visible = false;'>Execute</el-button>
-                    <span v-if="result.table">
-                        {{result.table}}
-                    </span>
-                </w>
-            </el-row>
-            <el-row v-if="result.table">
-                <el-col>
-                    <el-button type="info" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest"
-                        v-if="result.primaryKey">
-                    </el-button>
-                    <span>CostTime: </span><span v-text="toolbar.costTime"></span>ms
-                    <span v-if="result.table">, Row: {{result.data.length}}, Col: {{columnCount}}</span>
-                </el-col>
-            </el-row>
-            <!-- info panel -->
-            <div v-if="info.visible ">
-                <div v-if="info.error" class="info-panel" style="color:red" v-html="info.message"></div>
-                <div v-if="!info.error" class="info-panel" style="color: green;" v-html="info.message"></div>
-            </div>
-        </div>
+        <include path="components/toolPanel.html" />
         <!-- talbe result -->
         <div :style="'width:' + table.width + 'px;overflow:scroll'" v-if="result.data">
             <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort"
@@ -106,67 +18,12 @@
                 :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
                 border @cell-click="celledit">
                 <!-- tool bar -->
-                <el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey" align="center">
-                    <template slot-scope="scope">
-                        <div v-if="scope.row.isFilter" style="text-align: center;">
-                            <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
-                                <el-checkbox-group v-model="toolbar.showColumns">
-                                    <el-checkbox v-for="(column) in result.columnList" :label="column.name"
-                                        :key="column.name">
-                                        {{column.name}}
-                                    </el-checkbox>
-                                </el-checkbox-group>
-                                <el-button icon="el-icon-search" circle title="Select columns to show" size="small"
-                                    slot="reference"></el-button>
-                            </el-popover>
-                            <el-button @click="resetFilter" title="Reset filter" type="warning" size="small"
-                                icon="el-icon-refresh" circle title="Reset">
-                            </el-button>
-                        </div>
-                        <div v-if="scope.row[result.primaryKey]">
-                            <el-button @click="openEdit(scope.row)" type="primary" size="small" icon="el-icon-edit"
-                                circle>
-                            </el-button>
-                            <el-button @click="deleteConfirm(scope.row[result.primaryKey])" type="primary" size="small"
-                                icon="el-icon-delete" circle>
-                            </el-button>
-                        </div>
-                    </template>
-                </el-table-column>
+                <include path="components/toolbar.html" />
                 <!-- data  -->
-                <el-table-column :label="field.name" v-for="field in result.fields" :key="field.name" align="center"
-                    sortable v-if="result.columnList && toolbar.showColumns.includes(field.name.toLowerCase())"
-                    :width="computeWidth(field.name,0,toolbar.filter[field.name])">
-                    <template slot-scope="scope">
-                        <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[field.name]" placeholder="filter"
-                            @blur="filter($event,field.name)" v-on:keyup.enter.native="filter($event,field.name)">
-                        </el-input>
-                        <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[field.name])'></span>
-                    </template>
-                </el-table-column>
+                <include path="components/dataTable.html" />
             </el-table>
         </div>
-        <el-dialog :title="editorTilte" :visible.sync="editor.visible" width="90%" top="3vh" size="small">
-            <el-form ref="infoForm" :model="update.currentNew">
-                <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
-                    <template>
-                        <span>
-                            {{column.name}} : {{column.type}} : <span
-                                style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' Required'}}</span>&nbsp;
-                            {{column.comment?column.comment:''}}
-                        </span>
-                        <el-input v-model="update.currentNew[column.name]"></el-input>
-                    </template>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="editor.visible = false">Cancel</el-button>
-                <el-button v-if="update.primary!=null" type="primary" :loading="editor.loading" @click="confirmUpdate">
-                    Update</el-button>
-                <el-button v-if="update.primary==null" type="primary" :loading="editor.loading" @click="confirmInsert">
-                    Insert</el-button>
-            </span>
-        </el-dialog>
+        <include path="components/editDialog.html" />
     </div>
 </body>
 
@@ -497,9 +354,9 @@
                 vue.info.error = true
                 break;
             case "MESSAGE":
-                if(response.success){
+                if (response.success) {
                     vue.$message.success(response.message)
-                }else{
+                } else {
                     vue.$message.error(response.message)
                 }
                 break;

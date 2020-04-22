@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
 import { ConnectionManager } from "../database/ConnectionManager";
@@ -19,9 +20,9 @@ export class ViewOption {
 
 export class SqlViewManager {
 
-    private static extensionPath: string;
+    private static webviewPath: string;
     public static initExtesnsionPath(extensionPath: string) {
-        this.extensionPath = extensionPath;
+        this.webviewPath = extensionPath + "/resources/webview"
     }
 
     public static showConnectPage() {
@@ -52,7 +53,8 @@ export class SqlViewManager {
         const columnType = viewOption.splitResultView ? vscode.ViewColumn.Two : vscode.ViewColumn.One;
 
         return new Promise((resolve, reject) => {
-            fs.readFile(`${this.extensionPath}/resources/webview/${viewOption.viewPath}.html`, 'utf8', async (err, data) => {
+            const targetPath = `${this.webviewPath}/${viewOption.viewPath}.html`;
+            fs.readFile(targetPath, 'utf8', async (err, data) => {
                 if (err) {
                     Console.log(err);
                     reject(err);
@@ -64,9 +66,7 @@ export class SqlViewManager {
                     { viewColumn: columnType, preserveFocus: true },
                     { enableScripts: true, retainContextWhenHidden: true },
                 );
-                webviewPanel.webview.html = data.replace(/("|')\/?(css|js)\b/gi,
-                    "$1" + vscode.Uri.file(`${this.extensionPath}/resources/webview`)
-                        .with({ scheme: 'vscode-resource' }).toString() + "/$2");
+                webviewPanel.webview.html = this.buildInclude(this.buildPath(data), path.resolve(targetPath, ".."));
                 webviewPanel.webview.onDidReceiveMessage(viewOption.receiveListener);
                 webviewPanel.onDidDispose(viewOption.disposeListener);
 
@@ -75,6 +75,25 @@ export class SqlViewManager {
 
         });
 
+    }
+    static buildInclude(data: string, fileFolderPath: string): string {
+
+        const reg = new RegExp(`<include path="(.+?)" (\\/)?>`, 'ig')
+        let match = reg.exec(data)
+        while (match != null) {
+            const includePath = match[1].startsWith("/") ? this.webviewPath + match[1] : (fileFolderPath + "/" + match[1]);
+            const includeContent = fs.readFileSync(includePath, 'utf8')
+            if (includeContent) {
+                data = data.replace(match[0], includeContent)
+            }
+            match = reg.exec(data)
+        }
+
+        return data;
+    }
+
+    private static buildPath(data: string): string {
+        return data.replace(/("|')\/?(css|js)\b/gi, "$1" + vscode.Uri.file(`${this.webviewPath}/`).with({ scheme: 'vscode-resource' }).toString() + "/$2");
     }
 
 }
