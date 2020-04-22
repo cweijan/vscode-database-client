@@ -104,7 +104,8 @@ export class MockRunner {
             case "char":
                 return "@character('lower')";
             case "varchar":
-                return "@cword(5)"
+                return "@string('lower',5)"
+                // return "@cword(5)"
             case "tinyint":
                 return "@integer(0," + length + ")";
             case "smallint":
