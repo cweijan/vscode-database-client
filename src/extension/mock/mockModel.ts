@@ -6,5 +6,10 @@ export interface MockModel {
     table: string;
     mockStartIndex: number;
     mockCount: number;
-    mock: { [key: string]: any }
+    mock: {
+        [key: string]: {
+            type: string,
+            value: any,
+        }
+    }
 }

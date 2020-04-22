@@ -15,15 +15,19 @@ import { MessageType } from "../../common/Constants";
 
 export class MockRunner {
 
+    private readonly MOCK_INDEX = "$mockIndex";
+
     public async create(tableNode: TableNode) {
         const mockModel: MockModel = {
             host: tableNode.host, port: tableNode.port, user: tableNode.user, database: tableNode.database, table: tableNode.table,
             mockStartIndex: 0, mockCount: 50, mock: {}
         }
         const columnList = (await tableNode.getChildren()) as ColumnNode[]
-        for (const column of columnList) {
-
-            mockModel.mock[column.column.name] = this.getValueByType(column.column.simpleType)
+        for (const columnNode of columnList) {
+            mockModel.mock[columnNode.column.name] = {
+                type: columnNode.column.simpleType,
+                value: this.getValueByType(columnNode.column)
+            }
         }
 
         await vscode.window.showTextDocument(
@@ -52,16 +56,16 @@ export class MockRunner {
             return;
         }
 
-        const insertSqlTemplate = await tableNode.insertSqlTemplate(false)
+        const insertSqlTemplate = (await tableNode.insertSqlTemplate(false)).replace("\n", " ");
         const sqlList = [];
         const mockData = mockModel.mock;
         const { mockStartIndex, mockCount } = mockModel
         for (let i = mockStartIndex; i < (mockStartIndex + mockCount); i++) {
             let tempInsertSql = insertSqlTemplate;
             for (const column in mockData) {
-                if (mockData.hasOwnProperty(column)) {
-                    tempInsertSql = tempInsertSql.replace(new RegExp("\\$+" + column, 'i'), `'${Mock.mock(mockData[column])}'`);
-                }
+                let value = mockData[column].value;
+                if (value == this.MOCK_INDEX) { value = i; }
+                tempInsertSql = tempInsertSql.replace(new RegExp("\\$+" + column, 'i'), this.wrapQuote(mockData[column].type, Mock.mock(value)));
             }
             sqlList.push(tempInsertSql)
         }
@@ -71,27 +75,50 @@ export class MockRunner {
         QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
 
     }
-
-    private getValueByType(type: string): string {
+    private wrapQuote(type: string, value: any): any {
         type = type.toLowerCase()
+        switch (type) {
+            case "varchar": case "char": case "date": case "time": case "timestamp": case "datetime":
+                return `'${value}'`
+        }
+        return value;
+    }
+
+
+
+    // refrence : http://mockjs.com/examples.html
+    private getValueByType(column: any): string {
+        const type = column.simpleType.toLowerCase()
+        const match = column.type.match(/.+?\((\d+)\)/);
+        let length = 1024
+        if (match) {
+            length = 1 << (match[1] - 1)
+        }
+        if (column.key == "PRI") {
+            return this.MOCK_INDEX;
+        }
         // console.log(type)
         switch (type) {
             case "bit":
-                return "@integer(0,1)";
+                return "@integer(0," + length + ")";
             case "char":
                 return "@character('lower')";
             case "varchar":
                 return "@cword(5)"
+            case "tinyint":
+                return "@integer(0," + length + ")";
+            case "smallint":
+                return "@integer(0," + length + ")";
+            case "double": case "float":
+                return "@float(0,100,2,2)"
             case "date":
                 return "@date()"
-            case "double": case "float":
-                return "@float(30,80)"
             case "time":
                 return "@time()"
             case "timestamp": case "datetime":
                 return "@datetime()"
         }
-        return "@integer(1,1000)";
+        return "@integer(1," + length + ")";
     }
 
 }
