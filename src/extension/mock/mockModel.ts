@@ -1,6 +1,6 @@
 export interface MockModel {
     host: string;
-    port: number;
+    port: string;
     user: string;
     database: string;
     table: string;

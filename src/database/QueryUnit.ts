@@ -105,7 +105,7 @@ export class QueryUnit {
 
         });
     }
-    private static runBatch(connection: mysql.Connection, sqlList: string[]) {
+    public static runBatch(connection: mysql.Connection, sqlList: string[]) {
         return new Promise((resolve) => {
             connection.beginTransaction(async () => {
                 try {

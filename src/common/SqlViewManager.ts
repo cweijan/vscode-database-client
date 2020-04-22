@@ -76,7 +76,7 @@ export class SqlViewManager {
         });
 
     }
-    static buildInclude(data: string, fileFolderPath: string): string {
+    private static buildInclude(data: string, fileFolderPath: string): string {
 
         const reg = new RegExp(`<include path="(.+?)" (\\/)?>`, 'ig')
         let match = reg.exec(data)

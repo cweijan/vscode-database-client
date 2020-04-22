@@ -26,15 +26,12 @@ import { TableHoverProvider } from "./provider/TableHoverProvider";
 import { TableGroup } from "./model/table/tableGroup";
 import { MysqlSetting } from "./extension/MysqlSetting";
 import { CopyAble } from "./model/interface/copyAble";
-import { FileManager } from "./extension/FileManager";
+import { ServiceManager } from "./extension/serviceManager";
 
 export function activate(context: vscode.ExtensionContext) {
 
+    const serviceManager = new ServiceManager(context)
 
-    DatabaseCache.initCache(context);
-    SqlViewManager.initExtesnsionPath(context.extensionPath);
-
-    FileManager.init(context)
     const mysqlTreeDataProvider = new MySQLTreeDataProvider(context);
     const treeview = vscode.window.createTreeView("github.cweijan.mysql", {
         treeDataProvider: mysqlTreeDataProvider,
@@ -78,10 +75,13 @@ export function activate(context: vscode.ExtensionContext) {
                 tableNode.truncateTable();
             },
             "mysql.table.drop": (tableNode: TableNode) => {
-                tableNode.mockData();
-            },
-            "mysql.table.mock": (tableNode: TableNode) => {
                 tableNode.dropTable();
+            },
+            "mysql.mock.table": (tableNode: TableNode) => {
+                serviceManager.mockRunner.create(tableNode)
+            },
+            "mysql.mock.run": (fileUri: vscode.Uri) => {
+                serviceManager.mockRunner.runMock(fileUri)
             },
             "mysql.table.source": (tableNode: TableNode) => {
                 if (tableNode) { tableNode.showSource(); }
@@ -200,12 +200,14 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 }
 
-function initCommand(commandDefinition: Object): vscode.Disposable[] {
+function initCommand(commandDefinition: any): vscode.Disposable[] {
 
     const dispose = []
 
     for (const command in commandDefinition) {
-        dispose.push(vscode.commands.registerCommand(command, commandDefinition[command]))
+        if (commandDefinition.hasOwnProperty(command)) {
+            dispose.push(vscode.commands.registerCommand(command, commandDefinition[command]))
+        }
     }
 
     return dispose;

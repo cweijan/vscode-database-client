@@ -27,6 +27,7 @@
         "no-trailing-whitespace": false,
         "quotemark": false,
         "no-consecutive-blank-lines": false,
+        "no-console": false,
         "eofline": false,
         "ordered-imports": false,
         "radix": false,

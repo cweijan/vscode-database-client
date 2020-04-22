@@ -23,7 +23,7 @@ export class FileManager {
 
     }
 
-    public static record(fileName: string, content: string, model?: FileModel) {
+    public static record(fileName: string, content: string, model?: FileModel): Promise<string> {
         if (!this.storagePath) { vscode.window.showErrorMessage("FileManager is not init!") }
         if (!fileName || !content) { return; }
         return new Promise((resolve) => {

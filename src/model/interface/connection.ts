@@ -1,10 +1,10 @@
 export interface ConnectionInfo {
     readonly host: string;
-    readonly user: string;
-    password?: string;
     readonly port: string;
+    readonly user: string;
+    readonly password?: string;
     database?: string;
     multipleStatements?: boolean;
-    readonly certPath: string;
+    readonly certPath?: string;
 
 }
