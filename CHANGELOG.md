@@ -1,3 +1,9 @@
+## 1.8.0 (2020/4/22)
+- Show template sql in same file.
+- Get connection correctly when connection multi server.
+- Improve UI Interactive.
+- Fix bugs.
+
 ## 1.7.32 (2020/4/18)
 - Fix legacy bug: connect to same host fail.
 
