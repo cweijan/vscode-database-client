@@ -176,6 +176,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.table.mock",
+				"title": "Mock Data",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.changeTableName",
 				"title": "Change Name",
 				"category": "MySQL",
@@ -205,7 +210,7 @@
 			},
 			{
 				"command": "mysql.table.source",
-				"title": "Show table source",
+				"title": "Show Table Source",
 				"category": "MySQL"
 			},
 			{
@@ -474,24 +479,29 @@
 					"group": "1_inline@-1"
 				},
 				{
-					"command": "mysql.changeTableName",
+					"command": "mysql.table.source",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@0"
 				},
 				{
-					"command": "mysql.index.template",
+					"command": "mysql.table.mock",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@1"
 				},
 				{
-					"command": "mysql.column.add",
+					"command": "mysql.changeTableName",
 					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "1_inline@2"
+					"group": "inline"
 				},
 				{
-					"command": "mysql.table.source",
+					"command": "mysql.index.template",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@3"
+				},
+				{
+					"command": "mysql.column.add",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline@4"
 				},
 				
 				{

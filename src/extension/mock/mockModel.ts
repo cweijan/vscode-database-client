@@ -1,5 +1,10 @@
-export class MockModel {
-    satrt: number = 0;
-    count: number;
-    data: { [key: string]: any }
+export interface MockModel {
+    host: string;
+    port: number;
+    user: string;
+    database: string;
+    table: string;
+    mockStartIndex: number;
+    mockCount: number;
+    mock: { [key: string]: any }
 }

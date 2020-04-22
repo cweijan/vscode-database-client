@@ -50,150 +50,163 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormatProvider()),
         vscode.languages.registerHoverProvider('sql', new TableHoverProvider()),
         vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.', ">", "<", "=", "("),
-        vscode.commands.registerCommand(CommandKey.Refresh, () => {
-            mysqlTreeDataProvider.init();
+        ...initCommand({
+            "mysql.history.open": () => HistoryManager.showHistory(),
+            [CommandKey.Refresh]: () => { mysqlTreeDataProvider.init(); },
+            [CommandKey.RecordHistory]: (sql: string, costTime: number) => {
+                HistoryManager.recordHistory(sql, costTime);
+            },
+            "mysql.addDatabase": (connectionNode: ConnectionNode) => {
+                connectionNode.createDatabase();
+            },
+            "mysql.deleteDatabase": (databaseNode: DatabaseNode) => {
+                databaseNode.dropDatatabase();
+            },
+            "mysql.addConnection": () => {
+                SqlViewManager.showConnectPage();
+            },
+            "mysql.changeTableName": (tableNode: TableNode) => {
+                tableNode.changeTableName();
+            },
+            "mysql.index.template": (tableNode: TableNode) => {
+                tableNode.indexTemplate();
+            },
+            "mysql.db.active": () => {
+                mysqlTreeDataProvider.activeDb();
+            },
+            "mysql.table.truncate": (tableNode: TableNode) => {
+                tableNode.truncateTable();
+            },
+            "mysql.table.drop": (tableNode: TableNode) => {
+                tableNode.mockData();
+            },
+            "mysql.table.mock": (tableNode: TableNode) => {
+                tableNode.dropTable();
+            },
+            "mysql.table.source": (tableNode: TableNode) => {
+                if (tableNode) { tableNode.showSource(); }
+            },
+            "mysql.changeColumnName": (columnNode: ColumnNode) => {
+                columnNode.changeColumnName();
+            },
+            "mysql.column.add": (tableNode: TableNode) => {
+                tableNode.addColumnTemplate();
+            },
+            "mysql.column.update": (columnNode: ColumnNode) => {
+                columnNode.updateColumnTemplate();
+            },
+            "mysql.column.drop": (columnNode: ColumnNode) => {
+                columnNode.dropColumnTemplate();
+            },
+            "mysql.deleteConnection": (connectionNode: ConnectionNode) => {
+                connectionNode.deleteConnection(context);
+            },
+            "mysql.runQuery": (sql) => {
+                if (typeof sql != 'string') { sql = null; }
+                QueryUnit.runQuery(sql);
+            },
+            "mysql.newQuery": (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
+                if (databaseOrConnectionNode) {
+                    databaseOrConnectionNode.newQuery();
+                } else {
+                    ConnectionNode.tryOpenQuery();
+                }
+            },
+            "mysql.template.sql": (tableNode: TableNode, run: boolean) => {
+                tableNode.selectSqlTemplate(run);
+            },
+            "mysql.name.copy": (copyAble: CopyAble) => {
+                copyAble.copyName();
+            },
+            "mysql.data.import": (iNode: DatabaseNode | ConnectionNode) => {
+                vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
+                    iNode.importData(filePath[0].fsPath);
+                });
+            },
+            "mysql.data.export": (iNode: TableNode | DatabaseNode) => {
+                vscode.window.showOpenDialog({ canSelectMany: false, openLabel: "Select export file path", canSelectFiles: false, canSelectFolders: true }).then((folderPath) => {
+                    iNode.backupData(folderPath[0].fsPath);
+                });
+            },
+            "mysql.template.delete": (tableNode: TableNode) => {
+                tableNode.deleteSqlTemplate();
+            },
+            "mysql.copy.insert": (tableNode: TableNode) => {
+                tableNode.insertSqlTemplate();
+            },
+            "mysql.copy.update": (tableNode: TableNode) => {
+                tableNode.updateSqlTemplate();
+            },
+            "mysql.show.procedure": (procedureNode: ProcedureNode) => {
+                procedureNode.showSource();
+            },
+            "mysql.show.function": (functionNode: FunctionNode) => {
+                functionNode.showSource();
+            },
+            "mysql.show.trigger": (triggerNode: TriggerNode) => {
+                triggerNode.showSource();
+            },
+            "mysql.user.sql": (userNode: UserNode) => {
+                userNode.selectSqlTemplate();
+            },
+            "mysql.template.table": (tableGroup: TableGroup) => {
+                tableGroup.createTemplate();
+            },
+            "mysql.template.procedure": (procedureGroup: ProcedureGroup) => {
+                procedureGroup.createTemplate();
+            },
+            "mysql.setting.open": (procedureGroup: ProcedureGroup) => {
+                MysqlSetting.open();
+            },
+            "mysql.template.view": (viewGroup: ViewGroup) => {
+                viewGroup.createTemplate();
+            },
+            "mysql.template.trigger": (triggerGroup: TriggerGroup) => {
+                triggerGroup.createTemplate();
+            },
+            "mysql.template.function": (functionGroup: FunctionGroup) => {
+                functionGroup.createTemplate();
+            },
+            "mysql.template.user": (userGroup: UserGroup) => {
+                userGroup.createTemplate();
+            },
+            "mysql.delete.user": (userNode: UserNode) => {
+                userNode.drop();
+            },
+            "mysql.delete.view": (viewNode: ViewNode) => {
+                viewNode.drop();
+            },
+            "mysql.delete.procedure": (procedureNode: ProcedureNode) => {
+                procedureNode.drop();
+            },
+            "mysql.delete.function": (functionNode: FunctionNode) => {
+                functionNode.drop();
+            },
+            "mysql.delete.trigger": (triggerNode: TriggerNode) => {
+                triggerNode.drop();
+            },
+            "mysql.change.user": (userNode: UserNode) => {
+                userNode.changePasswordTemplate();
+            },
+            "mysql.grant.user": (userNode: UserNode) => {
+                userNode.grandTemplate();
+            },
         }),
-        vscode.commands.registerCommand("mysql.history.open", () => {
-            HistoryManager.showHistory();
-        }),
-        vscode.commands.registerCommand(CommandKey.RecordHistory, (sql: string, costTime: number) => {
-            HistoryManager.recordHistory(sql, costTime);
-        }),
-        vscode.commands.registerCommand("mysql.addDatabase", (connectionNode: ConnectionNode) => {
-            connectionNode.createDatabase();
-        }),
-        vscode.commands.registerCommand("mysql.deleteDatabase", (databaseNode: DatabaseNode) => {
-            databaseNode.dropDatatabase();
-        }),
-        vscode.commands.registerCommand("mysql.addConnection", () => {
-            SqlViewManager.showConnectPage();
-        }),
-        vscode.commands.registerCommand("mysql.changeTableName", (tableNode: TableNode) => {
-            tableNode.changeTableName();
-        }),
-        vscode.commands.registerCommand("mysql.index.template", (tableNode: TableNode) => {
-            tableNode.indexTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.db.active", () => {
-            mysqlTreeDataProvider.activeDb();
-        }),
-        vscode.commands.registerCommand("mysql.table.truncate", (tableNode: TableNode) => {
-            tableNode.truncateTable();
-        }),
-        vscode.commands.registerCommand("mysql.table.drop", (tableNode: TableNode) => {
-            tableNode.dropTable();
-        }),
-        vscode.commands.registerCommand("mysql.table.source", (tableNode: TableNode) => {
-            if (tableNode) { tableNode.showSource(); }
-        }),
-        vscode.commands.registerCommand("mysql.changeColumnName", (columnNode: ColumnNode) => {
-            columnNode.changeColumnName();
-        }),
-        vscode.commands.registerCommand("mysql.column.add", (tableNode: TableNode) => {
-            tableNode.addColumnTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.column.update", (columnNode: ColumnNode) => {
-            columnNode.updateColumnTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.column.drop", (columnNode: ColumnNode) => {
-            columnNode.dropColumnTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.deleteConnection", (connectionNode: ConnectionNode) => {
-            connectionNode.deleteConnection(context);
-        }),
-        vscode.commands.registerCommand("mysql.runQuery", (sql) => {
-            if (typeof sql != 'string') { sql = null; }
-            QueryUnit.runQuery(sql);
-        }),
-        vscode.commands.registerCommand("mysql.newQuery", (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
-            if (databaseOrConnectionNode) {
-                databaseOrConnectionNode.newQuery();
-            } else {
-                ConnectionNode.tryOpenQuery();
-            }
-        }),
-        vscode.commands.registerCommand("mysql.template.sql", (tableNode: TableNode, run: boolean) => {
-            tableNode.selectSqlTemplate(run);
-        }),
-        vscode.commands.registerCommand("mysql.name.copy", (copyAble: CopyAble) => {
-            copyAble.copyName();
-        }),
-        vscode.commands.registerCommand("mysql.data.import", (iNode: DatabaseNode | ConnectionNode) => {
-            vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
-                iNode.importData(filePath[0].fsPath);
-            });
-        }),
-        vscode.commands.registerCommand("mysql.data.export", (iNode: TableNode | DatabaseNode) => {
-            vscode.window.showOpenDialog({ canSelectMany: false, openLabel: "Select export file path", canSelectFiles: false, canSelectFolders: true }).then((folderPath) => {
-                iNode.backupData(folderPath[0].fsPath);
-            });
-        }),
-        vscode.commands.registerCommand("mysql.template.delete", (tableNode: TableNode) => {
-            tableNode.deleteSqlTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.copy.insert", (tableNode: TableNode) => {
-            tableNode.insertSqlTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.copy.update", (tableNode: TableNode) => {
-            tableNode.updateSqlTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.show.procedure", (procedureNode: ProcedureNode) => {
-            procedureNode.showSource();
-        }),
-        vscode.commands.registerCommand("mysql.show.function", (functionNode: FunctionNode) => {
-            functionNode.showSource();
-        }),
-        vscode.commands.registerCommand("mysql.show.trigger", (triggerNode: TriggerNode) => {
-            triggerNode.showSource();
-        }),
-        vscode.commands.registerCommand("mysql.user.sql", (userNode: UserNode) => {
-            userNode.selectSqlTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.template.table", (tableGroup: TableGroup) => {
-            tableGroup.createTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.template.procedure", (procedureGroup: ProcedureGroup) => {
-            procedureGroup.createTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.setting.open", (procedureGroup: ProcedureGroup) => {
-            MysqlSetting.open();
-        }),
-        vscode.commands.registerCommand("mysql.template.view", (viewGroup: ViewGroup) => {
-            viewGroup.createTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.template.trigger", (triggerGroup: TriggerGroup) => {
-            triggerGroup.createTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.template.function", (functionGroup: FunctionGroup) => {
-            functionGroup.createTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.template.user", (userGroup: UserGroup) => {
-            userGroup.createTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.delete.user", (userNode: UserNode) => {
-            userNode.drop();
-        }),
-        vscode.commands.registerCommand("mysql.delete.view", (viewNode: ViewNode) => {
-            viewNode.drop();
-        }),
-        vscode.commands.registerCommand("mysql.delete.procedure", (procedureNode: ProcedureNode) => {
-            procedureNode.drop();
-        }),
-        vscode.commands.registerCommand("mysql.delete.function", (functionNode: FunctionNode) => {
-            functionNode.drop();
-        }),
-        vscode.commands.registerCommand("mysql.delete.trigger", (triggerNode: TriggerNode) => {
-            triggerNode.drop();
-        }),
-        vscode.commands.registerCommand("mysql.change.user", (userNode: UserNode) => {
-            userNode.changePasswordTemplate();
-        }),
-        vscode.commands.registerCommand("mysql.grant.user", (userNode: UserNode) => {
-            userNode.grandTemplate();
-        }),
+
     );
 
 }
 
 export function deactivate() {
+}
+
+function initCommand(commandDefinition: Object): vscode.Disposable[] {
+
+    const dispose = []
+
+    for (const command in commandDefinition) {
+        dispose.push(vscode.commands.registerCommand(command, commandDefinition[command]))
+    }
+
+    return dispose;
 }

@@ -18,7 +18,6 @@ import format = require('date-format');
 
 export class TableNode implements Node, ConnectionInfo, CopyAble {
 
-
     public id: string;
     public type: string = ModelType.TABLE;
 
@@ -215,6 +214,12 @@ ADD
 
     public copyName(): void {
         Util.copyToBoard(this.table);
+    }
+
+
+    public mockData() {
+        // TODO 未实现
+        throw new Error("Method not implemented.");
     }
 
 }
