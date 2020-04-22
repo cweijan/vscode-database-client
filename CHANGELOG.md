@@ -2,6 +2,7 @@
 - Show template sql in same file.
 - Get connection correctly when connection multi server.
 - Improve UI Interactive.
+- Rollback when batch execute sql occur error.
 - Fix bugs.
 
 ## 1.7.32 (2020/4/18)
