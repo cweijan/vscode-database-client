@@ -63,7 +63,8 @@ export class ColumnChain implements ComplectionChain {
         const id = `${lcp.host}_${lcp.port}_${lcp.user}_${lcp.database}_${tableName}`;
 
         for (const tableNode of DatabaseCache.getTableNodeList()) {
-            if (tableNode.id === id) {
+            if ((!lcp.database && tableNode.table == tableName) ||
+                (tableNode.id === id)) {
                 columnNodes = (await tableNode.getChildren()) as ColumnNode[];
                 break;
             }
