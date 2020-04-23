@@ -75,7 +75,7 @@ export class ColumnNode implements Node, ConnectionInfo, CopyAble {
     public updateColumnTemplate() {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`ALTER TABLE 
-    ${wrap(this.database)}.${wrap(this.table)} CHANGE ${wrap(this.column.name)} ${wrap(this.column.name)} ${this.column.type}${this.column.nullable ? "" : " NOT NULL"}${this.column.comment ? " comment " + this.column.comment : ""};`);
+    ${wrap(this.database)}.${wrap(this.table)} CHANGE ${wrap(this.column.name)} ${wrap(this.column.name)} ${this.column.type}${this.column.nullable ? "" : " NOT NULL"}${this.column.comment ? ` comment '${this.column.comment}'` : ""};`);
     }
     public dropColumnTemplate() {
         ConnectionManager.getConnection(this, true);
