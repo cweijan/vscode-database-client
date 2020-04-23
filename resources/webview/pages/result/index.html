@@ -251,6 +251,9 @@
                 if (origin == undefined || origin == null) {
                     return "<b>(NULL)</b>";
                 }
+                if(Date.parse(origin)){
+                    return origin.toString().replace("T"," ").replace(/\.\d+Z$/,"")
+                }
                 return origin;
             },
             deepClone(obj) {
@@ -301,11 +304,14 @@
             vue.toolbar.filter = {}
             vue.$refs.dataTable.clearSort()
         }
+        if(vue.result.fields){
+            vue.initShowColumn(vue.result.fields)
+        }
         if (vue.result.columnList) {
             vue.uploadRole()
             // add filter row
             vue.result.data.unshift({ isFilter: true, content: '' })
-            vue.initShowColumn(vue.result.columnList)
+        
         }
         if (vue.toolbar.isRefrsh) {
             vue.toolbar.isRefrsh = false;
