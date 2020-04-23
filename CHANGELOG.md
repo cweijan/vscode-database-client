@@ -1,6 +1,6 @@
-## 1.8.1 (Preview)
+## 1.8.1 (2020/4/23)
 - Connect can specify database.
-- Init mock data feature.
+- Add mock data feature.
 - Update mysql connect client to newest version.
 - Fix inteliij bugs.
 
