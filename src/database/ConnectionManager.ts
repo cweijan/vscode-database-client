@@ -57,6 +57,8 @@ export class ConnectionManager {
 
     public static getConnection(connectionOptions: ConnectionInfo, changeActive: boolean = false): Promise<mysql.Connection> {
 
+        
+
         connectionOptions.multipleStatements = true;
         if (changeActive) { 
             this.lastConnectionOption = connectionOptions;

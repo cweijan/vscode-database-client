@@ -31,6 +31,30 @@
         <el-row>
             <include path="components/option.html" />
         </el-row>
+        <select v-model="connectionOption.usingSSH">
+            <option :value="true">
+                true
+            </option>
+            <option :value="false">
+                false
+            </option>
+        </select>
+        <div class="field field__input">
+            <b>ssh-host:</b>
+            <input class="field__input" v-model="connectionOption.ssh.host" />
+        </div>
+        <div class="field field__input">
+            <b>ssh-port:</b>
+            <input class="field__input" v-model="connectionOption.ssh.port" />
+        </div>
+        <div class="field field__input">
+            <b>ssh-username:</b>
+            <input class="field__input" v-model="connectionOption.ssh.username" />
+        </div>
+        <div class="field field__input">
+            <b>ssh-password:</b>
+            <input class="field__input" v-model="connectionOption.ssh.password" />
+        </div>
         <!-- <template id="field-template"> -->
         <!-- </template> -->
 
@@ -50,7 +74,9 @@
                     port: '3306',
                     user: 'root',
                     password: '',
-                    database: null
+                    database: null,
+                    usingSSH: false,
+                    ssh: {}
                 },
                 databaseType: 'mysql',
                 error: false,

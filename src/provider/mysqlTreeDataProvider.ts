@@ -56,7 +56,12 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
             connections = {};
         }
 
-        connections[`${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`] = connectionOptions;
+        if (connectionOptions.usingSSH) {
+            const sshConfig = connectionOptions.ssh;
+            connections[`${sshConfig.host}_${sshConfig.port}_${sshConfig.username}`] = connectionOptions;
+        } else {
+            connections[`${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`] = connectionOptions;
+        }
 
         await this.context.globalState.update(CacheKey.ConectionsKey, connections);
         MySQLTreeDataProvider.refresh();
@@ -74,7 +79,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
         const connections = this.context.globalState.get<{ [key: string]: ConnectionInfo }>(CacheKey.ConectionsKey);
         if (connections) {
             for (const key of Object.keys(connections)) {
-                connectionNodes.push(new ConnectionNode( connections[key].host, connections[key].user, connections[key].password, connections[key].port, connections[key].database, connections[key].certPath));
+                connectionNodes.push(new ConnectionNode(key, connections[key].host, connections[key].user, connections[key].password, connections[key].port, connections[key].database, connections[key].certPath));
             }
         }
         return connectionNodes;

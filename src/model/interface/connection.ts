@@ -1,3 +1,5 @@
+import { SSHConfig } from "./sshConfig";
+
 export interface ConnectionInfo {
     readonly host: string;
     readonly port: string;
@@ -6,5 +8,7 @@ export interface ConnectionInfo {
     database?: string;
     multipleStatements?: boolean;
     readonly certPath?: string;
+    readonly usingSSH?: boolean;
+    readonly ssh?: SSHConfig;
 
 }

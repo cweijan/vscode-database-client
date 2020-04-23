@@ -17,14 +17,13 @@ import { Util } from "../common/util";
 
 export class ConnectionNode implements Node, ConnectionInfo {
 
-    public id: string;
     public multipleStatements?: boolean;
     public type: string = ModelType.CONNECTION;
-    constructor(readonly host: string, readonly user: string,
+    constructor(readonly id: string, readonly host: string, readonly user: string,
         readonly password: string, readonly port: string,
         public readonly database: string,
         readonly certPath: string) {
-        this.id = `${this.host}_${this.port}_${this.user}`;
+        
     }
 
     public getTreeItem(): vscode.TreeItem {
