@@ -1,25 +1,26 @@
-<el-table-column fixed="left" label="Operations" width="100" v-if="result.primaryKey" align="center">
+<el-table-column fixed="left" label="Operations" width="130" v-if="result.primaryKey" align="center">
     <template slot-scope="scope">
         <div v-if="scope.row.isFilter" style="text-align: center;">
             <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
                 <el-checkbox-group v-model="toolbar.showColumns">
-                    <el-checkbox v-for="(column) in result.fields" :label="column.name"
-                        :key="column.name">
+                    <el-checkbox v-for="(column) in result.fields" :label="column.name" :key="column.name">
                         {{column.name}}
                     </el-checkbox>
                 </el-checkbox-group>
-                <el-button icon="el-icon-search" circle title="Select columns to show" size="small"
-                    slot="reference"></el-button>
+                <el-button icon="el-icon-search" circle title="Select columns to show" size="small" slot="reference">
+                </el-button>
             </el-popover>
-            <el-button @click="resetFilter" title="Reset filter" type="warning" size="small"
-                icon="el-icon-refresh" circle title="Reset">
+            <el-button @click="resetFilter" title="Reset filter" type="warning" size="small" icon="el-icon-refresh"
+                circle title="Reset">
             </el-button>
         </div>
         <div v-if="scope.row[result.primaryKey]">
-            <el-button @click="openEdit(scope.row)" type="primary" size="small" icon="el-icon-edit"
+            <el-button @click="openEdit(scope.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
+            </el-button>
+            <el-button @click="openEdit(scope.row);update.primary=null" type="info" size="small" title="copy" icon="el-icon-document-copy"
                 circle>
             </el-button>
-            <el-button @click="deleteConfirm(scope.row[result.primaryKey])" type="primary" size="small"
+            <el-button @click="deleteConfirm(scope.row[result.primaryKey])" title="delete" type="danger" size="small"
                 icon="el-icon-delete" circle>
             </el-button>
         </div>
