@@ -18,11 +18,11 @@ import { Util } from "../common/util";
 export class ConnectionNode implements Node, ConnectionInfo {
 
     public id: string;
-    public database?: string;
     public multipleStatements?: boolean;
     public type: string = ModelType.CONNECTION;
     constructor(readonly host: string, readonly user: string,
         readonly password: string, readonly port: string,
+        public readonly database: string,
         readonly certPath: string) {
         this.id = `${this.host}_${this.port}_${this.user}`;
     }
@@ -45,7 +45,7 @@ export class ConnectionNode implements Node, ConnectionInfo {
 
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "show databases")
             .then((databases) => {
-                databaseNodes = databases.map<DatabaseNode>((database) => {
+                databaseNodes = databases.filter(db => this.database == null || db.Database == this.database).map<DatabaseNode>((database) => {
                     return new DatabaseNode(this.host, this.user, this.password, this.port, database.Database, this.certPath);
                 });
                 databaseNodes.unshift(new UserGroup(this.host, this.user, this.password, this.port, 'mysql', this.certPath));
