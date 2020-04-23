@@ -1,4 +1,4 @@
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import * as Mock from 'mockjs';
 import * as vscode from "vscode";
 import { MessageType } from "../../common/Constants";
@@ -33,7 +33,14 @@ export class MockRunner {
 
         const mockPath = `mock/${tableNode.table}/mock.json`;
         const mockFullPath = `${FileManager.storagePath}/${mockPath}`;
-        if (!existsSync(mockFullPath)) {
+        if (existsSync(mockFullPath)) {
+            const existsMockModel = JSON.parse(readFileSync(mockFullPath, 'utf8')) as MockModel;
+            if (Object.keys(existsMockModel.mock).length != columnList.length) {
+                existsMockModel.mock = mockModel.mock
+                await FileManager.record(mockPath, JSON.stringify(existsMockModel, null, 4), FileModel.WRITE);
+            }
+
+        } else {
             await FileManager.record(mockPath, JSON.stringify(mockModel, null, 4), FileModel.WRITE);
         }
         await vscode.window.showTextDocument(
@@ -80,7 +87,7 @@ export class MockRunner {
                 for (const column in mockData) {
                     let value = mockData[column].value;
                     if (value == this.MOCK_INDEX) { value = i; }
-                    tempInsertSql = tempInsertSql.replace(new RegExp("\\$+" + column, 'i'), this.wrapQuote(mockData[column].type, Mock.mock(value)));
+                    tempInsertSql = tempInsertSql.replace(new RegExp("\\$+" + column, 'ig'), this.wrapQuote(mockData[column].type, Mock.mock(value)));
                 }
                 sqlList.push(tempInsertSql)
             }
