@@ -20,6 +20,7 @@ export class TableNode implements Node, ConnectionInfo, CopyAble {
 
     public id: string;
     public type: string = ModelType.TABLE;
+    public primaryKey: string;
 
     constructor(readonly host: string, readonly user: string, readonly password: string,
         readonly port: string, readonly database: string, readonly table: string,
@@ -50,6 +51,9 @@ export class TableNode implements Node, ConnectionInfo, CopyAble {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT COLUMN_NAME name,DATA_TYPE simpleType,COLUMN_TYPE type,COLUMN_COMMENT comment,COLUMN_KEY \`key\`,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column) => {
+                    if (column && column.key == "PRI") {
+                        this.primaryKey = column.name
+                    }
                     return new ColumnNode(this.host, this.user, this.password, this.port, this.database, this.table, this.certPath, column);
                 });
                 DatabaseCache.setColumnListOfTable(this.id, columnNodes);
@@ -184,6 +188,19 @@ ADD
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and ")}`;
                 QueryUnit.showSQLTextDocument(sql);
             });
+    }
+
+    public async getMaxPrimary(): Promise<number> {
+
+        const connection = await ConnectionManager.getConnection(this, false)
+
+        if (this.primaryKey) {
+            const count = await QueryUnit.queryPromise(connection, `select max(${this.primaryKey}) max from ${this.table}`);
+            if (count && count[0]) { return count[0].max }
+        }
+
+
+        return Promise.resolve(0)
     }
 
     public backupData(exportPath: string) {

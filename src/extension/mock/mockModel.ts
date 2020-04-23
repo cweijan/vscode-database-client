@@ -4,7 +4,7 @@ export interface MockModel {
     user: string;
     database: string;
     table: string;
-    mockStartIndex: number;
+    mockStartIndex: number|string;
     mockCount: number;
     mock: {
         [key: string]: {

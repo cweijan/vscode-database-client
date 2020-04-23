@@ -1,3 +1,4 @@
+import { existsSync } from 'fs';
 import * as Mock from 'mockjs';
 import * as vscode from "vscode";
 import { MessageType } from "../../common/Constants";
@@ -11,7 +12,6 @@ import { MessageResponse } from "../../view/result/queryResponse";
 import { FileManager, FileModel } from '../FileManager';
 import { MockModel } from './mockModel';
 import format = require('date-format');
-import { fsyncSync, existsSync } from 'fs';
 
 export class MockRunner {
 
@@ -20,7 +20,8 @@ export class MockRunner {
     public async create(tableNode: TableNode) {
         const mockModel: MockModel = {
             host: tableNode.host, port: tableNode.port, user: tableNode.user, database: tableNode.database, table: tableNode.table,
-            mockStartIndex: 1, mockCount: 50, mock: {}
+            mockStartIndex: tableNode.primaryKey ? tableNode.primaryKey : 1
+            , mockCount: 50, mock: {}
         }
         const columnList = (await tableNode.getChildren()) as ColumnNode[]
         for (const columnNode of columnList) {
@@ -65,23 +66,32 @@ export class MockRunner {
         const insertSqlTemplate = (await tableNode.insertSqlTemplate(false)).replace("\n", " ");
         const sqlList = [];
         const mockData = mockModel.mock;
-        let { mockStartIndex, mockCount } = mockModel
-        if (mockStartIndex < 1) { mockStartIndex = 1 }
-        for (let i = mockStartIndex; i < (mockStartIndex + mockCount); i++) {
-            let tempInsertSql = insertSqlTemplate;
-            for (const column in mockData) {
-                let value = mockData[column].value;
-                if (value == this.MOCK_INDEX) { value = i; }
-                tempInsertSql = tempInsertSql.replace(new RegExp("\\$+" + column, 'i'), this.wrapQuote(mockData[column].type, Mock.mock(value)));
+        const { mockStartIndex, mockCount } = mockModel
+        let startIndex = 1;
+        if (mockStartIndex != null) {
+            if (!isNaN(Number(mockStartIndex))) {
+                startIndex = mockStartIndex as number
+            } else if (mockStartIndex.toString().toLowerCase() == "auto") {
+                startIndex = (await tableNode.getMaxPrimary()) + 1;
             }
-            sqlList.push(tempInsertSql)
+
+            for (let i = startIndex; i < (startIndex + mockCount); i++) {
+                let tempInsertSql = insertSqlTemplate;
+                for (const column in mockData) {
+                    let value = mockData[column].value;
+                    if (value == this.MOCK_INDEX) { value = i; }
+                    tempInsertSql = tempInsertSql.replace(new RegExp("\\$+" + column, 'i'), this.wrapQuote(mockData[column].type, Mock.mock(value)));
+                }
+                sqlList.push(tempInsertSql)
+            }
+
+            const connection = await ConnectionManager.getConnection({ ...mockModel })
+            const success = await QueryUnit.runBatch(connection, sqlList)
+            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
+
         }
-
-        const connection = await ConnectionManager.getConnection({ ...mockModel })
-        const success = await QueryUnit.runBatch(connection, sqlList)
-        QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
-
     }
+
     private wrapQuote(type: string, value: any): any {
         type = type.toLowerCase()
         switch (type) {

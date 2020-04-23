@@ -250,7 +250,7 @@
             dataformat0(origin) {
                 if (origin == null) return null;
                 // bit
-                
+
                 if (origin.hasOwnProperty('type')) {
                     return origin.data[0];
                 }
@@ -363,11 +363,14 @@
                 vue.info.error = true
                 break;
             case "MESSAGE":
-                if (response.success) {
-                    vue.$message.success(response.message)
-                } else {
-                    vue.$message.error(response.message)
+                if (response.message) {
+                    if (response.success) {
+                        vue.$message.success(response.message)
+                    } else {
+                        vue.$message.error(response.message)
+                    }
                 }
+                vue.refresh()
                 break;
             default:
                 vue.$message(JSON.stringify(event.data));
