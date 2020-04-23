@@ -61,7 +61,7 @@ export class MockRunner {
         const mockData = mockModel.mock;
         let { mockStartIndex, mockCount } = mockModel
         if (mockStartIndex < 1) mockStartIndex = 1
-        for (let i = mockStartIndex; i <= (mockStartIndex + mockCount); i++) {
+        for (let i = mockStartIndex; i < (mockStartIndex + mockCount); i++) {
             let tempInsertSql = insertSqlTemplate;
             for (const column in mockData) {
                 let value = mockData[column].value;
