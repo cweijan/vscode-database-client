@@ -1,3 +1,9 @@
+## 1.8.1 (Preview)
+- Connect can specify database.
+- Init mock data feature.
+- Update mysql connect client to newest version.
+- Fix inteliij bugs.
+
 ## 1.8.0 (2020/4/22)
 - Show template sql in same file.
 - Get connection correctly when connection multi server.
