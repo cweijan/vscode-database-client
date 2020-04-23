@@ -159,7 +159,7 @@
                 this.editor.visible = true;
                 this.update = {
                     current: row,
-                    currentNew: this.deepClone(row),
+                    currentNew: this.clone(row),
                     primary: row[this.result.primaryKey]
                 }
             },
@@ -247,25 +247,35 @@
             deleteTemplate() {
                 this.result.sql = `DELETE FROM [table] WHERE id= `;
             },
-            dataformat(origin) {
-                if (origin == undefined || origin == null) {
-                    return "<b>(NULL)</b>";
+            dataformat0(origin) {
+                if (origin == null) return null;
+                // bit
+                
+                if (origin.hasOwnProperty('type')) {
+                    return origin.data[0];
                 }
-                if(Date.parse(origin)){
-                    return origin.toString().replace("T"," ").replace(/\.\d+Z$/,"")
+                if (Date.parse(origin)) {
+                    return origin.toString().replace("T", " ").replace(/\.\d+Z$/, "")
                 }
                 return origin;
             },
-            deepClone(obj) {
+            dataformat(origin) {
+
+                if (origin == undefined || origin == null) {
+                    return "<b>(NULL)</b>";
+                }
+
+                const preFormat = this.dataformat0(origin)
+                if (preFormat != origin) return preFormat;
+
+                return origin;
+            },
+            clone(obj) {
                 let objClone = Array.isArray(obj) ? [] : {};
                 if (obj && typeof obj === "object") {
                     for (let key in obj) {
                         if (obj.hasOwnProperty(key)) {
-                            if (obj[key] && typeof obj[key] === "object") {
-                                objClone[key] = this.deepClone(obj[key]);
-                            } else {
-                                objClone[key] = obj[key];
-                            }
+                            objClone[key] = this.dataformat0(obj[key]);
                         }
                     }
                 }
@@ -304,14 +314,14 @@
             vue.toolbar.filter = {}
             vue.$refs.dataTable.clearSort()
         }
-        if(vue.result.fields){
+        if (vue.result.fields) {
             vue.initShowColumn(vue.result.fields)
         }
         if (vue.result.columnList) {
             vue.uploadRole()
             // add filter row
             vue.result.data.unshift({ isFilter: true, content: '' })
-        
+
         }
         if (vue.toolbar.isRefrsh) {
             vue.toolbar.isRefrsh = false;
