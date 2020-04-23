@@ -8,7 +8,7 @@ export class Constants {
 }
 
 export enum Pattern {
-    TABLE_PATTERN = "\\b(from|join|update|into)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}",
+    TABLE_PATTERN = "\\b(from|join|update|into)\\b\\s*`?((\\w|\\.|-)+)`?",
     DML_PATTERN = "\\b(update|into)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}"
 }
 

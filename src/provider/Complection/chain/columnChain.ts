@@ -8,21 +8,18 @@ import { ConnectionManager } from "../../../database/ConnectionManager";
 
 export class ColumnChain implements ComplectionChain {
 
-    private tablePatternStr = "\\b(from|join|update)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}";
     private needStop = true;
     public async getComplection(complectionContext: ComplectionContext): Promise<vscode.CompletionItem[]> {
 
-        const afterDot = complectionContext.preChart === ".";
-        const inWhere = complectionContext.currentSqlFull.match(/\bwhere\b/ig);
-        if (afterDot || inWhere) {
+        if (complectionContext.preChart === ".") {
             let subComplectionItems = await this.generateColumnComplectionItem(complectionContext.preWord);
-            const tableReg = new RegExp(this.tablePatternStr + "(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
+            const tableReg = new RegExp(Pattern.TABLE_PATTERN + "(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
             let result = tableReg.exec(complectionContext.currentSqlFull);
             for (; result != null && subComplectionItems.length === 0;) {
                 subComplectionItems = await this.generateColumnComplectionItem(
                     Util.getTableName(result[0], Pattern.TABLE_PATTERN)
                 );
-                this.needStop = afterDot || inWhere == null;
+                this.needStop = true;
                 if (subComplectionItems.length > 0) {
                     break;
                 }
@@ -31,10 +28,18 @@ export class ColumnChain implements ComplectionChain {
             return subComplectionItems;
         }
 
-        const tableName = Util.getTableName(complectionContext.currentSql, Pattern.DML_PATTERN)
-        if (tableName) {
+        if (complectionContext.currentSqlFull.match(/\bwhere\b/ig)) {
+            const updateTableName = Util.getTableName(complectionContext.currentSql, Pattern.TABLE_PATTERN)
+            if (updateTableName) {
+                this.needStop = false;
+                return await this.generateColumnComplectionItem(updateTableName);
+            }
+        }
+
+        const dmlTableName = Util.getTableName(complectionContext.currentSql, Pattern.DML_PATTERN)
+        if (dmlTableName) {
             this.needStop = complectionContext.currentSql.match(/\binsert\b/ig) != null;
-            return await this.generateColumnComplectionItem(tableName);
+            return await this.generateColumnComplectionItem(dmlTableName);
         }
 
 
