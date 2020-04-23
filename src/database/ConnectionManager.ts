@@ -46,7 +46,7 @@ export class ConnectionManager {
                 if (host != null && port != null && user != null) {
                     return this.getConnection({
                         multipleStatements: true, host, port, user, database, certPath: null
-                    }, true)
+                    }, database != null)
                 }
             }
         }
@@ -58,8 +58,10 @@ export class ConnectionManager {
     public static getConnection(connectionOptions: ConnectionInfo, changeActive: boolean = false): Promise<mysql.Connection> {
 
         connectionOptions.multipleStatements = true;
-        this.lastConnectionOption = connectionOptions;
-        if (changeActive) { Global.updateStatusBarItems(connectionOptions); }
+        if (changeActive) { 
+            this.lastConnectionOption = connectionOptions;
+            Global.updateStatusBarItems(connectionOptions);
+         }
         const key = `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`;
 
         return new Promise((resolve, reject) => {

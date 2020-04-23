@@ -6,7 +6,7 @@ import { ColumnNode } from "./columnNode";
 import { InfoNode } from "../InfoNode";
 import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
-import { ModelType, Constants, Confirm } from "../../common/Constants";
+import { ModelType, Constants } from "../../common/Constants";
 import { ConnectionInfo } from "../interface/connection";
 import { Console } from "../../common/OutputChannel";
 import { ConnectionManager } from "../../database/ConnectionManager";
@@ -17,7 +17,6 @@ import format = require('date-format');
 
 
 export class TableNode implements Node, ConnectionInfo, CopyAble {
-
 
     public id: string;
     public type: string = ModelType.TABLE;
@@ -48,7 +47,7 @@ export class TableNode implements Node, ConnectionInfo, CopyAble {
         if (columnNodes && !isRresh) {
             return columnNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT COLUMN_NAME name,COLUMN_TYPE type,COLUMN_COMMENT comment,COLUMN_KEY \`key\`,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT COLUMN_NAME name,DATA_TYPE simpleType,COLUMN_TYPE type,COLUMN_COMMENT comment,COLUMN_KEY \`key\`,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column) => {
                     return new ColumnNode(this.host, this.user, this.password, this.port, this.database, this.table, this.certPath, column);
@@ -101,7 +100,7 @@ ADD
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
             });
         })
-        
+
     }
 
 
@@ -138,17 +137,23 @@ ADD
 
     }
 
-    public insertSqlTemplate() {
-        this
-            .getChildren()
-            .then((children: Node[]) => {
-                const childrenNames = children.map((child: any) => "\n    " + child.column.name);
-                let sql = `insert into \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} `;
-                sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  )\n`;
-                sql += "values\n  ";
-                sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  );`;
-                QueryUnit.showSQLTextDocument(sql);
-            });
+    public insertSqlTemplate(show: boolean = true): Promise<string> {
+        return new Promise((resolve) => {
+            this
+                .getChildren()
+                .then((children: Node[]) => {
+                    const childrenNames = children.map((child: any) => "\n    " + child.column.name);
+                    const childrenValues = children.map((child: any) => "\n    $" + child.column.name);
+                    let sql = `insert into \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} `;
+                    sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  )\n`;
+                    sql += "values\n  ";
+                    sql += `(${childrenValues.toString().replace(/,/g, ", ")}\n  );`;
+                    if (show) {
+                        QueryUnit.showSQLTextDocument(sql);
+                    }
+                    resolve(sql)
+                });
+        })
     }
 
     public deleteSqlTemplate(): any {
@@ -216,5 +221,6 @@ ADD
     public copyName(): void {
         Util.copyToBoard(this.table);
     }
+
 
 }

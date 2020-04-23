@@ -1,4 +1,5 @@
 body {
+    /* background-color: var(--vscode-editor-background); */
     background-color: #F7F7F7;
     font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
 }

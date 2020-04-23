@@ -48,7 +48,9 @@ export class TableChain implements ComplectionChain {
             });
         } else {
             const databaseid = `${lcp.host}_${lcp.port}_${lcp.user}_${lcp.database}`;
-            tableNodes = DatabaseCache.getTableListOfDatabase(databaseid).filter((tableNode: TableNode) => {
+            const tableList = DatabaseCache.getTableListOfDatabase(databaseid);
+            if (tableList == null) { return []; }
+            tableNodes = tableList.filter((tableNode: TableNode) => {
                 const included = tableNames.includes(tableNode.table);
                 tableNames.push(tableNode.table);
                 return !included && !tableNode.database.match(/\b(mysql|performance_schema|information_schema|sys)\b/ig);

@@ -16,7 +16,7 @@
             <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort"
                 :row-class-name="tableRowClassName" ref="dataTable"
                 :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
-                border @cell-click="celledit">
+                border @row-dblclick="row=>openEdit(row)">
                 <!-- tool bar -->
                 <include path="components/toolbar.html" />
                 <!-- data  -->
@@ -63,9 +63,7 @@
                 sql: null,
                 message: null,
                 visible: false,
-                error: false,
-                // rule have bug, disable it.
-                // rule: {}
+                error: false
             },
             update: {
                 current: {},
@@ -123,7 +121,6 @@
                 this.editor.visible = true;
                 this.update.primary = null;
                 this.update.currentNew = {};
-                // this.$refs['infoForm'].resetFields();
             },
             confirmInsert() {
                 let columns = "";
@@ -159,10 +156,6 @@
                 }
             },
             openEdit(row) {
-                this.$nextTick(() => {
-                    //获取不到, 貌似要从mounted的时候获取
-                    // this.$refs['infoForm'].resetFields();
-                })
                 this.editor.visible = true;
                 this.update = {
                     current: row,
@@ -179,7 +172,8 @@
                         max: column.maxLength
                     }
                 }
-                this.info.rule = rule
+                // disable, have bug
+                // this.info.rule = rule
             },
             deleteConfirm(primaryValue) {
                 this.$confirm('Are you sure you want to delete this data?', 'Warning', {
@@ -318,7 +312,6 @@
         } else {
             vue.info.visible = false;
         }
-        // vscode.setState({ result: vue.result }); is instead by retainContextWhenHidden=true
     }
 
     const handlerCommon = (res) => {
