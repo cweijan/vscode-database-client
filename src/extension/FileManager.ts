@@ -1,8 +1,11 @@
 import * as fs from "fs";
+import * as path from 'path';
 import * as vscode from "vscode";
+import shell = require('shelljs');
 
 export class FileManager {
-    private static storagePath: string;
+
+    public static storagePath: string;
     public static init(context: vscode.ExtensionContext) {
         this.storagePath = context.globalStoragePath;
     }
@@ -11,6 +14,7 @@ export class FileManager {
         if (!this.storagePath) { vscode.window.showErrorMessage("FileManager is not init!") }
         if (!fileName) { return; }
         const recordPath = `${this.storagePath}/${fileName}`;
+        this.check(path.resolve(recordPath, '..'))
         if (!fs.existsSync(recordPath)) {
             fs.appendFileSync(recordPath, "");
         }
@@ -28,6 +32,7 @@ export class FileManager {
         if (!fileName || !content) { return; }
         return new Promise((resolve) => {
             const recordPath = `${this.storagePath}/${fileName}`;
+            this.check(path.resolve(recordPath, '..'))
             if (!fs.existsSync(this.storagePath)) {
                 fs.mkdirSync(this.storagePath);
             }
@@ -39,6 +44,12 @@ export class FileManager {
             resolve(recordPath)
         });
     }
+
+    private static check(path: string) {
+        if (!fs.existsSync(path)) { shell.mkdir('-p', path) }
+
+    }
+
 }
 
 export enum FileModel {

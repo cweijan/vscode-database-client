@@ -1,17 +1,17 @@
+import * as Mock from 'mockjs';
 import * as vscode from "vscode";
-import format = require('date-format');
-import { TableNode } from '../../model/table/tableNode';
-import { MockModel } from './mockModel';
-import { FileManager, FileModel } from '../FileManager';
-import { ColumnNode } from "../../model/table/columnNode";
-import { readFileSync } from "fs";
+import { MessageType } from "../../common/Constants";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
-import * as Mock from 'mockjs'
 import { QueryUnit } from "../../database/QueryUnit";
+import { ColumnNode } from "../../model/table/columnNode";
+import { TableNode } from '../../model/table/tableNode';
 import { QueryPage } from "../../view/result/query";
 import { MessageResponse } from "../../view/result/queryResponse";
-import { MessageType } from "../../common/Constants";
+import { FileManager, FileModel } from '../FileManager';
+import { MockModel } from './mockModel';
+import format = require('date-format');
+import { fsyncSync, existsSync } from 'fs';
 
 export class MockRunner {
 
@@ -30,13 +30,19 @@ export class MockRunner {
             }
         }
 
+        const mockPath = `mock/${tableNode.table}/mock.json`;
+        const mockFullPath = `${FileManager.storagePath}/${mockPath}`;
+        if (!existsSync(mockFullPath)) {
+            await FileManager.record(mockPath, JSON.stringify(mockModel, null, 4), FileModel.WRITE);
+        }
         await vscode.window.showTextDocument(
-            await vscode.workspace.openTextDocument(await FileManager.record("mock.json", JSON.stringify(mockModel, null, 4), FileModel.WRITE))
+            await vscode.workspace.openTextDocument(mockFullPath)
         );
     }
 
-    public async runMock(fileUri: vscode.Uri) {
-        const content = readFileSync(fileUri.fsPath, 'utf8')
+    public async runMock() {
+
+        const content = vscode.window.activeTextEditor.document.getText()
 
         const mockModel = JSON.parse(content) as MockModel;
         const databaseid = `${mockModel.host}_${mockModel.port}_${mockModel.user}_${mockModel.database}`;
@@ -60,7 +66,7 @@ export class MockRunner {
         const sqlList = [];
         const mockData = mockModel.mock;
         let { mockStartIndex, mockCount } = mockModel
-        if (mockStartIndex < 1) mockStartIndex = 1
+        if (mockStartIndex < 1) { mockStartIndex = 1 }
         for (let i = mockStartIndex; i < (mockStartIndex + mockCount); i++) {
             let tempInsertSql = insertSqlTemplate;
             for (const column in mockData) {

@@ -696,6 +696,7 @@
 		"mockjs": "^1.1.0",
 		"mysql": "^2.18.1",
 		"mysqldump": "^2.3.0",
+		"shelljs": "^0.8.3",
 		"sql-formatter": "^2.3.3"
 	},
 	"__metadata": {

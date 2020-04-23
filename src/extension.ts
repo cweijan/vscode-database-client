@@ -81,7 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
                 serviceManager.mockRunner.create(tableNode)
             },
             "mysql.mock.run": (fileUri: vscode.Uri) => {
-                serviceManager.mockRunner.runMock(fileUri)
+                serviceManager.mockRunner.runMock()
             },
             "mysql.table.source": (tableNode: TableNode) => {
                 if (tableNode) { tableNode.showSource(); }
@@ -212,3 +212,6 @@ function initCommand(commandDefinition: any): vscode.Disposable[] {
 
     return dispose;
 }
+
+// refrences
+// - when : https://code.visualstudio.com/docs/getstarted/keybindings#_when-clause-contexts
