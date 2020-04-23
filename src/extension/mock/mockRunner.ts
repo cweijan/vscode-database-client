@@ -20,7 +20,7 @@ export class MockRunner {
     public async create(tableNode: TableNode) {
         const mockModel: MockModel = {
             host: tableNode.host, port: tableNode.port, user: tableNode.user, database: tableNode.database, table: tableNode.table,
-            mockStartIndex: 0, mockCount: 50, mock: {}
+            mockStartIndex: 1, mockCount: 50, mock: {}
         }
         const columnList = (await tableNode.getChildren()) as ColumnNode[]
         for (const columnNode of columnList) {
@@ -59,8 +59,9 @@ export class MockRunner {
         const insertSqlTemplate = (await tableNode.insertSqlTemplate(false)).replace("\n", " ");
         const sqlList = [];
         const mockData = mockModel.mock;
-        const { mockStartIndex, mockCount } = mockModel
-        for (let i = mockStartIndex; i < (mockStartIndex + mockCount); i++) {
+        let { mockStartIndex, mockCount } = mockModel
+        if (mockStartIndex < 1) mockStartIndex = 1
+        for (let i = mockStartIndex; i <= (mockStartIndex + mockCount); i++) {
             let tempInsertSql = insertSqlTemplate;
             for (const column in mockData) {
                 let value = mockData[column].value;
@@ -107,7 +108,7 @@ export class MockRunner {
                 return "@sentence()"
             case "varchar":
                 return "@string('lower',5)"
-                // return "@cword(5)"
+            // return "@cword(5)"
             case "tinyint":
                 return "@integer(0," + length + ")";
             case "smallint":
