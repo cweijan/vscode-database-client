@@ -63,7 +63,9 @@ export class ConnectionManager {
             this.lastConnectionOption = connectionOptions;
             Global.updateStatusBarItems(connectionOptions);
         }
-        const key = `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`;
+        const ssh = connectionOptions.ssh
+        const key = connectionOptions.usingSSH ? `${ssh.host}_${ssh.port}_${ssh.username}`
+            : `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`;
 
         return new Promise(async (resolve, reject) => {
             const connection = this.activeConnection[key];
@@ -83,7 +85,8 @@ export class ConnectionManager {
                         this.activeConnection[key] = null
                     })
                     if (!port) {
-                        throw new Error("create tunnel fail!");
+                        reject("create ssh tunnel fail!");
+                        return;
                     } else {
                         connectionOptions = Object.assign({ ...connectionOptions }, { port })
                     }
@@ -125,6 +128,7 @@ export class ConnectionManager {
             });
             server.on('error', (err) => {
                 Console.log('Bind local tunel occur eror : ' + err);
+                if (err && errorCallback) { errorCallback(err) }
                 resolve(0)
             });
         })
