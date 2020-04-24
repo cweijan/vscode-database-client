@@ -6,5 +6,6 @@ export interface ConnectionInfo {
     database?: string;
     multipleStatements?: boolean;
     readonly certPath?: string;
+    readonly timezone?: string;
 
 }
