@@ -1,11 +1,12 @@
 import * as fs from "fs";
-import * as path from "path";
 import * as mysql from "mysql";
+import * as path from "path";
 import * as vscode from "vscode";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
 import { ConnectionInfo } from "../model/interface/connection";
 import { QueryUnit } from "./QueryUnit";
+import tunnel = require('tunnel-ssh')
 
 export class ConnectionManager {
 
@@ -57,16 +58,14 @@ export class ConnectionManager {
 
     public static getConnection(connectionOptions: ConnectionInfo, changeActive: boolean = false): Promise<mysql.Connection> {
 
-        
-
         connectionOptions.multipleStatements = true;
-        if (changeActive) { 
+        if (changeActive) {
             this.lastConnectionOption = connectionOptions;
             Global.updateStatusBarItems(connectionOptions);
-         }
+        }
         const key = `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`;
 
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const connection = this.activeConnection[key];
             if (connection && connection.state == 'authenticated') {
                 if (connectionOptions.database) {
@@ -79,12 +78,22 @@ export class ConnectionManager {
                     resolve(connection);
                 }
             } else {
+                if (connectionOptions.usingSSH) {
+                    const port = await this.createTunnel(connectionOptions, (err) => {
+                        this.activeConnection[key] = null
+                    })
+                    if (!port) {
+                        throw new Error("create tunnel fail!");
+                    } else {
+                        connectionOptions = Object.assign({ ...connectionOptions }, { port })
+                    }
+                }
                 this.activeConnection[key] = this.createConnection(connectionOptions);
                 this.activeConnection[key].connect((err: Error) => {
                     if (!err) {
                         resolve(this.activeConnection[key]);
                     } else {
-                        this.activeConnection = {};
+                        this.activeConnection[key] = null;
                         Console.log(`${err.stack}\n${err.message}`);
                         reject(err.message);
                     }
@@ -95,6 +104,31 @@ export class ConnectionManager {
 
     }
 
+
+    private static createTunnel(connectionOptions: ConnectionInfo, errorCallback: (error) => void): Promise<number> {
+        return new Promise((resolve) => {
+            const ssh = connectionOptions.ssh
+            const port = 10567;
+            const config = {
+                username: ssh.username,
+                password: ssh.password,
+                host: ssh.host,
+                port: ssh.port,
+                dstHost: connectionOptions.host,
+                dstPort: connectionOptions.port,
+                localHost: '127.0.0.1',
+                localPort: port
+            };
+            const server = tunnel(config, (error, server) => {
+                if (error && errorCallback) { errorCallback(error) }
+                resolve(port)
+            });
+            server.on('error', (err) => {
+                Console.log('Bind local tunel occur eror : ' + err);
+                resolve(0)
+            });
+        })
+    }
 
     public static createConnection(connectionOptions: ConnectionInfo): mysql.Connection {
         const newConnectionOptions: any = Object.assign({ useConnectionPooling: true }, connectionOptions);

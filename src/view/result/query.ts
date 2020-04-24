@@ -97,6 +97,7 @@ export class QueryPage {
         }
         queryParam.res.table = tableName;
         queryParam.res.database = conn.database;
+        queryParam.connection = null;
     }
 
 }

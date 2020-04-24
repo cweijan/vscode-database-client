@@ -1,20 +1,14 @@
-import * as vscode from "vscode";
-import { Node } from "./interface/node";
 import { ModelType } from "../common/Constants";
+import { Node } from "./interface/node";
 
-export class InfoNode implements Node {
-    id: string;
-    type: string=ModelType.INFO;
-    constructor(private readonly label: string) {
+export class InfoNode extends Node {
+    public iconPath: string;
+    public contextValue: string = ModelType.INFO;
+    constructor(readonly label: string) {
+        super(label)
     }
 
-    public getTreeItem(): vscode.TreeItem {
-        return {
-            label: this.label,
-        };
-    }
-
-    public async getChildren(): Promise<Node[]>{
+    public async getChildren(): Promise<Node[]> {
         return [];
     }
 }

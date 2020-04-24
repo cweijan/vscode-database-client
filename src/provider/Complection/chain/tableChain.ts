@@ -42,7 +42,7 @@ export class TableChain implements ComplectionChain {
         if (inputWord) {
             const connectcionid = `${lcp.host}_${lcp.port}_${lcp.user}`;
             DatabaseCache.getDatabaseListOfConnection(connectcionid).forEach((databaseNode) => {
-                if (databaseNode.database === inputWord) {
+                if (databaseNode.name === inputWord) {
                     tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.id);
                 }
             });
@@ -53,16 +53,15 @@ export class TableChain implements ComplectionChain {
             tableNodes = tableList.filter((tableNode: TableNode) => {
                 const included = tableNames.includes(tableNode.table);
                 tableNames.push(tableNode.table);
-                return !included && !tableNode.database.match(/\b(mysql|performance_schema|information_schema|sys)\b/ig);
+                return !included && !tableNode.info.database.match(/\b(mysql|performance_schema|information_schema|sys)\b/ig);
             });
         }
 
         return tableNodes.map<vscode.CompletionItem>((tableNode: TableNode) => {
-            const treeItem = tableNode.getTreeItem();
-            const label = treeItem.label;
+            const label = tableNode.label;
             const completionItem = new vscode.CompletionItem(label);
             completionItem.insertText = Util.wrap(label);
-            switch (tableNode.type) {
+            switch (tableNode.contextValue) {
                 case ModelType.TABLE:
                     completionItem.kind = vscode.CompletionItemKind.Function;
                     break;

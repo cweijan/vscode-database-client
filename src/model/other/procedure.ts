@@ -10,32 +10,22 @@ import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 import { Util } from "../../common/util";
 
 
-export class ProcedureNode implements Node, ConnectionInfo {
-    id: string;
-    type: string = ModelType.PROCEDURE;
+export class ProcedureNode extends Node implements  ConnectionInfo {
 
-    constructor(readonly host: string, readonly user: string, readonly password: string,
-        readonly port: string, readonly database: string, readonly name: string,
-        readonly certPath: string) {
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${this.name}`
+    public contextValue: string = ModelType.PROCEDURE;
+    public iconPath = path.join(Constants.RES_PATH, "procedure.svg")
+    constructor(readonly name: string, readonly info: ConnectionInfo) {
+        super(name)
+        this.init(info)
+        // this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${name}`
+        this.command = {
+            command: "mysql.show.procedure",
+            title: "Show Procedure Create Source",
+            arguments: [this, true]
+        }
     }
 
-    public getTreeItem(): vscode.TreeItem {
-        return {
-            label: this.name,
-            id: this.id,
-            contextValue: ModelType.PROCEDURE,
-            iconPath: path.join(Constants.RES_PATH, "procedure.svg"),
-            command: {
-                command: "mysql.show.procedure",
-                title: "Show Procedure Create Source",
-                arguments: [this, true]
-            }
-        };
-
-    }
-
-    async showSource() {
+    public async showSource() {
         QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), `SHOW CREATE PROCEDURE \`${this.database}\`.\`${this.name}\``)
             .then((procedDtail) => {
                 procedDtail = procedDtail[0]

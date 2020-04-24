@@ -699,7 +699,8 @@
 		"mysqldump": "^3.1.0",
 		"shelljs": "^0.8.3",
 		"sql-formatter": "^2.3.3",
-		"ssh2": "^0.8.9"
+		"ssh2": "^0.8.9",
+		"tunnel-ssh": "^4.1.4"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",

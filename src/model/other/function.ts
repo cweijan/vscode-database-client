@@ -9,31 +9,19 @@ import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 import { Util } from "../../common/util";
 
-export class FunctionNode implements Node, ConnectionInfo {
+export class FunctionNode extends Node {
 
-    public id: string;
-    public type: string = ModelType.FUNCTION;
-
-    constructor(readonly host: string, readonly user: string, readonly password: string,
-        readonly port: string, readonly database: string, readonly name: string,
-        readonly certPath: string) {
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${this.name}`;
-    }
-
-    public getTreeItem(): vscode.TreeItem {
-
-        return {
-            label: this.name,
-            id: this.id,
-            contextValue: ModelType.FUNCTION,
-            iconPath: path.join(Constants.RES_PATH, "function.svg"),
-            command: {
-                command: "mysql.show.function",
-                title: "Show Function Create Source",
-                arguments: [this, true],
-            },
-        };
-
+    public contextValue: string = ModelType.FUNCTION;
+    public iconPath = path.join(Constants.RES_PATH, "function.svg")
+    constructor(readonly name: string, readonly info: ConnectionInfo) {
+        super(name)
+        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${name}`
+        this.init(info)
+        this.command = {
+            command: "mysql.show.function",
+            title: "Show Function Create Source",
+            arguments: [this, true],
+        }
     }
 
     public async showSource() {
@@ -53,7 +41,7 @@ export class FunctionNode implements Node, ConnectionInfo {
 
         Util.confirm(`Are you want to drop function ${this.name} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function \`${this.database}\`.\`${this.name}\``).then(() => {
-                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.FUNCTION_GROUP}`);
+                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.name}_${ModelType.FUNCTION_GROUP}`);
                 MySQLTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`Drop function ${this.name} success!`);
             });

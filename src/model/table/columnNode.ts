@@ -11,18 +11,25 @@ import { CopyAble } from "../interface/copyAble";
 import { Util } from "../../common/util";
 const wrap = Util.wrap;
 
-class ColumnTreeItem extends vscode.TreeItem {
-    public columnName: string;
-    public detail: string;
-    public document: string;
-}
 
-export class ColumnNode implements Node, ConnectionInfo, CopyAble {
-    public id: string;
-    public type: string = ModelType.COLUMN;
-    constructor(readonly host: string, readonly user: string, readonly password: string,
-        readonly port: string, readonly database: string, private readonly table: string,
-        readonly certPath: string, public readonly column: any) {
+export class ColumnNode extends Node implements CopyAble {
+    public comment: string;
+    public type: string;
+    public contextValue: string = ModelType.COLUMN;
+    public iconPath: string = path.join(Constants.RES_PATH, "table.svg");
+    constructor(private readonly table: string, readonly column: any, readonly info: ConnectionInfo) {
+        super(column.name)
+        this.init(info)
+        this.type = `${this.column.type}`
+        this.comment = `${this.column.comment}`
+        this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)}   ${this.column.comment}`
+        this.collapsibleState = vscode.TreeItemCollapsibleState.None
+        this.iconPath = path.join(Constants.RES_PATH, this.column.key === "PRI" ? "b_primary.png" : "b_props.png"),
+            this.command = {
+                command: "mysql.column.update",
+                title: "Update Column Statement",
+                arguments: [this, true],
+            }
     }
     public copyName(): void {
         Util.copyToBoard(this.column.name)
@@ -37,22 +44,6 @@ export class ColumnNode implements Node, ConnectionInfo, CopyAble {
         return '';
     }
 
-    public getTreeItem(): ColumnTreeItem {
-        return {
-            columnName: `${this.column.name}`,
-            detail: `${this.column.type}`,
-            document: `${this.column.comment}`,
-            label: `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)}   ${this.column.comment}`,
-            collapsibleState: vscode.TreeItemCollapsibleState.None,
-            contextValue: ModelType.COLUMN,
-            iconPath: path.join(Constants.RES_PATH, this.column.key === "PRI" ? "b_primary.png" : "b_props.png"),
-            command: {
-                command: "mysql.column.update",
-                title: "Update Column Statement",
-                arguments: [this, true],
-            },
-        };
-    }
 
     public async getChildren(): Promise<Node[]> {
         return [];

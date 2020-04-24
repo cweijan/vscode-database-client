@@ -9,22 +9,14 @@ import { TableNode } from "./tableNode";
 import { ConnectionInfo } from "../interface/connection";
 import { Constants, ModelType } from "../../common/Constants";
 
-export class TableGroup implements Node, ConnectionInfo {
-    public type: string; public id: string;
-    constructor(readonly host: string, readonly user: string, readonly password: string,
-        readonly port: string, readonly database: string, readonly certPath: string) {
+export class TableGroup extends Node {
 
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.TABLE_GROUP}`;
-    }
-
-
-    public getTreeItem(): vscode.TreeItem {
-        return {
-            label: "TABLE",
-            collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: ModelType.TABLE_GROUP,
-            iconPath: path.join(Constants.RES_PATH, "table.svg"),
-        };
+    public iconPath: string = path.join(Constants.RES_PATH, "table.svg");
+    public contextValue: string = ModelType.TABLE_GROUP;
+    constructor(readonly info: ConnectionInfo) {
+        super("TABLE")
+        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.TABLE_GROUP}`;
+        this.init(info)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -37,7 +29,7 @@ export class TableGroup implements Node, ConnectionInfo {
             `SELECT TABLE_NAME FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' and TABLE_TYPE<>'VIEW' order by table_name LIMIT ${QueryUnit.maxTableCount} ;`)
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
-                    return new TableNode(this.host, this.user, this.password, this.port, this.database, table.TABLE_NAME, this.certPath);
+                    return new TableNode(table.TABLE_NAME, this.info);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {

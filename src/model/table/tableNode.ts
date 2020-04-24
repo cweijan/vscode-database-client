@@ -16,31 +16,21 @@ import { CopyAble } from "../interface/copyAble";
 import format = require('date-format');
 
 
-export class TableNode implements Node, ConnectionInfo, CopyAble {
+export class TableNode extends Node implements CopyAble {
 
-    public id: string;
-    public type: string = ModelType.TABLE;
+    public iconPath: string = path.join(Constants.RES_PATH, "table.svg");
+    public contextValue: string = ModelType.TABLE;
     public primaryKey: string;
 
-    constructor(readonly host: string, readonly user: string, readonly password: string,
-        readonly port: string, readonly database: string, readonly table: string,
-        readonly certPath: string) {
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`;
-    }
-
-    public getTreeItem(): vscode.TreeItem {
-        return {
-            label: this.table,
-            collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: ModelType.TABLE,
-            iconPath: path.join(Constants.RES_PATH, "table.svg"),
-            command: {
-                command: "mysql.template.sql",
-                title: "Run Select Statement",
-                arguments: [this, true],
-            },
-        };
-
+    constructor(readonly table: string, readonly info: ConnectionInfo) {
+        super(table)
+        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${table}`
+        this.init(info)
+        this.command = {
+            command: "mysql.template.sql",
+            title: "Run Select Statement",
+            arguments: [this, true],
+        }
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -54,7 +44,7 @@ export class TableNode implements Node, ConnectionInfo, CopyAble {
                     if (column && column.key == "PRI") {
                         this.primaryKey = column.name
                     }
-                    return new ColumnNode(this.host, this.user, this.password, this.port, this.database, this.table, this.certPath, column);
+                    return new ColumnNode(this.table, column, this.info);
                 });
                 DatabaseCache.setColumnListOfTable(this.id, columnNodes);
 

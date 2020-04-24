@@ -9,32 +9,22 @@ import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 import { Util } from "../../common/util";
 
-export class TriggerNode implements Node, ConnectionInfo {
-    id: string;
-    type: string = ModelType.TRIGGER;
+export class TriggerNode extends Node implements ConnectionInfo {
 
-    constructor(readonly host: string, readonly user: string, readonly password: string,
-        readonly port: string, readonly database: string, readonly name: string,
-        readonly certPath: string) {
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${this.name}`
+
+    public contextValue: string = ModelType.TRIGGER;
+    public iconPath = path.join(Constants.RES_PATH, "trigger.svg")
+    constructor(readonly name: string, readonly info: ConnectionInfo) {
+        super(name)
+        this.init(info)
+        this.command = {
+            command: "mysql.show.trigger",
+            title: "Show Trigger Create Source",
+            arguments: [this, true]
+        }
     }
 
-    public getTreeItem(): vscode.TreeItem {
-        return {
-            label: this.name,
-            id: this.id,
-            contextValue: ModelType.TRIGGER,
-            iconPath: path.join(Constants.RES_PATH, "trigger.svg"),
-            command: {
-                command: "mysql.show.trigger",
-                title: "Show Trigger Create Source",
-                arguments: [this, true]
-            }
-        };
-
-    }
-
-    async showSource() {
+    public async showSource() {
         QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), `SHOW CREATE TRIGGER \`${this.database}\`.\`${this.name}\``)
             .then((procedDtail) => {
                 procedDtail = procedDtail[0]

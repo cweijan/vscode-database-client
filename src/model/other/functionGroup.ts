@@ -1,31 +1,21 @@
 import * as path from "path";
-import * as vscode from "vscode";
+import { Constants, ModelType } from "../../common/Constants";
+import { ConnectionManager } from "../../database/ConnectionManager";
+import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
 import { InfoNode } from "../InfoNode";
-import { Node } from "../interface/node";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { ConnectionManager } from "../../database/ConnectionManager";
 import { ConnectionInfo } from "../interface/connection";
-import { Constants, ModelType } from "../../common/Constants";
+import { Node } from "../interface/node";
 import { FunctionNode } from "./function";
 
-export class FunctionGroup implements Node, ConnectionInfo {
-    public type: string; public id: string;
-    constructor(readonly host: string, readonly user: string,
-        readonly password: string, readonly port: string, readonly database: string,
-        readonly certPath: string) {
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.FUNCTION_GROUP}`;
-    }
+export class FunctionGroup extends Node {
 
-
-    public getTreeItem(): vscode.TreeItem {
-        return {
-            label: "FUNCTION",
-            id: this.id,
-            collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: ModelType.FUNCTION_GROUP,
-            iconPath: path.join(Constants.RES_PATH, "function.svg"),
-        };
+    public contextValue = ModelType.FUNCTION_GROUP;
+    public iconPath = path.join(Constants.RES_PATH, "function.svg")
+    constructor(readonly info: ConnectionInfo) {
+        super("FUNCTION")
+        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.FUNCTION_GROUP}`;
+        this.init(info)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -37,7 +27,7 @@ export class FunctionGroup implements Node, ConnectionInfo {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT ROUTINE_NAME FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${this.database}' and ROUTINE_TYPE='FUNCTION'`)
             .then((tables) => {
                 tableNodes = tables.map<FunctionNode>((table) => {
-                    return new FunctionNode(this.host, this.user, this.password, this.port, this.database, table.ROUTINE_NAME, this.certPath);
+                    return new FunctionNode(table.ROUTINE_NAME, this.info);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {

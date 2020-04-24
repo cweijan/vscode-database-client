@@ -1,13 +1,12 @@
-import * as vscode from "vscode";
 import * as path from "path";
+import * as vscode from "vscode";
 import { CacheKey } from "../common/Constants";
-import { ConnectionInfo } from "../model/interface/connection";
-import { ConnectionNode } from "../model/ConnectionNode";
-import { Node } from "../model/interface/node";
-import { DatabaseCache } from "../database/DatabaseCache";
-import { DatabaseNode } from "../model/database/databaseNode";
-import { QueryUnit } from "../database/QueryUnit";
 import { ConnectionManager } from "../database/ConnectionManager";
+import { DatabaseCache } from "../database/DatabaseCache";
+import { ConnectionNode } from "../model/ConnectionNode";
+import { DatabaseNode } from "../model/database/databaseNode";
+import { ConnectionInfo } from "../model/interface/connection";
+import { Node } from "../model/interface/node";
 
 export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
@@ -37,7 +36,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
     }
 
     public getTreeItem(element: Node): Promise<vscode.TreeItem> | vscode.TreeItem {
-        return element.getTreeItem();
+        return element;
     }
 
     public getChildren(element?: Node): Thenable<Node[]> | Node[] {
@@ -79,7 +78,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
         const connections = this.context.globalState.get<{ [key: string]: ConnectionInfo }>(CacheKey.ConectionsKey);
         if (connections) {
             for (const key of Object.keys(connections)) {
-                connectionNodes.push(new ConnectionNode(key, connections[key].host, connections[key].user, connections[key].password, connections[key].port, connections[key].database, connections[key].certPath));
+                connectionNodes.push(new ConnectionNode(key, connections[key]));
             }
         }
         return connectionNodes;
@@ -102,7 +101,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
                     if (dbId) {
                         const dbNode = dbIdMap.get(dbId);
                         await ConnectionManager.getConnection(dbNode, true)
-                        vscode.window.showInformationMessage(`Change active database to ${dbNode.database} success!`)
+                        vscode.window.showInformationMessage(`Change active database to ${dbNode.name} success!`)
                     }
 
                 })

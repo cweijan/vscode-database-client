@@ -80,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.mock.table": (tableNode: TableNode) => {
                 serviceManager.mockRunner.create(tableNode)
             },
-            "mysql.mock.run": (fileUri: vscode.Uri) => {
+            "mysql.mock.run": () => {
                 serviceManager.mockRunner.runMock()
             },
             "mysql.table.source": (tableNode: TableNode) => {

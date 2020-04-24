@@ -15,27 +15,16 @@ import { FileManager } from "../extension/FileManager";
 import { Util } from "../common/util";
 
 
-export class ConnectionNode implements Node, ConnectionInfo {
+export class ConnectionNode extends Node {
 
+    public iconPath: string = path.join(Constants.RES_PATH, "server.png");;
     public multipleStatements?: boolean;
-    public type: string = ModelType.CONNECTION;
-    constructor(readonly id: string, readonly host: string, readonly user: string,
-        readonly password: string, readonly port: string,
-        public readonly database: string,
-        readonly certPath: string) {
-        
+    public contextValue: string = ModelType.CONNECTION;
+    constructor(readonly id: string, readonly connectionInfo: ConnectionInfo) {
+        super(id)
+        this.init(connectionInfo)
     }
-
-    public getTreeItem(): vscode.TreeItem {
-        return {
-            label: this.id,
-            id: this.id,
-            collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: ModelType.CONNECTION,
-            iconPath: path.join(Constants.RES_PATH, "server.png"),
-        };
-    }
-
+    
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.id);
         if (databaseNodes && !isRresh) {
@@ -44,10 +33,10 @@ export class ConnectionNode implements Node, ConnectionInfo {
 
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "show databases")
             .then((databases) => {
-                databaseNodes = databases.filter(db => this.database == null || db.Database == this.database).map<DatabaseNode>((database) => {
-                    return new DatabaseNode(this.host, this.user, this.password, this.port, database.Database, this.certPath);
+                databaseNodes = databases.filter((db) => this.database == null || db.Database == this.database).map<DatabaseNode>((database) => {
+                    return new DatabaseNode(database.Database, this.connectionInfo);
                 });
-                databaseNodes.unshift(new UserGroup(this.host, this.user, this.password, this.port, 'mysql', this.certPath));
+                databaseNodes.unshift(new UserGroup( "USER", this.connectionInfo));
                 DatabaseCache.setDataBaseListOfConnection(this.id, databaseNodes);
 
                 return databaseNodes;
@@ -100,7 +89,7 @@ export class ConnectionNode implements Node, ConnectionInfo {
         } else {
             const key = `${lcp.host}_${lcp.port}_${lcp.user}`;
             await FileManager.show(`${key}.sql`);
-            const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
+            const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.name);
             await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" }).then(async (dbName) => {
                 if (dbName) {
                     await ConnectionManager.getConnection({

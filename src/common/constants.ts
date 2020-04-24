@@ -28,8 +28,8 @@ export class CommandKey {
 }
 
 export class Cursor {
-    static FIRST_POSITION = new vscode.Position(0, 0);
-    static getRangeStartTo(end: vscode.Position): vscode.Range {
+    public static FIRST_POSITION = new vscode.Position(0, 0);
+    public static getRangeStartTo(end: vscode.Position): vscode.Range {
         return new vscode.Range(this.FIRST_POSITION, end);
     }
 }
@@ -69,11 +69,11 @@ export enum MessageType {
 
 
 export class OperateType {
-    static execute = 'execute';
-    static init = 'init';
-    static previous = 2;
-    static next = 3;
-    static save = 4;
-    static delete = 5;
-    static export = 6;
+    public static execute = 'execute';
+    public static init = 'init';
+    public static previous = 2;
+    public static next = 3;
+    public static save = 4;
+    public static delete = 5;
+    public static export = 6;
 }

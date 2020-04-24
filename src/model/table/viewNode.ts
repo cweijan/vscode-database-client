@@ -1,31 +1,17 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { TableNode } from "./tableNode";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { ModelType, Constants } from "../../common/Constants";
+import { Constants, ModelType } from "../../common/Constants";
+import { Util } from "../../common/util";
 import { ConnectionManager } from "../../database/ConnectionManager";
+import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
-import { Util } from "../../common/util";
+import { TableNode } from "./tableNode";
 
 export class ViewNode extends TableNode {
-    public type: string = ModelType.VIEW;
 
-    public getTreeItem(): vscode.TreeItem {
-
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`;
-        return {
-            label: this.table,
-            collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: ModelType.VIEW,
-            iconPath: path.join(Constants.RES_PATH, "view.svg"),
-            command: {
-                command: "mysql.template.sql",
-                title: "Run Select Statement",
-                arguments: [this, true],
-            },
-        };
-    }
+    public iconPath: string = path.join(Constants.RES_PATH, "view.svg");
+    public contextValue: string = ModelType.VIEW;
 
     public drop() {
 

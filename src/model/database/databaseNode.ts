@@ -1,12 +1,13 @@
 import mysqldump from 'mysqldump';
 import * as path from "path";
-
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/Constants";
 import { Console } from "../../common/OutputChannel";
+import { Util } from '../../common/util';
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
+import { FileManager } from '../../extension/FileManager';
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 import { ConnectionInfo } from "../interface/connection";
 import { CopyAble } from "../interface/copyAble";
@@ -16,42 +17,30 @@ import { ProcedureGroup } from "../other/procedureGroup";
 import { TriggerGroup } from "../other/triggerGroup";
 import { TableGroup } from "../table/tableGroup";
 import { ViewGroup } from "../table/viewGroup";
-import { Util } from '../../common/util';
-import { FileManager } from '../../extension/FileManager';
+
 import format = require('date-format');
 
-export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
+export class DatabaseNode extends Node implements CopyAble {
 
-    public id: string;
-    public type: string = ModelType.DATABASE;
-    constructor(readonly host: string, readonly user: string,
-        readonly password: string, readonly port: string, readonly database: string,
-        readonly certPath: string) {
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}`;
-    }
-
-    public getTreeItem(): vscode.TreeItem {
-        return {
-            label: this.database,
-            id: this.id,
-            collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: ModelType.DATABASE,
-            iconPath: path.join(Constants.RES_PATH, "database.svg"),
-        };
-
+    public contextValue: string = ModelType.DATABASE;
+    public iconPath: string = path.join(Constants.RES_PATH, "database.svg");
+    constructor(readonly name: string, readonly info: ConnectionInfo) {
+        super(name)
+        this.id = `${info.host}_${info.port}_${info.user}_${name}`
+        this.info = Object.assign({ ...info }, { database: name })
+        this.init(this.info)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-
-        return [new TableGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
-        new ViewGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
-        new ProcedureGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
-        new FunctionGroup(this.host, this.user, this.password, this.port, this.database, this.certPath),
-        new TriggerGroup(this.host, this.user, this.password, this.port, this.database, this.certPath)];
+        return [new TableGroup(this.info),
+        new ViewGroup(this.info),
+        new ProcedureGroup(this.info),
+        new FunctionGroup(this.info),
+        new TriggerGroup(this.info)];
     }
 
     public importData(fsPath: string) {
-        Console.log(`Doing import ${this.host}:${this.port}_${this.database}...`);
+        Console.log(`Doing import ${this.host}:${this.port}_${this.name}...`);
         ConnectionManager.getConnection(this).then((connection) => {
             QueryUnit.runFile(connection, fsPath);
         });
@@ -59,13 +48,13 @@ export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
 
     public backupData(exportPath: string) {
 
-        Console.log(`Doing backup ${this.host}_${this.database}...`);
+        Console.log(`Doing backup ${this.host}_${this.name}...`);
         mysqldump({
             connection: {
                 host: this.host,
                 user: this.user,
                 password: this.password,
-                database: this.database,
+                database: this.name,
                 port: parseInt(this.port),
             },
             dump: {
@@ -78,11 +67,11 @@ export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
                     engine: false,
                 },
             },
-            dumpToFile: `${exportPath}\\${this.database}_${format('yyyy-MM-dd_hhmmss', new Date())}.sql`,
+            dumpToFile: `${exportPath}\\${this.name}_${format('yyyy-MM-dd_hhmmss', new Date())}.sql`,
         }).then(() => {
-            vscode.window.showInformationMessage(`Backup ${this.host}_${this.database} success!`);
+            vscode.window.showInformationMessage(`Backup ${this.host}_${this.name} success!`);
         }).catch((err) => {
-            vscode.window.showErrorMessage(`Backup ${this.host}_${this.database} fail!\n${err}`);
+            vscode.window.showErrorMessage(`Backup ${this.host}_${this.name} fail!\n${err}`);
         });
         Console.log("backup end.");
 
@@ -90,11 +79,11 @@ export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
 
     public dropDatatabase() {
 
-        Util.confirm(`Are you want to Drop Database ${this.database} ? `, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE \`${this.database}\``).then(() => {
+        Util.confirm(`Are you want to Drop Database ${this.name} ? `, async () => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE \`${this.name}\``).then(() => {
                 DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`);
                 MySQLTreeDataProvider.refresh();
-                vscode.window.showInformationMessage(`Delete database ${this.database} success!`);
+                vscode.window.showInformationMessage(`Delete database ${this.name} success!`);
             });
         })
 
@@ -110,7 +99,7 @@ export class DatabaseNode implements Node, ConnectionInfo, CopyAble {
     }
 
     public copyName() {
-        Util.copyToBoard(this.database)
+        Util.copyToBoard(this.name)
     }
 
 }
