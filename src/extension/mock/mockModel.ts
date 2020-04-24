@@ -3,6 +3,7 @@ export interface MockModel {
     port: string;
     user: string;
     database: string;
+    examples: string;
     table: string;
     mockStartIndex: number|string;
     mockCount: number;

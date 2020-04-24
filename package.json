@@ -327,6 +327,11 @@
 				"command": "mysql.runQuery",
 				"key": "f9",
 				"when": "editorLangId == sql"
+			},
+			{
+				"command": "mysql.mock.run",
+				"when": "editorLangId == json && resourceFilename == mock.json ",
+				"key": "f9"
 			}
 		],
 		"menus": {

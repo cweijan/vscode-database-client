@@ -3,16 +3,14 @@ import * as fs from "fs";
 import * as mysql from "mysql";
 import { Connection } from "mysql";
 import * as vscode from "vscode";
-import { CommandKey, ConfigKey, Cursor, MessageType, Constants } from "../common/Constants";
+import { CommandKey, ConfigKey, Cursor, MessageType } from "../common/Constants";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
-import { Util } from "../common/util";
 import { ConnectionInfo } from "../model/interface/connection";
 import { QueryPage } from "../view/result/query";
 import { DataResponse, DMLResponse, ErrorResponse, RunResponse, MessageResponse } from "../view/result/queryResponse";
 import { ConnectionManager } from "./ConnectionManager";
 import { FileManager, FileModel } from "../extension/FileManager";
-import { resolve } from "url";
 
 export class QueryUnit {
 
