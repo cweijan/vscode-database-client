@@ -19,7 +19,7 @@ export class MockRunner {
     public async create(tableNode: TableNode) {
         const mockModel: MockModel = {
             host: tableNode.host, port: tableNode.port, user: tableNode.user, database: tableNode.database, table: tableNode.table,
-            mockStartIndex: tableNode.primaryKey ? tableNode.primaryKey : 1
+            mockStartIndex: tableNode.primaryKey ? 'auto' : 1
             , mockCount: 50, mock: {}
         }
         const columnList = (await tableNode.getChildren()) as ColumnNode[]
