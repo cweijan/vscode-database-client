@@ -690,14 +690,14 @@
 		"tslint": "^5.8.0",
 		"typescript": "^3.8.3",
 		"vscode": "^1.1.36"
+		
 	},
 	"dependencies": {
 		"date-format": "^3.0.0",
 		"mockjs": "^1.1.0",
 		"mysql": "^2.18.1",
-		"sql-formatter": "^2.3.3",
 		"mysqldump": "^3.1.0",
-		"shelljs": "^0.8.3"
+		"sql-formatter": "^2.3.3"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",

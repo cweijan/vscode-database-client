@@ -1,7 +1,6 @@
-import * as fs from "fs";
 import * as path from 'path';
 import * as vscode from "vscode";
-import shell = require('shelljs');
+import * as fs from 'fs-extra';
 
 export class FileManager {
 
@@ -46,8 +45,25 @@ export class FileManager {
     }
 
     private static check(path: string) {
-        if (!fs.existsSync(path)) { shell.mkdir('-p', path) }
 
+        if (!fs.existsSync(path)) { this.recursiseCreate(path) }
+
+    }
+
+
+    /**
+     * get from StackOverFlow
+     * @param folderPath 
+     */
+    private static recursiseCreate(folderPath: string) {
+        folderPath.split(path.sep)
+            .reduce((prevPath, folder) => {
+                const currentPath = path.join(prevPath, folder, path.sep);
+                if (!fs.existsSync(currentPath)) {
+                    fs.mkdirSync(currentPath);
+                }
+                return currentPath;
+            }, '');
     }
 
 }

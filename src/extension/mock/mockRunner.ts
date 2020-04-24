@@ -11,7 +11,6 @@ import { QueryPage } from "../../view/result/query";
 import { MessageResponse } from "../../view/result/queryResponse";
 import { FileManager, FileModel } from '../FileManager';
 import { MockModel } from './mockModel';
-import format = require('date-format');
 
 export class MockRunner {
 
