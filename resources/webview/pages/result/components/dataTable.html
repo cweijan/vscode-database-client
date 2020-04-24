@@ -1,5 +1,5 @@
 <el-table-column :label="field.name" v-for="field in result.fields" :key="field.name" align="center" sortable
-    v-if="result.columnList && toolbar.showColumns.includes(field.name.toLowerCase())"
+    v-if="result.fields && toolbar.showColumns.includes(field.name.toLowerCase())"
     :width="computeWidth(field.name,0,toolbar.filter[field.name])">
     <template slot-scope="scope">
         <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[field.name]" placeholder="filter"
