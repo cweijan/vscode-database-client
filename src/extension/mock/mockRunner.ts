@@ -17,12 +17,12 @@ export class MockRunner {
     private readonly MOCK_INDEX = "$mockIndex";
 
     public async create(tableNode: TableNode) {
+        const columnList = (await tableNode.getChildren()) as ColumnNode[]
         const mockModel: MockModel = {
             host: tableNode.host, port: tableNode.port, user: tableNode.user, database: tableNode.database, table: tableNode.table,
             mockStartIndex: tableNode.primaryKey ? 'auto' : 1
             , mockCount: 50, mock: {}
         }
-        const columnList = (await tableNode.getChildren()) as ColumnNode[]
         for (const columnNode of columnList) {
             mockModel.mock[columnNode.column.name] = {
                 type: columnNode.column.simpleType,
