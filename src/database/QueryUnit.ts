@@ -6,7 +6,7 @@ import * as vscode from "vscode";
 import { CommandKey, ConfigKey, Cursor, MessageType } from "../common/Constants";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
-import { FileManager, FileModel } from "../extension/FileManager";
+import { FileManager, FileModel } from "../common/FileManager";
 import { Node } from "../model/interface/node";
 import { QueryPage } from "../view/result/query";
 import { DataResponse, DMLResponse, ErrorResponse, MessageResponse, RunResponse } from "../view/result/queryResponse";

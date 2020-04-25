@@ -1,20 +1,19 @@
 import * as path from "path";
-import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/Constants";
+import { Constants, ModelType } from "../../common/constants";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { InfoNode } from "../InfoNode";
+import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
-import { ProcedureNode } from "./Procedure";
+import { FunctionNode } from "./function";
 
-export class ProcedureGroup extends Node  {
-    
-    public contextValue = ModelType.PROCEDURE_GROUP
-    public iconPath = path.join(Constants.RES_PATH, "procedure.svg")
+export class FunctionGroup extends Node {
+
+    public contextValue = ModelType.FUNCTION_GROUP;
+    public iconPath = path.join(Constants.RES_PATH, "function.svg")
     constructor(readonly info: Node) {
-        super("PROCEDURE")
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.PROCEDURE_GROUP}`;
+        super("FUNCTION")
+        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.FUNCTION_GROUP}`;
         this.init(info)
     }
 
@@ -24,14 +23,14 @@ export class ProcedureGroup extends Node  {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT ROUTINE_NAME FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${this.database}' and ROUTINE_TYPE='PROCEDURE'`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT ROUTINE_NAME FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${this.database}' and ROUTINE_TYPE='FUNCTION'`)
             .then((tables) => {
-                tableNodes = tables.map<Node>((table) => {
-                    return new ProcedureNode(table.ROUTINE_NAME, this.info);
+                tableNodes = tables.map<FunctionNode>((table) => {
+                    return new FunctionNode(table.ROUTINE_NAME, this.info);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {
-                    return [new InfoNode("This database has no procedure")];
+                    return [new InfoNode("This database has no function")];
                 }
                 return tableNodes;
             })
@@ -44,9 +43,9 @@ export class ProcedureGroup extends Node  {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
-PROCEDURE \`name\`()
+FUNCTION \`name\`() RETURNS [TYPE
 BEGIN
-
+    return [value;
 END;`);
     }
 

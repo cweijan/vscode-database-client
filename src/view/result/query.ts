@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
 import { MessageType, OperateType } from "../../common/Constants";
-import { SqlViewManager } from "../../common/SqlViewManager";
+import { SqlViewManager } from "../SqlViewManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { ColumnNode } from "../../model/table/columnNode";
+import { ColumnNode } from "../../model/other/columnNode";
 import { DataResponse } from "./queryResponse";
 import { Node } from "../../model/interface/node";
 

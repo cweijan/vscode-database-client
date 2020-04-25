@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { ModelType } from "../../../common/Constants";
 import { DatabaseCache } from "../../../database/DatabaseCache";
 import { Node } from "../../../model/interface/node";
-import { TableNode } from "../../../model/table/tableNode";
+import { TableNode } from "../../../model/main/tableNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Util } from "../../../common/util";
 import { ConnectionManager } from "../../../database/ConnectionManager";

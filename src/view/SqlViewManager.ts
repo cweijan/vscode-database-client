@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
 import { ConnectionManager } from "../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
-import { Console } from "./OutputChannel";
+import { Console } from "../common/OutputChannel";
 
 export class ViewOption {
     public viewPath?: string;

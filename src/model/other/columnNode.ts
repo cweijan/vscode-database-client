@@ -1,11 +1,11 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { Node } from "../interface/node";
-import { ModelType, Constants } from "../../common/Constants";
+import { ModelType, Constants } from "../../common/constants";
 import { QueryUnit } from "../../database/QueryUnit";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
-import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { MySQLTreeDataProvider } from "../../provider/mysqlTreeDataProvider";
 import { CopyAble } from "../interface/copyAble";
 import { Util } from "../../common/util";
 const wrap = Util.wrap;

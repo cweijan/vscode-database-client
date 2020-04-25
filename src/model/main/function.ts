@@ -1,11 +1,11 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/Constants";
+import { Constants, ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { MySQLTreeDataProvider } from "../../provider/mysqlTreeDataProvider";
 import { Node } from "../interface/node";
 
 export class FunctionNode extends Node {

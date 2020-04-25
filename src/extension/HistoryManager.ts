@@ -1,4 +1,4 @@
-import { FileManager } from "./FileManager";
+import { FileManager } from "../common/FileManager";
 export class HistoryManager {
 
     public static showHistory() {

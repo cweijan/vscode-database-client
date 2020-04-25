@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { CacheKey } from "../common/Constants";
 import { ConnectionManager } from "../database/ConnectionManager";
 import { DatabaseCache } from "../database/DatabaseCache";
-import { ConnectionNode } from "../model/ConnectionNode";
+import { ConnectionNode } from "../model/database/connectionNode";
 import { DatabaseNode } from "../model/database/databaseNode";
 import { Node } from "../model/interface/node";
 

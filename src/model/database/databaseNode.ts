@@ -7,15 +7,15 @@ import { Util } from '../../common/util';
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { FileManager } from '../../extension/FileManager';
+import { FileManager } from '../../common/FileManager';
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
-import { FunctionGroup } from "../other/functionGroup";
-import { ProcedureGroup } from "../other/procedureGroup";
-import { TriggerGroup } from "../other/triggerGroup";
-import { TableGroup } from "../table/tableGroup";
-import { ViewGroup } from "../table/viewGroup";
+import { FunctionGroup } from "../main/functionGroup";
+import { ProcedureGroup } from "../main/procedureGroup";
+import { TriggerGroup } from "../main/triggerGroup";
+import { TableGroup } from "../main/tableGroup";
+import { ViewGroup } from "../main/viewGroup";
 
 import format = require('date-format');
 

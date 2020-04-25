@@ -1,8 +1,8 @@
 import { MockRunner } from "./mock/mockRunner";
 import { ExtensionContext } from "vscode";
-import { SqlViewManager } from "../common/SqlViewManager";
+import { SqlViewManager } from "../view/SqlViewManager";
 import { DatabaseCache } from "../database/DatabaseCache";
-import { FileManager } from "./FileManager";
+import { FileManager } from "../common/FileManager";
 
 export class ServiceManager {
 

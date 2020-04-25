@@ -5,7 +5,7 @@ import { Util } from "../../common/util";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { QueryUnit } from "../../database/QueryUnit";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
-import { InfoNode } from "../InfoNode";
+import { InfoNode } from "../other/infoNode";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { DatabaseNode } from "./databaseNode";
