@@ -164,18 +164,17 @@ export class ConnectionManager {
     }
 
     public static createConnection(connectionOptions: Node): mysql.Connection {
-        const newConnectionOptions: any = Object.assign({ useConnectionPooling: true, multipleStatements: true }, connectionOptions);
+
+        const newConnectionOptions = { ...connectionOptions, useConnectionPooling: true, multipleStatements: true } as any as mysql.ConnectionConfig;
         if (connectionOptions.certPath && fs.existsSync(connectionOptions.certPath)) {
             newConnectionOptions.ssl = {
                 ca: fs.readFileSync(connectionOptions.certPath),
             };
         }
 
-        this.lastConnectionNode = newConnectionOptions;
+        this.lastConnectionNode = connectionOptions;
         return mysql.createConnection(newConnectionOptions);
 
     }
-
-
 
 }

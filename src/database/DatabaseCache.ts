@@ -63,7 +63,7 @@ export class DatabaseCache {
         }
 
         if (element.contextValue == ModelType.COLUMN || element.contextValue == ModelType.INFO || element.contextValue == ModelType.FUNCTION
-            || element.contextValue == ModelType.TRIGGER || element.contextValue == ModelType.PROCEDURE || element.contextValue == ModelType.USER_GROUP) {
+            || element.contextValue == ModelType.TRIGGER || element.contextValue == ModelType.PROCEDURE || element.contextValue == ModelType.USER) {
             return TreeItemCollapsibleState.None;
         }
 

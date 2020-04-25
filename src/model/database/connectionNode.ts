@@ -101,8 +101,7 @@ export class ConnectionNode extends Node {
             await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" }).then(async (dbName) => {
                 if (dbName) {
                     await ConnectionManager.getConnection({
-                        host: lcp.host, port: lcp.port, password: lcp.password,
-                        user: lcp.user, database: dbName, certPath: null,
+                        ...lcp, database: dbName, getConnectId: lcp.getConnectId
                     } as Node, true);
                 }
             });

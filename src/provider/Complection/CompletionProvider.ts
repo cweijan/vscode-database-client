@@ -8,6 +8,7 @@ import { TypeKeywordChain } from "./chain/typeKeywordChain";
 import { ComplectionChain, ComplectionContext } from "./complectionContext";
 import { TableDetecherChain } from "./chain/tableDetecherChain";
 import { FunctionChain } from "./chain/functionChain";
+import { Console } from "../../common/outputChannel";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
     constructor() {
@@ -40,12 +41,16 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         const context = ComplectionContext.build(document, position);
         let completionItemList = [];
         for (const chain of this.fullChain) {
-            const tempComplection = await chain.getComplection(context);
-            if (tempComplection != null) {
-                completionItemList = completionItemList.concat(tempComplection);
-                if (chain.stop()) {
-                    break;
+            try {
+                const tempComplection = await chain.getComplection(context);
+                if (tempComplection != null) {
+                    completionItemList = completionItemList.concat(tempComplection);
+                    if (chain.stop()) {
+                        break;
+                    }
                 }
+            } catch (err) {
+                Console.log(err)
             }
         }
 

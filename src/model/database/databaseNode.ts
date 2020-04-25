@@ -2,19 +2,19 @@ import mysqldump from 'mysqldump';
 import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/Constants";
+import { FileManager } from '../../common/FileManager';
 import { Console } from "../../common/OutputChannel";
 import { Util } from '../../common/util';
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { FileManager } from '../../common/FileManager';
-import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { MySQLTreeDataProvider } from '../../provider/mysqlTreeDataProvider';
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { FunctionGroup } from "../main/functionGroup";
 import { ProcedureGroup } from "../main/procedureGroup";
-import { TriggerGroup } from "../main/triggerGroup";
 import { TableGroup } from "../main/tableGroup";
+import { TriggerGroup } from "../main/triggerGroup";
 import { ViewGroup } from "../main/viewGroup";
 
 import format = require('date-format');
@@ -26,8 +26,7 @@ export class DatabaseNode extends Node implements CopyAble {
     constructor(readonly name: string, readonly info: Node) {
         super(name)
         this.id = `${info.getConnectId()}_${name}`
-        this.info = Object.assign({ ...info }, { database: name }) as Node
-        this.info.getConnectId = info.getConnectId
+        this.info = { ...info, database: name, getConnectId: info.getConnectId } as Node
         this.init(this.info)
     }
 
@@ -79,12 +78,16 @@ export class DatabaseNode extends Node implements CopyAble {
 
     public dropDatatabase() {
 
-        Util.confirm(`Are you want to Drop Database ${this.name} ? `, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE \`${this.name}\``).then(() => {
-                DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`);
-                MySQLTreeDataProvider.refresh();
-                vscode.window.showInformationMessage(`Delete database ${this.name} success!`);
-            });
+        vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
+            if (inputContent.toLowerCase() == this.database.toLowerCase()) {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE ${this.database}`).then(() => {
+                    DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`)
+                    MySQLTreeDataProvider.refresh();
+                    vscode.window.showInformationMessage(`Delete database ${this.database} success!`)
+                })
+            } else {
+                vscode.window.showInformationMessage(`Cancel delete database ${this.database}!`)
+            }
         })
 
     }

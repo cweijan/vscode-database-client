@@ -140,10 +140,13 @@ export class QueryUnit {
         const sqlList = content.split(";");
         const docCursor = document.getText(Cursor.getRangeStartTo(current)).length;
         let index = 0;
-        for (const sql of sqlList) {
+        for (let i = 0; i < sqlList.length; i++) {
+            const sql = sqlList[i];
             index += (sql.length + 1);
             if (docCursor < index) {
-                return sql.trim();
+                const trimSql = sql.trim();
+                if (!trimSql && i > 1) { return sqlList[i - 1]; }
+                return trimSql;
             }
         }
 

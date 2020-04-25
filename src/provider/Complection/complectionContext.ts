@@ -19,8 +19,8 @@ export class ComplectionContext {
 
         const context = new ComplectionContext();
         const currentSql = QueryUnit.obtainCursorSql(document, position).trim();
-        if (!currentSql) { return context; }
         context.currentSqlFull = QueryUnit.obtainCursorSql(document, position, document.getText()).trim();
+        if (!currentSql) { return context; }
 
         const prePostion = position.character === 0 ? position : new vscode.Position(position.line, position.character - 1);
         const preChart = position.character === 0 ? null : document.getText(new vscode.Range(prePostion, position));

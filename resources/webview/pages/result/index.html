@@ -122,6 +122,25 @@
                 this.update.primary = null;
                 this.update.currentNew = {};
             },
+            wrapQuote(columnName, value) {
+                if (typeof value == 'string') {
+                    value = value.replace(/'/g, "\\'")
+                }
+                const type = this.getTypeByColumn(columnName).toLowerCase()
+                switch (type) {
+                    case "varchar": case "char": case "date": case "time": case "timestamp": case "datetime":
+                        return `'${value}'`
+                }
+                return value;
+            },
+            getTypeByColumn(key) {
+                if (!this.result.columnList) return;
+                for (const column of this.result.columnList) {
+                    if (column.name == key) {
+                        return column.simpleType
+                    }
+                }
+            },
             confirmInsert() {
                 let columns = "";
                 let values = "";
@@ -129,7 +148,7 @@
                     const newEle = this.update.currentNew[key];
                     if (newEle) {
                         columns += `${key},`;
-                        values += `'${newEle.replace(/'/g, "\\'")}',`;
+                        values += `${this.wrapQuote(key, newEle)},`;
                     }
                 }
                 if (values) {
@@ -145,7 +164,7 @@
                     const oldEle = this.update.current[key];
                     const newEle = this.update.currentNew[key];
                     if (oldEle != newEle) {
-                        change += `${key}='${newEle.replace(/'/g, "\\'")}',`
+                        change += `${key}=${this.wrapQuote(key, newEle)},`
                     }
                 }
                 if (change) {
