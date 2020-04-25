@@ -44,8 +44,18 @@ export class ConnectionManager {
             if (fileName.includes('cweijan.vscode-mysql-client')) {
 
                 const queryName = path.basename(fileName, path.extname(fileName))
-                // TODO 
-                const [host, port, user, database] = queryName.split('_')
+                const filePattern = queryName.split('_');
+                const [host, port, user] = filePattern
+                let database: string;
+                if (filePattern.length >= 4) {
+                    database = filePattern[3]
+                    if (filePattern.length >= 4) {
+                        for (let index = 4; index < filePattern.length; index++) {
+                            database = `${database}_${filePattern[index]}`
+                        }
+                    }
+                }
+
                 if (host != null && port != null && user != null) {
                     return this.getConnection({
                         host, port, user, database, getConnectId: () => `${host}_${port}_${user}`
