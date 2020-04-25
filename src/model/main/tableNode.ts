@@ -2,45 +2,34 @@ import * as path from "path";
 import * as vscode from "vscode";
 import mysqldump from 'mysqldump';
 import { QueryUnit } from "../../database/QueryUnit";
-import { ColumnNode } from "./columnNode";
-import { InfoNode } from "../InfoNode";
+import { ColumnNode } from "../other/columnNode";
+import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
-import { ModelType, Constants } from "../../common/Constants";
-import { ConnectionInfo } from "../interface/connection";
-import { Console } from "../../common/OutputChannel";
+import { ModelType, Constants } from "../../common/constants";
+import { Console } from "../../common/outputChannel";
 import { ConnectionManager } from "../../database/ConnectionManager";
-import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { MySQLTreeDataProvider } from "../../provider/mysqlTreeDataProvider";
 import { Util } from "../../common/util";
 import { CopyAble } from "../interface/copyAble";
 import format = require('date-format');
 
 
-export class TableNode implements Node, ConnectionInfo, CopyAble {
+export class TableNode extends Node implements CopyAble {
 
-    public id: string;
-    public type: string = ModelType.TABLE;
+    public iconPath: string = path.join(Constants.RES_PATH, "table.svg");
+    public contextValue: string = ModelType.TABLE;
     public primaryKey: string;
 
-    constructor(readonly host: string, readonly user: string, readonly password: string,
-        readonly port: string, readonly database: string, readonly table: string,
-        readonly certPath: string) {
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`;
-    }
-
-    public getTreeItem(): vscode.TreeItem {
-        return {
-            label: this.table,
-            collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: ModelType.TABLE,
-            iconPath: path.join(Constants.RES_PATH, "table.svg"),
-            command: {
-                command: "mysql.template.sql",
-                title: "Run Select Statement",
-                arguments: [this, true],
-            },
-        };
-
+    constructor(readonly table: string, readonly info: Node) {
+        super(table)
+        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${table}`
+        this.init(info)
+        this.command = {
+            command: "mysql.template.sql",
+            title: "Run Select Statement",
+            arguments: [this, true],
+        }
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -54,7 +43,7 @@ export class TableNode implements Node, ConnectionInfo, CopyAble {
                     if (column && column.key == "PRI") {
                         this.primaryKey = column.name
                     }
-                    return new ColumnNode(this.host, this.user, this.password, this.port, this.database, this.table, this.certPath, column);
+                    return new ColumnNode(this.table, column, this.info);
                 });
                 DatabaseCache.setColumnListOfTable(this.id, columnNodes);
 

@@ -32,7 +32,7 @@ export class DatabaseChain implements ComplectionChain {
         const databaseNodes = DatabaseCache.getDatabaseListOfConnection(connectcionid);
 
         return databaseNodes.map<vscode.CompletionItem>((databaseNode) => {
-            const label = databaseNode.getTreeItem().label;
+            const label = databaseNode.label;
             const completionItem = new vscode.CompletionItem(label);
             completionItem.kind = vscode.CompletionItemKind.Folder;
             completionItem.insertText = wrap(label);

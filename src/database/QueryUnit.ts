@@ -6,11 +6,11 @@ import * as vscode from "vscode";
 import { CommandKey, ConfigKey, Cursor, MessageType } from "../common/Constants";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
-import { ConnectionInfo } from "../model/interface/connection";
+import { FileManager, FileModel } from "../common/FileManager";
+import { Node } from "../model/interface/node";
 import { QueryPage } from "../view/result/query";
-import { DataResponse, DMLResponse, ErrorResponse, RunResponse, MessageResponse } from "../view/result/queryResponse";
+import { DataResponse, DMLResponse, ErrorResponse, MessageResponse, RunResponse } from "../view/result/queryResponse";
 import { ConnectionManager } from "./ConnectionManager";
-import { FileManager, FileModel } from "../extension/FileManager";
 
 export class QueryUnit {
 
@@ -19,7 +19,7 @@ export class QueryUnit {
     public static queryPromise<T>(connection: mysql.Connection, sql: string): Promise<T> {
         return new Promise((resolve, reject) => {
             // Console.log(`Execute SQL:${sql}`)
-            connection.query(sql, (err, rows) => {
+            connection.query(sql, (err: mysql.MysqlError, rows) => {
                 if (err) {
                     Console.log(`Execute sql fail : ${sql}`);
                     Console.log(err);
@@ -33,23 +33,22 @@ export class QueryUnit {
 
     private static ddlPattern = /^(alter|create|drop)/ig;
     private static dmlPattern = /^(insert|update|delete)/ig;
-    public static async runQuery(sql?: string, connectionOptions?: ConnectionInfo): Promise<null> {
+    public static async runQuery(sql?: string, connectionNode?: Node): Promise<null> {
         if (!sql && !vscode.window.activeTextEditor) {
             vscode.window.showWarningMessage("No SQL file selected");
             return;
         }
         let connection: mysql.Connection;
-        if (!connectionOptions) {
+        if (!connectionNode) {
             if (!(connection = await ConnectionManager.getLastActiveConnection())) {
                 vscode.window.showWarningMessage("No MySQL Server or Database selected");
                 return;
             } else {
-                connectionOptions = ConnectionManager.getLastConnectionOption();
+                connectionNode = ConnectionManager.getLastConnectionOption();
             }
 
-        } else if (connectionOptions) {
-            connectionOptions.multipleStatements = true;
-            connection = await ConnectionManager.getConnection(connectionOptions);
+        } else if (connectionNode) {
+            connection = await ConnectionManager.getConnection(connectionNode);
         }
 
         let fromEditor = false;
@@ -96,7 +95,7 @@ export class QueryUnit {
                 return;
             }
             if (Array.isArray(data)) {
-                QueryPage.send({ type: MessageType.DATA, connection: connectionOptions, res: { sql, costTime, data, fields } as DataResponse });
+                QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields } as DataResponse });
                 return;
             }
             QueryPage.send({ type: MessageType.MESSAGE, res: { msg: `Execute sql success : ${sql}`, costTime } });

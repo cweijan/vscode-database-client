@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import {HoverProvider} from "vscode";
 import {DatabaseCache} from "../database/DatabaseCache";
-import {ColumnNode} from "../model/table/columnNode";
+import {ColumnNode} from "../model/other/columnNode";
 
 export class TableHoverProvider implements HoverProvider {
 

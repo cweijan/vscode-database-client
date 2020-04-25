@@ -692,6 +692,7 @@
 		"@types/mockjs": "^1.0.2",
 		"@types/mysql": "^2.15.10",
 		"@types/node": "^7.10.10",
+		"@types/ssh2": "^0.5.43",
 		"tslint": "^5.8.0",
 		"typescript": "^3.8.3",
 		"vscode": "^1.1.36"
@@ -701,7 +702,9 @@
 		"mockjs": "^1.1.0",
 		"mysql": "^2.18.1",
 		"mysqldump": "^3.1.0",
-		"sql-formatter": "^2.3.3"
+		"sql-formatter": "^2.3.3",
+		"get-port": "^5.1.1",
+		"tunnel-ssh": "^4.1.4"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { DatabaseCache } from "../../../database/DatabaseCache";
-import { ColumnNode } from "../../../model/table/columnNode";
+import { ColumnNode } from "../../../model/other/columnNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Util } from "../../../common/util";
 import { Pattern } from "../../../common/Constants";
@@ -71,9 +71,9 @@ export class ColumnChain implements ComplectionChain {
         }
 
         return columnNodes.map<vscode.CompletionItem>((columnNode) => {
-            const completionItem = new vscode.CompletionItem(columnNode.getTreeItem().columnName);
-            completionItem.detail = columnNode.getTreeItem().detail;
-            completionItem.documentation = columnNode.getTreeItem().document;
+            const completionItem = new vscode.CompletionItem(columnNode.label);
+            completionItem.detail = columnNode.type;
+            completionItem.documentation = columnNode.comment;
             completionItem.kind = vscode.CompletionItemKind.Field;
             return completionItem;
         });

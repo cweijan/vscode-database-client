@@ -5,12 +5,13 @@ import { MessageType } from "../../common/Constants";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { ColumnNode } from "../../model/table/columnNode";
-import { TableNode } from '../../model/table/tableNode';
+import { ColumnNode } from "../../model/other/columnNode";
+import { TableNode } from '../../model/main/tableNode';
 import { QueryPage } from "../../view/result/query";
 import { MessageResponse } from "../../view/result/queryResponse";
-import { FileManager, FileModel } from '../FileManager';
+import { FileManager, FileModel } from '../../common/FileManager';
 import { MockModel } from './mockModel';
+import { Node } from '../../model/interface/node';
 
 export class MockRunner {
 
@@ -91,7 +92,7 @@ export class MockRunner {
                 sqlList.push(tempInsertSql)
             }
 
-            const connection = await ConnectionManager.getConnection({ ...mockModel })
+            const connection = await ConnectionManager.getConnection({ ...mockModel } as any as Node)
             const success = await QueryUnit.runBatch(connection, sqlList)
             QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
 

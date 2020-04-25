@@ -1,31 +1,22 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { QueryUnit } from "../../database/QueryUnit";
-import { InfoNode } from "../InfoNode";
+import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
-import { ConnectionInfo } from "../interface/connection";
-import { Constants, ModelType } from "../../common/Constants";
-import { TriggerNode } from "./Trigger";
+import { Constants, ModelType } from "../../common/constants";
+import { TriggerNode } from "./trigger";
 
-export class TriggerGroup implements Node, ConnectionInfo {
-    public type: string; public id: string;
-    constructor(readonly host: string, readonly user: string,
-        readonly password: string, readonly port: string, readonly database: string,
-        readonly certPath: string) {
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.TRIGGER_GROUP}`;
-    }
+export class TriggerGroup extends Node {
+    
+    public iconPath: string = path.join(Constants.RES_PATH, "trigger.svg");
+    public contextValue = ModelType.TRIGGER_GROUP
 
-
-    public getTreeItem(): vscode.TreeItem {
-        return {
-            label: "TRIGGER",
-            id: this.id,
-            collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: ModelType.TRIGGER_GROUP,
-            iconPath: path.join(Constants.RES_PATH, "trigger.svg"),
-        };
+    constructor(readonly info: Node) {
+        super("TRIGGER")
+        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.TRIGGER_GROUP}`;
+        this.init(info)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -37,7 +28,7 @@ export class TriggerGroup implements Node, ConnectionInfo {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = '${this.database}'`)
             .then((tables) => {
                 tableNodes = tables.map<TriggerNode>((table) => {
-                    return new TriggerNode(this.host, this.user, this.password, this.port, this.database, table.TRIGGER_NAME, this.certPath);
+                    return new TriggerNode(table.ROUTINE_NAME, this.info);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {

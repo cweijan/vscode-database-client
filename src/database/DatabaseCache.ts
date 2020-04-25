@@ -1,9 +1,9 @@
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
 import { CacheKey, ModelType } from "../common/Constants";
-import { ColumnNode } from "../model/table/columnNode";
+import { ColumnNode } from "../model/other/columnNode";
 import { DatabaseNode } from "../model/database/databaseNode";
 import { Node } from "../model/interface/node";
-import { TableNode } from "../model/table/tableNode";
+import { TableNode } from "../model/main/tableNode";
 
 export class DatabaseCache {
 
@@ -58,7 +58,12 @@ export class DatabaseCache {
      */
     public static getElementState(element?: Node) {
 
-        if (element.type == ModelType.COLUMN || element.type == ModelType.INFO) {
+        if (!element.contextValue) {
+            return TreeItemCollapsibleState.None
+        }
+
+        if (element.contextValue == ModelType.COLUMN || element.contextValue == ModelType.INFO || element.contextValue == ModelType.FUNCTION
+            || element.contextValue == ModelType.TRIGGER || element.contextValue == ModelType.PROCEDURE || element.contextValue == ModelType.USER_GROUP) {
             return TreeItemCollapsibleState.None;
         }
 
@@ -70,9 +75,9 @@ export class DatabaseCache {
             this.collpaseState = {};
         }
 
-        if (this.collpaseState[element.id]) {
+        if (element.id && this.collpaseState[element.id]) {
             return this.collpaseState[element.id];
-        } else if (element.type == ModelType.CONNECTION || element.type == ModelType.TABLE_GROUP) {
+        } else if (element.contextValue == ModelType.CONNECTION || element.contextValue == ModelType.TABLE_GROUP) {
             return TreeItemCollapsibleState.Expanded;
         } else {
             return TreeItemCollapsibleState.Collapsed;
@@ -88,7 +93,7 @@ export class DatabaseCache {
      */
     public static storeElementState(element?: Node, collapseState?: TreeItemCollapsibleState) {
 
-        if (element.type == ModelType.COLUMN || element.type == ModelType.INFO) {
+        if (element.contextValue == ModelType.COLUMN || element.contextValue == ModelType.INFO) {
             return;
         }
 

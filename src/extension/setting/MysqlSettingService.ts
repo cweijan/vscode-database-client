@@ -1,12 +1,13 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import process = require('process');
+import { SettingInterface } from "./SettingInterface";
 
 
-export class MysqlSetting {
-    private static x64 = "C:\\Program Files\\MySQL";
-    private static x86 = "C:\\Program Files (x86)\\MySQL";
-    public static open() {
+export class MysqlSettingService implements SettingInterface {
+    private x64 = "C:\\Program Files\\MySQL";
+    private x86 = "C:\\Program Files (x86)\\MySQL";
+    public open() {
         if (!process.platform.match(/win/ig)) {
             vscode.window.showErrorMessage("Only Support Windows OS.");
             return;
@@ -20,7 +21,7 @@ export class MysqlSetting {
         }
     }
 
-    public static check(param): boolean {
+    private check(param): boolean {
         for (const fileName of fs.readdirSync(param)) {
             const serverPath = param + "\\" + fileName;
             if (fs.statSync(serverPath).isDirectory) {

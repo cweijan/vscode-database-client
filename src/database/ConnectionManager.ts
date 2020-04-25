@@ -1,27 +1,29 @@
 import * as fs from "fs";
-import * as path from "path";
+import * as getPort from 'get-port'
 import * as mysql from "mysql";
+import * as path from "path";
 import * as vscode from "vscode";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
-import { ConnectionInfo } from "../model/interface/connection";
+import { Node } from "../model/interface/node";
 import { QueryUnit } from "./QueryUnit";
+import tunnel = require('tunnel-ssh')
 
 export class ConnectionManager {
 
-    private static lastConnectionOption: ConnectionInfo;
+    private static lastConnectionNode: Node;
     private static activeConnection: { [key: string]: mysql.Connection } = {};
 
     public static getLastConnectionOption() {
-        return this.lastConnectionOption;
+        return this.lastConnectionNode;
     }
 
     public static removeConnection(id: string) {
 
-        const lcp = this.lastConnectionOption;
+        const lcp = this.lastConnectionNode;
         const key = `${lcp.host}_${lcp.port}_${lcp.user}`;
         if (key == id) {
-            delete this.lastConnectionOption
+            delete this.lastConnectionNode
         }
         const activeConnect = this.activeConnection[id];
         if (activeConnect) {
@@ -42,47 +44,62 @@ export class ConnectionManager {
             if (fileName.includes('cweijan.vscode-mysql-client')) {
 
                 const queryName = path.basename(fileName, path.extname(fileName))
+                // TODO 
                 const [host, port, user, database] = queryName.split('_')
                 if (host != null && port != null && user != null) {
                     return this.getConnection({
-                        multipleStatements: true, host, port, user, database, certPath: null
-                    }, database != null)
+                        host, port, user, database, certPath: null
+                    } as Node, database != null)
                 }
             }
         }
 
-        return this.getConnection(Object.assign({ multipleStatements: true }, this.lastConnectionOption));
+        return this.getConnection(this.lastConnectionNode);
 
     }
 
-    public static getConnection(connectionOptions: ConnectionInfo, changeActive: boolean = false): Promise<mysql.Connection> {
+    public static getConnection(connectionNode: Node, changeActive: boolean = false): Promise<mysql.Connection> {
 
-        connectionOptions.multipleStatements = true;
-        if (changeActive) { 
-            this.lastConnectionOption = connectionOptions;
-            Global.updateStatusBarItems(connectionOptions);
-         }
-        const key = `${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`;
+        if (changeActive) {
+            this.lastConnectionNode = connectionNode;
+            Global.updateStatusBarItems(connectionNode);
+        }
+        const key = `${connectionNode.host}_${connectionNode.port}_${connectionNode.user}`;
 
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
+
             const connection = this.activeConnection[key];
             if (connection && connection.state == 'authenticated') {
-                if (connectionOptions.database) {
-                    QueryUnit.queryPromise(connection, `use \`${connectionOptions.database}\``).then(() => {
+                if (connectionNode.database) {
+                    QueryUnit.queryPromise(connection, `use \`${connectionNode.database}\``).then(() => {
                         resolve(connection);
                     }).catch((error) => {
+                        this.activeConnection[key] = null
                         reject(error);
                     });
                 } else {
                     resolve(connection);
                 }
             } else {
-                this.activeConnection[key] = this.createConnection(connectionOptions);
+                if (connectionNode.usingSSH) {
+
+                    const port = await this.createTunnel(connectionNode, (err) => {
+                        if (err.errno == 'EADDRINUSE') { return; }
+                        this.activeConnection[key] = null
+                    })
+                    if (!port) {
+                        reject("create ssh tunnel fail!");
+                        return;
+                    } else {
+                        connectionNode = Object.assign({ ...connectionNode.origin }, { port }) as any as Node
+                    }
+                }
+                this.activeConnection[key] = this.createConnection(connectionNode);
                 this.activeConnection[key].connect((err: Error) => {
                     if (!err) {
                         resolve(this.activeConnection[key]);
                     } else {
-                        this.activeConnection = {};
+                        this.activeConnection[key] = null;
                         Console.log(`${err.stack}\n${err.message}`);
                         reject(err.message);
                     }
@@ -93,16 +110,58 @@ export class ConnectionManager {
 
     }
 
+    private static tunelMark: { [key: string]: any } = {};
+    private static createTunnel(connectionNode: Node, errorCallback: (error) => void): Promise<number> {
+        return new Promise(async (resolve) => {
+            const ssh = connectionNode.ssh
+            if (!connectionNode.ssh.tunnelPort) {
+                connectionNode.ssh.tunnelPort = await getPort({ port: getPort.makeRange(10567, 11567) })
+            }
+            const port = connectionNode.ssh.tunnelPort;
+            const key = `${ssh.username}_${ssh.port}_${ssh.username}`;
+            if (this.tunelMark[key]) {
+                resolve(port)
+            }
+            const origin = connectionNode.origin
+            const config = {
+                username: ssh.username,
+                password: ssh.password,
+                host: ssh.host,
+                port: ssh.port,
+                dstHost: origin.host,
+                dstPort: origin.port,
+                localHost: '127.0.0.1',
+                localPort: port
+            };
+            const localTunnel = tunnel(config, (error, server) => {
+                this.tunelMark[key] = server
+                if (error && errorCallback) {
+                    delete this.tunelMark[key]
+                    errorCallback(error)
+                }
+                resolve(port)
+            });
+            localTunnel.on('error', (err) => {
+                Console.log('Ssh tunel occur eror : ' + err);
+                if (err && errorCallback) {
+                    localTunnel.close()
+                    delete this.tunelMark[key]
+                    errorCallback(err)
+                }
+                resolve(0)
+            });
+        })
+    }
 
-    public static createConnection(connectionOptions: ConnectionInfo): mysql.Connection {
-        const newConnectionOptions: any = Object.assign({ useConnectionPooling: true }, connectionOptions);
+    public static createConnection(connectionOptions: Node): mysql.Connection {
+        const newConnectionOptions: any = Object.assign({ useConnectionPooling: true, multipleStatements: true }, connectionOptions);
         if (connectionOptions.certPath && fs.existsSync(connectionOptions.certPath)) {
             newConnectionOptions.ssl = {
                 ca: fs.readFileSync(connectionOptions.certPath),
             };
         }
 
-        this.lastConnectionOption = newConnectionOptions;
+        this.lastConnectionNode = newConnectionOptions;
         return mysql.createConnection(newConnectionOptions);
 
     }

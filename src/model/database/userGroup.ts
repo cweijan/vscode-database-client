@@ -1,37 +1,23 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/Constants";
+import { Util } from "../../common/util";
 import { ConnectionManager } from "../../database/ConnectionManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { ConnectionInfo } from "../interface/connection";
-import { InfoNode } from "../InfoNode";
+import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { InfoNode } from "../other/infoNode";
+import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { DatabaseNode } from "./databaseNode";
-import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
-import { CopyAble } from "../interface/copyAble";
-import { Util } from "../../common/util";
 
 export class UserGroup extends DatabaseNode {
 
-    public id: string;
-    public type: string = ModelType.DATABASE;
-    constructor(readonly host: string, readonly user: string,
-        readonly password: string, readonly port: string, readonly database: string,
-        readonly certPath: string) {
-        super(host, user, password, port, database, certPath);
-    }
-
-    public getTreeItem(): vscode.TreeItem {
-
+    public contextValue: string = ModelType.DATABASE;
+    public iconPath = path.join(Constants.RES_PATH, "user.svg")
+    constructor(readonly name: string, readonly info: Node) {
+        super(name, info)
         this.id = `${this.host}_${this.port}_${this.user}_${ModelType.USER_GROUP}`;
-        return {
-            label: "USER",
-            collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: ModelType.USER_GROUP,
-            iconPath: path.join(Constants.RES_PATH, "user.svg"),
-        };
-
+        this.database = null
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -39,7 +25,7 @@ export class UserGroup extends DatabaseNode {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT DISTINCT USER FROM mysql.user;`)
             .then((tables) => {
                 userNodes = tables.map<UserNode>((table) => {
-                    return new UserNode(this.host, this.user, this.password, this.port, table.USER, this.certPath);
+                    return new UserNode(table.USER, this.info);
                 });
                 return userNodes;
             })
@@ -56,29 +42,22 @@ export class UserGroup extends DatabaseNode {
 }
 
 
-export class UserNode implements Node, ConnectionInfo, CopyAble {
+export class UserNode extends Node implements CopyAble {
 
-    public type: string;
-    public id: string;
-    constructor(readonly host: string, readonly user: string, readonly password: string,
-        readonly port: string, readonly name: string,
-        readonly certPath: string) {
+    public contextValue = ModelType.USER;
+    public iconPath = path.join(Constants.RES_PATH, "user.svg")
+    constructor(readonly name: string, readonly info: Node) {
+        super(name)
+        this.init(info)
+        this.command = {
+            command: "mysql.user.sql",
+            title: "Run User Detail Statement",
+            arguments: [this, true],
+        }
     }
+
     public copyName(): void {
         Util.copyToBoard(this.name)
-    }
-    public getTreeItem(): vscode.TreeItem {
-        this.id = `${this.host}_${this.port}_${this.name}`;
-        return {
-            label: this.name,
-            contextValue: ModelType.USER,
-            iconPath: path.join(Constants.RES_PATH, "user.svg"),
-            command: {
-                command: "mysql.user.sql",
-                title: "Run User Detail Statement",
-                arguments: [this, true],
-            },
-        };
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {

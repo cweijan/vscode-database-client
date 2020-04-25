@@ -1,30 +1,20 @@
 import * as path from "path";
-import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/Constants";
+import { Constants, ModelType } from "../../common/constants";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { ConnectionInfo } from "../interface/connection";
-import { InfoNode } from "../InfoNode";
+import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
-import { ProcedureNode } from "./Procedure";
+import { ProcedureNode } from "./procedure";
 
-export class ProcedureGroup implements Node, ConnectionInfo {
-    public type: string; public id: string;
-    constructor(readonly host: string, readonly user: string,
-        readonly password: string, readonly port: string, readonly database: string,
-        readonly certPath: string) {
-        this.id = `${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.PROCEDURE_GROUP}`;
-    }
-
-
-    public getTreeItem(): vscode.TreeItem {
-        return {
-            label: "PROCEDURE",
-            collapsibleState: DatabaseCache.getElementState(this),
-            contextValue: ModelType.PROCEDURE_GROUP,
-            iconPath: path.join(Constants.RES_PATH, "procedure.svg"),
-        };
+export class ProcedureGroup extends Node  {
+    
+    public contextValue = ModelType.PROCEDURE_GROUP
+    public iconPath = path.join(Constants.RES_PATH, "procedure.svg")
+    constructor(readonly info: Node) {
+        super("PROCEDURE")
+        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.PROCEDURE_GROUP}`;
+        this.init(info)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -36,7 +26,7 @@ export class ProcedureGroup implements Node, ConnectionInfo {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT ROUTINE_NAME FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${this.database}' and ROUTINE_TYPE='PROCEDURE'`)
             .then((tables) => {
                 tableNodes = tables.map<Node>((table) => {
-                    return new ProcedureNode(this.host, this.user, this.password, this.port, this.database, table.ROUTINE_NAME, this.certPath);
+                    return new ProcedureNode(table.ROUTINE_NAME, this.info);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {

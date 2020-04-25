@@ -44,6 +44,8 @@ export class FileManager {
         });
     }
 
+
+    
     private static check(path: string) {
 
         if (!fs.existsSync(path)) { this.recursiseCreate(path) }
