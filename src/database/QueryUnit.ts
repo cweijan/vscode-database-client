@@ -19,7 +19,7 @@ export class QueryUnit {
     public static queryPromise<T>(connection: mysql.Connection, sql: string): Promise<T> {
         return new Promise((resolve, reject) => {
             // Console.log(`Execute SQL:${sql}`)
-            connection.query(sql, (err, rows) => {
+            connection.query(sql, (err: mysql.MysqlError, rows) => {
                 if (err) {
                     Console.log(`Execute sql fail : ${sql}`);
                     Console.log(err);

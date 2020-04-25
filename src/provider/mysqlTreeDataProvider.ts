@@ -11,18 +11,17 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public _onDidChangeTreeData: vscode.EventEmitter<Node> = new vscode.EventEmitter<Node>();
     public readonly onDidChangeTreeData: vscode.Event<Node> = this._onDidChangeTreeData.event;
-    public static instance: MySQLTreeDataProvider
+    private static instance: MySQLTreeDataProvider
 
     constructor(private context: vscode.ExtensionContext) {
         MySQLTreeDataProvider.instance = this
         this.init()
-
     }
 
     /**
      * reload treeview context
      */
-    async init() {
+    public async init() {
         (await this.getConnectionNodes()).forEach(async (connectionNode) => {
             (await connectionNode.getChildren(true)).forEach(async (databaseNode) => {
                 (await databaseNode.getChildren(true)).forEach(async (groupNode) => {
@@ -66,6 +65,10 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
      */
     public static refresh(element?: Node): void {
         this.instance._onDidChangeTreeData.fire(element);
+    }
+
+    public static getInstnace() {
+        return this.instance;
     }
 
     public async getConnectionNodes(): Promise<ConnectionNode[]> {

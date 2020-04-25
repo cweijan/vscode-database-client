@@ -11,7 +11,7 @@ export abstract class Node extends vscode.TreeItem {
     public database?: string;
     public certPath?: string;
     public origin?: Node;
-    
+
     public usingSSH?: boolean;
     public ssh?: SSHConfig;
 
@@ -23,16 +23,17 @@ export abstract class Node extends vscode.TreeItem {
         return []
     }
 
-    protected init(info: Node) {
-        this.host = info.host
-        this.port = info.port
-        this.user = info.user
-        this.password = info.password
-        this.database = info.database
-        this.certPath = info.certPath
-        this.ssh = info.ssh
-        this.usingSSH = info.usingSSH
+    protected init(source: Node) {
+        this.host = source.host
+        this.port = source.port
+        this.user = source.user
+        this.password = source.password
+        this.database = source.database
+        this.certPath = source.certPath
+        this.ssh = source.ssh
+        this.usingSSH = source.usingSSH
         this.collapsibleState = DatabaseCache.getElementState(this)
+        this.origin = source.origin
     }
 
 }

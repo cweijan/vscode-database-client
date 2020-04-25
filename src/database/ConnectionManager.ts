@@ -73,6 +73,7 @@ export class ConnectionManager {
                     QueryUnit.queryPromise(connection, `use \`${connectionNode.database}\``).then(() => {
                         resolve(connection);
                     }).catch((error) => {
+                        this.activeConnection[key] = null
                         reject(error);
                     });
                 } else {
@@ -136,7 +137,7 @@ export class ConnectionManager {
                 resolve(port)
             });
             localTunnel.on('error', (err) => {
-                Console.log('Bind local tunel occur eror : ' + err);
+                Console.log('Ssh tunel occur eror : ' + err);
                 if (err && errorCallback) {
                     localTunnel.close()
                     delete this.tunelMark[key]

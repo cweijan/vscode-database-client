@@ -3,8 +3,8 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
 import { ConnectionManager } from "../database/ConnectionManager";
-import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
 import { Console } from "../common/OutputChannel";
+import { MySQLTreeDataProvider } from "../provider/mysqlTreeDataProvider";
 
 export class ViewOption {
     public viewPath?: string;
@@ -25,7 +25,7 @@ export class SqlViewManager {
         this.webviewPath = extensionPath + "/resources/webview"
     }
 
-    public static showConnectPage() {
+    public static showConnectPage(provider: MySQLTreeDataProvider) {
 
         this.createWebviewPanel({
             viewPath: "pages/connect/connect",
@@ -34,14 +34,14 @@ export class SqlViewManager {
         }).then((webviewPanel) => {
             webviewPanel.webview.onDidReceiveMessage((params) => {
                 if (params.type === 'CONNECT_TO_SQL_SERVER') {
-                    const {connectionOption} = params
+                    const { connectionOption } = params
                     if (connectionOption.usingSSH) {
                         connectionOption.origin = { host: connectionOption.host, user: connectionOption.user, port: connectionOption.port, password: connectionOption.password }
                         connectionOption.host = connectionOption.ssh.host
                         connectionOption.port = "" + connectionOption.ssh.port
                     }
                     ConnectionManager.getConnection(connectionOption).then(() => {
-                        MySQLTreeDataProvider.instance.addConnection(params.connectionOption);
+                        provider.addConnection(params.connectionOption);
                         webviewPanel.dispose();
                     }).catch((err: Error) => {
                         webviewPanel.webview.postMessage({

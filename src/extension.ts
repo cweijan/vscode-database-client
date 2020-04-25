@@ -26,9 +26,10 @@ import { QueryUnit } from "./database/QueryUnit";
 export function activate(context: vscode.ExtensionContext) {
 
     const serviceManager = new ServiceManager(context)
+    const s = serviceManager.init()
 
     context.subscriptions.push(
-        ...serviceManager.init(),
+        ...s,
         ...initCommand({
             "mysql.history.open": () => serviceManager.historyService.showHistory(),
             [CommandKey.Refresh]: () => { serviceManager.provider.init(); },
@@ -48,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
                 serviceManager.mockRunner.runMock()
             },
             "mysql.addConnection": () => {
-                SqlViewManager.showConnectPage();
+                SqlViewManager.showConnectPage(serviceManager.provider);
             },
             "mysql.addDatabase": (connectionNode: ConnectionNode) => {
                 connectionNode.createDatabase();
