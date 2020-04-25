@@ -15,7 +15,7 @@ export class TriggerGroup extends Node {
 
     constructor(readonly info: Node) {
         super("TRIGGER")
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.TRIGGER_GROUP}`;
+        this.id = `${info.getConnectId()}_${info.database}_${ModelType.TRIGGER_GROUP}`;
         this.init(info)
     }
 

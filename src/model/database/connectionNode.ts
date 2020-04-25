@@ -42,9 +42,9 @@ export class ConnectionNode extends Node {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "show databases")
             .then((databases) => {
                 databaseNodes = databases.filter((db) => this.database == null || db.Database == this.database).map<DatabaseNode>((database) => {
-                    return new DatabaseNode(database.Database, this.parent);
+                    return new DatabaseNode(database.Database, this);
                 });
-                databaseNodes.unshift(new UserGroup("USER", this.parent));
+                databaseNodes.unshift(new UserGroup("USER", this));
                 DatabaseCache.setDataBaseListOfConnection(this.id, databaseNodes);
 
                 return databaseNodes;
@@ -95,7 +95,7 @@ export class ConnectionNode extends Node {
         if (!lcp) {
             Console.log("Not active connection found!");
         } else {
-            const key = `${lcp.host}_${lcp.port}_${lcp.user}`;
+            const key = `${lcp.getConnectId()}`;
             await FileManager.show(`${key}.sql`);
             const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.name);
             await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" }).then(async (dbName) => {

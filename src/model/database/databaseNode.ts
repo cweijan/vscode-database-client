@@ -25,8 +25,9 @@ export class DatabaseNode extends Node implements CopyAble {
     public iconPath: string = path.join(Constants.RES_PATH, "database.svg");
     constructor(readonly name: string, readonly info: Node) {
         super(name)
-        this.id = `${info.host}_${info.port}_${info.user}_${name}`
+        this.id = `${info.getConnectId()}_${name}`
         this.info = Object.assign({ ...info }, { database: name }) as Node
+        this.info.getConnectId = info.getConnectId
         this.init(this.info)
     }
 
@@ -80,7 +81,7 @@ export class DatabaseNode extends Node implements CopyAble {
 
         Util.confirm(`Are you want to Drop Database ${this.name} ? `, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE \`${this.name}\``).then(() => {
-                DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`);
+                DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`);
                 MySQLTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`Delete database ${this.name} success!`);
             });

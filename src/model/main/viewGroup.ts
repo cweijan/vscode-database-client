@@ -14,7 +14,7 @@ export class ViewGroup extends Node {
     public contextValue = ModelType.VIEW_GROUP
     constructor(readonly info: Node) {
         super("VIEW")
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.VIEW_GROUP}`;
+        this.id = `${info.getConnectId()}_${info.database}_${ModelType.VIEW_GROUP}`;
         this.init(info)
     }
 

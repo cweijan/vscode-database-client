@@ -55,7 +55,7 @@ export class ColumnNode extends Node implements CopyAble {
             if (!newColumnName) { return; }
             const sql = `alter table ${wrap(this.database)}.${wrap(this.table)} change column ${wrap(columnName)} ${wrap(newColumnName)} ${this.column.type} comment '${this.column.comment}'`;
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
-                DatabaseCache.clearColumnCache(`${this.host}_${this.port}_${this.user}_${this.database}_${this.table}`);
+                DatabaseCache.clearColumnCache(`${this.getConnectId()}_${this.database}_${this.table}`);
                 MySQLTreeDataProvider.refresh();
             });
 

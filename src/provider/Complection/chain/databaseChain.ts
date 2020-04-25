@@ -27,7 +27,7 @@ export class DatabaseChain implements ComplectionChain {
 
         const lcp = ConnectionManager.getLastConnectionOption()
         if (!lcp) { return []; }
-        const connectcionid = `${lcp.host}_${lcp.port}_${lcp.user}`;
+        const connectcionid = `${lcp.getConnectId()}`;
 
         const databaseNodes = DatabaseCache.getDatabaseListOfConnection(connectcionid);
 

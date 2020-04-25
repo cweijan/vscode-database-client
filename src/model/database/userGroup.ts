@@ -16,7 +16,7 @@ export class UserGroup extends DatabaseNode {
     public iconPath = path.join(Constants.RES_PATH, "user.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name, info)
-        this.id = `${this.host}_${this.port}_${this.user}_${ModelType.USER_GROUP}`;
+        this.id = `${this.getConnectId()}_${ModelType.USER_GROUP}`;
         this.database = null
     }
 

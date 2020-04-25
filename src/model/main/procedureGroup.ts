@@ -13,7 +13,7 @@ export class ProcedureGroup extends Node  {
     public iconPath = path.join(Constants.RES_PATH, "procedure.svg")
     constructor(readonly info: Node) {
         super("PROCEDURE")
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.PROCEDURE_GROUP}`;
+        this.id = `${info.getConnectId()}_${info.database}_${ModelType.PROCEDURE_GROUP}`;
         this.init(info)
     }
 

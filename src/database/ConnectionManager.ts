@@ -21,7 +21,7 @@ export class ConnectionManager {
     public static removeConnection(id: string) {
 
         const lcp = this.lastConnectionNode;
-        const key = `${lcp.host}_${lcp.port}_${lcp.user}`;
+        const key = lcp.getConnectId();
         if (key == id) {
             delete this.lastConnectionNode
         }

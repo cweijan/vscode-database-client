@@ -40,7 +40,7 @@ export class TriggerNode extends Node  {
 
         Util.confirm(`Are you want to drop trigger ${this.name} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP trigger \`${this.database}\`.\`${this.name}\``).then(() => {
-                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.TRIGGER_GROUP}`)
+                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}_${ModelType.TRIGGER_GROUP}`)
                 MySQLTreeDataProvider.refresh()
                 vscode.window.showInformationMessage(`Drop trigger ${this.name} success!`)
             })

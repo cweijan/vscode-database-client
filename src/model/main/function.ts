@@ -14,7 +14,7 @@ export class FunctionNode extends Node {
     public iconPath = path.join(Constants.RES_PATH, "function.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name)
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${name}`
+        this.id = `${info.getConnectId()}_${info.database}_${name}`
         this.init(info)
         this.command = {
             command: "mysql.show.function",
@@ -40,7 +40,7 @@ export class FunctionNode extends Node {
 
         Util.confirm(`Are you want to drop function ${this.name} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function \`${this.database}\`.\`${this.name}\``).then(() => {
-                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.name}_${ModelType.FUNCTION_GROUP}`);
+                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.name}_${ModelType.FUNCTION_GROUP}`);
                 MySQLTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`Drop function ${this.name} success!`);
             });

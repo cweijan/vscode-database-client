@@ -40,14 +40,14 @@ export class TableChain implements ComplectionChain {
             inputWord = lcp.database
         }
         if (inputWord) {
-            const connectcionid = `${lcp.host}_${lcp.port}_${lcp.user}`;
+            const connectcionid = lcp.getConnectId();
             DatabaseCache.getDatabaseListOfConnection(connectcionid).forEach((databaseNode) => {
                 if (databaseNode.name === inputWord) {
                     tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.id);
                 }
             });
         } else {
-            const databaseid = `${lcp.host}_${lcp.port}_${lcp.user}_${lcp.database}`;
+            const databaseid = `${lcp.getConnectId()}_${lcp.database}`;
             const tableList = DatabaseCache.getTableListOfDatabase(databaseid);
             if (tableList == null) { return []; }
             tableNodes = tableList.filter((tableNode: TableNode) => {

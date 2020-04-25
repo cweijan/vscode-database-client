@@ -13,7 +13,7 @@ export class FunctionGroup extends Node {
     public iconPath = path.join(Constants.RES_PATH, "function.svg")
     constructor(readonly info: Node) {
         super("FUNCTION")
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.FUNCTION_GROUP}`;
+        this.id = `${info.getConnectId()}_${info.database}_${ModelType.FUNCTION_GROUP}`;
         this.init(info)
     }
 

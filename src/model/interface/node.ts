@@ -23,6 +23,10 @@ export abstract class Node extends vscode.TreeItem {
         return []
     }
 
+    public getConnectId(): string {
+        return `${this.host}_${this.port}_${this.user}`;
+    }
+
     protected init(source: Node) {
         this.host = source.host
         this.port = source.port

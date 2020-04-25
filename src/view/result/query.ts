@@ -83,7 +83,7 @@ export class QueryPage {
         const database = fields[0].db;
         if (tableName == null || conn == null) { return; }
         // load table infomation
-        const tableNode = DatabaseCache.getTable(`${conn.host}_${conn.port}_${conn.user}_${database ? database : conn.database}`, tableName);
+        const tableNode = DatabaseCache.getTable(`${conn.getConnectId()}_${database ? database : conn.database}`, tableName);
         if (tableNode) {
             let primaryKey: string;
             const columnList = (await tableNode.getChildren()).map((columnNode: ColumnNode) => {

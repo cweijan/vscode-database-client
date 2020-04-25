@@ -16,7 +16,7 @@ export class ProcedureNode extends Node {
     constructor(readonly name: string, readonly info: Node) {
         super(name)
         this.init(info)
-        // this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${name}`
+        // this.id = `${info.getConnectKey()}_${info.database}_${name}`
         this.command = {
             command: "mysql.show.procedure",
             title: "Show Procedure Create Source",
@@ -41,7 +41,7 @@ export class ProcedureNode extends Node {
 
         Util.confirm(`Are you want to drop procedure ${this.name} ? `, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP procedure \`${this.database}\`.\`${this.name}\``).then(() => {
-                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.PROCEDURE_GROUP}`)
+                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}_${ModelType.PROCEDURE_GROUP}`)
                 MySQLTreeDataProvider.refresh()
                 vscode.window.showInformationMessage(`Drop procedure ${this.name} success!`)
             })

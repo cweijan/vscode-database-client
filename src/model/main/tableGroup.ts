@@ -14,7 +14,7 @@ export class TableGroup extends Node {
     public contextValue: string = ModelType.TABLE_GROUP;
     constructor(readonly info: Node) {
         super("TABLE")
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.TABLE_GROUP}`;
+        this.id = `${info.getConnectId()}_${info.database}_${ModelType.TABLE_GROUP}`;
         this.init(info)
     }
 

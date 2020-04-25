@@ -23,7 +23,7 @@ export class TableNode extends Node implements CopyAble {
 
     constructor(readonly table: string, readonly info: Node) {
         super(table)
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${table}`
+        this.id = `${info.getConnectId()}_${info.database}_${table}`
         this.init(info)
         this.command = {
             command: "mysql.template.sql",
@@ -76,7 +76,7 @@ ADD
             if (!newTableName) { return; }
             const sql = `RENAME TABLE \`${this.database}\`.\`${this.table}\` to \`${this.database}\`.\`${newTableName}\``;
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
-                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`);
+                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
                 MySQLTreeDataProvider.refresh();
             });
 
@@ -88,7 +88,7 @@ ADD
 
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE \`${this.database}\`.\`${this.table}\``).then(() => {
-                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`);
+                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
                 MySQLTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
             });
