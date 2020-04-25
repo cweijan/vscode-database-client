@@ -25,9 +25,9 @@ export class TriggerNode extends Node  {
 
     public async showSource() {
         QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), `SHOW CREATE TRIGGER \`${this.database}\`.\`${this.name}\``)
-            .then((procedDtail) => {
-                procedDtail = procedDtail[0]
-                QueryUnit.showSQLTextDocument(`\n\nDROP TRIGGER IF EXISTS ${procedDtail['Trigger']}; \n\n${procedDtail['SQL Original Statement']}`);
+            .then((procedDtails) => {
+                const procedDtail = procedDtails[0]
+                QueryUnit.showSQLTextDocument(`\n\nDROP TRIGGER IF EXISTS ${procedDtail.Trigger}; \n\n${procedDtail['SQL Original Statement']}`);
             });
     }
 

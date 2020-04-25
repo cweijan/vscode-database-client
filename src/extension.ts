@@ -26,10 +26,9 @@ import { QueryUnit } from "./database/QueryUnit";
 export function activate(context: vscode.ExtensionContext) {
 
     const serviceManager = new ServiceManager(context)
-    const s = serviceManager.init()
 
     context.subscriptions.push(
-        ...s,
+        ...serviceManager.init(),
         ...initCommand({
             "mysql.history.open": () => serviceManager.historyService.showHistory(),
             [CommandKey.Refresh]: () => { serviceManager.provider.init(); },
