@@ -11,6 +11,7 @@ import { Node } from "../model/interface/node";
 import { QueryPage } from "../view/result/query";
 import { DataResponse, DMLResponse, ErrorResponse, MessageResponse, RunResponse } from "../view/result/queryResponse";
 import { ConnectionManager } from "./ConnectionManager";
+import { DelimiterHolder } from "../extension/delimiterHolder";
 
 export class QueryUnit {
 
@@ -32,6 +33,7 @@ export class QueryUnit {
 
     private static ddlPattern = /^(alter|create|drop)/ig;
     private static dmlPattern = /^(insert|update|delete)/ig;
+    protected static delimiterHodler = new DelimiterHolder()
     public static async runQuery(sql?: string, connectionNode?: Node): Promise<null> {
         if (!sql && !vscode.window.activeTextEditor) {
             vscode.window.showWarningMessage("No SQL file selected");
@@ -65,10 +67,11 @@ export class QueryUnit {
         const executeTime = new Date().getTime();
         const isDDL = sql.match(this.ddlPattern);
         const isDML = sql.match(this.dmlPattern);
+        sql = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
         if (isDDL == null && isDML == null) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
-        sql = this.delimiterBuild(sql)
+
         if (!sql.match(Pattern.MULTI_PATTERN)) {
             const sqlList: string[] = sql.split(";").filter((s) => s.trim() != '')
             if (sqlList.length > 1) {
@@ -77,6 +80,11 @@ export class QueryUnit {
                 return;
             }
         }
+        if (!sql) {
+            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `empty query`, success: false } as MessageResponse });
+            return
+        }
+
         connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
             if (err) {
                 QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
@@ -99,7 +107,7 @@ export class QueryUnit {
                 QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields } as DataResponse });
                 return;
             }
-            QueryPage.send({ type: MessageType.MESSAGE, res: { msg: `Execute sql success : ${sql}`, costTime } });
+            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
 
         });
     }
@@ -172,7 +180,7 @@ export class QueryUnit {
             //     Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
             // }
         } else {
-            const fileContent = this.delimiterBuild(fs.readFileSync(fsPath, 'utf8'));
+            const fileContent = this.delimiterHodler.parseBatch(fs.readFileSync(fsPath, 'utf8'));
             if (fileContent.match(Pattern.MULTI_PATTERN)) {
                 const sqlList = fileContent.split(";")
                 await this.runBatch(connection, sqlList)
@@ -183,19 +191,6 @@ export class QueryUnit {
             vscode.commands.executeCommand(CommandKey.Refresh)
         }
 
-    }
-
-    private static delimiterPattern = /\bdelimiter\b\s*([\$\.\(\)\[\]\'\"\\\/\w]+)/ig;
-    private static delimiterBuild(sql: string): string {
-
-        let delimiterMatch = this.delimiterPattern.exec(sql)
-        while (delimiterMatch != null) {
-            sql = sql.replace(delimiterMatch[0], "")
-            const target = delimiterMatch[1].split("").map((c) => c.match(/\w/) ? c : "\\" + c).join("");
-            sql = sql.replace(new RegExp(`${target}\\s*$`, 'gm'), ";")
-            delimiterMatch = this.delimiterPattern.exec(sql)
-        }
-        return sql;
     }
 
     /**
