@@ -281,8 +281,10 @@
                 }
                 return objClone;
             }, initShowColumn(columnList) {
+                if (!columnList) return;
                 this.toolbar.showColumns = []
                 for (let i = 0; i < columnList.length; i++) {
+                    if (!columnList[i].name) continue;
                     this.toolbar.showColumns.push(columnList[i].name.toLowerCase());
                 }
             }

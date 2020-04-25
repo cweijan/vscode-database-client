@@ -43,7 +43,7 @@ export class ProcedureGroup extends Node  {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
-PROCEDURE \`name\`()
+PROCEDURE [name]()
 BEGIN
 
 END;`);

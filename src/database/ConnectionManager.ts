@@ -48,7 +48,7 @@ export class ConnectionManager {
                 const [host, port, user, database] = queryName.split('_')
                 if (host != null && port != null && user != null) {
                     return this.getConnection({
-                        host, port, user, database, certPath: null
+                        host, port, user, database, getConnectId: () => `${host}_${port}_${user}`
                     } as Node, database != null)
                 }
             }
@@ -91,7 +91,7 @@ export class ConnectionManager {
                         reject("create ssh tunnel fail!");
                         return;
                     } else {
-                        connectionNode = Object.assign({ ...connectionNode.origin }, { port }) as any as Node
+                        connectionNode = { ...connectionNode.origin, port, getConnectId: connectionNode.getConnectId } as any as Node
                     }
                 }
                 this.activeConnection[key] = this.createConnection(connectionNode);

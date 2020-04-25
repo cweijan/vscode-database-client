@@ -43,9 +43,9 @@ export class FunctionGroup extends Node {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
-FUNCTION \`name\`() RETURNS [TYPE
+FUNCTION [name]() RETURNS [TYPE]
 BEGIN
-    return [value;
+    return [value];
 END;`);
     }
 

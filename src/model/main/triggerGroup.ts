@@ -28,7 +28,7 @@ export class TriggerGroup extends Node {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = '${this.database}'`)
             .then((tables) => {
                 tableNodes = tables.map<TriggerNode>((table) => {
-                    return new TriggerNode(table.ROUTINE_NAME, this.info);
+                    return new TriggerNode(table.TRIGGER_NAME, this.info);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {
@@ -46,8 +46,8 @@ export class TriggerGroup extends Node {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
-TRIGGER \`name\` BEFORE/AFTER INSERT/UPDATE/DELETE
-ON \`table\`
+TRIGGER [name] BEFORE/AFTER INSERT/UPDATE/DELETE
+ON [table]
 FOR EACH ROW BEGIN
 
 END;`);

@@ -33,6 +33,7 @@ export class QueryUnit {
 
     private static ddlPattern = /^(alter|create|drop)/ig;
     private static dmlPattern = /^(insert|update|delete)/ig;
+    private static multiPattern = /\b(TRIGGER|PROCEDURE|FUNCTION)\b/ig;
     public static async runQuery(sql?: string, connectionNode?: Node): Promise<null> {
         if (!sql && !vscode.window.activeTextEditor) {
             vscode.window.showWarningMessage("No SQL file selected");
@@ -69,12 +70,13 @@ export class QueryUnit {
         if (isDDL == null && isDML == null) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
-        const sqlList: string[] = sql.split(";").filter((s) => s.trim() != '')
-
-        if (sqlList.length > 1) {
-            const success = await this.runBatch(connection, sqlList)
-            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Batch execute sql ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
-            return;
+        if (!sql.match(this.multiPattern)) {
+            const sqlList: string[] = sql.split(";").filter((s) => s.trim() != '')
+            if (sqlList.length > 1) {
+                const success = await this.runBatch(connection, sqlList)
+                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Batch execute sql ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
+                return;
+            }
         }
         connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
             if (err) {
