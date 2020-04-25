@@ -21,8 +21,8 @@ export class TableNode extends Node implements CopyAble {
     public contextValue: string = ModelType.TABLE;
     public primaryKey: string;
 
-    constructor(readonly table: string, readonly info: Node) {
-        super(table)
+    constructor(public readonly table: string, readonly comment: string, readonly info: Node) {
+        super(`${table}  ${comment}`)
         this.id = `${info.getConnectId()}_${info.database}_${table}`
         this.init(info)
         this.command = {
