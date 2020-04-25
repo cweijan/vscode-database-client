@@ -1,3 +1,7 @@
+## 1.9.0 (Preview)
+- Support SSH tunel.
+- Show column and table comment;
+
 ## 1.8.1 (2020/4/23)
 - Connect can specify database.
 - Add mock data feature.
