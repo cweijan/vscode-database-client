@@ -1,16 +1,16 @@
 import { FileManager } from "../common/FileManager";
-export class HistoryManager {
+export class HistoryService {
 
-    public static showHistory() {
+    public showHistory() {
         FileManager.show('history.sql')
     }
 
-    public static recordHistory(sql: string, costTime: number) {
+    public recordHistory(sql: string, costTime: number) {
         if (!sql) { return; }
         FileManager.record('history.sql', `/* ${this.getNowDate()} [${costTime} ms] */ ${sql.replace(/[\r\n]/g, " ")}\n`);
     }
 
-    private static getNowDate(): string {
+    private getNowDate(): string {
         const date = new Date();
         let month: string | number = date.getMonth() + 1;
         let strDate: string | number = date.getDate();
@@ -27,7 +27,7 @@ export class HistoryManager {
             + this.pad(date.getHours(), 2) + ":" + this.pad(date.getMinutes(), 2) + ":" + this.pad(date.getSeconds(), 2);
     }
 
-    public static pad(n: any, width: number, z?: any): number {
+    public pad(n: any, width: number, z?: any): number {
         z = z || '0';
         n = n + '';
         return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
