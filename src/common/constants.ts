@@ -7,14 +7,25 @@ export class Constants {
     public static DEFAULT_SIZE = 100;
 }
 
-export enum Pattern {
-    TABLE_PATTERN = "\\b(from|join|update|into)\\b\\s*`?((\\w|\\.|-)+)`?",
-    DML_PATTERN = "\\b(update|into)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}"
+export class Pattern {
+    public static TABLE_PATTERN = "\\b(from|join|update|into)\\b\\s*`?((\\w|\\.|-)+)`?";
+    public static DML_PATTERN = "\\b(update|into)\\b\\s*`{0,1}(\\w|\\.|-)+`{0,1}";
+    public static MULTI_PATTERN = /\b(TRIGGER|PROCEDURE|FUNCTION)\b/ig
 }
 
-export class CacheKey {
-    public static ConectionsKey = "mysql.connections";
-    public static CollapseSate = "mysql.database.cache.collapseState";
+export class OperateType {
+    public static execute = 'execute';
+    public static init = 'init';
+    public static previous = 2;
+    public static next = 3;
+    public static save = 4;
+    public static delete = 5;
+    public static export = 6;
+}
+
+export enum CacheKey {
+    ConectionsKey = "mysql.connections",
+    CollapseSate = "mysql.database.cache.collapseState"
 }
 
 export enum ConfigKey {
@@ -22,9 +33,9 @@ export enum ConfigKey {
 
 }
 
-export class CommandKey {
-    public static RecordHistory = "mysql.history.record";
-    public static Refresh = "mysql.refresh";
+export enum CommandKey {
+    RecordHistory = "mysql.history.record",
+    Refresh = "mysql.refresh"
 }
 
 export class Cursor {
@@ -38,25 +49,12 @@ export enum Confirm {
     YES = "YES", NO = "NO"
 }
 
-export class ModelType {
-    public static CONNECTION = "connection";
-    public static DATABASE = "database";
-    public static USER_GROUP = "userGroup";
-    public static USER = "user";
-    public static TABLE = "table";
-    public static COLUMN = "column";
-    public static INFO = "info";
-    public static TABLE_GROUP = "tableGroup";
-    public static VIEW = "view";
-    public static VIEW_GROUP = "viewGroup";
-    public static TRIGGER_GROUP = "triggerGroup";
-    public static TRIGGER = "trigger";
-    public static PROCEDURE_GROUP = "procedureGroup";
-    public static PROCEDURE = "procedure";
-    public static FUNCTION_GROUP = "functionGroup";
-    public static FUNCTION = "function";
+export enum ModelType {
+    CONNECTION = "connection", DATABASE = "database", USER_GROUP = "userGroup", USER = "user",
+    TABLE = "table", COLUMN = "column", INFO = "info", TABLE_GROUP = "tableGroup",
+    VIEW = "view", VIEW_GROUP = "viewGroup", TRIGGER_GROUP = "triggerGroup", TRIGGER = "trigger",
+    PROCEDURE_GROUP = "procedureGroup", PROCEDURE = "procedure", FUNCTION_GROUP = "functionGroup", FUNCTION = "function"
 }
-
 
 export enum MessageType {
     DATA = 'DATA',
@@ -65,15 +63,4 @@ export enum MessageType {
     ERROR = "ERROR",
     RUN = "RUN",
     MESSAGE = "MESSAGE"
-}
-
-
-export class OperateType {
-    public static execute = 'execute';
-    public static init = 'init';
-    public static previous = 2;
-    public static next = 3;
-    public static save = 4;
-    public static delete = 5;
-    public static export = 6;
 }

@@ -5,7 +5,7 @@ import { Pattern, Confirm } from "./Constants";
 
 export class Util {
 
-    public static getTableName(sql: string, tablePattern: Pattern): string {
+    public static getTableName(sql: string, tablePattern: string): string {
 
         const tableMatch = new RegExp(tablePattern, 'img').exec(sql)
         if (tableMatch) {

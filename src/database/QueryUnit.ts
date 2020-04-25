@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as mysql from "mysql";
 import { Connection } from "mysql";
 import * as vscode from "vscode";
-import { CommandKey, ConfigKey, Cursor, MessageType } from "../common/Constants";
+import { CommandKey, ConfigKey, Cursor, MessageType, Pattern } from "../common/Constants";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
 import { FileManager, FileModel } from "../common/FileManager";
@@ -18,7 +18,6 @@ export class QueryUnit {
 
     public static queryPromise<T>(connection: mysql.Connection, sql: string): Promise<T> {
         return new Promise((resolve, reject) => {
-            // Console.log(`Execute SQL:${sql}`)
             connection.query(sql, (err: mysql.MysqlError, rows) => {
                 if (err) {
                     Console.log(`Execute sql fail : ${sql}`);
@@ -33,7 +32,6 @@ export class QueryUnit {
 
     private static ddlPattern = /^(alter|create|drop)/ig;
     private static dmlPattern = /^(insert|update|delete)/ig;
-    private static multiPattern = /\b(TRIGGER|PROCEDURE|FUNCTION)\b/ig;
     public static async runQuery(sql?: string, connectionNode?: Node): Promise<null> {
         if (!sql && !vscode.window.activeTextEditor) {
             vscode.window.showWarningMessage("No SQL file selected");
@@ -70,7 +68,8 @@ export class QueryUnit {
         if (isDDL == null && isDML == null) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
-        if (!sql.match(this.multiPattern)) {
+        sql = this.delimiterBuild(sql)
+        if (!sql.match(Pattern.MULTI_PATTERN)) {
             const sqlList: string[] = sql.split(";").filter((s) => s.trim() != '')
             if (sqlList.length > 1) {
                 const success = await this.runBatch(connection, sqlList)
@@ -169,18 +168,34 @@ export class QueryUnit {
         const fileSize = stats.size;
         if (fileSize > 1024 * 1024 * 100) {
             vscode.window.showErrorMessage(`Import sql exceed max limit 100M!`)
-            return;
             // if (await this.executeByLine(connection, fsPath)) {
             //     Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
             // }
         } else {
-            const fileContent = fs.readFileSync(fsPath, 'utf8');
-            const sqlList = fileContent.split(";")
-            this.runBatch(connection, sqlList)
+            const fileContent = this.delimiterBuild(fs.readFileSync(fsPath, 'utf8'));
+            if (fileContent.match(Pattern.MULTI_PATTERN)) {
+                const sqlList = fileContent.split(";")
+                await this.runBatch(connection, sqlList)
+            } else {
+                await this.queryPromise(connection, fileContent)
+            }
             Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
+            vscode.commands.executeCommand(CommandKey.Refresh)
         }
-        vscode.commands.executeCommand(CommandKey.Refresh)
 
+    }
+
+    private static delimiterPattern = /\bdelimiter\b\s*([\$\.\(\)\[\]\'\"\\\/\w]+)/ig;
+    private static delimiterBuild(sql: string): string {
+
+        let delimiterMatch = this.delimiterPattern.exec(sql)
+        while (delimiterMatch != null) {
+            sql = sql.replace(delimiterMatch[0], "")
+            const target = delimiterMatch[1].split("").map((c) => c.match(/\w/) ? c : "\\" + c).join("");
+            sql = sql.replace(new RegExp(`${target}\\s*$`, 'gm'), ";")
+            delimiterMatch = this.delimiterPattern.exec(sql)
+        }
+        return sql;
     }
 
     /**

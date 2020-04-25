@@ -105,12 +105,14 @@ export function activate(context: vscode.ExtensionContext) {
             },
             "mysql.data.import": (iNode: DatabaseNode | ConnectionNode) => {
                 vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
-                    iNode.importData(filePath[0].fsPath);
+                    if (filePath)
+                        iNode.importData(filePath[0].fsPath);
                 });
             },
             "mysql.data.export": (iNode: TableNode | DatabaseNode) => {
                 vscode.window.showOpenDialog({ canSelectMany: false, openLabel: "Select export file path", canSelectFiles: false, canSelectFolders: true }).then((folderPath) => {
-                    iNode.backupData(folderPath[0].fsPath);
+                    if (folderPath)
+                        iNode.backupData(folderPath[0].fsPath);
                 });
             },
             "mysql.template.delete": (tableNode: TableNode) => {
