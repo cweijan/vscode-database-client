@@ -11,7 +11,7 @@ import { QueryPage } from "../../view/result/query";
 import { MessageResponse } from "../../view/result/queryResponse";
 import { FileManager, FileModel } from '../FileManager';
 import { MockModel } from './mockModel';
-import format = require('date-format');
+import { Node } from '../../model/interface/node';
 
 export class MockRunner {
 
@@ -92,7 +92,7 @@ export class MockRunner {
                 sqlList.push(tempInsertSql)
             }
 
-            const connection = await ConnectionManager.getConnection({ ...mockModel })
+            const connection = await ConnectionManager.getConnection({ ...mockModel } as any as Node)
             const success = await QueryUnit.runBatch(connection, sqlList)
             QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
 

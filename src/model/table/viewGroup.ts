@@ -6,7 +6,6 @@ import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { TableNode } from "./tableNode";
-import { ConnectionInfo } from "../interface/connection";
 import { Constants, ModelType } from "../../common/Constants";
 import { ViewNode } from "./viewNode";
 
@@ -14,7 +13,7 @@ export class ViewGroup extends Node {
 
     public iconPath: string = path.join(Constants.RES_PATH, "view.svg");
     public contextValue = ModelType.VIEW_GROUP
-    constructor(readonly info: ConnectionInfo) {
+    constructor(readonly info: Node) {
         super("VIEW")
         this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.VIEW_GROUP}`;
         this.init(info)

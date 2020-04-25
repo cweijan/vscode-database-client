@@ -4,7 +4,6 @@ import { Node } from "../interface/node";
 import { ModelType, Constants } from "../../common/Constants";
 import { QueryUnit } from "../../database/QueryUnit";
 import { DatabaseCache } from "../../database/DatabaseCache";
-import { ConnectionInfo } from "../interface/connection";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 import { CopyAble } from "../interface/copyAble";
@@ -17,7 +16,7 @@ export class ColumnNode extends Node implements CopyAble {
     public type: string;
     public contextValue: string = ModelType.COLUMN;
     public iconPath: string = path.join(Constants.RES_PATH, "table.svg");
-    constructor(private readonly table: string, readonly column: any, readonly info: ConnectionInfo) {
+    constructor(private readonly table: string, readonly column: any, readonly info: Node) {
         super(column.name)
         this.init(info)
         this.type = `${this.column.type}`

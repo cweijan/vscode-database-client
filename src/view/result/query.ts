@@ -4,16 +4,16 @@ import { MessageType, OperateType } from "../../common/Constants";
 import { SqlViewManager } from "../../common/SqlViewManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { ConnectionInfo } from "../../model/interface/connection";
 import { ColumnNode } from "../../model/table/columnNode";
 import { DataResponse } from "./queryResponse";
+import { Node } from "../../model/interface/node";
 
 export class QueryParam<T> {
     public type: MessageType;
     /**
      * using in loadColumnList
      */
-    public connection?: ConnectionInfo;
+    public connection?: Node;
     public res: T;
 }
 

@@ -5,7 +5,6 @@ import { InfoNode } from "../InfoNode";
 import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
-import { ConnectionInfo } from "../interface/connection";
 import { Constants, ModelType } from "../../common/Constants";
 import { TriggerNode } from "./Trigger";
 
@@ -14,7 +13,7 @@ export class TriggerGroup extends Node {
     public iconPath: string = path.join(Constants.RES_PATH, "trigger.svg");
     public contextValue = ModelType.TRIGGER_GROUP
 
-    constructor(readonly info: ConnectionInfo) {
+    constructor(readonly info: Node) {
         super("TRIGGER")
         this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.TRIGGER_GROUP}`;
         this.init(info)

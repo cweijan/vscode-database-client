@@ -6,7 +6,6 @@ import { ConnectionManager } from "../database/ConnectionManager";
 import { DatabaseCache } from "../database/DatabaseCache";
 import { QueryUnit } from "../database/QueryUnit";
 import { MySQLTreeDataProvider } from "../provider/MysqlTreeDataProvider";
-import { ConnectionInfo } from "./interface/connection";
 import { DatabaseNode } from "./database/databaseNode";
 import { UserGroup } from "./database/userGroup";
 import { InfoNode } from "./InfoNode";
@@ -17,14 +16,13 @@ import { Util } from "../common/util";
 
 export class ConnectionNode extends Node {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "server.png");;
-    public multipleStatements?: boolean;
+    public iconPath: string = path.join(Constants.RES_PATH, "server.png");
     public contextValue: string = ModelType.CONNECTION;
-    constructor(readonly id: string, readonly connectionInfo: ConnectionInfo) {
+    constructor(readonly id: string, readonly parent: Node) {
         super(id)
-        this.init(connectionInfo)
+        this.init(parent)
     }
-    
+
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.id);
         if (databaseNodes && !isRresh) {
@@ -34,9 +32,9 @@ export class ConnectionNode extends Node {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "show databases")
             .then((databases) => {
                 databaseNodes = databases.filter((db) => this.database == null || db.Database == this.database).map<DatabaseNode>((database) => {
-                    return new DatabaseNode(database.Database, this.connectionInfo);
+                    return new DatabaseNode(database.Database, this.parent);
                 });
-                databaseNodes.unshift(new UserGroup( "USER", this.connectionInfo));
+                databaseNodes.unshift(new UserGroup("USER", this.parent));
                 DatabaseCache.setDataBaseListOfConnection(this.id, databaseNodes);
 
                 return databaseNodes;
@@ -65,7 +63,7 @@ export class ConnectionNode extends Node {
     public async deleteConnection(context: vscode.ExtensionContext) {
 
         Util.confirm(`Are you want to Delete Connection ${this.id} ? `, async () => {
-            const connections = context.globalState.get<{ [key: string]: ConnectionInfo }>(CacheKey.ConectionsKey);
+            const connections = context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
             ConnectionManager.removeConnection(this.id)
             DatabaseCache.clearDatabaseCache(this.id)
             delete connections[this.id];
@@ -95,7 +93,7 @@ export class ConnectionNode extends Node {
                     await ConnectionManager.getConnection({
                         host: lcp.host, port: lcp.port, password: lcp.password,
                         user: lcp.user, database: dbName, certPath: null,
-                    }, true);
+                    } as Node, true);
                 }
             });
         }

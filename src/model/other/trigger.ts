@@ -4,17 +4,16 @@ import { QueryUnit } from "../../database/QueryUnit";
 import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ModelType, Constants } from "../../common/Constants";
-import { ConnectionInfo } from "../interface/connection";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 import { Util } from "../../common/util";
 
-export class TriggerNode extends Node implements ConnectionInfo {
+export class TriggerNode extends Node  {
 
 
     public contextValue: string = ModelType.TRIGGER;
     public iconPath = path.join(Constants.RES_PATH, "trigger.svg")
-    constructor(readonly name: string, readonly info: ConnectionInfo) {
+    constructor(readonly name: string, readonly info: Node) {
         super(name)
         this.init(info)
         this.command = {

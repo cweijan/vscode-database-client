@@ -6,7 +6,6 @@ import { ConnectionManager } from "../../database/ConnectionManager";
 import { QueryUnit } from "../../database/QueryUnit";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
 import { InfoNode } from "../InfoNode";
-import { ConnectionInfo } from "../interface/connection";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { DatabaseNode } from "./databaseNode";
@@ -15,7 +14,7 @@ export class UserGroup extends DatabaseNode {
 
     public contextValue: string = ModelType.DATABASE;
     public iconPath = path.join(Constants.RES_PATH, "user.svg")
-    constructor(readonly name: string, readonly info: ConnectionInfo) {
+    constructor(readonly name: string, readonly info: Node) {
         super(name, info)
         this.id = `${this.host}_${this.port}_${this.user}_${ModelType.USER_GROUP}`;
         this.database = null
@@ -47,7 +46,7 @@ export class UserNode extends Node implements CopyAble {
 
     public contextValue = ModelType.USER;
     public iconPath = path.join(Constants.RES_PATH, "user.svg")
-    constructor(readonly name: string, readonly info: ConnectionInfo) {
+    constructor(readonly name: string, readonly info: Node) {
         super(name)
         this.init(info)
         this.command = {

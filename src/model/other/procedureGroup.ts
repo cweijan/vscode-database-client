@@ -4,16 +4,15 @@ import { Constants, ModelType } from "../../common/Constants";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
-import { ConnectionInfo } from "../interface/connection";
 import { InfoNode } from "../InfoNode";
 import { Node } from "../interface/node";
 import { ProcedureNode } from "./Procedure";
 
-export class ProcedureGroup extends Node implements ConnectionInfo {
+export class ProcedureGroup extends Node  {
     
     public contextValue = ModelType.PROCEDURE_GROUP
     public iconPath = path.join(Constants.RES_PATH, "procedure.svg")
-    constructor(readonly info: ConnectionInfo) {
+    constructor(readonly info: Node) {
         super("PROCEDURE")
         this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.PROCEDURE_GROUP}`;
         this.init(info)

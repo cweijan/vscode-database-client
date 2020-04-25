@@ -4,7 +4,6 @@ import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
 import { InfoNode } from "../InfoNode";
-import { ConnectionInfo } from "../interface/connection";
 import { Node } from "../interface/node";
 import { FunctionNode } from "./function";
 
@@ -12,7 +11,7 @@ export class FunctionGroup extends Node {
 
     public contextValue = ModelType.FUNCTION_GROUP;
     public iconPath = path.join(Constants.RES_PATH, "function.svg")
-    constructor(readonly info: ConnectionInfo) {
+    constructor(readonly info: Node) {
         super("FUNCTION")
         this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.FUNCTION_GROUP}`;
         this.init(info)

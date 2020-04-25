@@ -7,7 +7,6 @@ import { InfoNode } from "../InfoNode";
 import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ModelType, Constants } from "../../common/Constants";
-import { ConnectionInfo } from "../interface/connection";
 import { Console } from "../../common/OutputChannel";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
@@ -22,7 +21,7 @@ export class TableNode extends Node implements CopyAble {
     public contextValue: string = ModelType.TABLE;
     public primaryKey: string;
 
-    constructor(readonly table: string, readonly info: ConnectionInfo) {
+    constructor(readonly table: string, readonly info: Node) {
         super(table)
         this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${table}`
         this.init(info)

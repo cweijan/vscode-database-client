@@ -5,7 +5,6 @@ import { ConnectionManager } from "../database/ConnectionManager";
 import { DatabaseCache } from "../database/DatabaseCache";
 import { ConnectionNode } from "../model/ConnectionNode";
 import { DatabaseNode } from "../model/database/databaseNode";
-import { ConnectionInfo } from "../model/interface/connection";
 import { Node } from "../model/interface/node";
 
 export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
@@ -24,12 +23,12 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
      * reload treeview context
      */
     async init() {
-        await (await this.getConnectionNodes()).forEach(async (connectionNode) => {
+        (await this.getConnectionNodes()).forEach(async (connectionNode) => {
             (await connectionNode.getChildren(true)).forEach(async (databaseNode) => {
                 (await databaseNode.getChildren(true)).forEach(async (groupNode) => {
-                    groupNode.getChildren(true)
-                })
-            })
+                    groupNode.getChildren(true);
+                });
+            });
         })
         DatabaseCache.clearColumnCache()
         MySQLTreeDataProvider.refresh()
@@ -47,20 +46,16 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
         return element.getChildren();
     }
 
-    public async addConnection(connectionOptions: ConnectionInfo) {
+    public async addConnection(connectionNode: Node) {
 
-        let connections = this.context.globalState.get<{ [key: string]: ConnectionInfo }>(CacheKey.ConectionsKey);
+        let connections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
 
         if (!connections) {
             connections = {};
         }
 
-        if (connectionOptions.usingSSH) {
-            const sshConfig = connectionOptions.ssh;
-            connections[`${sshConfig.host}_${sshConfig.port}_${sshConfig.username}`] = connectionOptions;
-        } else {
-            connections[`${connectionOptions.host}_${connectionOptions.port}_${connectionOptions.user}`] = connectionOptions;
-        }
+        connections[`${connectionNode.host}_${connectionNode.port}_${connectionNode.user}`] = connectionNode;
+
 
         await this.context.globalState.update(CacheKey.ConectionsKey, connections);
         MySQLTreeDataProvider.refresh();
@@ -75,7 +70,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async getConnectionNodes(): Promise<ConnectionNode[]> {
         const connectionNodes = [];
-        const connections = this.context.globalState.get<{ [key: string]: ConnectionInfo }>(CacheKey.ConectionsKey);
+        const connections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
         if (connections) {
             for (const key of Object.keys(connections)) {
                 connectionNodes.push(new ConnectionNode(key, connections[key]));

@@ -34,7 +34,13 @@ export class SqlViewManager {
         }).then((webviewPanel) => {
             webviewPanel.webview.onDidReceiveMessage((params) => {
                 if (params.type === 'CONNECT_TO_SQL_SERVER') {
-                    ConnectionManager.getConnection(params.connectionOption).then(() => {
+                    const {connectionOption} = params
+                    if (connectionOption.usingSSH) {
+                        connectionOption.origin = { host: connectionOption.host, user: connectionOption.user, port: connectionOption.port, password: connectionOption.password }
+                        connectionOption.host = connectionOption.ssh.host
+                        connectionOption.port = "" + connectionOption.ssh.port
+                    }
+                    ConnectionManager.getConnection(connectionOption).then(() => {
                         MySQLTreeDataProvider.instance.addConnection(params.connectionOption);
                         webviewPanel.dispose();
                     }).catch((err: Error) => {

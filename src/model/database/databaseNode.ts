@@ -9,7 +9,6 @@ import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
 import { FileManager } from '../../extension/FileManager';
 import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
-import { ConnectionInfo } from "../interface/connection";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { FunctionGroup } from "../other/functionGroup";
@@ -24,10 +23,10 @@ export class DatabaseNode extends Node implements CopyAble {
 
     public contextValue: string = ModelType.DATABASE;
     public iconPath: string = path.join(Constants.RES_PATH, "database.svg");
-    constructor(readonly name: string, readonly info: ConnectionInfo) {
+    constructor(readonly name: string, readonly info: Node) {
         super(name)
         this.id = `${info.host}_${info.port}_${info.user}_${name}`
-        this.info = Object.assign({ ...info }, { database: name })
+        this.info = Object.assign({ ...info }, { database: name }) as Node
         this.init(this.info)
     }
 

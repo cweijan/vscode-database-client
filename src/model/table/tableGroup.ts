@@ -6,14 +6,13 @@ import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { TableNode } from "./tableNode";
-import { ConnectionInfo } from "../interface/connection";
 import { Constants, ModelType } from "../../common/Constants";
 
 export class TableGroup extends Node {
 
     public iconPath: string = path.join(Constants.RES_PATH, "table.svg");
     public contextValue: string = ModelType.TABLE_GROUP;
-    constructor(readonly info: ConnectionInfo) {
+    constructor(readonly info: Node) {
         super("TABLE")
         this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.TABLE_GROUP}`;
         this.init(info)
