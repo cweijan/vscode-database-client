@@ -699,6 +699,7 @@
 		"mysqldump": "^3.1.0",
 		"shelljs": "^0.8.3",
 		"sql-formatter": "^2.3.3",
+		"get-port": "^5.1.1",
 		"ssh2": "^0.8.9",
 		"tunnel-ssh": "^4.1.4"
 	},

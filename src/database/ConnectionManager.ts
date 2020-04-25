@@ -112,7 +112,7 @@ export class ConnectionManager {
     private static createTunnel(connectionNode: Node, errorCallback: (error) => void): Promise<number> {
         return new Promise(async (resolve) => {
             const ssh = connectionNode.ssh
-            const port = 10567;
+            const port = connectionNode.ssh.tunnelPort;
             const key = `${ssh.username}_${ssh.port}_${ssh.username}`;
             if (this.tunelMark[key]) {
                 resolve(port)

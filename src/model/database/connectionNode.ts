@@ -12,6 +12,7 @@ import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
 import { FileManager } from "../../common/FileManager";
 import { Util } from "../../common/util";
+import * as getPort from 'get-port'
 
 
 export class ConnectionNode extends Node {
@@ -21,9 +22,18 @@ export class ConnectionNode extends Node {
     constructor(readonly id: string, readonly parent: Node) {
         super(id)
         this.init(parent)
+        if (parent.usingSSH) {
+            this.getPort()
+        }
     }
 
+    private async getPort() {
+        this.parent.ssh.tunnelPort = await getPort({ port: getPort.makeRange(10567, 11567) })
+    }
+
+
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
+
         let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.id);
         if (databaseNodes && !isRresh) {
             return databaseNodes;

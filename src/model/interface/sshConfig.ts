@@ -1,4 +1,8 @@
 export interface SSHConfig {
+    /**
+     * local tunnel port
+     */
+    tunnelPort: number;
     host: string;
     port: number;
     username: string;
