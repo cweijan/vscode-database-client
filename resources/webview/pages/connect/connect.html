@@ -31,29 +31,27 @@
         <el-row>
             <include path="components/option.html" />
         </el-row>
-        <select v-model="connectionOption.usingSSH">
-            <option :value="true">
-                true
-            </option>
-            <option :value="false">
-                false
-            </option>
-        </select>
         <div class="field field__input">
-            <b>ssh-host:</b>
-            <input class="field__input" v-model="connectionOption.ssh.host" />
+            usingSSH:
+            <el-switch v-model="connectionOption.usingSSH"></el-switch>
         </div>
-        <div class="field field__input">
-            <b>ssh-port:</b>
-            <input class="field__input" v-model="connectionOption.ssh.port" />
-        </div>
-        <div class="field field__input">
-            <b>ssh-username:</b>
-            <input class="field__input" v-model="connectionOption.ssh.username" />
-        </div>
-        <div class="field field__input">
-            <b>ssh-password:</b>
-            <input class="field__input" v-model="connectionOption.ssh.password" />
+        <div v-if="connectionOption.usingSSH">
+            <div class="field field__input">
+                <b>ssh-host:</b>
+                <input class="field__input" v-model="connectionOption.ssh.host" />
+            </div>
+            <div class="field field__input">
+                <b>ssh-port:</b>
+                <input class="field__input" v-model="connectionOption.ssh.port" />
+            </div>
+            <div class="field field__input">
+                <b>ssh-username:</b>
+                <input class="field__input" v-model="connectionOption.ssh.username" />
+            </div>
+            <div class="field field__input">
+                <b>ssh-password:</b>
+                <input class="field__input" v-model="connectionOption.ssh.password" />
+            </div>
         </div>
         <!-- <template id="field-template"> -->
         <!-- </template> -->
@@ -77,8 +75,8 @@
                     database: null,
                     usingSSH: false,
                     ssh: {
-                        port:22,
-                        username:'root'
+                        port: 22,
+                        username: 'root'
                     }
                 },
                 databaseType: 'mysql',

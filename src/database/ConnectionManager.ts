@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as getPort from 'get-port'
 import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -81,6 +82,7 @@ export class ConnectionManager {
                 }
             } else {
                 if (connectionNode.usingSSH) {
+
                     const port = await this.createTunnel(connectionNode, (err) => {
                         if (err.errno == 'EADDRINUSE') { return; }
                         this.activeConnection[key] = null
@@ -112,6 +114,9 @@ export class ConnectionManager {
     private static createTunnel(connectionNode: Node, errorCallback: (error) => void): Promise<number> {
         return new Promise(async (resolve) => {
             const ssh = connectionNode.ssh
+            if (!connectionNode.ssh.tunnelPort) {
+                connectionNode.ssh.tunnelPort = await getPort({ port: getPort.makeRange(10567, 11567) })
+            }
             const port = connectionNode.ssh.tunnelPort;
             const key = `${ssh.username}_${ssh.port}_${ssh.username}`;
             if (this.tunelMark[key]) {
