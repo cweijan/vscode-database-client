@@ -10,8 +10,7 @@ export class Util {
         const tableMatch = new RegExp(tablePattern, 'img').exec(sql)
         if (tableMatch) {
             return tableMatch[0].replace(/\bfrom|join|update|into\b/i, "") // remove keyword
-                .replace(/(\w|\s)*\./, "") // remove table name
-                .replace(/`/ig, "").trim() // remove `
+                .replace(/(\w|\s|-|`)*\./, "").trim() // remove databasename
         }
 
         return null;
