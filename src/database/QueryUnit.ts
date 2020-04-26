@@ -160,7 +160,7 @@ export class QueryUnit {
         for (let i = 0; i < sqlList.length; i++) {
             const sql = sqlList[i];
             index += (sql.length + 1);
-            if (docCursor < index) {
+            if (docCursor <= index) {
                 const trimSql = sql.trim();
                 if (!trimSql && i > 1) { return sqlList[i - 1]; }
                 return trimSql;

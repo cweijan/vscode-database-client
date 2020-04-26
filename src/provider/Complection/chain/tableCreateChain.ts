@@ -3,7 +3,7 @@ import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class TableCreateChain implements ComplectionChain {
 
-    private tableKeywordList: string[] = ["AUTO_INCREMENT", "NULL", "NOT", "PRIMARY", "CURRENT_TIME", "DELIMITER",
+    private tableKeywordList: string[] = ["AUTO_INCREMENT", "NULL", "NOT", "PRIMARY", "CURRENT_TIME", 
         "DEFAULT", "COMMENT", "UNIQUE", "KEY", "FOREIGN", "CASCADE", "RESTRICT", "UNSIGNED"];
     private tableKeywordComplectionItems: vscode.CompletionItem[] = [];
 
