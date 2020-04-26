@@ -4,42 +4,42 @@
 
 MySQL Client For Visual Studio Code
 
-
-> This plugin inspired for [MySQL](https://github.com/formulahendry/vscode-mysql)
-> 
-> Welcome to contribute in [repository](https://github.com/cweijan/vscode-mysql)
+> You are welcome to contribute via the [repository](https://github.com/cweijan/vscode-mysql)
+>
+> This extension was inspired by the [MySQL](https://github.com/formulahendry/vscode-mysql) extension.
 
 ## Features
 
-* [Connect To MySQL Server](#Connection)
-* Overview User、Database、Table、Procedure、Trigger、Function
-* [Sql Assistant ( Syntax, Formatter, Complection )](#exeucte-sql)
-* [Run MySQL Query](#exeucte-sql)
-* CRUD Table Data
-* [Backup/Import](#Backup/Import) Data to Sql
+* [Connect To MySQL Server](#how-to-connect)
+* Overview, Users, Databases, Tables, Procedures, Triggers, Functions
+* [SQL Assistant ( Syntax, Formatter, Completion )](#execute-sql)
+* [Run MySQL Query](#execute-sql)
+* Tabular CRUD editor
+* [Backup / import](#backupimport) data
 
-## Connection
+## How to Connect
 
-* Click MYSQL Panel, then click the `+` button.
+Open the MySQL tab, then press the `+` button.
 
 ![connection](images/connection.jpg)
 
-## View Table
+## View Tables
 
-* Click Table To Open Query page and Load data
+Press any 'Table' node to open the query page.
+
 ![query](images/QueryTable.jpg)
 
-## Exeucte Sql
+## Execute SQL
 
-* In MySQL Pannel, Click `New Query` button.
+* Under the MySQL tab, press the `New Query` button.
 ![newquery](images/newquery.jpg)
-* This will change active database.
-* Now Tou can enjoy Intelli SQL code in Editor.
-* Click Run Button or Press `F9` to Execute.
+* This changes the active database.
+* Now you may enjoy the Intelli SQL code within the editor.
+* Press the 'Run' button or the `F9` key to execute.
 ![run](images/run.jpg)
 
 
 ## Backup/Import
 
-* Move to DatabaseNode/TableNode, Right click to open menu
-![bakcup](images/Backup.jpg)
+Go to any Database or Table node, backup/import options are listed in the context menu (right click to open).
+![backup](images/Backup.jpg)
