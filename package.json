@@ -678,6 +678,11 @@
 					"type": "integer",
 					"default": 500,
 					"description": "The maximum table count shown in the tree view"
+				},
+				"vscode-mysql.enableDelimiter": {
+					"type": "boolean",
+					"default": false,
+					"description": "Support delimiter when import sql."
 				}
 			}
 		}

@@ -67,8 +67,12 @@ export class QueryUnit {
         const executeTime = new Date().getTime();
         const isDDL = sql.match(this.ddlPattern);
         const isDML = sql.match(this.dmlPattern);
-        const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
-        sql = parseResult.sql
+            const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
+            sql = parseResult.sql
+            if (!sql && parseResult.replace) {
+                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
+                return;
+            }
         if (isDDL == null && isDML == null && sql) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
@@ -81,16 +85,6 @@ export class QueryUnit {
                 QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Batch execute sql ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
                 return;
             }
-        }
-
-
-        if (!sql) {
-            if (parseResult.replace) {
-                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
-            } else {
-                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `empty query`, success: false } as MessageResponse });
-            }
-            return
         }
 
         connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
@@ -157,7 +151,10 @@ export class QueryUnit {
 
     public static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string, delimiter?: string) {
         if (!content) { content = document.getText(new vscode.Range(new vscode.Position(0, 0), current)); }
-        const sqlList = content.split(delimiter ? delimiter.replace(/\\/g, "") : ";");
+        if (delimiter) {
+            content = content.replace(new RegExp(delimiter, 'g'), ";")
+        }
+        const sqlList = content.split(";");
         const docCursor = document.getText(Cursor.getRangeStartTo(current)).length;
         let index = 0;
         for (let i = 0; i < sqlList.length; i++) {
@@ -187,13 +184,17 @@ export class QueryUnit {
         const stats = fs.statSync(fsPath);
         const startTime = new Date();
         const fileSize = stats.size;
-        if (fileSize > 1024 * 1024 * 100) {
-            vscode.window.showErrorMessage(`Import sql exceed max limit 100M!`)
+        if (fileSize > 1024 * 1024 * 200) {
+            vscode.window.showErrorMessage(`Import sql exceed max limit 200M!`)
             // if (await this.executeByLine(connection, fsPath)) {
             //     Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
             // }
         } else {
-            const { sql: fileContent } = this.delimiterHodler.parseBatch(fs.readFileSync(fsPath, 'utf8'));
+            let fileContent = fs.readFileSync(fsPath, 'utf8');
+            if (Global.getConfig<boolean>(ConfigKey.ENABLE_DELIMITER)) {
+                const parse = this.delimiterHodler.parseBatch(fileContent)
+                fileContent = parse.sql
+            }
             if (fileContent.match(Pattern.MULTI_PATTERN)) {
                 await this.queryPromise(connection, fileContent)
             } else {
