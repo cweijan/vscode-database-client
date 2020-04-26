@@ -21,8 +21,7 @@ export class ConnectionManager {
     public static removeConnection(id: string) {
 
         const lcp = this.lastConnectionNode;
-        const key = lcp.getConnectId();
-        if (key == id) {
+        if (lcp && lcp.getConnectId() == id) {
             delete this.lastConnectionNode
         }
         const activeConnect = this.activeConnection[id];
@@ -69,7 +68,9 @@ export class ConnectionManager {
     }
 
     public static getConnection(connectionNode: Node, changeActive: boolean = false): Promise<mysql.Connection> {
-
+        if (!connectionNode.getConnectId) {
+            connectionNode.getConnectId = () => `${connectionNode.host}_${connectionNode.port}_${connectionNode.user}`
+        }
         if (changeActive) {
             this.lastConnectionNode = connectionNode;
             Global.updateStatusBarItems(connectionNode);
