@@ -5,7 +5,7 @@ import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
-import { Constants, ModelType } from "../../common/constants";
+import { Constants, ModelType, Template } from "../../common/constants";
 import { TriggerNode } from "./trigger";
 
 export class TriggerGroup extends Node {
@@ -50,7 +50,7 @@ TRIGGER [name] BEFORE/AFTER INSERT/UPDATE/DELETE
 ON [table]
 FOR EACH ROW BEGIN
 
-END;`);
+END;`,Template.create);
     }
 
 }

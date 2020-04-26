@@ -6,7 +6,7 @@ import { ColumnNode } from "../other/columnNode";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
-import { ModelType, Constants } from "../../common/constants";
+import { ModelType, Constants, Template } from "../../common/constants";
 import { Console } from "../../common/outputChannel";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { MySQLTreeDataProvider } from "../../provider/mysqlTreeDataProvider";
@@ -59,7 +59,7 @@ export class TableNode extends Node implements CopyAble {
         QueryUnit.showSQLTextDocument(`ALTER TABLE
     ${Util.wrap(this.database)}.${Util.wrap(this.table)} 
 ADD 
-    COLUMN [column] [type] NOT NULL comment '';`);
+    COLUMN [column] [type] NOT NULL comment '';`,Template.alter);
     }
 
 
@@ -110,7 +110,7 @@ ADD
     public indexTemplate() {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`-- ALTER TABLE \`${this.database}\`.\`${this.table}\` DROP INDEX [indexName];
--- ALTER TABLE \`${this.database}\`.\`${this.table}\` ADD [UNIQUE|KEY|PRIMARY KEY] INDEX ([column]);`);
+-- ALTER TABLE \`${this.database}\`.\`${this.table}\` ADD [UNIQUE|KEY|PRIMARY KEY] INDEX ([column]);`,Template.alter);
         setTimeout(() => {
             QueryUnit.runQuery(`SELECT COLUMN_NAME name,table_schema,index_name,non_unique FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${this.database}' and table_name='${this.table}';`, this);
         }, 10);
@@ -125,7 +125,7 @@ ADD
             ConnectionManager.getConnection(this, true);
             QueryUnit.runQuery(sql, this);
         } else {
-            QueryUnit.showSQLTextDocument(sql);
+            QueryUnit.showSQLTextDocument(sql,Template.table);
         }
 
     }
@@ -142,7 +142,7 @@ ADD
                     sql += "values\n  ";
                     sql += `(${childrenValues.toString().replace(/,/g, ", ")}\n  );`;
                     if (show) {
-                        QueryUnit.showSQLTextDocument(sql);
+                        QueryUnit.showSQLTextDocument(sql,Template.table);
                     }
                     resolve(sql)
                 });
@@ -159,7 +159,7 @@ ADD
 
                 let sql = `delete from \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and")}`;
-                QueryUnit.showSQLTextDocument(sql);
+                QueryUnit.showSQLTextDocument(sql,Template.table);
             });
     }
 
@@ -175,7 +175,7 @@ ADD
 
                 let sql = `update \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \nset \n  ${sets.toString().replace(/,/g, ",\n  ")}\n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and ")}`;
-                QueryUnit.showSQLTextDocument(sql);
+                QueryUnit.showSQLTextDocument(sql,Template.table);
             });
     }
 

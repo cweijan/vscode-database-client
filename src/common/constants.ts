@@ -64,3 +64,9 @@ export enum MessageType {
     RUN = "RUN",
     MESSAGE = "MESSAGE"
 }
+
+export enum Template {
+    create = "create-template.sql",
+    table = "sql-template.sql",
+    alter = "alter-template.sql"
+}

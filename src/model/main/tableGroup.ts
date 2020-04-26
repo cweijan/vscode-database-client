@@ -6,7 +6,7 @@ import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { TableNode } from "./tableNode";
-import { Constants, ModelType } from "../../common/constants";
+import { Constants, ModelType, Template } from "../../common/constants";
 
 export class TableGroup extends Node {
 
@@ -46,6 +46,6 @@ export class TableGroup extends Node {
         QueryUnit.showSQLTextDocument(`CREATE TABLE tableName(  
   id int NOT NULL primary key AUTO_INCREMENT,
   column varchar(length)
-);`);
+);`,Template.create);
     }
 }

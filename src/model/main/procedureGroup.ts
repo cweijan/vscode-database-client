@@ -1,5 +1,5 @@
 import * as path from "path";
-import { Constants, ModelType } from "../../common/constants";
+import { Constants, ModelType, Template } from "../../common/constants";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { QueryUnit } from "../../database/QueryUnit";
@@ -46,7 +46,7 @@ export class ProcedureGroup extends Node  {
 PROCEDURE [name]()
 BEGIN
 
-END;`);
+END;`,Template.create);
     }
 
 }

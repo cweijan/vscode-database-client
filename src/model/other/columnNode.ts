@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { Node } from "../interface/node";
-import { ModelType, Constants } from "../../common/constants";
+import { ModelType, Constants, Template } from "../../common/constants";
 import { QueryUnit } from "../../database/QueryUnit";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
@@ -65,11 +65,12 @@ export class ColumnNode extends Node implements CopyAble {
     public updateColumnTemplate() {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`ALTER TABLE 
-    ${wrap(this.database)}.${wrap(this.table)} CHANGE ${wrap(this.column.name)} ${wrap(this.column.name)} ${this.column.type}${this.column.nullable ? "" : " NOT NULL"}${this.column.comment ? ` comment '${this.column.comment}'` : ""};`);
+    ${wrap(this.database)}.${wrap(this.table)} CHANGE ${wrap(this.column.name)} ${wrap(this.column.name)} ${this.column.type}${this.column.nullable ? "" : " NOT NULL"}${this.column.comment ? ` comment '${this.column.comment}'` : ""};`
+            , Template.alter);
     }
     public dropColumnTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t${wrap(this.database)}.${wrap(this.table)} DROP COLUMN ${wrap(this.column.name)};`);
+        QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t${wrap(this.database)}.${wrap(this.table)} DROP COLUMN ${wrap(this.column.name)};`, Template.alter);
     }
 
 

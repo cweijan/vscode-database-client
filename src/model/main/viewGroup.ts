@@ -5,7 +5,7 @@ import { Node } from "../interface/node";
 import { DatabaseCache } from "../../database/DatabaseCache";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { TableNode } from "./tableNode";
-import { Constants, ModelType } from "../../common/constants";
+import { Constants, ModelType, Template } from "../../common/constants";
 import { ViewNode } from "./viewNode";
 
 export class ViewGroup extends Node {
@@ -47,7 +47,7 @@ export class ViewGroup extends Node {
 /* [DEFINER = { user | CURRENT_USER }]*/
 VIEW \`name\`
 AS
-(SELECT * FROM ...);`);
+(SELECT * FROM ...);`, Template.create);
     }
 
 }

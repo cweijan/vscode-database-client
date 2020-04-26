@@ -105,7 +105,7 @@ export class QueryUnit {
             if (isMulti) {
                 QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
                 vscode.commands.executeCommand(CommandKey.Refresh);
-                return;   
+                return;
             }
             if (isDDL) {
                 QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
@@ -174,10 +174,10 @@ export class QueryUnit {
     }
 
     private static sqlDocument: vscode.TextEditor;
-    public static async showSQLTextDocument(sql: string = "") {
+    public static async showSQLTextDocument(sql: string = "", template = "template.sql") {
 
         this.sqlDocument = await vscode.window.showTextDocument(
-            await vscode.workspace.openTextDocument(await FileManager.record("template.sql", sql, FileModel.WRITE))
+            await vscode.workspace.openTextDocument(await FileManager.record(template, sql, FileModel.WRITE))
         );
 
         return this.sqlDocument;

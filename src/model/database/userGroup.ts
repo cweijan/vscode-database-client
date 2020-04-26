@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/Constants";
+import { Constants, ModelType, Template } from "../../common/Constants";
 import { Util } from "../../common/util";
 import { ConnectionManager } from "../../database/ConnectionManager";
 import { QueryUnit } from "../../database/QueryUnit";
@@ -36,7 +36,7 @@ export class UserGroup extends DatabaseNode {
 
     public createTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`);
+        QueryUnit.showSQLTextDocument(`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`,Template.create);
     }
 
 }
