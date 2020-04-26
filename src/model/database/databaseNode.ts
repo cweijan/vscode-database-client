@@ -79,7 +79,7 @@ export class DatabaseNode extends Node implements CopyAble {
     public dropDatatabase() {
 
         vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
-            if (inputContent.toLowerCase() == this.database.toLowerCase()) {
+            if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE ${this.database}`).then(() => {
                     DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`)
                     MySQLTreeDataProvider.refresh();
