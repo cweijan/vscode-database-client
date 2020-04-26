@@ -58,7 +58,7 @@ export class QueryUnit {
             const activeTextEditor = vscode.window.activeTextEditor;
             const selection = activeTextEditor.selection;
             if (selection.isEmpty) {
-                sql = this.obtainSql(activeTextEditor);
+                sql = this.obtainSql(activeTextEditor, this.delimiterHodler.get(connectionNode.getConnectId()));
             } else {
                 sql = activeTextEditor.document.getText(selection);
             }
@@ -67,13 +67,14 @@ export class QueryUnit {
         const executeTime = new Date().getTime();
         const isDDL = sql.match(this.ddlPattern);
         const isDML = sql.match(this.dmlPattern);
-        sql = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
-        if (isDDL == null && isDML == null) {
+        const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
+        sql = parseResult.sql
+        if (isDDL == null && isDML == null && sql) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
 
         if (!sql.match(Pattern.MULTI_PATTERN)) {
-            const sqlList: string[] = sql.split(";").filter((s) => s.trim() != '')
+            const sqlList: string[] = sql.split(";").filter((s) => (s.trim() != '' && s.trim() != ';'))
             if (sqlList.length > 1) {
                 const success = await this.runBatch(connection, sqlList)
                 QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Batch execute sql ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
@@ -81,7 +82,11 @@ export class QueryUnit {
             }
         }
         if (!sql) {
-            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `empty query`, success: false } as MessageResponse });
+            if (parseResult.replace) {
+                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
+            }else{
+                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `empty query`, success: false } as MessageResponse });
+            }
             return
         }
 
@@ -133,18 +138,18 @@ export class QueryUnit {
 
 
     private static batchPattern = /\s+(TRIGGER|PROCEDURE|FUNCTION)\s+/ig;
-    public static obtainSql(activeTextEditor: vscode.TextEditor): string {
+    public static obtainSql(activeTextEditor: vscode.TextEditor, delimiter?: string): string {
 
         const content = activeTextEditor.document.getText();
         if (content.match(this.batchPattern)) { return content; }
 
-        return this.obtainCursorSql(activeTextEditor.document, activeTextEditor.selection.active, content);
+        return this.obtainCursorSql(activeTextEditor.document, activeTextEditor.selection.active, content,delimiter);
 
     }
 
-    public static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string) {
+    public static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string, delimiter?: string) {
         if (!content) { content = document.getText(new vscode.Range(new vscode.Position(0, 0), current)); }
-        const sqlList = content.split(";");
+        const sqlList = content.split(delimiter ? delimiter.replace(/\\/g,"") : ";");
         const docCursor = document.getText(Cursor.getRangeStartTo(current)).length;
         let index = 0;
         for (let i = 0; i < sqlList.length; i++) {
@@ -180,7 +185,7 @@ export class QueryUnit {
             //     Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
             // }
         } else {
-            const fileContent = this.delimiterHodler.parseBatch(fs.readFileSync(fsPath, 'utf8'));
+            const { sql: fileContent } = this.delimiterHodler.parseBatch(fs.readFileSync(fsPath, 'utf8'));
             if (fileContent.match(Pattern.MULTI_PATTERN)) {
                 const sqlList = fileContent.split(";")
                 await this.runBatch(connection, sqlList)

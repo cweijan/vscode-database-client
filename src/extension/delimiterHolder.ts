@@ -10,9 +10,10 @@ export class DelimiterHolder {
     }
 
 
-    public parseBatch(sql: string, key?: string): string {
-        if (!sql) return sql;
-        
+    public parseBatch(sql: string, key?: string): { sql: string, replace: boolean } {
+        let replace = false;
+        if (!sql) return { sql, replace };
+
         const delimiterArray = []
         if (key) {
             const delimiter = this.delimiteMap.get(key)
@@ -32,10 +33,11 @@ export class DelimiterHolder {
             sql = sql.replace(this.delimiterPattern, "")
             for (const delimiter of delimiterArray) {
                 sql = this.buildDelimiter(sql, delimiter)
+                replace = true;
             }
         }
 
-        return sql;
+        return { sql, replace };
     }
 
     private buildDelimiter(sql: string, delimiter: string) {
