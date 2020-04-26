@@ -57,6 +57,8 @@ export class TableChain implements ComplectionChain {
             });
         }
 
+        if (!tableNodes) return []
+
         return tableNodes.map<vscode.CompletionItem>((tableNode: TableNode) => {
             const completionItem = new vscode.CompletionItem(tableNode.label);
             completionItem.insertText = Util.wrap(tableNode.table);

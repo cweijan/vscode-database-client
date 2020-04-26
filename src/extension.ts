@@ -18,6 +18,7 @@ import { TriggerGroup } from "./model/main/triggerGroup";
 import { ViewGroup } from "./model/main/viewGroup";
 import { ViewNode } from "./model/main/viewNode";
 import { ColumnNode } from "./model/other/columnNode";
+import { Console } from "./common/outputChannel";
 // must be last
 import { ServiceManager } from "./extension/serviceManager";
 import { SqlViewManager } from "./view/SqlViewManager";
@@ -190,7 +191,13 @@ function initCommand(commandDefinition: any): vscode.Disposable[] {
 
     for (const command in commandDefinition) {
         if (commandDefinition.hasOwnProperty(command)) {
-            dispose.push(vscode.commands.registerCommand(command, commandDefinition[command]))
+            dispose.push(vscode.commands.registerCommand(command, (...args: any[]) => {
+                try {
+                    commandDefinition[command](...args)
+                } catch (err) {
+                    Console.log(err)
+                }
+            }))
         }
     }
 
