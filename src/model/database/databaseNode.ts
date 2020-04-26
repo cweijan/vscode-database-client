@@ -50,11 +50,11 @@ export class DatabaseNode extends Node implements CopyAble {
         Console.log(`Doing backup ${this.host}_${this.name}...`);
         mysqldump({
             connection: {
-                host: this.host,
-                user: this.user,
-                password: this.password,
+                host: this.usingSSH ? this.origin.host : this.host,
+                user: this.usingSSH ? this.origin.user : this.user,
+                password: this.usingSSH ? this.origin.password : this.password,
                 database: this.name,
-                port: parseInt(this.port),
+                port: this.usingSSH ? this.ssh.tunnelPort : parseInt(this.port),
             },
             dump: {
                 schema: {
