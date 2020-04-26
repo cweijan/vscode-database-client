@@ -73,7 +73,8 @@ export class QueryUnit {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
 
-        if (!sql.match(Pattern.MULTI_PATTERN)) {
+        const isMulti = sql.match(Pattern.MULTI_PATTERN);
+        if (!isMulti) {
             const sqlList: string[] = sql.split(";").filter((s) => (s.trim() != '' && s.trim() != ';'))
             if (sqlList.length > 1) {
                 const success = await this.runBatch(connection, sqlList)
@@ -81,10 +82,12 @@ export class QueryUnit {
                 return;
             }
         }
+
+
         if (!sql) {
             if (parseResult.replace) {
                 QueryPage.send({ type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
-            }else{
+            } else {
                 QueryPage.send({ type: MessageType.MESSAGE, res: { message: `empty query`, success: false } as MessageResponse });
             }
             return
@@ -98,6 +101,11 @@ export class QueryUnit {
             const costTime = new Date().getTime() - executeTime;
             if (fromEditor) {
                 vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime);
+            }
+            if (isMulti) {
+                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
+                vscode.commands.executeCommand(CommandKey.Refresh);
+                return;   
             }
             if (isDDL) {
                 QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
@@ -143,13 +151,13 @@ export class QueryUnit {
         const content = activeTextEditor.document.getText();
         if (content.match(this.batchPattern)) { return content; }
 
-        return this.obtainCursorSql(activeTextEditor.document, activeTextEditor.selection.active, content,delimiter);
+        return this.obtainCursorSql(activeTextEditor.document, activeTextEditor.selection.active, content, delimiter);
 
     }
 
     public static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string, delimiter?: string) {
         if (!content) { content = document.getText(new vscode.Range(new vscode.Position(0, 0), current)); }
-        const sqlList = content.split(delimiter ? delimiter.replace(/\\/g,"") : ";");
+        const sqlList = content.split(delimiter ? delimiter.replace(/\\/g, "") : ";");
         const docCursor = document.getText(Cursor.getRangeStartTo(current)).length;
         let index = 0;
         for (let i = 0; i < sqlList.length; i++) {
@@ -187,10 +195,10 @@ export class QueryUnit {
         } else {
             const { sql: fileContent } = this.delimiterHodler.parseBatch(fs.readFileSync(fsPath, 'utf8'));
             if (fileContent.match(Pattern.MULTI_PATTERN)) {
+                await this.queryPromise(connection, fileContent)
+            } else {
                 const sqlList = fileContent.split(";")
                 await this.runBatch(connection, sqlList)
-            } else {
-                await this.queryPromise(connection, fileContent)
             }
             Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
             vscode.commands.executeCommand(CommandKey.Refresh)
