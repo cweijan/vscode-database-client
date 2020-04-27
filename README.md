@@ -18,6 +18,7 @@ MySQL Client For Visual Studio Code
   - [Generate Mock Date](#generate-mock-date)
   - [History](#history)
   - [Backup/Import](#backupimport)
+  - [Setting](#setting)
   - [Suprise](#suprise)
 
 ## Connection
@@ -54,6 +55,18 @@ MySQL Client For Visual Studio Code
 
 * Move to DatabaseNode/TableNode, Right click to open menu
 ![bakcup](images/Backup.jpg)
+
+## Setting
+
+```json
+{
+  // enable delimiter when import data
+  "vscode-mysql.enableDelimiter": false,
+  
+  // open query result as full screen.
+  "vscode-mysql.fullQueryScreen":false,
+}
+```
 
 ## Suprise
 * You can find suprise when right click on node.
