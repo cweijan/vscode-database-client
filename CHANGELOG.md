@@ -1,6 +1,7 @@
 ## 1.9.0 (Preview)
 - Support SSH tunel.
-- Show column and table comment;
+- Show comment of column、table on tree view.
+- Suport export table struct.
 
 ## 1.8.1 (2020/4/23)
 - Connect can specify database.

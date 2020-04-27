@@ -111,7 +111,10 @@ export function activate(context: vscode.ExtensionContext) {
                 });
             },
             "mysql.data.export": (node: Node) => {
-                serviceManager.dumpService.dump(node)
+                serviceManager.dumpService.dump(node, true)
+            },
+            "mysql.struct.export": (node: Node) => {
+                serviceManager.dumpService.dump(node, false)
             },
             "mysql.template.delete": (tableNode: TableNode) => {
                 tableNode.deleteSqlTemplate();

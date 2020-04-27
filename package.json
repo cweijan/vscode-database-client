@@ -151,6 +151,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.struct.export",
+				"title": "Export Table Struct",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.copy.insert",
 				"title": "Insert SQL",
 				"category": "MySQL"
@@ -489,6 +494,11 @@
 					"group": "mysql@5"
 				},
 				{
+					"command": "mysql.struct.export",
+					"when": "view == github.cweijan.mysql && viewItem == database",
+					"group": "mysql@6"
+				},
+				{
 					"command": "mysql.data.import",
 					"when": "view == github.cweijan.mysql && viewItem == database",
 					"group": "mysql@6"
@@ -522,6 +532,11 @@
 					"command": "mysql.data.export",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline1@2"
+				},
+				{
+					"command": "mysql.struct.export",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline1@3"
 				},
 				{
 					"command": "mysql.template.sql",
