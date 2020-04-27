@@ -31,6 +31,7 @@ export enum CacheKey {
 export enum ConfigKey {
     MAX_TABLE_COUNT = "maxTableCount",
     ENABLE_DELIMITER = "enableDelimiter",
+    QUERY_FULL_SCREEN = "fullQueryScreen",
 
 }
 

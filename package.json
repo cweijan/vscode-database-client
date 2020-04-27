@@ -698,6 +698,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Support delimiter when import sql."
+				},
+				"vscode-mysql.fullQueryScreen": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show query result full screen."
 				}
 			}
 		}
@@ -715,15 +720,17 @@
 		"@types/ssh2": "^0.5.43",
 		"tslint": "^5.8.0",
 		"typescript": "^3.8.3",
+		"@types/async-lock": "^1.1.2",
 		"vscode": "^1.1.36"
 	},
 	"dependencies": {
+		"async-lock": "^1.2.2",
 		"date-format": "^3.0.0",
+		"get-port": "^5.1.1",
 		"mockjs": "^1.1.0",
 		"mysql": "^2.18.1",
 		"mysqldump": "^3.1.0",
 		"sql-formatter": "^2.3.3",
-		"get-port": "^5.1.1",
 		"tunnel-ssh": "^4.1.4"
 	},
 	"__metadata": {

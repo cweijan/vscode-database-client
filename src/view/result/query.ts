@@ -1,10 +1,11 @@
-import { MessageType, OperateType } from "../../common/Constants";
+import { MessageType, OperateType, ConfigKey } from "../../common/Constants";
 import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
 import { DatabaseCache } from "../../service/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { ViewManager } from "../viewManager";
 import { DataResponse } from "./queryResponse";
+import { Global } from "../../common/Global";
 
 export class QueryParam<T> {
     /**
@@ -33,7 +34,8 @@ export class QueryPage {
         }
 
         ViewManager.createWebviewPanel({
-            splitView: true, path: "pages/result/index", title: "Query",
+            splitView: !Global.getConfig(ConfigKey.QUERY_FULL_SCREEN),
+            path: "pages/result/index", title: "Query",
             initListener: (webviewPanel) => {
                 webviewPanel.webview.postMessage(queryParam);
             },

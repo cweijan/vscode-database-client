@@ -5,6 +5,8 @@ import { WebviewPanel } from "vscode";
 import { ConnectionManager } from "../service/connectionManager";
 import { Console } from "../common/OutputChannel";
 import { MySQLTreeDataProvider } from "../provider/treeDataProvider";
+import * as AsyncLock from 'async-lock'
+const lock = new AsyncLock()
 
 export class ViewOption {
     public path?: string;
@@ -72,67 +74,69 @@ export class ViewManager {
     }
 
     public static createWebviewPanel(viewOption: ViewOption): Promise<WebviewPanel> {
-        
-        const currentStatus = this.viewStatu[viewOption.title]
-        if (!currentStatus) { this.viewStatu[viewOption.title] = { creating: true } as ViewState }
-
-        if (typeof (viewOption.singlePage) == 'undefined') { viewOption.singlePage = true }
-        if (typeof (viewOption.killHidden) == 'undefined') { viewOption.killHidden = true }
-
-        if (viewOption.singlePage && currentStatus) {
-            if (viewOption.killHidden && currentStatus.instance.visible == false) {
-                currentStatus.instance.dispose()
-            } else {
-                if (currentStatus.creating) {
-                    currentStatus.initListener = viewOption.initListener
-                } else if (viewOption.initListener) {
-                    viewOption.initListener(currentStatus.instance)
-                }
-                if (viewOption.receiveListener) { currentStatus.receiveListener = viewOption.receiveListener }
-                return Promise.resolve(currentStatus.instance);
-            }
-        }
 
         return new Promise((resolve, reject) => {
-            const targetPath = `${this.webviewPath}/${viewOption.path}.html`;
-            fs.readFile(targetPath, 'utf8', async (err, data) => {
-                if (err) {
-                    Console.log(err);
-                    reject(err);
-                    return;
-                }
-                const webviewPanel = vscode.window.createWebviewPanel(
-                    viewOption.title,
-                    viewOption.title,
-                    {
-                        viewColumn: viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One,
-                        preserveFocus: true
-                    },
-                    { enableScripts: true, retainContextWhenHidden: true },
-                );
-                webviewPanel.webview.html = this.buildInclude(this.buildPath(data), path.resolve(targetPath, ".."));
-                this.viewStatu[viewOption.title] = {
-                    creating: true,
-                    instance: webviewPanel,
-                    initListener: viewOption.initListener,
-                    receiveListener: viewOption.receiveListener
-                }
-                webviewPanel.onDidDispose(() => {
-                    this.viewStatu[viewOption.title] = null
-                })
-                const newStatus = this.viewStatu[viewOption.title]
-                webviewPanel.webview.onDidReceiveMessage((message) => {
-                    if (message.type == 'init') {
-                        newStatus.creating = false
-                        if (newStatus.initListener) {
-                            newStatus.initListener(webviewPanel)
+
+            lock.acquire("viewManager", (done) => {
+                if (typeof (viewOption.singlePage) == 'undefined') { viewOption.singlePage = true }
+                if (typeof (viewOption.killHidden) == 'undefined') { viewOption.killHidden = true }
+
+                const currentStatus = this.viewStatu[viewOption.title]
+                if (viewOption.singlePage && currentStatus) {
+                    if (viewOption.killHidden && currentStatus.instance.visible == false) {
+                        currentStatus.instance.dispose()
+                    } else {
+                        if (currentStatus.creating) {
+                            currentStatus.initListener = viewOption.initListener
+                        } else if (viewOption.initListener) {
+                            viewOption.initListener(currentStatus.instance)
                         }
-                    } else if (newStatus.receiveListener) {
-                        newStatus.receiveListener(webviewPanel, message)
+                        if (viewOption.receiveListener) { currentStatus.receiveListener = viewOption.receiveListener }
+                        done()
+                        return Promise.resolve(currentStatus.instance);
                     }
-                })
-                resolve(webviewPanel);
-            });
+                }
+                const targetPath = `${this.webviewPath}/${viewOption.path}.html`;
+                fs.readFile(targetPath, 'utf8', async (err, data) => {
+                    if (err) {
+                        Console.log(err);
+                        reject(err);
+                        return;
+                    }
+                    const webviewPanel = vscode.window.createWebviewPanel(
+                        viewOption.title,
+                        viewOption.title,
+                        {
+                            viewColumn: viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One,
+                            preserveFocus: true
+                        },
+                        { enableScripts: true, retainContextWhenHidden: true },
+                    );
+                    webviewPanel.webview.html = this.buildInclude(this.buildPath(data), path.resolve(targetPath, ".."));
+                    this.viewStatu[viewOption.title] = {
+                        creating: true,
+                        instance: webviewPanel,
+                        initListener: viewOption.initListener,
+                        receiveListener: viewOption.receiveListener
+                    }
+                    webviewPanel.onDidDispose(() => {
+                        this.viewStatu[viewOption.title] = null
+                    })
+                    const newStatus = this.viewStatu[viewOption.title]
+                    webviewPanel.webview.onDidReceiveMessage((message) => {
+                        if (message.type == 'init') {
+                            newStatus.creating = false
+                            if (newStatus.initListener) {
+                                newStatus.initListener(webviewPanel)
+                            }
+                        } else if (newStatus.receiveListener) {
+                            newStatus.receiveListener(webviewPanel, message)
+                        }
+                    })
+                    resolve(webviewPanel);
+                    done();
+                });
+            })
 
         });
 
