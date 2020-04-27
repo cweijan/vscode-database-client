@@ -1,9 +1,9 @@
 import * as path from "path";
-import { QueryUnit } from "../../database/QueryUnit";
+import { QueryUnit } from "../../service/queryUnit";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { ConnectionManager } from "../../database/ConnectionManager";
+import { DatabaseCache } from "../../service/databaseCache";
+import { ConnectionManager } from "../../service/connectionManager";
 import { TableNode } from "./tableNode";
 import { Constants, ModelType, Template } from "../../common/constants";
 import { ViewNode } from "./viewNode";
@@ -45,7 +45,7 @@ export class ViewGroup extends Node {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`CREATE
 /* [DEFINER = { user | CURRENT_USER }]*/
-VIEW \`name\`
+VIEW [name]
 AS
 (SELECT * FROM ...);`, Template.create);
     }

@@ -5,14 +5,14 @@ export class DelimiterHolder {
 
     public get(key: string) {
         const delimiter = this.delimiteMap.get(key);
-        if (!delimiter) return ";"
+        if (!delimiter) { return ";" }
         return delimiter
     }
 
 
     public parseBatch(sql: string, key?: string): { sql: string, replace: boolean } {
         let replace = false;
-        if (!sql) return { sql, replace };
+        if (!sql) { return { sql, replace }; }
 
         const delimiterArray = []
         if (key) {
@@ -41,7 +41,7 @@ export class DelimiterHolder {
     }
 
     private buildDelimiter(sql: string, delimiter: string) {
-        if (!sql || !delimiter) return sql;
+        if (!sql || !delimiter) { return sql; }
         return sql.replace(new RegExp(`${delimiter}\\s*$`, 'gm'), ";")
     }
 

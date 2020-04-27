@@ -2,18 +2,16 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { CacheKey, Constants, ModelType } from "../../common/constants";
 import { Console } from "../../common/outputChannel";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { QueryUnit } from "../../database/QueryUnit";
-import { MySQLTreeDataProvider } from "../../provider/mysqlTreeDataProvider";
+import { ConnectionManager } from "../../service/connectionManager";
+import { DatabaseCache } from "../../service/databaseCache";
+import { QueryUnit } from "../../service/queryUnit";
+import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
 import { DatabaseNode } from "./databaseNode";
 import { UserGroup } from "./userGroup";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
 import { FileManager } from "../../common/FileManager";
 import { Util } from "../../common/util";
-import * as getPort from 'get-port'
-
 
 export class ConnectionNode extends Node {
 
@@ -22,15 +20,7 @@ export class ConnectionNode extends Node {
     constructor(readonly id: string, readonly parent: Node) {
         super(id)
         this.init(parent)
-        if (parent.usingSSH) {
-            this.getPort()
-        }
     }
-
-    private async getPort() {
-        this.parent.ssh.tunnelPort = await getPort({ port: getPort.makeRange(10567, 11567) })
-    }
-
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
@@ -97,7 +87,7 @@ export class ConnectionNode extends Node {
         } else {
             const key = `${lcp.getConnectId()}`;
             await FileManager.show(`${key}.sql`);
-            const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.name);
+            const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
             await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" }).then(async (dbName) => {
                 if (dbName) {
                     await ConnectionManager.getConnection({

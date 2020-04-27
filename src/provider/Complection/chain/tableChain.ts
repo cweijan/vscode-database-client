@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
 import { ModelType } from "../../../common/Constants";
-import { DatabaseCache } from "../../../database/DatabaseCache";
+import { DatabaseCache } from "../../../service/databaseCache";
 import { Node } from "../../../model/interface/node";
 import { TableNode } from "../../../model/main/tableNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Util } from "../../../common/util";
-import { ConnectionManager } from "../../../database/ConnectionManager";
+import { ConnectionManager } from "../../../service/connectionManager";
 
 export class TableChain implements ComplectionChain {
 
@@ -42,7 +42,7 @@ export class TableChain implements ComplectionChain {
         if (inputWord) {
             const connectcionid = lcp.getConnectId();
             DatabaseCache.getDatabaseListOfConnection(connectcionid).forEach((databaseNode) => {
-                if (databaseNode.name === inputWord) {
+                if (databaseNode.database === inputWord) {
                     tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.id);
                 }
             });
@@ -57,7 +57,7 @@ export class TableChain implements ComplectionChain {
             });
         }
 
-        if (!tableNodes) return []
+        if (!tableNodes) { return [] }
 
         return tableNodes.map<vscode.CompletionItem>((tableNode: TableNode) => {
             const completionItem = new vscode.CompletionItem(tableNode.label);

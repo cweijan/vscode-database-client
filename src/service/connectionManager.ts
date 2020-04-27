@@ -6,16 +6,26 @@ import * as vscode from "vscode";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
 import { Node } from "../model/interface/node";
-import { QueryUnit } from "./QueryUnit";
+import { QueryUnit } from "./queryUnit";
 import tunnel = require('tunnel-ssh')
+import { SSHConfig } from "../model/interface/sshConfig";
+
+interface ActiveConnection {
+    connection: mysql.Connection;
+    ssh: SSHConfig
+}
 
 export class ConnectionManager {
 
     private static lastConnectionNode: Node;
-    private static activeConnection: { [key: string]: mysql.Connection } = {};
+    private static activeConnection: { [key: string]: ActiveConnection } = {};
 
     public static getLastConnectionOption() {
         return this.lastConnectionNode;
+    }
+
+    public static getActiveConnectByKey(key: string): ActiveConnection {
+        return this.activeConnection[key]
     }
 
     public static removeConnection(id: string) {
@@ -27,7 +37,7 @@ export class ConnectionManager {
         const activeConnect = this.activeConnection[id];
         if (activeConnect) {
             this.activeConnection[id] = null
-            activeConnect.end()
+            activeConnect.connection.end()
         }
 
     }
@@ -56,6 +66,7 @@ export class ConnectionManager {
                 }
 
                 if (host != null && port != null && user != null) {
+                    // TODO lost infomation
                     return this.getConnection({
                         host, port, user, database, getConnectId: () => `${host}_${port}_${user}`
                     } as Node, database != null)
@@ -80,16 +91,17 @@ export class ConnectionManager {
         return new Promise(async (resolve, reject) => {
 
             const connection = this.activeConnection[key];
-            if (connection && connection.state == 'authenticated') {
+            const ssh = connectionNode.ssh;
+            if (connection && connection.connection.state == 'authenticated') {
                 if (connectionNode.database) {
-                    QueryUnit.queryPromise(connection, `use \`${connectionNode.database}\``).then(() => {
-                        resolve(connection);
+                    QueryUnit.queryPromise(connection.connection, `use \`${connectionNode.database}\``).then(() => {
+                        resolve(connection.connection);
                     }).catch((error) => {
                         this.activeConnection[key] = null
                         reject(error);
                     });
                 } else {
-                    resolve(connection);
+                    resolve(connection.connection);
                 }
             } else {
                 if (connectionNode.usingSSH) {
@@ -101,14 +113,13 @@ export class ConnectionManager {
                     if (!port) {
                         reject("create ssh tunnel fail!");
                         return;
-                    } else {
-                        connectionNode = { ...connectionNode.origin, port, getConnectId: connectionNode.getConnectId } as any as Node
                     }
+                    connectionNode = { ...connectionNode.origin, port, getConnectId: () => `${ssh.host}_${ssh.port}_${connectionNode.user}` } as any as Node
                 }
-                this.activeConnection[key] = this.createConnection(connectionNode);
-                this.activeConnection[key].connect((err: Error) => {
+                this.activeConnection[key] = { connection: this.createConnection(connectionNode), ssh };
+                this.activeConnection[key].connection.connect((err: Error) => {
                     if (!err) {
-                        resolve(this.activeConnection[key]);
+                        resolve(this.activeConnection[key].connection);
                     } else {
                         this.activeConnection[key] = null;
                         Console.log(`${err.stack}\n${err.message}`);
@@ -126,7 +137,7 @@ export class ConnectionManager {
         return new Promise(async (resolve) => {
             const ssh = connectionNode.ssh
             if (!connectionNode.ssh.tunnelPort) {
-                connectionNode.ssh.tunnelPort = await getPort({ port: getPort.makeRange(10567, 11567) })
+                connectionNode.ssh.tunnelPort = await getPort({ port: 10567 })
             }
             const port = connectionNode.ssh.tunnelPort;
             const key = `${ssh.username}_${ssh.port}_${ssh.username}`;

@@ -8,9 +8,10 @@ export class TableCreateChain implements ComplectionChain {
     private tableKeywordComplectionItems: vscode.CompletionItem[] = [];
 
     constructor() {
+
         this.tableKeywordList.forEach((keyword) => {
             const keywordComplectionItem = new vscode.CompletionItem(keyword + " ");
-            keywordComplectionItem.kind = vscode.CompletionItemKind.Property;
+            keywordComplectionItem.kind = vscode.CompletionItemKind.Keyword;
             this.tableKeywordComplectionItems.push(keywordComplectionItem);
         });
     }

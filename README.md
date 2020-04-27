@@ -9,12 +9,16 @@ MySQL Client For Visual Studio Code
 > 
 > Give [project](https://github.com/cweijan/vscode-mysql) star keep me motivated to keep updating
 
+**Features**
+
 - [MySQL Client](#mysql-client)
   - [Connection](#connection)
   - [View Table](#view-table)
   - [Execute Sql](#execute-sql)
+  - [Generate Mock Date](#generate-mock-date)
   - [History](#history)
   - [Backup/Import](#backupimport)
+  - [Setting](#setting)
   - [Suprise](#suprise)
 
 ## Connection
@@ -39,6 +43,10 @@ MySQL Client For Visual Studio Code
 * Click Run Button or Press `F9` to Execute.
 ![run](images/run.jpg)
 
+## Generate Mock Date
+- Now you not need spend time to writing test data
+![mockData](images/mockData.png)
+
 ## History
 - Click history button to open run history record.
 ![history](images/history.jpg)
@@ -47,6 +55,18 @@ MySQL Client For Visual Studio Code
 
 * Move to DatabaseNode/TableNode, Right click to open menu
 ![bakcup](images/Backup.jpg)
+
+## Setting
+
+```json
+{
+  // enable delimiter when import data
+  "vscode-mysql.enableDelimiter": false,
+  
+  // open query result as full screen.
+  "vscode-mysql.fullQueryScreen":false,
+}
+```
 
 ## Suprise
 * You can find suprise when right click on node.

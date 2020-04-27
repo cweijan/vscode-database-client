@@ -19,7 +19,6 @@
         ],
         "trailing-comma":false,
         "semicolon":false,
-        "curly":false,
         "no-empty": false,
         "object-literal-sort-keys": false,
         "interface-name": false,

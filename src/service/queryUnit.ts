@@ -10,8 +10,8 @@ import { FileManager, FileModel } from "../common/FileManager";
 import { Node } from "../model/interface/node";
 import { QueryPage } from "../view/result/query";
 import { DataResponse, DMLResponse, ErrorResponse, MessageResponse, RunResponse } from "../view/result/queryResponse";
-import { ConnectionManager } from "./ConnectionManager";
-import { DelimiterHolder } from "../extension/delimiterHolder";
+import { ConnectionManager } from "./connectionManager";
+import { DelimiterHolder } from "./delimiterHolder";
 
 export class QueryUnit {
 

@@ -1,29 +1,23 @@
-import * as vscode from "vscode";
-import { WebviewPanel } from "vscode";
-import { MessageType, OperateType } from "../../common/Constants";
-import { SqlViewManager } from "../SqlViewManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { QueryUnit } from "../../database/QueryUnit";
-import { ColumnNode } from "../../model/other/columnNode";
-import { DataResponse } from "./queryResponse";
+import { MessageType, OperateType, ConfigKey } from "../../common/Constants";
 import { Node } from "../../model/interface/node";
+import { ColumnNode } from "../../model/other/columnNode";
+import { DatabaseCache } from "../../service/databaseCache";
+import { QueryUnit } from "../../service/queryUnit";
+import { ViewManager } from "../viewManager";
+import { DataResponse } from "./queryResponse";
+import { Global } from "../../common/Global";
 
 export class QueryParam<T> {
-    public type: MessageType;
     /**
-     * using in loadColumnList
+     * using in loadColumnList.
      */
     public connection?: Node;
+    public type: MessageType;
     public res: T;
 }
 
 export class QueryPage {
-    private static resultWebviewPanel: WebviewPanel;
-    /**
-     * ensure send newest message.
-     */
-    private static sendData: any;
-    private static creating = false;
+
     public static async send(queryParam: QueryParam<any>) {
 
         switch (queryParam.type) {
@@ -39,38 +33,19 @@ export class QueryPage {
                 break;
         }
 
-        this.sendData = queryParam;
-        if (this.creating) { return; }
-
-        // update result webview
-        if (this.resultWebviewPanel) {
-            if (this.resultWebviewPanel.visible) {
-                this.resultWebviewPanel.webview.postMessage(QueryPage.sendData);
-                this.resultWebviewPanel.reveal(vscode.ViewColumn.Two, true);
-                return;
-            } else {
-                this.resultWebviewPanel.dispose();
-            }
-        }
-
-        // init result webview
-        this.creating = true;
-        SqlViewManager.createWebviewPanel({
-            splitResultView: true, viewPath: "pages/result/index", viewTitle: "Query",
-        }).then(async (webviewPanel) => {
-            this.resultWebviewPanel = webviewPanel;
-            this.creating = false;
-            webviewPanel.onDidDispose(() => { this.resultWebviewPanel = undefined; this.creating = false; });
-            webviewPanel.webview.onDidReceiveMessage((params) => {
+        ViewManager.createWebviewPanel({
+            splitView: !Global.getConfig(ConfigKey.QUERY_FULL_SCREEN),
+            path: "pages/result/index", title: "Query",
+            initListener: (webviewPanel) => {
+                webviewPanel.webview.postMessage(queryParam);
+            },
+            receiveListener: async (_, params) => {
                 switch (params.type) {
-                    case OperateType.init:
-                        webviewPanel.webview.postMessage(QueryPage.sendData);
-                        break;
                     case OperateType.execute:
                         QueryUnit.runQuery(params.sql);
                         break;
                 }
-            });
+            }
         });
 
     }
@@ -100,9 +75,4 @@ export class QueryPage {
         queryParam.connection = null;
     }
 
-}
-
-class TableInfo {
-    public database: string;
-    public table: string;
 }

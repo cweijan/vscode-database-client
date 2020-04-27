@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
-import { DatabaseCache } from "../../../database/DatabaseCache";
+import { DatabaseCache } from "../../../service/databaseCache";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
-import { ConnectionManager } from "../../../database/ConnectionManager";
+import { ConnectionManager } from "../../../service/connectionManager";
 import { UserGroup } from "../../../model/database/userGroup";
 
 function wrap(origin: string): string {
@@ -31,6 +31,7 @@ export class DatabaseChain implements ComplectionChain {
         const connectcionid = `${lcp.getConnectId()}`;
 
         const databaseNodes = DatabaseCache.getDatabaseListOfConnection(connectcionid);
+        if (databaseNodes == null) { return []; }
 
         return databaseNodes.filter((databaseNode) => !(databaseNode instanceof UserGroup)).map<vscode.CompletionItem>((databaseNode) => {
             const label = databaseNode.label;

@@ -2,9 +2,9 @@ import { existsSync, readFileSync } from 'fs';
 import * as Mock from 'mockjs';
 import * as vscode from "vscode";
 import { MessageType } from "../../common/Constants";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { QueryUnit } from "../../database/QueryUnit";
+import { ConnectionManager } from "../connectionManager";
+import { DatabaseCache } from "../databaseCache";
+import { QueryUnit } from "../queryUnit";
 import { ColumnNode } from "../../model/other/columnNode";
 import { TableNode } from '../../model/main/tableNode';
 import { QueryPage } from "../../view/result/query";
@@ -86,13 +86,14 @@ export class MockRunner {
                 let tempInsertSql = insertSqlTemplate;
                 for (const column in mockData) {
                     let value = mockData[column].value;
+                    if (value && (typeof value == "string")) { value = value.replace(/^'|'$/g, "\\'") }
                     if (value == this.MOCK_INDEX) { value = i; }
-                    tempInsertSql = tempInsertSql.replace(new RegExp("\\$+" + column, 'ig'), this.wrapQuote(mockData[column].type, Mock.mock(value)));
+                    tempInsertSql = tempInsertSql.replace(new RegExp("\\$+" + column + "(,|\\s)", 'ig'), this.wrapQuote(mockData[column].type, Mock.mock(value)) + "$1");
                 }
                 sqlList.push(tempInsertSql)
             }
 
-            const connection = await ConnectionManager.getConnection({ ...mockModel, getConnectId: () => `${mockModel.host}_${mockModel.port}_${mockModel.user}` } as any as Node)
+            const connection = await ConnectionManager.getConnection({ ...mockModel, timezone: tableNode.timezone, getConnectId: () => `${mockModel.host}_${mockModel.port}_${mockModel.user}` } as any as Node)
 
             const success = await QueryUnit.runBatch(connection, sqlList)
             vscode.commands.executeCommand("mysql.template.sql", tableNode, true)
@@ -104,13 +105,13 @@ export class MockRunner {
     private wrapQuote(type: string, value: any): any {
         type = type.toLowerCase()
         switch (type) {
-            case "varchar": case "char": case "date": case "time": case "timestamp": case "datetime":
+            case "varchar": case "char": case "date": case "time": case "timestamp": case "datetime": case "set": case "json":
                 return `'${value}'`
+            default:
+                if (type.indexOf("text") != -1 || type.indexOf("blob") != -1) { return `'${value}'` }
         }
         return value;
     }
-
-
 
     // refrence : http://mockjs.com/examples.html
     private getValueByType(column: any): string {

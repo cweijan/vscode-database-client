@@ -1,8 +1,8 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { CacheKey } from "../common/Constants";
-import { ConnectionManager } from "../database/ConnectionManager";
-import { DatabaseCache } from "../database/DatabaseCache";
+import { ConnectionManager } from "../service/connectionManager";
+import { DatabaseCache } from "../service/databaseCache";
 import { ConnectionNode } from "../model/database/connectionNode";
 import { DatabaseNode } from "../model/database/databaseNode";
 import { Node } from "../model/interface/node";
@@ -99,7 +99,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
                     if (dbId) {
                         const dbNode = dbIdMap.get(dbId);
                         await ConnectionManager.getConnection(dbNode, true)
-                        vscode.window.showInformationMessage(`Change active database to ${dbNode.name} success!`)
+                        vscode.window.showInformationMessage(`Change active database to ${dbNode.database} success!`)
                     }
 
                 })
