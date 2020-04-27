@@ -11,7 +11,7 @@ import { Node } from "../interface/node";
 export class FunctionNode extends Node {
 
     public contextValue: string = ModelType.FUNCTION;
-    public iconPath = path.join(Constants.RES_PATH, "function.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name)
         this.id = `${info.getConnectId()}_${info.database}_${name}`

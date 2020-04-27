@@ -12,7 +12,7 @@ export class TriggerNode extends Node  {
 
 
     public contextValue: string = ModelType.TRIGGER;
-    public iconPath = path.join(Constants.RES_PATH, "trigger.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/trigger.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name)
         this.init(info)

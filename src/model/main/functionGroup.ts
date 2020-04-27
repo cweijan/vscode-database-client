@@ -10,7 +10,7 @@ import { FunctionNode } from "./function";
 export class FunctionGroup extends Node {
 
     public contextValue = ModelType.FUNCTION_GROUP;
-    public iconPath = path.join(Constants.RES_PATH, "function.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
     constructor(readonly info: Node) {
         super("FUNCTION")
         this.id = `${info.getConnectId()}_${info.database}_${ModelType.FUNCTION_GROUP}`;

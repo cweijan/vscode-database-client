@@ -17,7 +17,7 @@ import format = require('date-format');
 
 export class TableNode extends Node implements CopyAble {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "table.svg");
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.TABLE;
     public primaryKey: string;
 

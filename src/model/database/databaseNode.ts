@@ -20,7 +20,7 @@ import { ViewGroup } from "../main/viewGroup";
 export class DatabaseNode extends Node implements CopyAble {
 
     public contextValue: string = ModelType.DATABASE;
-    public iconPath: string = path.join(Constants.RES_PATH, "database.svg");
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/database.svg");
     constructor(name: string, readonly info: Node) {
         super(name)
         this.id = `${info.getConnectId()}_${name}`

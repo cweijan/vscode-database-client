@@ -45,7 +45,7 @@
 				{
 					"id": "github-cweijan-mysql",
 					"title": "Mysql",
-					"icon": "resources/database-container.svg"
+					"icon": "resources/icon/database-container.svg"
 				}
 			]
 		},
@@ -62,13 +62,13 @@
 				"command": "mysql.history.open",
 				"title": "Open History",
 				"category": "MySQL",
-				"icon": "resources/history.svg"
+				"icon": "resources/icon/history.svg"
 			},
 			{
 				"command": "mysql.setting.open",
 				"title": "Open Setting",
 				"category": "MySQL",
-				"icon": "resources/settings.svg"
+				"icon": "resources/icon/settings.svg"
 			},
 			{
 				"command": "mysql.refresh",

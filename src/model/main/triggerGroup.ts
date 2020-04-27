@@ -10,7 +10,7 @@ import { TriggerNode } from "./trigger";
 
 export class TriggerGroup extends Node {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "trigger.svg");
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/trigger.svg");
     public contextValue = ModelType.TRIGGER_GROUP
 
     constructor(readonly info: Node) {

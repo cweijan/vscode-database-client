@@ -12,7 +12,7 @@ import { Node } from "../interface/node";
 export class ProcedureNode extends Node {
 
     public contextValue: string = ModelType.PROCEDURE;
-    public iconPath = path.join(Constants.RES_PATH, "procedure.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/procedure.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name)
         this.init(info)

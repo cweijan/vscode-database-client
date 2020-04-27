@@ -13,7 +13,7 @@ import { DatabaseNode } from "./databaseNode";
 export class UserGroup extends DatabaseNode {
 
     public contextValue: string = ModelType.DATABASE;
-    public iconPath = path.join(Constants.RES_PATH, "user.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/userGroup.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name, info)
         this.id = `${this.getConnectId()}_${ModelType.USER_GROUP}`;
@@ -45,7 +45,7 @@ export class UserGroup extends DatabaseNode {
 export class UserNode extends Node implements CopyAble {
 
     public contextValue = ModelType.USER;
-    public iconPath = path.join(Constants.RES_PATH, "user.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/user.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name)
         this.init(info)

@@ -10,7 +10,7 @@ import { ViewNode } from "./viewNode";
 
 export class ViewGroup extends Node {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "view.svg");
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/view.svg");
     public contextValue = ModelType.VIEW_GROUP
     constructor(readonly info: Node) {
         super("VIEW")

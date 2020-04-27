@@ -10,7 +10,7 @@ import { Constants, ModelType, Template } from "../../common/constants";
 
 export class TableGroup extends Node {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "table.svg");
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.TABLE_GROUP;
     constructor(readonly info: Node) {
         super("TABLE")

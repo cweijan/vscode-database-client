@@ -10,7 +10,7 @@ import { TableNode } from "./tableNode";
 
 export class ViewNode extends TableNode {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "view.svg");
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/view.svg");
     public contextValue: string = ModelType.VIEW;
 
     public drop() {

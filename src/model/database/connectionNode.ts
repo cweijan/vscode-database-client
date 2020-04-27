@@ -15,7 +15,7 @@ import { UserGroup } from "./userGroup";
 
 export class ConnectionNode extends Node {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "server.png");
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/server.png");
     public contextValue: string = ModelType.CONNECTION;
     constructor(readonly id: string, readonly parent: Node) {
         super(id)
