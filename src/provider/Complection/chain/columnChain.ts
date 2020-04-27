@@ -13,6 +13,7 @@ export class ColumnChain implements ComplectionChain {
 
         if (complectionContext.preChart === ".") {
             let subComplectionItems = await this.generateColumnComplectionItem(complectionContext.preWord);
+            if (subComplectionItems != null && subComplectionItems.length > 0) { this.needStop = true }
             const tableReg = new RegExp(Pattern.TABLE_PATTERN + "(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
             let result = tableReg.exec(complectionContext.currentSqlFull);
             for (; result != null && subComplectionItems.length === 0;) {
