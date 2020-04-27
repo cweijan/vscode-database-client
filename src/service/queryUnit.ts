@@ -11,7 +11,7 @@ import { Node } from "../model/interface/node";
 import { QueryPage } from "../view/result/query";
 import { DataResponse, DMLResponse, ErrorResponse, MessageResponse, RunResponse } from "../view/result/queryResponse";
 import { ConnectionManager } from "./connectionManager";
-import { DelimiterHolder } from "./delimiterHolder";
+import { DelimiterHolder } from "./common/delimiterHolder";
 
 export class QueryUnit {
 

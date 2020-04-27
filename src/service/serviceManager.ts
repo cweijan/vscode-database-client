@@ -8,11 +8,11 @@ import { DbTreeDataProvider as DbTreeDataProvider } from "../provider/treeDataPr
 import { ViewManager } from "../view/viewManager";
 import { AbstractConnectService } from "./connect/abstractConnectService";
 import { MysqlConnectService } from "./connect/impl/mysqlConnectService";
-import { DatabaseCache } from "./databaseCache";
-import { DatabaseType } from "./databaseType";
+import { DatabaseCache } from "./common/databaseCache";
+import { DatabaseType } from "./common/databaseType";
 import { AbstractDumpService } from "./dump/abstractDumpService";
 import { MysqlDumpService } from "./dump/mysqlDumpService";
-import { HistoryService } from "./HistoryService";
+import { HistoryService } from "./common/HistoryService";
 import { MockRunner } from "./mock/mockRunner";
 import { MysqlSettingService } from "./setting/MysqlSettingService";
 import { SettingService } from "./setting/settingService";

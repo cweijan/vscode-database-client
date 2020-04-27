@@ -9,7 +9,7 @@ import { Node } from "../model/interface/node";
 import { QueryUnit } from "./queryUnit";
 import tunnel = require('tunnel-ssh')
 import { SSHConfig } from "../model/interface/sshConfig";
-import { DatabaseCache } from "./databaseCache";
+import { DatabaseCache } from "./common/databaseCache";
 
 interface ActiveConnection {
     connection: mysql.Connection;

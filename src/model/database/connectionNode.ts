@@ -6,7 +6,7 @@ import { Console } from "../../common/outputChannel";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ConnectionManager } from "../../service/connectionManager";
-import { DatabaseCache } from "../../service/databaseCache";
+import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";

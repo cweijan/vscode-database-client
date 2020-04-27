@@ -2,7 +2,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { CacheKey } from "../common/Constants";
 import { ConnectionManager } from "../service/connectionManager";
-import { DatabaseCache } from "../service/databaseCache";
+import { DatabaseCache } from "../service/common/databaseCache";
 import { ConnectionNode } from "../model/database/connectionNode";
 import { DatabaseNode } from "../model/database/databaseNode";
 import { Node } from "../model/interface/node";

@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { Node } from "../interface/node";
 import { ModelType, Constants, Template } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
-import { DatabaseCache } from "../../service/databaseCache";
+import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { CopyAble } from "../interface/copyAble";

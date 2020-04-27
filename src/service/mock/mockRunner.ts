@@ -3,7 +3,7 @@ import * as Mock from 'mockjs';
 import * as vscode from "vscode";
 import { MessageType } from "../../common/Constants";
 import { ConnectionManager } from "../connectionManager";
-import { DatabaseCache } from "../databaseCache";
+import { DatabaseCache } from "../common/databaseCache";
 import { QueryUnit } from "../queryUnit";
 import { ColumnNode } from "../../model/other/columnNode";
 import { TableNode } from '../../model/main/tableNode';

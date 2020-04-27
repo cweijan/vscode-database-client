@@ -5,7 +5,7 @@ import { QueryUnit } from "../../service/queryUnit";
 import { ColumnNode } from "../other/columnNode";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
-import { DatabaseCache } from "../../service/databaseCache";
+import { DatabaseCache } from "../../service/common/databaseCache";
 import { ModelType, Constants, Template } from "../../common/constants";
 import { Console } from "../../common/outputChannel";
 import { ConnectionManager } from "../../service/connectionManager";

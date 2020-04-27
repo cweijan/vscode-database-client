@@ -1,7 +1,7 @@
 import { MessageType, OperateType, ConfigKey } from "../../common/Constants";
 import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
-import { DatabaseCache } from "../../service/databaseCache";
+import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { ViewManager } from "../viewManager";
 import { DataResponse } from "./queryResponse";

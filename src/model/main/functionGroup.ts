@@ -1,7 +1,7 @@
 import * as path from "path";
 import { Constants, ModelType, Template } from "../../common/constants";
 import { ConnectionManager } from "../../service/connectionManager";
-import { DatabaseCache } from "../../service/databaseCache";
+import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";

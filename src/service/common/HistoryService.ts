@@ -1,4 +1,4 @@
-import { FileManager } from "../common/FileManager";
+import { FileManager } from "../../common/FileManager";
 export class HistoryService {
 
     public showHistory() {

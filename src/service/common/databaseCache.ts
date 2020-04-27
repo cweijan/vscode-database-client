@@ -1,9 +1,9 @@
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
-import { CacheKey, ModelType } from "../common/Constants";
-import { ColumnNode } from "../model/other/columnNode";
-import { DatabaseNode } from "../model/database/databaseNode";
-import { Node } from "../model/interface/node";
-import { TableNode } from "../model/main/tableNode";
+import { CacheKey, ModelType } from "../../common/constants";
+import { ColumnNode } from "../../model/other/columnNode";
+import { DatabaseNode } from "../../model/database/databaseNode";
+import { Node } from "../../model/interface/node";
+import { TableNode } from "../../model/main/tableNode";
 
 export class DatabaseCache {
 

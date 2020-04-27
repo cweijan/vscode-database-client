@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { DatabaseCache } from "../../../service/databaseCache";
+import { DatabaseCache } from "../../../service/common/databaseCache";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { ConnectionManager } from "../../../service/connectionManager";
 import { UserGroup } from "../../../model/database/userGroup";

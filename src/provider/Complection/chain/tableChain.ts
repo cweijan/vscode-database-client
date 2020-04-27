@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { ModelType } from "../../../common/Constants";
-import { DatabaseCache } from "../../../service/databaseCache";
+import { DatabaseCache } from "../../../service/common/databaseCache";
 import { Node } from "../../../model/interface/node";
 import { TableNode } from "../../../model/main/tableNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";

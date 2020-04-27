@@ -2,7 +2,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
-import { DatabaseCache } from "../../service/databaseCache";
+import { DatabaseCache } from "../../service/common/databaseCache";
 import { ModelType, Constants } from "../../common/constants";
 import { ConnectionManager } from "../../service/connectionManager";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";

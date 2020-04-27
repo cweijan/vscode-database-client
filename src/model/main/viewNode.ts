@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
 import { ConnectionManager } from "../../service/connectionManager";
-import { DatabaseCache } from "../../service/databaseCache";
+import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { TableNode } from "./tableNode";

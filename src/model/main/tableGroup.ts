@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { QueryUnit } from "../../service/queryUnit";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
-import { DatabaseCache } from "../../service/databaseCache";
+import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { TableNode } from "./tableNode";
 import { Constants, ModelType, Template } from "../../common/constants";
