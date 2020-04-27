@@ -177,7 +177,7 @@
 			},
 			{
 				"command": "mysql.mock.run",
-				"title": "Start Data",
+				"title": "Start Generate",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/run.png",
@@ -186,7 +186,7 @@
 			},
 			{
 				"command": "mysql.mock.table",
-				"title": "Mock Data",
+				"title": "Generate Mock Data",
 				"category": "MySQL"
 			},
 			{
