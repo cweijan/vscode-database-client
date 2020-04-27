@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { DatabaseCache } from "../../database/DatabaseCache";
+import { DatabaseCache } from "../../service/databaseCache";
 import { SSHConfig } from "./sshConfig";
 
 export abstract class Node extends vscode.TreeItem {

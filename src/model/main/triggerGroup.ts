@@ -1,15 +1,15 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { QueryUnit } from "../../database/QueryUnit";
+import { QueryUnit } from "../../service/queryUnit";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { ConnectionManager } from "../../database/ConnectionManager";
+import { DatabaseCache } from "../../service/databaseCache";
+import { ConnectionManager } from "../../service/connectionManager";
 import { Constants, ModelType, Template } from "../../common/constants";
 import { TriggerNode } from "./trigger";
 
 export class TriggerGroup extends Node {
-    
+
     public iconPath: string = path.join(Constants.RES_PATH, "trigger.svg");
     public contextValue = ModelType.TRIGGER_GROUP
 
@@ -50,7 +50,7 @@ TRIGGER [name] BEFORE/AFTER INSERT/UPDATE/DELETE
 ON [table]
 FOR EACH ROW BEGIN
 
-END;`,Template.create);
+END;`, Template.create);
     }
 
 }

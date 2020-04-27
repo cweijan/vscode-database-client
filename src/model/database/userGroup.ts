@@ -2,9 +2,9 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType, Template } from "../../common/Constants";
 import { Util } from "../../common/util";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { QueryUnit } from "../../database/QueryUnit";
-import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { ConnectionManager } from "../../service/connectionManager";
+import { QueryUnit } from "../../service/queryUnit";
+import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
 import { InfoNode } from "../other/infoNode";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
@@ -36,7 +36,7 @@ export class UserGroup extends DatabaseNode {
 
     public createTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`,Template.create);
+        QueryUnit.showSQLTextDocument(`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`, Template.create);
     }
 
 }

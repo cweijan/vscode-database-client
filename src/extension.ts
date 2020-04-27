@@ -20,9 +20,10 @@ import { ViewNode } from "./model/main/viewNode";
 import { ColumnNode } from "./model/other/columnNode";
 import { Console } from "./common/outputChannel";
 // must be last
-import { ServiceManager } from "./extension/serviceManager";
+import { ServiceManager } from "./service/serviceManager";
 import { SqlViewManager } from "./view/SqlViewManager";
-import { QueryUnit } from "./database/QueryUnit";
+import { QueryUnit } from "./service/queryUnit";
+import { Node } from "./model/interface/node";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -104,17 +105,13 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.name.copy": (copyAble: CopyAble) => {
                 copyAble.copyName();
             },
-            "mysql.data.import": (iNode: DatabaseNode | ConnectionNode) => {
+            "mysql.data.import": (node: DatabaseNode | ConnectionNode) => {
                 vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
-                    if (filePath)
-                        iNode.importData(filePath[0].fsPath);
+                    if (filePath) { node.importData(filePath[0].fsPath); }
                 });
             },
-            "mysql.data.export": (iNode: TableNode | DatabaseNode) => {
-                vscode.window.showOpenDialog({ canSelectMany: false, openLabel: "Select export file path", canSelectFiles: false, canSelectFolders: true }).then((folderPath) => {
-                    if (folderPath)
-                        iNode.backupData(folderPath[0].fsPath);
-                });
+            "mysql.data.export": (node: Node) => {
+                serviceManager.dumpService.dump(node)
             },
             "mysql.template.delete": (tableNode: TableNode) => {
                 tableNode.deleteSqlTemplate();

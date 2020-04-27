@@ -2,26 +2,32 @@ import * as vscode from "vscode";
 import { MockRunner } from "./mock/mockRunner";
 import { ExtensionContext } from "vscode";
 import { SqlViewManager } from "../view/SqlViewManager";
-import { DatabaseCache } from "../database/DatabaseCache";
+import { DatabaseCache } from "./databaseCache";
 import { FileManager } from "../common/FileManager";
 import { SqlFormatProvider } from "../provider/SqlFormatProvider";
 import { TableHoverProvider } from "../provider/TableHoverProvider";
 import { CompletionProvider } from "../provider/Complection/CompletionProvider";
-import { MySQLTreeDataProvider } from "../provider/mysqlTreeDataProvider";
+import { MySQLTreeDataProvider as TreeDataProvider } from "../provider/treeDataProvider";
 import { HistoryService } from "./HistoryService";
 import { MysqlSettingService } from "./setting/MysqlSettingService";
-import { SettingInterface } from "./setting/SettingInterface";
+import { SettingService } from "./setting/settingService";
+import { AbstractDumpService } from "./dump/abstractDumpService";
+import { MysqlDumpService } from "./dump/mysqlDumpService";
+import { DatabaseType } from "./databaseType";
 
 export class ServiceManager {
 
     public mockRunner: MockRunner;
     public historyService: HistoryService;
-    public provider: MySQLTreeDataProvider;
-    public settingService: SettingInterface;
+    public provider: TreeDataProvider;
+    public settingService: SettingService;
+    public dumpService: AbstractDumpService;
     private isInit = false;
+    private type: DatabaseType = DatabaseType.mysql;
 
     constructor(private readonly context: ExtensionContext) {
         this.mockRunner = new MockRunner();
+        this.historyService = new HistoryService()
         DatabaseCache.initCache(context);
         SqlViewManager.initExtesnsionPath(context.extensionPath);
         FileManager.init(context)
@@ -35,10 +41,20 @@ export class ServiceManager {
             vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.', ">", "<", "=", "(")
         ]
 
-        this.historyService = new HistoryService()
-        this.settingService = new MysqlSettingService()
+        switch (this.type) {
+            case DatabaseType.mysql:
+                this.initMysqlService();
+                break;
+        }
 
-        this.provider = new MySQLTreeDataProvider(this.context);
+        res.push(this.initTreeView())
+        this.isInit = true
+        return res
+    }
+
+
+    private initTreeView() {
+        this.provider = new TreeDataProvider(this.context);
         const treeview = vscode.window.createTreeView("github.cweijan.mysql", {
             treeDataProvider: this.provider,
         });
@@ -48,10 +64,12 @@ export class ServiceManager {
         treeview.onDidExpandElement((event) => {
             DatabaseCache.storeElementState(event.element, vscode.TreeItemCollapsibleState.Expanded);
         });
+        return treeview;
+    }
 
-        res.push(treeview)
-        this.isInit = true
-        return res
+    private initMysqlService() {
+        this.settingService = new MysqlSettingService();
+        this.dumpService = new MysqlDumpService();
     }
 
 }

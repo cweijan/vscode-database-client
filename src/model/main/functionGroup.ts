@@ -1,8 +1,8 @@
 import * as path from "path";
 import { Constants, ModelType, Template } from "../../common/constants";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { QueryUnit } from "../../database/QueryUnit";
+import { ConnectionManager } from "../../service/connectionManager";
+import { DatabaseCache } from "../../service/databaseCache";
+import { QueryUnit } from "../../service/queryUnit";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
 import { FunctionNode } from "./function";
@@ -46,7 +46,7 @@ export class FunctionGroup extends Node {
 FUNCTION [name]() RETURNS [TYPE]
 BEGIN
     return [value];
-END;`,Template.create);
+END;`, Template.create);
     }
 
 }

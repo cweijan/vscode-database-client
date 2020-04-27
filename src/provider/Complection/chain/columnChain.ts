@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
-import { DatabaseCache } from "../../../database/DatabaseCache";
+import { DatabaseCache } from "../../../service/databaseCache";
 import { ColumnNode } from "../../../model/other/columnNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Util } from "../../../common/util";
 import { Pattern } from "../../../common/Constants";
-import { ConnectionManager } from "../../../database/ConnectionManager";
+import { ConnectionManager } from "../../../service/connectionManager";
 
 export class ColumnChain implements ComplectionChain {
 

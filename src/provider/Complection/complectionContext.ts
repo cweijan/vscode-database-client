@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { QueryUnit } from "../../database/QueryUnit";
+import { QueryUnit } from "../../service/queryUnit";
 
 export interface ComplectionChain {
     getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] | Promise<vscode.CompletionItem[]>;

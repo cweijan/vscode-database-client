@@ -2,10 +2,10 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { QueryUnit } from "../../database/QueryUnit";
-import { MySQLTreeDataProvider } from "../../provider/mysqlTreeDataProvider";
+import { ConnectionManager } from "../../service/connectionManager";
+import { DatabaseCache } from "../../service/databaseCache";
+import { QueryUnit } from "../../service/queryUnit";
+import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
 import { TableNode } from "./tableNode";
 
 export class ViewNode extends TableNode {

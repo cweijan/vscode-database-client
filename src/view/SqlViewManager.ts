@@ -2,9 +2,9 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
-import { ConnectionManager } from "../database/ConnectionManager";
+import { ConnectionManager } from "../service/connectionManager";
 import { Console } from "../common/OutputChannel";
-import { MySQLTreeDataProvider } from "../provider/mysqlTreeDataProvider";
+import { MySQLTreeDataProvider } from "../provider/treeDataProvider";
 
 export class ViewOption {
     public viewPath?: string;

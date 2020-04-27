@@ -2,9 +2,9 @@ import { existsSync, readFileSync } from 'fs';
 import * as Mock from 'mockjs';
 import * as vscode from "vscode";
 import { MessageType } from "../../common/Constants";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { QueryUnit } from "../../database/QueryUnit";
+import { ConnectionManager } from "../connectionManager";
+import { DatabaseCache } from "../databaseCache";
+import { QueryUnit } from "../queryUnit";
 import { ColumnNode } from "../../model/other/columnNode";
 import { TableNode } from '../../model/main/tableNode';
 import { QueryPage } from "../../view/result/query";
@@ -112,8 +112,6 @@ export class MockRunner {
         }
         return value;
     }
-
-
 
     // refrence : http://mockjs.com/examples.html
     private getValueByType(column: any): string {

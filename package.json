@@ -494,9 +494,9 @@
 					"group": "mysql@6"
 				},
 				{
-					"command": "mysql.template.sql",
+					"command": "mysql.changeTableName",
 					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "1_mysql@0"
+					"group": "inline"
 				},
 				{
 					"command": "mysql.name.copy",
@@ -509,24 +509,24 @@
 					"group": "1_inline@0"
 				},
 				{
-					"command": "mysql.mock.table",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "1_inline@1"
-				},
-				{
-					"command": "mysql.changeTableName",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "inline"
-				},
-				{
-					"command": "mysql.index.template",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "1_inline@3"
-				},
-				{
 					"command": "mysql.column.add",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@4"
+				},
+				{
+					"command": "mysql.mock.table",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline1@1"
+				},
+				{
+					"command": "mysql.data.export",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline1@2"
+				},
+				{
+					"command": "mysql.template.sql",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_mysql@0"
 				},
 				{
 					"command": "mysql.copy.insert",
@@ -544,6 +544,21 @@
 					"group": "1_mysql@2"
 				},
 				{
+					"command": "mysql.table.truncate",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "2_mysql@1"
+				},
+				{
+					"command": "mysql.table.drop",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "2_mysql@2"
+				},
+				{
+					"command": "mysql.index.template",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "2_mysql@3"
+				},
+				{
 					"command": "mysql.template.table",
 					"when": "view == github.cweijan.mysql && viewItem == tableGroup",
 					"group": "1_mysql@1"
@@ -557,21 +572,6 @@
 					"command": "mysql.template.table",
 					"when": "view == github.cweijan.mysql && viewItem == tableGroup",
 					"group": "inline"
-				},
-				{
-					"command": "mysql.table.drop",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "2_mysql@4"
-				},
-				{
-					"command": "mysql.table.truncate",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "2_mysql@4"
-				},
-				{
-					"command": "mysql.data.export",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "2_mysql@5"
 				},
 				{
 					"command": "mysql.changeColumnName",

@@ -1,11 +1,11 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { QueryUnit } from "../../database/QueryUnit";
+import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
-import { DatabaseCache } from "../../database/DatabaseCache";
+import { DatabaseCache } from "../../service/databaseCache";
 import { ModelType, Constants } from "../../common/constants";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { MySQLTreeDataProvider } from "../../provider/mysqlTreeDataProvider";
+import { ConnectionManager } from "../../service/connectionManager";
+import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
 import { Util } from "../../common/util";
 
 export class TriggerNode extends Node  {

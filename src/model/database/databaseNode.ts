@@ -5,10 +5,10 @@ import { Constants, ModelType } from "../../common/Constants";
 import { FileManager } from '../../common/FileManager';
 import { Console } from "../../common/OutputChannel";
 import { Util } from '../../common/util';
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { QueryUnit } from "../../database/QueryUnit";
-import { MySQLTreeDataProvider } from '../../provider/mysqlTreeDataProvider';
+import { ConnectionManager } from "../../service/connectionManager";
+import { DatabaseCache } from "../../service/databaseCache";
+import { QueryUnit } from "../../service/queryUnit";
+import { MySQLTreeDataProvider } from '../../provider/treeDataProvider';
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { FunctionGroup } from "../main/functionGroup";
@@ -17,13 +17,11 @@ import { TableGroup } from "../main/tableGroup";
 import { TriggerGroup } from "../main/triggerGroup";
 import { ViewGroup } from "../main/viewGroup";
 
-import format = require('date-format');
-
 export class DatabaseNode extends Node implements CopyAble {
 
     public contextValue: string = ModelType.DATABASE;
     public iconPath: string = path.join(Constants.RES_PATH, "database.svg");
-    constructor(readonly name: string, readonly info: Node) {
+    constructor(name: string, readonly info: Node) {
         super(name)
         this.id = `${info.getConnectId()}_${name}`
         this.info = { ...info, database: name, getConnectId: info.getConnectId } as Node
@@ -39,41 +37,10 @@ export class DatabaseNode extends Node implements CopyAble {
     }
 
     public importData(fsPath: string) {
-        Console.log(`Doing import ${this.host}:${this.port}_${this.name}...`);
+        Console.log(`Doing import ${this.host}:${this.port}_${this.database}...`);
         ConnectionManager.getConnection(this).then((connection) => {
             QueryUnit.runFile(connection, fsPath);
         });
-    }
-
-    public backupData(exportPath: string) {
-
-        Console.log(`Doing backup ${this.host}_${this.name}...`);
-        mysqldump({
-            connection: {
-                host: this.usingSSH ? this.origin.host : this.host,
-                user: this.usingSSH ? this.origin.user : this.user,
-                password: this.usingSSH ? this.origin.password : this.password,
-                database: this.name,
-                port: this.usingSSH ? this.ssh.tunnelPort : parseInt(this.port),
-            },
-            dump: {
-                schema: {
-                    table: {
-                        ifNotExist: false,
-                        dropIfExist: true,
-                        charset: false,
-                    },
-                    engine: false,
-                },
-            },
-            dumpToFile: `${exportPath}\\${this.name}_${format('yyyy-MM-dd_hhmmss', new Date())}.sql`,
-        }).then(() => {
-            vscode.window.showInformationMessage(`Backup ${this.host}_${this.name} success!`);
-        }).catch((err) => {
-            vscode.window.showErrorMessage(`Backup ${this.host}_${this.name} fail!\n${err}`);
-        });
-        Console.log("backup end.");
-
     }
 
     public dropDatatabase() {
@@ -101,7 +68,7 @@ export class DatabaseNode extends Node implements CopyAble {
     }
 
     public copyName() {
-        Util.copyToBoard(this.name)
+        Util.copyToBoard(this.database)
     }
 
 }

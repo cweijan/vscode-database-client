@@ -6,7 +6,7 @@ import * as vscode from "vscode";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
 import { Node } from "../model/interface/node";
-import { QueryUnit } from "./QueryUnit";
+import { QueryUnit } from "./queryUnit";
 import tunnel = require('tunnel-ssh')
 
 export class ConnectionManager {

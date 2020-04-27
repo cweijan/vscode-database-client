@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
-import { DatabaseCache } from "../../../database/DatabaseCache";
+import { DatabaseCache } from "../../../service/databaseCache";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
-import { ConnectionManager } from "../../../database/ConnectionManager";
+import { ConnectionManager } from "../../../service/connectionManager";
 import { UserGroup } from "../../../model/database/userGroup";
 
 function wrap(origin: string): string {

@@ -1,10 +1,9 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import process = require('process');
-import { SettingInterface } from "./SettingInterface";
+import { SettingService } from "./settingService";
 
-
-export class MysqlSettingService implements SettingInterface {
+export class MysqlSettingService implements SettingService {
     private x64 = "C:\\Program Files\\MySQL";
     private x86 = "C:\\Program Files (x86)\\MySQL";
     public open() {
