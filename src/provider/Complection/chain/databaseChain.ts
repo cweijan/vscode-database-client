@@ -31,6 +31,7 @@ export class DatabaseChain implements ComplectionChain {
         const connectcionid = `${lcp.getConnectId()}`;
 
         const databaseNodes = DatabaseCache.getDatabaseListOfConnection(connectcionid);
+        if (databaseNodes == null) { return []; }
 
         return databaseNodes.filter((databaseNode) => !(databaseNode instanceof UserGroup)).map<vscode.CompletionItem>((databaseNode) => {
             const label = databaseNode.label;

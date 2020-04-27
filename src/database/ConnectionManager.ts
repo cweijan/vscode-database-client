@@ -101,9 +101,9 @@ export class ConnectionManager {
                     if (!port) {
                         reject("create ssh tunnel fail!");
                         return;
-                    } else {
-                        connectionNode = { ...connectionNode.origin, port, getConnectId: connectionNode.getConnectId } as any as Node
                     }
+                    const ssh = connectionNode.ssh;
+                    connectionNode = { ...connectionNode.origin, port, getConnectId: () => `${ssh.host}_${ssh.port}_${connectionNode.user}` } as any as Node
                 }
                 this.activeConnection[key] = this.createConnection(connectionNode);
                 this.activeConnection[key].connect((err: Error) => {
