@@ -56,6 +56,7 @@ export class ConnectionManager {
                 }
 
                 if (host != null && port != null && user != null) {
+                    // TODO lost infomation
                     return this.getConnection({
                         host, port, user, database, getConnectId: () => `${host}_${port}_${user}`
                     } as Node, database != null)
@@ -126,7 +127,7 @@ export class ConnectionManager {
         return new Promise(async (resolve) => {
             const ssh = connectionNode.ssh
             if (!connectionNode.ssh.tunnelPort) {
-                connectionNode.ssh.tunnelPort = await getPort({ port: getPort.makeRange(10567, 11567) })
+                connectionNode.ssh.tunnelPort = await getPort({ port: 10567 })
             }
             const port = connectionNode.ssh.tunnelPort;
             const key = `${ssh.username}_${ssh.port}_${ssh.username}`;

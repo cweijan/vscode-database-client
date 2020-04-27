@@ -9,6 +9,8 @@ MySQL Client For Visual Studio Code
 > 
 > Give [project](https://github.com/cweijan/vscode-mysql) star keep me motivated to keep updating
 
+**Features**
+
 - [MySQL Client](#mysql-client)
   - [Connection](#connection)
   - [View Table](#view-table)

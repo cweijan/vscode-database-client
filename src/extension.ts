@@ -21,7 +21,7 @@ import { ColumnNode } from "./model/other/columnNode";
 import { Console } from "./common/outputChannel";
 // must be last
 import { ServiceManager } from "./service/serviceManager";
-import { SqlViewManager } from "./view/SqlViewManager";
+import { ViewManager } from "./view/viewManager";
 import { QueryUnit } from "./service/queryUnit";
 import { Node } from "./model/interface/node";
 
@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
                 serviceManager.mockRunner.runMock()
             },
             "mysql.addConnection": () => {
-                SqlViewManager.showConnectPage(serviceManager.provider);
+                ViewManager.showConnectPage(serviceManager.provider);
             },
             "mysql.addDatabase": (connectionNode: ConnectionNode) => {
                 connectionNode.createDatabase();

@@ -9,6 +9,7 @@ export abstract class Node extends vscode.TreeItem {
     public user: string;
     public password?: string;
     public database?: string;
+    public timezone?: string;
     public certPath?: string;
     public origin?: Node;
 
@@ -33,6 +34,7 @@ export abstract class Node extends vscode.TreeItem {
         this.user = source.user
         this.password = source.password
         this.database = source.database
+        this.timezone = source.timezone
         this.certPath = source.certPath
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH

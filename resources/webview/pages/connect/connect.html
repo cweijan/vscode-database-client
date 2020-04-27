@@ -45,7 +45,8 @@
     </div>
 
     <script>
-        const vscode = acquireVsCodeApi();
+        const vscode = typeof (acquireVsCodeApi) != "undefined" ? acquireVsCodeApi() : null;
+        const postMessage = (message) => { if (vscode) { vscode.postMessage(message) } }
         const vue = new Vue({
             el: '#container',
             data: {
@@ -56,6 +57,7 @@
                     password: '',
                     database: null,
                     usingSSH: false,
+                    timezone: null,
                     ssh: {
                         port: 22,
                         username: 'root'
@@ -83,6 +85,7 @@
                 document.write("Connect success!")
             }
         })
+        postMessage({ type: 'init' })
     </script>
 </body>
 

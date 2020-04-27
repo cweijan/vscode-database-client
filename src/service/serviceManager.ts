@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { MockRunner } from "./mock/mockRunner";
 import { ExtensionContext } from "vscode";
-import { SqlViewManager } from "../view/SqlViewManager";
+import { ViewManager } from "../view/viewManager";
 import { DatabaseCache } from "./databaseCache";
 import { FileManager } from "../common/FileManager";
 import { SqlFormatProvider } from "../provider/SqlFormatProvider";
@@ -29,7 +29,7 @@ export class ServiceManager {
         this.mockRunner = new MockRunner();
         this.historyService = new HistoryService()
         DatabaseCache.initCache(context);
-        SqlViewManager.initExtesnsionPath(context.extensionPath);
+        ViewManager.initExtesnsionPath(context.extensionPath);
         FileManager.init(context)
     }
 
