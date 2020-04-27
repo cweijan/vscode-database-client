@@ -9,7 +9,7 @@ import { DatabaseCache } from "../../service/databaseCache";
 import { ModelType, Constants, Template } from "../../common/constants";
 import { Console } from "../../common/outputChannel";
 import { ConnectionManager } from "../../service/connectionManager";
-import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { Util } from "../../common/util";
 import { CopyAble } from "../interface/copyAble";
 import format = require('date-format');
@@ -77,7 +77,7 @@ ADD
             const sql = `RENAME TABLE \`${this.database}\`.\`${this.table}\` to \`${this.database}\`.\`${newTableName}\``;
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
-                MySQLTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh();
             });
 
         });
@@ -89,7 +89,7 @@ ADD
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE \`${this.database}\`.\`${this.table}\``).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
-                MySQLTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
             });
         })

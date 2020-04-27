@@ -5,7 +5,7 @@ import { ModelType, Constants, Template } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
 import { DatabaseCache } from "../../service/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
-import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { CopyAble } from "../interface/copyAble";
 import { Util } from "../../common/util";
 const wrap = Util.wrap;
@@ -56,7 +56,7 @@ export class ColumnNode extends Node implements CopyAble {
             const sql = `alter table ${wrap(this.database)}.${wrap(this.table)} change column ${wrap(columnName)} ${wrap(newColumnName)} ${this.column.type} comment '${this.column.comment}'`;
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearColumnCache(`${this.getConnectId()}_${this.database}_${this.table}`);
-                MySQLTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh();
             });
 
         });

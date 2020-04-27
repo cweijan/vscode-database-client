@@ -5,7 +5,7 @@ import { Node } from "../interface/node";
 import { DatabaseCache } from "../../service/databaseCache";
 import { ModelType, Constants } from "../../common/constants";
 import { ConnectionManager } from "../../service/connectionManager";
-import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { Util } from "../../common/util";
 
 export class TriggerNode extends Node  {
@@ -41,7 +41,7 @@ export class TriggerNode extends Node  {
         Util.confirm(`Are you want to drop trigger ${this.name} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP trigger \`${this.database}\`.\`${this.name}\``).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}_${ModelType.TRIGGER_GROUP}`)
-                MySQLTreeDataProvider.refresh()
+                DbTreeDataProvider.refresh()
                 vscode.window.showInformationMessage(`Drop trigger ${this.name} success!`)
             })
         })

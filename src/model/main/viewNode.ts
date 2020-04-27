@@ -5,7 +5,7 @@ import { Util } from "../../common/util";
 import { ConnectionManager } from "../../service/connectionManager";
 import { DatabaseCache } from "../../service/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
-import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { TableNode } from "./tableNode";
 
 export class ViewNode extends TableNode {
@@ -18,7 +18,7 @@ export class ViewNode extends TableNode {
         Util.confirm(`Are you want to drop view ${this.table} ? `, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP view \`${this.database}\`.\`${this.table}\``).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
-                MySQLTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`Drop view ${this.table} success!`);
             });
         })

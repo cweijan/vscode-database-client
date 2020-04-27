@@ -7,14 +7,14 @@ import { ConnectionNode } from "../model/database/connectionNode";
 import { DatabaseNode } from "../model/database/databaseNode";
 import { Node } from "../model/interface/node";
 
-export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
+export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public _onDidChangeTreeData: vscode.EventEmitter<Node> = new vscode.EventEmitter<Node>();
     public readonly onDidChangeTreeData: vscode.Event<Node> = this._onDidChangeTreeData.event;
-    private static instance: MySQLTreeDataProvider
+    private static instance: DbTreeDataProvider
 
     constructor(private context: vscode.ExtensionContext) {
-        MySQLTreeDataProvider.instance = this
+        DbTreeDataProvider.instance = this
         this.init()
     }
 
@@ -30,7 +30,7 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
             });
         })
         DatabaseCache.clearColumnCache()
-        MySQLTreeDataProvider.refresh()
+        DbTreeDataProvider.refresh()
     }
 
     public getTreeItem(element: Node): Promise<vscode.TreeItem> | vscode.TreeItem {
@@ -54,10 +54,11 @@ export class MySQLTreeDataProvider implements vscode.TreeDataProvider<Node> {
         }
 
         connections[`${connectionNode.host}_${connectionNode.port}_${connectionNode.user}`] = connectionNode;
+        ConnectionManager.removeConnection(connectionNode.getConnectId())
 
 
         await this.context.globalState.update(CacheKey.ConectionsKey, connections);
-        MySQLTreeDataProvider.refresh();
+        DbTreeDataProvider.refresh();
     }
 
     /**

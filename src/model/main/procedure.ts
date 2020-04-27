@@ -5,7 +5,7 @@ import { Util } from "../../common/util";
 import { ConnectionManager } from "../../service/connectionManager";
 import { DatabaseCache } from "../../service/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
-import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { Node } from "../interface/node";
 
 
@@ -42,7 +42,7 @@ export class ProcedureNode extends Node {
         Util.confirm(`Are you want to drop procedure ${this.name} ? `, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP procedure \`${this.database}\`.\`${this.name}\``).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}_${ModelType.PROCEDURE_GROUP}`)
-                MySQLTreeDataProvider.refresh()
+                DbTreeDataProvider.refresh()
                 vscode.window.showInformationMessage(`Drop procedure ${this.name} success!`)
             })
         })

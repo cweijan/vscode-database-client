@@ -5,7 +5,7 @@ import { Util } from "../../common/util";
 import { ConnectionManager } from "../../service/connectionManager";
 import { DatabaseCache } from "../../service/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
-import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { Node } from "../interface/node";
 
 export class FunctionNode extends Node {
@@ -41,7 +41,7 @@ export class FunctionNode extends Node {
         Util.confirm(`Are you want to drop function ${this.name} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function \`${this.database}\`.\`${this.name}\``).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.name}_${ModelType.FUNCTION_GROUP}`);
-                MySQLTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`Drop function ${this.name} success!`);
             });
         })

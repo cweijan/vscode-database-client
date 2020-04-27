@@ -8,7 +8,7 @@ import { Util } from '../../common/util';
 import { ConnectionManager } from "../../service/connectionManager";
 import { DatabaseCache } from "../../service/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
-import { MySQLTreeDataProvider } from '../../provider/treeDataProvider';
+import { DbTreeDataProvider } from '../../provider/treeDataProvider';
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { FunctionGroup } from "../main/functionGroup";
@@ -49,7 +49,7 @@ export class DatabaseNode extends Node implements CopyAble {
             if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE ${this.database}`).then(() => {
                     DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`)
-                    MySQLTreeDataProvider.refresh();
+                    DbTreeDataProvider.refresh();
                     vscode.window.showInformationMessage(`Delete database ${this.database} success!`)
                 })
             } else {

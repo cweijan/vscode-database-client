@@ -1,8 +1,7 @@
 "use strict";
-// Don't change import order, it will occur circular reference
+
 import * as vscode from "vscode";
 import { CommandKey } from "./common/Constants";
-
 import { ConnectionNode } from "./model/database/connectionNode";
 import { DatabaseNode } from "./model/database/databaseNode";
 import { UserGroup, UserNode } from "./model/database/userGroup";
@@ -19,11 +18,9 @@ import { ViewGroup } from "./model/main/viewGroup";
 import { ViewNode } from "./model/main/viewNode";
 import { ColumnNode } from "./model/other/columnNode";
 import { Console } from "./common/outputChannel";
-// must be last
+// Don't change last order, it will occur circular reference
 import { ServiceManager } from "./service/serviceManager";
-import { ViewManager } from "./view/viewManager";
 import { QueryUnit } from "./service/queryUnit";
-import { Node } from "./model/interface/node";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -50,10 +47,10 @@ export function activate(context: vscode.ExtensionContext) {
                 serviceManager.mockRunner.runMock()
             },
             "mysql.addConnection": () => {
-                ViewManager.showConnectPage(serviceManager.provider);
+                serviceManager.connectService.openConnect(serviceManager.provider)
             },
             "mysql.editConnection": (connectionNode: ConnectionNode) => {
-                ViewManager.showConnectPage(serviceManager.provider, connectionNode);
+                serviceManager.connectService.openConnect(serviceManager.provider, connectionNode)
             },
             "mysql.addDatabase": (connectionNode: ConnectionNode) => {
                 connectionNode.createDatabase();
@@ -113,10 +110,10 @@ export function activate(context: vscode.ExtensionContext) {
                     if (filePath) { node.importData(filePath[0].fsPath); }
                 });
             },
-            "mysql.data.export": (node: Node) => {
+            "mysql.data.export": (node: DatabaseNode | TableNode) => {
                 serviceManager.dumpService.dump(node, true)
             },
-            "mysql.struct.export": (node: Node) => {
+            "mysql.struct.export": (node: DatabaseNode | TableNode) => {
                 serviceManager.dumpService.dump(node, false)
             },
             "mysql.template.delete": (tableNode: TableNode) => {

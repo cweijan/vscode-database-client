@@ -9,6 +9,7 @@ import { Node } from "../model/interface/node";
 import { QueryUnit } from "./queryUnit";
 import tunnel = require('tunnel-ssh')
 import { SSHConfig } from "../model/interface/sshConfig";
+import { DatabaseCache } from "./databaseCache";
 
 interface ActiveConnection {
     connection: mysql.Connection;
@@ -39,6 +40,7 @@ export class ConnectionManager {
             this.activeConnection[id] = null
             activeConnect.connection.end()
         }
+        DatabaseCache.clearDatabaseCache(id)
 
     }
 

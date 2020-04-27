@@ -4,7 +4,7 @@ import { Constants, ModelType, Template } from "../../common/Constants";
 import { Util } from "../../common/util";
 import { ConnectionManager } from "../../service/connectionManager";
 import { QueryUnit } from "../../service/queryUnit";
-import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { InfoNode } from "../other/infoNode";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
@@ -73,7 +73,7 @@ export class UserNode extends Node implements CopyAble {
 
         Util.confirm(`Are you want to drop user ${this.user} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP user ${this.name}`).then(() => {
-                MySQLTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`Drop user ${this.name} success!`);
             });
         })

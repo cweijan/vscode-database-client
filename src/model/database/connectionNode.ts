@@ -1,17 +1,17 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { CacheKey, Constants, ModelType } from "../../common/constants";
+import { FileManager } from "../../common/FileManager";
 import { Console } from "../../common/outputChannel";
+import { Util } from "../../common/util";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ConnectionManager } from "../../service/connectionManager";
 import { DatabaseCache } from "../../service/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
-import { MySQLTreeDataProvider } from "../../provider/treeDataProvider";
+import { Node } from "../interface/node";
+import { InfoNode } from "../other/infoNode";
 import { DatabaseNode } from "./databaseNode";
 import { UserGroup } from "./userGroup";
-import { InfoNode } from "../other/infoNode";
-import { Node } from "../interface/node";
-import { FileManager } from "../../common/FileManager";
-import { Util } from "../../common/util";
 
 export class ConnectionNode extends Node {
 
@@ -31,7 +31,7 @@ export class ConnectionNode extends Node {
 
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "show databases")
             .then((databases) => {
-                databaseNodes = databases.filter((db) => this.database == null || db.Database == this.database).map<DatabaseNode>((database) => {
+                databaseNodes = databases.filter((db) => !this.database || db.Database == this.database).map<DatabaseNode>((database) => {
                     return new DatabaseNode(database.Database, this);
                 });
                 databaseNodes.unshift(new UserGroup("USER", this));
@@ -54,7 +54,7 @@ export class ConnectionNode extends Node {
             if (!inputContent) { return; }
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `create database \`${inputContent}\` default character set = 'utf8' `).then(() => {
                 DatabaseCache.clearDatabaseCache(this.id);
-                MySQLTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`create database ${inputContent} success!`);
             });
         });
@@ -68,7 +68,7 @@ export class ConnectionNode extends Node {
             DatabaseCache.clearDatabaseCache(this.id)
             delete connections[this.id];
             await context.globalState.update(CacheKey.ConectionsKey, connections);
-            MySQLTreeDataProvider.refresh();
+            DbTreeDataProvider.refresh();
         })
 
     }

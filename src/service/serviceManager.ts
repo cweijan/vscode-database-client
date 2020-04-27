@@ -1,25 +1,28 @@
 import * as vscode from "vscode";
-import { MockRunner } from "./mock/mockRunner";
 import { ExtensionContext } from "vscode";
-import { ViewManager } from "../view/viewManager";
-import { DatabaseCache } from "./databaseCache";
 import { FileManager } from "../common/FileManager";
+import { CompletionProvider } from "../provider/Complection/CompletionProvider";
 import { SqlFormatProvider } from "../provider/SqlFormatProvider";
 import { TableHoverProvider } from "../provider/TableHoverProvider";
-import { CompletionProvider } from "../provider/Complection/CompletionProvider";
-import { MySQLTreeDataProvider as TreeDataProvider } from "../provider/treeDataProvider";
-import { HistoryService } from "./HistoryService";
-import { MysqlSettingService } from "./setting/MysqlSettingService";
-import { SettingService } from "./setting/settingService";
+import { DbTreeDataProvider as DbTreeDataProvider } from "../provider/treeDataProvider";
+import { ViewManager } from "../view/viewManager";
+import { AbstractConnectService } from "./connect/abstractConnectService";
+import { MysqlConnectService } from "./connect/impl/mysqlConnectService";
+import { DatabaseCache } from "./databaseCache";
+import { DatabaseType } from "./databaseType";
 import { AbstractDumpService } from "./dump/abstractDumpService";
 import { MysqlDumpService } from "./dump/mysqlDumpService";
-import { DatabaseType } from "./databaseType";
+import { HistoryService } from "./HistoryService";
+import { MockRunner } from "./mock/mockRunner";
+import { MysqlSettingService } from "./setting/MysqlSettingService";
+import { SettingService } from "./setting/settingService";
 
 export class ServiceManager {
 
     public mockRunner: MockRunner;
+    public provider: DbTreeDataProvider;
     public historyService: HistoryService;
-    public provider: TreeDataProvider;
+    public connectService: AbstractConnectService;
     public settingService: SettingService;
     public dumpService: AbstractDumpService;
     private isInit = false;
@@ -54,7 +57,7 @@ export class ServiceManager {
 
 
     private initTreeView() {
-        this.provider = new TreeDataProvider(this.context);
+        this.provider = new DbTreeDataProvider(this.context);
         const treeview = vscode.window.createTreeView("github.cweijan.mysql", {
             treeDataProvider: this.provider,
         });
@@ -70,6 +73,7 @@ export class ServiceManager {
     private initMysqlService() {
         this.settingService = new MysqlSettingService();
         this.dumpService = new MysqlDumpService();
+        this.connectService = new MysqlConnectService();
     }
 
 }

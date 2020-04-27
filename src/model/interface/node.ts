@@ -42,4 +42,17 @@ export abstract class Node extends vscode.TreeItem {
         this.origin = source.origin
     }
 
+    public static build(node: Node): Node {
+        if (node.usingSSH) {
+            const { ssh, ...origin } = node
+            node.origin = origin as Node
+            node.host = node.ssh.host
+            node.port = "" + node.ssh.port
+        }
+        if (!node.getConnectId) {
+            node.getConnectId = Node.prototype.getConnectId
+        }
+        return node;
+    }
+
 }
