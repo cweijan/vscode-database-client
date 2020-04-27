@@ -45,7 +45,7 @@ export class ViewGroup extends Node {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`CREATE
 /* [DEFINER = { user | CURRENT_USER }]*/
-VIEW \`name\`
+VIEW [name]
 AS
 (SELECT * FROM ...);`, Template.create);
     }
