@@ -5,6 +5,7 @@ import format = require('date-format');
 import { Node } from "../../model/interface/node";
 import { Console } from "../../common/outputChannel";
 import { TableNode } from "../../model/main/tableNode";
+import { ConnectionManager } from "../connectionManager";
 
 export class MysqlDumpService extends AbstractDumpService {
     protected dumpData(node: Node, exportPath: string, withData: boolean): void {
@@ -16,7 +17,7 @@ export class MysqlDumpService extends AbstractDumpService {
                 user: node.usingSSH ? node.origin.user : node.user,
                 password: node.usingSSH ? node.origin.password : node.password,
                 database: node.database,
-                port: node.usingSSH ? node.ssh.tunnelPort : parseInt(node.port),
+                port: node.usingSSH ? ConnectionManager.getActiveConnectByKey(node.getConnectId()).ssh.tunnelPort : parseInt(node.port),
             },
             dump: {
                 tables: tableName ? [tableName] : [],
