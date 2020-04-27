@@ -13,6 +13,7 @@ MySQL Client For Visual Studio Code
   - [Connection](#connection)
   - [View Table](#view-table)
   - [Execute Sql](#execute-sql)
+  - [Generate Mock Date](#generate-mock-date)
   - [History](#history)
   - [Backup/Import](#backupimport)
   - [Suprise](#suprise)
@@ -38,6 +39,10 @@ MySQL Client For Visual Studio Code
 * Now You can enjoy Intelli SQL code in Editor.
 * Click Run Button or Press `F9` to Execute.
 ![run](images/run.jpg)
+
+## Generate Mock Date
+- Now you not need spend time to writing test data
+![mockData](images/mockData.png)
 
 ## History
 - Click history button to open run history record.
