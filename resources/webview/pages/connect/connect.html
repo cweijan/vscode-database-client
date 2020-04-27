@@ -59,8 +59,9 @@
                     usingSSH: false,
                     timezone: null,
                     ssh: {
+                        host: '',
                         port: 22,
-                        username: 'root'
+                        username: 'root',
                     }
                 },
                 databaseType: 'mysql',
@@ -78,11 +79,17 @@
         })
 
         window.addEventListener('message', ({ data }) => {
-            if (data.type === 'CONNECTION_ERROR') {
-                vue.error = true;
-                vue.errorMessage = data.err;
-            } else {
-                document.write("Connect success!")
+            switch (data.type) {
+                case 'EDIT':
+                    vue.connectionOption = data.node
+                    break;
+                case 'CONNECTION_ERROR':
+                    vue.error = true;
+                    vue.errorMessage = data.err;
+                    break;
+                default:
+                    document.write("Connect success!")
+                    break;
             }
         })
         postMessage({ type: 'init' })

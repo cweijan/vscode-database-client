@@ -52,6 +52,9 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.addConnection": () => {
                 ViewManager.showConnectPage(serviceManager.provider);
             },
+            "mysql.editConnection": (connectionNode: ConnectionNode) => {
+                ViewManager.showConnectPage(serviceManager.provider, connectionNode);
+            },
             "mysql.addDatabase": (connectionNode: ConnectionNode) => {
                 connectionNode.createDatabase();
             },

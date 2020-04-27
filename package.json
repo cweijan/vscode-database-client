@@ -94,6 +94,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.editConnection",
+				"title": "Edit Connection",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.deleteConnection",
 				"title": "Delete Connection",
 				"category": "MySQL"
@@ -397,6 +402,11 @@
 					"command": "mysql.newQuery",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.editConnection",
+					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.refresh",

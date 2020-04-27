@@ -6,6 +6,7 @@ import { ConnectionManager } from "../service/connectionManager";
 import { Console } from "../common/OutputChannel";
 import { MySQLTreeDataProvider } from "../provider/treeDataProvider";
 import * as AsyncLock from 'async-lock'
+import { ConnectionNode } from "../model/database/connectionNode";
 const lock = new AsyncLock()
 
 export class ViewOption {
@@ -45,17 +46,30 @@ export class ViewManager {
         this.webviewPath = extensionPath + "/resources/webview"
     }
 
-    public static showConnectPage(provider: MySQLTreeDataProvider) {
-
+    public static showConnectPage(provider: MySQLTreeDataProvider, connectionNode?: ConnectionNode) {
+        let node;
+        if (connectionNode) {
+            node = connectionNode.origin ? { ...connectionNode.origin, usingSSH: true, timezone: connectionNode.timezone, ssh: { ...connectionNode.ssh } } : { connectionNode }
+            node.ssh.tunnelPort = null
+        }
         this.createWebviewPanel({
             path: "pages/connect/connect",
             title: "connect",
             splitView: false,
+            initListener: (webviewPanel) => {
+                if (node) {
+                    webviewPanel.webview.postMessage({
+                        type: "EDIT",
+                        node
+                    });
+                }
+            },
             receiveListener: (webviewPanel, params) => {
                 if (params.type === 'CONNECT_TO_SQL_SERVER') {
                     const { connectionOption } = params
                     if (connectionOption.usingSSH) {
-                        connectionOption.origin = { host: connectionOption.host, user: connectionOption.user, port: connectionOption.port, password: connectionOption.password }
+                        const { ssh, ...origin } = connectionOption
+                        connectionOption.origin = origin
                         connectionOption.host = connectionOption.ssh.host
                         connectionOption.port = "" + connectionOption.ssh.port
                     }
