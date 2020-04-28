@@ -1,9 +1,9 @@
 import mysqldump from 'mysqldump';
 import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/Constants";
-import { FileManager } from '../../common/FileManager';
-import { Console } from "../../common/OutputChannel";
+import { Constants, ModelType } from "../../common/constants";
+import { FileManager } from '../../common/filesManager';
+import { Console } from "../../common/outputChannel";
 import { Util } from '../../common/util';
 import { ConnectionManager } from "../../service/connectionManager";
 import { DatabaseCache } from "../../service/common/databaseCache";

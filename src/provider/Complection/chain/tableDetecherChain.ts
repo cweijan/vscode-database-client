@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
-import { Pattern } from "../../../common/Constants";
+import { Pattern } from "../../../common/constants";
 
 export class TableDetecherChain implements ComplectionChain {
 

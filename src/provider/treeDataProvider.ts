@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { CacheKey } from "../common/Constants";
+import { CacheKey } from "../common/constants";
 import { ConnectionManager } from "../service/connectionManager";
 import { DatabaseCache } from "../service/common/databaseCache";
 import { ConnectionNode } from "../model/database/connectionNode";

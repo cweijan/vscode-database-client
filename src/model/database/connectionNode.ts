@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { CacheKey, Constants, ModelType } from "../../common/constants";
-import { FileManager } from "../../common/FileManager";
+import { FileManager } from "../../common/filesManager";
 import { Console } from "../../common/outputChannel";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";

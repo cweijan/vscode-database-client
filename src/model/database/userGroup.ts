@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType, Template } from "../../common/Constants";
+import { Constants, ModelType, Template } from "../../common/constants";
 import { Util } from "../../common/util";
 import { ConnectionManager } from "../../service/connectionManager";
 import { QueryUnit } from "../../service/queryUnit";

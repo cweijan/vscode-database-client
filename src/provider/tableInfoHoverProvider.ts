@@ -3,7 +3,7 @@ import {HoverProvider} from "vscode";
 import {DatabaseCache} from "../service/common/databaseCache";
 import {ColumnNode} from "../model/other/columnNode";
 
-export class TableHoverProvider implements HoverProvider {
+export class TableInfoHoverProvider implements HoverProvider {
 
     public async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover> {
 

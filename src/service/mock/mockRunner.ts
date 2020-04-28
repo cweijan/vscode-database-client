@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 import * as Mock from 'mockjs';
 import * as vscode from "vscode";
-import { MessageType } from "../../common/Constants";
+import { MessageType } from "../../common/constants";
 import { ConnectionManager } from "../connectionManager";
 import { DatabaseCache } from "../common/databaseCache";
 import { QueryUnit } from "../queryUnit";
@@ -9,7 +9,7 @@ import { ColumnNode } from "../../model/other/columnNode";
 import { TableNode } from '../../model/main/tableNode';
 import { QueryPage } from "../../view/result/query";
 import { MessageResponse } from "../../view/result/queryResponse";
-import { FileManager, FileModel } from '../../common/FileManager';
+import { FileManager, FileModel } from '../../common/filesManager';
 import { MockModel } from './mockModel';
 import { Node } from '../../model/interface/node';
 
