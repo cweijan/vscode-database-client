@@ -1,7 +1,7 @@
 <div class="hint">
     <!-- sql input -->
     <el-row style="margin-bottom: 10px;">
-        <el-input type="textarea" autosize v-model="toolbar.sql" style="width: 600px;"></el-input>
+        <el-input type="textarea" :autosize="{ minRows:3, maxRows:5}" v-model="toolbar.sql" style="width:90vw" ></el-input>
     </el-row>
     <!-- tool panel -->
     <el-row>

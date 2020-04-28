@@ -43,9 +43,9 @@ export class TableGroup extends Node {
 
     public createTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`CREATE TABLE tableName(  
+        QueryUnit.showSQLTextDocument(`CREATE TABLE [name](  
   id int NOT NULL primary key AUTO_INCREMENT,
-  column varchar(length)
+  [column] varchar(255)
 );`, Template.create);
     }
 }
