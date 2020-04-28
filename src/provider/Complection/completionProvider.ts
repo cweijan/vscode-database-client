@@ -3,7 +3,7 @@ import { ColumnChain } from "./chain/columnChain";
 import { DatabaseChain } from "./chain/databaseChain";
 import { KeywordChain } from "./chain/keywordChain";
 import { TableChain } from "./chain/tableChain";
-import { TableCreateChain } from "./chain/TableCreateChain";
+import { TableCreateChain } from "./chain/tableCreatingChain";
 import { TypeKeywordChain } from "./chain/typeKeywordChain";
 import { ComplectionChain, ComplectionContext } from "./complectionContext";
 import { TableDetecherChain } from "./chain/tableDetecherChain";
