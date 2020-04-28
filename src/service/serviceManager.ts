@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { ExtensionContext } from "vscode";
 import { FileManager } from "../common/filesManager";
-import { CompletionProvider } from "../provider/Complection/completionProvider0";
+import { CompletionProvider } from "../provider/Complection/completionProvider";
 import { SqlFormattingProvider } from "../provider/sqlFormattingProvider";
 import { TableInfoHoverProvider } from "../provider/tableInfoHoverProvider";
 import { DbTreeDataProvider as DbTreeDataProvider } from "../provider/treeDataProvider";
