@@ -58,7 +58,7 @@ MySQL Client For Visual Studio Code
 
 ## Setting
 
-```json
+```jsonc
 {
   // enable delimiter when import data
   "vscode-mysql.enableDelimiter": false,
