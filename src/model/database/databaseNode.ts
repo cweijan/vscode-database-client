@@ -16,6 +16,7 @@ import { ProcedureGroup } from "../main/procedureGroup";
 import { TableGroup } from "../main/tableGroup";
 import { TriggerGroup } from "../main/triggerGroup";
 import { ViewGroup } from "../main/viewGroup";
+import { NodeUtil } from '../nodeUtil';
 
 export class DatabaseNode extends Node implements CopyAble {
 
@@ -24,7 +25,7 @@ export class DatabaseNode extends Node implements CopyAble {
     constructor(name: string, readonly info: Node) {
         super(name)
         this.id = `${info.getConnectId()}_${name}`
-        this.info = { ...info, database: name, getConnectId: info.getConnectId } as Node
+        this.info = NodeUtil.build({ ...info, database: name } as Node)
         this.init(this.info)
     }
 
