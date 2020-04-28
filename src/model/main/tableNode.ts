@@ -1,15 +1,15 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import mysqldump from 'mysqldump';
-import { QueryUnit } from "../../database/QueryUnit";
+import { QueryUnit } from "../../service/queryUnit";
 import { ColumnNode } from "../other/columnNode";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { ModelType, Constants } from "../../common/constants";
+import { DatabaseCache } from "../../service/common/databaseCache";
+import { ModelType, Constants, Template } from "../../common/constants";
 import { Console } from "../../common/outputChannel";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { MySQLTreeDataProvider } from "../../provider/mysqlTreeDataProvider";
+import { ConnectionManager } from "../../service/connectionManager";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { Util } from "../../common/util";
 import { CopyAble } from "../interface/copyAble";
 import format = require('date-format');
@@ -17,13 +17,13 @@ import format = require('date-format');
 
 export class TableNode extends Node implements CopyAble {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "table.svg");
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.TABLE;
     public primaryKey: string;
 
-    constructor(readonly table: string, readonly info: Node) {
-        super(table)
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${table}`
+    constructor(public readonly table: string, readonly comment: string, readonly info: Node) {
+        super(`${table}  ${comment}`)
+        this.id = `${info.getConnectId()}_${info.database}_${table}`
         this.init(info)
         this.command = {
             command: "mysql.template.sql",
@@ -59,7 +59,7 @@ export class TableNode extends Node implements CopyAble {
         QueryUnit.showSQLTextDocument(`ALTER TABLE
     ${Util.wrap(this.database)}.${Util.wrap(this.table)} 
 ADD 
-    COLUMN [column] [type] NOT NULL comment '';`);
+    COLUMN [column] [type] NOT NULL comment '';`, Template.alter);
     }
 
 
@@ -76,8 +76,8 @@ ADD
             if (!newTableName) { return; }
             const sql = `RENAME TABLE \`${this.database}\`.\`${this.table}\` to \`${this.database}\`.\`${newTableName}\``;
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
-                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`);
-                MySQLTreeDataProvider.refresh();
+                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
+                DbTreeDataProvider.refresh();
             });
 
         });
@@ -88,8 +88,8 @@ ADD
 
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE \`${this.database}\`.\`${this.table}\``).then(() => {
-                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}`);
-                MySQLTreeDataProvider.refresh();
+                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
+                DbTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
             });
         })
@@ -109,8 +109,8 @@ ADD
 
     public indexTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`-- ALTER TABLE \`${this.database}\`.\`${this.table}\` DROP INDEX [indexName];
--- ALTER TABLE \`${this.database}\`.\`${this.table}\` ADD [UNIQUE|KEY|PRIMARY KEY] INDEX ([column]);`);
+        QueryUnit.showSQLTextDocument(`-- ALTER TABLE ${Util.wrap(this.database)}.${Util.wrap(this.table)} DROP INDEX [indexName];
+-- ALTER TABLE ${Util.wrap(this.database)}.${Util.wrap(this.table)} ADD [UNIQUE|KEY|PRIMARY KEY] INDEX ([column]);`, Template.alter);
         setTimeout(() => {
             QueryUnit.runQuery(`SELECT COLUMN_NAME name,table_schema,index_name,non_unique FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${this.database}' and table_name='${this.table}';`, this);
         }, 10);
@@ -125,7 +125,7 @@ ADD
             ConnectionManager.getConnection(this, true);
             QueryUnit.runQuery(sql, this);
         } else {
-            QueryUnit.showSQLTextDocument(sql);
+            QueryUnit.showSQLTextDocument(sql, Template.table);
         }
 
     }
@@ -142,7 +142,7 @@ ADD
                     sql += "values\n  ";
                     sql += `(${childrenValues.toString().replace(/,/g, ", ")}\n  );`;
                     if (show) {
-                        QueryUnit.showSQLTextDocument(sql);
+                        QueryUnit.showSQLTextDocument(sql, Template.table);
                     }
                     resolve(sql)
                 });
@@ -159,7 +159,7 @@ ADD
 
                 let sql = `delete from \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and")}`;
-                QueryUnit.showSQLTextDocument(sql);
+                QueryUnit.showSQLTextDocument(sql, Template.table);
             });
     }
 
@@ -175,7 +175,7 @@ ADD
 
                 let sql = `update \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \nset \n  ${sets.toString().replace(/,/g, ",\n  ")}\n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and ")}`;
-                QueryUnit.showSQLTextDocument(sql);
+                QueryUnit.showSQLTextDocument(sql, Template.table);
             });
     }
 
@@ -190,38 +190,6 @@ ADD
 
 
         return Promise.resolve(0)
-    }
-
-    public backupData(exportPath: string) {
-
-        Console.log(`Doing backup ${this.host}_${this.database}_${this.table}...`);
-        mysqldump({
-            connection: {
-                host: this.host,
-                user: this.user,
-                password: this.password,
-                database: this.database,
-                port: parseInt(this.port),
-            },
-            dump: {
-                tables: [this.table],
-                schema: {
-                    table: {
-                        ifNotExist: false,
-                        dropIfExist: true,
-                        charset: false,
-                    },
-                    engine: false,
-                },
-            },
-            dumpToFile: `${exportPath}\\${this.database}_${this.table}_${format('yyyy-MM-dd_hhmmss', new Date())}.sql`,
-        }).then(() => {
-            vscode.window.showInformationMessage(`Backup ${this.host}_${this.database}_${this.table} success!`);
-        }).catch((err) => {
-            vscode.window.showErrorMessage(`Backup ${this.host}_${this.database}_${this.table} fail!\n${err}`);
-        });
-        Console.log("backup end.");
-
     }
 
     public copyName(): void {

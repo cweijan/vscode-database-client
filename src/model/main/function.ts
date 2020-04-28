@@ -2,19 +2,19 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { QueryUnit } from "../../database/QueryUnit";
-import { MySQLTreeDataProvider } from "../../provider/mysqlTreeDataProvider";
+import { ConnectionManager } from "../../service/connectionManager";
+import { DatabaseCache } from "../../service/common/databaseCache";
+import { QueryUnit } from "../../service/queryUnit";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { Node } from "../interface/node";
 
 export class FunctionNode extends Node {
 
     public contextValue: string = ModelType.FUNCTION;
-    public iconPath = path.join(Constants.RES_PATH, "function.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name)
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${name}`
+        this.id = `${info.getConnectId()}_${info.database}_${name}`
         this.init(info)
         this.command = {
             command: "mysql.show.function",
@@ -40,8 +40,8 @@ export class FunctionNode extends Node {
 
         Util.confirm(`Are you want to drop function ${this.name} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function \`${this.database}\`.\`${this.name}\``).then(() => {
-                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.name}_${ModelType.FUNCTION_GROUP}`);
-                MySQLTreeDataProvider.refresh();
+                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.name}_${ModelType.FUNCTION_GROUP}`);
+                DbTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`Drop function ${this.name} success!`);
             });
         })

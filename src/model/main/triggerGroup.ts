@@ -1,21 +1,21 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { QueryUnit } from "../../database/QueryUnit";
+import { QueryUnit } from "../../service/queryUnit";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { Constants, ModelType } from "../../common/constants";
+import { DatabaseCache } from "../../service/common/databaseCache";
+import { ConnectionManager } from "../../service/connectionManager";
+import { Constants, ModelType, Template } from "../../common/constants";
 import { TriggerNode } from "./trigger";
 
 export class TriggerGroup extends Node {
-    
-    public iconPath: string = path.join(Constants.RES_PATH, "trigger.svg");
+
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/trigger.svg");
     public contextValue = ModelType.TRIGGER_GROUP
 
     constructor(readonly info: Node) {
         super("TRIGGER")
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.TRIGGER_GROUP}`;
+        this.id = `${info.getConnectId()}_${info.database}_${ModelType.TRIGGER_GROUP}`;
         this.init(info)
     }
 
@@ -28,7 +28,7 @@ export class TriggerGroup extends Node {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = '${this.database}'`)
             .then((tables) => {
                 tableNodes = tables.map<TriggerNode>((table) => {
-                    return new TriggerNode(table.ROUTINE_NAME, this.info);
+                    return new TriggerNode(table.TRIGGER_NAME, this.info);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {
@@ -46,11 +46,11 @@ export class TriggerGroup extends Node {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
-TRIGGER \`name\` BEFORE/AFTER INSERT/UPDATE/DELETE
-ON \`table\`
+TRIGGER [name] BEFORE/AFTER INSERT/UPDATE/DELETE
+ON [table]
 FOR EACH ROW BEGIN
 
-END;`);
+END;`, Template.create);
     }
 
 }

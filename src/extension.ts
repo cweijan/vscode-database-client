@@ -1,8 +1,7 @@
 "use strict";
-// Don't change import order, it will occur circular reference
+
 import * as vscode from "vscode";
 import { CommandKey } from "./common/Constants";
-
 import { ConnectionNode } from "./model/database/connectionNode";
 import { DatabaseNode } from "./model/database/databaseNode";
 import { UserGroup, UserNode } from "./model/database/userGroup";
@@ -18,10 +17,10 @@ import { TriggerGroup } from "./model/main/triggerGroup";
 import { ViewGroup } from "./model/main/viewGroup";
 import { ViewNode } from "./model/main/viewNode";
 import { ColumnNode } from "./model/other/columnNode";
-// must be last
-import { ServiceManager } from "./extension/serviceManager";
-import { SqlViewManager } from "./view/SqlViewManager";
-import { QueryUnit } from "./database/QueryUnit";
+import { Console } from "./common/outputChannel";
+// Don't change last order, it will occur circular reference
+import { ServiceManager } from "./service/serviceManager";
+import { QueryUnit } from "./service/queryUnit";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -48,7 +47,10 @@ export function activate(context: vscode.ExtensionContext) {
                 serviceManager.mockRunner.runMock()
             },
             "mysql.addConnection": () => {
-                SqlViewManager.showConnectPage(serviceManager.provider);
+                serviceManager.connectService.openConnect(serviceManager.provider)
+            },
+            "mysql.editConnection": (connectionNode: ConnectionNode) => {
+                serviceManager.connectService.openConnect(serviceManager.provider, connectionNode)
             },
             "mysql.addDatabase": (connectionNode: ConnectionNode) => {
                 connectionNode.createDatabase();
@@ -103,15 +105,16 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.name.copy": (copyAble: CopyAble) => {
                 copyAble.copyName();
             },
-            "mysql.data.import": (iNode: DatabaseNode | ConnectionNode) => {
+            "mysql.data.import": (node: DatabaseNode | ConnectionNode) => {
                 vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
-                    iNode.importData(filePath[0].fsPath);
+                    if (filePath) { node.importData(filePath[0].fsPath); }
                 });
             },
-            "mysql.data.export": (iNode: TableNode | DatabaseNode) => {
-                vscode.window.showOpenDialog({ canSelectMany: false, openLabel: "Select export file path", canSelectFiles: false, canSelectFolders: true }).then((folderPath) => {
-                    iNode.backupData(folderPath[0].fsPath);
-                });
+            "mysql.data.export": (node: DatabaseNode | TableNode) => {
+                serviceManager.dumpService.dump(node, true)
+            },
+            "mysql.struct.export": (node: DatabaseNode | TableNode) => {
+                serviceManager.dumpService.dump(node, false)
             },
             "mysql.template.delete": (tableNode: TableNode) => {
                 tableNode.deleteSqlTemplate();
@@ -188,7 +191,13 @@ function initCommand(commandDefinition: any): vscode.Disposable[] {
 
     for (const command in commandDefinition) {
         if (commandDefinition.hasOwnProperty(command)) {
-            dispose.push(vscode.commands.registerCommand(command, commandDefinition[command]))
+            dispose.push(vscode.commands.registerCommand(command, (...args: any[]) => {
+                try {
+                    commandDefinition[command](...args)
+                } catch (err) {
+                    Console.log(err)
+                }
+            }))
         }
     }
 

@@ -17,8 +17,7 @@
     </el-row>
     <el-row v-if="result.table">
         <el-col>
-            <el-button type="info" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest"
-                v-if="result.primaryKey">
+            <el-button type="info" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest" >
             </el-button>
             <span>CostTime: </span><span v-text="toolbar.costTime"></span>ms
             <span v-if="result.table">, Row: {{result.data.length}}, Col: {{columnCount}}</span>

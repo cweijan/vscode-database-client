@@ -1,36 +1,26 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { CacheKey, Constants, ModelType } from "../../common/constants";
+import { FileManager } from "../../common/FileManager";
 import { Console } from "../../common/outputChannel";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { QueryUnit } from "../../database/QueryUnit";
-import { MySQLTreeDataProvider } from "../../provider/mysqlTreeDataProvider";
+import { Util } from "../../common/util";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
+import { ConnectionManager } from "../../service/connectionManager";
+import { DatabaseCache } from "../../service/common/databaseCache";
+import { QueryUnit } from "../../service/queryUnit";
+import { Node } from "../interface/node";
+import { InfoNode } from "../other/infoNode";
 import { DatabaseNode } from "./databaseNode";
 import { UserGroup } from "./userGroup";
-import { InfoNode } from "../other/infoNode";
-import { Node } from "../interface/node";
-import { FileManager } from "../../common/FileManager";
-import { Util } from "../../common/util";
-import * as getPort from 'get-port'
-
 
 export class ConnectionNode extends Node {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "server.png");
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/server.png");
     public contextValue: string = ModelType.CONNECTION;
     constructor(readonly id: string, readonly parent: Node) {
         super(id)
         this.init(parent)
-        if (parent.usingSSH) {
-            this.getPort()
-        }
     }
-
-    private async getPort() {
-        this.parent.ssh.tunnelPort = await getPort({ port: getPort.makeRange(10567, 11567) })
-    }
-
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
@@ -41,10 +31,10 @@ export class ConnectionNode extends Node {
 
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "show databases")
             .then((databases) => {
-                databaseNodes = databases.filter((db) => this.database == null || db.Database == this.database).map<DatabaseNode>((database) => {
-                    return new DatabaseNode(database.Database, this.parent);
+                databaseNodes = databases.filter((db) => !this.database || db.Database == this.database).map<DatabaseNode>((database) => {
+                    return new DatabaseNode(database.Database, this);
                 });
-                databaseNodes.unshift(new UserGroup("USER", this.parent));
+                databaseNodes.unshift(new UserGroup("USER", this));
                 DatabaseCache.setDataBaseListOfConnection(this.id, databaseNodes);
 
                 return databaseNodes;
@@ -64,7 +54,7 @@ export class ConnectionNode extends Node {
             if (!inputContent) { return; }
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `create database \`${inputContent}\` default character set = 'utf8' `).then(() => {
                 DatabaseCache.clearDatabaseCache(this.id);
-                MySQLTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`create database ${inputContent} success!`);
             });
         });
@@ -78,7 +68,7 @@ export class ConnectionNode extends Node {
             DatabaseCache.clearDatabaseCache(this.id)
             delete connections[this.id];
             await context.globalState.update(CacheKey.ConectionsKey, connections);
-            MySQLTreeDataProvider.refresh();
+            DbTreeDataProvider.refresh();
         })
 
     }
@@ -95,14 +85,13 @@ export class ConnectionNode extends Node {
         if (!lcp) {
             Console.log("Not active connection found!");
         } else {
-            const key = `${lcp.host}_${lcp.port}_${lcp.user}`;
+            const key = `${lcp.getConnectId()}`;
             await FileManager.show(`${key}.sql`);
-            const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.name);
+            const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
             await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" }).then(async (dbName) => {
                 if (dbName) {
                     await ConnectionManager.getConnection({
-                        host: lcp.host, port: lcp.port, password: lcp.password,
-                        user: lcp.user, database: dbName, certPath: null,
+                        ...lcp, database: dbName, getConnectId: lcp.getConnectId
                     } as Node, true);
                 }
             });

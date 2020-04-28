@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
-import { DatabaseCache } from "../../../database/DatabaseCache";
+import { DatabaseCache } from "../../../service/common/databaseCache";
 import { ColumnNode } from "../../../model/other/columnNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Util } from "../../../common/util";
 import { Pattern } from "../../../common/Constants";
-import { ConnectionManager } from "../../../database/ConnectionManager";
+import { ConnectionManager } from "../../../service/connectionManager";
 
 export class ColumnChain implements ComplectionChain {
 
@@ -13,6 +13,7 @@ export class ColumnChain implements ComplectionChain {
 
         if (complectionContext.preChart === ".") {
             let subComplectionItems = await this.generateColumnComplectionItem(complectionContext.preWord);
+            if (subComplectionItems != null && subComplectionItems.length > 0) { this.needStop = true }
             const tableReg = new RegExp(Pattern.TABLE_PATTERN + "(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
             let result = tableReg.exec(complectionContext.currentSqlFull);
             for (; result != null && subComplectionItems.length === 0;) {
@@ -60,10 +61,10 @@ export class ColumnChain implements ComplectionChain {
 
         const lcp = ConnectionManager.getLastConnectionOption()
         if (!lcp) { return []; }
-        const id = `${lcp.host}_${lcp.port}_${lcp.user}_${lcp.database}_${tableName}`;
+        const id = `${lcp.getConnectId()}_${lcp.database}_${tableName}`;
 
         for (const tableNode of DatabaseCache.getTableNodeList()) {
-            if ((!lcp.database && tableNode.table == tableName) ||
+            if ((tableNode.table == tableName) ||
                 (tableNode.id === id)) {
                 columnNodes = (await tableNode.getChildren()) as ColumnNode[];
                 break;
@@ -74,6 +75,7 @@ export class ColumnChain implements ComplectionChain {
             const completionItem = new vscode.CompletionItem(columnNode.label);
             completionItem.detail = columnNode.type;
             completionItem.documentation = columnNode.comment;
+            completionItem.insertText = columnNode.column.name
             completionItem.kind = vscode.CompletionItemKind.Field;
             return completionItem;
         });

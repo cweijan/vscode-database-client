@@ -1,18 +1,18 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { QueryUnit } from "../../database/QueryUnit";
+import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
-import { DatabaseCache } from "../../database/DatabaseCache";
+import { DatabaseCache } from "../../service/common/databaseCache";
 import { ModelType, Constants } from "../../common/constants";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { MySQLTreeDataProvider } from "../../provider/mysqlTreeDataProvider";
+import { ConnectionManager } from "../../service/connectionManager";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { Util } from "../../common/util";
 
 export class TriggerNode extends Node  {
 
 
     public contextValue: string = ModelType.TRIGGER;
-    public iconPath = path.join(Constants.RES_PATH, "trigger.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/trigger.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name)
         this.init(info)
@@ -40,8 +40,8 @@ export class TriggerNode extends Node  {
 
         Util.confirm(`Are you want to drop trigger ${this.name} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP trigger \`${this.database}\`.\`${this.name}\``).then(() => {
-                DatabaseCache.clearTableCache(`${this.host}_${this.port}_${this.user}_${this.database}_${ModelType.TRIGGER_GROUP}`)
-                MySQLTreeDataProvider.refresh()
+                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}_${ModelType.TRIGGER_GROUP}`)
+                DbTreeDataProvider.refresh()
                 vscode.window.showInformationMessage(`Drop trigger ${this.name} success!`)
             })
         })

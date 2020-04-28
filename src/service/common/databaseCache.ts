@@ -1,9 +1,9 @@
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
-import { CacheKey, ModelType } from "../common/Constants";
-import { ColumnNode } from "../model/other/columnNode";
-import { DatabaseNode } from "../model/database/databaseNode";
-import { Node } from "../model/interface/node";
-import { TableNode } from "../model/main/tableNode";
+import { CacheKey, ModelType } from "../../common/constants";
+import { ColumnNode } from "../../model/other/columnNode";
+import { DatabaseNode } from "../../model/database/databaseNode";
+import { Node } from "../../model/interface/node";
+import { TableNode } from "../../model/main/tableNode";
 
 export class DatabaseCache {
 
@@ -63,7 +63,7 @@ export class DatabaseCache {
         }
 
         if (element.contextValue == ModelType.COLUMN || element.contextValue == ModelType.INFO || element.contextValue == ModelType.FUNCTION
-            || element.contextValue == ModelType.TRIGGER || element.contextValue == ModelType.PROCEDURE || element.contextValue == ModelType.USER_GROUP) {
+            || element.contextValue == ModelType.TRIGGER || element.contextValue == ModelType.PROCEDURE || element.contextValue == ModelType.USER) {
             return TreeItemCollapsibleState.None;
         }
 

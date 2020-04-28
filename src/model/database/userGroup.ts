@@ -1,10 +1,10 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/Constants";
+import { Constants, ModelType, Template } from "../../common/Constants";
 import { Util } from "../../common/util";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { QueryUnit } from "../../database/QueryUnit";
-import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { ConnectionManager } from "../../service/connectionManager";
+import { QueryUnit } from "../../service/queryUnit";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { InfoNode } from "../other/infoNode";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
@@ -13,10 +13,10 @@ import { DatabaseNode } from "./databaseNode";
 export class UserGroup extends DatabaseNode {
 
     public contextValue: string = ModelType.DATABASE;
-    public iconPath = path.join(Constants.RES_PATH, "user.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/userGroup.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name, info)
-        this.id = `${this.host}_${this.port}_${this.user}_${ModelType.USER_GROUP}`;
+        this.id = `${this.getConnectId()}_${ModelType.USER_GROUP}`;
         this.database = null
     }
 
@@ -36,7 +36,7 @@ export class UserGroup extends DatabaseNode {
 
     public createTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`);
+        QueryUnit.showSQLTextDocument(`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`, Template.create);
     }
 
 }
@@ -45,7 +45,7 @@ export class UserGroup extends DatabaseNode {
 export class UserNode extends Node implements CopyAble {
 
     public contextValue = ModelType.USER;
-    public iconPath = path.join(Constants.RES_PATH, "user.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/user.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name)
         this.init(info)
@@ -73,7 +73,7 @@ export class UserNode extends Node implements CopyAble {
 
         Util.confirm(`Are you want to drop user ${this.user} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP user ${this.name}`).then(() => {
-                MySQLTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`Drop user ${this.name} success!`);
             });
         })

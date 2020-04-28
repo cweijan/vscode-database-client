@@ -1,0 +1,22 @@
+<div class="field field__input">
+    usingSSH:
+    <el-switch v-model="connectionOption.usingSSH"></el-switch>
+</div>
+<div v-if="connectionOption.usingSSH">
+    <div class="field field__input">
+        <b>ssh-host:</b>
+        <input class="field__input" v-model="connectionOption.ssh.host" />
+    </div>
+    <div class="field field__input">
+        <b>ssh-port:</b>
+        <input class="field__input" v-model="connectionOption.ssh.port" />
+    </div>
+    <div class="field field__input">
+        <b>ssh-username:</b>
+        <input class="field__input" v-model="connectionOption.ssh.username" />
+    </div>
+    <div class="field field__input">
+        <b>ssh-password:</b>
+        <input class="field__input" type="password" v-model="connectionOption.ssh.password" />
+    </div>
+</div>

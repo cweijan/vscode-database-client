@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
-import { DatabaseCache } from "../../../database/DatabaseCache";
+import { DatabaseCache } from "../../../service/common/databaseCache";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
-import { ConnectionManager } from "../../../database/ConnectionManager";
+import { ConnectionManager } from "../../../service/connectionManager";
+import { UserGroup } from "../../../model/database/userGroup";
 
 function wrap(origin: string): string {
     if (origin != null && origin.match(/\b(-|\.)\b/ig)) {
@@ -27,11 +28,12 @@ export class DatabaseChain implements ComplectionChain {
 
         const lcp = ConnectionManager.getLastConnectionOption()
         if (!lcp) { return []; }
-        const connectcionid = `${lcp.host}_${lcp.port}_${lcp.user}`;
+        const connectcionid = `${lcp.getConnectId()}`;
 
         const databaseNodes = DatabaseCache.getDatabaseListOfConnection(connectcionid);
+        if (databaseNodes == null) { return []; }
 
-        return databaseNodes.map<vscode.CompletionItem>((databaseNode) => {
+        return databaseNodes.filter((databaseNode) => !(databaseNode instanceof UserGroup)).map<vscode.CompletionItem>((databaseNode) => {
             const label = databaseNode.label;
             const completionItem = new vscode.CompletionItem(label);
             completionItem.kind = vscode.CompletionItemKind.Folder;

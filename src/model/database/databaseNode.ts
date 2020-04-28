@@ -2,31 +2,29 @@ import mysqldump from 'mysqldump';
 import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/Constants";
+import { FileManager } from '../../common/FileManager';
 import { Console } from "../../common/OutputChannel";
 import { Util } from '../../common/util';
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { QueryUnit } from "../../database/QueryUnit";
-import { FileManager } from '../../common/FileManager';
-import { MySQLTreeDataProvider } from "../../provider/MysqlTreeDataProvider";
+import { ConnectionManager } from "../../service/connectionManager";
+import { DatabaseCache } from "../../service/common/databaseCache";
+import { QueryUnit } from "../../service/queryUnit";
+import { DbTreeDataProvider } from '../../provider/treeDataProvider';
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { FunctionGroup } from "../main/functionGroup";
 import { ProcedureGroup } from "../main/procedureGroup";
-import { TriggerGroup } from "../main/triggerGroup";
 import { TableGroup } from "../main/tableGroup";
+import { TriggerGroup } from "../main/triggerGroup";
 import { ViewGroup } from "../main/viewGroup";
-
-import format = require('date-format');
 
 export class DatabaseNode extends Node implements CopyAble {
 
     public contextValue: string = ModelType.DATABASE;
-    public iconPath: string = path.join(Constants.RES_PATH, "database.svg");
-    constructor(readonly name: string, readonly info: Node) {
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/database.svg");
+    constructor(name: string, readonly info: Node) {
         super(name)
-        this.id = `${info.host}_${info.port}_${info.user}_${name}`
-        this.info = Object.assign({ ...info }, { database: name }) as Node
+        this.id = `${info.getConnectId()}_${name}`
+        this.info = { ...info, database: name, getConnectId: info.getConnectId } as Node
         this.init(this.info)
     }
 
@@ -39,51 +37,24 @@ export class DatabaseNode extends Node implements CopyAble {
     }
 
     public importData(fsPath: string) {
-        Console.log(`Doing import ${this.host}:${this.port}_${this.name}...`);
+        Console.log(`Doing import ${this.host}:${this.port}_${this.database}...`);
         ConnectionManager.getConnection(this).then((connection) => {
             QueryUnit.runFile(connection, fsPath);
         });
     }
 
-    public backupData(exportPath: string) {
-
-        Console.log(`Doing backup ${this.host}_${this.name}...`);
-        mysqldump({
-            connection: {
-                host: this.host,
-                user: this.user,
-                password: this.password,
-                database: this.name,
-                port: parseInt(this.port),
-            },
-            dump: {
-                schema: {
-                    table: {
-                        ifNotExist: false,
-                        dropIfExist: true,
-                        charset: false,
-                    },
-                    engine: false,
-                },
-            },
-            dumpToFile: `${exportPath}\\${this.name}_${format('yyyy-MM-dd_hhmmss', new Date())}.sql`,
-        }).then(() => {
-            vscode.window.showInformationMessage(`Backup ${this.host}_${this.name} success!`);
-        }).catch((err) => {
-            vscode.window.showErrorMessage(`Backup ${this.host}_${this.name} fail!\n${err}`);
-        });
-        Console.log("backup end.");
-
-    }
-
     public dropDatatabase() {
 
-        Util.confirm(`Are you want to Drop Database ${this.name} ? `, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE \`${this.name}\``).then(() => {
-                DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`);
-                MySQLTreeDataProvider.refresh();
-                vscode.window.showInformationMessage(`Delete database ${this.name} success!`);
-            });
+        vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
+            if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
+                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE ${this.database}`).then(() => {
+                    DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`)
+                    DbTreeDataProvider.refresh();
+                    vscode.window.showInformationMessage(`Delete database ${this.database} success!`)
+                })
+            } else {
+                vscode.window.showInformationMessage(`Cancel delete database ${this.database}!`)
+            }
         })
 
     }
@@ -97,7 +68,7 @@ export class DatabaseNode extends Node implements CopyAble {
     }
 
     public copyName() {
-        Util.copyToBoard(this.name)
+        Util.copyToBoard(this.database)
     }
 
 }

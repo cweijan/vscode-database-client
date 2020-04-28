@@ -15,7 +15,7 @@ export class TableDetecherChain implements ComplectionChain {
             const completionItem = [];
             let result = tableMatch.exec(complectionContext.currentSqlFull);
             while (result != null) {
-                const alias = result[5];
+                const alias = result[4];
                 if (alias) {
                     completionItem.push(new vscode.CompletionItem(alias, vscode.CompletionItemKind.Interface));
                 } else {

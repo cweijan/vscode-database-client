@@ -3,14 +3,15 @@ import * as fs from "fs";
 import * as mysql from "mysql";
 import { Connection } from "mysql";
 import * as vscode from "vscode";
-import { CommandKey, ConfigKey, Cursor, MessageType } from "../common/Constants";
+import { CommandKey, ConfigKey, Cursor, MessageType, Pattern } from "../common/Constants";
 import { Global } from "../common/Global";
 import { Console } from "../common/OutputChannel";
 import { FileManager, FileModel } from "../common/FileManager";
 import { Node } from "../model/interface/node";
 import { QueryPage } from "../view/result/query";
 import { DataResponse, DMLResponse, ErrorResponse, MessageResponse, RunResponse } from "../view/result/queryResponse";
-import { ConnectionManager } from "./ConnectionManager";
+import { ConnectionManager } from "./connectionManager";
+import { DelimiterHolder } from "./common/delimiterHolder";
 
 export class QueryUnit {
 
@@ -18,7 +19,6 @@ export class QueryUnit {
 
     public static queryPromise<T>(connection: mysql.Connection, sql: string): Promise<T> {
         return new Promise((resolve, reject) => {
-            // Console.log(`Execute SQL:${sql}`)
             connection.query(sql, (err: mysql.MysqlError, rows) => {
                 if (err) {
                     Console.log(`Execute sql fail : ${sql}`);
@@ -33,6 +33,7 @@ export class QueryUnit {
 
     private static ddlPattern = /^(alter|create|drop)/ig;
     private static dmlPattern = /^(insert|update|delete)/ig;
+    protected static delimiterHodler = new DelimiterHolder()
     public static async runQuery(sql?: string, connectionNode?: Node): Promise<null> {
         if (!sql && !vscode.window.activeTextEditor) {
             vscode.window.showWarningMessage("No SQL file selected");
@@ -57,7 +58,7 @@ export class QueryUnit {
             const activeTextEditor = vscode.window.activeTextEditor;
             const selection = activeTextEditor.selection;
             if (selection.isEmpty) {
-                sql = this.obtainSql(activeTextEditor);
+                sql = this.obtainSql(activeTextEditor, this.delimiterHodler.get(connectionNode.getConnectId()));
             } else {
                 sql = activeTextEditor.document.getText(selection);
             }
@@ -66,16 +67,26 @@ export class QueryUnit {
         const executeTime = new Date().getTime();
         const isDDL = sql.match(this.ddlPattern);
         const isDML = sql.match(this.dmlPattern);
-        if (isDDL == null && isDML == null) {
+            const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
+            sql = parseResult.sql
+            if (!sql && parseResult.replace) {
+                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
+                return;
+            }
+        if (isDDL == null && isDML == null && sql) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
-        const sqlList: string[] = sql.split(";").filter((s) => s.trim() != '')
 
-        if (sqlList.length > 1) {
-            const success = await this.runBatch(connection, sqlList)
-            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Batch execute sql ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
-            return;
+        const isMulti = sql.match(Pattern.MULTI_PATTERN);
+        if (!isMulti) {
+            const sqlList: string[] = sql.split(";").filter((s) => (s.trim() != '' && s.trim() != ';'))
+            if (sqlList.length > 1) {
+                const success = await this.runBatch(connection, sqlList)
+                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Batch execute sql ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
+                return;
+            }
         }
+
         connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
             if (err) {
                 QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
@@ -84,6 +95,11 @@ export class QueryUnit {
             const costTime = new Date().getTime() - executeTime;
             if (fromEditor) {
                 vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime);
+            }
+            if (isMulti) {
+                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
+                vscode.commands.executeCommand(CommandKey.Refresh);
+                return;
             }
             if (isDDL) {
                 QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
@@ -98,7 +114,7 @@ export class QueryUnit {
                 QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields } as DataResponse });
                 return;
             }
-            QueryPage.send({ type: MessageType.MESSAGE, res: { msg: `Execute sql success : ${sql}`, costTime } });
+            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
 
         });
     }
@@ -124,24 +140,30 @@ export class QueryUnit {
 
 
     private static batchPattern = /\s+(TRIGGER|PROCEDURE|FUNCTION)\s+/ig;
-    public static obtainSql(activeTextEditor: vscode.TextEditor): string {
+    public static obtainSql(activeTextEditor: vscode.TextEditor, delimiter?: string): string {
 
         const content = activeTextEditor.document.getText();
         if (content.match(this.batchPattern)) { return content; }
 
-        return this.obtainCursorSql(activeTextEditor.document, activeTextEditor.selection.active, content);
+        return this.obtainCursorSql(activeTextEditor.document, activeTextEditor.selection.active, content, delimiter);
 
     }
 
-    public static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string) {
+    public static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string, delimiter?: string) {
         if (!content) { content = document.getText(new vscode.Range(new vscode.Position(0, 0), current)); }
+        if (delimiter) {
+            content = content.replace(new RegExp(delimiter, 'g'), ";")
+        }
         const sqlList = content.split(";");
         const docCursor = document.getText(Cursor.getRangeStartTo(current)).length;
         let index = 0;
-        for (const sql of sqlList) {
+        for (let i = 0; i < sqlList.length; i++) {
+            const sql = sqlList[i];
             index += (sql.length + 1);
-            if (docCursor < index) {
-                return sql.trim();
+            if (docCursor <= index) {
+                const trimSql = sql.trim();
+                if (!trimSql && i > 1) { return sqlList[i - 1]; }
+                return trimSql;
             }
         }
 
@@ -149,10 +171,10 @@ export class QueryUnit {
     }
 
     private static sqlDocument: vscode.TextEditor;
-    public static async showSQLTextDocument(sql: string = "") {
+    public static async showSQLTextDocument(sql: string = "", template = "template.sql") {
 
         this.sqlDocument = await vscode.window.showTextDocument(
-            await vscode.workspace.openTextDocument(await FileManager.record("template.sql", sql, FileModel.WRITE))
+            await vscode.workspace.openTextDocument(await FileManager.record(template, sql, FileModel.WRITE))
         );
 
         return this.sqlDocument;
@@ -162,19 +184,26 @@ export class QueryUnit {
         const stats = fs.statSync(fsPath);
         const startTime = new Date();
         const fileSize = stats.size;
-        if (fileSize > 1024 * 1024 * 100) {
-            vscode.window.showErrorMessage(`Import sql exceed max limit 100M!`)
-            return;
+        if (fileSize > 1024 * 1024 * 200) {
+            vscode.window.showErrorMessage(`Import sql exceed max limit 200M!`)
             // if (await this.executeByLine(connection, fsPath)) {
             //     Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
             // }
         } else {
-            const fileContent = fs.readFileSync(fsPath, 'utf8');
-            const sqlList = fileContent.split(";")
-            this.runBatch(connection, sqlList)
+            let fileContent = fs.readFileSync(fsPath, 'utf8');
+            if (Global.getConfig<boolean>(ConfigKey.ENABLE_DELIMITER)) {
+                const parse = this.delimiterHodler.parseBatch(fileContent)
+                fileContent = parse.sql
+            }
+            if (fileContent.match(Pattern.MULTI_PATTERN)) {
+                await this.queryPromise(connection, fileContent)
+            } else {
+                const sqlList = fileContent.split(";")
+                await this.runBatch(connection, sqlList)
+            }
             Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
+            vscode.commands.executeCommand(CommandKey.Refresh)
         }
-        vscode.commands.executeCommand(CommandKey.Refresh)
 
     }
 

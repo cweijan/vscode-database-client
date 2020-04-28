@@ -3,13 +3,15 @@ import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class TableCreateChain implements ComplectionChain {
 
-    private tableKeywordList: string[] = ["AUTO_INCREMENT", "NULL", "NOT", "PRIMARY", "CURRENT_TIME", "DEFAULT", "COMMENT", "UNIQUE", "KEY"];
+    private tableKeywordList: string[] = ["AUTO_INCREMENT", "NULL", "NOT", "PRIMARY", "CURRENT_TIME", 
+        "DEFAULT", "COMMENT", "UNIQUE", "KEY", "FOREIGN", "CASCADE", "RESTRICT", "UNSIGNED"];
     private tableKeywordComplectionItems: vscode.CompletionItem[] = [];
 
     constructor() {
+
         this.tableKeywordList.forEach((keyword) => {
             const keywordComplectionItem = new vscode.CompletionItem(keyword + " ");
-            keywordComplectionItem.kind = vscode.CompletionItemKind.Property;
+            keywordComplectionItem.kind = vscode.CompletionItemKind.Keyword;
             this.tableKeywordComplectionItems.push(keywordComplectionItem);
         });
     }

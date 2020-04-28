@@ -1,8 +1,8 @@
 import * as path from "path";
-import { Constants, ModelType } from "../../common/constants";
-import { ConnectionManager } from "../../database/ConnectionManager";
-import { DatabaseCache } from "../../database/DatabaseCache";
-import { QueryUnit } from "../../database/QueryUnit";
+import { Constants, ModelType, Template } from "../../common/constants";
+import { ConnectionManager } from "../../service/connectionManager";
+import { DatabaseCache } from "../../service/common/databaseCache";
+import { QueryUnit } from "../../service/queryUnit";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
 import { FunctionNode } from "./function";
@@ -10,10 +10,10 @@ import { FunctionNode } from "./function";
 export class FunctionGroup extends Node {
 
     public contextValue = ModelType.FUNCTION_GROUP;
-    public iconPath = path.join(Constants.RES_PATH, "function.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
     constructor(readonly info: Node) {
         super("FUNCTION")
-        this.id = `${info.host}_${info.port}_${info.user}_${info.database}_${ModelType.FUNCTION_GROUP}`;
+        this.id = `${info.getConnectId()}_${info.database}_${ModelType.FUNCTION_GROUP}`;
         this.init(info)
     }
 
@@ -43,10 +43,10 @@ export class FunctionGroup extends Node {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
-FUNCTION \`name\`() RETURNS [TYPE
+FUNCTION [name]() RETURNS [TYPE]
 BEGIN
-    return [value;
-END;`);
+    return [value];
+END;`, Template.create);
     }
 
 }

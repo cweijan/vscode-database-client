@@ -4,42 +4,74 @@
 
 MySQL Client For Visual Studio Code
 
-> You are welcome to contribute via the [repository](https://github.com/cweijan/vscode-mysql)
->
-> This extension was inspired by the [MySQL](https://github.com/formulahendry/vscode-mysql) extension.
 
-## Features
+> This plugin inspired for [MySQL](https://github.com/formulahendry/vscode-mysql)
+> 
+> Give [project](https://github.com/cweijan/vscode-mysql) star keep me motivated to keep updating
 
-* [Connect To MySQL Server](#how-to-connect)
-* Overview, Users, Databases, Tables, Procedures, Triggers, Functions
-* [SQL Assistant ( Syntax, Formatter, Completion )](#execute-sql)
-* [Run MySQL Query](#execute-sql)
-* Tabular CRUD editor
-* [Backup / import](#backupimport) data
+**Features**
 
-## How to Connect
+- [MySQL Client](#mysql-client)
+  - [Connect](#connect)
+  - [View Tables](#view-tables)
+  - [Execute Sql](#execute-sql)
+  - [Generate Mock Date](#generate-mock-date)
+  - [History](#history)
+  - [Backup/Import](#backupimport)
+  - [Setting](#setting)
+  - [Suprise](#suprise)
 
-Open the MySQL tab, then press the `+` button.
+## Connect
+
+1. Open MySQL Panel, then click the `+` button.
+2. Input you connect info then click connect.
 
 ![connection](images/connection.jpg)
 
 ## View Tables
 
-Press any 'Table' node to open the query page.
-
+1. Click Table To Open Query page and Load data.
+2. You can do data modification on query page.
 ![query](images/QueryTable.jpg)
 
-## Execute SQL
+## Execute Sql
 
-* Under the MySQL tab, press the `New Query` button.
+* In the MySQL Panel, click the `New Query` button.
 ![newquery](images/newquery.jpg)
 * This changes the active database.
-* Now you may enjoy the Intelli SQL code within the editor.
-* Press the 'Run' button or the `F9` key to execute.
+* Now You can enjoy Intelli SQL code within the editor.
+* Click Run Button or Press `F9` to Execute.
 ![run](images/run.jpg)
 
+## Generate Mock Date
+- Now you not need spend time to writing test data
+![mockData](images/mockData.png)
+
+## History
+- Click history button to open run history record.
+![history](images/history.jpg)
 
 ## Backup/Import
 
-Go to any Database or Table node, backup/import options are listed in the context menu (right click to open).
-![backup](images/Backup.jpg)
+* Move to ant DatabaseNode or TableNode, backup/import options are listed in the context menu (right click to open).
+![bakcup](images/Backup.jpg)
+
+## Setting
+
+```json
+{
+  // enable delimiter when import data
+  "vscode-mysql.enableDelimiter": false,
+  
+  // open query result as full screen.
+  "vscode-mysql.fullQueryScreen":false,
+
+  // set max tables show of each database.
+  "vscode-mysql.maxTableCount": 500
+}
+```
+
+## Suprise
+* You can find suprise when right click on node.
+
+![suprise](images/surprise.jpg)

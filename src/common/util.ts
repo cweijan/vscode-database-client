@@ -5,13 +5,12 @@ import { Pattern, Confirm } from "./Constants";
 
 export class Util {
 
-    public static getTableName(sql: string, tablePattern: Pattern): string {
+    public static getTableName(sql: string, tablePattern: string): string {
 
         const tableMatch = new RegExp(tablePattern, 'img').exec(sql)
         if (tableMatch) {
             return tableMatch[0].replace(/\bfrom|join|update|into\b/i, "") // remove keyword
-                .replace(/(\w|\s)*\./, "") // remove table name
-                .replace(/`/ig, "").trim() // remove `
+                .replace(/(\w|\s|-|`)*\./, "").trim() // remove databasename
         }
 
         return null;
@@ -59,7 +58,7 @@ export class Util {
     public static confirm(placeHolder: string, callback: () => void) {
         vscode.window.showQuickPick([Confirm.YES, Confirm.NO], { placeHolder }).then((res) => {
             if (res == Confirm.YES) {
-                callback() 
+                callback()
             }
         })
     }

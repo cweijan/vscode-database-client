@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
 import { ModelType } from "../../../common/Constants";
-import { DatabaseCache } from "../../../database/DatabaseCache";
+import { DatabaseCache } from "../../../service/common/databaseCache";
 import { Node } from "../../../model/interface/node";
 import { TableNode } from "../../../model/main/tableNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Util } from "../../../common/util";
-import { ConnectionManager } from "../../../database/ConnectionManager";
+import { ConnectionManager } from "../../../service/connectionManager";
 
 export class TableChain implements ComplectionChain {
 
@@ -40,14 +40,14 @@ export class TableChain implements ComplectionChain {
             inputWord = lcp.database
         }
         if (inputWord) {
-            const connectcionid = `${lcp.host}_${lcp.port}_${lcp.user}`;
+            const connectcionid = lcp.getConnectId();
             DatabaseCache.getDatabaseListOfConnection(connectcionid).forEach((databaseNode) => {
-                if (databaseNode.name === inputWord) {
+                if (databaseNode.database === inputWord) {
                     tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.id);
                 }
             });
         } else {
-            const databaseid = `${lcp.host}_${lcp.port}_${lcp.user}_${lcp.database}`;
+            const databaseid = `${lcp.getConnectId()}_${lcp.database}`;
             const tableList = DatabaseCache.getTableListOfDatabase(databaseid);
             if (tableList == null) { return []; }
             tableNodes = tableList.filter((tableNode: TableNode) => {
@@ -57,10 +57,11 @@ export class TableChain implements ComplectionChain {
             });
         }
 
+        if (!tableNodes) { return [] }
+
         return tableNodes.map<vscode.CompletionItem>((tableNode: TableNode) => {
-            const label = tableNode.label;
-            const completionItem = new vscode.CompletionItem(label);
-            completionItem.insertText = Util.wrap(label);
+            const completionItem = new vscode.CompletionItem(tableNode.label);
+            completionItem.insertText = Util.wrap(tableNode.table);
             switch (tableNode.contextValue) {
                 case ModelType.TABLE:
                     completionItem.kind = vscode.CompletionItemKind.Function;

@@ -45,7 +45,7 @@
 				{
 					"id": "github-cweijan-mysql",
 					"title": "Mysql",
-					"icon": "resources/database-container.svg"
+					"icon": "resources/icon/database-container.svg"
 				}
 			]
 		},
@@ -62,13 +62,13 @@
 				"command": "mysql.history.open",
 				"title": "Open History",
 				"category": "MySQL",
-				"icon": "resources/history.svg"
+				"icon": "resources/icon/history.svg"
 			},
 			{
 				"command": "mysql.setting.open",
 				"title": "Open Setting",
 				"category": "MySQL",
-				"icon": "resources/settings.svg"
+				"icon": "resources/icon/settings.svg"
 			},
 			{
 				"command": "mysql.refresh",
@@ -91,6 +91,11 @@
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
 				},
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.editConnection",
+				"title": "Edit Connection",
 				"category": "MySQL"
 			},
 			{
@@ -151,6 +156,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.struct.export",
+				"title": "Export Table Struct",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.copy.insert",
 				"title": "Insert SQL",
 				"category": "MySQL"
@@ -177,7 +187,7 @@
 			},
 			{
 				"command": "mysql.mock.run",
-				"title": "Start Data",
+				"title": "Start Generate",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/run.png",
@@ -186,7 +196,7 @@
 			},
 			{
 				"command": "mysql.mock.table",
-				"title": "Mock Data",
+				"title": "Generate Mock Data",
 				"category": "MySQL"
 			},
 			{
@@ -394,6 +404,11 @@
 					"group": "1_mysql@1"
 				},
 				{
+					"command": "mysql.editConnection",
+					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"group": "1_mysql@2"
+				},
+				{
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "2_mysql@1"
@@ -489,14 +504,19 @@
 					"group": "mysql@5"
 				},
 				{
+					"command": "mysql.struct.export",
+					"when": "view == github.cweijan.mysql && viewItem == database",
+					"group": "mysql@6"
+				},
+				{
 					"command": "mysql.data.import",
 					"when": "view == github.cweijan.mysql && viewItem == database",
 					"group": "mysql@6"
 				},
 				{
-					"command": "mysql.template.sql",
+					"command": "mysql.changeTableName",
 					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "1_mysql@0"
+					"group": "inline"
 				},
 				{
 					"command": "mysql.name.copy",
@@ -509,24 +529,29 @@
 					"group": "1_inline@0"
 				},
 				{
-					"command": "mysql.mock.table",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "1_inline@1"
-				},
-				{
-					"command": "mysql.changeTableName",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "inline"
-				},
-				{
-					"command": "mysql.index.template",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "1_inline@3"
-				},
-				{
 					"command": "mysql.column.add",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@4"
+				},
+				{
+					"command": "mysql.mock.table",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline1@1"
+				},
+				{
+					"command": "mysql.data.export",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline1@2"
+				},
+				{
+					"command": "mysql.struct.export",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline1@3"
+				},
+				{
+					"command": "mysql.template.sql",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_mysql@0"
 				},
 				{
 					"command": "mysql.copy.insert",
@@ -544,6 +569,21 @@
 					"group": "1_mysql@2"
 				},
 				{
+					"command": "mysql.table.truncate",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "2_mysql@1"
+				},
+				{
+					"command": "mysql.table.drop",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "2_mysql@2"
+				},
+				{
+					"command": "mysql.index.template",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "2_mysql@3"
+				},
+				{
 					"command": "mysql.template.table",
 					"when": "view == github.cweijan.mysql && viewItem == tableGroup",
 					"group": "1_mysql@1"
@@ -557,21 +597,6 @@
 					"command": "mysql.template.table",
 					"when": "view == github.cweijan.mysql && viewItem == tableGroup",
 					"group": "inline"
-				},
-				{
-					"command": "mysql.table.drop",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "2_mysql@4"
-				},
-				{
-					"command": "mysql.table.truncate",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "2_mysql@4"
-				},
-				{
-					"command": "mysql.data.export",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "2_mysql@5"
 				},
 				{
 					"command": "mysql.changeColumnName",
@@ -678,6 +703,16 @@
 					"type": "integer",
 					"default": 500,
 					"description": "The maximum table count shown in the tree view"
+				},
+				"vscode-mysql.enableDelimiter": {
+					"type": "boolean",
+					"default": false,
+					"description": "Support delimiter when import sql."
+				},
+				"vscode-mysql.fullQueryScreen": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show query result full screen."
 				}
 			}
 		}
@@ -695,15 +730,17 @@
 		"@types/ssh2": "^0.5.43",
 		"tslint": "^5.8.0",
 		"typescript": "^3.8.3",
+		"@types/async-lock": "^1.1.2",
 		"vscode": "^1.1.36"
 	},
 	"dependencies": {
+		"async-lock": "^1.2.2",
 		"date-format": "^3.0.0",
+		"get-port": "^5.1.1",
 		"mockjs": "^1.1.0",
 		"mysql": "^2.18.1",
 		"mysqldump": "^3.1.0",
 		"sql-formatter": "^2.3.3",
-		"get-port": "^5.1.1",
 		"tunnel-ssh": "^4.1.4"
 	},
 	"__metadata": {

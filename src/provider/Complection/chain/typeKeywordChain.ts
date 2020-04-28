@@ -10,7 +10,7 @@ export class TypeKeywordChain implements ComplectionChain {
     constructor() {
         this.typeList.forEach((columnType) => {
             const columnTypeComplectionItem = new vscode.CompletionItem(columnType + " ");
-            columnTypeComplectionItem.kind = vscode.CompletionItemKind.TypeParameter;
+            columnTypeComplectionItem.kind = vscode.CompletionItemKind.Variable;
             this.typeComplectionItems.push(columnTypeComplectionItem);
         });
     }
