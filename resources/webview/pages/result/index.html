@@ -299,12 +299,12 @@
                     }
                 }
                 return objClone;
-            }, initShowColumn(columnList) {
-                if (!columnList) return;
+            }, initShowColumn(fields) {
+                if (!fields) return;
                 this.toolbar.showColumns = []
-                for (let i = 0; i < columnList.length; i++) {
-                    if (!columnList[i].name) continue;
-                    this.toolbar.showColumns.push(columnList[i].name.toLowerCase());
+                for (let i = 0; i < fields.length; i++) {
+                    if (!fields[i].name) continue;
+                    this.toolbar.showColumns.push(fields[i].name.toLowerCase());
                 }
             }
 

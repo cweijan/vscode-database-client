@@ -1,4 +1,4 @@
-<el-table-column  :label="field.name" v-for="field in result.fields" :key="field.name" align="center" sortable
+<el-table-column  :label="field.name" v-for="(field,index) in result.fields" :key="index" align="center" sortable
     v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())"
     :width="computeWidth(field.name,0,toolbar.filter[field.name])">
     <template slot-scope="scope">

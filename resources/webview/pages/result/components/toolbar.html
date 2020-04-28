@@ -3,7 +3,7 @@
         <div v-if="scope.row.isFilter" style="text-align: center;">
             <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
                 <el-checkbox-group v-model="toolbar.showColumns">
-                    <el-checkbox v-for="(column) in result.fields" :label="column.name" :key="column.name">
+                    <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
                         {{column.name}}
                     </el-checkbox>
                 </el-checkbox-group>
