@@ -46,13 +46,13 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.mock.run": () => {
                 serviceManager.mockRunner.runMock()
             },
-            "mysql.addConnection": () => {
+            "mysql.connection.add": () => {
                 serviceManager.connectService.openConnect(serviceManager.provider)
             },
-            "mysql.editConnection": (connectionNode: ConnectionNode) => {
+            "mysql.connection.edit": (connectionNode: ConnectionNode) => {
                 serviceManager.connectService.openConnect(serviceManager.provider, connectionNode)
             },
-            "mysql.addDatabase": (connectionNode: ConnectionNode) => {
+            "mysql.database.add": (connectionNode: ConnectionNode) => {
                 connectionNode.createDatabase();
             },
             "mysql.deleteDatabase": (databaseNode: DatabaseNode) => {
@@ -73,7 +73,7 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.table.source": (tableNode: TableNode) => {
                 if (tableNode) { tableNode.showSource(); }
             },
-            "mysql.changeColumnName": (columnNode: ColumnNode) => {
+            "mysql.column.changeName": (columnNode: ColumnNode) => {
                 columnNode.changeColumnName();
             },
             "mysql.column.add": (tableNode: TableNode) => {
@@ -85,14 +85,14 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.column.drop": (columnNode: ColumnNode) => {
                 columnNode.dropColumnTemplate();
             },
-            "mysql.deleteConnection": (connectionNode: ConnectionNode) => {
+            "mysql.connection.delete": (connectionNode: ConnectionNode) => {
                 connectionNode.deleteConnection(context);
             },
             "mysql.runQuery": (sql) => {
                 if (typeof sql != 'string') { sql = null; }
                 QueryUnit.runQuery(sql);
             },
-            "mysql.newQuery": (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
+            "mysql.query.switch": (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
                 if (databaseOrConnectionNode) {
                     databaseOrConnectionNode.newQuery();
                 } else {
@@ -173,7 +173,7 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.change.user": (userNode: UserNode) => {
                 userNode.changePasswordTemplate();
             },
-            "mysql.grant.user": (userNode: UserNode) => {
+            "mysql.user.grant": (userNode: UserNode) => {
                 userNode.grandTemplate();
             },
         }),

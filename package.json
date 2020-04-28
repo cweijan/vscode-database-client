@@ -85,7 +85,7 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.addConnection",
+				"command": "mysql.connection.add",
 				"title": "Add Connection",
 				"icon": {
 					"light": "resources/light/add.svg",
@@ -94,17 +94,17 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.editConnection",
+				"command": "mysql.connection.edit",
 				"title": "Edit Connection",
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.deleteConnection",
+				"command": "mysql.connection.delete",
 				"title": "Delete Connection",
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.addDatabase",
+				"command": "mysql.database.add",
 				"title": "New Database",
 				"icon": {
 					"light": "resources/light/add.svg",
@@ -127,7 +127,7 @@
 				}
 			},
 			{
-				"command": "mysql.newQuery",
+				"command": "mysql.query.switch",
 				"title": "Open Query",
 				"category": "MySQL",
 				"icon": {
@@ -214,7 +214,7 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.changeColumnName",
+				"command": "mysql.column.changeName",
 				"title": "Change Column Name",
 				"category": "MySQL",
 				"icon": {
@@ -302,7 +302,7 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.grant.user",
+				"command": "mysql.user.grant",
 				"title": "Grant Privileges",
 				"category": "MySQL"
 			},
@@ -371,7 +371,7 @@
 			],
 			"view/title": [
 				{
-					"command": "mysql.addConnection",
+					"command": "mysql.connection.add",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@3"
 				},
@@ -381,7 +381,7 @@
 					"group": "navigation@2"
 				},
 				{
-					"command": "mysql.newQuery",
+					"command": "mysql.query.switch",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@1"
 				},
@@ -399,12 +399,12 @@
 			],
 			"view/item/context": [
 				{
-					"command": "mysql.newQuery",
+					"command": "mysql.query.switch",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "1_mysql@1"
 				},
 				{
-					"command": "mysql.editConnection",
+					"command": "mysql.connection.edit",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "1_mysql@2"
 				},
@@ -414,7 +414,7 @@
 					"group": "2_mysql@1"
 				},
 				{
-					"command": "mysql.addDatabase",
+					"command": "mysql.database.add",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "2_mysql@0"
 				},
@@ -424,17 +424,17 @@
 					"group": "3_mysql@1"
 				},
 				{
-					"command": "mysql.deleteConnection",
+					"command": "mysql.connection.delete",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "mysql@2"
 				},
 				{
-					"command": "mysql.newQuery",
+					"command": "mysql.query.switch",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "inline@1"
 				},
 				{
-					"command": "mysql.addDatabase",
+					"command": "mysql.database.add",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "inline@0"
 				},
@@ -459,7 +459,7 @@
 					"group": "1_mysql@-1"
 				},
 				{
-					"command": "mysql.grant.user",
+					"command": "mysql.user.grant",
 					"when": "view == github.cweijan.mysql && viewItem == user",
 					"group": "1_mysql@0"
 				},
@@ -474,12 +474,12 @@
 					"group": "1_mysql@2"
 				},
 				{
-					"command": "mysql.newQuery",
+					"command": "mysql.query.switch",
 					"when": "view == github.cweijan.mysql && viewItem == database",
 					"group": "inline"
 				},
 				{
-					"command": "mysql.newQuery",
+					"command": "mysql.query.switch",
 					"when": "view == github.cweijan.mysql && viewItem == database",
 					"group": "2_mysql@0"
 				},
@@ -599,7 +599,7 @@
 					"group": "inline"
 				},
 				{
-					"command": "mysql.changeColumnName",
+					"command": "mysql.column.changeName",
 					"when": "view == github.cweijan.mysql && viewItem == column",
 					"group": "inline"
 				},
