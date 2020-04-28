@@ -55,7 +55,7 @@ export class ConnectionNode extends Node {
     }
 
     public async newQuery() {
-        ConnectionManager.getConnection(this);
+        ConnectionManager.getConnection(this, true);
         ConnectionNode.tryOpenQuery()
     }
 

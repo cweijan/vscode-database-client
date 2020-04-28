@@ -96,6 +96,7 @@ export function activate(context: vscode.ExtensionContext) {
                 if (databaseOrConnectionNode) {
                     databaseOrConnectionNode.newQuery();
                 } else {
+                    // QueryUnit.showSQLTextDocument("", `sql/${new Date().getTime()}.sql`)
                     ConnectionNode.tryOpenQuery();
                 }
             },
