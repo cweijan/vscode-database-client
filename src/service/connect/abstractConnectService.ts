@@ -2,6 +2,7 @@ import { ConnectionNode } from "../../model/database/connectionNode";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ViewManager } from "../../view/viewManager";
 import { Node } from "../../model/interface/node";
+import { NodeUtil } from "../../model/nodeUtil";
 
 export abstract class AbstractConnectService {
 
@@ -10,7 +11,10 @@ export abstract class AbstractConnectService {
     public async openConnect(provider: DbTreeDataProvider, connectionNode?: ConnectionNode) {
         let node;
         if (connectionNode) {
-            node = connectionNode.origin ? { ...connectionNode.origin, usingSSH: true, timezone: connectionNode.timezone, ssh: { ...connectionNode.ssh, tunnelPort: null } } : connectionNode
+            node = { ...connectionNode }
+            if (node.ssh) {
+                node.ssh.tunnelPort = null
+            }
         }
         ViewManager.createWebviewPanel({
             path: "pages/connect/connect",
@@ -26,7 +30,7 @@ export abstract class AbstractConnectService {
             },
             receiveListener: async (webviewPanel, params) => {
                 if (params.type === 'CONNECT_TO_SQL_SERVER') {
-                    const connectNode = Node.build(params.connectionOption as Node)
+                    const connectNode = NodeUtil.build(params.connectionOption)
                     try {
                         await this.connect(connectNode)
                         provider.addConnection(connectNode)

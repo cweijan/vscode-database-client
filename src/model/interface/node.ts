@@ -5,27 +5,18 @@ import { SSHConfig } from "./sshConfig";
 export abstract class Node extends vscode.TreeItem {
 
     public host: string;
-    public port: string;
+    public port: number;
     public user: string;
     public password?: string;
     public database?: string;
     public timezone?: string;
     public certPath?: string;
-    public origin?: Node;
 
     public usingSSH?: boolean;
     public ssh?: SSHConfig;
 
     constructor(id: string) {
         super(id)
-    }
-
-    public getChildren(isRresh?: boolean): Node[] | Promise<Node[]> {
-        return []
-    }
-
-    public getConnectId(): string {
-        return `${this.host}_${this.port}_${this.user}`;
     }
 
     protected init(source: Node) {
@@ -39,20 +30,21 @@ export abstract class Node extends vscode.TreeItem {
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
         this.collapsibleState = DatabaseCache.getElementState(this)
-        this.origin = source.origin
     }
 
-    public static build(node: Node): Node {
-        if (node.usingSSH) {
-            const { ssh, ...origin } = node
-            node.origin = origin as Node
-            node.host = node.ssh.host
-            node.port = "" + node.ssh.port
-        }
-        if (!node.getConnectId) {
-            node.getConnectId = Node.prototype.getConnectId
-        }
-        return node;
+    public getChildren(isRresh?: boolean): Node[] | Promise<Node[]> {
+        return []
     }
+
+    public getConnectId(): string {
+        if (this.usingSSH && this.ssh) {
+            return `${this.ssh.host}_${this.ssh.port}_${this.ssh.username}`;
+        }
+        return `${this.host}_${this.port}_${this.user}`;
+    }
+
+    public getHost = () => this.usingSSH ? this.ssh.host : this.host
+    public getPort = () => this.usingSSH ? this.ssh.port : this.port
+    public getUser = () => this.usingSSH ? this.ssh.username : this.user
 
 }

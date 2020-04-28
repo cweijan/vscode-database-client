@@ -74,7 +74,7 @@ export class ConnectionNode extends Node {
     }
 
     public importData(fsPath: string) {
-        Console.log(`Doing import ${this.host}:${this.port}...`);
+        Console.log(`Doing import ${this.getHost()}:${this.getPort()}...`);
         ConnectionManager.getConnection(this).then((connection) => {
             QueryUnit.runFile(connection, fsPath);
         });

@@ -53,8 +53,9 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
             connections = {};
         }
 
-        connections[`${connectionNode.host}_${connectionNode.port}_${connectionNode.user}`] = connectionNode;
-        ConnectionManager.removeConnection(connectionNode.getConnectId())
+        const connectId = connectionNode.getConnectId();
+        connections[connectId] = connectionNode;
+        ConnectionManager.removeConnection(connectId)
 
 
         await this.context.globalState.update(CacheKey.ConectionsKey, connections);

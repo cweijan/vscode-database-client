@@ -18,7 +18,7 @@ export class Global {
     }
 
     private static getStatusBarItemText(activeConnection: Node): string {
-        return `$(server) ${activeConnection.host}` + (activeConnection.database ? ` $(database) ${activeConnection.database}` : "");
+        return `$(server) ${activeConnection.getHost()}` + (activeConnection.database ? ` $(database) ${activeConnection.database}` : "");
     }
 
     /**

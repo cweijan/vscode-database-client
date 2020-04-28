@@ -1,11 +1,11 @@
-import * as vscode from "vscode";
 import mysqldump, { Options } from 'mysqldump';
+import * as vscode from "vscode";
+import { Console } from "../../common/outputChannel";
+import { Node } from "../../model/interface/node";
+import { TableNode } from "../../model/main/tableNode";
+import { NodeUtil } from "../../model/nodeUtil";
 import { AbstractDumpService } from "./abstractDumpService";
 import format = require('date-format');
-import { Node } from "../../model/interface/node";
-import { Console } from "../../common/outputChannel";
-import { TableNode } from "../../model/main/tableNode";
-import { ConnectionManager } from "../connectionManager";
 
 export class MysqlDumpService extends AbstractDumpService {
     protected dumpData(node: Node, exportPath: string, withData: boolean): void {
@@ -13,11 +13,11 @@ export class MysqlDumpService extends AbstractDumpService {
         const tableName = node instanceof TableNode ? (node as TableNode).table : null;
         const option: Options = {
             connection: {
-                host: node.usingSSH ? node.origin.host : node.host,
-                user: node.usingSSH ? node.origin.user : node.user,
-                password: node.usingSSH ? node.origin.password : node.password,
+                host: node.host,
+                user: node.user,
+                password: node.password,
                 database: node.database,
-                port: node.usingSSH ? ConnectionManager.getActiveConnectByKey(node.getConnectId()).ssh.tunnelPort : parseInt(node.port),
+                port: node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port,
             },
             dump: {
                 tables: tableName ? [tableName] : [],
@@ -36,9 +36,9 @@ export class MysqlDumpService extends AbstractDumpService {
             option.dump.data = false;
         }
         mysqldump(option).then(() => {
-            vscode.window.showInformationMessage(`Backup ${node.host}_${node.database} success!`);
+            vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.database} success!`);
         }).catch((err) => {
-            vscode.window.showErrorMessage(`Backup ${node.host}_${node.database} fail!\n${err}`);
+            vscode.window.showErrorMessage(`Backup ${node.getHost()}_${node.database} fail!\n${err}`);
         }).then(() => {
             Console.log("backup end.");
         })

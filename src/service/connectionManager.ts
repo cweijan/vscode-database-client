@@ -10,6 +10,7 @@ import { QueryUnit } from "./queryUnit";
 import tunnel = require('tunnel-ssh')
 import { SSHConfig } from "../model/interface/sshConfig";
 import { DatabaseCache } from "./common/databaseCache";
+import { NodeUtil } from "../model/nodeUtil";
 
 interface ActiveConnection {
     connection: mysql.Connection;
@@ -69,9 +70,7 @@ export class ConnectionManager {
 
                 if (host != null && port != null && user != null) {
                     // TODO lost infomation
-                    return this.getConnection({
-                        host, port, user, database, getConnectId: () => `${host}_${port}_${user}`
-                    } as Node, database != null)
+                    return this.getConnection({ host, port: parseInt(port), user, database } as Node, database != null)
                 }
             }
         }
@@ -81,14 +80,12 @@ export class ConnectionManager {
     }
 
     public static getConnection(connectionNode: Node, changeActive: boolean = false): Promise<mysql.Connection> {
-        if (!connectionNode.getConnectId) {
-            connectionNode.getConnectId = () => `${connectionNode.host}_${connectionNode.port}_${connectionNode.user}`
-        }
+        NodeUtil.build(connectionNode)
         if (changeActive) {
             this.lastConnectionNode = connectionNode;
             Global.updateStatusBarItems(connectionNode);
         }
-        const key = `${connectionNode.host}_${connectionNode.port}_${connectionNode.user}`;
+        const key = connectionNode.getConnectId();
 
         return new Promise(async (resolve, reject) => {
 
@@ -116,7 +113,7 @@ export class ConnectionManager {
                         reject("create ssh tunnel fail!");
                         return;
                     }
-                    connectionNode = { ...connectionNode.origin, port, getConnectId: () => `${ssh.host}_${ssh.port}_${connectionNode.user}` } as any as Node
+                    connectionNode = { ...connectionNode, port } as Node
                 }
                 this.activeConnection[key] = { connection: this.createConnection(connectionNode), ssh };
                 this.activeConnection[key].connection.connect((err: Error) => {
@@ -146,14 +143,13 @@ export class ConnectionManager {
             if (this.tunelMark[key]) {
                 resolve(port)
             }
-            const origin = connectionNode.origin
             const config = {
                 username: ssh.username,
                 password: ssh.password,
                 host: ssh.host,
                 port: ssh.port,
-                dstHost: origin.host,
-                dstPort: origin.port,
+                dstHost: connectionNode.host,
+                dstPort: connectionNode.port,
                 localHost: '127.0.0.1',
                 localPort: port
             };

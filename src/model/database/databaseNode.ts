@@ -37,7 +37,7 @@ export class DatabaseNode extends Node implements CopyAble {
     }
 
     public importData(fsPath: string) {
-        Console.log(`Doing import ${this.host}:${this.port}_${this.database}...`);
+        Console.log(`Doing import ${this.getConnectId()}...`);
         ConnectionManager.getConnection(this).then((connection) => {
             QueryUnit.runFile(connection, fsPath);
         });
@@ -48,7 +48,7 @@ export class DatabaseNode extends Node implements CopyAble {
         vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE ${this.database}`).then(() => {
-                    DatabaseCache.clearDatabaseCache(`${this.host}_${this.port}_${this.user}`)
+                    DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`)
                     DbTreeDataProvider.refresh();
                     vscode.window.showInformationMessage(`Delete database ${this.database} success!`)
                 })

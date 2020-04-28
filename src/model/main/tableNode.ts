@@ -1,19 +1,15 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import mysqldump from 'mysqldump';
+import { Constants, ModelType, Template } from "../../common/constants";
+import { Util } from "../../common/util";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
+import { DatabaseCache } from "../../service/common/databaseCache";
+import { ConnectionManager } from "../../service/connectionManager";
 import { QueryUnit } from "../../service/queryUnit";
+import { CopyAble } from "../interface/copyAble";
+import { Node } from "../interface/node";
 import { ColumnNode } from "../other/columnNode";
 import { InfoNode } from "../other/infoNode";
-import { Node } from "../interface/node";
-import { DatabaseCache } from "../../service/common/databaseCache";
-import { ModelType, Constants, Template } from "../../common/constants";
-import { Console } from "../../common/outputChannel";
-import { ConnectionManager } from "../../service/connectionManager";
-import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { Util } from "../../common/util";
-import { CopyAble } from "../interface/copyAble";
-import format = require('date-format');
-
 
 export class TableNode extends Node implements CopyAble {
 
