@@ -24,7 +24,7 @@ export class Util {
         if (origin == null) { return origin; }
 
         if (origin.match(/\b[-\.]\b/ig)
-            || origin.match(/^if|key|name|user|desc|length$/i)) {
+            || origin.match(/^(if|key|name|user|desc|length)$/i)) {
             return `\`${origin}\``;
         }
 

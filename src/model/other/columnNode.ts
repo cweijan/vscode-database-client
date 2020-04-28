@@ -62,14 +62,21 @@ export class ColumnNode extends Node implements CopyAble {
     }
 
     public updateColumnTemplate() {
+
         ConnectionManager.getConnection(this, true);
+
+        const comment = this.column.comment ? ` comment '${this.column.comment}'` : "";
+        const defaultDefinition = this.column.nullable == "YES" ? "" : " NOT NULL";
+
         QueryUnit.showSQLTextDocument(`ALTER TABLE 
-    ${wrap(this.database)}.${wrap(this.table)} CHANGE ${wrap(this.column.name)} ${wrap(this.column.name)} ${this.column.type}${this.column.nullable ? "" : " NOT NULL"}${this.column.comment ? ` comment '${this.column.comment}'` : ""};`
-            , Template.alter);
+    ${wrap(this.database)}.${wrap(this.table)} CHANGE ${wrap(this.column.name)} ${wrap(this.column.name)} ${this.column.type}${defaultDefinition}${comment};`, Template.alter);
+
     }
     public dropColumnTemplate() {
+
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t${wrap(this.database)}.${wrap(this.table)} DROP COLUMN ${wrap(this.column.name)};`, Template.alter);
+
     }
 
 
