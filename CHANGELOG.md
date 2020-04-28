@@ -1,4 +1,4 @@
-## 1.9.0 (Preview)
+## 1.9.0 (2020/4/28)
 - Support SSH tunel.
 - Show comment of column、table on tree view.
 - Suport export table struct.
