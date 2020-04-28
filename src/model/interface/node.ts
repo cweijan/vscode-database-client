@@ -11,6 +11,7 @@ export abstract class Node extends vscode.TreeItem {
     public database?: string;
     public timezone?: string;
     public certPath?: string;
+    public excludeDatabases?: string;
 
     public usingSSH?: boolean;
     public ssh?: SSHConfig;
@@ -29,6 +30,7 @@ export abstract class Node extends vscode.TreeItem {
         this.certPath = source.certPath
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
+        this.excludeDatabases = source.excludeDatabases
         this.collapsibleState = DatabaseCache.getElementState(this)
     }
 

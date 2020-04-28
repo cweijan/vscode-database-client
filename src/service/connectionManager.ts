@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import * as getPort from 'get-port'
 import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -7,7 +6,6 @@ import { Global } from "../common/global";
 import { Console } from "../common/outputChannel";
 import { Node } from "../model/interface/node";
 import { QueryUnit } from "./queryUnit";
-import tunnel = require('tunnel-ssh')
 import { SSHConfig } from "../model/interface/sshConfig";
 import { DatabaseCache } from "./common/databaseCache";
 import { NodeUtil } from "../model/nodeUtil";
@@ -117,7 +115,7 @@ export class ConnectionManager {
                 this.activeConnection[key] = { connection: this.createConnection(connectOption), ssh };
                 this.activeConnection[key].connection.connect((err: Error) => {
                     if (!err) {
-                        this.lastConnectionNode = connectionNode;
+                        this.lastConnectionNode = NodeUtil.build(connectionNode);
                         resolve(this.activeConnection[key].connection);
                     } else {
                         this.activeConnection[key] = null;

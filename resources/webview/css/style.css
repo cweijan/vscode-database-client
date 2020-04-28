@@ -53,6 +53,10 @@
     margin: 2px 4px;
 }
 
+.field input{
+    width: 50vw;
+}
+
 .field__input {
     background: var(--vscode-input-background);
     border: 1px solid var(--vscode-dropdown-border);

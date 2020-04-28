@@ -31,7 +31,17 @@ export class ConnectionNode extends Node {
 
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "show databases")
             .then((databases) => {
-                databaseNodes = databases.filter((db) => !this.database || db.Database == this.database).map<DatabaseNode>((database) => {
+                databaseNodes = databases.filter((db) => {
+                    if (this.database) {
+                        return db.Database == this.database;
+                    }
+                    if (this.excludeDatabases) {
+                        for (const excludeDatabase of this.excludeDatabases.split(",")) {
+                            if (db.Database == excludeDatabase.trim()) { return false; }
+                        }
+                    }
+                    return true;
+                }).map<DatabaseNode>((database) => {
                     return new DatabaseNode(database.Database, this);
                 });
                 databaseNodes.unshift(new UserGroup("USER", this));
