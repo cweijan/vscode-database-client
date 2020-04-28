@@ -3,7 +3,7 @@ import { DatabaseCache } from "../../../service/common/databaseCache";
 import { ColumnNode } from "../../../model/other/columnNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Util } from "../../../common/util";
-import { Pattern } from "../../../common/Constants";
+import { Pattern } from "../../../common/constants";
 import { ConnectionManager } from "../../../service/connectionManager";
 
 export class ColumnChain implements ComplectionChain {

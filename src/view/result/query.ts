@@ -1,11 +1,11 @@
-import { MessageType, OperateType, ConfigKey } from "../../common/Constants";
+import { MessageType, OperateType, ConfigKey } from "../../common/constants";
 import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { ViewManager } from "../viewManager";
 import { DataResponse } from "./queryResponse";
-import { Global } from "../../common/Global";
+import { Global } from "../../common/global";
 
 export class QueryParam<T> {
     /**

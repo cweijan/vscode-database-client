@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
 import { ExtensionContext } from "vscode";
-import { FileManager } from "../common/FileManager";
-import { CompletionProvider } from "../provider/Complection/CompletionProvider";
-import { SqlFormatProvider } from "../provider/SqlFormatProvider";
-import { TableHoverProvider } from "../provider/TableHoverProvider";
+import { FileManager } from "../common/filesManager";
+import { CompletionProvider } from "../provider/Complection/completionProvider0";
+import { SqlFormattingProvider } from "../provider/sqlFormattingProvider";
+import { TableInfoHoverProvider } from "../provider/tableInfoHoverProvider";
 import { DbTreeDataProvider as DbTreeDataProvider } from "../provider/treeDataProvider";
 import { ViewManager } from "../view/viewManager";
 import { AbstractConnectService } from "./connect/abstractConnectService";
@@ -12,16 +12,16 @@ import { DatabaseCache } from "./common/databaseCache";
 import { DatabaseType } from "./common/databaseType";
 import { AbstractDumpService } from "./dump/abstractDumpService";
 import { MysqlDumpService } from "./dump/mysqlDumpService";
-import { HistoryService } from "./common/HistoryService";
 import { MockRunner } from "./mock/mockRunner";
 import { MysqlSettingService } from "./setting/MysqlSettingService";
 import { SettingService } from "./setting/settingService";
+import { HistoryRecorder } from "./common/historyRecorder";
 
 export class ServiceManager {
 
     public mockRunner: MockRunner;
     public provider: DbTreeDataProvider;
-    public historyService: HistoryService;
+    public historyService: HistoryRecorder;
     public connectService: AbstractConnectService;
     public settingService: SettingService;
     public dumpService: AbstractDumpService;
@@ -30,7 +30,7 @@ export class ServiceManager {
 
     constructor(private readonly context: ExtensionContext) {
         this.mockRunner = new MockRunner();
-        this.historyService = new HistoryService()
+        this.historyService = new HistoryRecorder()
         DatabaseCache.initCache(context);
         ViewManager.initExtesnsionPath(context.extensionPath);
         FileManager.init(context)
@@ -39,8 +39,8 @@ export class ServiceManager {
     public init(): vscode.Disposable[] {
         if (this.isInit) { return [] }
         const res: vscode.Disposable[] = [
-            vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormatProvider()),
-            vscode.languages.registerHoverProvider('sql', new TableHoverProvider()),
+            vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormattingProvider()),
+            vscode.languages.registerHoverProvider('sql', new TableInfoHoverProvider()),
             vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.', ">", "<", "=", "(")
         ]
 

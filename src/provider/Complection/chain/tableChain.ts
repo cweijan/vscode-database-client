@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { ModelType } from "../../../common/Constants";
+import { ModelType } from "../../../common/constants";
 import { DatabaseCache } from "../../../service/common/databaseCache";
 import { Node } from "../../../model/interface/node";
 import { TableNode } from "../../../model/main/tableNode";

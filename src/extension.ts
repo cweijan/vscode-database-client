@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CommandKey } from "./common/Constants";
+import { CommandKey } from "./common/constants";
 import { ConnectionNode } from "./model/database/connectionNode";
 import { DatabaseNode } from "./model/database/databaseNode";
 import { UserGroup, UserNode } from "./model/database/userGroup";

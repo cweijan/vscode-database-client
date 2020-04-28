@@ -719,7 +719,7 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
+		"compile": "rm -rf out/ && tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"tslint": "tslint -t verbose src/**/*.ts"
 	},

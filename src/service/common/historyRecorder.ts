@@ -1,5 +1,5 @@
-import { FileManager } from "../../common/FileManager";
-export class HistoryService {
+import { FileManager } from "../../common/filesManager";
+export class HistoryRecorder {
 
     public showHistory() {
         FileManager.show('history.sql')

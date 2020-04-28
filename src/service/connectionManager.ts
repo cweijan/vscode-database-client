@@ -3,8 +3,8 @@ import * as getPort from 'get-port'
 import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
-import { Global } from "../common/Global";
-import { Console } from "../common/OutputChannel";
+import { Global } from "../common/global";
+import { Console } from "../common/outputChannel";
 import { Node } from "../model/interface/node";
 import { QueryUnit } from "./queryUnit";
 import tunnel = require('tunnel-ssh')
