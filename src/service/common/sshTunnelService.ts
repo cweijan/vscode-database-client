@@ -2,6 +2,7 @@ import tunnel = require('tunnel-ssh')
 import * as getPort from 'get-port'
 import { Node } from '../../model/interface/node';
 import { Console } from '../../common/outputChannel';
+import { existsSync } from 'fs';
 
 export class SSHTunnelService {
 
@@ -34,8 +35,16 @@ export class SSHTunnelService {
                 dstHost: connectionNode.host,
                 dstPort: connectionNode.port,
                 localHost: '127.0.0.1',
-                localPort: port
+                localPort: port,
+                passphrase: ssh.passphrase,
+                privateKey: (() => {
+                    if (ssh.privateKeyPath && existsSync(ssh.privateKeyPath)) {
+                        return require('fs').readFileSync(ssh.privateKeyPath)
+                    }
+                    return null
+                })()
             };
+
             const localTunnel = tunnel(config, (error, server) => {
                 this.tunelMark[key] = localTunnel
                 if (error && errorCallback) {

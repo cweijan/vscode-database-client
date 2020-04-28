@@ -8,21 +8,20 @@
     <link rel="stylesheet" href="/css/element.css">
     <script src="js/vue.js"></script>
     <script src="/js/element.js"></script>
-    <title>Connect to SQL server</title>
 </head>
 
 <body>
     <div class="container" id='container'>
-        <h1>Connect to SQL server</h1>
+        <h1>Connect to MySQL server</h1>
         <!-- <select name="" id="">
             <option value="">mysql</option>
            <option value="">oracle</option> 
         </select> -->
-        <ul class="tab" id="tabs">
+        <!-- <ul class="tab" id="tabs">
             <li class="tab__item tab__item--active">
                 MySQL
             </li>
-        </ul>
+        </ul> -->
         <blockquote class="panel" id="error" v-if="error">
             <p class="panel__text">
                 Connection error! <span id="errorMessage" v-text="errorMessage"></span><br />
@@ -65,6 +64,7 @@
                         username: 'root',
                     }
                 },
+                type: 'password',
                 databaseType: 'mysql',
                 error: false,
                 errorMessage: ''
