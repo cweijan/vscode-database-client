@@ -31,7 +31,7 @@ export abstract class AbstractConnectService {
             },
             receiveListener: async (webviewPanel, params) => {
                 if (params.type === 'CONNECT_TO_SQL_SERVER') {
-                    const connectNode = Util.trim(NodeUtil.build(params.connectionOption))
+                    const connectNode = Util.trim(NodeUtil.of(params.connectionOption))
                     try {
                         await this.connect(connectNode)
                         provider.addConnection(connectNode)

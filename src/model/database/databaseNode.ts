@@ -25,7 +25,7 @@ export class DatabaseNode extends Node implements CopyAble {
     constructor(name: string, readonly info: Node) {
         super(name)
         this.id = `${info.getConnectId()}_${name}`
-        this.info = NodeUtil.build({ ...info, database: name } as Node)
+        this.info = NodeUtil.of({ ...info, database: name } as Node)
         this.init(this.info)
     }
 

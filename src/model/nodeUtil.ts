@@ -2,7 +2,7 @@ import { Node } from "./interface/node";
 import { ConnectionManager } from "../service/connectionManager";
 
 export abstract class NodeUtil {
-    public static build(node: any): Node {
+    public static of(node: any): Node {
         if (node && !node.getConnectId) {
             node.__proto__ = Node.prototype
         }

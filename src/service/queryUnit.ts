@@ -39,17 +39,13 @@ export class QueryUnit {
             vscode.window.showWarningMessage("No SQL file selected");
             return;
         }
-        let connection: mysql.Connection;
         if (!connectionNode) {
-            if (!(connection = await ConnectionManager.getLastActiveConnection())) {
-                vscode.window.showWarningMessage("No MySQL Server or Database selected");
-                return;
-            } else {
-                connectionNode = ConnectionManager.getLastConnectionOption();
-            }
-
-        } else if (connectionNode) {
-            connection = await ConnectionManager.getConnection(connectionNode);
+            connectionNode = ConnectionManager.getLastConnectionOption();
+        }
+        const connection = await ConnectionManager.getConnection(connectionNode);
+        if (!connection) {
+            vscode.window.showWarningMessage("No MySQL Server or Database selected");
+            return;
         }
 
         let fromEditor = false;
@@ -67,12 +63,12 @@ export class QueryUnit {
         const executeTime = new Date().getTime();
         const isDDL = sql.match(this.ddlPattern);
         const isDML = sql.match(this.dmlPattern);
-            const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
-            sql = parseResult.sql
-            if (!sql && parseResult.replace) {
-                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
-                return;
-            }
+        const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
+        sql = parseResult.sql
+        if (!sql && parseResult.replace) {
+            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
+            return;
+        }
         if (isDDL == null && isDML == null && sql) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }

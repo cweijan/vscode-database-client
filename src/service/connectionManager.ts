@@ -11,7 +11,7 @@ import { DatabaseCache } from "./common/databaseCache";
 import { NodeUtil } from "../model/nodeUtil";
 import { SSHTunnelService } from "./common/sshTunnelService";
 
-interface ActiveConnection {
+interface ConnectionWrapper {
     connection: mysql.Connection;
     ssh: SSHConfig
 }
@@ -19,14 +19,36 @@ interface ActiveConnection {
 export class ConnectionManager {
 
     private static lastConnectionNode: Node;
-    private static activeConnection: { [key: string]: ActiveConnection } = {};
+    private static activeConnection: { [key: string]: ConnectionWrapper } = {};
     private static tunnelService = new SSHTunnelService();
 
     public static getLastConnectionOption() {
+
+        if (vscode.window.activeTextEditor) {
+            const fileName = vscode.window.activeTextEditor.document.fileName;
+            if (fileName.includes('cweijan.vscode-mysql-client')) {
+                const queryName = path.basename(fileName, path.extname(fileName))
+                const filePattern = queryName.split('_');
+                const [host, port, user] = filePattern
+                let database: string;
+                if (filePattern.length >= 4) {
+                    database = filePattern[3]
+                    if (filePattern.length >= 4) {
+                        for (let index = 4; index < filePattern.length; index++) {
+                            database = `${database}_${filePattern[index]}`
+                        }
+                    }
+                }
+                if (host != null && port != null && user != null) {
+                    return NodeUtil.of({ host, port: parseInt(port), user, database })
+                }
+            }
+        }
+
         return this.lastConnectionNode;
     }
 
-    public static getActiveConnectByKey(key: string): ActiveConnection {
+    public static getActiveConnectByKey(key: string): ConnectionWrapper {
         return this.activeConnection[key]
     }
 
@@ -46,43 +68,10 @@ export class ConnectionManager {
 
     }
 
-    public static getLastActiveConnection(): Promise<mysql.Connection> {
-
-        if (!this.activeConnection) {
-            return undefined;
-        }
-
-        if (vscode.window.activeTextEditor) {
-            const fileName = vscode.window.activeTextEditor.document.fileName;
-            if (fileName.includes('cweijan.vscode-mysql-client')) {
-
-                const queryName = path.basename(fileName, path.extname(fileName))
-                const filePattern = queryName.split('_');
-                const [host, port, user] = filePattern
-                let database: string;
-                if (filePattern.length >= 4) {
-                    database = filePattern[3]
-                    if (filePattern.length >= 4) {
-                        for (let index = 4; index < filePattern.length; index++) {
-                            database = `${database}_${filePattern[index]}`
-                        }
-                    }
-                }
-
-                if (host != null && port != null && user != null) {
-                    // TODO lost infomation
-                    return this.getConnection({ host, port: parseInt(port), user, database } as Node, database != null)
-                }
-            }
-        }
-
-        return this.getConnection(this.lastConnectionNode);
-
-    }
-
     public static getConnection(connectionNode: Node, changeActive: boolean = false): Promise<mysql.Connection> {
+        if (!connectionNode) { return Promise.resolve(null) }
         return new Promise(async (resolve, reject) => {
-            NodeUtil.build(connectionNode)
+            NodeUtil.of(connectionNode)
             if (changeActive) {
                 this.lastConnectionNode = connectionNode;
                 Global.updateStatusBarItems(connectionNode);
@@ -115,7 +104,7 @@ export class ConnectionManager {
                 this.activeConnection[key] = { connection: this.createConnection(connectOption), ssh };
                 this.activeConnection[key].connection.connect((err: Error) => {
                     if (!err) {
-                        this.lastConnectionNode = NodeUtil.build(connectionNode);
+                        this.lastConnectionNode = NodeUtil.of(connectionNode);
                         resolve(this.activeConnection[key].connection);
                     } else {
                         this.activeConnection[key] = null;
