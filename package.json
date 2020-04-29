@@ -730,7 +730,6 @@
 	"dependencies": {
 		"async-lock": "^1.2.2",
 		"date-format": "^3.0.0",
-		"get-port": "^5.1.1",
 		"mockjs": "^1.1.0",
 		"mysql": "^2.18.1",
 		"mysqldump": "^3.1.0",
