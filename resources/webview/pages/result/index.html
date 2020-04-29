@@ -72,6 +72,24 @@
             }
         },
         methods: {
+            exportData() {
+                this.$confirm('Export without limit?', 'Export', {
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    type: 'warning'
+                }).then(() => {
+                    vscode.postMessage({
+                        type: 'export',
+                        sql: this.result.sql.replace(/\blimit\b.+/ig, '')
+                    });
+                }).catch(() => {
+                    vscode.postMessage({
+                        type: 'export',
+                        sql: this.result.sql
+                    });
+                });
+
+            },
             filter(event, column) {
 
                 let inputvalue = "" + event.target.value

@@ -6,6 +6,8 @@ import { QueryUnit } from "../../service/queryUnit";
 import { ViewManager } from "../viewManager";
 import { DataResponse } from "./queryResponse";
 import { Global } from "../../common/global";
+import { ExportService } from "../../service/export/exportService";
+import { MysqlExportService } from "../../service/export/impl/mysqlExportService";
 
 export class QueryParam<T> {
     /**
@@ -17,6 +19,8 @@ export class QueryParam<T> {
 }
 
 export class QueryPage {
+
+    private static exportService: ExportService = new MysqlExportService()
 
     public static async send(queryParam: QueryParam<any>) {
 
@@ -43,6 +47,9 @@ export class QueryPage {
                 switch (params.type) {
                     case OperateType.execute:
                         QueryUnit.runQuery(params.sql);
+                        break;
+                    case OperateType.export:
+                        this.exportService.export(params.sql)
                         break;
                 }
             }

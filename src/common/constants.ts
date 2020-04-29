@@ -15,12 +15,12 @@ export class Pattern {
 
 export class OperateType {
     public static execute = 'execute';
+    public static export = 'export';
     public static init = 'init';
     public static previous = 2;
     public static next = 3;
     public static save = 4;
     public static delete = 5;
-    public static export = 6;
 }
 
 export enum CacheKey {
