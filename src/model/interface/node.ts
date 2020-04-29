@@ -45,8 +45,8 @@ export abstract class Node extends vscode.TreeItem {
         return `${this.host}_${this.port}_${this.user}`;
     }
 
-    public getHost = () => this.usingSSH ? this.ssh.host : this.host
-    public getPort = () => this.usingSSH ? this.ssh.port : this.port
-    public getUser = () => this.usingSSH ? this.ssh.username : this.user
+    public getHost(): string { return this.usingSSH ? this.ssh.host : this.host }
+    public getPort(): number { return this.usingSSH ? this.ssh.port : this.port }
+    public getUser(): string { return this.usingSSH ? this.ssh.username : this.user }
 
 }
