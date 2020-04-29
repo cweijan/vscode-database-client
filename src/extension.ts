@@ -92,7 +92,7 @@ export function activate(context: vscode.ExtensionContext) {
                 if (typeof sql != 'string') { sql = null; }
                 QueryUnit.runQuery(sql);
             },
-            "mysql.query.switch":async (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
+            "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
                 if (databaseOrConnectionNode) {
                     databaseOrConnectionNode.newQuery();
                 } else {
@@ -167,6 +167,9 @@ export function activate(context: vscode.ExtensionContext) {
             },
             "mysql.delete.procedure": (procedureNode: ProcedureNode) => {
                 procedureNode.drop();
+            },
+            "mysql.server.info": (connectionNode: ConnectionNode) => {
+                serviceManager.statusService.show(connectionNode)
             },
             "mysql.delete.function": (functionNode: FunctionNode) => {
                 functionNode.drop();

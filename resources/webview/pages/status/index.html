@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/element.css">
+    <script src="/js/vue.js"></script>
+    <script src="/js/element.js"></script>
+</head>
+<style>
+    body {
+        /* background-color: var(--vscode-editor-background); */
+        background-color: #F7F7F7;
+        font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    }
+</style>
+
+<body>
+    <div id="container">
+        <el-tabs v-model="activePanel" @tab-click="changePannel">
+            <el-tab-pane label="processList" name="processList">
+                <el-table :data="process.list" style="width: 100%">
+                    <el-table-column :label="field" v-for="(field,index) in process.fields" :key="index" align="center">
+                        <template slot-scope="scope">
+                            <span v-text='scope.row[field]'></span>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-tab-pane>
+        </el-tabs>
+
+    </div>
+    <script>
+        const vscode = typeof (acquireVsCodeApi) != "undefined" ? acquireVsCodeApi() : null;
+        const postMessage = (message) => { if (vscode) { vscode.postMessage(message) } }
+
+        const vue = new Vue({
+            el: '#container',
+            data: {
+                activePanel: 'processList',
+                process: {
+                    fields: [],
+                    list: []
+                }
+            }, methods: {
+                changePannel() {
+                    switch (this.activePanel) {
+                        case 'processList':
+                            postMessage({type:'processList'})
+                            break;
+                    }
+                }
+            }
+        })
+
+        window.addEventListener('message', event => {
+            switch (event.data.type) {
+                case "processList":
+                    vue.process.fields = event.data.fields
+                    vue.process.list = event.data.list
+                    break;
+            }
+        })
+
+        postMessage({ type: 'init' })
+    </script>
+</body>
+
+</html>

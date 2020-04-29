@@ -99,6 +99,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.server.info",
+				"title": "Server Status",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.connection.delete",
 				"title": "Delete Connection",
 				"category": "MySQL"
@@ -403,24 +408,29 @@
 					"group": "1_mysql@2"
 				},
 				{
-					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem == connection",
-					"group": "2_mysql@1"
-				},
-				{
 					"command": "mysql.database.add",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "2_mysql@0"
 				},
 				{
+					"command": "mysql.refresh",
+					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"group": "2_mysql@1"
+				},
+				{
+					"command": "mysql.server.info",
+					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"group": "4_mysql@1"
+				},
+				{
 					"command": "mysql.data.import",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
-					"group": "3_mysql@1"
+					"group": "8_mysql@1"
 				},
 				{
 					"command": "mysql.connection.delete",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
-					"group": "mysql@2"
+					"group": "10mysql@2"
 				},
 				{
 					"command": "mysql.query.switch",

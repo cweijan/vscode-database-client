@@ -16,6 +16,8 @@ import { MockRunner } from "./mock/mockRunner";
 import { MysqlSettingService } from "./setting/MysqlSettingService";
 import { SettingService } from "./setting/settingService";
 import { HistoryRecorder } from "./common/historyRecorder";
+import { StatusService } from "./status/statusService";
+import { MysqlStatusService } from "./status/impl/mysqlStatusService";
 
 export class ServiceManager {
 
@@ -24,6 +26,7 @@ export class ServiceManager {
     public historyService: HistoryRecorder;
     public connectService: AbstractConnectService;
     public settingService: SettingService;
+    public statusService: StatusService;
     public dumpService: AbstractDumpService;
     private isInit = false;
     private type: DatabaseType = DatabaseType.mysql;
@@ -74,6 +77,7 @@ export class ServiceManager {
         this.settingService = new MysqlSettingService();
         this.dumpService = new MysqlDumpService();
         this.connectService = new MysqlConnectService();
+        this.statusService = new MysqlStatusService()
     }
 
 }
