@@ -1,6 +1,6 @@
 <el-table-column  :label="field.name" v-for="(field,index) in result.fields" :key="index" align="center" sortable
     v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())"
-    :width="computeWidth(field.name,0,toolbar.filter[field.name])">
+    :width="computeWidth(field.name,0,index,toolbar.filter[field.name])">
     <template slot-scope="scope">
         <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[field.name]" placeholder="filter"
             @blur="filter($event,field.name)" v-on:keyup.enter.native="filter($event,field.name)">

@@ -226,8 +226,8 @@
                 this.table.width = width + 100;
 
             },
-            computeWidth(key, index, value) {
-                if (this.table.widthItem[key]) return this.table.widthItem[key];
+            computeWidth(key, index, keyIndex, value) {
+                if (this.table.widthItem[keyIndex]) return this.table.widthItem[keyIndex];
                 if (!index) index = 0
                 if (!this.result.data[index] || index > 10) return 60;
                 if (!value) {
@@ -236,9 +236,9 @@
                 var dynamic = value ? ((value + "").length) * 10 : ((key + "").length) * 10;
                 if (dynamic > 600) dynamic = 600;
                 if (dynamic < 60) dynamic = 60;
-                var nextDynamic = this.computeWidth(key, ++index)
+                var nextDynamic = this.computeWidth(key, ++index, keyIndex)
                 if (dynamic < nextDynamic) dynamic = nextDynamic;
-                this.table.widthItem[key] = dynamic;
+                this.table.widthItem[keyIndex] = dynamic;
                 this.updateWidth()
                 return dynamic;
             },
