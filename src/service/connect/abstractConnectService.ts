@@ -3,6 +3,7 @@ import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ViewManager } from "../../view/viewManager";
 import { Node } from "../../model/interface/node";
 import { NodeUtil } from "../../model/nodeUtil";
+import { Util } from "../../common/util";
 
 export abstract class AbstractConnectService {
 
@@ -30,7 +31,7 @@ export abstract class AbstractConnectService {
             },
             receiveListener: async (webviewPanel, params) => {
                 if (params.type === 'CONNECT_TO_SQL_SERVER') {
-                    const connectNode = NodeUtil.build(params.connectionOption)
+                    const connectNode = Util.trim(NodeUtil.build(params.connectionOption))
                     try {
                         await this.connect(connectNode)
                         provider.addConnection(connectNode)

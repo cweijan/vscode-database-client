@@ -12,7 +12,7 @@ export class Util {
             return tableMatch[0].replace(/\bfrom|join|update|into\b/i, "") // remove keyword
                 .replace(/(\w|\s|-|`)*\./, "")// remove databasename
                 .replace(/`/g, "")// trim tableName
-                .trim() 
+                .trim()
         }
 
         return null;
@@ -33,12 +33,29 @@ export class Util {
         return origin;
     }
 
+    public static trim(origin: any): any {
+
+        if (origin) {
+            const originType = typeof origin
+            if (originType == "string") {
+                return origin.trim()
+            }
+            if (originType == "object") {
+                for (const key in origin) {
+                    origin[key] = this.trim(origin[key])
+                }
+            }
+        }
+
+        return origin
+    }
+
     /**
      * trim array, got from SO.
      * @param origin origin array
      * @param attr duplicate check attribute
      */
-    public static trim<T>(origin: T[], attr: string): T[] {
+    public static trimArray<T>(origin: T[], attr: string): T[] {
         const seen = new Set();
         return origin.filter((item) => {
             const temp = item[attr];
