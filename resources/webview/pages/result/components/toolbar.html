@@ -17,7 +17,7 @@
         <div v-if="scope.row[result.primaryKey]">
             <el-button @click="openEdit(scope.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
             </el-button>
-            <el-button @click="scope.row[result.primaryKey]=null;openEdit(scope.row);update.primary=null;" type="info" size="small" title="copy" icon="el-icon-document-copy"
+            <el-button @click="openEdit(scope.row);update.currentNew[result.primaryKey]=null;update.primary=null;" type="info" size="small" title="copy" icon="el-icon-document-copy"
                 circle>
             </el-button>
             <el-button @click="deleteConfirm(scope.row[result.primaryKey])" title="delete" type="danger" size="small"
