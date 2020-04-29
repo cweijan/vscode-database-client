@@ -93,7 +93,7 @@ export class MockRunner {
                 sqlList.push(tempInsertSql)
             }
 
-            const connection = await ConnectionManager.getConnection({ ...mockModel, timezone: tableNode.timezone, getConnectId: () => `${mockModel.host}_${mockModel.port}_${mockModel.user}` } as any as Node)
+            const connection = await ConnectionManager.getConnection({ ...tableNode } as any as Node)
 
             const success = await QueryUnit.runBatch(connection, sqlList)
             vscode.commands.executeCommand("mysql.template.sql", tableNode, true)
