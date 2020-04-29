@@ -128,8 +128,10 @@
                 }
                 const type = this.getTypeByColumn(columnName).toLowerCase()
                 switch (type) {
-                    case "varchar": case "char": case "date": case "time": case "timestamp": case "datetime":
+                    case "varchar": case "char": case "date": case "time": case "timestamp": case "datetime": case "set": case "json":
                         return `'${value}'`
+                    default:
+                        if (type.indexOf("text") != -1 || type.indexOf("blob") != -1) { return `'${value}'` }
                 }
                 return value;
             },
