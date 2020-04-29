@@ -10,7 +10,7 @@ import { ConnectionManager } from "../../../service/connectionManager";
 export class TableChain implements ComplectionChain {
 
     public getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] {
-        ConnectionManager.getLastActiveConnection()
+        
         if (complectionContext.preChart == ".") {
             const temp = this.generateTableComplectionItem(complectionContext.preWord);
             if (temp.length == 0) {
