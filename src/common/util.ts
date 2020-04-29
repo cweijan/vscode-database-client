@@ -1,7 +1,7 @@
 
-import { Position, TextDocument } from "vscode";
 import * as vscode from "vscode";
-import { Pattern, Confirm } from "./Constants";
+import { Position, TextDocument } from "vscode";
+import { Confirm } from "./constants";
 
 export class Util {
 

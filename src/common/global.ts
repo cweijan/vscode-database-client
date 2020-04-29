@@ -1,7 +1,7 @@
 "use strict";
 import * as vscode from "vscode";
 import { Node } from "../model/interface/node";
-import { Constants } from "./Constants";
+import { Constants } from "./constants";
 
 export class Global {
 

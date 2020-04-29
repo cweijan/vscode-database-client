@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-client",
 	"displayName": "MySQL",
 	"description": "MySQL Client for vscode",
-	"version": "1.9.2",
+	"version": "1.9.3",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
@@ -389,12 +389,6 @@
 					"command": "mysql.history.open",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@0"
-				},
-				{
-					"command": "mysql.setting.open",
-					"title": "Open Setting",
-					"when": "view == github.cweijan.mysql && isWindows",
-					"group": "navigation@-1"
 				}
 			],
 			"view/item/context": [
@@ -740,6 +734,7 @@
 		"mockjs": "^1.1.0",
 		"mysql": "^2.18.1",
 		"mysqldump": "^3.1.0",
+		"portfinder": "^1.0.26",
 		"sql-formatter": "^2.3.3",
 		"tunnel-ssh": "^4.1.4"
 	},
