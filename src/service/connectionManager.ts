@@ -71,6 +71,7 @@ export class ConnectionManager {
     public static getConnection(connectionNode: Node, changeActive: boolean = false): Promise<mysql.Connection> {
         if (!connectionNode) { return Promise.resolve(null) }
         return new Promise(async (resolve, reject) => {
+
             NodeUtil.of(connectionNode)
             if (changeActive) {
                 this.lastConnectionNode = connectionNode;
@@ -78,7 +79,6 @@ export class ConnectionManager {
             }
             const key = connectionNode.getConnectId();
             const connection = this.activeConnection[key];
-            const ssh = connectionNode.ssh;
             if (connection && connection.connection.state == 'authenticated') {
                 if (connectionNode.database) {
                     try {
@@ -89,30 +89,32 @@ export class ConnectionManager {
                     }
                 }
                 resolve(connection.connection);
-            } else {
-                let connectOption = connectionNode;
-                if (connectOption.usingSSH) {
-                    connectOption = await this.tunnelService.createTunnel(connectOption, (err) => {
-                        if (err.errno == 'EADDRINUSE') { return; }
-                        this.activeConnection[key] = null
-                    })
-                    if (!connectOption) {
-                        reject("create ssh tunnel fail!");
-                        return;
-                    }
-                }
-                this.activeConnection[key] = { connection: this.createConnection(connectOption), ssh };
-                this.activeConnection[key].connection.connect((err: Error) => {
-                    if (!err) {
-                        this.lastConnectionNode = NodeUtil.of(connectionNode);
-                        resolve(this.activeConnection[key].connection);
-                    } else {
-                        this.activeConnection[key] = null;
-                        Console.log(`${err.stack}\n${err.message}`);
-                        reject(err.message);
-                    }
-                });
+                return;
             }
+
+            const ssh = connectionNode.ssh;
+            let connectOption = connectionNode;
+            if (connectOption.usingSSH) {
+                connectOption = await this.tunnelService.createTunnel(connectOption, (err) => {
+                    if (err.errno == 'EADDRINUSE') { return; }
+                    this.activeConnection[key] = null
+                })
+                if (!connectOption) {
+                    reject("create ssh tunnel fail!");
+                    return;
+                }
+            }
+            this.activeConnection[key] = { connection: this.createConnection(connectOption), ssh };
+            this.activeConnection[key].connection.connect((err: Error) => {
+                if (!err) {
+                    this.lastConnectionNode = NodeUtil.of(connectionNode);
+                    resolve(this.activeConnection[key].connection);
+                } else {
+                    this.activeConnection[key] = null;
+                    Console.log(`${err.stack}\n${err.message}`);
+                    reject(err.message);
+                }
+            });
 
         });
 
