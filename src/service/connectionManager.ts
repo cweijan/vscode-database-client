@@ -23,36 +23,14 @@ export class ConnectionManager {
     private static activeConnection: { [key: string]: ConnectionWrapper } = {};
     private static tunnelService = new SSHTunnelService();
 
-    public static getLastConnectionOption(): Node {
+    public static getLastConnectionOption(checkActiveFile=true): Node {
 
-        const fileNode = this.getByActiveFile()
-        if (fileNode) { return fileNode }
+        if(checkActiveFile){
+            const fileNode = this.getByActiveFile()
+            if (fileNode) { return fileNode }
+        }
 
         return this.lastConnectionNode;
-    }
-
-    public static getByActiveFile(): Node {
-        if (vscode.window.activeTextEditor) {
-            const fileName = vscode.window.activeTextEditor.document.fileName;
-            if (fileName.includes('cweijan.vscode-mysql-client')) {
-                const queryName = path.basename(fileName, path.extname(fileName))
-                const filePattern = queryName.split('_');
-                const [host, port, user] = filePattern
-                let database: string;
-                if (filePattern.length >= 4) {
-                    database = filePattern[3]
-                    if (filePattern.length >= 4) {
-                        for (let index = 4; index < filePattern.length; index++) {
-                            database = `${database}_${filePattern[index]}`
-                        }
-                    }
-                }
-                if (host != null && port != null && user != null) {
-                    return NodeUtil.of({ host, port: parseInt(port), user, database })
-                }
-            }
-        }
-        return null;
     }
 
     public static getActiveConnectByKey(key: string): ConnectionWrapper {
@@ -140,6 +118,30 @@ export class ConnectionManager {
         }
         return mysql.createConnection(newConnectionOptions);
 
+    }
+
+    public static getByActiveFile(): Node {
+        if (vscode.window.activeTextEditor) {
+            const fileName = vscode.window.activeTextEditor.document.fileName;
+            if (fileName.includes('cweijan.vscode-mysql-client')) {
+                const queryName = path.basename(fileName, path.extname(fileName))
+                const filePattern = queryName.split('_');
+                const [host, port, user] = filePattern
+                let database: string;
+                if (filePattern.length >= 4) {
+                    database = filePattern[3]
+                    if (filePattern.length >= 4) {
+                        for (let index = 4; index < filePattern.length; index++) {
+                            database = `${database}_${filePattern[index]}`
+                        }
+                    }
+                }
+                if (host != null && port != null && user != null) {
+                    return NodeUtil.of({ host, port: parseInt(port), user, database })
+                }
+            }
+        }
+        return null;
     }
 
 }
