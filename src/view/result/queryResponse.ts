@@ -18,6 +18,7 @@ export class DataResponse {
     public table: string | null;
     public data: any[];
     public fields: mysql.FieldInfo[];
+    public pageSize: number;
 }
 export class ErrorResponse {
     public sql: string;

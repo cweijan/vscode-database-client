@@ -42,6 +42,12 @@
                 database: null,
                 table: null
             },
+            page: {
+                pageNum: 1,
+                pageSize: -1,
+                isEnd: false,
+                lock: false
+            },
             table: {
                 search: '',
                 loading: true,
@@ -303,6 +309,17 @@
 
                 return origin;
             },
+            nextPage() {
+                if (this.page.isEnd || this.page.lock) return;
+                console.log('next')
+                vscode.postMessage({
+                    type: 'next',
+                    sql: this.result.sql,
+                    pageNum: ++this.page.pageNum,
+                    pageSize: this.page.pageSize
+                });
+                this.page.lock = true
+            },
             dataformat(origin) {
 
                 if (origin == undefined || origin == null) {
@@ -355,6 +372,10 @@
         vue.table.widthItem = {}
         vue.result = data;
         vue.table.loading = false
+        vue.page.pageNum = 1
+        vue.page.isEnd = false
+        vue.page.lock = false
+        vue.page.pageSize = data.pageSize
         if (!data.sql.match(/\bwhere\b/ig)) {
             // clear filter
             vue.toolbar.filter = {}
@@ -398,6 +419,14 @@
             case "DATA":
                 handlerData(response)
                 break;
+            case "NEXT_PAGE":
+                if (response.data && response.data.length > 0) {
+                    vue.result.data.push(...response.data)
+                } else {
+                    vue.page.isEnd = true;
+                }
+                vue.page.lock = false
+                break;
             case "DML":
             case "DDL":
                 handlerCommon(response)
@@ -423,9 +452,11 @@
         }
     });
     vscode.postMessage({ type: 'init' })
-    setInterval(() => {
-        // vue.updateWidth()
-    }, 100)
+    window.addEventListener('scroll', function () {
+        if ((document.body.offsetHeight - document.documentElement.scrollTop - document.documentElement.clientHeight) <= 200) {
+            vue.nextPage()
+        }
+    });
 </script>
 
 </html>

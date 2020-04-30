@@ -107,7 +107,7 @@ export class QueryUnit {
                 return;
             }
             if (Array.isArray(data)) {
-                QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields } as DataResponse });
+                QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields, pageSize: 100 } as DataResponse });
                 return;
             }
             QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
