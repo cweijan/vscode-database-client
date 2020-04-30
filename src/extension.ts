@@ -22,7 +22,7 @@ import { Console } from "./common/outputChannel";
 import { ServiceManager } from "./service/serviceManager";
 import { QueryUnit } from "./service/queryUnit";
 import { FileManager } from "./common/filesManager";
-import { DbTreeDataProvider } from "./provider/treeDataProvider";
+import { ConnectionManager } from "./service/connectionManager";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -30,6 +30,12 @@ export function activate(context: vscode.ExtensionContext) {
     ConnectionNode.init()
     context.subscriptions.push(
         ...serviceManager.init(),
+        vscode.window.onDidChangeActiveTextEditor((e) => {
+            const fileNode = ConnectionManager.getByActiveFile()
+            if (fileNode) {
+                ConnectionManager.getConnection(fileNode, this)
+            }
+        }),
         ...initCommand({
             "mysql.history.open": () => serviceManager.historyService.showHistory(),
             [CommandKey.Refresh]: () => { serviceManager.provider.init(); },
@@ -100,7 +106,6 @@ export function activate(context: vscode.ExtensionContext) {
                 } else {
                     FileManager.show(`sql/${new Date().getTime()}.sql`)
                 }
-                DbTreeDataProvider.refresh()
             },
             "mysql.template.sql": (tableNode: TableNode, run: boolean) => {
                 tableNode.selectSqlTemplate(run);

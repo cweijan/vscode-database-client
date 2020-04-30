@@ -10,6 +10,7 @@ import { SSHConfig } from "../model/interface/sshConfig";
 import { DatabaseCache } from "./common/databaseCache";
 import { NodeUtil } from "../model/nodeUtil";
 import { SSHTunnelService } from "./common/sshTunnelService";
+import { DbTreeDataProvider } from "../provider/treeDataProvider";
 
 interface ConnectionWrapper {
     connection: mysql.Connection;
@@ -24,6 +25,13 @@ export class ConnectionManager {
 
     public static getLastConnectionOption(): Node {
 
+        const fileNode = this.getByActiveFile()
+        if (fileNode) { return fileNode }
+
+        return this.lastConnectionNode;
+    }
+
+    public static getByActiveFile(): Node {
         if (vscode.window.activeTextEditor) {
             const fileName = vscode.window.activeTextEditor.document.fileName;
             if (fileName.includes('cweijan.vscode-mysql-client')) {
@@ -44,8 +52,7 @@ export class ConnectionManager {
                 }
             }
         }
-
-        return this.lastConnectionNode;
+        return null;
     }
 
     public static getActiveConnectByKey(key: string): ConnectionWrapper {
@@ -76,6 +83,9 @@ export class ConnectionManager {
             if (changeActive) {
                 this.lastConnectionNode = connectionNode;
                 Global.updateStatusBarItems(connectionNode);
+                setTimeout(() => {
+                    DbTreeDataProvider.refresh()
+                }, 100);
             }
             const key = connectionNode.getConnectId();
             const connection = this.activeConnection[key];

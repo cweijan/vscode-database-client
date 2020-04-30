@@ -58,8 +58,23 @@ export class ConnectionNode extends Node {
     }
 
     public async newQuery() {
-        ConnectionManager.getConnection(this, true);
-        ConnectionNode.tryOpenQuery()
+
+        const key = `${this.getConnectId()}`;
+        await FileManager.show(`${key}.sql`);
+        const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
+        let dbName;
+        if (dbNameList.length == 1) {
+            dbName = dbNameList[0]
+        }
+        if (dbNameList.length > 1) {
+            dbName = await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" })
+        }
+        if (dbName) {
+            await ConnectionManager.getConnection({
+                ...this, database: dbName
+            } as Node, true);
+        }
+        
     }
 
     public createDatabase() {
@@ -95,27 +110,5 @@ export class ConnectionNode extends Node {
 
     public static init() { }
 
-    public static async tryOpenQuery() {
-        const lcp = ConnectionManager.getLastConnectionOption();
-        if (!lcp) {
-            Console.log("Not active connection found!");
-        } else {
-            const key = `${lcp.getConnectId()}`;
-            await FileManager.show(`${key}.sql`);
-            const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
-            let dbName;
-            if (dbNameList.length == 1) {
-                dbName = dbNameList[0]
-            }
-            if (dbNameList.length > 1) {
-                dbName = await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" })
-            }
-            if (dbName) {
-                await ConnectionManager.getConnection({
-                    ...lcp, database: dbName, getConnectId: lcp.getConnectId
-                } as Node, true);
-            }
-        }
-    }
 
 }
