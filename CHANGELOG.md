@@ -1,3 +1,6 @@
+## 1.9.6 (2020/5/1)
+- Fix bugs.
+
 ## 1.9.0 (2020/4/28)
 - Support SSH tunel.
 - Show comment of column、table on tree view.
