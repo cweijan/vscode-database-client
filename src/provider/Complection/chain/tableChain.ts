@@ -10,7 +10,7 @@ import { ConnectionManager } from "../../../service/connectionManager";
 export class TableChain implements ComplectionChain {
 
     public getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] {
-        
+
         if (complectionContext.preChart == ".") {
             const temp = this.generateTableComplectionItem(complectionContext.preWord);
             if (temp.length == 0) {
@@ -60,7 +60,7 @@ export class TableChain implements ComplectionChain {
         if (!tableNodes) { return [] }
 
         return tableNodes.map<vscode.CompletionItem>((tableNode: TableNode) => {
-            const completionItem = new vscode.CompletionItem(tableNode.label);
+            const completionItem = new vscode.CompletionItem(tableNode.comment ? `${tableNode.table}  ${tableNode.comment}` : tableNode.table);
             completionItem.insertText = Util.wrap(tableNode.table);
             switch (tableNode.contextValue) {
                 case ModelType.TABLE:

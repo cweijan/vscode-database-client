@@ -12,15 +12,14 @@ const wrap = Util.wrap;
 
 
 export class ColumnNode extends Node implements CopyAble {
-    public comment: string;
     public type: string;
     public contextValue: string = ModelType.COLUMN;
     constructor(private readonly table: string, readonly column: any, readonly info: Node) {
         super(column.name)
         this.init(info)
         this.type = `${this.column.type}`
-        this.comment = `${this.column.comment}`
-        this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)}   ${this.column.comment}`
+        this.description = `${this.column.comment}`
+        this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)}`
         this.collapsibleState = vscode.TreeItemCollapsibleState.None
         this.iconPath = path.join(Constants.RES_PATH, this.column.key === "PRI" ? "icon/b_primary.png" : "icon/b_props.png"),
             this.command = {

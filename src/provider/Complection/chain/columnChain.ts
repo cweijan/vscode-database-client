@@ -72,9 +72,7 @@ export class ColumnChain implements ComplectionChain {
         }
 
         return columnNodes.map<vscode.CompletionItem>((columnNode) => {
-            const completionItem = new vscode.CompletionItem(columnNode.label);
-            completionItem.detail = columnNode.type;
-            completionItem.documentation = columnNode.comment;
+            const completionItem = new vscode.CompletionItem(columnNode.description ? `${columnNode.label}  ${columnNode.description}` : columnNode.label);
             completionItem.insertText = columnNode.column.name
             completionItem.kind = vscode.CompletionItemKind.Field;
             return completionItem;
