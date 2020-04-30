@@ -98,13 +98,18 @@ export class ConnectionNode extends Node {
             const key = `${lcp.getConnectId()}`;
             await FileManager.show(`${key}.sql`);
             const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
-            await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" }).then(async (dbName) => {
-                if (dbName) {
-                    await ConnectionManager.getConnection({
-                        ...lcp, database: dbName, getConnectId: lcp.getConnectId
-                    } as Node, true);
-                }
-            });
+            let dbName;
+            if (dbNameList.length == 1) {
+                dbName = dbNameList[0]
+            }
+            if (dbNameList.length > 1) {
+                dbName = await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" })
+            }
+            if (dbName) {
+                await ConnectionManager.getConnection({
+                    ...lcp, database: dbName, getConnectId: lcp.getConnectId
+                } as Node, true);
+            }
         }
     }
 
