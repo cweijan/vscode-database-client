@@ -1,3 +1,6 @@
+## 1.9.7 (Preview)
+- Highlight active database.
+
 ## 1.9.6 (2020/5/1)
 - Fix bugs.
 
