@@ -36,7 +36,7 @@ export class ConnectionNode extends Node {
         } catch (err) {
             return [new InfoNode(err)];
         }
-        
+
         return QueryUnit.queryPromise<any[]>(connection, "show databases")
             .then((databases) => {
                 databaseNodes = databases.filter((db) => {
@@ -97,6 +97,8 @@ export class ConnectionNode extends Node {
             QueryUnit.runFile(connection, fsPath);
         });
     }
+
+    public static init() { }
 
     public static async tryOpenQuery() {
         const lcp = ConnectionManager.getLastConnectionOption();
