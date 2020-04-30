@@ -288,10 +288,8 @@
             },
             dataformat0(origin) {
                 if (origin == null) return null;
-                // bit
-
                 if (origin.hasOwnProperty('type')) {
-                    return origin.data[0];
+                    return String.fromCharCode.apply(null, new Uint16Array(origin.data))
                 }
                 if (Date.parse(origin)) {
                     return origin.toString().replace("T", " ").replace(/\.\d+Z$/, "")
