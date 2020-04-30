@@ -57,7 +57,6 @@
             toolbar: {
                 sql: null,
                 costTime: 0,
-                isRefrsh: false,
                 filter: {},
                 showColumns: []
             },
@@ -208,18 +207,6 @@
                     primary: row[this.result.primaryKey]
                 }
             },
-            uploadRole() {
-                if (this.result.columnList == null) return;
-                let rule = {};
-                for (let column of this.result.columnList) {
-                    rule[column.name] = {
-                        required: (column.nullable == "NO") && (column.key != "PRI"),
-                        max: column.maxLength
-                    }
-                }
-                // disable, have bug
-                // this.info.rule = rule
-            },
             deleteConfirm(primaryValue) {
                 this.$confirm('Are you sure you want to delete this data?', 'Warning', {
                     confirmButtonText: 'OK',
@@ -277,7 +264,6 @@
             },
             refresh() {
                 if (this.result.sql) {
-                    this.toolbar.isRefrsh = true;
                     this.execute(this.result.sql)
                 }
             },
@@ -341,12 +327,40 @@
                     }
                 }
                 return objClone;
-            }, initShowColumn(fields) {
+            }, 
+            initShowColumn() {
+                const fields = this.result.fields
                 if (!fields) return;
                 this.toolbar.showColumns = []
                 for (let i = 0; i < fields.length; i++) {
                     if (!fields[i].name) continue;
                     this.toolbar.showColumns.push(fields[i].name.toLowerCase());
+                }
+            },
+            // show call when load same table data
+            clear() {
+                // reset page
+                this.page.pageNum = 1
+                this.page.isEnd = false
+                this.page.lock = false
+                // info
+                this.info.visible = false;
+            },
+            // show call when change table
+            reset() {
+                this.clear()
+                // table
+                this.table.widthItem = {}
+                this.table.loading = false
+                this.initShowColumn()
+                // add filter row
+                if (this.result.columnList) {
+                    this.result.data.unshift({ isFilter: true, content: '' })
+                }
+                // toolbar
+                if (!this.result.sql.match(/\bwhere\b/ig)) {
+                    this.toolbar.filter = {}
+                    this.$refs.dataTable.clearSort()
                 }
             }
 
@@ -365,36 +379,18 @@
         }
     })
 
-    const handlerData = (data) => {
+    const handlerData = (data, sameTable) => {
 
-        vue.result.sql = data.sql;
-        vue.toolbar.sql = data.sql;
-        vue.table.widthItem = {}
         vue.result = data;
-        vue.table.loading = false
-        vue.page.pageNum = 1
-        vue.page.isEnd = false
-        vue.page.lock = false
+        vue.toolbar.sql = data.sql;
         vue.page.pageSize = data.pageSize
-        if (!data.sql.match(/\bwhere\b/ig)) {
-            // clear filter
-            vue.toolbar.filter = {}
-            vue.$refs.dataTable.clearSort()
-        }
-        if (vue.result.fields) {
-            vue.initShowColumn(vue.result.fields)
-        }
-        if (vue.result.columnList) {
-            vue.uploadRole()
-            // add filter row
-            vue.result.data.unshift({ isFilter: true, content: '' })
 
-        }
-        if (vue.toolbar.isRefrsh) {
-            vue.toolbar.isRefrsh = false;
+        if (sameTable) {
+            vue.clear()
         } else {
-            vue.info.visible = false;
+            vue.reset()
         }
+
     }
 
     const handlerCommon = (res) => {
@@ -406,8 +402,8 @@
     }
 
     window.addEventListener('message', event => {
+        const response = event.data.res;
         vue.table.loading = false;
-        let response = event.data.res;
         if (response.costTime) {
             vue.toolbar.costTime = response.costTime
         }
