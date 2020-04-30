@@ -291,9 +291,6 @@
                 if (origin.hasOwnProperty('type')) {
                     return String.fromCharCode.apply(null, new Uint16Array(origin.data))
                 }
-                if (Date.parse(origin)) {
-                    return origin.toString().replace("T", " ").replace(/\.\d+Z$/, "")
-                }
                 return origin;
             },
             wrap(origin) {
