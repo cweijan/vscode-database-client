@@ -12,6 +12,7 @@ import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
 import { DatabaseNode } from "./databaseNode";
 import { UserGroup } from "./userGroup";
+import { Connection } from "mysql";
 
 export class ConnectionNode extends Node {
 
@@ -29,7 +30,14 @@ export class ConnectionNode extends Node {
             return databaseNodes;
         }
 
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "show databases")
+        let connection: Connection;
+        try {
+            connection = await ConnectionManager.getConnection(this);
+        } catch (err) {
+            return [new InfoNode(err)];
+        }
+        
+        return QueryUnit.queryPromise<any[]>(connection, "show databases")
             .then((databases) => {
                 databaseNodes = databases.filter((db) => {
                     if (this.database) {
