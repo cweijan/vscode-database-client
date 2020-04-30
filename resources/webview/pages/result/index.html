@@ -167,7 +167,7 @@
                 for (const key in this.update.currentNew) {
                     const newEle = this.update.currentNew[key];
                     if (newEle) {
-                        columns += `${key},`;
+                        columns += `${this.wrap(key)},`;
                         values += `${this.wrapQuote(key, newEle)},`;
                     }
                 }
@@ -184,7 +184,7 @@
                     const oldEle = this.update.current[key];
                     const newEle = this.update.currentNew[key];
                     if (oldEle != newEle) {
-                        change += `${key}=${this.wrapQuote(key, newEle)},`
+                        change += `${this.wrap(key)}=${this.wrapQuote(key, newEle)},`
                     }
                 }
                 if (change) {
@@ -294,6 +294,16 @@
                 if (Date.parse(origin)) {
                     return origin.toString().replace("T", " ").replace(/\.\d+Z$/, "")
                 }
+                return origin;
+            },
+            wrap(origin) {
+                if (origin == null) { return origin; }
+
+                if (origin.match(/\b[-\.]\b/ig)
+                    || origin.match(/^(if|key|desc|length)$/i)) {
+                    return `\`${origin}\``;
+                }
+
                 return origin;
             },
             dataformat(origin) {

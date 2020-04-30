@@ -131,7 +131,7 @@ ADD
             this
                 .getChildren()
                 .then((children: Node[]) => {
-                    const childrenNames = children.map((child: any) => "\n    " + child.column.name);
+                    const childrenNames = children.map((child: any) => "\n    " + Util.wrap(child.column.name));
                     const childrenValues = children.map((child: any) => "\n    $" + child.column.name);
                     let sql = `insert into \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} `;
                     sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  )\n`;
@@ -151,7 +151,7 @@ ADD
             .then((children: Node[]) => {
                 const keysNames = children.filter((child: any) => child.column.key).map((child: any) => child.column.name);
 
-                const where = keysNames.map((name: string) => `${name} = ${name}`);
+                const where = keysNames.map((name: string) => `${Util.wrap(name)} = \$${name}`);
 
                 let sql = `delete from \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and")}`;
