@@ -22,7 +22,7 @@ export class ConnectionManager {
     private static activeConnection: { [key: string]: ConnectionWrapper } = {};
     private static tunnelService = new SSHTunnelService();
 
-    public static getLastConnectionOption() {
+    public static getLastConnectionOption(): Node {
 
         if (vscode.window.activeTextEditor) {
             const fileName = vscode.window.activeTextEditor.document.fileName;

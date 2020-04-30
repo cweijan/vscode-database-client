@@ -27,6 +27,11 @@ export class DatabaseNode extends Node implements CopyAble {
         this.id = `${info.getConnectId()}_${name}`
         this.info = NodeUtil.of({ ...info, database: name } as Node)
         this.init(this.info)
+        const lcp = ConnectionManager.getLastConnectionOption();
+        if (lcp.getConnectId() == this.getConnectId() && lcp.database == this.database) {
+            this.iconPath = path.join(Constants.RES_PATH, "icon/database-active.svg");
+            this.description = `Actived`
+        }
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {

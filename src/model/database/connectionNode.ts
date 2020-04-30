@@ -25,11 +25,6 @@ export class ConnectionNode extends Node {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.id);
-        if (databaseNodes && !isRresh) {
-            return databaseNodes;
-        }
-
         let connection: Connection;
         try {
             connection = await ConnectionManager.getConnection(this);
@@ -39,7 +34,7 @@ export class ConnectionNode extends Node {
 
         return QueryUnit.queryPromise<any[]>(connection, "show databases")
             .then((databases) => {
-                databaseNodes = databases.filter((db) => {
+                const databaseNodes = databases.filter((db) => {
                     if (this.database) {
                         return db.Database == this.database;
                     }

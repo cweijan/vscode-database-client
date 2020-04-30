@@ -22,6 +22,7 @@ import { Console } from "./common/outputChannel";
 import { ServiceManager } from "./service/serviceManager";
 import { QueryUnit } from "./service/queryUnit";
 import { FileManager } from "./common/filesManager";
+import { DbTreeDataProvider } from "./provider/treeDataProvider";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -95,10 +96,11 @@ export function activate(context: vscode.ExtensionContext) {
             },
             "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
                 if (databaseOrConnectionNode) {
-                    databaseOrConnectionNode.newQuery();
+                    await databaseOrConnectionNode.newQuery();
                 } else {
                     FileManager.show(`sql/${new Date().getTime()}.sql`)
                 }
+                DbTreeDataProvider.refresh()
             },
             "mysql.template.sql": (tableNode: TableNode, run: boolean) => {
                 tableNode.selectSqlTemplate(run);
