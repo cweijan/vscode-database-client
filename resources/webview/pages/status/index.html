@@ -68,9 +68,9 @@
                     lock: false
                 },
                 dashBoard: {
-                    sessions: { data: [], lock: false, chart: null },
-                    queries: { data: [], lock: false, chart: null },
-                    traffic: { data: [], lock: false, chart: null },
+                    sessions: { data: [], lock: false, chart: null, previous: null },
+                    queries: { data: [], lock: false, chart: null, previous: null },
+                    traffic: { data: [], lock: false, chart: null, previous: null },
                 },
             }, methods: {
                 sendLoadProcessList() {
@@ -108,8 +108,16 @@
             return chart;
         }
 
-        function loadChart(id, chartOption, data) {
+        function loadChart(id, chartOption, data, before) {
+            const copy = JSON.parse(JSON.stringify(data))
+            if (!chartOption.previous) {
+                chartOption.previous = copy
+            }
             chartOption.data.push(...data)
+            if (before) {
+                before(data, chartOption.previous)
+            }
+            chartOption.previous = copy
             if (!chartOption.chart) {
                 const chart = new G2.Chart({
                     container: id,
@@ -141,8 +149,16 @@
                     break;
                 case "dashBoard":
                     loadChart('sessions', vue.dashBoard.sessions, data.sessions)
-                    loadChart('queries', vue.dashBoard.queries, data.queries)
-                    loadChart('traffic', vue.dashBoard.traffic, data.traffic)
+                    loadChart('queries', vue.dashBoard.queries, data.queries, (data, previous) => {
+                        for (let index = 0; index < previous.length; index++) {
+                            data[index].value = data[index].value - previous[index].value
+                        }
+                    })
+                    loadChart('traffic', vue.dashBoard.traffic, data.traffic, (data, previous) => {
+                        for (let index = 0; index < previous.length; index++) {
+                            data[index].value = (data[index].value - previous[index].value)/1000+"kb"
+                        }
+                    })
                     break;
             }
         })
@@ -152,8 +168,6 @@
         vue.sendLoadDashBoard()
         setInterval(() => {
             vue.sendLoadProcessList()
-        }, 1000);
-        setInterval(() => {
             vue.sendLoadDashBoard()
         }, 1000);
     </script>
