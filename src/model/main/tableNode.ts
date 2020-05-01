@@ -10,12 +10,12 @@ import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { ColumnNode } from "../other/columnNode";
 import { InfoNode } from "../other/infoNode";
+import { MockRunner } from "../../service/mock/mockRunner";
 
 export class TableNode extends Node implements CopyAble {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.TABLE;
-    public primaryKey: string;
 
     constructor(public readonly table: string, readonly comment: string, readonly info: Node) {
         super(`${table}`)
@@ -38,7 +38,7 @@ export class TableNode extends Node implements CopyAble {
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column) => {
                     if (column && column.key == "PRI") {
-                        this.primaryKey = column.name
+                        MockRunner.primaryKeyMap[this.getConnectId()] = column.name
                     }
                     return new ColumnNode(this.table, column, this.info);
                 });
@@ -180,8 +180,9 @@ ADD
 
         const connection = await ConnectionManager.getConnection(this, false)
 
-        if (this.primaryKey) {
-            const count = await QueryUnit.queryPromise(connection, `select max(${this.primaryKey}) max from ${this.table}`);
+        const primaryKey = MockRunner.primaryKeyMap[this.getConnectId()];
+        if (primaryKey != null) {
+            const count = await QueryUnit.queryPromise(connection, `select max(${primaryKey}) max from ${this.table}`);
             if (count && count[0]) { return count[0].max }
         }
 

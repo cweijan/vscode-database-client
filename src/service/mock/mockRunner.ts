@@ -16,12 +16,13 @@ import { Node } from '../../model/interface/node';
 export class MockRunner {
 
     private readonly MOCK_INDEX = "$mockIndex";
+    public static primaryKeyMap: { [key: string]: string } = {}
 
     public async create(tableNode: TableNode) {
         const columnList = (await tableNode.getChildren()) as ColumnNode[]
         const mockModel: MockModel = {
             host: tableNode.getHost(), port: tableNode.getPort(), user: tableNode.getUser(), database: tableNode.database, table: tableNode.table,
-            mockStartIndex: tableNode.primaryKey ? 'auto' : 1
+            mockStartIndex: MockRunner.primaryKeyMap[tableNode.getConnectId()] ? 'auto' : 1
             , mockCount: 50, mock: {}, examples: "http://mockjs.com/examples.html#DPD"
         }
         for (const columnNode of columnList) {
