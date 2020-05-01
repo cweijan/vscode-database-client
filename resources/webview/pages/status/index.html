@@ -21,7 +21,26 @@
     <div id="container">
         <el-tabs v-model="activePanel" @tab-click="changePannel">
             <el-tab-pane label="dashBoard" name="dashBoard">
-                <div id="sessions"></div>
+                <el-row style="height:45vh">
+                    <el-col :span="12">
+                        Queries:
+                        <div id="queries"></div>
+                    </el-col>
+                    <el-col :span="12">
+                        Server Sessions:
+                        <div id="sessions"></div>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        Traffic:
+                        <div id="traffic"></div>
+                    </el-col>
+                    <el-col :span="12">
+                        <div class="grid-content bg-purple-light"></div>
+                    </el-col>
+                </el-row>
+
             </el-tab-pane>
             <el-tab-pane label="processList" name="processList">
                 <el-table :data="process.list" style="width: 100%">
@@ -49,17 +68,17 @@
                     lock: false
                 },
                 dashBoard: {
-                    sessions: [],
-                    sessionChart: null,
-                    lock: false,
-                }
+                    sessions: { data: [], lock: false, chart: null },
+                    queries: { data: [], lock: false, chart: null },
+                    traffic: { data: [], lock: false, chart: null },
+                },
             }, methods: {
                 sendLoadProcessList() {
                     postMessage({ type: 'processList' })
                 },
                 sendLoadDashBoard() {
-                    if (this.dashBoard.lock) return;
-                    this.dashBoard.lock = true;
+                    if (this.dashBoard.sessions.lock) return;
+                    this.dashBoard.sessions.lock = true;
                     postMessage({ type: 'dashBoard' })
                 },
                 changePannel() {
@@ -75,6 +94,45 @@
             }
         })
 
+        function createChart(id, data) {
+            const chart = new G2.Chart({
+                container: id,
+                autoFit: true,
+                height: 300
+            })
+            chart.data(data);
+            chart.line().position('now*value')
+                .color('type')
+                .size(2);
+            chart.render();
+            return chart;
+        }
+
+        function loadChart(id, chartOption, data) {
+            chartOption.data.push(...data)
+            if (!chartOption.chart) {
+                const chart = new G2.Chart({
+                    container: id,
+                    autoFit: true,
+                    height: 300
+                })
+                chart.data(chartOption.data);
+                chart.line().position('now*value')
+                    .color('type')
+                    .size(2);
+                chart.render();
+                chartOption.chart = chart
+            } else {
+                if (chartOption.data.length >= data.length * 10) {
+                    for (let index = 0; index < data.length; index++) {
+                        chartOption.data.shift()
+                    }
+                }
+                chartOption.chart.changeData(chartOption.data);
+            }
+            chartOption.lock = false
+        }
+
         window.addEventListener('message', ({ data }) => {
             switch (data.type) {
                 case "processList":
@@ -82,29 +140,9 @@
                     vue.process.list = data.list
                     break;
                 case "dashBoard":
-                    vue.dashBoard.sessions.push(...data.session)
-                    if (!vue.dashBoard.sessionChart) {
-                        const sessionChart = new G2.Chart({
-                            container: 'sessions',
-                            autoFit: false,
-                            width: 600,
-                            height: 300
-                        })
-                        sessionChart.data(vue.dashBoard.sessions);
-                        sessionChart.line().position('now*value')
-                            .color('type')
-                            .size(2);
-                        sessionChart.render();
-                        vue.dashBoard.sessionChart = sessionChart
-                    } else {
-                        if (vue.dashBoard.sessions.length >= 30) {
-                            vue.dashBoard.sessions.shift()
-                            vue.dashBoard.sessions.shift()
-                            vue.dashBoard.sessions.shift()
-                        }
-                        vue.dashBoard.sessionChart.changeData(vue.dashBoard.sessions);
-                    }
-                    vue.dashBoard.lock = false
+                    loadChart('sessions', vue.dashBoard.sessions, data.sessions)
+                    loadChart('queries', vue.dashBoard.queries, data.queries)
+                    loadChart('traffic', vue.dashBoard.traffic, data.traffic)
                     break;
             }
         })
@@ -117,7 +155,7 @@
         }, 1000);
         setInterval(() => {
             vue.sendLoadDashBoard()
-        }, 3000);
+        }, 1000);
     </script>
 </body>
 

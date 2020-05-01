@@ -29,7 +29,6 @@
         "no-bitwise": false,
         "no-consecutive-blank-lines": false,
         "no-console": false,
-        "no-string-literal": false,
         "forin": false,
         "eofline": false,
         "ordered-imports": false,

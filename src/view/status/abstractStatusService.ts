@@ -40,10 +40,14 @@ export interface ProcessListResponse {
     list: any[]
 }
 
+export interface DashBoardItem {
+    now: any;
+    type: string;
+    value: number
+}
+
 export interface DashBoardResponse {
-    session: Array<{
-        now: any,
-        type: string
-        value: number
-    }>
+    sessions: DashBoardItem[],
+    queries: DashBoardItem[],
+    traffic: DashBoardItem[],
 }
