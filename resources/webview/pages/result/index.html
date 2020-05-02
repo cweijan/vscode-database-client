@@ -297,13 +297,13 @@
             },
             nextPage() {
                 if (this.page.isEnd || this.page.lock) return;
-                console.log('next')
                 vscode.postMessage({
                     type: 'next',
                     sql: this.result.sql,
                     pageNum: ++this.page.pageNum,
                     pageSize: this.page.pageSize
                 });
+                this.table.loading = true
                 this.page.lock = true
             },
             dataformat(origin) {
@@ -327,7 +327,7 @@
                     }
                 }
                 return objClone;
-            }, 
+            },
             initShowColumn() {
                 const fields = this.result.fields
                 if (!fields) return;
@@ -345,13 +345,14 @@
                 this.page.lock = false
                 // info
                 this.info.visible = false;
+                // loading
+                this.table.loading = false
             },
             // show call when change table
             reset() {
                 this.clear()
                 // table
                 this.table.widthItem = {}
-                this.table.loading = false
                 this.initShowColumn()
                 // add filter row
                 if (this.result.columnList) {
@@ -421,7 +422,9 @@
                 } else {
                     vue.page.isEnd = true;
                 }
-                vue.page.lock = false
+                setTimeout(() => {
+                    vue.page.lock = false
+                }, 100);
                 break;
             case "DML":
             case "DDL":
