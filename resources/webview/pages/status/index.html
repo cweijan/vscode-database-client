@@ -22,13 +22,9 @@
         <el-tabs v-model="activePanel" @tab-click="changePannel">
             <el-tab-pane label="dashBoard" name="dashBoard">
                 <el-row style="height:45vh">
-                    <el-col :span="12">
+                    <el-col :span="24">
                         Queries:
                         <div id="queries"></div>
-                    </el-col>
-                    <el-col :span="12">
-                        Server Sessions:
-                        <div id="sessions"></div>
                     </el-col>
                 </el-row>
                 <el-row>
@@ -37,7 +33,8 @@
                         <div id="traffic"></div>
                     </el-col>
                     <el-col :span="12">
-                        <div class="grid-content bg-purple-light"></div>
+                        Server Sessions:
+                        <div id="sessions"></div>
                     </el-col>
                 </el-row>
 
@@ -131,7 +128,7 @@
                 chart.render();
                 chartOption.chart = chart
             } else {
-                if (chartOption.data.length >= data.length * 10) {
+                if (chartOption.data.length >= data.length * 100) {
                     for (let index = 0; index < data.length; index++) {
                         chartOption.data.shift()
                     }
