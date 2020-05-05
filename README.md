@@ -1,6 +1,6 @@
 # MySQL Client
 
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-client.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client) 
+[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) 
 
 MySQL Client For Visual Studio Code
 
@@ -8,6 +8,8 @@ MySQL Client For Visual Studio Code
 > This plugin inspired for [MySQL](https://github.com/formulahendry/vscode-mysql)
 > 
 > Give [project](https://github.com/cweijan/vscode-mysql) star keep me motivated to keep updating
+
+**Note: This plugin is not support MySql 8.0!**
 
 **Features**
 

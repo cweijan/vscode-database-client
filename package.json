@@ -1,8 +1,8 @@
 {
-	"name": "vscode-mysql-client",
+	"name": "vscode-mysql-client2",
 	"displayName": "MySQL",
 	"description": "MySQL Client for vscode",
-	"version": "1.9.6",
+	"version": "2.0.0",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
@@ -723,7 +723,7 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
-		"compile": "rm -rf out/ && tsc -p ./",
+		"compile": "rm -rf out/ && tsc --forceConsistentCasingInFileNames true -p ./",
 		"watch": "tsc -watch -p ./",
 		"tslint": "tslint -t verbose src/**/*.ts"
 	},

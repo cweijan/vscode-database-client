@@ -3,7 +3,7 @@ import * as path from "path";
 
 export class Constants {
     public static CONFIG_PREFIX = "vscode-mysql"
-    public static RES_PATH = path.join(vscode.extensions.getExtension('cweijan.vscode-mysql-client').extensionPath, "resources");
+    public static RES_PATH = path.join(vscode.extensions.getExtension('cweijan.vscode-mysql-client2').extensionPath, "resources");
     public static DEFAULT_SIZE = 100;
 }
 
