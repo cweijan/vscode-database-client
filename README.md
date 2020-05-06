@@ -17,7 +17,7 @@ MySQL Client For Visual Studio Code
   - [Connect](#connect)
   - [View Tables](#view-tables)
   - [Execute Sql](#execute-sql)
-  - [Generate Mock Date](#generate-mock-date)
+  - [Generate Mock Data](#generate-mock-data)
   - [History](#history)
   - [Backup/Import](#backupimport)
   - [Setting](#setting)
@@ -45,7 +45,7 @@ MySQL Client For Visual Studio Code
 * Click Run Button or Press `F9` to Execute.
 ![run](images/run.jpg)
 
-## Generate Mock Date
+## Generate Mock Data
 - Now you not need spend time to writing test data
 ![mockData](images/mockData.png)
 
