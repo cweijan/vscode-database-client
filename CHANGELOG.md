@@ -1,6 +1,7 @@
-## 1.9.7 (Preview)
+## 2.0.1 (2020/5/6)
 - Highlight active database.
 - Enhance dashboard.
+- Support open table in new panel.
 
 ## 1.9.6 (2020/5/1)
 - Fix bugs.
