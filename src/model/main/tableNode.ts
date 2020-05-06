@@ -1,6 +1,7 @@
 import * as path from "path";
+import * as mysql from "mysql";
 import * as vscode from "vscode";
-import { Constants, ModelType, Template } from "../../common/constants";
+import { Constants, ModelType, Template, MessageType } from "../../common/constants";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { DatabaseCache } from "../../service/common/databaseCache";
@@ -11,6 +12,8 @@ import { Node } from "../interface/node";
 import { ColumnNode } from "../other/columnNode";
 import { InfoNode } from "../other/infoNode";
 import { MockRunner } from "../../service/mock/mockRunner";
+import { QueryPage } from "../../view/result/query";
+import { DataResponse } from "../../view/result/queryResponse";
 
 export class TableNode extends Node implements CopyAble {
 
@@ -114,12 +117,21 @@ ADD
 
     }
 
+    public async openInNew() {
+        const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${Constants.DEFAULT_SIZE};`;
+        const connection = await ConnectionManager.getConnection(this);
+        const executeTime = new Date().getTime();
+        connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
+            const costTime = new Date().getTime() - executeTime;
+            QueryPage.send({ singlePage: false, type: MessageType.DATA, connection: this, res: { sql, costTime, data, fields, pageSize: Constants.DEFAULT_SIZE } as DataResponse });
+        })
+
+    }
 
     public async selectSqlTemplate(run: boolean) {
         const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${Constants.DEFAULT_SIZE};`;
 
         if (run) {
-            ConnectionManager.getConnection(this, true);
             QueryUnit.runQuery(sql, this);
         } else {
             QueryUnit.showSQLTextDocument(sql, Template.table);

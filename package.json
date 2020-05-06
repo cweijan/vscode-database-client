@@ -238,6 +238,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.table.show",
+				"title": "Open In New Panel",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.column.update",
 				"title": "Modify Column",
 				"category": "MySQL"
@@ -531,6 +536,11 @@
 					"command": "mysql.table.source",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@0"
+				},
+				{
+					"command": "mysql.table.show",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline@2"
 				},
 				{
 					"command": "mysql.column.add",

@@ -23,9 +23,9 @@ export class ConnectionManager {
     private static activeConnection: { [key: string]: ConnectionWrapper } = {};
     private static tunnelService = new SSHTunnelService();
 
-    public static getLastConnectionOption(checkActiveFile=true): Node {
+    public static getLastConnectionOption(checkActiveFile= true): Node {
 
-        if(checkActiveFile){
+        if (checkActiveFile) {
             const fileNode = this.getByActiveFile()
             if (fileNode) { return fileNode }
         }

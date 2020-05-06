@@ -81,6 +81,9 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.table.source": (tableNode: TableNode) => {
                 if (tableNode) { tableNode.showSource(); }
             },
+            "mysql.table.show": (tableNode: TableNode) => {
+                if (tableNode) { tableNode.openInNew(); }
+            },
             "mysql.column.changeName": (columnNode: ColumnNode) => {
                 columnNode.changeColumnName();
             },

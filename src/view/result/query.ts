@@ -18,6 +18,7 @@ export class QueryParam<T> {
      * using in loadColumnList.
      */
     public connection?: Node;
+    public singlePage?: boolean;
     public type: MessageType;
     public res: T;
 }
@@ -28,6 +29,10 @@ export class QueryPage {
     private static pageService: PageService = new MysqlPageSerivce()
 
     public static async send(queryParam: QueryParam<any>) {
+
+        if (typeof queryParam.singlePage == 'undefined') {
+            queryParam.singlePage = true;
+        }
 
         switch (queryParam.type) {
             case MessageType.DATA:
@@ -43,6 +48,7 @@ export class QueryPage {
         }
 
         ViewManager.createWebviewPanel({
+            singlePage: queryParam.singlePage,
             splitView: !Global.getConfig(ConfigKey.QUERY_FULL_SCREEN),
             path: "pages/result/index", title: "Query",
             initListener: (webviewPanel) => {
