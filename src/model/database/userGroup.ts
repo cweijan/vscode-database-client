@@ -12,7 +12,7 @@ import { DatabaseNode } from "./databaseNode";
 
 export class UserGroup extends DatabaseNode {
 
-    public contextValue: string = ModelType.DATABASE;
+    public contextValue: string = ModelType.USER_GROUP;
     public iconPath = path.join(Constants.RES_PATH, "icon/userGroup.svg")
     constructor(readonly name: string, readonly info: Node) {
         super(name, info)

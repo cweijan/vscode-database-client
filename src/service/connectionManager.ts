@@ -10,6 +10,7 @@ import { SSHConfig } from "../model/interface/sshConfig";
 import { DatabaseCache } from "./common/databaseCache";
 import { NodeUtil } from "../model/nodeUtil";
 import { SSHTunnelService } from "./common/sshTunnelService";
+import { DbTreeDataProvider } from "../provider/treeDataProvider";
 
 interface ConnectionWrapper {
     connection: mysql.Connection;
@@ -22,27 +23,11 @@ export class ConnectionManager {
     private static activeConnection: { [key: string]: ConnectionWrapper } = {};
     private static tunnelService = new SSHTunnelService();
 
-    public static getLastConnectionOption() {
+    public static getLastConnectionOption(checkActiveFile= true): Node {
 
-        if (vscode.window.activeTextEditor) {
-            const fileName = vscode.window.activeTextEditor.document.fileName;
-            if (fileName.includes('cweijan.vscode-mysql-client')) {
-                const queryName = path.basename(fileName, path.extname(fileName))
-                const filePattern = queryName.split('_');
-                const [host, port, user] = filePattern
-                let database: string;
-                if (filePattern.length >= 4) {
-                    database = filePattern[3]
-                    if (filePattern.length >= 4) {
-                        for (let index = 4; index < filePattern.length; index++) {
-                            database = `${database}_${filePattern[index]}`
-                        }
-                    }
-                }
-                if (host != null && port != null && user != null) {
-                    return NodeUtil.of({ host, port: parseInt(port), user, database })
-                }
-            }
+        if (checkActiveFile) {
+            const fileNode = this.getByActiveFile()
+            if (fileNode) { return fileNode }
         }
 
         return this.lastConnectionNode;
@@ -76,6 +61,9 @@ export class ConnectionManager {
             if (changeActive) {
                 this.lastConnectionNode = connectionNode;
                 Global.updateStatusBarItems(connectionNode);
+                setTimeout(() => {
+                    DbTreeDataProvider.refresh()
+                }, 100);
             }
             const key = connectionNode.getConnectId();
             const connection = this.activeConnection[key];
@@ -122,7 +110,7 @@ export class ConnectionManager {
 
     public static createConnection(connectionOptions: Node): mysql.Connection {
 
-        const newConnectionOptions = { ...connectionOptions, useConnectionPooling: true, multipleStatements: true } as any as mysql.ConnectionConfig;
+        const newConnectionOptions = { ...connectionOptions, useConnectionPooling: true, multipleStatements: true, dateStrings: true } as any as mysql.ConnectionConfig;
         if (connectionOptions.certPath && fs.existsSync(connectionOptions.certPath)) {
             newConnectionOptions.ssl = {
                 ca: fs.readFileSync(connectionOptions.certPath),
@@ -130,6 +118,30 @@ export class ConnectionManager {
         }
         return mysql.createConnection(newConnectionOptions);
 
+    }
+
+    public static getByActiveFile(): Node {
+        if (vscode.window.activeTextEditor) {
+            const fileName = vscode.window.activeTextEditor.document.fileName;
+            if (fileName.includes('cweijan.vscode-mysql-client2')) {
+                const queryName = path.basename(fileName, path.extname(fileName))
+                const filePattern = queryName.split('_');
+                const [host, port, user] = filePattern
+                let database: string;
+                if (filePattern.length >= 4) {
+                    database = filePattern[3]
+                    if (filePattern.length >= 4) {
+                        for (let index = 4; index < filePattern.length; index++) {
+                            database = `${database}_${filePattern[index]}`
+                        }
+                    }
+                }
+                if (host != null && port != null && user != null) {
+                    return NodeUtil.of({ host, port: parseInt(port), user, database })
+                }
+            }
+        }
+        return null;
     }
 
 }

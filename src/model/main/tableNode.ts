@@ -1,6 +1,7 @@
 import * as path from "path";
+import * as mysql from "mysql";
 import * as vscode from "vscode";
-import { Constants, ModelType, Template } from "../../common/constants";
+import { Constants, ModelType, Template, MessageType } from "../../common/constants";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { DatabaseCache } from "../../service/common/databaseCache";
@@ -10,15 +11,18 @@ import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { ColumnNode } from "../other/columnNode";
 import { InfoNode } from "../other/infoNode";
+import { MockRunner } from "../../service/mock/mockRunner";
+import { QueryPage } from "../../view/result/query";
+import { DataResponse } from "../../view/result/queryResponse";
 
 export class TableNode extends Node implements CopyAble {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.TABLE;
-    public primaryKey: string;
 
     constructor(public readonly table: string, readonly comment: string, readonly info: Node) {
-        super(`${table}  ${comment}`)
+        super(`${table}`)
+        this.description = comment
         this.id = `${info.getConnectId()}_${info.database}_${table}`
         this.init(info)
         this.command = {
@@ -37,7 +41,7 @@ export class TableNode extends Node implements CopyAble {
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column) => {
                     if (column && column.key == "PRI") {
-                        this.primaryKey = column.name
+                        MockRunner.primaryKeyMap[this.getConnectId()] = column.name
                     }
                     return new ColumnNode(this.table, column, this.info);
                 });
@@ -113,12 +117,21 @@ ADD
 
     }
 
+    public async openInNew() {
+        const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${Constants.DEFAULT_SIZE};`;
+        const connection = await ConnectionManager.getConnection(this);
+        const executeTime = new Date().getTime();
+        connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
+            const costTime = new Date().getTime() - executeTime;
+            QueryPage.send({ singlePage: false, type: MessageType.DATA, connection: this, res: { sql, costTime, data, fields, pageSize: Constants.DEFAULT_SIZE } as DataResponse });
+        })
+
+    }
 
     public async selectSqlTemplate(run: boolean) {
         const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${Constants.DEFAULT_SIZE};`;
 
         if (run) {
-            ConnectionManager.getConnection(this, true);
             QueryUnit.runQuery(sql, this);
         } else {
             QueryUnit.showSQLTextDocument(sql, Template.table);
@@ -131,7 +144,7 @@ ADD
             this
                 .getChildren()
                 .then((children: Node[]) => {
-                    const childrenNames = children.map((child: any) => "\n    " + child.column.name);
+                    const childrenNames = children.map((child: any) => "\n    " + Util.wrap(child.column.name));
                     const childrenValues = children.map((child: any) => "\n    $" + child.column.name);
                     let sql = `insert into \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} `;
                     sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  )\n`;
@@ -151,7 +164,7 @@ ADD
             .then((children: Node[]) => {
                 const keysNames = children.filter((child: any) => child.column.key).map((child: any) => child.column.name);
 
-                const where = keysNames.map((name: string) => `${name} = ${name}`);
+                const where = keysNames.map((name: string) => `${Util.wrap(name)} = \$${name}`);
 
                 let sql = `delete from \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and")}`;
@@ -179,8 +192,9 @@ ADD
 
         const connection = await ConnectionManager.getConnection(this, false)
 
-        if (this.primaryKey) {
-            const count = await QueryUnit.queryPromise(connection, `select max(${this.primaryKey}) max from ${this.table}`);
+        const primaryKey = MockRunner.primaryKeyMap[this.getConnectId()];
+        if (primaryKey != null) {
+            const count = await QueryUnit.queryPromise(connection, `select max(${primaryKey}) max from ${this.table}`);
             if (count && count[0]) { return count[0].max }
         }
 

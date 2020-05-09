@@ -42,6 +42,12 @@
                 database: null,
                 table: null
             },
+            page: {
+                pageNum: 1,
+                pageSize: -1,
+                isEnd: false,
+                lock: false
+            },
             table: {
                 search: '',
                 loading: true,
@@ -51,7 +57,6 @@
             toolbar: {
                 sql: null,
                 costTime: 0,
-                isRefrsh: false,
                 filter: {},
                 showColumns: []
             },
@@ -167,7 +172,7 @@
                 for (const key in this.update.currentNew) {
                     const newEle = this.update.currentNew[key];
                     if (newEle) {
-                        columns += `${key},`;
+                        columns += `${this.wrap(key)},`;
                         values += `${this.wrapQuote(key, newEle)},`;
                     }
                 }
@@ -184,7 +189,7 @@
                     const oldEle = this.update.current[key];
                     const newEle = this.update.currentNew[key];
                     if (oldEle != newEle) {
-                        change += `${key}=${this.wrapQuote(key, newEle)},`
+                        change += `${this.wrap(key)}=${this.wrapQuote(key, newEle)},`
                     }
                 }
                 if (change) {
@@ -201,18 +206,6 @@
                     currentNew: this.clone(row),
                     primary: row[this.result.primaryKey]
                 }
-            },
-            uploadRole() {
-                if (this.result.columnList == null) return;
-                let rule = {};
-                for (let column of this.result.columnList) {
-                    rule[column.name] = {
-                        required: (column.nullable == "NO") && (column.key != "PRI"),
-                        max: column.maxLength
-                    }
-                }
-                // disable, have bug
-                // this.info.rule = rule
             },
             deleteConfirm(primaryValue) {
                 this.$confirm('Are you sure you want to delete this data?', 'Warning', {
@@ -271,7 +264,6 @@
             },
             refresh() {
                 if (this.result.sql) {
-                    this.toolbar.isRefrsh = true;
                     this.execute(this.result.sql)
                 }
             },
@@ -291,10 +283,28 @@
                 if (origin.hasOwnProperty('type')) {
                     return String.fromCharCode.apply(null, new Uint16Array(origin.data))
                 }
-                if (Date.parse(origin)) {
-                    return origin.toString().replace("T", " ").replace(/\.\d+Z$/, "")
-                }
                 return origin;
+            },
+            wrap(origin) {
+                if (origin == null) { return origin; }
+
+                if (origin.match(/\b[-\.]\b/ig)
+                    || origin.match(/^(if|key|desc|length)$/i)) {
+                    return `\`${origin}\``;
+                }
+
+                return origin;
+            },
+            nextPage() {
+                if (this.page.isEnd || this.page.lock) return;
+                vscode.postMessage({
+                    type: 'next',
+                    sql: this.result.sql,
+                    pageNum: ++this.page.pageNum,
+                    pageSize: this.page.pageSize
+                });
+                this.table.loading = true
+                this.page.lock = true
             },
             dataformat(origin) {
 
@@ -317,12 +327,41 @@
                     }
                 }
                 return objClone;
-            }, initShowColumn(fields) {
+            },
+            initShowColumn() {
+                const fields = this.result.fields
                 if (!fields) return;
                 this.toolbar.showColumns = []
                 for (let i = 0; i < fields.length; i++) {
                     if (!fields[i].name) continue;
                     this.toolbar.showColumns.push(fields[i].name.toLowerCase());
+                }
+            },
+            // show call when load same table data
+            clear() {
+                // reset page
+                this.page.pageNum = 1
+                this.page.isEnd = false
+                this.page.lock = false
+                // info
+                this.info.visible = false;
+                // loading
+                this.table.loading = false
+            },
+            // show call when change table
+            reset() {
+                this.clear()
+                // table
+                this.table.widthItem = {}
+                this.initShowColumn()
+                // add filter row
+                if (this.result.columnList) {
+                    this.result.data.unshift({ isFilter: true, content: '' })
+                }
+                // toolbar
+                if (!this.result.sql.match(/\bwhere\b/ig)) {
+                    this.toolbar.filter = {}
+                    this.$refs.dataTable.clearSort()
                 }
             }
 
@@ -341,32 +380,18 @@
         }
     })
 
-    const handlerData = (data) => {
+    const handlerData = (data, sameTable) => {
 
-        vue.result.sql = data.sql;
-        vue.toolbar.sql = data.sql;
-        vue.table.widthItem = {}
         vue.result = data;
-        vue.table.loading = false
-        if (!data.sql.match(/\bwhere\b/ig)) {
-            // clear filter
-            vue.toolbar.filter = {}
-            vue.$refs.dataTable.clearSort()
-        }
-        if (vue.result.fields) {
-            vue.initShowColumn(vue.result.fields)
-        }
-        if (vue.result.columnList) {
-            vue.uploadRole()
-            // add filter row
-            vue.result.data.unshift({ isFilter: true, content: '' })
+        vue.toolbar.sql = data.sql;
+        vue.page.pageSize = data.pageSize
 
-        }
-        if (vue.toolbar.isRefrsh) {
-            vue.toolbar.isRefrsh = false;
+        if (sameTable) {
+            vue.clear()
         } else {
-            vue.info.visible = false;
+            vue.reset()
         }
+
     }
 
     const handlerCommon = (res) => {
@@ -378,8 +403,8 @@
     }
 
     window.addEventListener('message', event => {
+        const response = event.data.res;
         vue.table.loading = false;
-        let response = event.data.res;
         if (response.costTime) {
             vue.toolbar.costTime = response.costTime
         }
@@ -390,6 +415,16 @@
                 break;
             case "DATA":
                 handlerData(response)
+                break;
+            case "NEXT_PAGE":
+                if (response.data && response.data.length > 0) {
+                    vue.result.data.push(...response.data)
+                } else {
+                    vue.page.isEnd = true;
+                }
+                setTimeout(() => {
+                    vue.page.lock = false
+                }, 100);
                 break;
             case "DML":
             case "DDL":
@@ -416,9 +451,11 @@
         }
     });
     vscode.postMessage({ type: 'init' })
-    setInterval(() => {
-        // vue.updateWidth()
-    }, 100)
+    window.addEventListener('scroll', function () {
+        if ((document.body.offsetHeight - document.documentElement.scrollTop - document.documentElement.clientHeight) <= 200) {
+            vue.nextPage()
+        }
+    });
 </script>
 
 </html>

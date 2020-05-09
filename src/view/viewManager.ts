@@ -51,6 +51,10 @@ export class ViewManager {
                 if (typeof (viewOption.singlePage) == 'undefined') { viewOption.singlePage = true }
                 if (typeof (viewOption.killHidden) == 'undefined') { viewOption.killHidden = true }
 
+                if (!viewOption.singlePage) {
+                    viewOption.title = viewOption.title + new Date().getTime()
+                }
+
                 const currentStatus = this.viewStatu[viewOption.title]
                 if (viewOption.singlePage && currentStatus) {
                     if (viewOption.killHidden && currentStatus.instance.visible == false) {

@@ -16,8 +16,8 @@ import { MockRunner } from "./mock/mockRunner";
 import { MysqlSettingService } from "./setting/MysqlSettingService";
 import { SettingService } from "./setting/settingService";
 import { HistoryRecorder } from "./common/historyRecorder";
-import { StatusService } from "./status/statusService";
-import { MysqlStatusService } from "./status/impl/mysqlStatusService";
+import { StatusService } from "../view/status/statusService";
+import { MysqlStatusService } from "../view/status/impl/mysqlStatusService";
 
 export class ServiceManager {
 

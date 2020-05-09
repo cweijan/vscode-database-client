@@ -21,13 +21,21 @@ import { Console } from "./common/outputChannel";
 // Don't change last order, it will occur circular reference
 import { ServiceManager } from "./service/serviceManager";
 import { QueryUnit } from "./service/queryUnit";
+import { FileManager } from "./common/filesManager";
+import { ConnectionManager } from "./service/connectionManager";
 
 export function activate(context: vscode.ExtensionContext) {
 
     const serviceManager = new ServiceManager(context)
-
+    ConnectionNode.init()
     context.subscriptions.push(
         ...serviceManager.init(),
+        vscode.window.onDidChangeActiveTextEditor((e) => {
+            const fileNode = ConnectionManager.getByActiveFile()
+            if (fileNode) {
+                ConnectionManager.getConnection(fileNode, this)
+            }
+        }),
         ...initCommand({
             "mysql.history.open": () => serviceManager.historyService.showHistory(),
             [CommandKey.Refresh]: () => { serviceManager.provider.init(); },
@@ -73,6 +81,9 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.table.source": (tableNode: TableNode) => {
                 if (tableNode) { tableNode.showSource(); }
             },
+            "mysql.table.show": (tableNode: TableNode) => {
+                if (tableNode) { tableNode.openInNew(); }
+            },
             "mysql.column.changeName": (columnNode: ColumnNode) => {
                 columnNode.changeColumnName();
             },
@@ -94,13 +105,9 @@ export function activate(context: vscode.ExtensionContext) {
             },
             "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
                 if (databaseOrConnectionNode) {
-                    databaseOrConnectionNode.newQuery();
+                    await databaseOrConnectionNode.newQuery();
                 } else {
-                    // TODO
-                    // await vscode.window.showTextDocument(
-                    //     await vscode.workspace.openTextDocument(await FileManager.record(`sql/${new Date().getTime()}.sql`, null, FileModel.WRITE))
-                    // );
-                    ConnectionNode.tryOpenQuery();
+                    FileManager.show(`sql/${new Date().getTime()}.sql`)
                 }
             },
             "mysql.template.sql": (tableNode: TableNode, run: boolean) => {

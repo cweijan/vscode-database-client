@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as mysql from "mysql";
 import { Connection } from "mysql";
 import * as vscode from "vscode";
-import { CommandKey, ConfigKey, Cursor, MessageType, Pattern } from "../common/constants";
+import { CommandKey, ConfigKey, Cursor, MessageType, Pattern, Constants } from "../common/constants";
 import { Global } from "../common/global";
 import { Console } from "../common/outputChannel";
 import { FileManager, FileModel } from "../common/filesManager";
@@ -107,7 +107,7 @@ export class QueryUnit {
                 return;
             }
             if (Array.isArray(data)) {
-                QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields } as DataResponse });
+                QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields, pageSize: Constants.DEFAULT_SIZE } as DataResponse });
                 return;
             }
             QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });

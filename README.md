@@ -1,13 +1,15 @@
 # MySQL Client
 
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-client.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client) 
+[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) 
 
 MySQL Client For Visual Studio Code
 
 
-> This plugin inspired for [MySQL](https://github.com/formulahendry/vscode-mysql)
+> This plugin was inspired by [MySQL](https://github.com/formulahendry/vscode-mysql).
 > 
-> Give [project](https://github.com/cweijan/vscode-mysql) star keep me motivated to keep updating
+> Give [project](https://github.com/cweijan/vscode-mysql) a star to keep me motivated to keep updating.
+
+**Note: This plugin does not support MySql 8.0!**
 
 **Features**
 
@@ -15,7 +17,7 @@ MySQL Client For Visual Studio Code
   - [Connect](#connect)
   - [View Tables](#view-tables)
   - [Execute Sql](#execute-sql)
-  - [Generate Mock Date](#generate-mock-date)
+  - [Generate Mock Data](#generate-mock-data)
   - [History](#history)
   - [Backup/Import](#backupimport)
   - [Setting](#setting)
@@ -24,7 +26,7 @@ MySQL Client For Visual Studio Code
 ## Connect
 
 1. Open MySQL Panel, then click the `+` button.
-2. Input you connect info then click connect.
+2. Input your connect info then click connect.
 
 ![connection](images/connection.jpg)
 
@@ -39,12 +41,12 @@ MySQL Client For Visual Studio Code
 * In the MySQL Panel, click the `New Query` button.
 ![newquery](images/newquery.jpg)
 * This changes the active database.
-* Now You can enjoy Intelli SQL code within the editor.
+* Now you can enjoy Intellisense for SQL code within the editor.
 * Click Run Button or Press `F9` to Execute.
 ![run](images/run.jpg)
 
-## Generate Mock Date
-- Now you not need spend time to writing test data
+## Generate Mock Data
+- Now you do not need spend time writing test data.
 ![mockData](images/mockData.png)
 
 ## History
@@ -72,6 +74,6 @@ MySQL Client For Visual Studio Code
 ```
 
 ## Suprise
-* You can find suprise when right click on node.
+* Find a suprise when you right click on a node.
 
 ![suprise](images/surprise.jpg)

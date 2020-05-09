@@ -3,7 +3,7 @@ import { ConnectionManager } from "../service/connectionManager";
 
 export abstract class NodeUtil {
     public static of(node: any): Node {
-        if (node && !node.getConnectId) {
+        if (node && !(node instanceof Node)) {
             node.__proto__ = Node.prototype
         }
         return node;

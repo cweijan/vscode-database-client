@@ -12,6 +12,7 @@ import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
 import { DatabaseNode } from "./databaseNode";
 import { UserGroup } from "./userGroup";
+import { Connection } from "mysql";
 
 export class ConnectionNode extends Node {
 
@@ -24,14 +25,16 @@ export class ConnectionNode extends Node {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let databaseNodes = DatabaseCache.getDatabaseListOfConnection(this.id);
-        if (databaseNodes && !isRresh) {
-            return databaseNodes;
+        let connection: Connection;
+        try {
+            connection = await ConnectionManager.getConnection(this);
+        } catch (err) {
+            return [new InfoNode(err)];
         }
 
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), "show databases")
+        return QueryUnit.queryPromise<any[]>(connection, "show databases")
             .then((databases) => {
-                databaseNodes = databases.filter((db) => {
+                const databaseNodes = databases.filter((db) => {
                     if (this.database) {
                         return db.Database == this.database;
                     }
@@ -55,8 +58,23 @@ export class ConnectionNode extends Node {
     }
 
     public async newQuery() {
-        ConnectionManager.getConnection(this, true);
-        ConnectionNode.tryOpenQuery()
+
+        const key = `${this.getConnectId()}`;
+        await FileManager.show(`${key}.sql`);
+        const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
+        let dbName;
+        if (dbNameList.length == 1) {
+            dbName = dbNameList[0]
+        }
+        if (dbNameList.length > 1) {
+            dbName = await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" })
+        }
+        if (dbName) {
+            await ConnectionManager.getConnection({
+                ...this, database: dbName
+            } as Node, true);
+        }
+        
     }
 
     public createDatabase() {
@@ -90,22 +108,7 @@ export class ConnectionNode extends Node {
         });
     }
 
-    public static async tryOpenQuery() {
-        const lcp = ConnectionManager.getLastConnectionOption();
-        if (!lcp) {
-            Console.log("Not active connection found!");
-        } else {
-            const key = `${lcp.getConnectId()}`;
-            await FileManager.show(`${key}.sql`);
-            const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
-            await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" }).then(async (dbName) => {
-                if (dbName) {
-                    await ConnectionManager.getConnection({
-                        ...lcp, database: dbName, getConnectId: lcp.getConnectId
-                    } as Node, true);
-                }
-            });
-        }
-    }
+    public static init() { }
+
 
 }

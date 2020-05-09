@@ -1,8 +1,8 @@
 {
-	"name": "vscode-mysql-client",
+	"name": "vscode-mysql-client2",
 	"displayName": "MySQL",
 	"description": "MySQL Client for vscode",
-	"version": "1.9.5",
+	"version": "2.0.1",
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
@@ -235,6 +235,11 @@
 			{
 				"command": "mysql.table.source",
 				"title": "Show Table Source",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.table.show",
+				"title": "Open In New Panel",
 				"category": "MySQL"
 			},
 			{
@@ -533,6 +538,11 @@
 					"group": "1_inline@0"
 				},
 				{
+					"command": "mysql.table.show",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline@2"
+				},
+				{
 					"command": "mysql.column.add",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@4"
@@ -723,7 +733,7 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
-		"compile": "rm -rf out/ && tsc -p ./",
+		"compile": "rm -rf out/ && tsc --forceConsistentCasingInFileNames true -p ./",
 		"watch": "tsc -watch -p ./",
 		"tslint": "tslint -t verbose src/**/*.ts"
 	},

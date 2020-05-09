@@ -1,7 +1,8 @@
 <div class="hint">
     <!-- sql input -->
     <el-row style="margin-bottom: 10px;">
-        <el-input type="textarea" :autosize="{ minRows:3, maxRows:5}" v-model="toolbar.sql" style="width:90vw" ></el-input>
+        <el-input type="textarea" :autosize="{ minRows:3, maxRows:5}" v-model="toolbar.sql" style="width:90vw">
+        </el-input>
     </el-row>
     <!-- tool panel -->
     <el-row>
@@ -17,10 +18,10 @@
     </el-row>
     <el-row v-if="result.table">
         <el-col>
-            <el-button type="info" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest" >
+            <el-button type="info" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest">
             </el-button>
             <span>CostTime: </span><span v-text="toolbar.costTime"></span>ms
-            <span v-if="result.table">, Row: {{result.data.length}}, Col: {{columnCount}}</span>
+            <span v-if="result.table">, Row: {{result.data.length-1}}, Col: {{columnCount}}</span>
         </el-col>
     </el-row>
     <!-- info panel -->

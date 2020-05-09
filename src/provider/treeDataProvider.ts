@@ -86,26 +86,21 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async activeDb() {
 
-        const fileName = vscode.window.activeTextEditor.document.fileName;
-        if (fileName.includes('cweijan.vscode-mysql-client') && path.basename(fileName, path.extname(fileName)).split('_')[3] != null) {
-            vscode.window.showErrorMessage("You in query file, not support change.")
-        } else {
-            const dbIdList: string[] = [];
-            const dbIdMap = new Map<string, DatabaseNode>();
-            for (const dbNode of DatabaseCache.getDatabaseNodeList()) {
-                dbIdList.push(dbNode.id)
-                dbIdMap.set(dbNode.id, dbNode)
-            }
-            if (dbIdList) {
-                vscode.window.showQuickPick(dbIdList).then(async (dbId) => {
-                    if (dbId) {
-                        const dbNode = dbIdMap.get(dbId);
-                        await ConnectionManager.getConnection(dbNode, true)
-                        vscode.window.showInformationMessage(`Change active database to ${dbNode.database} success!`)
-                    }
+        const dbIdList: string[] = [];
+        const dbIdMap = new Map<string, DatabaseNode>();
+        for (const dbNode of DatabaseCache.getDatabaseNodeList()) {
+            dbIdList.push(dbNode.id)
+            dbIdMap.set(dbNode.id, dbNode)
+        }
+        if (dbIdList) {
+            vscode.window.showQuickPick(dbIdList).then(async (dbId) => {
+                if (dbId) {
+                    const dbNode = dbIdMap.get(dbId);
+                    await ConnectionManager.getConnection(dbNode, true)
+                    vscode.window.showInformationMessage(`Change active database to ${dbNode.database} success!`)
+                }
 
-                })
-            }
+            })
         }
 
     }
