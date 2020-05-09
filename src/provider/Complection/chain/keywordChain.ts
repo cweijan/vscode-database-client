@@ -3,7 +3,7 @@ import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class KeywordChain implements ComplectionChain {
 
-    private keywordList: string[] = ["JOIN", "AND", "OR", "SELECT", "SET", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN", "rollback", , "COMMENT", "rollback", "commit", "begin", "DELIMITER", "CALL"];
+    private keywordList: string[] = ["JOIN", "AND", "OR", "SELECT", "SET", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN", "rollback" , "COMMENT", "rollback", "commit", "begin", "DELIMITER", "CALL", "REPLACE"];
     private keywordComplectionItems: vscode.CompletionItem[] = [];
 
     constructor() {
