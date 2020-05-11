@@ -3,7 +3,11 @@ import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class KeywordChain implements ComplectionChain {
 
-    private keywordList: string[] = ["JOIN", "AND", "OR", "SELECT", "SET", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COLUMN", "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN", "rollback", "COMMENT", "commit", "begin", "DELIMITER", "CALL", "REPLACE", "REFERENCES"];
+    private keywordList: string[] = ["JOIN", "AND", "OR", "SELECT", "SET", "UPDATE", "DELETE", "TABLE", "INSERT", "INTO", "VALUES", "FROM", "WHERE", "IS",
+        "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COLUMN", "BETWEEN",
+        "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN", "ROLLBACK", "COMMENT", "COMMIT", "BEGIN", "DELIMITER", "CALL", "REPLACE",
+        "REFERENCES", "USING", "END", "BEFORE", "AFTER", "GRANT", "RETURNS", "IN", "SOME", "ANY", "SOME", "ASC", "DESC", "UNIQUE", "UNION", "ALL", "ON",
+        "OUTER", "INNER", "EXEC", "EXISTS", "NOT", "FOREIGN", "FULL", "LIKE", "IN", "PRIMARY", "KEY", "RIGHT", "LEFT", "TRUNCATE", "IGNORE", "DISTINCT"];
     private keywordComplectionItems: vscode.CompletionItem[] = [];
 
     constructor() {
