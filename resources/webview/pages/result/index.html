@@ -12,7 +12,7 @@
     <div id="app">
         <include path="components/toolPanel.html" />
         <!-- talbe result -->
-        <div :style="'width:' + table.width + 'px;overflow:scroll'" v-if="result.data">
+        <div :style="'width:' + table.width + 'px;'" v-if="result.data">
             <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort"
                 :row-class-name="tableRowClassName" ref="dataTable"
                 :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
@@ -40,7 +40,8 @@
                 primaryKey: null,
                 columnList: null,
                 database: null,
-                table: null
+                table: null,
+                pageSize: null
             },
             page: {
                 pageNum: 1,
@@ -343,6 +344,7 @@
                 this.page.pageNum = 1
                 this.page.isEnd = false
                 this.page.lock = false
+                this.page.pageSize = this.result.pageSize
                 // info
                 this.info.visible = false;
                 // loading
@@ -384,7 +386,6 @@
 
         vue.result = data;
         vue.toolbar.sql = data.sql;
-        vue.page.pageSize = data.pageSize
 
         if (sameTable) {
             vue.clear()
