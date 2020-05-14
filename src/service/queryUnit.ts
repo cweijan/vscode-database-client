@@ -42,7 +42,7 @@ export class QueryUnit {
         if (!connectionNode) {
             connectionNode = ConnectionManager.getLastConnectionOption();
         }
-        const connection = await ConnectionManager.getConnection(connectionNode);
+        const connection = await ConnectionManager.getConnection(connectionNode, true);
         if (!connection) {
             vscode.window.showWarningMessage("No MySQL Server or Database selected");
             return;
