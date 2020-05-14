@@ -23,7 +23,7 @@ export class MockRunner {
         const mockModel: MockModel = {
             host: tableNode.getHost(), port: tableNode.getPort(), user: tableNode.getUser(), database: tableNode.database, table: tableNode.table,
             mockStartIndex: MockRunner.primaryKeyMap[tableNode.getConnectId()] ? 'auto' : 1
-            , mockCount: 50, mock: {}, examples: "http://mockjs.com/examples.html#DPD"
+            , mockCount: 50, examples: "http://mockjs.com/examples.html#DPD", mock: {}
         }
         for (const columnNode of columnList) {
             mockModel.mock[columnNode.column.name] = {
