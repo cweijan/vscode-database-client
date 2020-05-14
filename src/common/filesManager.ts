@@ -9,7 +9,7 @@ export class FileManager {
         this.storagePath = context.globalStoragePath;
     }
 
-    public static show(fileName: string) {
+    public static show(fileName: string): Promise<vscode.TextEditor> {
         if (!this.storagePath) { vscode.window.showErrorMessage("FileManager is not init!") }
         if (!fileName) { return; }
         const recordPath = `${this.storagePath}/${fileName}`;
@@ -45,7 +45,7 @@ export class FileManager {
     }
 
 
-    
+
     private static check(path: string) {
 
         if (!fs.existsSync(path)) { this.recursiseCreate(path) }

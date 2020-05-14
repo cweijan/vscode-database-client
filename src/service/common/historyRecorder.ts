@@ -1,8 +1,14 @@
+import { TextEditor, Selection } from "vscode";
 import { FileManager } from "../../common/filesManager";
 export class HistoryRecorder {
 
     public showHistory() {
-        FileManager.show('history.sql')
+        FileManager.show('history.sql').then((textEditor: TextEditor) => {
+            const lineCount = textEditor.document.lineCount;
+            const range = textEditor.document.lineAt(lineCount - 1).range;
+            textEditor.selection = new Selection(range.end, range.end);
+            textEditor.revealRange(range);
+        })
     }
 
     public recordHistory(sql: string, costTime: number) {

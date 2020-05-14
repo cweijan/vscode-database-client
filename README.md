@@ -21,7 +21,7 @@ MySQL Client For Visual Studio Code
   - [History](#history)
   - [Backup/Import](#backupimport)
   - [Setting](#setting)
-  - [Suprise](#suprise)
+  - [Other](#other)
 
 ## Connect
 
@@ -73,7 +73,7 @@ MySQL Client For Visual Studio Code
 }
 ```
 
-## Suprise
+## Other
 * Find a suprise when you right click on a node.
 
 ![suprise](images/surprise.jpg)
