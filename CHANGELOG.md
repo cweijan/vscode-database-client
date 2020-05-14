@@ -1,3 +1,6 @@
+## 2.1.0 (2020/5/14)
+- Update Query Result Page
+
 ## 2.0.1 (2020/5/6)
 - Highlight active database.
 - Enhance dashboard.
