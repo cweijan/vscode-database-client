@@ -30,7 +30,7 @@ export class DatabaseNode extends Node implements CopyAble {
         const lcp = ConnectionManager.getLastConnectionOption(false);
         if (lcp.getConnectId() == this.getConnectId() && lcp.database == this.database) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/database-active.svg");
-            this.description = `Actived`
+            this.description = `Active`
         }
     }
 
