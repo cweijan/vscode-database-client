@@ -14,6 +14,7 @@ import { InfoNode } from "../other/infoNode";
 import { MockRunner } from "../../service/mock/mockRunner";
 import { QueryPage } from "../../view/result/query";
 import { DataResponse } from "../../view/result/queryResponse";
+import { ColumnMeta } from "../other/columnMeta";
 
 export class TableNode extends Node implements CopyAble {
 
@@ -37,7 +38,7 @@ export class TableNode extends Node implements CopyAble {
         if (columnNodes && !isRresh) {
             return columnNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT COLUMN_NAME name,DATA_TYPE simpleType,COLUMN_TYPE type,COLUMN_COMMENT comment,COLUMN_KEY \`key\`,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
+        return QueryUnit.queryPromise<ColumnMeta[]>(await ConnectionManager.getConnection(this), `SELECT COLUMN_NAME name,DATA_TYPE simpleType,COLUMN_TYPE type,COLUMN_COMMENT comment,COLUMN_KEY \`key\`,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}';`)
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column) => {
                     if (column && column.key == "PRI") {

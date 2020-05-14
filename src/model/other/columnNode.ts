@@ -8,13 +8,14 @@ import { ConnectionManager } from "../../service/connectionManager";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { CopyAble } from "../interface/copyAble";
 import { Util } from "../../common/util";
+import { ColumnMeta } from "./columnMeta";
 const wrap = Util.wrap;
 
 
 export class ColumnNode extends Node implements CopyAble {
     public type: string;
     public contextValue: string = ModelType.COLUMN;
-    constructor(private readonly table: string, readonly column: any, readonly info: Node) {
+    constructor(private readonly table: string, readonly column: ColumnMeta, readonly info: Node) {
         super(column.name)
         this.init(info)
         this.type = `${this.column.type}`

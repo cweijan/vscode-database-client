@@ -12,6 +12,7 @@ import { MessageResponse } from "../../view/result/queryResponse";
 import { FileManager, FileModel } from '../../common/filesManager';
 import { MockModel } from './mockModel';
 import { Node } from '../../model/interface/node';
+import { ColumnMeta } from '../../model/other/columnMeta';
 
 export class MockRunner {
 
@@ -28,7 +29,7 @@ export class MockRunner {
         for (const columnNode of columnList) {
             mockModel.mock[columnNode.column.name] = {
                 type: columnNode.column.simpleType,
-                value: this.getValueByType(columnNode.column)
+                value: this.getMockValue(columnNode.column)
             }
         }
 
@@ -115,12 +116,39 @@ export class MockRunner {
     }
 
     // refrence : http://mockjs.com/examples.html
-    private getValueByType(column: any): string {
+    private getMockValue(column: ColumnMeta): string {
+
+        const valueByName = this.getValueByName(column.name)
+        if (valueByName) {
+            return valueByName;
+        }
+
+        return this.getValueByType(column);
+    }
+    private getValueByName(name: string) {
+
+        name = name.toLowerCase()
+        if (name == "create_time" || name == "created_time" || name == "update_time" || name == "updated_time") {
+            return "@now('yyyy-MM-dd HH:mm:ss')"
+        }
+
+        if (name == "created_by" || name == "updated_by" ) {
+            return "vscode-mysql-mock"
+        }
+
+        if (name == "revision" || name == "version" ) {
+            return "1"
+        }
+
+        return null;
+    }
+
+    private getValueByType(column: ColumnMeta): string {
         const type = column.simpleType.toLowerCase()
-        const match = column.type.match(/.+?\((\d+)\)/);
+        const numericMatch = column.type.match(/.+?\((\d+)\)/);
         let length = 1024
-        if (match) {
-            length = 1 << (match[1] - 1)
+        if (numericMatch) {
+            length = 1 << (parseInt(numericMatch[1]) - 1)
         }
         if (column.key == "PRI") {
             return this.MOCK_INDEX;
