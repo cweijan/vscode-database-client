@@ -60,6 +60,18 @@ body {
 }
 
 .el-textarea__inner,.el-input__inner,
-.el-table, .el-table tr, .el-table th{
+.el-table, .el-table tr, .el-table th, 
+.el-dialog__header,.el-el-dialog__body,.el-dialog__footer
+{
     background-color: #F8F8F8;
+}
+
+.el-table__row--striped td{
+    background-color: #FFF0EF !important;
+}
+
+
+.el-table th.is-leaf{
+    border: 1px solid #eae7e7;
+    border-radius: 3px;
 }

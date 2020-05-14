@@ -12,17 +12,15 @@
     <div id="app">
         <include path="components/toolPanel.html" />
         <!-- talbe result -->
-        <div :style="'width:' + table.width + 'px;'" v-if="result.data">
-            <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort"
-                :row-class-name="tableRowClassName" ref="dataTable"
-                :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
-                border @row-dblclick="row=>openEdit(row)">
-                <!-- tool bar -->
-                <include path="components/toolbar.html" />
-                <!-- data  -->
-                <include path="components/dataTable.html" />
-            </el-table>
-        </div>
+        <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort"
+            :row-class-name="tableRowClassName" ref="dataTable" :height="remainHeight" width="100vh" stripe
+            :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
+            border @row-dblclick="row=>openEdit(row)">
+            <!-- tool bar -->
+            <include path="components/toolbar.html" />
+            <!-- data  -->
+            <include path="components/dataTable.html" />
+        </el-table>
         <include path="components/editDialog.html" />
     </div>
 </body>
@@ -52,7 +50,6 @@
             table: {
                 search: '',
                 loading: true,
-                width: null,
                 widthItem: {}
             },
             toolbar: {
@@ -76,6 +73,17 @@
                 currentNew: {},
                 primary: null
             }
+        },
+        mounted() {
+            setTimeout(() => {
+                const table = document.querySelector('.el-table__fixed-body-wrapper');
+                table.addEventListener('scroll', (event) => {
+                    console.log(table.scrollHeight - table.scrollTop - document.documentElement.clientHeight)
+                    if ((table.scrollHeight - table.scrollTop - document.documentElement.clientHeight ) <= 200) {
+                        vue.nextPage()
+                    }
+                });
+            }, 1000);
         },
         methods: {
             exportData() {
@@ -227,17 +235,6 @@
                 }
                 return '';
             },
-            updateWidth() {
-                let width = 0;
-                for (const key in this.table.widthItem) {
-                    width = width + parseInt(this.table.widthItem[key])
-                }
-                if (this.result.primaryKey) {
-                    width += 60;
-                }
-                this.table.width = width + 100;
-
-            },
             computeWidth(key, index, keyIndex, value) {
                 if (this.table.widthItem[keyIndex]) return this.table.widthItem[keyIndex];
                 if (!index) index = 0
@@ -251,7 +248,6 @@
                 var nextDynamic = this.computeWidth(key, ++index, keyIndex)
                 if (dynamic < nextDynamic) dynamic = nextDynamic;
                 this.table.widthItem[keyIndex] = dynamic;
-                this.updateWidth()
                 return dynamic;
             },
             celledit(row, column, cell, event) {
@@ -384,6 +380,9 @@
                 }
                 return 'Edit For ' + this.result.table + ' : ' + this.result.primaryKey + '=' + this.update.primary
             },
+            remainHeight() {
+                return screen.height - 300;
+            }
         }
     })
 
@@ -457,11 +456,6 @@
         }
     });
     vscode.postMessage({ type: 'init' })
-    window.addEventListener('scroll', function () {
-        if ((document.body.offsetHeight - document.documentElement.scrollTop - document.documentElement.clientHeight) <= 200) {
-            vue.nextPage()
-        }
-    });
 </script>
 
 </html>
