@@ -153,7 +153,6 @@ export class MockRunner {
         if (column.key == "PRI") {
             return this.MOCK_INDEX;
         }
-        // console.log(type)
         switch (type) {
             case "bit":
                 return "@integer(0," + length + ")";

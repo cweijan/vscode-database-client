@@ -59,7 +59,7 @@ body {
     background: oldlace;
 }
 
-.el-textarea__inner,.el-input__inner,
+.el-textarea__inner,
 .el-table, .el-table tr, .el-table th, 
 .el-dialog__header,.el-el-dialog__body,.el-dialog__footer
 {
@@ -67,7 +67,7 @@ body {
 }
 
 .el-table__row--striped td{
-    background-color: #FFF0EF !important;
+    background-color: #f0fdf0 !important;
 }
 
 

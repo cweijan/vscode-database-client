@@ -12,7 +12,7 @@
     <div id="app">
         <include path="components/toolPanel.html" />
         <!-- talbe result -->
-        <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort"
+        <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort"  element-loading-text="Loading Next Page Data"
             :row-class-name="tableRowClassName" ref="dataTable" :height="remainHeight" width="100vh" stripe
             :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
             border @row-dblclick="row=>openEdit(row)">
@@ -78,7 +78,6 @@
             setTimeout(() => {
                 const table = document.querySelector('.el-table__fixed-body-wrapper');
                 table.addEventListener('scroll', (event) => {
-                    console.log(table.scrollHeight - table.scrollTop - document.documentElement.clientHeight)
                     if ((table.scrollHeight - table.scrollTop - document.documentElement.clientHeight ) <= 200) {
                         vue.nextPage()
                     }
