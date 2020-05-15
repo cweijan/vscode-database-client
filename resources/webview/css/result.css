@@ -55,8 +55,8 @@ body {
 
 
 
-.el-table .edit-row {
-    background: oldlace;
+.el-table .edit-row td{
+    background: oldlace !important;
 }
 
 .el-textarea__inner,
@@ -66,8 +66,8 @@ body {
     background-color: #F8F8F8;
 }
 
-.el-table__row--striped td{
-    background-color: #f0fdf0 !important;
+.el-table--striped .el-table__body tr.el-table__row--striped td{
+    background-color: #f0fdf0 ;
 }
 
 

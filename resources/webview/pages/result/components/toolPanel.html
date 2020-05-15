@@ -6,23 +6,12 @@
     </el-row>
     <!-- tool panel -->
     <el-row>
-        <el-col :span="8">
-            <el-input v-model="table.search" placeholder="Input to searching loaded data" />
-        </el-col>
-        <el-col :span="12" style="margin-left: 20px;">
-            <el-button type="primary" @click='execute(toolbar.sql);info.visible = false;'>Execute</el-button>
-            <span v-if="result.table">
-                {{result.table}}
-            </span>
-        </el-col>
-    </el-row>
-    <el-row v-if="result.table">
-        <el-col>
-            <el-button type="info" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest">
-            </el-button>
-            <span>CostTime: </span><span v-text="toolbar.costTime"></span>ms
-            <span v-if="result.table">, Row: {{result.data.length-1}}, Col: {{columnCount}}</span>
-        </el-col>
+        <el-button type="primary" @click='execute(toolbar.sql);info.visible = false;'>Execute</el-button>
+        <span v-if="result.table">
+            {{result.table}}
+        </span>
+        <span>CostTime: </span><span v-text="toolbar.costTime"></span>ms
+        <span v-if="result.table">, Row: {{result.data.length-1}}, Col: {{columnCount}}</span>
     </el-row>
     <!-- info panel -->
     <div v-if="info.visible ">
