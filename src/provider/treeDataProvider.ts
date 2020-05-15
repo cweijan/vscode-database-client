@@ -6,6 +6,7 @@ import { DatabaseCache } from "../service/common/databaseCache";
 import { ConnectionNode } from "../model/database/connectionNode";
 import { DatabaseNode } from "../model/database/databaseNode";
 import { Node } from "../model/interface/node";
+import { UserGroup } from "../model/database/userGroup";
 
 export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
@@ -89,8 +90,10 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         const dbIdList: string[] = [];
         const dbIdMap = new Map<string, DatabaseNode>();
         for (const dbNode of DatabaseCache.getDatabaseNodeList()) {
-            dbIdList.push(dbNode.id)
-            dbIdMap.set(dbNode.id, dbNode)
+            if (dbNode instanceof UserGroup) { continue }
+            const id = dbIdList.includes(dbNode.database) ? dbNode.id : dbNode.database
+            dbIdList.push(id)
+            dbIdMap.set(id, dbNode)
         }
         if (dbIdList) {
             vscode.window.showQuickPick(dbIdList).then(async (dbId) => {

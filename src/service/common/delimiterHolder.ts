@@ -1,6 +1,6 @@
 export class DelimiterHolder {
 
-    private delimiterPattern = /\bdelimiter\b\s*([;\$\.\(\)\[\]\'\"\\\/\w]+)/ig;
+    private delimiterPattern = /\bdelimiter\b\s*(\S+)/ig;
     private delimiteMap = new Map<string, string>();
 
     public get(key: string) {

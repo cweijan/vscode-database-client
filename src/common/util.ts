@@ -69,9 +69,7 @@ export class Util {
     }
 
     public static copyToBoard(content: string) {
-        vscode.env.clipboard.writeText(content).then(() => {
-            vscode.window.showInformationMessage(`Copy ${content} to clipboard success!`);
-        });
+        vscode.env.clipboard.writeText(content)
     }
 
     public static confirm(placeHolder: string, callback: () => void) {
