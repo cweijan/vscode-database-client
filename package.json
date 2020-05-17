@@ -6,7 +6,7 @@
 	"publisher": "cweijan",
 	"icon": "logo.png",
 	"engines": {
-		"vscode": "^1.35.0"
+		"vscode": "^1.38.0"
 	},
 	"categories": [
 		"Programming Languages",
@@ -743,9 +743,9 @@
 		"@types/mysql": "^2.15.10",
 		"@types/node": "^7.10.10",
 		"@types/ssh2": "^0.5.43",
+		"@types/vscode": "1.38.0",
 		"tslint": "^5.8.0",
-		"typescript": "^3.8.3",
-		"vscode": "^1.1.36"
+		"typescript": "^3.8.3"
 	},
 	"dependencies": {
 		"async-lock": "^1.2.2",
