@@ -35,16 +35,19 @@ export class MockRunner {
 
         const mockPath = `mock/${tableNode.database}/${tableNode.table}/mock.json`;
         const mockFullPath = `${FileManager.storagePath}/${mockPath}`;
-        if (existsSync(mockFullPath)) {
-            const existsMockModel = JSON.parse(readFileSync(mockFullPath, 'utf8')) as MockModel;
-            if (Object.keys(existsMockModel.mock).length != columnList.length) {
-                existsMockModel.mock = mockModel.mock
-                await FileManager.record(mockPath, JSON.stringify(existsMockModel, null, 4), FileModel.WRITE);
-            }
+        let targetModel = mockModel;
 
-        } else {
-            await FileManager.record(mockPath, JSON.stringify(mockModel, null, 4), FileModel.WRITE);
-        }
+        try {
+            if (existsSync(mockFullPath)) {
+                const existsMockModel = JSON.parse(readFileSync(mockFullPath, 'utf8')) as MockModel;
+                if (Object.keys(existsMockModel.mock).length != columnList.length) {
+                    existsMockModel.mock = mockModel.mock
+                }
+                targetModel = existsMockModel
+            }
+        } catch (err) { }
+
+        await FileManager.record(mockPath, JSON.stringify(targetModel, null, 4), FileModel.WRITE);
         await vscode.window.showTextDocument(
             await vscode.workspace.openTextDocument(mockFullPath)
         );
@@ -132,11 +135,11 @@ export class MockRunner {
             return "@now('yyyy-MM-dd HH:mm:ss')"
         }
 
-        if (name == "created_by" || name == "updated_by" ) {
+        if (name == "created_by" || name == "updated_by") {
             return "vscode-mysql-mock"
         }
 
-        if (name == "revision" || name == "version" ) {
+        if (name == "revision" || name == "version") {
             return "1"
         }
 
