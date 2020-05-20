@@ -1,3 +1,6 @@
+## 2.1.4 (2020/5/20)
+- Fix connect database by ssh tunnel fail.
+
 ## 2.1.0 (2020/5/14)
 - Update Query Result Page
 
