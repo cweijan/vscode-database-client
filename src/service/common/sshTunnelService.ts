@@ -49,7 +49,7 @@ export class SSHTunnelService {
                     delete this.tunelMark[key]
                     errorCallback(error)
                 }
-                resolve({ ...connectionNode, port } as Node)
+                resolve({ ...connectionNode, host: "127.0.0.1", port } as Node)
             });
             localTunnel.on('error', (err) => {
                 Console.log('Ssh tunel occur error : ' + err);
