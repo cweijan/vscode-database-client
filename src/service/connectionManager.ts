@@ -23,7 +23,7 @@ export class ConnectionManager {
     private static activeConnection: { [key: string]: ConnectionWrapper } = {};
     private static tunnelService = new SSHTunnelService();
 
-    public static getLastConnectionOption(checkActiveFile= true): Node {
+    public static getLastConnectionOption(checkActiveFile = true): Node {
 
         if (checkActiveFile) {
             const fileNode = this.getByActiveFile()
@@ -99,6 +99,7 @@ export class ConnectionManager {
                     resolve(this.activeConnection[key].connection);
                 } else {
                     this.activeConnection[key] = null;
+                    this.tunnelService.closeTunnel(key)
                     Console.log(`${err.stack}\n${err.message}`);
                     reject(err.message);
                 }
