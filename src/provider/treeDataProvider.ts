@@ -1,12 +1,12 @@
-import * as path from "path";
 import * as vscode from "vscode";
-import { CacheKey } from "../common/constants";
+import { CacheKey, ConfigKey } from "../common/constants";
 import { ConnectionManager } from "../service/connectionManager";
 import { DatabaseCache } from "../service/common/databaseCache";
 import { ConnectionNode } from "../model/database/connectionNode";
 import { DatabaseNode } from "../model/database/databaseNode";
 import { Node } from "../model/interface/node";
 import { UserGroup } from "../model/database/userGroup";
+import { Global } from "../common/global";
 
 export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
@@ -16,7 +16,9 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     constructor(private context: vscode.ExtensionContext) {
         DbTreeDataProvider.instance = this
-        this.init()
+        if (Global.getConfig<boolean>(ConfigKey.LOAD_META_ON_CONNECT)) {
+            this.init()
+        }
     }
 
     /**

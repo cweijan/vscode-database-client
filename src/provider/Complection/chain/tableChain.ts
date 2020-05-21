@@ -6,22 +6,23 @@ import { TableNode } from "../../../model/main/tableNode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Util } from "../../../common/util";
 import { ConnectionManager } from "../../../service/connectionManager";
+import { TableGroup } from "../../../model/main/tableGroup";
 
 export class TableChain implements ComplectionChain {
 
-    public getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] {
+    public async getComplection(complectionContext: ComplectionContext): Promise<vscode.CompletionItem[]> {
 
         if (complectionContext.preChart == ".") {
-            const temp = this.generateTableComplectionItem(complectionContext.preWord);
+            const temp = await this.generateTableComplectionItem(complectionContext.preWord);
             if (temp.length == 0) {
                 return null;
             } else {
-                return this.generateTableComplectionItem(complectionContext.preWord);
+                return await this.generateTableComplectionItem(complectionContext.preWord);
             }
 
         }
         if (complectionContext.preWord && complectionContext.preWord.match(/\b(into|from|update|table|join)\b/ig)) {
-            return this.generateTableComplectionItem();
+            return await this.generateTableComplectionItem();
         }
         return null;
     }
@@ -30,7 +31,7 @@ export class TableChain implements ComplectionChain {
         return true;
     }
 
-    private generateTableComplectionItem(inputWord?: string): vscode.CompletionItem[] {
+    private async generateTableComplectionItem(inputWord?: string): Promise<vscode.CompletionItem[]> {
 
         let tableNodes: Node[] = [];
         const tableNames: string[] = [];
@@ -41,11 +42,14 @@ export class TableChain implements ComplectionChain {
         }
         if (inputWord) {
             const connectcionid = lcp.getConnectId();
-            DatabaseCache.getDatabaseListOfConnection(connectcionid).forEach((databaseNode) => {
+            for (const databaseNode of DatabaseCache.getDatabaseListOfConnection(connectcionid)) {
                 if (databaseNode.database === inputWord) {
                     tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.id);
+                    if (tableNodes == null || tableNodes.length == 0) {
+                        tableNodes = await new TableGroup(databaseNode.info).getChildren()
+                    }
                 }
-            });
+            }
         } else {
             const databaseid = `${lcp.getConnectId()}_${lcp.database}`;
             const tableList = DatabaseCache.getTableListOfDatabase(databaseid);

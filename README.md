@@ -68,6 +68,9 @@ MySQL Client For Visual Studio Code
   // open query result as full screen.
   "vscode-mysql.fullQueryScreen":false,
 
+  // Load database meta info when connected, If your machine's performance is low, turn it off.
+  "vscode-mysql.fullQueryScreen":true,
+
   // set max tables show of each database.
   "vscode-mysql.maxTableCount": 500
 }
