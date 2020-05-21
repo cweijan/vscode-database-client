@@ -138,7 +138,10 @@ export class ConnectionManager {
                     }
                 }
                 if (host != null && port != null && user != null) {
-                    return NodeUtil.of({ host, port: parseInt(port), user, database })
+                    const node = NodeUtil.of({ host, port: parseInt(port), user, database });
+                    if (this.getActiveConnectByKey(node.getConnectId())) {
+                        return node;
+                    }
                 }
             }
         }
