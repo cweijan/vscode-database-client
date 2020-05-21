@@ -20,7 +20,7 @@ export class SSHTunnelService {
             const ssh = connectionNode.ssh
             const key = connectionNode.getConnectId();
             if (this.tunelMark[key]) {
-                resolve({ ...connectionNode, port: this.tunelMark[key].tunnelPort } as Node)
+                resolve({ ...connectionNode, host: "127.0.0.1", port: this.tunelMark[key].tunnelPort } as Node)
                 return;
             }
             const port = await portfinder.getPortPromise();
