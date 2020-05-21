@@ -47,7 +47,11 @@ export class ConnectionNode extends Node {
                 }).map<DatabaseNode>((database) => {
                     return new DatabaseNode(database.Database, this);
                 });
-                databaseNodes.unshift(new UserGroup("USER", this));
+
+                if (this.user.toLocaleLowerCase() == "root") {
+                    databaseNodes.unshift(new UserGroup("USER", this));
+                }
+
                 DatabaseCache.setDataBaseListOfConnection(this.id, databaseNodes);
 
                 return databaseNodes;
@@ -74,7 +78,7 @@ export class ConnectionNode extends Node {
                 ...this, database: dbName
             } as Node, true);
         }
-        
+
     }
 
     public createDatabase() {
