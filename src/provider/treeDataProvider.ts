@@ -16,22 +16,22 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     constructor(private context: vscode.ExtensionContext) {
         DbTreeDataProvider.instance = this
-        if (Global.getConfig<boolean>(ConfigKey.LOAD_META_ON_CONNECT)) {
-            this.init()
-        }
+        this.init()
     }
 
     /**
      * reload treeview context
      */
     public async init() {
-        (await this.getConnectionNodes()).forEach(async (connectionNode) => {
-            (await connectionNode.getChildren(true)).forEach(async (databaseNode) => {
-                (await databaseNode.getChildren(true)).forEach(async (groupNode) => {
-                    groupNode.getChildren(true);
+        if (Global.getConfig<boolean>(ConfigKey.LOAD_META_ON_CONNECT)) {
+            (await this.getConnectionNodes()).forEach(async (connectionNode) => {
+                (await connectionNode.getChildren(true)).forEach(async (databaseNode) => {
+                    (await databaseNode.getChildren(true)).forEach(async (groupNode) => {
+                        groupNode.getChildren(true);
+                    });
                 });
-            });
-        })
+            })
+        }
         DatabaseCache.clearColumnCache()
         DbTreeDataProvider.refresh()
     }
