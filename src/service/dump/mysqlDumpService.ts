@@ -6,6 +6,7 @@ import { TableNode } from "../../model/main/tableNode";
 import { NodeUtil } from "../../model/nodeUtil";
 import { AbstractDumpService } from "./abstractDumpService";
 import format = require('date-format');
+import path = require('path');
 
 export class MysqlDumpService extends AbstractDumpService {
     protected dumpData(node: Node, exportPath: string, withData: boolean): void {
@@ -30,7 +31,7 @@ export class MysqlDumpService extends AbstractDumpService {
                     }
                 },
             },
-            dumpToFile: `${exportPath}\\${node.database}${tableName ? "_" + tableName : ''}_${format('yyyy-MM-dd_hhmmss', new Date())}.sql`,
+            dumpToFile: path.join(exportPath, `${node.database}${tableName ? "_" + tableName : ''}_${format('yyyy-MM-dd_hhmmss', new Date())}.sql`),
         };
         if (!withData) {
             option.dump.data = false;
