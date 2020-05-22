@@ -31,6 +31,9 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
                     });
                 });
             })
+        } else {
+            DatabaseCache.clearDatabaseCache()
+            DatabaseCache.clearTableCache()
         }
         DatabaseCache.clearColumnCache()
         DbTreeDataProvider.refresh()
