@@ -209,6 +209,9 @@
                 }
             },
             updateEdit(row) {
+                if(row.isFilter){
+                   return; 
+                }
                 this.update = {
                     current: row,
                     currentNew: this.clone(row),
