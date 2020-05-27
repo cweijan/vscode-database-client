@@ -65,9 +65,6 @@ MySQL Client For Visual Studio Code
   // enable delimiter when import data
   "vscode-mysql.enableDelimiter": false,
   
-  // open query result as full screen.
-  "vscode-mysql.fullQueryScreen":false,
-
   // Load database meta info when connected, If your machine's performance is low, turn it off.
   "vscode-mysql.loadMetaOnConnect":true,
 

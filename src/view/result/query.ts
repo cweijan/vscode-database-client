@@ -12,6 +12,8 @@ import { MysqlExportService } from "../../service/export/impl/mysqlExportService
 import { PageService } from "../../service/page/pageService";
 import { MysqlPageSerivce } from "../../service/page/impl/mysqlPageSerivce";
 import { ConnectionManager } from "../../service/connectionManager";
+import { window } from "vscode";
+import { extname } from "path";
 
 export class QueryParam<T> {
     /**
@@ -49,7 +51,7 @@ export class QueryPage {
 
         ViewManager.createWebviewPanel({
             singlePage: queryParam.singlePage,
-            splitView: !Global.getConfig(ConfigKey.QUERY_FULL_SCREEN),
+            splitView: this.isActiveSql(),
             path: "pages/result/index", title: "Query",
             initListener: (webviewPanel) => {
                 webviewPanel.webview.postMessage(queryParam);
@@ -73,6 +75,15 @@ export class QueryPage {
             }
         });
 
+    }
+
+    private static isActiveSql(): boolean {
+
+        if (!window.activeTextEditor || !window.activeTextEditor.document) return false;
+
+        const extName = extname(window.activeTextEditor.document.fileName)
+
+        return extName == '.sql';
     }
 
     private static async loadColumnList(queryParam: QueryParam<DataResponse>) {
