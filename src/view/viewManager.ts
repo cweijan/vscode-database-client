@@ -60,13 +60,13 @@ export class ViewManager {
                     if (viewOption.killHidden && currentStatus.instance.visible == false) {
                         currentStatus.instance.dispose()
                     } else {
+                        done()
                         if (currentStatus.creating) {
                             currentStatus.initListener = viewOption.initListener
                         } else if (viewOption.initListener) {
                             viewOption.initListener(currentStatus.instance)
                         }
                         if (viewOption.receiveListener) { currentStatus.receiveListener = viewOption.receiveListener }
-                        done()
                         return Promise.resolve(currentStatus.instance);
                     }
                 }
