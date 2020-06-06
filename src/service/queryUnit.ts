@@ -208,20 +208,20 @@ export class QueryUnit {
      * @param connection 
      * @param fsPath 
      */
-    private static async executeByLine(connection: any, fsPath: string) {
-        const readline = require('readline');
-        const rl = readline.createInterface({
-            input: fs.createReadStream(fsPath.replace("\\", "/")),
-            terminal: false,
-        });
-        rl.on('line', (chunk) => {
-            const sql = chunk.toString('utf8');
-            connection.query(sql, (err, sets, fields) => {
-                if (err) { Console.log(`execute sql ${sql} fail,${err}`); }
-            });
-        });
-        return true;
-    }
+    // private static async executeByLine(connection: any, fsPath: string) {
+    //     const readline = require('readline');
+    //     const rl = readline.createInterface({
+    //         input: fs.createReadStream(fsPath.replace("\\", "/")),
+    //         terminal: false,
+    //     });
+    //     rl.on('line', (chunk) => {
+    //         const sql = chunk.toString('utf8');
+    //         connection.query(sql, (err, sets, fields) => {
+    //             if (err) { Console.log(`execute sql ${sql} fail,${err}`); }
+    //         });
+    //     });
+    //     return true;
+    // }
 
 }
 

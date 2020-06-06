@@ -4,17 +4,35 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "webpack-dev",
             "type": "npm",
-            "script": "watch",
-            "problemMatcher": "$tsc-watch",
+            "script": "dev",
             "isBackground": true,
-            "presentation": {
-                "reveal": "never"
-            },
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+             "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": ".",
+                            "file": 1,
+                            "location": 2,
+                            "message": 3
+                        }
+                    ],
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": {
+                            "regexp": "webpack is watching the files"
+                        },
+                        "endsPattern": {
+                            "regexp": "Entrypoint main = extension.js"
+                        }
+                    }
+                }
+            ]
         }
     ]
 }
