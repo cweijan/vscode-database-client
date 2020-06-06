@@ -3,6 +3,7 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 module.exports = {
+    target: "node",
     node: {
         fs: 'empty', net: 'empty', tls: 'empty',
         child_process: 'empty', dns: 'empty',
