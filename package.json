@@ -746,21 +746,31 @@
 		"@types/vscode": "1.38.0",
 		"cardinal": "^2.1.1",
 		"clean-webpack-plugin": "^3.0.0",
+		"css-loader": "^3.5.3",
+		"file-loader": "^6.0.0",
+		"html-webpack-plugin": "^4.3.0",
+		"style-loader": "^1.2.1",
 		"ts-loader": "^7.0.5",
 		"tslint": "^5.8.0",
 		"typescript": "^3.8.3",
+		"url-loader": "^4.1.0",
+		"vue-loader": "^15.9.2",
+		"vue-style-loader": "^4.1.2",
+		"vue-template-compiler": "^2.6.11",
 		"webpack": "^4.43.0",
 		"webpack-cli": "^3.3.11"
 	},
 	"dependencies": {
 		"async-lock": "^1.2.2",
 		"date-format": "^3.0.0",
+		"element-ui": "^2.13.2",
 		"mockjs": "^1.1.0",
 		"mysql": "^2.18.1",
 		"mysqldump": "^3.1.0",
 		"portfinder": "^1.0.26",
 		"sql-formatter": "^2.3.3",
-		"tunnel-ssh": "^4.1.4"
+		"tunnel-ssh": "^4.1.4",
+		"vue": "^2.6.11"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",

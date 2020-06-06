@@ -12,7 +12,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-             "problemMatcher": [
+            "problemMatcher": [
                 {
                     "pattern": [
                         {
@@ -28,7 +28,7 @@
                             "regexp": "webpack is watching the files"
                         },
                         "endsPattern": {
-                            "regexp": "Entrypoint main = extension.js"
+                            "regexp": "extension = extension.js"
                         }
                     }
                 }
