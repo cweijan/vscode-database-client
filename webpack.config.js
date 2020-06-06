@@ -1,8 +1,7 @@
-const isProd = process.argv.indexOf('-p') >= 0;
 const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const isProd = process.argv.indexOf('-p') >= 0;
 
 module.exports = [
     {
@@ -25,17 +24,23 @@ module.exports = [
             extensions: ['.ts', '.js']
         },
         module: { rules: [{ test: /\.ts$/, exclude: /node_modules/, use: ['ts-loader'] }] },
-        watch: !isProd,
         optimization: { minimize: false },
+        watch: !isProd,
         mode: isProd ? 'production' : 'development',
         devtool: isProd ? false : 'source-map',
     },
     {
         entry: {
-            query: './src/vue/pages/result/main.js',
-            connect: './src/vue/pages/connect/main.js',
-            status: './src/vue/pages/status/main.js'
+            query: './src/vue/result/main.js',
+            connect: './src/vue/connect/main.js',
+            status: './src/vue/status/main.js'
         },
+        plugins: [
+            new VueLoaderPlugin(),
+            new HtmlWebpackPlugin({ inject: true, template: './src/vue/common.html', chunks: ['query'], filename: 'webview/result.html' }),
+            new HtmlWebpackPlugin({ inject: true, template: './src/vue/common.html', chunks: ['connect'], filename: 'webview/connect.html' }),
+            new HtmlWebpackPlugin({ inject: true, template: './src/vue/common.html', chunks: ['status'], filename: 'webview/status.html' }),
+        ],
         output: {
             path: path.resolve(__dirname, 'out'),
             filename: 'webview/js/[name].js'
@@ -51,36 +56,15 @@ module.exports = [
                 { test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/, loader: 'url-loader', options: { limit: 80000 } }
             ]
         },
-        plugins: [
-            new VueLoaderPlugin(),
-            new HtmlWebpackPlugin({
-                chunks: ['query'], inject: true, template: './src/vue/pages/common.html',
-                filename: 'webview/result.html'
-            }),
-            new HtmlWebpackPlugin({
-                chunks: ['connect'], inject: true, template: './src/vue/pages/common.html',
-                filename: 'webview/connect.html'
-            }),
-            new HtmlWebpackPlugin({
-                chunks: ['status'], inject: true, template: './src/vue/pages/common.html',
-                filename: 'webview/status.html'
-            }),
-            // new CleanWebpackPlugin({ cleanStaleWebpackAssets: false })
-        ],
-        watch: !isProd,
         optimization: {
             minimize: isProd,
             splitChunks: {
                 cacheGroups: {
-                    vendor: {
-                        name: "vendor",
-                        test: /[\\/]node_modules[\\/]/,
-                        chunks: "all",
-                        priority: 10 // 优先级
-                    }
+                    vendor: { name: "vendor", test: /[\\/]node_modules[\\/]/, chunks: "all", priority: 10 }
                 }
             }
         },
+        watch: !isProd,
         mode: isProd ? 'production' : 'development',
         devtool: isProd ? false : 'source-map',
     }
