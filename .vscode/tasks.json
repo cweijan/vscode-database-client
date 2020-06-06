@@ -28,7 +28,7 @@
                             "regexp": "webpack is watching the files"
                         },
                         "endsPattern": {
-                            "regexp": "extension = extension.js"
+                            "regexp": "Entrypoint HtmlWebpackPlugin_0"
                         }
                     }
                 }

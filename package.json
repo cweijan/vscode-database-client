@@ -747,6 +747,7 @@
 		"cardinal": "^2.1.1",
 		"clean-webpack-plugin": "^3.0.0",
 		"css-loader": "^3.5.3",
+		"extract-text-webpack-plugin": "^4.0.0-beta.0",
 		"file-loader": "^6.0.0",
 		"html-webpack-plugin": "^4.3.0",
 		"style-loader": "^1.2.1",
