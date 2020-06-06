@@ -18,7 +18,7 @@ export abstract class AbstractConnectService {
             }
         }
         ViewManager.createWebviewPanel({
-            path: "pages/connect/connect",
+            path: "connect",
             title: "connect",
             splitView: false,
             initListener: (webviewPanel) => {

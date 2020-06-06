@@ -747,7 +747,6 @@
 		"cardinal": "^2.1.1",
 		"clean-webpack-plugin": "^3.0.0",
 		"css-loader": "^3.5.3",
-		"extract-text-webpack-plugin": "^4.0.0-beta.0",
 		"file-loader": "^6.0.0",
 		"html-webpack-plugin": "^4.3.0",
 		"style-loader": "^1.2.1",
@@ -762,6 +761,7 @@
 		"webpack-cli": "^3.3.11"
 	},
 	"dependencies": {
+		"@antv/g2": "^4.0.9",
 		"async-lock": "^1.2.2",
 		"date-format": "^3.0.0",
 		"element-ui": "^2.13.2",

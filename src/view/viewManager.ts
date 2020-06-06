@@ -40,7 +40,7 @@ export class ViewManager {
     private static viewStatu: { [key: string]: ViewState } = {};
     private static webviewPath: string;
     public static initExtesnsionPath(extensionPath: string) {
-        this.webviewPath = extensionPath + "/resources/webview"
+        this.webviewPath = extensionPath + "/out/webview"
     }
 
     public static createWebviewPanel(viewOption: ViewOption): Promise<WebviewPanel> {
@@ -124,7 +124,7 @@ export class ViewManager {
     }
 
     private static buildPath(data: string, webview: vscode.Webview, contextPath: string): string {
-        return data.replace(/((src|href)=("|'))(.+\.(css|js))\b/gi, "$1" + webview.asWebviewUri(vscode.Uri.file(`${contextPath}/`)) + "/$4");
+        return data.replace(/((src|href)=("|'))(.+?\.(css|js))\b/gi, "$1" + webview.asWebviewUri(vscode.Uri.file(`${contextPath}/`)) + "/$4");
     }
 
 }

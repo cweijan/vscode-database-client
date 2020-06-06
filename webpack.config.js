@@ -2,7 +2,6 @@ const isProd = process.argv.indexOf('-p') >= 0;
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = [
@@ -27,60 +26,60 @@ module.exports = [
         },
         module: { rules: [{ test: /\.ts$/, exclude: /node_modules/, use: ['ts-loader'] }] },
         watch: !isProd,
-        optimization: {
-            minimize: false
-        },
+        optimization: { minimize: false },
         mode: isProd ? 'production' : 'development',
         devtool: isProd ? false : 'source-map',
     },
     {
         entry: {
-            query: './src/vue/pages/result/main.js'
+            query: './src/vue/pages/result/main.js',
+            connect: './src/vue/pages/connect/main.js',
+            status: './src/vue/pages/status/main.js'
         },
         output: {
             path: path.resolve(__dirname, 'out'),
-            filename: '[name].js'
+            filename: 'webview/js/[name].js'
         },
         resolve: {
             extensions: ['.vue', '.js'],
-            alias: {
-                'vue$': 'vue/dist/vue.esm.js',
-                '@': path.resolve('src'),
-            }
+            alias: { 'vue$': 'vue/dist/vue.esm.js', '@': path.resolve('src'), }
         },
         module: {
             rules: [
-                // {
-                //     test: /index\.css$/, use: ExtractTextPlugin.extract({
-                //         fallback: "vue-style-loader",
-                //         use: "css-loader"
-                //     })
-                // },
                 { test: /\.vue$/, loader: 'vue-loader', options: { loaders: { css: ["vue-style-loader", "css-loader"] } } },
-                {
-                    test: /\.css$/, use: ["vue-style-loader", "css-loader"]
-                },
-                {
-                    test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                    loader: 'url-loader',
-                    options: {
-                        limit: 80000
-                    }
-                }
+                { test: /\.css$/, use: ["vue-style-loader", "css-loader"] },
+                { test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/, loader: 'url-loader', options: { limit: 80000 } }
             ]
         },
         plugins: [
-            new ExtractTextPlugin("styles.css"),
             new VueLoaderPlugin(),
             new HtmlWebpackPlugin({
-                filename: '../resources/webview/pages/result/index.html', template: './src/vue/pages/result/index.html',
-                chunks: ['query'], inject: true
+                chunks: ['query'], inject: true, template: './src/vue/pages/common.html',
+                filename: 'webview/result.html'
             }),
-            new CleanWebpackPlugin({ cleanStaleWebpackAssets: false })
+            new HtmlWebpackPlugin({
+                chunks: ['connect'], inject: true, template: './src/vue/pages/common.html',
+                filename: 'webview/connect.html'
+            }),
+            new HtmlWebpackPlugin({
+                chunks: ['status'], inject: true, template: './src/vue/pages/common.html',
+                filename: 'webview/status.html'
+            }),
+            // new CleanWebpackPlugin({ cleanStaleWebpackAssets: false })
         ],
         watch: !isProd,
         optimization: {
-            minimize: false
+            minimize: isProd,
+            splitChunks: {
+                cacheGroups: {
+                    vendor: {
+                        name: "vendor",
+                        test: /[\\/]node_modules[\\/]/,
+                        chunks: "all",
+                        priority: 10 // 优先级
+                    }
+                }
+            }
         },
         mode: isProd ? 'production' : 'development',
         devtool: isProd ? false : 'source-map',

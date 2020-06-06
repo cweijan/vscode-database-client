@@ -9,7 +9,7 @@ export abstract class AbstractStatusService implements StatusService {
 
     public show(connectionNode: ConnectionNode): void | Promise<void> {
         ViewManager.createWebviewPanel({
-            path: "pages/status/index",
+            path: "status",
             splitView: false, title: "Server Status",
             receiveListener: async (webviewPanel, params) => {
                 switch (params.type) {

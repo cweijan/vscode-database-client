@@ -52,7 +52,7 @@ export class QueryPage {
         ViewManager.createWebviewPanel({
             singlePage: queryParam.singlePage,
             splitView: this.isActiveSql(),
-            path: "pages/result/index", title: "Query",
+            path: "result", title: "Query",
             initListener: (webviewPanel) => {
                 webviewPanel.webview.postMessage(queryParam);
             },
