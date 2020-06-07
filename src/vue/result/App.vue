@@ -1,78 +1,160 @@
-<html>
-
-<head>
-    <title>result</title>
-    <link rel="stylesheet" href="/css/element.css">
-    <link rel="stylesheet" href="/css/result.css">
-    <script src="/js/vue.js"></script>
-    <script src="/js/element.js"></script>
-</head>
-
-<body>
+<template>
     <div id="app">
-        <include path="components/toolPanel.html" />
+        <div class="hint">
+            <!-- sql input -->
+            <el-row style="margin-bottom: 10px;">
+                <el-input type="textarea" :autosize="{ minRows:3, maxRows:5}" v-model="toolbar.sql" style="width:90vw">
+                </el-input>
+            </el-row>
+            <!-- tool panel -->
+            <el-row>
+                <el-button type="primary" @click='execute(toolbar.sql);info.visible = false;'>Execute</el-button>
+                <el-tag>Table :</el-tag>
+                <span v-if="result.table">
+                    {{result.table}}
+                </span>
+                <el-tag type="success">CostTime :</el-tag>
+                <span v-text="toolbar.costTime"></span>ms
+                <span v-if="result.table">, <el-tag type="warning">Row :</el-tag> {{result.data.length-1}},<el-tag
+                        type="danger"> Col :</el-tag> {{columnCount}}</span>
+            </el-row>
+            <!-- info panel -->
+            <div v-if="info.visible ">
+                <div v-if="info.error" class="info-panel" style="color:red" v-html="info.message"></div>
+                <div v-if="!info.error" class="info-panel" style="color: green;" v-html="info.message"></div>
+            </div>
+        </div>
         <!-- talbe result -->
-        <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort" 
-            element-loading-text="Loading Data"
-            :row-class-name="tableRowClassName" ref="dataTable" :height="remainHeight" width="100vh" stripe
+        <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort"
+            element-loading-text="Loading Data" :row-class-name="tableRowClassName" ref="dataTable"
+            :height="remainHeight" width="100vh" stripe
             :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
             border @row-dblclick="row=>openEdit(row)" @row-click="row=>updateEdit(row)">
             <!-- tool bar -->
-            <include path="components/toolbar.html" />
+            <el-table-column fixed="left" width="200" align="center">
+                <template slot="header" slot-scope="scope">
+                    <el-input v-model="table.search" placeholder="Input To Search Data" />
+                </template>
+                <template slot-scope="scope">
+                    <div v-if="scope.row.isFilter" style="text-align: center;">
+                        <el-button @click="exportData()" type="primary" size="small" icon="el-icon-orange" circle title="Export"></el-button>
+                        <el-button type="info" icon="el-icon-circle-plus-outline" size="small" circle
+                            @click="insertRequest">
+                        </el-button>
+                        <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
+                            <el-checkbox-group v-model="toolbar.showColumns">
+                                <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
+                                    {{column.name}}
+                                </el-checkbox>
+                            </el-checkbox-group>
+                            <el-button icon="el-icon-search" circle title="Select columns to show" size="small"
+                                slot="reference">
+                            </el-button>
+                        </el-popover>
+                        <el-button @click="resetFilter" title="Reset filter" type="warning" size="small"
+                            icon="el-icon-refresh" circle>
+                        </el-button>
+                    </div>
+                    <div v-if="result.primaryKey && scope.row[result.primaryKey]">
+                        <el-button @click="openEdit(scope.row)" type="primary" size="small" icon="el-icon-edit"
+                            title="edit" circle>
+                        </el-button>
+                        <el-button
+                            @click="openEdit(scope.row);update.currentNew[result.primaryKey]=null;update.primary=null;"
+                            type="info" size="small" title="copy" icon="el-icon-document-copy" circle>
+                        </el-button>
+                        <el-button @click="deleteConfirm(scope.row[result.primaryKey])" title="delete" type="danger"
+                            size="small" icon="el-icon-delete" circle>
+                        </el-button>
+                    </div>
+                </template>
+            </el-table-column>
             <!-- data  -->
-            <include path="components/dataTable.html" />
+            <el-table-column :label="field.name" v-for="(field,index) in result.fields" :key="index" align="center"
+                sortable v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())"
+                :width="computeWidth(field.name,0,index,toolbar.filter[field.name])">
+                <template slot-scope="scope">
+                    <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[field.name]" placeholder="filter"
+                        @blur="filter($event,field.name)" v-on:keyup.enter.native="filter($event,field.name)">
+                    </el-input>
+                    <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[field.name])'></span>
+                </template>
+            </el-table-column>
         </el-table>
-        <include path="components/editDialog.html" />
+        <el-dialog ref="editDialog" :title="editorTilte" :visible.sync="editor.visible" width="90%" top="3vh"
+            size="small">
+            <el-form ref="infoForm" :model="update.currentNew">
+                <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
+                    <template>
+                        <span>
+                            {{column.name}} : {{column.type}} : <span
+                                style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' Required'}}</span>&nbsp;
+                            {{column.comment?column.comment:''}}
+                        </span>
+                        <el-input v-model="update.currentNew[column.name]"></el-input>
+                    </template>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editor.visible = false">Cancel</el-button>
+                <el-button v-if="update.primary!=null" type="primary" :loading="editor.loading" @click="confirmUpdate">
+                    Update</el-button>
+                <el-button v-if="update.primary==null" type="primary" :loading="editor.loading" @click="confirmInsert">
+                    Insert</el-button>
+            </span>
+        </el-dialog>
     </div>
-</body>
+</template>
 
 <script>
-    const vscode = acquireVsCodeApi();
-    // const previousState = vscode.getState();
-    const previousState = false;
-    const vue = new Vue({
-        el: '#app',
-        data: {
-            result: {
-                data: [],
-                sql: '',
-                primaryKey: null,
-                columnList: null,
-                database: null,
-                table: null,
-                pageSize: null
-            },
-            page: {
-                pageNum: 1,
-                pageSize: -1,
-                isEnd: false,
-                lock: false
-            },
-            table: {
-                search: '',
-                loading: true,
-                widthItem: {}
-            },
-            toolbar: {
-                sql: null,
-                costTime: 0,
-                filter: {},
-                showColumns: []
-            },
-            editor: {
-                visible: false,
-                loading: false
-            },
-            info: {
-                sql: null,
-                message: null,
-                visible: false,
-                error: false
-            },
-            update: {
-                current: {},
-                currentNew: {},
-                primary: null
+    const vscode = typeof (acquireVsCodeApi) != "undefined" ? acquireVsCodeApi() : null;
+    const postMessage = (message) => { if (vscode) { vscode.postMessage(message) } }
+    export default {
+        name: "App",
+        data() {
+            return {
+                result: {
+                    data: [],
+                    sql: '',
+                    primaryKey: null,
+                    columnList: null,
+                    database: null,
+                    table: null,
+                    pageSize: null
+                },
+                page: {
+                    pageNum: 1,
+                    pageSize: -1,
+                    isEnd: false,
+                    lock: false
+                },
+                table: {
+                    search: '',
+                    loading: true,
+                    widthItem: {}
+                },
+                toolbar: {
+                    sql: null,
+                    costTime: 0,
+                    filter: {},
+                    showColumns: []
+                },
+                editor: {
+                    visible: false,
+                    loading: false
+                },
+                info: {
+                    sql: null,
+                    message: null,
+                    visible: false,
+                    error: false
+                },
+                update: {
+                    current: {},
+                    currentNew: {},
+                    primary: null
+                }
+
             }
         },
         mounted() {
@@ -80,10 +162,81 @@
                 const table = document.querySelector('.el-table__fixed-body-wrapper');
                 table.addEventListener('scroll', (event) => {
                     if ((table.scrollHeight - table.scrollTop - document.documentElement.clientHeight) <= 200) {
-                        vue.nextPage()
+                        this.nextPage()
                     }
                 });
             }, 1000);
+            const handlerData = (data, sameTable) => {
+
+                this.result = data;
+                this.toolbar.sql = data.sql;
+
+                if (sameTable) {
+                    this.clear()
+                } else {
+                    this.reset()
+                }
+
+            }
+
+            const handlerCommon = (res) => {
+                this.editor.loading = false;
+                this.editor.visible = false;
+                this.info.visible = true;
+                this.info.message = res.message
+                // this.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
+            }
+
+            window.addEventListener('message', ({data}) => {
+                if(!data)return;
+                const response = data.res;
+                this.table.loading = false;
+                if (response && response.costTime) {
+                    this.toolbar.costTime = response.costTime
+                }
+                switch (data.type) {
+                    case "RUN":
+                        this.toolbar.sql = response.sql;
+                        this.table.loading = true;
+                        break;
+                    case "DATA":
+                        handlerData(response)
+                        break;
+                    case "NEXT_PAGE":
+                        if (response.data && response.data.length > 0) {
+                            this.result.data.push(...response.data)
+                        } else {
+                            this.page.isEnd = true;
+                        }
+                        setTimeout(() => {
+                            this.page.lock = false
+                        }, 100);
+                        break;
+                    case "DML":
+                    case "DDL":
+                        handlerCommon(response)
+                        this.info.error = false
+                        this.refresh()
+                        break;
+                    case "ERROR":
+                        handlerCommon(response)
+                        this.info.error = true
+                        break;
+                    case "MESSAGE":
+                        if (response.message) {
+                            if (response.success) {
+                                this.$message.success(response.message)
+                            } else {
+                                this.$message.error(response.message)
+                            }
+                        }
+                        this.refresh()
+                        break;
+                    default:
+                        this.$message(JSON.stringify(data));
+                }
+            });
+            postMessage({ type: 'init' })
         },
         methods: {
             exportData() {
@@ -92,12 +245,12 @@
                     cancelButtonText: 'No',
                     type: 'warning'
                 }).then(() => {
-                    vscode.postMessage({
+                    postMessage({
                         type: 'export',
                         sql: this.result.sql.replace(/\blimit\b.+/ig, '')
                     });
                 }).catch(() => {
-                    vscode.postMessage({
+                    postMessage({
                         type: 'export',
                         sql: this.result.sql
                     });
@@ -209,8 +362,8 @@
                 }
             },
             updateEdit(row) {
-                if(row.isFilter){
-                   return; 
+                if (row.isFilter) {
+                    return;
                 }
                 this.update = {
                     current: row,
@@ -271,7 +424,7 @@
             },
             execute(sql) {
                 if (!sql) return;
-                vscode.postMessage({
+                postMessage({
                     type: 'execute',
                     sql: sql.replace(/ +/ig, " ")
                 });
@@ -304,7 +457,7 @@
                     return;
                 }
 
-                vscode.postMessage({
+                postMessage({
                     type: 'next',
                     sql: this.result.sql,
                     pageNum: ++this.page.pageNum,
@@ -389,78 +542,87 @@
                 return screen.height - 300;
             }
         }
-    })
-
-    const handlerData = (data, sameTable) => {
-
-        vue.result = data;
-        vue.toolbar.sql = data.sql;
-
-        if (sameTable) {
-            vue.clear()
-        } else {
-            vue.reset()
-        }
 
     }
 
-    const handlerCommon = (res) => {
-        vue.editor.loading = false;
-        vue.editor.visible = false;
-        vue.info.visible = true;
-        vue.info.message = res.message
-        // vue.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
-    }
-
-    window.addEventListener('message', event => {
-        const response = event.data.res;
-        vue.table.loading = false;
-        if (response.costTime) {
-            vue.toolbar.costTime = response.costTime
-        }
-        switch (event.data.type) {
-            case "RUN":
-                vue.toolbar.sql = response.sql;
-                vue.table.loading = true;
-                break;
-            case "DATA":
-                handlerData(response)
-                break;
-            case "NEXT_PAGE":
-                if (response.data && response.data.length > 0) {
-                    vue.result.data.push(...response.data)
-                } else {
-                    vue.page.isEnd = true;
-                }
-                setTimeout(() => {
-                    vue.page.lock = false
-                }, 100);
-                break;
-            case "DML":
-            case "DDL":
-                handlerCommon(response)
-                vue.info.error = false
-                vue.refresh()
-                break;
-            case "ERROR":
-                handlerCommon(response)
-                vue.info.error = true
-                break;
-            case "MESSAGE":
-                if (response.message) {
-                    if (response.success) {
-                        vue.$message.success(response.message)
-                    } else {
-                        vue.$message.error(response.message)
-                    }
-                }
-                vue.refresh()
-                break;
-            default:
-                vue.$message(JSON.stringify(event.data));
-        }
-    });
-    vscode.postMessage({ type: 'init' })
 </script>
 
-</html>
+<style>
+    body {
+    /* background-color: var(--vscode-editor-background); */
+    background-color: #F0F0F0;
+    font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+}
+
+.hint {
+    padding: 5px;
+    font-size: 17px;
+    color: #444;
+    display: inline-block;
+    margin-top: 8px;
+}
+
+.cell {
+    overflow: hidden !important;
+    text-overflow: unset !important;
+    white-space: nowrap !important;
+    user-select: text !important;
+    padding: 1px !important;
+}
+
+.info-panel {
+    color: #444;
+    font-size: 14px;
+    border: 1px solid #dcdfe6;
+    border-radius: 5px;
+    padding: 10px;
+    margin-left: 6px;
+}
+
+/* 滚动条样式（高宽及背景）*/
+::-webkit-scrollbar {
+    background-color: #ccc;  
+    width: 12px;   
+    height: 12px;
+}
+
+/* 滚动条轨道（凹槽）样式*/
+::-webkit-scrollbar-track {
+    /* -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);   */
+    border-radius: 8px; 
+    background-color: #424242;  
+}
+
+/* 滑块样式*/
+::-webkit-scrollbar-thumb {
+    border-radius: 8px; 
+    background-color: #b0b0b0;  
+}
+::-webkit-scrollbar-thumb:hover{
+    border-radius: 8px; 
+    background-color: #ccc;  
+}
+
+
+
+.el-table .edit-row td{
+    background: oldlace !important;
+}
+
+.el-textarea__inner,
+.el-table, .el-table tr, .el-table th, 
+.el-dialog__header,.el-el-dialog__body,.el-dialog__footer
+{
+    background-color: #F8F8F8;
+}
+
+.el-table--striped .el-table__body tr.el-table__row--striped td{
+    background-color: #f0fdf0 ;
+}
+
+
+.el-table th.is-leaf{
+    border: 1px solid #eae7e7;
+    border-radius: 3px;
+}
+</style>

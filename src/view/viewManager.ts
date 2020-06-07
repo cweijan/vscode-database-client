@@ -1,10 +1,8 @@
-import * as AsyncLock from 'async-lock';
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
 import { Console } from "../common/outputChannel";
-const lock = new AsyncLock()
 
 export class ViewOption {
     public path?: string;
@@ -40,7 +38,7 @@ export class ViewManager {
     private static viewStatu: { [key: string]: ViewState } = {};
     private static webviewPath: string;
     public static initExtesnsionPath(extensionPath: string) {
-        this.webviewPath = extensionPath + "/resources/webview"
+        this.webviewPath = extensionPath + "/out/webview"
     }
 
     public static createWebviewPanel(viewOption: ViewOption): Promise<WebviewPanel> {
@@ -84,7 +82,8 @@ export class ViewManager {
                     { enableScripts: true, retainContextWhenHidden: true },
                 );
                 this.viewStatu[viewOption.title].instance = webviewPanel
-                webviewPanel.webview.html = this.buildInclude(this.buildPath(data, webviewPanel.webview), path.resolve(targetPath, ".."));
+                const contextPath = path.resolve(targetPath, "..");
+                webviewPanel.webview.html = this.buildInclude(this.buildPath(data, webviewPanel.webview, contextPath), contextPath);
 
                 webviewPanel.onDidDispose(() => {
                     this.viewStatu[viewOption.title] = null
@@ -122,8 +121,8 @@ export class ViewManager {
         return data;
     }
 
-    private static buildPath(data: string, webview: vscode.Webview): string {
-        return data.replace(/("|')\/?(css|js)\b/gi, "$1" + webview.asWebviewUri(vscode.Uri.file(`${this.webviewPath}/`)) + "/$2");
+    private static buildPath(data: string, webview: vscode.Webview, contextPath: string): string {
+        return data.replace(/((src|href)=("|'))(.+?\.(css|js))\b/gi, "$1" + webview.asWebviewUri(vscode.Uri.file(`${contextPath}/`)) + "/$4");
     }
 
 }

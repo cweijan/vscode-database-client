@@ -1,0 +1,19 @@
+name: CI
+on:
+  push:
+    branches: [ master,webpack ]
+  pull_request:
+    branches: [ master,webpack ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - run: npm i && npm i -g vsce 
+    - run: |
+        echo ">>> Start compile vscode-mysql."
+        vsce package
+        echo ">>> Compile vscode-mysql sucess!"

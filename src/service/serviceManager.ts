@@ -6,8 +6,8 @@ import { SqlFormattingProvider } from "../provider/sqlFormattingProvider";
 import { TableInfoHoverProvider } from "../provider/tableInfoHoverProvider";
 import { DbTreeDataProvider as DbTreeDataProvider } from "../provider/treeDataProvider";
 import { ViewManager } from "../view/viewManager";
-import { AbstractConnectService } from "./connect/abstractConnectService";
-import { MysqlConnectService } from "./connect/impl/mysqlConnectService";
+import { AbstractConnectService } from "../view/connect/abstractConnectService";
+import { MysqlConnectService } from "../view/connect/mysqlConnectService";
 import { DatabaseCache } from "./common/databaseCache";
 import { DatabaseType } from "./common/databaseType";
 import { AbstractDumpService } from "./dump/abstractDumpService";
@@ -17,7 +17,7 @@ import { MysqlSettingService } from "./setting/MysqlSettingService";
 import { SettingService } from "./setting/settingService";
 import { HistoryRecorder } from "./common/historyRecorder";
 import { StatusService } from "../view/status/statusService";
-import { MysqlStatusService } from "../view/status/impl/mysqlStatusService";
+import { MysqlStatusService } from "../view/status/mysqlStatusService";
 
 export class ServiceManager {
 

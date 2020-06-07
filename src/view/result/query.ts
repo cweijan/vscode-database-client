@@ -1,4 +1,3 @@
-import * as mysql from "mysql";
 import { MessageType, OperateType, ConfigKey } from "../../common/constants";
 import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
@@ -6,11 +5,10 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { ViewManager } from "../viewManager";
 import { DataResponse } from "./queryResponse";
-import { Global } from "../../common/global";
 import { ExportService } from "../../service/export/exportService";
-import { MysqlExportService } from "../../service/export/impl/mysqlExportService";
+import { MysqlExportService } from "../../service/export/mysqlExportService";
 import { PageService } from "../../service/page/pageService";
-import { MysqlPageSerivce } from "../../service/page/impl/mysqlPageSerivce";
+import { MysqlPageSerivce } from "../../service/page/mysqlPageSerivce";
 import { ConnectionManager } from "../../service/connectionManager";
 import { window } from "vscode";
 import { extname } from "path";
@@ -52,7 +50,7 @@ export class QueryPage {
         ViewManager.createWebviewPanel({
             singlePage: queryParam.singlePage,
             splitView: this.isActiveSql(),
-            path: "pages/result/index", title: "Query",
+            path: "result", title: "Query",
             initListener: (webviewPanel) => {
                 webviewPanel.webview.postMessage(queryParam);
             },
@@ -79,7 +77,7 @@ export class QueryPage {
 
     private static isActiveSql(): boolean {
 
-        if (!window.activeTextEditor || !window.activeTextEditor.document) return false;
+        if (!window.activeTextEditor || !window.activeTextEditor.document) { return false; }
 
         const extName = extname(window.activeTextEditor.document.fileName)
 

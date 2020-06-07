@@ -1,4 +1,4 @@
-import { AbstractPageSerivce } from "../pageService";
+import { AbstractPageSerivce } from "./pageService";
 
 export class MysqlPageSerivce extends AbstractPageSerivce {
 
