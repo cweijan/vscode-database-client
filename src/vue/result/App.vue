@@ -107,7 +107,8 @@
 </template>
 
 <script>
-    const vscode = acquireVsCodeApi();
+    const vscode = typeof (acquireVsCodeApi) != "undefined" ? acquireVsCodeApi() : null;
+    const postMessage = (message) => { if (vscode) { vscode.postMessage(message) } }
     export default {
         name: "App",
         data() {
@@ -186,13 +187,14 @@
                 // this.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
             }
 
-            window.addEventListener('message', event => {
-                const response = event.data.res;
+            window.addEventListener('message', ({data}) => {
+                if(!data)return;
+                const response = data.res;
                 this.table.loading = false;
                 if (response && response.costTime) {
                     this.toolbar.costTime = response.costTime
                 }
-                switch (event.data.type) {
+                switch (data.type) {
                     case "RUN":
                         this.toolbar.sql = response.sql;
                         this.table.loading = true;
@@ -231,10 +233,10 @@
                         this.refresh()
                         break;
                     default:
-                        this.$message(JSON.stringify(event.data));
+                        this.$message(JSON.stringify(data));
                 }
             });
-            vscode.postMessage({ type: 'init' })
+            postMessage({ type: 'init' })
         },
         methods: {
             exportData() {
@@ -243,12 +245,12 @@
                     cancelButtonText: 'No',
                     type: 'warning'
                 }).then(() => {
-                    vscode.postMessage({
+                    postMessage({
                         type: 'export',
                         sql: this.result.sql.replace(/\blimit\b.+/ig, '')
                     });
                 }).catch(() => {
-                    vscode.postMessage({
+                    postMessage({
                         type: 'export',
                         sql: this.result.sql
                     });
@@ -422,7 +424,7 @@
             },
             execute(sql) {
                 if (!sql) return;
-                vscode.postMessage({
+                postMessage({
                     type: 'execute',
                     sql: sql.replace(/ +/ig, " ")
                 });
@@ -455,7 +457,7 @@
                     return;
                 }
 
-                vscode.postMessage({
+                postMessage({
                     type: 'next',
                     sql: this.result.sql,
                     pageNum: ++this.page.pageNum,

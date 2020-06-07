@@ -148,6 +148,7 @@
         },
         mounted() {
             window.addEventListener('message', ({ data }) => {
+                if(!data)return;
                 switch (data.type) {
                     case 'EDIT':
                         vue.connectionOption = data.node
@@ -156,9 +157,9 @@
                         vue.error = true;
                         vue.errorMessage = data.err;
                         break;
-                    // default:
-                    //     document.write("Connect success!")
-                    //     break;
+                    default:
+                        document.write("Connect success!")
+                        break;
                 }
             })
             postMessage({ type: 'init' })

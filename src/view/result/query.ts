@@ -79,7 +79,7 @@ export class QueryPage {
 
     private static isActiveSql(): boolean {
 
-        if (!window.activeTextEditor || !window.activeTextEditor.document) return false;
+        if (!window.activeTextEditor || !window.activeTextEditor.document) { return false; }
 
         const extName = extname(window.activeTextEditor.document.fileName)
 
