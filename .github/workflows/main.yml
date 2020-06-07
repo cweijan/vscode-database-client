@@ -3,20 +3,17 @@ on:
   push:
     branches: [ master,webpack ]
   pull_request:
-    branches: [ master ]
+    branches: [ master,webpack ]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Install Node.js
-      uses: actions/setup-node@v1
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
       with:
         node-version: 10.x
-    - run: npm install
-    - run: echo ">>> Start compile vscode-mysql."
-    - name: Run Compile
-      run: |
-        npm run build
+    - run: npm i && npm i -g vsce 
+    - run: |
+        echo ">>> Start compile vscode-mysql."
+        vsce package
         echo ">>> Compile vscode-mysql sucess!"
