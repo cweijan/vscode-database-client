@@ -11,3 +11,4 @@ vsc-extension-quickstart.md
 node_modules/
 webpack.config.js
 tslint.json
+.github/
