@@ -1,7 +1,7 @@
 import { FieldInfo } from "mysql";
-import { Console } from "../../../common/outputChannel";
-import { ConnectionManager } from "../../connectionManager";
-import { AbstractExportService } from "../abstractExportService";
+import { Console } from "../../common/outputChannel";
+import { ConnectionManager } from "../connectionManager";
+import { AbstractExportService } from "./abstractExportService";
 
 export class MysqlExportService extends AbstractExportService {
 

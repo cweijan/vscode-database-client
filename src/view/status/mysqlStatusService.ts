@@ -1,9 +1,9 @@
 import { FieldInfo } from "mysql";
-import { Console } from "../../../common/outputChannel";
-import { ConnectionNode } from "../../../model/database/connectionNode";
-import { ConnectionManager } from "../../../service/connectionManager";
-import { AbstractStatusService, DashBoardResponse, ProcessListResponse, DashBoardItem } from "../abstractStatusService";
-import { QueryUnit } from "../../../service/queryUnit";
+import { Console } from "../../common/outputChannel";
+import { ConnectionNode } from "../../model/database/connectionNode";
+import { ConnectionManager } from "../../service/connectionManager";
+import { AbstractStatusService, DashBoardResponse, ProcessListResponse, DashBoardItem } from "./abstractStatusService";
+import { QueryUnit } from "../../service/queryUnit";
 import format = require('date-format');
 
 interface QueryResponse {
