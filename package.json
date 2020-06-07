@@ -4,7 +4,7 @@
 	"description": "MySQL Client for vscode",
 	"version": "2.1.9",
 	"publisher": "cweijan",
-	"icon": "logo.png",
+	"icon": "resources/logo.png",
 	"engines": {
 		"vscode": "^1.38.0"
 	},
