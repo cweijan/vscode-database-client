@@ -17,21 +17,22 @@ export abstract class AbstractExportService implements ExportService {
     protected abstract exportExcel(folderPath: string, sql: string): void;
 
     protected exportByNodeXlsx(folderPath: string, fields: FieldInfo[], rows: any) {
-        // const nodeXlsx = require('node-xlsx');
-        // fs.writeFileSync(`${folderPath}/${new Date().getTime()}.xlsx`, nodeXlsx.build([{
-        //     name: "sheet1",
-        //     data: [
-        //         fields.map((field) => field.name),
-        //         ...rows.map((row) => {
-        //             const values = [];
-        //             for (const key in row) {
-        //                 values.push(row[key]);
-        //             }
-        //             return values;
-        //         })
-        //     ]
-        // }]), "binary");
-        // Console.log("export success!")
+        Console.log("start export data...")
+        const nodeXlsx = require('node-xlsx');
+        fs.writeFileSync(`${folderPath}/${new Date().getTime()}.xlsx`, nodeXlsx.build([{
+            name: "sheet1",
+            data: [
+                fields.map((field) => field.name),
+                ...rows.map((row) => {
+                    const values = [];
+                    for (const key in row) {
+                        values.push(row[key]);
+                    }
+                    return values;
+                })
+            ]
+        }]), "binary");
+        Console.log("export success!")
     }
 
 }

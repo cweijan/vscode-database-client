@@ -62,7 +62,9 @@ module.exports = [
             minimize: isProd,
             splitChunks: {
                 cacheGroups: {
-                    vendor: { name: "vendor", test: /[\\/]node_modules[\\/]/, chunks: "all", priority: 10 }
+                    nodeXlsx: { name: "node-xlsx", test: /[\\/]@node-xlsx[\\/]/, chunks: "all", priority: 11 },
+                    antv: { name: "antv", test: /[\\/]@antv[\\/]/, chunks: "all", priority: 10 },
+                    vendor: { name: "vendor", test: /[\\/]node_modules[\\/]/, chunks: "all", priority: -1 }
                 }
             }
         },

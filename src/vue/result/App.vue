@@ -37,7 +37,7 @@
                 </template>
                 <template slot-scope="scope">
                     <div v-if="scope.row.isFilter" style="text-align: center;">
-                        <!-- <el-button @click="exportData()" type="primary" size="small" icon="el-icon-orange" circle title="Export"></el-button> -->
+                        <el-button @click="exportData()" type="primary" size="small" icon="el-icon-orange" circle title="Export"></el-button>
                         <el-button type="info" icon="el-icon-circle-plus-outline" size="small" circle
                             @click="insertRequest">
                         </el-button>

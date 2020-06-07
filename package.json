@@ -764,6 +764,7 @@
 		"mockjs": "^1.1.0",
 		"mysql": "^2.18.1",
 		"mysqldump": "^3.1.0",
+		"node-xlsx": "^0.15.0",
 		"portfinder": "^1.0.26",
 		"sql-formatter": "^2.3.3",
 		"tunnel-ssh": "^4.1.4",
