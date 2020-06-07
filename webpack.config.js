@@ -15,7 +15,9 @@ module.exports = [
         output: {
             path: path.resolve(__dirname, 'out'),
             filename: 'extension.js',
-            libraryTarget: 'commonjs2'
+            libraryTarget: 'commonjs2',
+            // config source map sources url
+            devtoolModuleFilenameTemplate: '[absoluteResourcePath]',
         },
         externals: {
             vscode: 'commonjs vscode'
