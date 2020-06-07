@@ -738,7 +738,6 @@
 		"tslint": "tslint -t verbose src/**/*.ts"
 	},
 	"devDependencies": {
-		"@types/async-lock": "^1.1.2",
 		"@types/mockjs": "^1.0.2",
 		"@types/mysql": "^2.15.10",
 		"@types/node": "^7.10.10",
@@ -750,7 +749,6 @@
 		"html-webpack-plugin": "^4.3.0",
 		"style-loader": "^1.2.1",
 		"ts-loader": "^7.0.5",
-		"tslint": "^5.8.0",
 		"typescript": "^3.8.3",
 		"url-loader": "^4.1.0",
 		"vue-loader": "^15.9.2",
@@ -761,7 +759,6 @@
 	},
 	"dependencies": {
 		"@antv/g2": "^4.0.9",
-		"async-lock": "^1.2.2",
 		"date-format": "^3.0.0",
 		"element-ui": "^2.13.2",
 		"mockjs": "^1.1.0",

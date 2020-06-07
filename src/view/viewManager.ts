@@ -1,10 +1,8 @@
-import * as AsyncLock from 'async-lock';
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
 import { Console } from "../common/outputChannel";
-const lock = new AsyncLock()
 
 export class ViewOption {
     public path?: string;
