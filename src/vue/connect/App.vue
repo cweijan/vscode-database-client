@@ -1,15 +1,6 @@
 <template>
     <div class="container" id='app'>
         <h1>Connect to MySQL server</h1>
-        <!-- <select name="" id="">
-            <option value="">mysql</option>
-           <option value="">oracle</option> 
-        </select> -->
-        <!-- <ul class="tab" id="tabs">
-            <li class="tab__item tab__item--active">
-                MySQL
-            </li>
-        </ul> -->
         <blockquote class="panel" id="error" v-if="error">
             <p class="panel__text">
                 Connection error! <span id="errorMessage" v-text="errorMessage"></span><br />
@@ -18,44 +9,44 @@
         <el-row>
             <div>
                 <div class="field field__input">
-                    <b>host:</b>
+                    <strong>host:</strong>
                     <input class="field__input" v-model="connectionOption.host" />
                 </div>
             </div>
             <div>
                 <div class="field field__input">
-                    <b>port:</b>
+                    <strong>port:</strong>
                     <input class="field__input" v-model="connectionOption.port" />
                 </div>
             </div>
             <div>
                 <div class="field field__input">
-                    <b>username:</b>
+                    <strong>username:</strong>
                     <input class="field__input" v-model="connectionOption.user" />
                 </div>
             </div>
             <div>
                 <div class="field field__input">
-                    <b>password:</b>
+                    <strong>password:</strong>
                     <input class="field__input" type="password" v-model="connectionOption.password" />
                 </div>
             </div>
             <div>
                 <div class="field field__input">
-                    <b>database:</b>
+                    <strong>database:</strong>
                     <input class="field__input" placeholder="database, can be empty"
                         v-model="connectionOption.database" />
                 </div>
             </div>
             <div>
                 <div class="field field__input">
-                    <b>excludeDatabases:</b>
+                    <strong>excludeDatabases:</strong>
                     <input class="field__input" v-model="connectionOption.excludeDatabases" />
                 </div>
             </div>
             <div>
                 <div class="field field__input">
-                    <b>timezone:</b>
+                    <strong>timezone:</strong>
                     <input class="field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
                 </div>
             </div>
@@ -67,20 +58,20 @@
             </div>
             <div v-if="connectionOption.usingSSH">
                 <div class="field field__input">
-                    <b>ssh-host:</b>
+                    <strong>ssh-host:</strong>
                     <input class="field__input" v-model="connectionOption.ssh.host" />
                 </div>
                 <div class="field field__input">
-                    <b>ssh-port:</b>
+                    <strong>ssh-port:</strong>
                     <input class="field__input" v-model="connectionOption.ssh.port" />
                 </div>
                 <div class="field field__input">
-                    <b>ssh-username:</b>
+                    <strong>ssh-username:</strong>
                     <input class="field__input" v-model="connectionOption.ssh.username" />
                 </div>
                 <div>
                     <div class="field field__input">
-                        <b>type:</b>
+                        <strong>type:</strong>
                         <select v-model="type">
                             <option value="password">password</option>
                             <option value="privateKey">privateKey</option>
@@ -89,21 +80,21 @@
                 </div>
                 <div v-if="type=='password'">
                     <div class="field field__input">
-                        <b>password:</b>
+                        <strong>password:</strong>
                         <input class="field__input" type="password" v-model="connectionOption.ssh.password" />
                     </div>
                 </div>
                 <div v-if="type=='privateKey'">
                     <div>
                         <div class="field field__input">
-                            <b>privateKeyPath:</b>
+                            <strong>privateKeyPath:</strong>
                             <input class="field__input" placeholder="input your private key path"
                                 v-model="connectionOption.ssh.privateKeyPath" />
                         </div>
                     </div>
                     <div>
                         <div class="field field__input">
-                            <b>passphrase:</b>
+                            <strong>passphrase:</strong>
                             <input class="field__input" type="passphrase" v-model="connectionOption.ssh.passphrase" />
                         </div>
                     </div>

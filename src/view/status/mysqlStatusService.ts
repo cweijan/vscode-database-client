@@ -47,7 +47,7 @@ export class MysqlStatusService extends AbstractStatusService {
         const connection = await ConnectionManager.getConnection(connectionNode)
         const now = format('hh:mm:ss', new Date())
 
-        const status = this.responseToObj((await QueryUnit.queryPromise(connection, "show global status ") as QueryResponse[]));
+        const status = this.responseToObj((await QueryUnit.queryPromise(connection, "show global status ")));
 
         const sessions = await this.buildSession(status, now);
         const queries = await this.buildQueries(status, now);
