@@ -80,17 +80,7 @@
                 }
                 chartOption.previous = copy
                 if (!chartOption.chart) {
-                    const chart = new Chart({
-                        container: id,
-                        autoFit: true,
-                        height: 300
-                    })
-                    chart.data(chartOption.data);
-                    chart.line().position('now*value')
-                        .color('type')
-                        .size(2);
-                    chart.render();
-                    chartOption.chart = chart
+                    chartOption.chart = createChart(id,chartOption.data)
                 } else {
                     if (chartOption.data.length >= data.length * 100) {
                         for (let index = 0; index < data.length; index++) {

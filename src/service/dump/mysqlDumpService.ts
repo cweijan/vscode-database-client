@@ -11,7 +11,7 @@ import path = require('path');
 export class MysqlDumpService extends AbstractDumpService {
     protected dumpData(node: Node, exportPath: string, withData: boolean): void {
         Console.log(`Doing backup ${node.host}_${node.database}...`);
-        const tableName = node instanceof TableNode ? (node as TableNode).table : null;
+        const tableName = node instanceof TableNode ? node.table : null;
         const option: Options = {
             connection: {
                 host: node.host,

@@ -47,7 +47,7 @@ export class MysqlStatusService extends AbstractStatusService {
         const connection = await ConnectionManager.getConnection(connectionNode)
         const now = format('hh:mm:ss', new Date())
 
-        const status = this.responseToObj((await QueryUnit.queryPromise(connection, "show global status ")) as QueryResponse[]);
+        const status = this.responseToObj((await QueryUnit.queryPromise(connection, "show global status ") as QueryResponse[]));
 
         const sessions = await this.buildSession(status, now);
         const queries = await this.buildQueries(status, now);
@@ -60,14 +60,14 @@ export class MysqlStatusService extends AbstractStatusService {
         };
     }
 
-    private async buildTraffic(resposne, now: any): Promise<DashBoardItem[]> {
+    private async buildTraffic(resposne:any, now: any): Promise<DashBoardItem[]> {
         return [
             { now, type: 'received', value: resposne.Bytes_received },
             { now, type: 'sent', value: resposne.Bytes_sent }
         ];
     }
 
-    private async buildSession(resposne, now: any): Promise<DashBoardItem[]> {
+    private async buildSession(resposne:any, now: any): Promise<DashBoardItem[]> {
         return [
             { now, type: 'count', value: resposne.Threads_connected },
             { now, type: 'running', value: resposne.Threads_running },
@@ -75,7 +75,7 @@ export class MysqlStatusService extends AbstractStatusService {
         ];
     }
 
-    private async buildQueries(resposne, now: any): Promise<DashBoardItem[]> {
+    private async buildQueries(resposne:any, now: any): Promise<DashBoardItem[]> {
         return [
             { now, type: 'insert', value: resposne.Com_insert },
             { now, type: 'update', value: resposne.Com_update },

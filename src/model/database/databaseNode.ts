@@ -1,4 +1,3 @@
-import mysqldump from 'mysqldump';
 import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/constants";

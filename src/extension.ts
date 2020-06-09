@@ -199,24 +199,30 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 }
 
+function commandWrapper(commandDefinition: any, command: string): (...args: any[]) => any {
+    return (...args: any[]) => {
+        try {
+            commandDefinition[command](...args);
+        }
+        catch (err) {
+            Console.log(err);
+        }
+    };
+}
+
 function initCommand(commandDefinition: any): vscode.Disposable[] {
 
     const dispose = []
 
     for (const command in commandDefinition) {
         if (commandDefinition.hasOwnProperty(command)) {
-            dispose.push(vscode.commands.registerCommand(command, (...args: any[]) => {
-                try {
-                    commandDefinition[command](...args)
-                } catch (err) {
-                    Console.log(err)
-                }
-            }))
+            dispose.push(vscode.commands.registerCommand(command, commandWrapper(commandDefinition, command)))
         }
     }
 
     return dispose;
 }
+
 
 // refrences
 // - when : https://code.visualstudio.com/docs/getstarted/keybindings#_when-clause-contexts

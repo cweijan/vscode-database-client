@@ -1,5 +1,4 @@
 import * as path from "path";
-import * as vscode from "vscode";
 import { QueryUnit } from "../../service/queryUnit";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";

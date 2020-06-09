@@ -16,7 +16,7 @@ export class ColumnChain implements ComplectionChain {
             if (subComplectionItems != null && subComplectionItems.length > 0) { this.needStop = true }
             const tableReg = new RegExp(Pattern.TABLE_PATTERN + "(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
             let result = tableReg.exec(complectionContext.currentSqlFull);
-            for (; result != null && subComplectionItems.length === 0;) {
+            while (result != null && subComplectionItems.length === 0) {
                 subComplectionItems = await this.generateColumnComplectionItem(
                     Util.getTableName(result[0], Pattern.TABLE_PATTERN)
                 );
