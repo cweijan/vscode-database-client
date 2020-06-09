@@ -22,12 +22,12 @@ export class ColumnNode extends Node implements CopyAble {
         this.description = `${this.column.comment}`
         this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)}`
         this.collapsibleState = vscode.TreeItemCollapsibleState.None
-        this.iconPath = path.join(Constants.RES_PATH, this.column.key === "PRI" ? "icon/b_primary.png" : "icon/b_props.png"),
-            this.command = {
-                command: "mysql.column.update",
-                title: "Update Column Statement",
-                arguments: [this, true],
-            }
+        this.iconPath = path.join(Constants.RES_PATH, this.column.key === "PRI" ? "icon/b_primary.png" : "icon/b_props.png");
+        this.command = {
+            command: "mysql.column.update",
+            title: "Update Column Statement",
+            arguments: [this, true],
+        }
     }
     public copyName(): void {
         Util.copyToBoard(this.column.name)
