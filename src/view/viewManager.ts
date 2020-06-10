@@ -54,15 +54,17 @@ export class ViewManager {
 
             const currentStatus = this.viewStatu[viewOption.title]
             if (viewOption.singlePage && currentStatus) {
-                if (currentStatus.creating) {
-                    currentStatus.initListener = viewOption.initListener
-                } else if (viewOption.killHidden && currentStatus.instance.visible == false) {
+                if (viewOption.killHidden && currentStatus.instance.visible == false) {
                     currentStatus.instance.dispose()
-                } else if (viewOption.initListener) {
-                    viewOption.initListener(currentStatus.instance)
+                } else {
+                    if (currentStatus.creating) {
+                        currentStatus.initListener = viewOption.initListener
+                    } else if (viewOption.initListener) {
+                        viewOption.initListener(currentStatus.instance)
+                    }
+                    if (viewOption.receiveListener) { currentStatus.receiveListener = viewOption.receiveListener }
+                    return Promise.resolve(currentStatus.instance);
                 }
-                if (viewOption.receiveListener) { currentStatus.receiveListener = viewOption.receiveListener }
-                return Promise.resolve(currentStatus.instance);
             }
             this.viewStatu[viewOption.title] = { creating: true, instance: null, initListener: viewOption.initListener, receiveListener: viewOption.receiveListener }
             const targetPath = `${this.webviewPath}/${viewOption.path}.html`;
@@ -83,7 +85,7 @@ export class ViewManager {
                 );
                 this.viewStatu[viewOption.title].instance = webviewPanel
                 const contextPath = path.resolve(targetPath, "..");
-                webviewPanel.webview.html = this.buildInclude(this.buildPath(data, webviewPanel.webview, contextPath), contextPath);
+                webviewPanel.webview.html = this.buildPath(data, webviewPanel.webview, contextPath);
 
                 webviewPanel.onDidDispose(() => {
                     this.viewStatu[viewOption.title] = null
@@ -104,21 +106,6 @@ export class ViewManager {
 
         });
 
-    }
-    private static buildInclude(data: string, fileFolderPath: string): string {
-
-        const reg = new RegExp(`<include path="(.+?)" (\\/)?>`, 'ig')
-        let match = reg.exec(data)
-        while (match != null) {
-            const includePath = match[1].startsWith("/") ? this.webviewPath + match[1] : (fileFolderPath + "/" + match[1]);
-            const includeContent = fs.readFileSync(includePath, 'utf8')
-            if (includeContent) {
-                data = data.replace(match[0], includeContent)
-            }
-            match = reg.exec(data)
-        }
-
-        return data;
     }
 
     private static buildPath(data: string, webview: vscode.Webview, contextPath: string): string {
