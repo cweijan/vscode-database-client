@@ -123,7 +123,7 @@
                     password: '',
                     database: null,
                     usingSSH: false,
-                    excludeDatabases: 'mysql,performance_schema,information_schema',
+                    excludeDatabases: 'mysql,performance_schema,information_schema,sys',
                     timezone: '+00:00',
                     ssh: {
                         host: '',
