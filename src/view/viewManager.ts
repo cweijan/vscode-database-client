@@ -54,7 +54,7 @@ export class ViewManager {
 
             const currentStatus = this.viewStatu[viewOption.title]
             if (viewOption.singlePage && currentStatus) {
-                if (viewOption.killHidden && currentStatus.instance.visible == false) {
+                if (viewOption.killHidden && currentStatus.instance?.visible == false) {
                     currentStatus.instance.dispose()
                 } else {
                     if (currentStatus.creating) {

@@ -1,4 +1,4 @@
-import { extname } from "path";
+import { extname, basename } from "path";
 import { window } from "vscode";
 import { MessageType, OperateType } from "../../common/constants";
 import { Node } from "../../model/interface/node";
@@ -79,9 +79,10 @@ export class QueryPage {
 
         if (!window.activeTextEditor || !window.activeTextEditor.document) { return false; }
 
-        const extName = extname(window.activeTextEditor.document.fileName)
+        const extName = extname(window.activeTextEditor.document.fileName)?.toLowerCase()
+        const fileName=basename(window.activeTextEditor.document.fileName)?.toLowerCase()
 
-        return extName == '.sql';
+        return extName == '.sql' || fileName == 'mock.json';
     }
 
     private static async loadColumnList(queryParam: QueryParam<DataResponse>) {
