@@ -5,8 +5,9 @@ import { WebviewPanel } from "vscode";
 import { Console } from "../common/outputChannel";
 
 export class ViewOption {
-    public path?: string;
-    public title?: string;
+    public iconPath?: string;
+    public path: string;
+    public title: string;
     public splitView: boolean = false;
     /**
      * keep single page by viewType
@@ -81,9 +82,12 @@ export class ViewManager {
                         viewColumn: viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One,
                         preserveFocus: true
                     },
-                    { enableScripts: true, retainContextWhenHidden: true },
+                    { enableScripts: true, retainContextWhenHidden: true }
                 );
                 this.viewStatu[viewOption.title].instance = webviewPanel
+                if (viewOption.iconPath) {
+                    webviewPanel.iconPath = vscode.Uri.file(viewOption.iconPath)
+                }
                 const contextPath = path.resolve(targetPath, "..");
                 webviewPanel.webview.html = this.buildPath(data, webviewPanel.webview, contextPath);
 

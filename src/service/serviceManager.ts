@@ -18,6 +18,7 @@ import { SettingService } from "./setting/settingService";
 import { HistoryRecorder } from "./common/historyRecorder";
 import { StatusService } from "../view/status/statusService";
 import { MysqlStatusService } from "../view/status/mysqlStatusService";
+import { Global } from "../common/global";
 
 export class ServiceManager {
 
@@ -32,6 +33,7 @@ export class ServiceManager {
     private type: DatabaseType = DatabaseType.mysql;
 
     constructor(private readonly context: ExtensionContext) {
+        Global.context = context;
         this.mockRunner = new MockRunner();
         this.historyService = new HistoryRecorder()
         DatabaseCache.initCache(context);

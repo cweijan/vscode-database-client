@@ -4,6 +4,7 @@ import { ViewManager } from "../viewManager";
 import { Node } from "../../model/interface/node";
 import { NodeUtil } from "../../model/nodeUtil";
 import { Util } from "../../common/util";
+import { Global } from "../../common/global";
 
 export abstract class AbstractConnectService {
 
@@ -18,9 +19,8 @@ export abstract class AbstractConnectService {
             }
         }
         ViewManager.createWebviewPanel({
-            path: "connect",
-            title: "connect",
-            splitView: false,
+            path: "connect", title: "connect",
+            splitView: false, iconPath: Global.getExtPath("resources", "icon", "add.svg"),
             initListener: (webviewPanel) => {
                 if (node) {
                     webviewPanel.webview.postMessage({

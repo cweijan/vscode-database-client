@@ -12,6 +12,7 @@ import { PageService } from "../../service/page/pageService";
 import { QueryUnit } from "../../service/queryUnit";
 import { ViewManager } from "../viewManager";
 import { DataResponse } from "./queryResponse";
+import { Global } from "../../common/global";
 
 export class QueryParam<T> {
     /**
@@ -51,6 +52,7 @@ export class QueryPage {
             singlePage: queryParam.singlePage,
             splitView: this.isActiveSql(),
             path: "result", title: "Query",
+            iconPath: Global.getExtPath("resources", "icon","query.svg"),
             initListener: (webviewPanel) => {
                 webviewPanel.webview.postMessage(queryParam);
             },
@@ -80,7 +82,7 @@ export class QueryPage {
         if (!window.activeTextEditor || !window.activeTextEditor.document) { return false; }
 
         const extName = extname(window.activeTextEditor.document.fileName)?.toLowerCase()
-        const fileName=basename(window.activeTextEditor.document.fileName)?.toLowerCase()
+        const fileName = basename(window.activeTextEditor.document.fileName)?.toLowerCase()
 
         return extName == '.sql' || fileName == 'mock.json';
     }

@@ -1,6 +1,7 @@
 import { StatusService } from "./statusService";
 import { ConnectionNode } from "../../model/database/connectionNode";
 import { ViewManager } from "../viewManager";
+import { Global } from "../../common/global";
 
 export abstract class AbstractStatusService implements StatusService {
 
@@ -11,6 +12,7 @@ export abstract class AbstractStatusService implements StatusService {
         ViewManager.createWebviewPanel({
             path: "status",
             splitView: false, title: "Server Status",
+            iconPath: Global.getExtPath("resources", "icon","state.svg"),
             receiveListener: async (webviewPanel, params) => {
                 switch (params.type) {
                     case "processList":

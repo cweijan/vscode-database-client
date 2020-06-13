@@ -2,10 +2,16 @@
 import * as vscode from "vscode";
 import { Node } from "../model/interface/node";
 import { Constants } from "./constants";
+import { join } from "path";
 
 export class Global {
 
+    public static context: vscode.ExtensionContext;
     private static mysqlStatusBarItem: vscode.StatusBarItem;
+
+    public static getExtPath(...paths: string[]) {
+        return join(Global.context.extensionPath, ...paths)
+    }
 
     public static updateStatusBarItems(activeConnection: Node) {
         if (Global.mysqlStatusBarItem) {
