@@ -1,3 +1,7 @@
+## 2.2.0 (2020/6/13)
+- Reduce package size.
+- Support export data as xlsx.
+
 ## 2.1.4 (2020/5/20)
 - Fix connect database by ssh tunnel fail.
 
