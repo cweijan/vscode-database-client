@@ -50,7 +50,7 @@
           <div v-if="result.primaryKey && scope.row[result.primaryKey]">
             <el-button @click="openEdit(scope.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
             </el-button>
-            <el-button @click="openEdit(scope.row);update.currentNew[result.primaryKey]=null;update.primary=null;" type="info" size="small" title="copy" icon="el-icon-document-copy" circle>
+            <el-button @click.stop="openCopy(scope.row)" type="info" size="small" title="copy" icon="el-icon-document-copy" circle>
             </el-button>
             <el-button @click="deleteConfirm(scope.row[result.primaryKey])" title="delete" type="danger" size="small" icon="el-icon-delete" circle>
             </el-button>
@@ -264,7 +264,7 @@ export default {
           // condition present
           filterSql = filterSql.replace(
             existsCheck,
-            `$1 ${column}='${inputValue}' `
+            `$1 ${column}='${inputvalue}' `
           );
         } else if (filterSql.match(/\bwhere\b/gi)) {
           //have where
@@ -397,6 +397,12 @@ export default {
       };
     },
     openEdit(row) {
+      this.editor.visible = true;
+    },
+    openCopy(row) {
+      this.updateEdit(row);
+      this.update.currentNew[this.result.primaryKey] = null;
+      this.update.primary = null;
       this.editor.visible = true;
     },
     deleteConfirm(primaryValue) {
