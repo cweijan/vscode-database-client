@@ -54,6 +54,9 @@ export class QueryPage {
             path: "result", title: "Query",
             iconPath: Global.getExtPath("resources", "icon","query.svg"),
             initListener: (webviewPanel) => {
+                if(queryParam.res?.table){
+                    webviewPanel.title=queryParam.res.table
+                }
                 webviewPanel.webview.postMessage(queryParam);
             },
             receiveListener: async (_, params) => {
