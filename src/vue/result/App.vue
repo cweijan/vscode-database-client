@@ -582,7 +582,7 @@ export default {
       );
     },
     remainHeight() {
-      return window.innerHeight - 170;
+      return window.innerHeight - 175;
     }
   }
 };
