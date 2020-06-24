@@ -1,11 +1,17 @@
-## 2.2.0 (2020/6/13)
+# CHANGELOG
+
+## 2.2.3 - 2020/6/24
+- Add copy host feature.
+- Support add name prefix to connection.
+
+## 2.2.0 - 2020/6/13
 - Reduce package size.
 - Support export data as xlsx.
 
-## 2.1.4 (2020/5/20)
+## 2.1.4 - 2020/5/20
 - Fix connect database by ssh tunnel fail.
 
-## 2.1.0 (2020/5/14)
+## 2.1.0 - 2020/5/14
 - Update Query Result Page
 
 ## 2.0.1 (2020/5/6)
@@ -16,59 +22,59 @@
 ## 1.9.6 (2020/5/1)
 - Fix bugs.
 
-## 1.9.0 (2020/4/28)
+## 1.9.0 - 2020/4/28
 - Support SSH tunel.
 - Show comment of column、table on tree view.
 - Suport export table struct.
 
-## 1.8.1 (2020/4/23)
+## 1.8.1 - 2020/4/23
 - Connect can specify database.
 - Add mock data feature.
 - Update mysql connect client to newest version.
 - Fix inteliij bugs.
 
-## 1.8.0 (2020/4/22)
+## 1.8.0 - 2020/4/22
 - Show template sql in same file.
 - Get connection correctly when connection multi server.
 - Improve UI Interactive.
 - Rollback when batch execute sql occur error.
 - Fix bugs.
 
-## 1.7.32 (2020/4/18)
+## 1.7.32 - 2020/4/18
 - Fix legacy bug: connect to same host fail.
 
-## 1.7.31 (2020/4/17)
+## 1.7.31 - 2020/4/17
 - Switch active database using open query.
 - support insert or update in any query result page.
 - intellij insert|update code.
 - show comment when edit.
 - fix bugs.
 
-## 1.7.2 (2020/4/15)
+## 1.7.2 - 2020/4/15
 - Support copy database、table、column name
 - Support show error message when importing data occur error.
 - Remeber sql history for database
 - Ui improve
 
-## 1.7.1 (2020/4/11)
+## 1.7.1 - 2020/4/11
 - Support sort、filter in result page.
 - Enhance sql intelliCode.
 
-## 1.7.0 (2020/4/10)
+## 1.7.0 - 2020/4/10
 - Support Insert,Update,Delete in reuslt page.
 - Refactoring event message.
 
-## 1.6.37(2020/3/20)
+## 1.6.37- 2020/3/20
 - Table name inference
 - Sql formatter
 - Record History
 - Import sql file
 - Hover table to get info
 
-## 1.6.36 (2020/3/19)
+## 1.6.36 - 2020/3/19
 - Fix many mysql connection error.
 
-## 1.6.35 (2020/3/18)
+## 1.6.35 - 2020/3/18
 - get sql divisiton with semicolon on editor
 - fix mysql 8.0 get function|procedure info fail.
 
@@ -84,7 +90,7 @@
 - Query result page beautify
 - Sql assistant enhance
 
-## 1.5.3 (2020/2/22)
+## 1.5.3 - 2020/2/22
 - Focus query result panel when query
 
 ## 0.3.0 (2018-03-12)
