@@ -80,6 +80,11 @@
 				}
 			},
 			{
+				"command": "mysql.host.copy",
+				"title": "Copy Host",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.name.copy",
 				"title": "Copy Name",
 				"category": "MySQL"
@@ -411,6 +416,11 @@
 					"command": "mysql.connection.edit",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "1_mysql@2"
+				},
+				{
+					"command": "mysql.host.copy",
+					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"group": "1_mysql@3"
 				},
 				{
 					"command": "mysql.database.add",

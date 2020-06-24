@@ -60,6 +60,9 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.connection.edit": (connectionNode: ConnectionNode) => {
                 serviceManager.connectService.openConnect(serviceManager.provider, connectionNode)
             },
+            "mysql.host.copy": (connectionNode: ConnectionNode) => {
+                connectionNode.copyName();
+            },
             "mysql.database.add": (connectionNode: ConnectionNode) => {
                 connectionNode.createDatabase();
             },

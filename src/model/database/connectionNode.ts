@@ -13,8 +13,9 @@ import { InfoNode } from "../other/infoNode";
 import { DatabaseNode } from "./databaseNode";
 import { UserGroup } from "./userGroup";
 import { Connection } from "mysql";
+import { CopyAble } from "../interface/copyAble";
 
-export class ConnectionNode extends Node {
+export class ConnectionNode extends Node implements CopyAble {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/server.png");
     public contextValue: string = ModelType.CONNECTION;
@@ -62,6 +63,10 @@ export class ConnectionNode extends Node {
             .catch((err) => {
                 return [new InfoNode(err)];
             });
+    }
+
+    public copyName() {
+        Util.copyToBoard(this.host)
     }
 
     public async newQuery() {
