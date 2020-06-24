@@ -21,6 +21,9 @@ export class ConnectionNode extends Node {
     constructor(readonly id: string, readonly parent: Node) {
         super(id)
         this.init(parent)
+        if (parent.name) {
+            this.label = `${parent.name}_${id}`
+        }
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {

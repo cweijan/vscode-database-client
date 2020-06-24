@@ -9,6 +9,12 @@
         <el-row>
             <div>
                 <div class="field field__input">
+                    <strong>name:</strong>
+                    <input class="field__input" placeholder="connection name, can be empty" v-model="connectionOption.name" />
+                </div>
+            </div>
+            <div>
+                <div class="field field__input">
                     <strong>host:</strong>
                     <input class="field__input" v-model="connectionOption.host" />
                 </div>
@@ -142,11 +148,11 @@
                 if(!data)return;
                 switch (data.type) {
                     case 'EDIT':
-                        vue.connectionOption = data.node
+                        this.connectionOption = data.node
                         break;
                     case 'CONNECTION_ERROR':
-                        vue.error = true;
-                        vue.errorMessage = data.err;
+                        this.error = true;
+                        this.errorMessage = data.err;
                         break;
                     default:
                         document.write("Connect success!")
