@@ -255,33 +255,35 @@ export default {
         this.result.sql.replace(/\n/, " ").replace(";", " ") + " ";
 
       let existsCheck = new RegExp(
-        `(WHERE|AND)?\\s*${column}\\s*=\\s*.+?\\s`,
+        `(WHERE|AND)?\\s*${column}\\s*(=|is)\\s*.+?\\s`,
         "igm"
       );
 
       if (inputvalue) {
+        const condition=inputvalue.toLowerCase()=="null"?`${column} is null`:`${column}='${inputvalue}'`;
         if (existsCheck.exec(filterSql)) {
           // condition present
           filterSql = filterSql.replace(
             existsCheck,
-            `$1 ${column}='${inputvalue}' `
+            `$1 ${condition} `
           );
         } else if (filterSql.match(/\bwhere\b/gi)) {
           //have where
           filterSql = filterSql.replace(
             /\b(where)\b/gi,
-            `\$1 ${column}='${inputvalue}' AND `
+            `\$1 ${condition} AND `
           );
         } else {
           //have not where
           filterSql = filterSql.replace(
             new RegExp(`(from\\s*.+?)\\s`, "ig"),
-            `\$1 WHERE ${column}='${inputvalue}' `
+            `\$1 WHERE ${condition} `
           );
         }
       } else {
+        console.log('222')
         // empty value, clear filter
-        let beforeAndCheck = new RegExp(`${column}\\s*=\\s*.+?\\s*AND`, "igm");
+        let beforeAndCheck = new RegExp(`${column}\\s*(=|is)\\s*.+?\\s*AND`, "igm");
         if (beforeAndCheck.exec(filterSql)) {
           filterSql = filterSql.replace(beforeAndCheck, "");
         } else {
@@ -380,7 +382,7 @@ export default {
         const updateSql = `UPDATE ${this.result.table} SET ${change.replace(
           /,$/,
           ""
-        )} WHERE ${this.result.primaryKey}=${this.update.primary}`;
+        )} WHERE ${this.result.primaryKey}='${this.update.primary}'`;
         this.execute(updateSql);
       } else {
         this.$message("Not any change, update fail!");
