@@ -75,7 +75,7 @@ export class QueryUnit {
 
         const isMulti = sql.match(Pattern.MULTI_PATTERN);
         if (!isMulti) {
-            const sqlList: string[] = sql.split(";").filter((s) => (s.trim() != '' && s.trim() != ';'))
+            const sqlList: string[] = sql.match(/(?:[^;"']+|["'][^"']*["'])+/g) .filter((s) => (s.trim() != '' && s.trim() != ';'))
             if (sqlList.length > 1) {
                 const success = await this.runBatch(connection, sqlList)
                 QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Batch execute sql ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
@@ -150,7 +150,7 @@ export class QueryUnit {
         if (delimiter) {
             content = content.replace(new RegExp(delimiter, 'g'), ";")
         }
-        const sqlList = content.split(";");
+        const sqlList = content.match(/(?:[^;"']+|["'][^"']*["'])+/g);
         const docCursor = document.getText(Cursor.getRangeStartTo(current)).length;
         let index = 0;
         for (let i = 0; i < sqlList.length; i++) {

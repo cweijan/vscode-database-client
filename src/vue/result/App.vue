@@ -281,7 +281,6 @@ export default {
           );
         }
       } else {
-        console.log('222')
         // empty value, clear filter
         let beforeAndCheck = new RegExp(`${column}\\s*(=|is)\\s*.+?\\s*AND`, "igm");
         if (beforeAndCheck.exec(filterSql)) {
@@ -354,7 +353,7 @@ export default {
       let values = "";
       for (const key in this.update.currentNew) {
         const newEle = this.update.currentNew[key];
-        if (newEle) {
+        if (newEle!=null) {
           columns += `${this.wrap(key)},`;
           values += `${this.wrapQuote(key, newEle)},`;
         }
@@ -382,7 +381,7 @@ export default {
         const updateSql = `UPDATE ${this.result.table} SET ${change.replace(
           /,$/,
           ""
-        )} WHERE ${this.result.primaryKey}='${this.update.primary}'`;
+        )} WHERE ${this.result.primaryKey}=${this.wrapQuote(this.result.primaryKey,this.update.primary)}`;
         this.execute(updateSql);
       } else {
         this.$message("Not any change, update fail!");
@@ -414,7 +413,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          const deleteSql = `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}='${primaryValue}'`;
+          const deleteSql = `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}=${this.wrapQuote(this.result.primaryKey,primaryValue)}`;
           this.execute(deleteSql);
         })
         .catch(() => {
