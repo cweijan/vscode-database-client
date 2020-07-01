@@ -315,6 +315,9 @@ export default {
       this.update.currentNew = {};
     },
     wrapQuote(columnName, value) {
+      if(value==""){
+        return "null";
+      }
       if (typeof value == "string") {
         value = value.replace(/'/g, "\\'");
       }
