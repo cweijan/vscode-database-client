@@ -586,7 +586,7 @@ export default {
       );
     },
     remainHeight() {
-      return window.innerHeight - 175;
+      return window.innerHeight - 185;
     }
   }
 };
