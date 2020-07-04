@@ -255,7 +255,7 @@ export default {
         this.result.sql.replace(/\n/, " ").replace(";", " ") + " ";
 
       let existsCheck = new RegExp(
-        `(WHERE|AND)?\\s*${column}\\s*(=|is)\\s*.+?\\s`,
+        `(WHERE|AND)?\\s*\\b${column}\\b\\s*(=|is)\\s*.+?\\s`,
         "igm"
       );
 
@@ -282,7 +282,7 @@ export default {
         }
       } else {
         // empty value, clear filter
-        let beforeAndCheck = new RegExp(`${column}\\s*(=|is)\\s*.+?\\s*AND`, "igm");
+        let beforeAndCheck = new RegExp(`\\b${column}\\b\\s*(=|is)\\s*.+?\\s*AND`, "igm");
         if (beforeAndCheck.exec(filterSql)) {
           filterSql = filterSql.replace(beforeAndCheck, "");
         } else {

@@ -46,8 +46,8 @@ export class UserNode extends Node implements CopyAble {
 
     public contextValue = ModelType.USER;
     public iconPath = path.join(Constants.RES_PATH, "icon/user.svg")
-    constructor(readonly name: string, readonly info: Node) {
-        super(name)
+    constructor(readonly username: string, readonly info: Node) {
+        super(username)
         this.init(info)
         this.command = {
             command: "mysql.user.sql",
@@ -57,7 +57,7 @@ export class UserNode extends Node implements CopyAble {
     }
 
     public copyName(): void {
-        Util.copyToBoard(this.name)
+        Util.copyToBoard(this.username)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -65,23 +65,23 @@ export class UserNode extends Node implements CopyAble {
     }
 
     public async selectSqlTemplate() {
-        const sql = `SELECT USER 0USER,HOST 1HOST,Super_priv,Select_priv,Insert_priv,Update_priv,Delete_priv,Create_priv,Drop_priv,Index_priv,Alter_priv FROM mysql.user where user='${this.name}';`;
+        const sql = `SELECT USER 0USER,HOST 1HOST,Super_priv,Select_priv,Insert_priv,Update_priv,Delete_priv,Create_priv,Drop_priv,Index_priv,Alter_priv FROM mysql.user where user='${this.username}';`;
         QueryUnit.runQuery(sql, this);
     }
 
     public drop() {
 
-        Util.confirm(`Are you want to drop user ${this.user} ?`, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP user ${this.name}`).then(() => {
+        Util.confirm(`Are you want to drop user ${this.username} ?`, async () => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP user ${this.username}`).then(() => {
                 DbTreeDataProvider.refresh();
-                vscode.window.showInformationMessage(`Drop user ${this.name} success!`);
+                vscode.window.showInformationMessage(`Drop user ${this.username} success!`);
             });
         })
     }
 
     public grandTemplate() {
         QueryUnit.showSQLTextDocument(`
-GRANT ALL PRIVILEGES ON *.* to '${this.name}'@'%'
+GRANT ALL PRIVILEGES ON *.* to '${this.username}'@'%'
 `.replace(/^\s/, ""));
     }
 
@@ -93,7 +93,7 @@ update
 set
     password = PASSWORD("newPassword")
 where
-    User = '${this.name}';
+    User = '${this.username}';
 FLUSH PRIVILEGES;
 -- since mysql version 5.7, password column need change to authentication_string=PASSWORD("test")`
             .replace(/^\s/, ""));

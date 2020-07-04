@@ -75,7 +75,7 @@ export class QueryUnit {
 
         const isMulti = sql.match(Pattern.MULTI_PATTERN);
         if (!isMulti) {
-            const sqlList: string[] = sql.match(/(?:[^;"']+|["'][^"']*["'])+/g) .filter((s) => (s.trim() != '' && s.trim() != ';'))
+            const sqlList: string[] = sql.match(/(?:[^;"']+|["'][^"']*["'])+/g).filter((s) => (s.trim() != '' && s.trim() != ';'))
             if (sqlList.length > 1) {
                 const success = await this.runBatch(connection, sqlList)
                 QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Batch execute sql ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
@@ -151,19 +151,25 @@ export class QueryUnit {
             content = content.replace(new RegExp(delimiter, 'g'), ";")
         }
         const sqlList = content.match(/(?:[^;"']+|["'][^"']*["'])+/g);
+        if (sqlList.length == 1) return sqlList[0];
+
+        const trimSqlList=[]
         const docCursor = document.getText(Cursor.getRangeStartTo(current)).length;
         let index = 0;
         for (let i = 0; i < sqlList.length; i++) {
             const sql = sqlList[i];
+            const trimSql=sql.trim();
+            if(trimSql){
+                trimSqlList.push(trimSql)
+            }
             index += (sql.length + 1);
             if (docCursor < index) {
-                const trimSql = sql.trim();
                 if (!trimSql && sqlList.length > 1) { return sqlList[i - 1]; }
                 return trimSql;
             }
         }
 
-        return '';
+        return trimSqlList[trimSqlList.length-1];
     }
 
     private static sqlDocument: vscode.TextEditor;
