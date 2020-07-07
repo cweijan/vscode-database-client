@@ -8,7 +8,8 @@
       </el-row>
       <!-- tool panel -->
       <el-row>
-        <el-button type="primary" @click='execute(toolbar.sql);info.visible = false;'>Execute</el-button>
+        <el-button type="primary" @click='count(toolbar.sql);'>Count</el-button>
+        <el-button type="primary" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
         <el-tag>Table :</el-tag>
         <span v-if="result.table">
           {{result.table}}
@@ -458,6 +459,12 @@ export default {
       if (this.result.sql) {
         this.execute(this.result.sql);
       }
+    },
+    count(sql){
+      this.info.visible = false;
+      let countSql=sql.replace(/select (.+?) from/i,"SELECT count(*) FROM")
+          .replace(/\blimit\b.+$/gi, "");
+      this.execute(countSql)
     },
     execute(sql) {
       if (!sql) return;

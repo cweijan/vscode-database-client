@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.2.8 - 2020/7/7
+- Add count button in view.
+
+## 2.2.4~2.2.7
+- Fix bugs and adjust result view.
+
 ## 2.2.3 - 2020/6/24
 - Add copy host feature.
 - Support add name prefix to connection.
