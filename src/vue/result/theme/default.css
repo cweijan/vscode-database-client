@@ -1,0 +1,22 @@
+.el-table .edit-row td {
+  background: oldlace !important;
+}
+
+.el-textarea__inner,
+.el-table,
+.el-table tr,
+.el-table th,
+.el-dialog__header,
+.el-el-dialog__body,
+.el-dialog__footer {
+  background-color: #f8f8f8;
+}
+
+.el-table--striped .el-table__body tr.el-table__row--striped td {
+  background-color: #f0fdf0;
+}
+
+.el-table th.is-leaf {
+  border: 1px solid #eae7e7;
+  border-radius: 3px;
+}

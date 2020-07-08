@@ -51,7 +51,7 @@ export class QueryPage {
         ViewManager.createWebviewPanel({
             singlePage: queryParam.singlePage,
             splitView: this.isActiveSql(),
-            path: "result", title: "Query",
+            path: "result-dark", title: "Query",
             iconPath: Global.getExtPath("resources", "icon","query.svg"),
             initListener: (webviewPanel) => {
                 if(queryParam.res?.table){
