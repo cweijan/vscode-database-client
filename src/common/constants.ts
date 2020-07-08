@@ -15,7 +15,7 @@ export class Pattern {
 
 export enum OperateType {
     execute = 'execute', export = 'export',
-    next = 'next', init = 'init'
+    next = 'next', init = 'init', changeTheme="changeTheme"
 }
 
 export enum CacheKey {
@@ -27,6 +27,7 @@ export enum ConfigKey {
     MAX_TABLE_COUNT = "maxTableCount",
     ENABLE_DELIMITER = "enableDelimiter",
     LOAD_META_ON_CONNECT = "loadMetaOnConnect",
+    REULST_THEME = "resultTheme",
 
 }
 
@@ -60,7 +61,8 @@ export enum MessageType {
     ERROR = "ERROR",
     RUN = "RUN",
     MESSAGE = "MESSAGE",
-    NEXT_PAGE = "NEXT_PAGE"
+    NEXT_PAGE = "NEXT_PAGE",
+    THEME = "theme"
 }
 
 export enum Template {

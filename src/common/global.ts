@@ -35,4 +35,13 @@ export class Global {
         return vscode.workspace.getConfiguration(Constants.CONFIG_PREFIX).get<T>(key);
     }
 
+    /**
+     * update mysql config for vscode.
+     * @param name  config name
+     * @param value config value 
+     */
+    public static async updateConfig(name: string, value: any) {
+        await vscode.workspace.getConfiguration(Constants.CONFIG_PREFIX).update(name, value, true)
+    }
+
 }

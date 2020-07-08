@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.3.0 - 2020/7/8
+- Add dark theme.
+
 ## 2.2.8 - 2020/7/7
 - Add count button in view.
 

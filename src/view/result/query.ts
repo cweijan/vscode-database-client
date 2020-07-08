@@ -1,6 +1,6 @@
 import { extname, basename } from "path";
 import { window } from "vscode";
-import { MessageType, OperateType } from "../../common/constants";
+import { MessageType, OperateType, ConfigKey } from "../../common/constants";
 import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
 import { DatabaseCache } from "../../service/common/databaseCache";
@@ -48,18 +48,27 @@ export class QueryPage {
                 break;
         }
 
+
+        const themeMap = { "Dark": "result-dark", "Default": "result" }
+        const themeName: string = Global.getConfig(ConfigKey.REULST_THEME)
+        let path = themeMap[themeName]
+        if (!path) {
+            path = "result"
+        }
+
         ViewManager.createWebviewPanel({
             singlePage: queryParam.singlePage,
             splitView: this.isActiveSql(),
-            path: "result-dark", title: "Query",
-            iconPath: Global.getExtPath("resources", "icon","query.svg"),
+            path, title: "Query",
+            iconPath: Global.getExtPath("resources", "icon", "query.svg"),
             initListener: (webviewPanel) => {
-                if(queryParam.res?.table){
-                    webviewPanel.title=queryParam.res.table
+                if (queryParam.res?.table) {
+                    webviewPanel.title = queryParam.res.table
                 }
                 webviewPanel.webview.postMessage(queryParam);
+                webviewPanel.webview.postMessage({ type: MessageType.THEME, res: themeName } as QueryParam<string>);
             },
-            receiveListener: async (_, params) => {
+            receiveListener: async (viewPanel, params) => {
                 switch (params.type) {
                     case OperateType.execute:
                         QueryUnit.runQuery(params.sql);
@@ -73,6 +82,11 @@ export class QueryPage {
                         break;
                     case OperateType.export:
                         this.exportService.export(params.sql)
+                        break;
+                    case OperateType.changeTheme:
+                        await Global.updateConfig(ConfigKey.REULST_THEME, params.theme)
+                        viewPanel.dispose()
+                        QueryUnit.runQuery(params.sql)
                         break;
                 }
             }

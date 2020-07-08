@@ -10,6 +10,11 @@
       <el-row>
         <el-button type="primary" @click='count(toolbar.sql);'>Count</el-button>
         <el-button type="primary" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
+        <el-tag>Theme(Preview) :</el-tag>
+        <el-select v-model="theme.select" @change="changeTheme">
+          <el-option v-for="theme in theme.list" :key="theme" :label="theme" :value="theme">
+          </el-option>
+        </el-select>
         <el-tag>Table :</el-tag>
         <span v-if="result.table">
           {{result.table}}
@@ -102,6 +107,10 @@ export default {
   name: "App",
   data() {
     return {
+      theme: {
+        list: [ "Default", "Dark"],
+        select: "Default"
+      },
       result: {
         data: [],
         sql: "",
@@ -180,6 +189,10 @@ export default {
 
     window.addEventListener("message", ({ data }) => {
       if (!data) return;
+      if (data.type == "theme") {
+        this.theme.select = data.res;
+        return;
+      }
       const response = data.res;
       this.table.loading = false;
       if (response && response.costTime) {
@@ -230,6 +243,13 @@ export default {
     postMessage({ type: "init" });
   },
   methods: {
+    changeTheme(theme) {
+      postMessage({
+        type: "changeTheme",
+        theme,
+        sql: this.result.sql
+      });
+    },
     exportData() {
       this.$confirm("Export without limit?", "Export", {
         confirmButtonText: "Yes",
@@ -261,13 +281,13 @@ export default {
       );
 
       if (inputvalue) {
-        const condition=inputvalue.toLowerCase()=="null"?`${column} is null`:`${column}='${inputvalue}'`;
+        const condition =
+          inputvalue.toLowerCase() == "null"
+            ? `${column} is null`
+            : `${column}='${inputvalue}'`;
         if (existsCheck.exec(filterSql)) {
           // condition present
-          filterSql = filterSql.replace(
-            existsCheck,
-            `$1 ${condition} `
-          );
+          filterSql = filterSql.replace(existsCheck, `$1 ${condition} `);
         } else if (filterSql.match(/\bwhere\b/gi)) {
           //have where
           filterSql = filterSql.replace(
@@ -283,7 +303,10 @@ export default {
         }
       } else {
         // empty value, clear filter
-        let beforeAndCheck = new RegExp(`\\b${column}\\b\\s*(=|is)\\s*.+?\\s*AND`, "igm");
+        let beforeAndCheck = new RegExp(
+          `\\b${column}\\b\\s*(=|is)\\s*.+?\\s*AND`,
+          "igm"
+        );
         if (beforeAndCheck.exec(filterSql)) {
           filterSql = filterSql.replace(beforeAndCheck, "");
         } else {
@@ -316,7 +339,7 @@ export default {
       this.update.currentNew = {};
     },
     wrapQuote(columnName, value) {
-      if(value==""){
+      if (value == "") {
         return "null";
       }
       if (typeof value == "string") {
@@ -357,7 +380,7 @@ export default {
       let values = "";
       for (const key in this.update.currentNew) {
         const newEle = this.update.currentNew[key];
-        if (newEle!=null) {
+        if (newEle != null) {
           columns += `${this.wrap(key)},`;
           values += `${this.wrapQuote(key, newEle)},`;
         }
@@ -385,7 +408,10 @@ export default {
         const updateSql = `UPDATE ${this.result.table} SET ${change.replace(
           /,$/,
           ""
-        )} WHERE ${this.result.primaryKey}=${this.wrapQuote(this.result.primaryKey,this.update.primary)}`;
+        )} WHERE ${this.result.primaryKey}=${this.wrapQuote(
+          this.result.primaryKey,
+          this.update.primary
+        )}`;
         this.execute(updateSql);
       } else {
         this.$message("Not any change, update fail!");
@@ -417,7 +443,9 @@ export default {
         type: "warning"
       })
         .then(() => {
-          const deleteSql = `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}=${this.wrapQuote(this.result.primaryKey,primaryValue)}`;
+          const deleteSql = `DELETE FROM ${this.result.table} WHERE ${
+            this.result.primaryKey
+          }=${this.wrapQuote(this.result.primaryKey, primaryValue)}`;
           this.execute(deleteSql);
         })
         .catch(() => {
@@ -460,11 +488,12 @@ export default {
         this.execute(this.result.sql);
       }
     },
-    count(sql){
+    count(sql) {
       this.info.visible = false;
-      let countSql=sql.replace(/select (.+?) from/i,"SELECT count(*) FROM")
-          .replace(/\blimit\b.+$/gi, "");
-      this.execute(countSql)
+      let countSql = sql
+        .replace(/select (.+?) from/i, "SELECT count(*) FROM")
+        .replace(/\blimit\b.+$/gi, "");
+      this.execute(countSql);
     },
     execute(sql) {
       if (!sql) return;
@@ -501,8 +530,8 @@ export default {
     nextPage() {
       if (this.page.isEnd || this.page.lock) return;
 
-      if(!this.result.sql.match(/\blimit\b/i)){
-        this.page.isEnd=true;
+      if (!this.result.sql.match(/\blimit\b/i)) {
+        this.page.isEnd = true;
         return;
       }
 
@@ -660,5 +689,4 @@ body {
   border-radius: 8px;
   background-color: #ccc;
 }
-
 </style>
