@@ -77,3 +77,7 @@ MySQL Client For Visual Studio Code
 * Find a suprise when you right click on a node.
 
 ![suprise](images/surprise.jpg)
+
+## Sponsor
+- [IDEA](https://www.jetbrains.com/)
+
