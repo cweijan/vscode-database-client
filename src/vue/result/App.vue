@@ -501,6 +501,11 @@ export default {
     nextPage() {
       if (this.page.isEnd || this.page.lock) return;
 
+      if(!this.result.sql.match(/\blimit\b/i)){
+        this.page.isEnd=true;
+        return;
+      }
+
       if (!this.result.sql.match(/^\s*select/i)) {
         return;
       }

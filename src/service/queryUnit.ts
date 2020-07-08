@@ -59,7 +59,7 @@ export class QueryUnit {
                 sql = activeTextEditor.document.getText(selection);
             }
         }
-        sql = sql.replace(/--.+/ig, '').trim();
+        sql = sql.replace(/^\s*--.+/igm, '').trim();
         const executeTime = new Date().getTime();
         const isDDL = sql.match(this.ddlPattern);
         const isDML = sql.match(this.dmlPattern);
