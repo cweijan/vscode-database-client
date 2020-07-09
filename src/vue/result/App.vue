@@ -30,9 +30,11 @@
       </div>
     </div>
     <!-- talbe result -->
-    <el-table id="dataTable" v-loading='table.loading' size='small' @sort-change="sort" element-loading-text="Loading Data" :row-class-name="tableRowClassName" ref="dataTable" :height="remainHeight" width="100vh" stripe :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" border @row-dblclick="row=>openEdit(row)" @row-click="row=>updateEdit(row)">
+    <el-table id="dataTable" v-loading='table.loading' :cell-style="{padding: '0', height: '25px'}" size='small' @sort-change="sort" element-loading-text="Loading Data" :row-class-name="tableRowClassName" ref="dataTable" :height="remainHeight" width="100vh" stripe :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" border @row-dblclick="row=>openEdit(row)" @row-click="row=>updateEdit(row)">
       <!-- tool bar -->
-      <el-table-column fixed="left" width="200" align="center">
+      <el-table-column fixed="left" type="index" :index="0" width="50" align="center">
+      </el-table-column>
+      <el-table-column fixed="left" width="160" align="center" height="30">
         <template slot="header" slot-scope="scope">
           <el-input v-model="table.search" placeholder="Input To Search Data" />
         </template>
