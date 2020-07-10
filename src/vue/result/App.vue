@@ -10,15 +10,17 @@
       <el-row id="tool-panel">
         <el-button type="primary" @click='count(toolbar.sql);'>Count</el-button>
         <el-button type="primary" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
-        <el-tag>Theme(Preview) :</el-tag>
+        <el-tag>Theme :</el-tag>
         <el-select v-model="theme.select" @change="changeTheme">
           <el-option v-for="theme in theme.list" :key="theme" :label="theme" :value="theme">
           </el-option>
         </el-select>
-        <el-tag>Table :</el-tag>
-        <span v-if="result.table">
-          {{result.table}}
-        </span>
+        <template v-if="result.table">
+          <el-tag>Table :</el-tag>
+          <span >
+            {{result.table}}
+          </span>
+        </template>
         <el-tag type="success">CostTime :</el-tag>
         <span v-text="toolbar.costTime"></span>ms
         <span v-if="result.table">, <el-tag type="warning">Row :</el-tag>{{result.data.length-1}}, <el-tag type="danger"> Col :</el-tag> {{columnCount}}</span>
@@ -449,7 +451,7 @@ export default {
           this.execute(deleteSql);
         })
         .catch(() => {
-          this.$message({ type: "info", message: "Update canceled" });
+          this.$message({ type: "warning", message: "Delete canceled" });
         });
     },
     tableRowClassName({ row, rowIndex }) {
@@ -594,6 +596,7 @@ export default {
     },
     // show call when change table
     reset() {
+      console.log( this.result.fields.length)
       this.clear();
       // table
       this.table.widthItem = {};
@@ -629,7 +632,7 @@ export default {
       );
     },
     remainHeight() {
-      return window.innerHeight - 185;
+      return window.innerHeight - 200;
     }
   }
 };
