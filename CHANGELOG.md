@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.3.0 - 2020/7/10
+- Update result view.
+
 ## 2.3.0 - 2020/7/8
 - Add dark theme.
 
