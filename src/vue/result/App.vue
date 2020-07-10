@@ -7,7 +7,7 @@
         </el-input>
       </el-row>
       <!-- tool panel -->
-      <el-row>
+      <el-row id="tool-panel">
         <el-button type="primary" @click='count(toolbar.sql);'>Count</el-button>
         <el-button type="primary" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
         <el-tag>Theme(Preview) :</el-tag>
@@ -21,7 +21,7 @@
         </span>
         <el-tag type="success">CostTime :</el-tag>
         <span v-text="toolbar.costTime"></span>ms
-        <span v-if="result.table">, <el-tag type="warning">Row :</el-tag> {{result.data.length-1}},<el-tag type="danger"> Col :</el-tag> {{columnCount}}</span>
+        <span v-if="result.table">, <el-tag type="warning">Row :</el-tag>{{result.data.length-1}}, <el-tag type="danger"> Col :</el-tag> {{columnCount}}</span>
       </el-row>
       <!-- info panel -->
       <div v-if="info.visible ">
@@ -29,46 +29,42 @@
         <div v-if="!info.error" class="info-panel" style="color: green;" v-html="info.message"></div>
       </div>
     </div>
+    <!-- toolbar -->
+    <div style="margin:8px">
+      <el-input v-model="table.search" placeholder="Input To Search Data" style="width:200px" />
+      <el-button @click="exportData()" type="primary" size="small" icon="el-icon-orange" circle title="Export"></el-button>
+      <el-button type="info" icon="el-icon-circle-plus-outline" size="small" circle @click="insertRequest">
+      </el-button>
+      <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
+        <el-checkbox-group v-model="toolbar.showColumns">
+          <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
+            {{column.name}}
+          </el-checkbox>
+        </el-checkbox-group>
+        <el-button icon="el-icon-search" circle title="Select columns to show" size="small" slot="reference">
+        </el-button>
+      </el-popover>
+      <el-button @click="resetFilter" title="Reset filter" type="warning" size="small" icon="el-icon-refresh" circle>
+      </el-button>
+      <template v-if="result.primaryKey && toolbar.row[result.primaryKey]">
+        <el-tag type="warning" style="margin:0 10px">Row : </el-tag>
+        <el-button @click="openEdit(toolbar.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
+        </el-button>
+        <el-button @click.stop="openCopy(toolbar.row)" type="info" size="small" title="copy" icon="el-icon-document-copy" circle>
+        </el-button>
+        <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="small" icon="el-icon-delete" circle>
+        </el-button>
+      </template>
+    </div>
     <!-- talbe result -->
-    <el-table id="dataTable" v-loading='table.loading' :cell-style="{padding: '0', height: '25px'}" size='small' @sort-change="sort" element-loading-text="Loading Data" :row-class-name="tableRowClassName" ref="dataTable" :height="remainHeight" width="100vh" stripe :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" border @row-dblclick="row=>openEdit(row)" @row-click="row=>updateEdit(row)">
+    <el-table id="dataTable" v-loading='table.loading' :cell-style="{padding: '0', height: '20px'}" size='small' @sort-change="sort" element-loading-text="Loading Data" :row-class-name="tableRowClassName" ref="dataTable" :height="remainHeight" width="100vh" stripe :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" border @row-dblclick="row=>openEdit(row)" @row-click="row=>updateEdit(row)">
       <!-- tool bar -->
       <el-table-column fixed="left" type="index" :index="0" width="50" align="center">
-      </el-table-column>
-      <el-table-column fixed="left" width="160" align="center" height="30">
-        <template slot="header" slot-scope="scope">
-          <el-input v-model="table.search" placeholder="Input To Search Data" />
-        </template>
-        <template slot-scope="scope">
-          <div v-if="scope.row.isFilter" style="text-align: center;">
-            <el-button @click="exportData()" type="primary" size="small" icon="el-icon-orange" circle title="Export"></el-button>
-            <el-button type="info" icon="el-icon-circle-plus-outline" size="small" circle @click="insertRequest">
-            </el-button>
-            <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
-              <el-checkbox-group v-model="toolbar.showColumns">
-                <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
-                  {{column.name}}
-                </el-checkbox>
-              </el-checkbox-group>
-              <el-button icon="el-icon-search" circle title="Select columns to show" size="small" slot="reference">
-              </el-button>
-            </el-popover>
-            <el-button @click="resetFilter" title="Reset filter" type="warning" size="small" icon="el-icon-refresh" circle>
-            </el-button>
-          </div>
-          <div v-if="result.primaryKey && scope.row[result.primaryKey]">
-            <el-button @click="openEdit(scope.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
-            </el-button>
-            <el-button @click.stop="openCopy(scope.row)" type="info" size="small" title="copy" icon="el-icon-document-copy" circle>
-            </el-button>
-            <el-button @click="deleteConfirm(scope.row[result.primaryKey])" title="delete" type="danger" size="small" icon="el-icon-delete" circle>
-            </el-button>
-          </div>
-        </template>
       </el-table-column>
       <!-- data  -->
       <el-table-column :label="field.name" v-for="(field,index) in result.fields" :key="index" align="center" sortable v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" :width="computeWidth(field.name,0,index,toolbar.filter[field.name])">
         <template slot-scope="scope">
-          <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[field.name]" placeholder="filter" v-on:keyup.enter.native="filter($event,field.name)">
+          <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[field.name]" placeholder="Filter" v-on:keyup.enter.native="filter($event,field.name)">
           </el-input>
           <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[field.name])'></span>
         </template>
@@ -110,7 +106,7 @@ export default {
   data() {
     return {
       theme: {
-        list: [ "Default", "Dark"],
+        list: ["Default", "Dark"],
         select: "Default"
       },
       result: {
@@ -134,6 +130,7 @@ export default {
         widthItem: {}
       },
       toolbar: {
+        row: {},
         sql: null,
         costTime: 0,
         filter: {},
@@ -341,7 +338,7 @@ export default {
       this.update.currentNew = {};
     },
     wrapQuote(columnName, value) {
-      if (value == "") {
+      if (value === "") {
         return "null";
       }
       if (typeof value == "string") {
@@ -423,6 +420,7 @@ export default {
       if (row.isFilter) {
         return;
       }
+      this.toolbar.row = row;
       this.update = {
         current: row,
         currentNew: this.clone(row),
@@ -464,13 +462,13 @@ export default {
     computeWidth(key, index, keyIndex, value) {
       if (this.table.widthItem[keyIndex]) return this.table.widthItem[keyIndex];
       if (!index) index = 0;
-      if (!this.result.data[index] || index > 10) return 60;
+      if (!this.result.data[index] || index > 10) return 70;
       if (!value) {
         value = this.result.data[index][key];
       }
       var dynamic = value ? (value + "").length * 10 : (key + "").length * 10;
       if (dynamic > 600) dynamic = 600;
-      if (dynamic < 60) dynamic = 60;
+      if (dynamic < 70) dynamic = 70;
       var nextDynamic = this.computeWidth(key, index + 1, keyIndex);
       if (dynamic < nextDynamic) dynamic = nextDynamic;
       this.table.widthItem[keyIndex] = dynamic;
@@ -591,6 +589,8 @@ export default {
       this.info.visible = false;
       // loading
       this.table.loading = false;
+      // toolbar
+      this.toolbar.row = {};
     },
     // show call when change table
     reset() {
@@ -641,6 +641,10 @@ body {
   background-color: #f0f0f0;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", Arial, sans-serif;
+}
+
+#tool-panel *{
+  margin-right: 10px;
 }
 
 .hint {
