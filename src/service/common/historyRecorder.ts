@@ -2,6 +2,8 @@ import { TextEditor, Selection } from "vscode";
 import { FileManager } from "../../common/filesManager";
 export class HistoryRecorder {
 
+    private preSql:string;
+
     public showHistory() {
         FileManager.show('history.sql').then((textEditor: TextEditor) => {
             const lineCount = textEditor.document.lineCount;
@@ -12,7 +14,8 @@ export class HistoryRecorder {
     }
 
     public recordHistory(sql: string, costTime: number) {
-        if (!sql) { return; }
+        if (!sql || sql==this.preSql) { return; }
+        this.preSql=sql;
         FileManager.record('history.sql', `/* ${this.getNowDate()} [${costTime} ms] */ ${sql.replace(/[\r\n]/g, " ")}\n`);
     }
 
