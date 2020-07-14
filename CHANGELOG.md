@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.3.3 - 2020/7/14
+- Not record repeat history.
+- Support query in new panel.
+- Add count query to content menu of table node.
+
 ## 2.3.0 - 2020/7/10
 - Update result view.
 
