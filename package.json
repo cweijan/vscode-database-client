@@ -123,7 +123,7 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.deleteDatabase",
+				"command": "mysql.db.drop",
 				"title": "Drop Database",
 				"category": "MySQL"
 			},
@@ -188,6 +188,11 @@
 			{
 				"command": "mysql.table.truncate",
 				"title": "Truncate Table",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.db.truncate",
+				"title": "Truncate Database",
 				"category": "MySQL"
 			},
 			{
@@ -518,7 +523,12 @@
 					"group": "3_mysql@1"
 				},
 				{
-					"command": "mysql.deleteDatabase",
+					"command": "mysql.db.truncate",
+					"when": "view == github.cweijan.mysql && viewItem == database",
+					"group": "4_mysql@4"
+				},
+				{
+					"command": "mysql.db.drop",
 					"when": "view == github.cweijan.mysql && viewItem == database",
 					"group": "4_mysql@5"
 				},

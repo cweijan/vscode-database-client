@@ -66,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.database.add": (connectionNode: ConnectionNode) => {
                 connectionNode.createDatabase();
             },
-            "mysql.deleteDatabase": (databaseNode: DatabaseNode) => {
+            "mysql.db.drop": (databaseNode: DatabaseNode) => {
                 databaseNode.dropDatatabase();
             },
             "mysql.changeTableName": (tableNode: TableNode) => {
@@ -77,6 +77,9 @@ export function activate(context: vscode.ExtensionContext) {
             },
             "mysql.table.truncate": (tableNode: TableNode) => {
                 tableNode.truncateTable();
+            },
+            "mysql.db.truncate": (databaseNode: DatabaseNode) => {
+                databaseNode.truncateDb();
             },
             "mysql.table.drop": (tableNode: TableNode) => {
                 tableNode.dropTable();

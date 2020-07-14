@@ -50,7 +50,7 @@ export class DatabaseNode extends Node implements CopyAble {
 
     public dropDatatabase() {
 
-        vscode.window.showInputBox({ prompt: `Are you want to Delete Database ${this.database} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
+        vscode.window.showInputBox({ prompt: `Are you want to drop database ${this.database} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE \`${this.database}\``).then(() => {
                     DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`)
@@ -64,6 +64,23 @@ export class DatabaseNode extends Node implements CopyAble {
 
     }
 
+
+    public async truncateDb(){
+
+
+        vscode.window.showInputBox({ prompt: `Dangerous: Are you want to truncate database ${this.database} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
+            if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
+                const connection = await ConnectionManager.getConnection(this);
+                QueryUnit.queryPromise(connection, `SELECT Concat('TRUNCATE TABLE ',table_schema,'.',TABLE_NAME, ';') trun FROM INFORMATION_SCHEMA.TABLES where  table_schema ='${this.database}';`).then(async (res:any) => {
+                    await QueryUnit.runBatch(connection,res.map(data=>data.trun))
+                    vscode.window.showInformationMessage(`Truncate database ${this.database} success!`)
+                })
+            } else {
+                vscode.window.showInformationMessage(`Cancel truncate database ${this.database}!`)
+            }
+        })
+
+    }
 
     public async newQuery() {
 
