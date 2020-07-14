@@ -28,6 +28,7 @@ export class QueryPage {
 
     private static exportService: ExportService = new MysqlExportService()
     private static pageService: PageService = new MysqlPageSerivce()
+    private static hodlder: Map<string, string> = new Map()
 
     public static async send(queryParam: QueryParam<any>) {
 
@@ -55,11 +56,20 @@ export class QueryPage {
         if (!path) {
             path = "result"
         }
+        let title = queryParam.singlePage ? "Query" : "Query" + new Date().getTime();
+        const olderTitle = this.hodlder.get(queryParam.res.sql);
+        if (olderTitle) {
+            title = olderTitle
+            queryParam.singlePage = false
+            if(queryParam.type==MessageType.DATA){
+                this.hodlder.delete(queryParam.res.sql)
+            }
+        }
 
         ViewManager.createWebviewPanel({
-            singlePage: queryParam.singlePage,
+            singlePage: true,
             splitView: this.isActiveSql(),
-            path, title: "Query",
+            path, title,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
             initListener: (webviewPanel) => {
                 if (queryParam.res?.table) {
@@ -71,6 +81,9 @@ export class QueryPage {
             receiveListener: async (viewPanel, params) => {
                 switch (params.type) {
                     case OperateType.execute:
+                        if (!queryParam.singlePage) {
+                            this.hodlder.set(params.sql, title)
+                        }
                         QueryUnit.runQuery(params.sql);
                         break;
                     case OperateType.next:
