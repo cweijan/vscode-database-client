@@ -113,6 +113,9 @@ export function activate(context: vscode.ExtensionContext) {
                     FileManager.show(`sql/${new Date().getTime()}.sql`)
                 }
             },
+            "mysql.count.sql": (tableNode: TableNode) => {
+                tableNode.countSql()
+            },
             "mysql.template.sql": (tableNode: TableNode, run: boolean) => {
                 tableNode.selectSqlTemplate(run);
             },

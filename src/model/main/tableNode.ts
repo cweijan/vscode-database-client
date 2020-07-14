@@ -129,6 +129,10 @@ ADD
 
     }
 
+    public async countSql() {
+        QueryUnit.runQuery(`SELECT count(*) FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)};`, this);
+    }
+
     public async selectSqlTemplate(run: boolean) {
         const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${Constants.DEFAULT_SIZE};`;
 

@@ -243,6 +243,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.count.sql",
+				"title": "Show Count",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.table.show",
 				"title": "Open In New Panel",
 				"category": "MySQL"
@@ -551,6 +556,11 @@
 					"command": "mysql.table.show",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "1_inline@2"
+				},
+				{
+					"command": "mysql.count.sql",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "1_inline@3"
 				},
 				{
 					"command": "mysql.column.add",
