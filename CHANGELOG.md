@@ -1,9 +1,10 @@
 # CHANGELOG
 
-## 2.3.3 - 2020/7/14
+## 2.3.5 - 2020/7/14
 - Not record repeat history.
 - Support query in new panel.
 - Add count query to content menu of table node.
+- Add truncate database to content menu of database node.
 
 ## 2.3.0 - 2020/7/10
 - Update result view.

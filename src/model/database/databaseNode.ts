@@ -71,7 +71,7 @@ export class DatabaseNode extends Node implements CopyAble {
         vscode.window.showInputBox({ prompt: `Dangerous: Are you want to truncate database ${this.database} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
                 const connection = await ConnectionManager.getConnection(this);
-                QueryUnit.queryPromise(connection, `SELECT Concat('TRUNCATE TABLE ',table_schema,'.',TABLE_NAME, ';') trun FROM INFORMATION_SCHEMA.TABLES where  table_schema ='${this.database}';`).then(async (res:any) => {
+                QueryUnit.queryPromise(connection, `SELECT Concat('TRUNCATE TABLE \`',table_schema,'\`.\`',TABLE_NAME, '\`;') trun FROM INFORMATION_SCHEMA.TABLES where  table_schema ='${this.database}';`).then(async (res:any) => {
                     await QueryUnit.runBatch(connection,res.map(data=>data.trun))
                     vscode.window.showInformationMessage(`Truncate database ${this.database} success!`)
                 })
