@@ -92,7 +92,7 @@ export class ConnectionNode extends Node implements CopyAble {
     public createDatabase() {
         vscode.window.showInputBox({ placeHolder: 'Input you want to create new database name.' }).then(async (inputContent) => {
             if (!inputContent) { return; }
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `create database \`${inputContent}\` default character set = 'utf8' `).then(() => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `create database \`${inputContent}\` default character set = 'utf8mb4' `).then(() => {
                 DatabaseCache.clearDatabaseCache(this.id);
                 DbTreeDataProvider.refresh();
                 vscode.window.showInformationMessage(`create database ${inputContent} success!`);
