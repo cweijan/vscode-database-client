@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.3.6 - 2020/7/15
+- Support edit date in result view.
+
 ## 2.3.5 - 2020/7/14
 - Not record repeat history.
 - Support query in new panel.
