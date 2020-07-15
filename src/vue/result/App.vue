@@ -73,14 +73,17 @@
       </el-table-column>
     </el-table>
     <el-dialog ref="editDialog" :title="editorTilte" :visible.sync="editor.visible" width="90%" top="3vh" size="small">
-      <el-form ref="infoForm" :model="update.currentNew">
+      <el-form ref="infoForm" :model="update.currentNew" :inline="true">
         <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
           <template>
             <span>
               {{column.name}} : {{column.type}} : <span style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' Required'}}</span>&nbsp;
               {{column.comment?column.comment:''}}
             </span>
-            <el-input v-model="update.currentNew[column.name]"></el-input>
+            <el-date-picker v-if="column.type=='date'" value-format="yyyy-MM-dd" v-model="update.currentNew[column.name]"></el-date-picker>
+            <el-time-picker v-else-if="column.type=='time'"  value-format="HH:mm:ss" v-model="update.currentNew[column.name]"></el-time-picker>
+            <el-date-picker v-else-if="column.type=='datetime'" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" v-model="update.currentNew[column.name]"></el-date-picker>
+            <el-input v-else="column.type" v-model="update.currentNew[column.name]"></el-input>
           </template>
         </el-form-item>
       </el-form>
