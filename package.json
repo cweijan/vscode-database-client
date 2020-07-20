@@ -760,7 +760,7 @@
 				},
 				"vscode-mysql.defaultLimit": {
 					"type": "integer",
-					"default": "100",
+					"default": 30,
 					"description": "Default limit of query sql."
 				},
 				"vscode-mysql.resultTheme": {
