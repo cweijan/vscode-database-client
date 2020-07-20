@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.3.7 - 2020/7/20
+- Support config default limit of query.
+
 ## 2.3.6 - 2020/7/15
 - Support edit date in result view.
 

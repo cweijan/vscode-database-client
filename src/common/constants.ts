@@ -4,7 +4,6 @@ import * as path from "path";
 export class Constants {
     public static CONFIG_PREFIX = "vscode-mysql"
     public static RES_PATH = path.join(vscode.extensions.getExtension('cweijan.vscode-mysql-client2').extensionPath, "resources");
-    public static DEFAULT_SIZE = 100;
 }
 
 export class Pattern {
@@ -28,7 +27,7 @@ export enum ConfigKey {
     ENABLE_DELIMITER = "enableDelimiter",
     LOAD_META_ON_CONNECT = "loadMetaOnConnect",
     REULST_THEME = "resultTheme",
-
+    DEFAULT_LIMIT = "defaultLimit",
 }
 
 export enum CommandKey {

@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as mysql from "mysql";
 import * as vscode from "vscode";
-import { Constants, ModelType, Template, MessageType } from "../../common/constants";
+import { Constants, ModelType, Template, MessageType, ConfigKey } from "../../common/constants";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { DatabaseCache } from "../../service/common/databaseCache";
@@ -15,6 +15,7 @@ import { MockRunner } from "../../service/mock/mockRunner";
 import { QueryPage } from "../../view/result/query";
 import { DataResponse } from "../../view/result/queryResponse";
 import { ColumnMeta } from "../other/columnMeta";
+import { Global } from "../../common/global";
 
 export class TableNode extends Node implements CopyAble {
 
@@ -119,12 +120,13 @@ ADD
     }
 
     public async openInNew() {
-        const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${Constants.DEFAULT_SIZE};`;
+        const pageSize=Global.getConfig(ConfigKey.DEFAULT_LIMIT);
+        const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${pageSize};`;
         const connection = await ConnectionManager.getConnection(this);
         const executeTime = new Date().getTime();
         connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
             const costTime = new Date().getTime() - executeTime;
-            QueryPage.send({ singlePage: false, type: MessageType.DATA, connection: this, res: { sql, costTime, data, fields, pageSize: Constants.DEFAULT_SIZE } as DataResponse });
+            QueryPage.send({ singlePage: false, type: MessageType.DATA, connection: this, res: { sql, costTime, data, fields, pageSize: pageSize } as DataResponse });
         })
 
     }
@@ -134,7 +136,7 @@ ADD
     }
 
     public async selectSqlTemplate(run: boolean) {
-        const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${Constants.DEFAULT_SIZE};`;
+        const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${Global.getConfig(ConfigKey.DEFAULT_LIMIT)};`;
 
         if (run) {
             QueryUnit.runQuery(sql, this);

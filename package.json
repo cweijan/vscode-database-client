@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-client2",
 	"displayName": "MySQL",
 	"description": "MySQL Client for vscode",
-	"version": "2.3.6",
+	"version": "2.3.7",
 	"publisher": "cweijan",
 	"icon": "resources/logo.png",
 	"engines": {
@@ -757,6 +757,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Load database meta info when connected, If your machine's performance is low, turn it off."
+				},
+				"vscode-mysql.defaultLimit": {
+					"type": "integer",
+					"default": "100",
+					"description": "Default limit of query sql."
 				},
 				"vscode-mysql.resultTheme": {
 					"type": "string",

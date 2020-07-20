@@ -60,18 +60,9 @@ MySQL Client For Visual Studio Code
 
 ## Setting
 
-```jsonc
-{
-  // enable delimiter when import data
-  "vscode-mysql.enableDelimiter": false,
-  
-  // Load database meta info when connected, If your machine's performance is low, turn it off.
-  "vscode-mysql.loadMetaOnConnect":true,
+OpenSetting -> extensions -> Mysql
 
-  // set max tables show of each database.
-  "vscode-mysql.maxTableCount": 500
-}
-```
+![Setting](images/setting.png)
 
 ## Other
 * Find a suprise when you right click on a node.

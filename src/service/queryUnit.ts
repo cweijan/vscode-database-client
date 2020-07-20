@@ -107,7 +107,7 @@ export class QueryUnit {
                 return;
             }
             if (Array.isArray(data)) {
-                QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields, pageSize: Constants.DEFAULT_SIZE } as DataResponse });
+                QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
                 return;
             }
             QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
@@ -153,13 +153,13 @@ export class QueryUnit {
         const sqlList = content.match(/(?:[^;"']+|["'][^"']*["'])+/g);
         if (sqlList.length == 1) return sqlList[0];
 
-        const trimSqlList=[]
+        const trimSqlList = []
         const docCursor = document.getText(Cursor.getRangeStartTo(current)).length;
         let index = 0;
         for (let i = 0; i < sqlList.length; i++) {
             const sql = sqlList[i];
-            const trimSql=sql.trim();
-            if(trimSql){
+            const trimSql = sql.trim();
+            if (trimSql) {
                 trimSqlList.push(trimSql)
             }
             index += (sql.length + 1);
@@ -169,7 +169,7 @@ export class QueryUnit {
             }
         }
 
-        return trimSqlList[trimSqlList.length-1];
+        return trimSqlList[trimSqlList.length - 1];
     }
 
     private static sqlDocument: vscode.TextEditor;
