@@ -43,8 +43,8 @@ export class TableGroup extends Node {
     public createTemplate() {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`CREATE TABLE [name](  
-  id int NOT NULL primary key AUTO_INCREMENT,
-  [column] varchar(255)
-);`, Template.create);
+  id int NOT NULL primary key AUTO_INCREMENT comment '',
+  [column] varchar(255) comment ''
+) default charset utf8 comment '';`, Template.create);
     }
 }
