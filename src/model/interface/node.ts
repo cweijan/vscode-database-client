@@ -27,7 +27,6 @@ export abstract class Node extends vscode.TreeItem {
         this.user = source.user
         this.password = source.password
         this.database = source.database
-        this.name = source.name
         this.timezone = source.timezone
         this.certPath = source.certPath
         this.ssh = source.ssh
