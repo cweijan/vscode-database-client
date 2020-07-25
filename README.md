@@ -9,7 +9,16 @@ MySQL Client For Visual Studio Code
 > 
 > Give [project](https://github.com/cweijan/vscode-mysql) a star to keep me motivated to keep updating.
 
-**Note: This plugin does not support MySql 8.0!**
+## Regarding MySQL 8.0 support
+
+While this plugin can connect to a MySQL 8.0 server, the newer authentication methods are not supported.
+
+To change a user's authentication method to the older one supported by this plugin, run the following query:
+
+```sql
+alter user my_user@'%' identified with mysql_native_password by "myPassword";
+```
+
 
 **Features**
 
