@@ -385,7 +385,7 @@ export default {
       for (const key in this.update.currentNew) {
         const newEle = this.update.currentNew[key];
         if (newEle != null) {
-          columns += `${this.wrap(key)},`;
+          columns += `\`${this.wrap(key)}\`,`;
           values += `${this.wrapQuote(key, newEle)},`;
         }
       }
@@ -405,7 +405,7 @@ export default {
         const oldEle = this.update.current[key];
         const newEle = this.update.currentNew[key];
         if (oldEle != newEle) {
-          change += `${this.wrap(key)}=${this.wrapQuote(key, newEle)},`;
+          change += `\`${this.wrap(key)}\`=${this.wrapQuote(key, newEle)},`;
         }
       }
       if (change) {
