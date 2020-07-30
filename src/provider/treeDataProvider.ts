@@ -94,9 +94,10 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
         const dbIdList: string[] = [];
         const dbIdMap = new Map<string, DatabaseNode>();
+        const numbers=(await this.getConnectionNodes()).length>1
         for (const dbNode of DatabaseCache.getDatabaseNodeList()) {
             if (dbNode instanceof UserGroup) { continue }
-            const id = dbIdList.includes(dbNode.database) ? dbNode.id : dbNode.database
+            const id = numbers ? dbNode.id : dbNode.database
             dbIdList.push(id)
             dbIdMap.set(id, dbNode)
         }
