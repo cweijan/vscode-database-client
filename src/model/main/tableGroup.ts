@@ -43,7 +43,9 @@ export class TableGroup extends Node {
     public createTemplate() {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`CREATE TABLE [name](  
-  id int NOT NULL primary key AUTO_INCREMENT comment '',
+  id int NOT NULL primary key AUTO_INCREMENT comment 'primary key',
+  created_time DATETIME COMMENT 'created tiem',
+  updated_time DATETIME COMMENT 'updated tiem',
   [column] varchar(255) comment ''
 ) default charset utf8 comment '';`, Template.create);
     }
