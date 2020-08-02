@@ -34,4 +34,8 @@ export interface ColumnMeta {
      * default value or column.
      */
     defaultValue:any;
+    /**
+     * extra info, auto_increment
+     */
+    extra:any;
 }

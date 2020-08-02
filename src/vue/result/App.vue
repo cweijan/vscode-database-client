@@ -80,6 +80,7 @@
               {{column.name}} : {{column.type}} &nbsp;
               <span style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' NOT NULL'}}</span>&nbsp;
               <span>{{column.defaultValue?` Default : ${column.defaultValue}`:""}}</span>
+              <span>{{column.extra=="auto_increment"?` AUTO_INCREMENT`:""}}</span>
             </span>
             <template v-if="column.type=='date'">
               <br/>
