@@ -25,6 +25,11 @@ export class ConnectionNode extends Node implements CopyAble {
         if (parent.name) {
             this.label = `${parent.name}_${id}`
         }
+        const lcp = ConnectionManager.getLastConnectionOption(false);
+        if (lcp && lcp.getConnectId() == this.getConnectId()) {
+            this.iconPath = path.join(Constants.RES_PATH, "icon/connection-active.svg");
+            this.description = `Active`
+        }
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
