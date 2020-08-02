@@ -107,6 +107,10 @@ export class QueryUnit {
                 return;
             }
             if (Array.isArray(data)) {
+                if (data[1] && data[1].__proto__.constructor.name == "OkPacket") {
+                    QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
+                    return;
+                }
                 QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
                 return;
             }
