@@ -17,7 +17,7 @@
         </el-select>
         <template v-if="result.table">
           <el-tag>Table :</el-tag>
-          <span >
+          <span>
             {{result.table}}
           </span>
         </template>
@@ -64,7 +64,12 @@
       <el-table-column fixed="left" type="index" :index="0" width="50" align="center">
       </el-table-column>
       <!-- data  -->
-      <el-table-column :label="field.name" v-for="(field,index) in result.fields" :key="index" align="center" sortable v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" :width="computeWidth(field.name,0,index,toolbar.filter[field.name])">
+      <el-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :label="field.name" align="center" sortable :width="computeWidth(field.name,0,index,toolbar.filter[field.name])" title='test'>
+        <template slot="header" slot-scope="scope">
+          <el-tooltip class="item" effect="dark" :content="getTypeByColumn(scope.column.label)" placement="left-start">
+            <span>{{scope.column.label}}</span>
+          </el-tooltip>
+        </template>
         <template slot-scope="scope">
           <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[field.name]" placeholder="Filter" v-on:keyup.enter.native="filter($event,field.name)">
           </el-input>
@@ -83,15 +88,15 @@
               <span>{{column.extra=="auto_increment"?` AUTO_INCREMENT`:""}}</span>
             </span>
             <template v-if="column.type=='date'">
-              <br/>
+              <br />
               <el-date-picker value-format="yyyy-MM-dd" v-model="update.currentNew[column.name]"></el-date-picker>
             </template>
             <template v-else-if="column.type=='time'">
-              <br/>
-              <el-time-picker   value-format="HH:mm:ss" v-model="update.currentNew[column.name]"></el-time-picker>
+              <br />
+              <el-time-picker value-format="HH:mm:ss" v-model="update.currentNew[column.name]"></el-time-picker>
             </template>
-            <template  v-else-if="column.type=='datetime'" >
-              <br/>
+            <template v-else-if="column.type=='datetime'">
+              <br />
               <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" type="datetime" v-model="update.currentNew[column.name]"></el-date-picker>
             </template>
             <el-input v-else="column.type" v-model="update.currentNew[column.name]"></el-input>
@@ -610,7 +615,7 @@ export default {
     },
     // show call when change table
     reset() {
-      console.log( this.result.fields.length)
+      console.log(this.result.fields.length);
       this.clear();
       // table
       this.table.widthItem = {};
@@ -660,7 +665,7 @@ body {
     "Microsoft YaHei", Arial, sans-serif;
 }
 
-#tool-panel *{
+#tool-panel * {
   margin-right: 10px;
 }
 
