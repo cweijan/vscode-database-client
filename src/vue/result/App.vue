@@ -261,6 +261,12 @@ export default {
       }
     });
     postMessage({ type: "init" });
+    window.addEventListener("keyup", event => {
+      if (event.key == "c" && event.ctrlKey) {
+        console.log(document.activeElement.value);
+        document.execCommand("copy");
+      }
+    });
   },
   methods: {
     changeTheme(theme) {
