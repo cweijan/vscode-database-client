@@ -81,9 +81,18 @@
               <span style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' NOT NULL'}}</span>&nbsp;
               <span>{{column.defaultValue?` Default : ${column.defaultValue}`:""}}</span>
             </span>
-            <el-date-picker v-if="column.type=='date'" value-format="yyyy-MM-dd" v-model="update.currentNew[column.name]"></el-date-picker>
-            <el-time-picker v-else-if="column.type=='time'"  value-format="HH:mm:ss" v-model="update.currentNew[column.name]"></el-time-picker>
-            <el-date-picker v-else-if="column.type=='datetime'" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" v-model="update.currentNew[column.name]"></el-date-picker>
+            <template v-if="column.type=='date'">
+              <br/>
+              <el-date-picker value-format="yyyy-MM-dd" v-model="update.currentNew[column.name]"></el-date-picker>
+            </template>
+            <template v-else-if="column.type=='time'">
+              <br/>
+              <el-time-picker   value-format="HH:mm:ss" v-model="update.currentNew[column.name]"></el-time-picker>
+            </template>
+            <template  v-else-if="column.type=='datetime'" >
+              <br/>
+              <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" type="datetime" v-model="update.currentNew[column.name]"></el-date-picker>
+            </template>
             <el-input v-else="column.type" v-model="update.currentNew[column.name]"></el-input>
           </template>
         </el-form-item>
