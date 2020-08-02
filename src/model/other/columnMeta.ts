@@ -30,4 +30,8 @@ export interface ColumnMeta {
      * man length or this column value.
      */
     maxLength: string;
+    /**
+     * default value or column.
+     */
+    defaultValue:any;
 }

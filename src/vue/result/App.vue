@@ -77,8 +77,9 @@
         <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
           <template>
             <span>
-              {{column.name}} : {{column.type}} : <span style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' Required'}}</span>&nbsp;
-              {{column.comment?column.comment:''}}
+              {{column.name}} : {{column.type}} &nbsp;
+              <span style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' NOT NULL'}}</span>&nbsp;
+              <span>{{column.defaultValue?` Default : ${column.defaultValue}`:""}}</span>
             </span>
             <el-date-picker v-if="column.type=='date'" value-format="yyyy-MM-dd" v-model="update.currentNew[column.name]"></el-date-picker>
             <el-time-picker v-else-if="column.type=='time'"  value-format="HH:mm:ss" v-model="update.currentNew[column.name]"></el-time-picker>
