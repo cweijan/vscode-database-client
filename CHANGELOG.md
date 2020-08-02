@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.3.11 - 2020/8/2
+- Hight light active connection.
+- Show more info when open edit panel.
+- Add column type tooltip in result panel.
+- Fix copy fail.
+
 ## 2.3.7 - 2020/7/20
 - Support config default limit of query.
 
