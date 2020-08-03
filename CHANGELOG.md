@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.3.13 - 2020/8/3
+- Enhance dump performance.
+
 ## 2.3.12 - 2020/8/3
 - Auto add limit for select statement.
 
