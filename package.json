@@ -198,7 +198,8 @@
 			{
 				"command": "mysql.table.drop",
 				"title": "Drop table",
-				"category": "MySQL"
+				"category": "MySQL",
+				"icon": "resources/icon/criss-cross.svg"
 			},
 			{
 				"command": "mysql.mock.run",
@@ -550,7 +551,12 @@
 				{
 					"command": "mysql.changeTableName",
 					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "inline"
+					"group": "inline@0"
+				},
+				{
+					"command": "mysql.table.drop",
+					"when": "view == github.cweijan.mysql && viewItem == table && false",
+					"group": "inline@1"
 				},
 				{
 					"command": "mysql.name.copy",
