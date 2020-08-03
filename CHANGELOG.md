@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.3.12 - 2020/8/3
+- Auto add limit for select statement.
+
 ## 2.3.11 - 2020/8/2
 - Hight light active connection.
 - Show more info when open edit panel.
