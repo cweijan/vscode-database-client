@@ -31,8 +31,9 @@ export class QueryUnit {
         });
     }
 
-    private static ddlPattern = /^(alter|create|drop)/ig;
-    private static dmlPattern = /^(insert|update|delete)/ig;
+    private static ddlPattern = /^\s*(alter|create|drop)/ig;
+    private static dmlPattern = /^\s*(insert|update|delete)/ig;
+    private static selectPattern = /^\s*\bselect\b.+/ig;
     protected static delimiterHodler = new DelimiterHolder()
     public static async runQuery(sql?: string, connectionNode?: Node): Promise<null> {
         if (!sql && !vscode.window.activeTextEditor) {
@@ -75,6 +76,11 @@ export class QueryUnit {
 
         const isMulti = sql.match(Pattern.MULTI_PATTERN);
         if (!isMulti) {
+
+            if(sql.match(this.selectPattern) && !sql.match(/\blimit\b/) && !sql.match(/;\s*$/)){
+                sql+=` LIMIT ${Global.getConfig(ConfigKey.DEFAULT_LIMIT)}`;
+            }
+
             const sqlList: string[] = sql.match(/(?:[^;"']+|["'][^"']*["'])+/g).filter((s) => (s.trim() != '' && s.trim() != ';'))
             if (sqlList.length > 1) {
                 const success = await this.runBatch(connection, sqlList)
