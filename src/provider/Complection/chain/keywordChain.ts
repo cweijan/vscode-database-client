@@ -7,7 +7,7 @@ export class KeywordChain implements ComplectionChain {
         "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "ALTER", "CREATE", "DROP", "FUNCTION", "CASE", "PROCEDURE", "TRIGGER", "INDEX", "CHANGE", "COLUMN", "BETWEEN",
         "ADD", 'SHOW', "PRIVILEGES", "IDENTIFIED", "VIEW", "CURSOR", "EXPLAIN", "ROLLBACK", "COMMENT", "COMMIT", "BEGIN", "DELIMITER", "CALL", "REPLACE",
         "REFERENCES", "USING", "END", "BEFORE", "AFTER", "GRANT", "RETURNS", "IN", "SOME", "ANY", "SOME", "ASC", "DESC", "UNIQUE", "UNION", "ALL", "ON",
-        "OUTER", "INNER", "EXEC", "EXISTS", "NOT", "FOREIGN", "FULL", "LIKE", "IN", "PRIMARY", "KEY", "RIGHT", "LEFT", "TRUNCATE", "IGNORE", "DISTINCT"];
+        "OUTER", "INNER", "EXEC", "EXISTS", "NOT", "FOREIGN", "FULL", "LIKE", "IN", "PRIMARY", "KEY", "RIGHT", "LEFT", "TRUNCATE", "IGNORE", "DISTINCT","SOURCE"];
     private keywordComplectionItems: vscode.CompletionItem[] = [];
 
     constructor() {

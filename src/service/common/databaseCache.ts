@@ -173,6 +173,15 @@ export class DatabaseCache {
         return result;
     }
 
+    public static getDatabase(connectId: string, dbName: string): DatabaseNode {
+        const dbList = this.connectionNodeMapDatabaseNode[connectId];
+        if (!dbList) { return null; }
+        for (const dbNode of dbList) {
+            if (dbNode.database == dbName) { return dbNode; }
+        }
+        return null;
+    }
+
     public static getTable(databaseid: string, tableName: string): TableNode {
         const tableList = this.databaseNodeMapTableNode[databaseid + "_" + ModelType.TABLE_GROUP];
         if (!tableList) { return null; }

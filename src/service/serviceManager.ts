@@ -19,18 +19,22 @@ import { HistoryRecorder } from "./common/historyRecorder";
 import { StatusService } from "../view/status/statusService";
 import { MysqlStatusService } from "../view/status/mysqlStatusService";
 import { Global } from "../common/global";
+import { ImportService } from "./import/importService";
+import { MysqlImportService } from "./import/mysqlImportService";
 
 export class ServiceManager {
 
+    public static instance:ServiceManager;
     public mockRunner: MockRunner;
     public provider: DbTreeDataProvider;
     public historyService: HistoryRecorder;
     public connectService: AbstractConnectService;
     public settingService: SettingService;
     public statusService: StatusService;
+    public importService: ImportService;
     public dumpService: AbstractDumpService;
-    private isInit = false;
     private type: DatabaseType = DatabaseType.mysql;
+    private isInit = false;
 
     constructor(private readonly context: ExtensionContext) {
         Global.context = context;
@@ -56,6 +60,7 @@ export class ServiceManager {
         }
 
         res.push(this.initTreeView())
+        ServiceManager.instance=this;
         this.isInit = true
         return res
     }
@@ -80,6 +85,7 @@ export class ServiceManager {
         this.dumpService = new MysqlDumpService();
         this.connectService = new MysqlConnectService();
         this.statusService = new MysqlStatusService()
+        this.importService = new MysqlImportService();
     }
 
 }

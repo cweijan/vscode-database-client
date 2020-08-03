@@ -2,7 +2,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/constants";
 import { FileManager } from '../../common/filesManager';
-import { Console } from "../../common/outputChannel";
 import { Util } from '../../common/util';
 import { ConnectionManager } from "../../service/connectionManager";
 import { DatabaseCache } from "../../service/common/databaseCache";
@@ -41,13 +40,6 @@ export class DatabaseNode extends Node implements CopyAble {
         new TriggerGroup(this.info)];
     }
 
-    public importData(fsPath: string) {
-        Console.log(`Doing import ${this.getConnectId()}...`);
-        ConnectionManager.getConnection(this).then((connection) => {
-            QueryUnit.runFile(connection, fsPath);
-        });
-    }
-
     public dropDatatabase() {
 
         vscode.window.showInputBox({ prompt: `Are you want to drop database ${this.database} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
@@ -65,14 +57,14 @@ export class DatabaseNode extends Node implements CopyAble {
     }
 
 
-    public async truncateDb(){
+    public async truncateDb() {
 
 
         vscode.window.showInputBox({ prompt: `Dangerous: Are you want to truncate database ${this.database} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
                 const connection = await ConnectionManager.getConnection(this);
-                QueryUnit.queryPromise(connection, `SELECT Concat('TRUNCATE TABLE \`',table_schema,'\`.\`',TABLE_NAME, '\`;') trun FROM INFORMATION_SCHEMA.TABLES where  table_schema ='${this.database}';`).then(async (res:any) => {
-                    await QueryUnit.runBatch(connection,res.map(data=>data.trun))
+                QueryUnit.queryPromise(connection, `SELECT Concat('TRUNCATE TABLE \`',table_schema,'\`.\`',TABLE_NAME, '\`;') trun FROM INFORMATION_SCHEMA.TABLES where  table_schema ='${this.database}' and TABLE_TYPE<>'VIEW';`).then(async (res: any) => {
+                    await QueryUnit.runBatch(connection, res.map(data => data.trun))
                     vscode.window.showInformationMessage(`Truncate database ${this.database} success!`)
                 })
             } else {

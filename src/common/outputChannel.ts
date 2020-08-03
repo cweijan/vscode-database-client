@@ -1,5 +1,6 @@
 "user strict";
 import * as vscode from "vscode";
+import format = require('date-format');
 
 export class Console {
     public static log(value: any) {
@@ -7,7 +8,8 @@ export class Console {
             this.outputChannel = vscode.window.createOutputChannel("MySQL");
         }
         this.outputChannel.show(true);
-        this.outputChannel.appendLine(value + "");
+        const begin = format('yyyy-MM-dd hh:mm:ss', new Date());
+        this.outputChannel.appendLine(`${begin} : ${value}`);
         this.outputChannel.appendLine("-----------------------------------------------------------------------------------------");
     }
 

@@ -127,7 +127,9 @@ export function activate(context: vscode.ExtensionContext) {
             },
             "mysql.data.import": (node: DatabaseNode | ConnectionNode) => {
                 vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
-                    if (filePath) { node.importData(filePath[0].fsPath); }
+                    if (filePath) {
+                        serviceManager.importService.import(filePath[0].fsPath, node)
+                    }
                 });
             },
             "mysql.data.export": (node: DatabaseNode | TableNode) => {

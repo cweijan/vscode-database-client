@@ -12,6 +12,7 @@ import { QueryPage } from "../view/result/query";
 import { DataResponse, DMLResponse, ErrorResponse, MessageResponse, RunResponse } from "../view/result/queryResponse";
 import { ConnectionManager } from "./connectionManager";
 import { DelimiterHolder } from "./common/delimiterHolder";
+import { ServiceManager } from "./serviceManager";
 
 export class QueryUnit {
 
@@ -34,6 +35,7 @@ export class QueryUnit {
     private static ddlPattern = /^\s*(alter|create|drop)/ig;
     private static dmlPattern = /^\s*(insert|update|delete)/ig;
     private static selectPattern = /^\s*\bselect\b.+/ig;
+    private static importPattern = /^\s*\bsource\b\s+(.+)/i;
     protected static delimiterHodler = new DelimiterHolder()
     public static async runQuery(sql?: string, connectionNode?: Node): Promise<null> {
         if (!sql && !vscode.window.activeTextEditor) {
@@ -70,6 +72,13 @@ export class QueryUnit {
             QueryPage.send({ type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
             return;
         }
+
+        const importMatch=sql.match(this.importPattern);
+        if(importMatch){
+            ServiceManager.instance.importService.import(importMatch[1], ConnectionManager.getLastConnectionOption())
+            return;
+        }
+
         if (isDDL == null && isDML == null && sql) {
             QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
         }
