@@ -24,6 +24,7 @@ export class ConnectionNode extends Node implements CopyAble {
         this.init(parent)
         if (parent.name) {
             this.label = `${parent.name}_${id}`
+            this.name = parent.name
         }
         const lcp = ConnectionManager.getLastConnectionOption(false);
         if (lcp && lcp.getConnectId() == this.getConnectId()) {
