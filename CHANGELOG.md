@@ -1,7 +1,8 @@
 # CHANGELOG
 
-## 2.3.13 - 2020/8/3
+## 2.4.0 - 2020/8/3
 - Enhance dump performance.
+- Refactor data import.
 
 ## 2.3.12 - 2020/8/3
 - Auto add limit for select statement.
