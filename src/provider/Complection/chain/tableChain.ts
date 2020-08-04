@@ -44,7 +44,7 @@ export class TableChain implements ComplectionChain {
             const connectcionid = lcp.getConnectId();
             for (const databaseNode of DatabaseCache.getDatabaseListOfConnection(connectcionid)) {
                 if (databaseNode.database === inputWord) {
-                    tableNodes = DatabaseCache.getTableListOfDatabase(databaseNode.id);
+                    tableNodes = DatabaseCache.getChildListOfDatabase(databaseNode.id);
                     if (tableNodes == null || tableNodes.length == 0) {
                         tableNodes = await new TableGroup(databaseNode.info).getChildren()
                     }
@@ -52,7 +52,7 @@ export class TableChain implements ComplectionChain {
             }
         } else {
             const databaseid = `${lcp.getConnectId()}_${lcp.database}`;
-            const tableList = DatabaseCache.getTableListOfDatabase(databaseid);
+            const tableList = DatabaseCache.getChildListOfDatabase(databaseid);
             if (tableList == null) { return []; }
             tableNodes = tableList.filter((tableNode: TableNode) => {
                 const included = tableNames.includes(tableNode.table);

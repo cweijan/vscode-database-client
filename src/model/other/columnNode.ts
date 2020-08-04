@@ -15,6 +15,7 @@ const wrap = Util.wrap;
 export class ColumnNode extends Node implements CopyAble {
     public type: string;
     public contextValue: string = ModelType.COLUMN;
+    public isPrimaryKey = false;
     constructor(private readonly table: string, readonly column: ColumnMeta, readonly info: Node) {
         super(column.name)
         this.init(info)
@@ -37,7 +38,9 @@ export class ColumnNode extends Node implements CopyAble {
         switch (columnKey) {
             case 'UNI': return "UniqueKey";
             case 'MUL': return "IndexKey";
-            case 'PRI': return "PrimaryKey";
+            case 'PRI':
+                this.isPrimaryKey = true
+                return "PrimaryKey";
         }
         return '';
     }

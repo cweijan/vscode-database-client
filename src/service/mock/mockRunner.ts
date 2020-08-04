@@ -59,7 +59,7 @@ export class MockRunner {
 
         const mockModel = JSON.parse(content) as MockModel;
         const databaseid = `${mockModel.host}_${mockModel.port}_${mockModel.user}_${mockModel.database}`;
-        const tableList = DatabaseCache.getTableListOfDatabase(databaseid) as TableNode[]
+        const tableList = DatabaseCache.getChildListOfDatabase(databaseid) as TableNode[]
         if (!tableList) {
             vscode.window.showErrorMessage(`Database ${mockModel.database} not found!`)
             return;

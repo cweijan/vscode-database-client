@@ -1,7 +1,8 @@
 <template>
   <div id="container">
+    <el-input v-model="diagramName" placeholder="Diagram Name" style="width:200px" />
     <el-button @click="save">Save Diagram</el-button>
-    <div id="diagramPanel" style="background-color: #ffeeee; border: solid 1px black; width: 100%; height: 700px"></div>
+    <div id="diagramPanel" style="background-color: #ffffff; border: solid 1px black; width: 100%; height: 700px"></div>
   </div>
 </template>
 
@@ -163,7 +164,8 @@ export default {
   name: "App",
   data() {
     return {
-      myDiagram: null
+      myDiagram: null,
+      diagramName: null
     };
   },
   mounted() {
@@ -326,7 +328,7 @@ export default {
   },
   methods: {
     save: function() {
-      this.$message.success("Save Success!")
+      this.$message.success("Save Success!");
       vscodeEvent.emit("save", this.myDiagram.model.toJson());
     }
   }

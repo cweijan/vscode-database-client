@@ -7,6 +7,7 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { Node } from "../interface/node";
+import { ViewManager } from "../../view/viewManager";
 
 export class DiagramNode extends Node {
 
@@ -23,6 +24,19 @@ export class DiagramNode extends Node {
         }
     }
 
+    public open() {
+        const content = "read from disk";
+        ViewManager.createWebviewPanel({
+            path: "diagram", title: "diagram",
+            splitView: false, eventHandler(handler) {
+                handler.on("init", () => {
+                    handler.emit('load', JSON.parse(content))
+                })
+            }
+        })
+    }
+
+
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         return [];
     }
@@ -30,7 +44,7 @@ export class DiagramNode extends Node {
     public drop() {
 
         Util.confirm(`Are you want to drop function ${this.name} ?`, async () => {
-         
+
         })
 
     }
