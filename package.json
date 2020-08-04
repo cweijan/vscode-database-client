@@ -90,6 +90,20 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.diagram.add",
+				"title": "Create Diagram",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				},
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.diagram.open",
+				"title": "Open Diagram",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.connection.add",
 				"title": "Add Connection",
 				"icon": {
@@ -439,6 +453,11 @@
 					"group": "2_mysql@0"
 				},
 				{
+					"command": "mysql.diagram.add",
+					"when": "view == github.cweijan.mysql && viewItem == diagramGroup",
+					"group": "2_mysql@0"
+				},
+				{
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "2_mysql@1"
@@ -466,6 +485,11 @@
 				{
 					"command": "mysql.database.add",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"group": "inline@0"
+				},
+				{
+					"command": "mysql.diagram.add",
+					"when": "view == github.cweijan.mysql && viewItem == diagramGroup",
 					"group": "inline@0"
 				},
 				{
