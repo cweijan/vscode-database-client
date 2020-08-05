@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.4.2 - 2020/8/5
+- Fix limit generator error.
+- Adjust result page height.
+
 ## 2.4.0 - 2020/8/3
 - Enhance dump performance.
 - Refactor data import.
