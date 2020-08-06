@@ -18,9 +18,9 @@ export class DiagramGroup extends Node {
             iconPath: Global.getExtPath("resources", "icon", "diagram.svg"),
             splitView: false, eventHandler: (handler) => {
                 handler.on("init", () => {
-                    handler.emit('route', 'diagram')
-                }).on("diagram", async () => {
-                    handler.emit('load', { content: await this.getData() })
+                    handler.emit('route', 'selector')
+                }).on("selector", async () => {
+                    handler.emit("selector-load", await this.getTableInfos())
                 }).on("save", ({ name, data }) => {
                     const diagramPath = `diagram/${this.getConnectId()}_${this.database}/${name}.json`;
                     FileManager.record(diagramPath, data, FileModel.WRITE)
@@ -48,6 +48,18 @@ export class DiagramGroup extends Node {
 
 
     public async getData() {
+        const nodeDataArray = await this.getTableInfos()
+        return {
+            copiesArrays: true,
+            copiesArrayObjects: true,
+            linkDataArray: [],
+            nodeDataArray
+
+        };
+    }
+
+
+    public async getTableInfos() {
         var colors = {
             red: "#be4b15",
             green: "#52ce60",
@@ -59,7 +71,7 @@ export class DiagramGroup extends Node {
             purple: "#d689ff",
             orange: "#fdb400"
         };
-        const nodeDataArray = await Promise.all(DatabaseCache.getTableListOfDatabase(`${this.getConnectId()}_${this.database}`).map(async (node: TableNode) => {
+        return await Promise.all(DatabaseCache.getTableListOfDatabase(`${this.getConnectId()}_${this.database}`).map(async (node: TableNode) => {
             return {
                 key: node.table,
                 items: (await node.getChildren()).map((columnNode: ColumnNode) => {
@@ -68,17 +80,13 @@ export class DiagramGroup extends Node {
                         iskey: columnNode.isPrimaryKey,
                         figure: "Decision",
                         color: colors[columnNode.column.simpleType] ? colors[columnNode.column.simpleType] : '#be4b15'
-                    }
+                    };
                 })
-            }
-        }))
-        return {
-            copiesArrays: true,
-            copiesArrayObjects: true,
-            linkDataArray: [],
-            nodeDataArray
-
-        };
+            };
+        }));
     }
 
 }
+
+
+

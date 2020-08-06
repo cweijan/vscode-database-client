@@ -8,8 +8,7 @@
 
 <script>
 import { getVscodeEvent } from "../../util/vscode";
-
-const vscodeEvent = getVscodeEvent();
+let vscodeEvent;
 
 export default {
   name: "Gojs",
@@ -19,17 +18,30 @@ export default {
       diagramName: null
     };
   },
-  destroyed(){
-    vscodeEvent.destroy()
+  destroyed() {
+    vscodeEvent.destroy();
   },
   mounted() {
+    vscodeEvent = getVscodeEvent();
+    if (this.$route.query.new) {
+      const gojsData = JSON.parse(localStorage.getItem("gojs-data"));
+      this.handler({ name: null, content: gojsData });
+    } else {
+      vscodeEvent.on("load", this.handler);
+    }
     vscodeEvent.emit(this.$route.name);
-    vscodeEvent.on("load", data => {
+  },
+  methods: {
+    handler(data) {
       this.diagramName = data.name;
+      var $ = go.GraphObject.make; // for conciseness in defining templates
+
+      if (this.myDiagram) {
+        this.myDiagram.model = $(go.GraphLinksModel, data.content);
+        return;
+      }
       document.getElementById("diagramPanel").style.height =
         window.outerHeight - 135 + "px";
-
-      var $ = go.GraphObject.make; // for conciseness in defining templates
 
       const myDiagram = $(
         go.Diagram,
@@ -41,8 +53,8 @@ export default {
           },
           allowDelete: true,
           allowCopy: true,
-          "undoManager.isEnabled": true,
-          layout: $(go.GridLayout)
+          "undoManager.isEnabled": true
+          // layout: $(go.GridLayout)
         }
       );
       this.myDiagram = myDiagram;
@@ -179,9 +191,7 @@ export default {
         $(go.Shape, { toArrow: "Standard", stroke: null })
       );
       myDiagram.model = $(go.GraphLinksModel, data.content);
-    });
-  },
-  methods: {
+    },
     save: function() {
       if (!this.diagramName) {
         this.$message.error("Diagram name cannot be null!");

@@ -13,15 +13,15 @@ export const getVscodeEvent = () => {
     }
     return {
         on(event, data) {
-            this.init();
+            this.tryInit();
             events[event] = data
             return this;
         },
         emit(event, data) {
-            this.init();
+            this.tryInit();
             postMessage({ type: event, content: data })
         },
-        init() {
+        tryInit() {
             if (init) return;
             init = true;
             window.addEventListener('message', receive)

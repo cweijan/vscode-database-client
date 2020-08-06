@@ -10,11 +10,17 @@ const vscodeEvent = getVscodeEvent();
 export default {
   name: "App",
   mounted() {
-    vscodeEvent.on("route", path => this.$router.push("/" + path));
+    vscodeEvent.on("route", path => {
+      if (this.$route.name == path) {
+        vscodeEvent.emit(this.$route.name);
+      } else {
+        this.$router.push("/" + path);
+      }
+    });
     vscodeEvent.emit("init");
   },
-  destroyed(){
-    vscodeEvent.destroy()
+  destroyed() {
+    vscodeEvent.destroy();
   }
 };
 </script>
