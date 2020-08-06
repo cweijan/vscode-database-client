@@ -17,7 +17,9 @@ export class DiagramGroup extends Node {
             path: "diagram", title: "diagram",
             iconPath: Global.getExtPath("resources", "icon", "diagram.svg"),
             splitView: false, eventHandler: (handler) => {
-                handler.on("init", async () => {
+                handler.on("init", () => {
+                    handler.emit('route', 'diagram')
+                }).on("diagram", async () => {
                     handler.emit('load', { content: await this.getData() })
                 }).on("save", ({ name, data }) => {
                     const diagramPath = `diagram/${this.getConnectId()}_${this.database}/${name}.json`;

@@ -849,7 +849,8 @@
 		"portfinder": "^1.0.26",
 		"sql-formatter": "^2.3.3",
 		"tunnel-ssh": "^4.1.4",
-		"vue": "^2.6.11"
+		"vue": "^2.6.11",
+		"vue-router": "^3.4.1"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",

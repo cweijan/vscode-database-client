@@ -33,6 +33,8 @@ export class DiagramNode extends Node {
             splitView: false, eventHandler: (handler) => {
                 handler.on("init", () => {
                     delete content.class
+                    handler.emit('route', 'diagram')
+                }).on("diagram", () => {
                     handler.emit('load', { content, name: this.name })
                 }).on("save", ({ name, data }) => {
                     unlinkSync(this.getFilePath())
