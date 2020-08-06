@@ -9,155 +9,6 @@
 <script>
 import { getVscodeEvent } from "../util/vscode";
 
-function getData() {
-  // create the model for the E-R diagram
-  var colors = {
-    red: "#be4b15",
-    green: "#52ce60",
-    blue: "#6ea5f8",
-    lightred: "#fd8852",
-    lightblue: "#afd4fe",
-    lightgreen: "#b9e986",
-    pink: "#faadc1",
-    purple: "#d689ff",
-    orange: "#fdb400"
-  };
-  var nodeDataArray = [
-    {
-      key: "Products",
-      items: [
-        {
-          name: "ProductID",
-          iskey: true,
-          figure: "Decision",
-          color: colors.red
-        },
-        {
-          name: "ProductName",
-          iskey: false,
-          figure: "Hexagon",
-          color: colors.blue
-        },
-        {
-          name: "SupplierID",
-          iskey: false,
-          figure: "Decision",
-          color: "purple"
-        },
-        {
-          name: "CategoryID",
-          iskey: false,
-          figure: "Decision",
-          color: "purple"
-        }
-      ]
-    },
-    {
-      key: "Suppliers",
-      items: [
-        {
-          name: "SupplierID",
-          iskey: true,
-          figure: "Decision",
-          color: colors.red
-        },
-        {
-          name: "CompanyName",
-          iskey: false,
-          figure: "Hexagon",
-          color: colors.blue
-        },
-        {
-          name: "ContactName",
-          iskey: false,
-          figure: "Hexagon",
-          color: colors.blue
-        },
-        {
-          name: "Address",
-          iskey: false,
-          figure: "Hexagon",
-          color: colors.blue
-        }
-      ]
-    },
-    {
-      key: "Categories",
-      items: [
-        {
-          name: "CategoryID",
-          iskey: true,
-          figure: "Decision",
-          color: colors.red
-        },
-        {
-          name: "CategoryName",
-          iskey: false,
-          figure: "Hexagon",
-          color: colors.blue
-        },
-        {
-          name: "Description",
-          iskey: false,
-          figure: "Hexagon",
-          color: colors.blue
-        },
-        {
-          name: "Picture",
-          iskey: false,
-          figure: "TriangleUp",
-          color: colors.pink
-        }
-      ]
-    },
-    {
-      key: "Order Details",
-      items: [
-        {
-          name: "OrderID",
-          iskey: true,
-          figure: "Decision",
-          color: colors.red
-        },
-        {
-          name: "ProductID",
-          iskey: true,
-          figure: "Decision",
-          color: colors.red
-        },
-        {
-          name: "UnitPrice",
-          iskey: false,
-          figure: "Circle",
-          color: colors.green
-        },
-        {
-          name: "Quantity",
-          iskey: false,
-          figure: "Circle",
-          color: colors.green
-        },
-        {
-          name: "Discount",
-          iskey: false,
-          figure: "Circle",
-          color: colors.green
-        }
-      ]
-    }
-  ];
-  var linkDataArray = [
-    { from: "Products", to: "Suppliers" },
-    { from: "Products", to: "Categories" },
-    { from: "Order Details", to: "Products" }
-  ];
-  return {
-    copiesArrays: true,
-    copiesArrayObjects: true,
-    nodeDataArray: nodeDataArray,
-    linkDataArray: linkDataArray
-  };
-}
 const vscodeEvent = getVscodeEvent();
 
 export default {
@@ -323,13 +174,21 @@ export default {
         $(go.Shape, { stroke: "#303B45", strokeWidth: 2.5 }),
         $(go.Shape, { toArrow: "Standard", stroke: null })
       );
-      myDiagram.model = $(go.GraphLinksModel, data);
+      this.diagramName=data.name
+      myDiagram.model = $(go.GraphLinksModel, data.content);
     });
   },
   methods: {
     save: function() {
+      if(!this.diagramName){
+        this.$message.error("Diagram name cannot be null!");
+        return;
+      }
       this.$message.success("Save Success!");
-      vscodeEvent.emit("save", this.myDiagram.model.toJson());
+      vscodeEvent.emit("save",{
+        name:this.diagramName,
+        data: this.myDiagram.model.toJson()
+      });
     }
   }
 };

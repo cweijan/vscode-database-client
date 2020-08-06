@@ -50,8 +50,11 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.diagram.add": (diagramNode:DiagramGroup) => {
                 diagramNode.openAdd()
             },
-            "mysql.diagram.open": () => {
-                serviceManager.provider.activeDb();
+            "mysql.diagram.open": (node:DiagramNode) => {
+                node.open()
+            },
+            "mysql.diagram.drop": (node:DiagramNode) => {
+                node.drop()
             },
             "mysql.db.active": () => {
                 serviceManager.provider.activeDb();

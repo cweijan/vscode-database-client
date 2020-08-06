@@ -104,6 +104,12 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.diagram.drop",
+				"title": "Drop Diagram",
+				"category": "MySQL",
+				"icon": "resources/icon/criss-cross.svg"
+			},
+			{
 				"command": "mysql.connection.add",
 				"title": "Add Connection",
 				"icon": {
@@ -706,6 +712,11 @@
 					"command": "mysql.delete.view",
 					"when": "view == github.cweijan.mysql && viewItem == view",
 					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.diagram.drop",
+					"when": "view == github.cweijan.mysql && viewItem == diagram",
+					"group": "inline@0"
 				},
 				{
 					"command": "mysql.template.procedure",

@@ -1,22 +1,28 @@
+import { existsSync, readdirSync } from "fs";
 import * as path from "path";
-import { Constants, ModelType, Template } from "../../common/constants";
-import { ConnectionManager } from "../../service/connectionManager";
+import { Constants, ModelType } from "../../common/constants";
+import { FileManager, FileModel } from "../../common/filesManager";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { DatabaseCache } from "../../service/common/databaseCache";
-import { QueryUnit } from "../../service/queryUnit";
-import { InfoNode } from "../other/infoNode";
-import { Node } from "../interface/node";
-import { DiagramNode } from "./diagramNode";
 import { ViewManager } from "../../view/viewManager";
+import { Node } from "../interface/node";
 import { TableNode } from "../main/tableNode";
 import { ColumnNode } from "../other/columnNode";
+import { DiagramNode } from "./diagramNode";
+import { Global } from "../../common/global";
 
 export class DiagramGroup extends Node {
     public openAdd() {
         ViewManager.createWebviewPanel({
             path: "diagram", title: "diagram",
-            splitView: false, eventHandler:  (handler) => {
-                handler.on("init",async () => {
-                    handler.emit('load', await this.getData())
+            iconPath: Global.getExtPath("resources", "icon", "diagram.svg"),
+            splitView: false, eventHandler: (handler) => {
+                handler.on("init", async () => {
+                    handler.emit('load', { content: await this.getData() })
+                }).on("save", ({ name, data }) => {
+                    const diagramPath = `diagram/${this.getConnectId()}_${this.database}/${name}.json`;
+                    FileManager.record(diagramPath, data, FileModel.WRITE)
+                    DbTreeDataProvider.refresh()
                 })
             }
         })
@@ -31,7 +37,11 @@ export class DiagramGroup extends Node {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        return []
+        const path = `${FileManager.storagePath}/diagram/${this.getConnectId()}_${this.database}`;
+        if (!existsSync(path)) {
+            return []
+        }
+        return readdirSync(path).map(fileName => new DiagramNode(fileName.replace(/\.[^/.]+$/, ""), this))
     }
 
 
