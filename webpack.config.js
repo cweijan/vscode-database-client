@@ -35,16 +35,16 @@ module.exports = [
         entry: {
             query: './src/vue/result/main.js',
             queryDark: './src/vue/result/main-dark.js',
-            connect: './src/vue/connect/main.js',
+            app: './src/vue/main.js',
             diagram: './src/vue/diagram/main.js',
             status: './src/vue/status/main.js'
         },
         plugins: [
             new VueLoaderPlugin(),
+            new HtmlWebpackPlugin({ inject: true, template: './src/vue/common.html', chunks: ['app'], filename: 'webview/app.html' }),
             new HtmlWebpackPlugin({ inject: true, template: './src/vue/common.html', chunks: ['query'], filename: 'webview/result.html' }),
             new HtmlWebpackPlugin({ inject: true, template: './src/vue/common.html', chunks: ['queryDark'], filename: 'webview/result-dark.html' }),
             new HtmlWebpackPlugin({ inject: true, template: './src/vue/common.html', chunks: ['diagram'], filename: 'webview/diagram.html' }),
-            new HtmlWebpackPlugin({ inject: true, template: './src/vue/common.html', chunks: ['connect'], filename: 'webview/connect.html' }),
             new HtmlWebpackPlugin({ inject: true, template: './src/vue/common.html', chunks: ['status'], filename: 'webview/status.html' }),
         ],
         output: {

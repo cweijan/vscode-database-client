@@ -14,7 +14,7 @@ import { Global } from "../../common/global";
 export class DiagramGroup extends Node {
     public openAdd() {
         ViewManager.createWebviewPanel({
-            path: "diagram", title: "diagram",
+            path: "diagram", title: "new",
             iconPath: Global.getExtPath("resources", "icon", "diagram.svg"),
             splitView: false, eventHandler: (handler) => {
                 handler.on("init", () => {
