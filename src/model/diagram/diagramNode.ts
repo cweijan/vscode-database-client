@@ -57,7 +57,7 @@ export class DiagramNode extends Node {
     public drop() {
 
         Util.confirm(`Are you want to drop diagram ${this.name} ?`, async () => {
-            unlink(this.getFilePath())
+            unlinkSync(this.getFilePath())
             DbTreeDataProvider.refresh()
         })
 

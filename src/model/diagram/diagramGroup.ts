@@ -49,7 +49,7 @@ export class DiagramGroup extends Node {
         var colors = {
             red: "#be4b15",
             green: "#52ce60",
-            blue: "#6ea5f8",
+            int: "#6ea5f8",
             lightred: "#fd8852",
             lightblue: "#afd4fe",
             lightgreen: "#b9e986",
@@ -65,7 +65,7 @@ export class DiagramGroup extends Node {
                         name: `${columnNode.column.name} : ${columnNode.type}`,
                         iskey: columnNode.isPrimaryKey,
                         figure: "Decision",
-                        color: colors[columnNode.type] ? colors[columnNode.column.simpleType] : '#be4b15'
+                        color: colors[columnNode.column.simpleType] ? colors[columnNode.column.simpleType] : '#be4b15'
                     }
                 })
             }

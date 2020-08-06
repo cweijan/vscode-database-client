@@ -22,8 +22,9 @@ export default {
   mounted() {
     vscodeEvent.emit("init");
     vscodeEvent.on("load", data => {
+      this.diagramName = data.name;
       document.getElementById("diagramPanel").style.height =
-        window.innerHeight - 50 + "px";
+        window.outerHeight - 135 + "px";
 
       var $ = go.GraphObject.make; // for conciseness in defining templates
 
@@ -37,8 +38,8 @@ export default {
           },
           allowDelete: true,
           allowCopy: true,
-          layout: $(go.ForceDirectedLayout),
-          "undoManager.isEnabled": true
+          "undoManager.isEnabled": true,
+          layout: $(go.GridLayout)
         }
       );
       this.myDiagram = myDiagram;
@@ -174,19 +175,18 @@ export default {
         $(go.Shape, { stroke: "#303B45", strokeWidth: 2.5 }),
         $(go.Shape, { toArrow: "Standard", stroke: null })
       );
-      this.diagramName=data.name
       myDiagram.model = $(go.GraphLinksModel, data.content);
     });
   },
   methods: {
     save: function() {
-      if(!this.diagramName){
+      if (!this.diagramName) {
         this.$message.error("Diagram name cannot be null!");
         return;
       }
       this.$message.success("Save Success!");
-      vscodeEvent.emit("save",{
-        name:this.diagramName,
+      vscodeEvent.emit("save", {
+        name: this.diagramName,
         data: this.myDiagram.model.toJson()
       });
     }
