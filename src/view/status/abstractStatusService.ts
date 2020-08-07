@@ -12,26 +12,16 @@ export abstract class AbstractStatusService implements StatusService {
         ViewManager.createWebviewPanel({
             path: "status",
             splitView: false, title: "Server Status",
-            iconPath: Global.getExtPath("resources", "icon","state.svg"),
-            receiveListener: async (webviewPanel, params) => {
-                switch (params.type) {
-                    case "processList":
-                        const processList = await this.onProcessList(connectionNode)
-                        webviewPanel.webview.postMessage({
-                            type: "processList",
-                            ...processList
-                        })
-                        break;
-                    case "dashBoard":
-                        const dashBoard = await this.onDashBoard(connectionNode)
-                        webviewPanel.webview.postMessage({
-                            type: "dashBoard",
-                            ...dashBoard
-                        })
-                        break;
-                }
+            iconPath: Global.getExtPath("resources", "icon", "state.svg"),
+            eventHandler: (handler) => {
+                handler.on("processList", async () => {
+                    const processList = await this.onProcessList(connectionNode)
+                    handler.emit("processList", { ...processList })
+                }).on("dashBoard", async () => {
+                    const dashBoard = await this.onDashBoard(connectionNode)
+                    handler.emit("dashBoard", { ...dashBoard })
+                })
             }
-
         })
     }
 
