@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import './go.js';
 import { getVscodeEvent } from "../../util/vscode";
 let vscodeEvent;
 
@@ -29,7 +30,7 @@ export default {
     } else {
       vscodeEvent.on("load", this.handler);
     }
-    vscodeEvent.emit(this.$route.name);
+    vscodeEvent.emit("route-" + this.$route.name);
   },
   methods: {
     handler(data) {

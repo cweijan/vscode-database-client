@@ -35,7 +35,7 @@ export default {
       });
       this.nodeDataArray = nodeDataArray;
     });
-    vscodeEvent.emit(this.$route.name);
+    vscodeEvent.emit("route-" + this.$route.name);
   },
   methods: {
     confirm() {

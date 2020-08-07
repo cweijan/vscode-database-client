@@ -28,13 +28,13 @@ export class DiagramNode extends Node {
     public open() {
         const content = JSON.parse(readFileSync(this.getFilePath(), 'utf8'));
         ViewManager.createWebviewPanel({
-            path: "diagram", title: "diagram",
+            path: "app", title: "diagram",
             iconPath: Global.getExtPath("resources", "icon", "diagram-node.svg"),
             splitView: false, eventHandler: (handler) => {
                 handler.on("init", () => {
                     delete content.class
                     handler.emit('route', 'diagram')
-                }).on("diagram", () => {
+                }).on("route-diagram", () => {
                     handler.emit('load', { content, name: this.name })
                 }).on("save", ({ name, data }) => {
                     unlinkSync(this.getFilePath())

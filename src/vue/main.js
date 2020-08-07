@@ -8,13 +8,18 @@ import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(VueRouter)
 Vue.use(ElementUI);
 
-import connect from "./connect";
-
 Vue.config.productionTip = false
+
+import connect from "./connect";
+import  Gojs  from "./diagram/Gojs";
+import  Selector  from "./diagram/Selector";
+
 
 const router = new VueRouter({
   routes: [
-    { path: '/connect', component: connect, name: 'connect' },
+    { path: '/connect', component:  connect, name: 'connect' },
+    { path: '/diagram', component:  Gojs ,name:'diagram'},
+    { path: '/selector', component:  Selector ,name:'selector'},
   ]
 })
 

@@ -14,12 +14,12 @@ import { Global } from "../../common/global";
 export class DiagramGroup extends Node {
     public openAdd() {
         ViewManager.createWebviewPanel({
-            path: "diagram", title: "new",
+            path: "app", title: "new",
             iconPath: Global.getExtPath("resources", "icon", "diagram.svg"),
             splitView: false, eventHandler: (handler) => {
                 handler.on("init", () => {
                     handler.emit('route', 'selector')
-                }).on("selector", async () => {
+                }).on("route-selector", async () => {
                     handler.emit("selector-load", await this.getTableInfos())
                 }).on("save", ({ name, data }) => {
                     const diagramPath = `diagram/${this.getConnectId()}_${this.database}/${name}.json`;

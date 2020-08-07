@@ -153,6 +153,9 @@ export default {
       });
     vscodeEvent.emit("route-" + this.$route.name);
   },
+  destroyed(){
+    vscodeEvent.destroy()
+  },
   methods: {
     tryConnect() {
       vscodeEvent.emit("connecting", {
