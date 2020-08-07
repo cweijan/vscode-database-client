@@ -2,12 +2,14 @@ import { ViewManager } from "../viewManager";
 import { Node } from "../../model/interface/node";
 import { QueryUnit } from "../../service/queryUnit";
 import { ConnectionManager } from "../../service/connectionManager";
+import { Global } from "../../common/global";
 
 export class OverviewService {
 
     public openOverview(node: Node) {
         ViewManager.createWebviewPanel({
             path: "app", splitView: false, title: "overview", singlePage: true,
+            iconPath: Global.getExtPath("resources", "icon", "overview.svg"),
             eventHandler: async (handler) => {
                 handler.on("init", () => {
                     handler.emit("route", 'overview')
