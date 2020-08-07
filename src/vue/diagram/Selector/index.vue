@@ -60,7 +60,7 @@ export default {
 };
 </script>
 
-<style >
+<style scoped>
 .el-transfer-panel {
   width: 250px !important;
   height: 700px !important;

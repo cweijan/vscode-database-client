@@ -1,5 +1,5 @@
 <template>
-  <div id='app'>
+  <div class='status-container'>
     <el-tabs v-model="activePanel" @tab-click="changePannel">
       <el-tab-pane label="dashBoard" name="dashBoard">
         <el-row style="height:45vh">
@@ -40,7 +40,7 @@ import { getVscodeEvent } from "../util/vscode";
 let vscodeEvent;
 
 export default {
-  name: "App",
+  name: "status",
   data() {
     return {
       activePanel: "dashBoard",
@@ -55,6 +55,9 @@ export default {
         traffic: { data: [], lock: false, chart: null, previous: null }
       }
     };
+  },
+  destroyed(){
+      vscodeEvent.destroy()
   },
   mounted() {
     vscodeEvent = getVscodeEvent();
@@ -158,10 +161,11 @@ export default {
 };
 </script>
 
-<style>
-body {
+<style scoped>
+.status-container {
+  padding: 20px;
   /* background-color: var(--vscode-editor-background); */
-  background-color: #f7f7f7;
+  background-color: #f7f7f7 !important;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", Arial, sans-serif;
 }

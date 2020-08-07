@@ -11,6 +11,7 @@ Vue.use(ElementUI);
 Vue.config.productionTip = false
 
 import connect from "./connect";
+import status from "./status";
 import  Gojs  from "./diagram/Gojs";
 import  Selector  from "./diagram/Selector";
 
@@ -18,6 +19,7 @@ import  Selector  from "./diagram/Selector";
 const router = new VueRouter({
   routes: [
     { path: '/connect', component:  connect, name: 'connect' },
+    { path: '/status', component:  status, name: 'status' },
     { path: '/diagram', component:  Gojs ,name:'diagram'},
     { path: '/selector', component:  Selector ,name:'selector'},
   ]

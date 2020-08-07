@@ -167,7 +167,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .container {
   margin: auto;
   padding-left: 24px;

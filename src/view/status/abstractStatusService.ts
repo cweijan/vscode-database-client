@@ -10,11 +10,14 @@ export abstract class AbstractStatusService implements StatusService {
 
     public show(connectionNode: ConnectionNode): void | Promise<void> {
         ViewManager.createWebviewPanel({
-            path: "status",
+            path: "app",
             splitView: false, title: "Server Status",
             iconPath: Global.getExtPath("resources", "icon", "state.svg"),
             eventHandler: (handler) => {
-                handler.on("processList", async () => {
+                handler.on("init",()=>{
+                    handler.emit('route', 'status')
+                })
+                .on("processList", async () => {
                     const processList = await this.onProcessList(connectionNode)
                     handler.emit("processList", { ...processList })
                 }).on("dashBoard", async () => {
