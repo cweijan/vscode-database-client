@@ -20,7 +20,7 @@ export class ViewGroup extends Node {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let tableNodes = DatabaseCache.getTableListOfDatabase(this.id);
+        let tableNodes = DatabaseCache.getChildListOfDatabase(this.id);
         if (tableNodes && !isRresh) {
             return tableNodes;
         }

@@ -3,6 +3,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
 import { Console } from "../common/outputChannel";
+import { EventEmitter } from 'events'
 
 export class ViewOption {
     public iconPath?: string;
@@ -25,13 +26,30 @@ export class ViewOption {
      * callback when init success.
      */
     public initListener?: (viewPanel: WebviewPanel) => void;
+    public eventHandler?: (handler: Hanlder) => void;
+}
+
+export class Hanlder {
+    
+    constructor(public panel: WebviewPanel, private eventEmitter: EventEmitter) { }
+    
+    on(event: string, callback: (content: any) => void): this {
+        this.eventEmitter.on(event, callback)
+        return this;
+    }
+
+    emit(event: string, content?: any) {
+        this.panel.webview.postMessage({ type: event, content })
+    }
+
 }
 
 interface ViewState {
     instance: WebviewPanel;
     creating: boolean;
+    eventEmitter: EventEmitter;
     initListener: (viewPanel: WebviewPanel) => void;
-    receiveListener: (viewPanel: WebviewPanel, message: any) => void
+    receiveListener: (viewPanel: WebviewPanel, message: any) => void;
 }
 
 export class ViewManager {
@@ -64,10 +82,16 @@ export class ViewManager {
                         viewOption.initListener(currentStatus.instance)
                     }
                     if (viewOption.receiveListener) { currentStatus.receiveListener = viewOption.receiveListener }
+                    currentStatus.eventEmitter.removeAllListeners()
+                    if (viewOption.eventHandler) {
+                        viewOption.eventHandler(new Hanlder(currentStatus.instance, currentStatus.eventEmitter))
+                    }
+                    currentStatus.eventEmitter.emit('init')
                     return Promise.resolve(currentStatus.instance);
                 }
             }
-            this.viewStatu[viewOption.title] = { creating: true, instance: null, initListener: viewOption.initListener, receiveListener: viewOption.receiveListener }
+            const newStatus = { creating: true, instance: null, eventEmitter: new EventEmitter(), initListener: viewOption.initListener, receiveListener: viewOption.receiveListener }
+            this.viewStatu[viewOption.title] = newStatus
             const targetPath = `${this.webviewPath}/${viewOption.path}.html`;
             fs.readFile(targetPath, 'utf8', async (err, data) => {
                 if (err) {
@@ -82,20 +106,23 @@ export class ViewManager {
                         viewColumn: viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One,
                         preserveFocus: true
                     },
-                    { enableScripts: true, retainContextWhenHidden: true }
+                    { enableScripts: true, retainContextWhenHidden: true },
                 );
-                this.viewStatu[viewOption.title].instance = webviewPanel
                 if (viewOption.iconPath) {
                     webviewPanel.iconPath = vscode.Uri.file(viewOption.iconPath)
                 }
+                this.viewStatu[viewOption.title].instance = webviewPanel
                 const contextPath = path.resolve(targetPath, "..");
                 webviewPanel.webview.html = this.buildPath(data, webviewPanel.webview, contextPath);
 
                 webviewPanel.onDidDispose(() => {
                     this.viewStatu[viewOption.title] = null
                 })
-                const newStatus = this.viewStatu[viewOption.title]
+                if (viewOption.eventHandler) {
+                    viewOption.eventHandler(new Hanlder(webviewPanel, newStatus.eventEmitter))
+                }
                 webviewPanel.webview.onDidReceiveMessage((message) => {
+                    newStatus.eventEmitter.emit(message.type, message.content)
                     if (message.type == 'init') {
                         newStatus.creating = false
                         if (newStatus.initListener) {
@@ -113,7 +140,8 @@ export class ViewManager {
     }
 
     private static buildPath(data: string, webview: vscode.Webview, contextPath: string): string {
-        return data.replace(/((src|href)=("|'))(.+?\.(css|js))\b/gi, "$1" + webview.asWebviewUri(vscode.Uri.file(`${contextPath}/`)) + "$4");
+        return data.replace(/((src|href)=("|'))(.+?\.(css|js))\b/gi, "$1" + webview.asWebviewUri(vscode.Uri.file(`${contextPath}`)) + "/$4");
     }
+
 
 }

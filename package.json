@@ -90,6 +90,26 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.diagram.add",
+				"title": "Create Diagram",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				},
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.diagram.open",
+				"title": "Open Diagram",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.diagram.drop",
+				"title": "Drop Diagram",
+				"category": "MySQL",
+				"icon": "resources/icon/criss-cross.svg"
+			},
+			{
 				"command": "mysql.connection.add",
 				"title": "Add Connection",
 				"icon": {
@@ -120,6 +140,11 @@
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
 				},
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.db.overview",
+				"title": "Overview",
 				"category": "MySQL"
 			},
 			{
@@ -439,6 +464,11 @@
 					"group": "2_mysql@0"
 				},
 				{
+					"command": "mysql.diagram.add",
+					"when": "view == github.cweijan.mysql && viewItem == diagramGroup",
+					"group": "2_mysql@0"
+				},
+				{
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "2_mysql@1"
@@ -466,6 +496,11 @@
 				{
 					"command": "mysql.database.add",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"group": "inline@0"
+				},
+				{
+					"command": "mysql.diagram.add",
+					"when": "view == github.cweijan.mysql && viewItem == diagramGroup",
 					"group": "inline@0"
 				},
 				{
@@ -522,6 +557,11 @@
 					"command": "mysql.name.copy",
 					"when": "view == github.cweijan.mysql && viewItem == database",
 					"group": "3_mysql@1"
+				},
+				{
+					"command": "mysql.db.overview",
+					"when": "view == github.cweijan.mysql && viewItem == database",
+					"group": "3_mysql@2"
 				},
 				{
 					"command": "mysql.db.truncate",
@@ -684,6 +724,11 @@
 					"group": "1_mysql@1"
 				},
 				{
+					"command": "mysql.diagram.drop",
+					"when": "view == github.cweijan.mysql && viewItem == diagram",
+					"group": "inline@0"
+				},
+				{
 					"command": "mysql.template.procedure",
 					"when": "view == github.cweijan.mysql && viewItem == procedureGroup",
 					"group": "1_mysql@1"
@@ -812,9 +857,11 @@
 		"mysqldump": "^3.1.0",
 		"node-xlsx": "^0.15.0",
 		"portfinder": "^1.0.26",
+		"pretty-bytes": "^5.3.0",
 		"sql-formatter": "^2.3.3",
 		"tunnel-ssh": "^4.1.4",
-		"vue": "^2.6.11"
+		"vue": "^2.6.11",
+		"vue-router": "^3.4.1"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",

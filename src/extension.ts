@@ -23,6 +23,8 @@ import { ServiceManager } from "./service/serviceManager";
 import { QueryUnit } from "./service/queryUnit";
 import { FileManager } from "./common/filesManager";
 import { ConnectionManager } from "./service/connectionManager";
+import { DiagramNode } from "./model/diagram/diagramNode";
+import { DiagramGroup } from "./model/diagram/diagramGroup";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -44,6 +46,15 @@ export function activate(context: vscode.ExtensionContext) {
             },
             "mysql.setting.open": () => {
                 serviceManager.settingService.open();
+            },
+            "mysql.diagram.add": (diagramNode:DiagramGroup) => {
+                diagramNode.openAdd()
+            },
+            "mysql.diagram.open": (node:DiagramNode) => {
+                node.open()
+            },
+            "mysql.diagram.drop": (node:DiagramNode) => {
+                node.drop()
             },
             "mysql.db.active": () => {
                 serviceManager.provider.activeDb();
@@ -68,6 +79,9 @@ export function activate(context: vscode.ExtensionContext) {
             },
             "mysql.db.drop": (databaseNode: DatabaseNode) => {
                 databaseNode.dropDatatabase();
+            },
+            "mysql.db.overview": (databaseNode: DatabaseNode) => {
+                databaseNode.openOverview();
             },
             "mysql.changeTableName": (tableNode: TableNode) => {
                 tableNode.changeTableName();

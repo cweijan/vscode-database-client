@@ -11,7 +11,7 @@ export abstract class AbstractConnectService {
     protected abstract connect(connectionNode: Node): Promise<any> | any;
 
     public async openConnect(provider: DbTreeDataProvider, connectionNode?: ConnectionNode) {
-        let node;
+        let node: any;
         if (connectionNode) {
             node = { ...connectionNode }
             if (node.ssh) {
@@ -19,30 +19,24 @@ export abstract class AbstractConnectService {
             }
         }
         ViewManager.createWebviewPanel({
-            path: "connect", title: "connect",
+            path: "app", title: "connect",
             splitView: false, iconPath: Global.getExtPath("resources", "icon", "add.svg"),
-            initListener: (webviewPanel) => {
-                if (node) {
-                    webviewPanel.webview.postMessage({
-                        type: "EDIT",
-                        node
-                    });
-                }
-            },
-            receiveListener: async (webviewPanel, params) => {
-                if (params.type === 'CONNECT_TO_SQL_SERVER') {
-                    const connectNode = Util.trim(NodeUtil.of(params.connectionOption))
+            eventHandler: (handler) => {
+                handler.on("init", () => {
+                    handler.emit('route', 'connect')
+                }).on("route-connect", async () => {
+                    if (node) handler.emit("edit", node)
+                }).on("connecting", async (data) => {
+                    const connectionOption = data.connectionOption
+                    const connectNode = Util.trim(NodeUtil.of(connectionOption))
                     try {
                         await this.connect(connectNode)
                         provider.addConnection(connectNode)
-                        webviewPanel.dispose();
+                        handler.panel.dispose();
                     } catch (err) {
-                        webviewPanel.webview.postMessage({
-                            type: 'CONNECTION_ERROR',
-                            err,
-                        });
+                        handler.emit("error", err)
                     }
-                }
+                })
             }
         });
     }

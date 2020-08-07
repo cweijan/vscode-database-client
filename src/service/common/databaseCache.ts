@@ -163,7 +163,7 @@ export class DatabaseCache {
      * @param databaseid 
      */
     private static tableTypeList = [ModelType.TABLE_GROUP, ModelType.VIEW_GROUP, ModelType.FUNCTION_GROUP, ModelType.TRIGGER_GROUP, ModelType.PROCEDURE_GROUP];
-    public static getTableListOfDatabase(databaseid: string): Node[] {
+    public static getChildListOfDatabase(databaseid: string): Node[] {
         let result = [];
         this.tableTypeList.forEach((tableType) => {
             const tableList = this.databaseNodeMapTableNode[databaseid + "_" + tableType];
@@ -171,6 +171,12 @@ export class DatabaseCache {
         });
         if (result.length == 0) { return null; }
         return result;
+    }
+
+
+    public static getTableListOfDatabase(databaseid: string): Node[] {
+        const tableList = this.databaseNodeMapTableNode[databaseid + "_" + ModelType.TABLE_GROUP];
+        return tableList;
     }
 
     public static getDatabase(connectId: string, dbName: string): DatabaseNode {
