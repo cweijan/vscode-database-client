@@ -34,7 +34,7 @@ export class DiagramGroup extends Node {
     public iconPath = path.join(Constants.RES_PATH, "icon/diagram.svg")
     constructor(readonly info: Node) {
         super("DIAGRAM")
-        this.id = `${this.getConnectId()}_${info.database}_${ModelType.DIAGRAM_GROUP}`;
+        // this.id = `${this.getConnectId()}_${info.database}_${ModelType.DIAGRAM_GROUP}`;
         this.init(info)
     }
 

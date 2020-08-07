@@ -15,7 +15,7 @@ export class DiagramNode extends Node {
     public iconPath = path.join(Constants.RES_PATH, "icon/diagram-node.svg")
     constructor(public name: string, readonly info: Node) {
         super(name)
-        this.id = `${info.getConnectId()}_${info.database}_diragram_${name}`
+        // this.id = `${info.getConnectId()}_${info.database}_diragram_${name}`
         this.init(info)
         this.collapsibleState = TreeItemCollapsibleState.None
         this.command = {
