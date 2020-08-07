@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.4.3 - 2020/8/7
+- Add database overview.
+- Add diagram design.
+
 ## 2.4.2 - 2020/8/5
 - Fix limit generator error.
 - Adjust result page height.
