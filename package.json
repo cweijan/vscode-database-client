@@ -143,6 +143,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.db.overview",
+				"title": "Overview",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.db.drop",
 				"title": "Drop Database",
 				"category": "MySQL"
@@ -554,6 +559,11 @@
 					"group": "3_mysql@1"
 				},
 				{
+					"command": "mysql.db.overview",
+					"when": "view == github.cweijan.mysql && viewItem == database",
+					"group": "3_mysql@2"
+				},
+				{
 					"command": "mysql.db.truncate",
 					"when": "view == github.cweijan.mysql && viewItem == database",
 					"group": "4_mysql@4"
@@ -847,6 +857,7 @@
 		"mysqldump": "^3.1.0",
 		"node-xlsx": "^0.15.0",
 		"portfinder": "^1.0.26",
+		"pretty-bytes": "^5.3.0",
 		"sql-formatter": "^2.3.3",
 		"tunnel-ssh": "^4.1.4",
 		"vue": "^2.6.11",

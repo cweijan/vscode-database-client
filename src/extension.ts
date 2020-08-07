@@ -80,6 +80,9 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.db.drop": (databaseNode: DatabaseNode) => {
                 databaseNode.dropDatatabase();
             },
+            "mysql.db.overview": (databaseNode: DatabaseNode) => {
+                databaseNode.openOverview();
+            },
             "mysql.changeTableName": (tableNode: TableNode) => {
                 tableNode.changeTableName();
             },

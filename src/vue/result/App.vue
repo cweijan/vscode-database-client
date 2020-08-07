@@ -669,6 +669,7 @@ body {
   background-color: #f0f0f0;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", Arial, sans-serif;
+  padding: 0;
 }
 
 #tool-panel * {

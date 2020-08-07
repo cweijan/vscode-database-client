@@ -16,6 +16,8 @@ import { TriggerGroup } from "../main/triggerGroup";
 import { ViewGroup } from "../main/viewGroup";
 import { NodeUtil } from '../nodeUtil';
 import { DiagramGroup } from "../diagram/diagramGroup";
+import { OverviewService } from "../../view/overview/overviewService";
+import { ServiceManager } from "../../service/serviceManager";
 
 export class DatabaseNode extends Node implements CopyAble {
 
@@ -40,6 +42,10 @@ export class DatabaseNode extends Node implements CopyAble {
         new ProcedureGroup(this.info),
         new FunctionGroup(this.info),
         new TriggerGroup(this.info)];
+    }
+
+    public openOverview() {
+        ServiceManager.instance.overviewService.openOverview(this)
     }
 
     public dropDatatabase() {

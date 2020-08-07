@@ -21,6 +21,7 @@ import { MysqlStatusService } from "../view/status/mysqlStatusService";
 import { Global } from "../common/global";
 import { ImportService } from "./import/importService";
 import { MysqlImportService } from "./import/mysqlImportService";
+import { OverviewService } from "../view/overview/overviewService";
 
 export class ServiceManager {
 
@@ -30,6 +31,7 @@ export class ServiceManager {
     public historyService: HistoryRecorder;
     public connectService: AbstractConnectService;
     public settingService: SettingService;
+    public overviewService: OverviewService;
     public statusService: StatusService;
     public importService: ImportService;
     public dumpService: AbstractDumpService;
@@ -82,6 +84,7 @@ export class ServiceManager {
 
     private initMysqlService() {
         this.settingService = new MysqlSettingService();
+        this.overviewService = new OverviewService();
         this.dumpService = new MysqlDumpService();
         this.connectService = new MysqlConnectService();
         this.statusService = new MysqlStatusService()
