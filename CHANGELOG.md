@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.4.5 - 2020/8/10
+- Support big number type.
+
 ## 2.4.3 - 2020/8/7
 - Add database overview.
 - Add diagram design.
