@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-client2",
 	"displayName": "MySQL",
 	"description": "MySQL Client for vscode",
-	"version": "2.4.5",
+	"version": "2.4.6",
 	"publisher": "cweijan",
 	"icon": "resources/logo.png",
 	"engines": {
@@ -671,7 +671,7 @@
 				{
 					"command": "mysql.index.template",
 					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "2_mysql@3"
+					"group": "1_inline@7"
 				},
 				{
 					"command": "mysql.template.table",

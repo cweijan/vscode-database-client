@@ -112,7 +112,7 @@ ADD
     public indexTemplate() {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`-- ALTER TABLE ${Util.wrap(this.database)}.${Util.wrap(this.table)} DROP INDEX [indexName];
--- ALTER TABLE ${Util.wrap(this.database)}.${Util.wrap(this.table)} ADD [UNIQUE|KEY|PRIMARY KEY] INDEX ([column]);`, Template.alter);
+-- ALTER TABLE ${Util.wrap(this.database)}.${Util.wrap(this.table)} ADD [UNIQUE|INDEX|PRIMARY KEY] ([columns]);`, Template.alter);
         setTimeout(() => {
             QueryUnit.runQuery(`SELECT COLUMN_NAME name,table_schema,index_name,non_unique FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${this.database}' and table_name='${this.table}';`, this);
         }, 10);
