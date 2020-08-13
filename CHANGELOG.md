@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.4.7 - 2020/8/13
+- Fix overview render bug.
+
+## 2.4.6 - 2020/8/11
+- Add more keyword.
+
 ## 2.4.5 - 2020/8/10
 - Support big number type.
 
