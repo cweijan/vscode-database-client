@@ -86,7 +86,7 @@ export class QueryUnit {
         const isMulti = sql.match(Pattern.MULTI_PATTERN);
         if (!isMulti) {
 
-            if(sql.match(this.selectPattern) && !sql.match(/\blimit\b/i) && !sql.match(/;\s*$/)){
+            if(sql.match(this.selectPattern) && !sql.match(/\blimit\b/i) && !sql.match(/;\s*$/) && !sql.match(/[count|sum|min|max]\(/i)){
                 sql+=` LIMIT ${Global.getConfig(ConfigKey.DEFAULT_LIMIT)}`;
             }
 

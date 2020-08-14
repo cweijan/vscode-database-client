@@ -82,7 +82,7 @@ export class QueryPage {
                 switch (params.type) {
                     case OperateType.execute:
                         if (!queryParam.singlePage) {
-                            this.hodlder.set(params.sql, title)
+                            this.hodlder.set(params.sql.trim(), title)
                         }
                         QueryUnit.runQuery(params.sql);
                         break;
@@ -90,7 +90,7 @@ export class QueryPage {
                         const sql = this.pageService.build(params.sql, params.pageNum, params.pageSize)
                         const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())
                         QueryUnit.queryPromise(connection, sql).then((rows) => {
-                            QueryPage.send({ type: MessageType.NEXT_PAGE, res: { sql, data: rows } as DataResponse });
+                            viewPanel.webview.postMessage({ type: MessageType.NEXT_PAGE, res: { sql, data: rows } as DataResponse });
                         })
                         break;
                     case OperateType.export:
