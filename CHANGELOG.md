@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.4.8 - 2020/8/14
+- Fix new panel bug.
+
 ## 2.4.7 - 2020/8/13
 - Fix overview render bug.
 
