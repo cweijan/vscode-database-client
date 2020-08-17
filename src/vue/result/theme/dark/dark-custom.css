@@ -1,7 +1,30 @@
 .el-table .edit-row td {
-  background: #4c5879 !important ;
+    background: #4c5879 !important;
 }
 
 .hint {
-  color: #eee !important;
+    color: #eee !important;
+}
+
+.plx-table.border--full .plx-table--header-wrapper{
+    background: #222933 !important;
+}
+
+.plx-table .plx-table--border-line {
+    border: 1px solid #222933;
+}
+
+.plx-header--column {
+    border-radius: 3px;
+    border: 1px solid #121820 !important;
+}
+
+.plx-table .plx-body--row {
+    background: #222933;
+    color: #E5E6E7;
+}
+
+.plx-table .plx-body--row.row--stripe,.plx-table .plx-header--row {
+    background: #33373c;
+    color: #E5E6E7;
 }
