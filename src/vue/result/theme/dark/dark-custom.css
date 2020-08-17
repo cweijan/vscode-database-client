@@ -28,3 +28,21 @@
     background: #33373c;
     color: #E5E6E7;
 }
+
+.plx-table .plx-body--row.row--hover,
+.plx-table .plx-body--row.row--cheched,
+.plx-table .plx-body--row.row--current{
+    background: #444c63 !important;
+    color: white;
+}
+.plx-cell{
+    text-align: center !important;
+}
+.plx-cell span{
+    margin: auto !important;
+}
+
+.plx-body--column,.plx-header--column{
+    background: none !important;   
+    border: 1px solid rgb(26, 25, 25);
+}

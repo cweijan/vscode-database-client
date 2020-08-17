@@ -65,7 +65,7 @@
     <ux-grid
         ref="dataTable"
         v-loading='table.loading'
-        :cell-style="{height: '40px'}"
+        size='small'
         @sort-change="sort"
         @table-body-scroll="(_,e)=>scrollChange(e)"
         :height="remainHeight"
