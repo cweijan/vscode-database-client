@@ -493,15 +493,18 @@ export default {
         let checkboxRecords = this.$refs.dataTable.getCheckboxRecords();
         if (checkboxRecords.length > 0) {
           checkboxRecords = checkboxRecords.map(checkboxRecord =>
-            this.wrapQuote(this.result.primaryKey,checkboxRecord[this.result.primaryKey])
+              this.wrapQuote(this.result.primaryKey, checkboxRecord[this.result.primaryKey])
           )
         }
         const deleteSql = (checkboxRecords.length > 0) ? `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey} in (${checkboxRecords.join(',')})`
             : `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}=${this.wrapQuote(this.result.primaryKey, primaryValue)}`;
         this.execute(deleteSql);
       }).catch((e) => {
-        console.log(e)
-        this.$message({type: "warning", message: "Delete canceled"});
+        if (e) {
+          this.$message.error(e);
+        } else {
+          this.$message({type: "warning", message: "Delete canceled"});
+        }
       });
     },
     tableRowClassName({row, rowIndex}) {
@@ -690,7 +693,7 @@ export default {
 <style>
 body {
   /* background-color: var(--vscode-editor-background); */
-  background-color: #f0f0f0;
+  background-color: #f8f6f6;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
   "Microsoft YaHei", Arial, sans-serif;
   padding: 0;
