@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.5.0 - 2020/8/17
+- Improvement query result render performance.
+
 ## 2.4.8 - 2020/8/14
 - Fix new panel bug.
 
