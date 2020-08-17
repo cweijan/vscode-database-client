@@ -281,7 +281,8 @@
 			{
 				"command": "mysql.table.show",
 				"title": "Open In New Panel",
-				"category": "MySQL"
+				"category": "MySQL",
+				"icon": "resources/icon/analysis.svg"
 			},
 			{
 				"command": "mysql.column.update",
@@ -592,6 +593,11 @@
 					"command": "mysql.changeTableName",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "inline@0"
+				},
+				{
+					"command": "mysql.table.show",
+					"when": "view == github.cweijan.mysql && viewItem == table",
+					"group": "inline@3"
 				},
 				{
 					"command": "mysql.table.drop",
