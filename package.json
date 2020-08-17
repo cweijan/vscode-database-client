@@ -417,7 +417,7 @@
 				},
 				{
 					"command": "mysql.mock.run",
-					"when": "editorLangId == json && resourceFilename == mock.json ",
+					"when": "resourceFilename == mock.json ",
 					"group": "navigation"
 				}
 			],
