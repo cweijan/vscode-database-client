@@ -18,12 +18,13 @@
         <template v-if="result.table">
           <el-tag>Table :</el-tag>
           <span>
-            {{result.table}}
+            {{ result.table }}
           </span>
         </template>
         <el-tag type="success">CostTime :</el-tag>
         <span v-text="toolbar.costTime"></span>ms
-        <span v-if="result.table">, <el-tag type="warning">Row :</el-tag>{{result.data.length-1}}, <el-tag type="danger"> Col :</el-tag> {{columnCount}}</span>
+        <span v-if="result.table">, <el-tag type="warning">Row :</el-tag>{{ result.data.length - 1 }}, <el-tag
+            type="danger"> Col :</el-tag> {{ columnCount }}</span>
       </el-row>
       <!-- info panel -->
       <div v-if="info.visible ">
@@ -33,14 +34,15 @@
     </div>
     <!-- toolbar -->
     <div style="margin:8px">
-      <el-input v-model="table.search" placeholder="Input To Search Data" style="width:200px" />
-      <el-button @click="exportData()" type="primary" size="small" icon="el-icon-orange" circle title="Export"></el-button>
+      <el-input v-model="table.search" placeholder="Input To Search Data" style="width:200px"/>
+      <el-button @click="exportData()" type="primary" size="small" icon="el-icon-orange" circle
+                 title="Export"></el-button>
       <el-button type="info" icon="el-icon-circle-plus-outline" size="small" circle @click="insertRequest">
       </el-button>
       <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
         <el-checkbox-group v-model="toolbar.showColumns">
           <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
-            {{column.name}}
+            {{ column.name }}
           </el-checkbox>
         </el-checkbox-group>
         <el-button icon="el-icon-search" circle title="Select columns to show" size="small" slot="reference">
@@ -49,55 +51,82 @@
       <el-button @click="resetFilter" title="Reset filter" type="warning" size="small" icon="el-icon-refresh" circle>
       </el-button>
       <template v-if="result.primaryKey && toolbar.row[result.primaryKey]">
-        <el-tag type="warning" style="margin:0 10px">Row : </el-tag>
+        <el-tag type="warning" style="margin:0 10px">Row :</el-tag>
         <el-button @click="openEdit(toolbar.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
         </el-button>
-        <el-button @click.stop="openCopy(toolbar.row)" type="info" size="small" title="copy" icon="el-icon-document-copy" circle>
+        <el-button @click.stop="openCopy(toolbar.row)" type="info" size="small" title="copy"
+                   icon="el-icon-document-copy" circle>
         </el-button>
-        <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="small" icon="el-icon-delete" circle>
+        <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="small"
+                   icon="el-icon-delete" circle>
         </el-button>
       </template>
     </div>
-    <!-- talbe result -->
-    <el-table id="dataTable" v-loading='table.loading' :cell-style="{padding: '0', height: '20px'}" size='small' @sort-change="sort" element-loading-text="Loading Data" :row-class-name="tableRowClassName" ref="dataTable" :height="remainHeight" width="100vh" stripe :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" border @row-dblclick="row=>openEdit(row)" @row-click="row=>updateEdit(row)">
-      <!-- tool bar -->
-      <el-table-column fixed="left" type="index" :index="0" width="50" align="center">
-      </el-table-column>
-      <!-- data  -->
-      <el-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :label="field.name" align="center" sortable :width="computeWidth(field.name,0,index,toolbar.filter[field.name])" title='test'>
+    <ux-grid
+        ref="dataTable"
+        v-loading='table.loading'
+        :cell-style="{height: '40px'}"
+        @sort-change="sort"
+        @table-body-scroll="(_,e)=>scrollChange(e)"
+        :height="remainHeight"
+        width="100vh" stripe
+        :checkboxConfig="{ highlight: true}"
+        :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
+        @row-dblclick="row=>openEdit(row)"
+        @row-click="row=>updateEdit(row)"
+        :show-header-overflow="false"
+        :show-overflow="false"
+    >
+      <ux-table-column type="checkbox" width="80"/>
+      <ux-table-column type="index" width="100"
+                       :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined"/>
+      <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())"
+                       v-for="(field,index) in result.fields"
+                       :key="index"
+                       :resizable="true"
+                       :field="field.name"
+                       :title="field.name"
+                       :sortable="true"
+                       :width="computeWidth(field.name,0,index,toolbar.filter[field.name])">
         <template slot="header" slot-scope="scope">
-          <el-tooltip class="item" effect="dark" :content="getTypeByColumn(scope.column.label)" placement="left-start">
-            <span>{{scope.column.label}}</span>
+          <el-tooltip class="item" effect="dark" :content="scope.column.title" placement="left-start">
+            <span v-text="scope.column.title">
+              {{ scope.column.title }}
+            </span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
-          <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[field.name]" placeholder="Filter" v-on:keyup.enter.native="filter($event,field.name)">
+          <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter"
+                    v-on:keyup.enter.native="filter($event,scope.column.title)">
           </el-input>
-          <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[field.name])'></span>
+          <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[scope.column.title])'></span>
         </template>
-      </el-table-column>
-    </el-table>
+      </ux-table-column>
+    </ux-grid>
+    <!-- talbe result -->
+
     <el-dialog ref="editDialog" :title="editorTilte" :visible.sync="editor.visible" width="90%" top="3vh" size="small">
       <el-form ref="infoForm" :model="update.currentNew" :inline="true">
         <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
           <template>
             <span>
-              {{column.name}} : {{column.type}} &nbsp;
-              <span style="color: red;">{{column.key}}{{column.nullable=='YES'?'':' NOT NULL'}}</span>&nbsp;
-              <span>{{column.defaultValue?` Default : ${column.defaultValue}`:""}}</span>
-              <span>{{column.extra=="auto_increment"?` AUTO_INCREMENT`:""}}</span>
+              {{ column.name }} : {{ column.type }} &nbsp;
+              <span style="color: red;">{{ column.key }}{{ column.nullable == 'YES' ? '' : ' NOT NULL' }}</span>&nbsp;
+              <span>{{ column.defaultValue ? ` Default : ${column.defaultValue}` : "" }}</span>
+              <span>{{ column.extra == "auto_increment" ? ` AUTO_INCREMENT` : "" }}</span>
             </span>
             <template v-if="column.type=='date'">
-              <br />
+              <br/>
               <el-date-picker value-format="yyyy-MM-dd" v-model="update.currentNew[column.name]"></el-date-picker>
             </template>
             <template v-else-if="column.type=='time'">
-              <br />
+              <br/>
               <el-time-picker value-format="HH:mm:ss" v-model="update.currentNew[column.name]"></el-time-picker>
             </template>
             <template v-else-if="column.type=='datetime'">
-              <br />
-              <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" type="datetime" v-model="update.currentNew[column.name]"></el-date-picker>
+              <br/>
+              <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" type="datetime"
+                              v-model="update.currentNew[column.name]"></el-date-picker>
             </template>
             <el-input v-else="column.type" v-model="update.currentNew[column.name]"></el-input>
           </template>
@@ -116,7 +145,7 @@
 
 <script>
 const vscode =
-  typeof acquireVsCodeApi != "undefined" ? acquireVsCodeApi() : null;
+    typeof acquireVsCodeApi != "undefined" ? acquireVsCodeApi() : null;
 const postMessage = message => {
   if (vscode) {
     vscode.postMessage(message);
@@ -175,19 +204,6 @@ export default {
     };
   },
   mounted() {
-    setTimeout(() => {
-      const table = document.querySelector(".el-table__fixed-body-wrapper");
-      table.addEventListener("scroll", event => {
-        if (
-          table.scrollHeight -
-            table.scrollTop -
-            document.documentElement.clientHeight <=
-          200
-        ) {
-          this.nextPage();
-        }
-      });
-    }, 1000);
     const handlerData = (data, sameTable) => {
       this.result = data;
       this.toolbar.sql = data.sql;
@@ -198,7 +214,6 @@ export default {
         this.reset();
       }
     };
-
     const handlerCommon = res => {
       this.editor.loading = false;
       this.editor.visible = false;
@@ -207,7 +222,7 @@ export default {
       // this.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
     };
 
-    window.addEventListener("message", ({ data }) => {
+    window.addEventListener("message", ({data}) => {
       if (!data) return;
       if (data.type == "theme") {
         this.theme.select = data.res;
@@ -260,15 +275,24 @@ export default {
           this.$message(JSON.stringify(data));
       }
     });
-    postMessage({ type: "init" });
+    postMessage({type: "init"});
     window.addEventListener("keyup", event => {
       if (event.key == "c" && event.ctrlKey) {
-        console.log(document.activeElement.value);
         document.execCommand("copy");
       }
     });
   },
   methods: {
+    output(obj) {
+      console.log(obj)
+    },
+    scrollChange(event) {
+      const table = event.target
+      if (table.scrollHeight - table.scrollTop
+          - document.documentElement.clientHeight <= 50) {
+        this.nextPage();
+      }
+    },
     changeTheme(theme) {
       postMessage({
         type: "changeTheme",
@@ -281,57 +305,55 @@ export default {
         confirmButtonText: "Yes",
         cancelButtonText: "No",
         type: "warning"
-      })
-        .then(() => {
-          postMessage({
-            type: "export",
-            sql: this.result.sql.replace(/\blimit\b.+/gi, "")
-          });
-        })
-        .catch(() => {
-          postMessage({
-            type: "export",
-            sql: this.result.sql
-          });
+      }).then(() => {
+        postMessage({
+          type: "export",
+          sql: this.result.sql.replace(/\blimit\b.+/gi, "")
         });
+      }).catch(() => {
+        postMessage({
+          type: "export",
+          sql: this.result.sql
+        });
+      });
     },
     filter(event, column) {
       let inputvalue = "" + event.target.value;
 
       let filterSql =
-        this.result.sql.replace(/\n/, " ").replace(";", " ") + " ";
+          this.result.sql.replace(/\n/, " ").replace(";", " ") + " ";
 
       let existsCheck = new RegExp(
-        `(WHERE|AND)?\\s*\\b${column}\\b\\s*(=|is)\\s*.+?\\s`,
-        "igm"
+          `(WHERE|AND)?\\s*\\b${column}\\b\\s*(=|is)\\s*.+?\\s`,
+          "igm"
       );
 
       if (inputvalue) {
         const condition =
-          inputvalue.toLowerCase() == "null"
-            ? `${column} is null`
-            : `${column}='${inputvalue}'`;
+            inputvalue.toLowerCase() === "null"
+                ? `${column} is null`
+                : `${column}='${inputvalue}'`;
         if (existsCheck.exec(filterSql)) {
           // condition present
           filterSql = filterSql.replace(existsCheck, `$1 ${condition} `);
         } else if (filterSql.match(/\bwhere\b/gi)) {
           //have where
           filterSql = filterSql.replace(
-            /\b(where)\b/gi,
-            `\$1 ${condition} AND `
+              /\b(where)\b/gi,
+              `\$1 ${condition} AND `
           );
         } else {
           //have not where
           filterSql = filterSql.replace(
-            new RegExp(`(from\\s*.+?)\\s`, "ig"),
-            `\$1 WHERE ${condition} `
+              new RegExp(`(from\\s*.+?)\\s`, "ig"),
+              `\$1 WHERE ${condition} `
           );
         }
       } else {
         // empty value, clear filter
         let beforeAndCheck = new RegExp(
-          `\\b${column}\\b\\s*(=|is)\\s*.+?\\s*AND`,
-          "igm"
+            `\\b${column}\\b\\s*(=|is)\\s*.+?\\s*AND`,
+            "igm"
         );
         if (beforeAndCheck.exec(filterSql)) {
           filterSql = filterSql.replace(beforeAndCheck, "");
@@ -344,19 +366,18 @@ export default {
     },
     resetFilter() {
       this.execute(
-        this.result.sql.replace(/where.+?\b(order|limit|group)\b/gi, "$1")
+          this.result.sql.replace(/where.+?\b(order|limit|group)\b/gi, "$1")
       );
     },
     sort(row) {
-      let order = row.order == "ascending" ? "asc" : "desc";
       let sortSql = this.result.sql
-        .replace(/\n/, " ")
-        .replace(";", "")
-        .replace(/order by .+? (desc|asc)?/gi, "")
-        .replace(
-          /\s?(limit.+)?$/i,
-          ` ORDER BY ${row.column.label} ${order} \$1 `
-        );
+          .replace(/\n/, " ")
+          .replace(";", "")
+          .replace(/order by .+? (desc|asc)?/gi, "")
+          .replace(
+              /\s?(limit.+)?$/i,
+              ` ORDER BY ${row.prop} ${row.order} \$1 `
+          );
       this.execute(sortSql + ";");
     },
     insertRequest() {
@@ -384,9 +405,9 @@ export default {
           return `'${value}'`;
         default:
           if (
-            type.indexOf("text") != -1 ||
-            type.indexOf("blob") != -1 ||
-            type.indexOf("binary") != -1
+              type.indexOf("text") !== -1 ||
+              type.indexOf("blob") !== -1 ||
+              type.indexOf("binary") !== -1
           ) {
             return `'${value}'`;
           }
@@ -396,7 +417,7 @@ export default {
     getTypeByColumn(key) {
       if (!this.result.columnList) return;
       for (const column of this.result.columnList) {
-        if (column.name == key) {
+        if (column.name === key) {
           return column.simpleType;
         }
       }
@@ -413,8 +434,8 @@ export default {
       }
       if (values) {
         const insertSql = `INSERT INTO ${this.result.table}(${columns.replace(
-          /,$/,
-          ""
+            /,$/,
+            ""
         )}) VALUES(${values.replace(/,$/, "")})`;
         this.execute(insertSql);
       } else {
@@ -426,17 +447,17 @@ export default {
       for (const key in this.update.currentNew) {
         const oldEle = this.update.current[key];
         const newEle = this.update.currentNew[key];
-        if (oldEle != newEle) {
+        if (oldEle !== newEle) {
           change += `\`${this.wrap(key)}\`=${this.wrapQuote(key, newEle)},`;
         }
       }
       if (change) {
         const updateSql = `UPDATE ${this.result.table} SET ${change.replace(
-          /,$/,
-          ""
+            /,$/,
+            ""
         )} WHERE ${this.result.primaryKey}=${this.wrapQuote(
-          this.result.primaryKey,
-          this.update.primary
+            this.result.primaryKey,
+            this.update.primary
         )}`;
         this.execute(updateSql);
       } else {
@@ -468,20 +489,24 @@ export default {
         confirmButtonText: "OK",
         cancelButtonText: "Cancel",
         type: "warning"
-      })
-        .then(() => {
-          const deleteSql = `DELETE FROM ${this.result.table} WHERE ${
-            this.result.primaryKey
-          }=${this.wrapQuote(this.result.primaryKey, primaryValue)}`;
-          this.execute(deleteSql);
-        })
-        .catch(() => {
-          this.$message({ type: "warning", message: "Delete canceled" });
-        });
+      }).then(() => {
+        let checkboxRecords = this.$refs.dataTable.getCheckboxRecords();
+        if (checkboxRecords.length > 0) {
+          checkboxRecords = checkboxRecords.map(checkboxRecord =>
+            this.wrapQuote(this.result.primaryKey,checkboxRecord[this.result.primaryKey])
+          )
+        }
+        const deleteSql = (checkboxRecords.length > 0) ? `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey} in (${checkboxRecords.join(',')})`
+            : `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}=${this.wrapQuote(this.result.primaryKey, primaryValue)}`;
+        this.execute(deleteSql);
+      }).catch((e) => {
+        console.log(e)
+        this.$message({type: "warning", message: "Delete canceled"});
+      });
     },
-    tableRowClassName({ row, rowIndex }) {
+    tableRowClassName({row, rowIndex}) {
       if (!this.result.primaryKey || !this.update.primary) return "";
-      if (row[this.result.primaryKey] == this.update.primary) {
+      if (row[this.result.primaryKey] === this.update.primary) {
         return "edit-row";
       }
       return "";
@@ -518,8 +543,8 @@ export default {
     count(sql) {
       this.info.visible = false;
       let countSql = sql
-        .replace(/select (.+?) from/i, "SELECT count(*) FROM")
-        .replace(/\blimit\b.+$/gi, "");
+          .replace(/select (.+?) from/i, "SELECT count(*) FROM")
+          .replace(/\blimit\b.+$/gi, "");
       this.execute(countSql);
     },
     execute(sql) {
@@ -546,8 +571,8 @@ export default {
       }
 
       if (
-        origin.match(/\b[-\.]\b/gi) ||
-        origin.match(/^(if|key|desc|length)$/i)
+          origin.match(/\b[-\.]\b/gi) ||
+          origin.match(/^(if|key|desc|length)$/i)
       ) {
         return `\`${origin}\``;
       }
@@ -621,14 +646,13 @@ export default {
     },
     // show call when change table
     reset() {
-      console.log(this.result.fields.length);
       this.clear();
       // table
       this.table.widthItem = {};
       this.initShowColumn();
       // add filter row
       if (this.result.columnList) {
-        this.result.data.unshift({ isFilter: true, content: "" });
+        this.result.data.unshift({isFilter: true, content: ""});
       }
       // toolbar
       if (!this.result.sql.match(/\bwhere\b/gi)) {
@@ -648,12 +672,12 @@ export default {
         return "Insert To " + this.result.table;
       }
       return (
-        "Edit For " +
-        this.result.table +
-        " : " +
-        this.result.primaryKey +
-        "=" +
-        this.update.primary
+          "Edit For " +
+          this.result.table +
+          " : " +
+          this.result.primaryKey +
+          "=" +
+          this.update.primary
       );
     },
     remainHeight() {
@@ -668,7 +692,7 @@ body {
   /* background-color: var(--vscode-editor-background); */
   background-color: #f0f0f0;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", Arial, sans-serif;
+  "Microsoft YaHei", Arial, sans-serif;
   padding: 0;
 }
 
@@ -682,6 +706,10 @@ body {
   color: #444;
   display: inline-block;
   margin-top: 8px;
+}
+
+.plx-cell, .plx-cell--title {
+  text-overflow: unset !important;
 }
 
 .cell {
@@ -720,6 +748,7 @@ body {
   border-radius: 8px;
   background-color: #b0b0b0;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   border-radius: 8px;
   background-color: #ccc;

@@ -866,6 +866,7 @@
 		"pretty-bytes": "^5.3.0",
 		"sql-formatter": "^2.3.3",
 		"tunnel-ssh": "^4.1.4",
+		"umy-ui": "^1.0.4",
 		"vue": "^2.6.11",
 		"vue-router": "^3.4.1"
 	},
