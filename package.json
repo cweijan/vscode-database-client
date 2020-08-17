@@ -815,9 +815,9 @@
 					"default": true,
 					"description": "Load database meta info when connected, If your machine's performance is low, turn it off."
 				},
-				"vscode-mysql.defaultLimit": {
+				"vscode-mysql.defaultSelectLimit": {
 					"type": "integer",
-					"default": 30,
+					"default": 100,
 					"description": "Default limit of query sql."
 				},
 				"vscode-mysql.resultTheme": {

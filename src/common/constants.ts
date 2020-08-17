@@ -27,7 +27,7 @@ export enum ConfigKey {
     ENABLE_DELIMITER = "enableDelimiter",
     LOAD_META_ON_CONNECT = "loadMetaOnConnect",
     REULST_THEME = "resultTheme",
-    DEFAULT_LIMIT = "defaultLimit",
+    DEFAULT_LIMIT = "defaultSelectLimit",
 }
 
 export enum CommandKey {
