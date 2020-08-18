@@ -759,10 +759,15 @@ body {
 }
 .plx-cell{
   padding: 0px !important;
+  text-align: center !important;
 }
 .plx-table--body .el-input__inner{
   line-height: 30px !important;
   height:  30px !important;
+}
+
+.plx-cell span{
+    margin: auto !important;
 }
 
 </style>

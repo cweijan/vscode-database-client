@@ -35,12 +35,6 @@
     background: #444c63 !important;
     color: white;
 }
-.plx-cell{
-    text-align: center !important;
-}
-.plx-cell span{
-    margin: auto !important;
-}
 
 .plx-body--column,.plx-header--column{
     background: none !important;   
