@@ -66,6 +66,7 @@
         ref="dataTable"
         v-loading='table.loading'
         size='small'
+        :cell-style="{height: '30px'}"
         @sort-change="sort"
         @table-body-scroll="(_,e)=>scrollChange(e)"
         :height="remainHeight"
@@ -756,4 +757,12 @@ body {
   border-radius: 8px;
   background-color: #ccc;
 }
+.plx-cell{
+  padding: 0px !important;
+}
+.plx-table--body .el-input__inner{
+  line-height: 30px !important;
+  height:  30px !important;
+}
+
 </style>
