@@ -8,8 +8,8 @@
       </el-row>
       <!-- tool panel -->
       <el-row id="tool-panel">
-        <el-button type="primary" @click='count(toolbar.sql);'>Count</el-button>
-        <el-button type="primary" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
+        <el-button type="success" size="small" @click='count(toolbar.sql);'>Count</el-button>
+        <el-button type="primary" size="small" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
         <el-tag>Theme :</el-tag>
         <el-select v-model="theme.select" @change="changeTheme">
           <el-option v-for="theme in theme.list" :key="theme" :label="theme" :value="theme">
@@ -50,7 +50,7 @@
       </el-popover>
       <el-button @click="resetFilter" title="Reset filter" type="warning" size="small" icon="el-icon-refresh" circle>
       </el-button>
-      <template v-if="result.primaryKey && toolbar.row[result.primaryKey]">
+      <template v-if="result.primaryKey && (toolbar.row[result.primaryKey]||toolbar.show)">
         <el-tag type="warning" style="margin:0 10px">Row :</el-tag>
         <el-button @click="openEdit(toolbar.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
         </el-button>
@@ -71,6 +71,7 @@
         @table-body-scroll="(_,e)=>scrollChange(e)"
         :height="remainHeight"
         width="100vh" stripe
+        @select-all="toolbar.show=true"
         :checkboxConfig="{ highlight: true}"
         :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
         @row-dblclick="row=>openEdit(row)"
@@ -78,8 +79,8 @@
         :show-header-overflow="false"
         :show-overflow="false"
     >
-      <ux-table-column type="checkbox" width="80"/>
-      <ux-table-column type="index" width="100"
+      <ux-table-column type="checkbox" width="40" fixed="left" />
+      <ux-table-column type="index" width="40" 
                        :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined"/>
       <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())"
                        v-for="(field,index) in result.fields"
@@ -183,6 +184,7 @@ export default {
       toolbar: {
         row: {},
         sql: null,
+        show:false,
         costTime: 0,
         filter: {},
         showColumns: []
@@ -493,7 +495,7 @@ export default {
       }).then(() => {
         let checkboxRecords = this.$refs.dataTable.getCheckboxRecords();
         if (checkboxRecords.length > 0) {
-          checkboxRecords = checkboxRecords.map(checkboxRecord =>
+          checkboxRecords = checkboxRecords.filter(checkboxRecord=>checkboxRecord[this.result.primaryKey]!=null).map(checkboxRecord =>
               this.wrapQuote(this.result.primaryKey, checkboxRecord[this.result.primaryKey])
           )
         }
@@ -769,5 +771,9 @@ body {
 .plx-cell span{
     margin: auto !important;
 }
-
+.plx-table.size--small .plx-cell--checkbox .plx-checkbox--icon,
+.plx-table .plx-cell--checkbox .plx-checkbox--icon:before{
+  height: 1.3em !important;
+    width: 1.3em !important;
+}
 </style>

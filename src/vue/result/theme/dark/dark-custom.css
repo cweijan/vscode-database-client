@@ -6,12 +6,14 @@
     color: #eee !important;
 }
 
-.plx-table.border--full .plx-table--header-wrapper{
+.plx-table.border--full .plx-table--header-wrapper,
+.plx-table--body-wrapper{
     background: #222933 !important;
 }
 
-.plx-table .plx-table--border-line {
-    border: 1px solid #222933;
+.plx-table .plx-table--border-line,
+.plx-table--fixed-left-wrapper {
+    border: 1px solid #222933 !important;
 }
 
 .plx-header--column {
