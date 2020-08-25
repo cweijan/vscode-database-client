@@ -327,7 +327,7 @@ export default {
           this.result.sql.replace(/\n/, " ").replace(";", " ") + " ";
 
       let existsCheck = new RegExp(
-          `(WHERE|AND)?\\s*\\b${column}\\b\\s*(=|is)\\s*.+?\\s`,
+          `(WHERE|AND)?\\s*\`?${column}\`?\\s*(=|is)\\s*.+?\\s`,
           "igm"
       );
 
@@ -335,7 +335,7 @@ export default {
         const condition =
             inputvalue.toLowerCase() === "null"
                 ? `${column} is null`
-                : `${column}='${inputvalue}'`;
+                : `\`${column}\`='${inputvalue}'`;
         if (existsCheck.exec(filterSql)) {
           // condition present
           filterSql = filterSql.replace(existsCheck, `$1 ${condition} `);
@@ -431,7 +431,7 @@ export default {
       for (const key in this.update.currentNew) {
         const newEle = this.update.currentNew[key];
         if (newEle != null) {
-          columns += `\`${this.wrap(key)}\`,`;
+          columns += `\`${key}\`,`;
           values += `${this.wrapQuote(key, newEle)},`;
         }
       }
@@ -451,7 +451,7 @@ export default {
         const oldEle = this.update.current[key];
         const newEle = this.update.currentNew[key];
         if (oldEle !== newEle) {
-          change += `\`${this.wrap(key)}\`=${this.wrapQuote(key, newEle)},`;
+          change += `\`${key}\`=${this.wrapQuote(key, newEle)},`;
         }
       }
       if (change) {
