@@ -78,6 +78,10 @@ OpenSetting -> extensions -> Mysql
 
 ![suprise](images/surprise.jpg)
 
+## Coffee
+
+If you like this this extension, consider [buying me a coffee](https://www.buymeacoffee.com/cweijan). Thank you!
+
 ## Sponsor
 - [IDEA](https://www.jetbrains.com/)
 
