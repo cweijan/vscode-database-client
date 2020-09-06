@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.5.5 - 2020/9/6
+- Change update as edit in same view.
+
 ## 2.5.0 - 2020/8/17
 - Improvement query result render performance.
 
