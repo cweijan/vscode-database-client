@@ -58,7 +58,7 @@
         </el-button>
       </template>
     </div>
-    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '30px'}" @sort-change="sort" @table-body-scroll="(_,e)=>scrollChange(e)" :height="remainHeight" width="100vh" stripe @select-all="toolbar.show=true" :edit-config="{trigger: 'dblclick', mode: 'row',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-dblclick="row=>updateEdit(row)" :show-header-overflow="false" :show-overflow="false">
+    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '30px'}" @sort-change="sort" @table-body-scroll="(_,e)=>scrollChange(e)" :height="remainHeight" width="100vh" stripe @select-all="toolbar.show=true" :edit-config="{trigger: 'click', mode: 'row',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="row=>updateEdit(row)" :show-header-overflow="false" :show-overflow="false">
       <ux-table-column type="checkbox" width="40" fixed="left" />
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined" />
       <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field.name,0,index,toolbar.filter[field.name])" edit-render>
@@ -170,7 +170,8 @@ export default {
         sql: null,
         message: null,
         visible: false,
-        error: false
+        error: false,
+        needRefresh:true
       },
       update: {
         current: {},
@@ -231,6 +232,7 @@ export default {
         case "DDL":
           handlerCommon(response);
           this.info.error = false;
+          this.info.needRefresh=false;
           this.refresh();
           break;
         case "ERROR":
@@ -635,7 +637,11 @@ export default {
       this.page.lock = false;
       this.page.pageSize = this.result.pageSize;
       // info
-      this.info.visible = false;
+      if(this.info.needRefresh){
+        this.info.visible = false;
+      }else{
+        this.info.needRefresh=true;
+      }
       // loading
       this.table.loading = false;
       // toolbar
