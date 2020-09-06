@@ -23,8 +23,7 @@
         </template>
         <el-tag type="success">CostTime :</el-tag>
         <span v-text="toolbar.costTime"></span>ms
-        <span v-if="result.table">, <el-tag type="warning">Row :</el-tag>{{ result.data.length - 1 }}, <el-tag
-            type="danger"> Col :</el-tag> {{ columnCount }}</span>
+        <span v-if="result.table">, <el-tag type="warning">Row :</el-tag>{{ result.data.length - 1 }}, <el-tag type="danger"> Col :</el-tag> {{ columnCount }}</span>
       </el-row>
       <!-- info panel -->
       <div v-if="info.visible ">
@@ -34,9 +33,8 @@
     </div>
     <!-- toolbar -->
     <div style="margin:8px">
-      <el-input v-model="table.search" placeholder="Input To Search Data" style="width:200px"/>
-      <el-button @click="exportData()" type="primary" size="small" icon="el-icon-orange" circle
-                 title="Export"></el-button>
+      <el-input v-model="table.search" placeholder="Input To Search Data" style="width:200px" />
+      <el-button @click="exportData()" type="primary" size="small" icon="el-icon-orange" circle title="Export"></el-button>
       <el-button type="info" icon="el-icon-circle-plus-outline" size="small" circle @click="insertRequest">
       </el-button>
       <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
@@ -54,42 +52,16 @@
         <el-tag type="warning" style="margin:0 10px">Row :</el-tag>
         <el-button @click="openEdit(toolbar.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
         </el-button>
-        <el-button @click.stop="openCopy(toolbar.row)" type="info" size="small" title="copy"
-                   icon="el-icon-document-copy" circle>
+        <el-button @click.stop="openCopy(toolbar.row)" type="info" size="small" title="copy" icon="el-icon-document-copy" circle>
         </el-button>
-        <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="small"
-                   icon="el-icon-delete" circle>
+        <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="small" icon="el-icon-delete" circle>
         </el-button>
       </template>
     </div>
-    <ux-grid
-        ref="dataTable"
-        v-loading='table.loading'
-        size='small'
-        :cell-style="{height: '30px'}"
-        @sort-change="sort"
-        @table-body-scroll="(_,e)=>scrollChange(e)"
-        :height="remainHeight"
-        width="100vh" stripe
-        @select-all="toolbar.show=true"
-        :checkboxConfig="{ highlight: true}"
-        :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))"
-        @row-dblclick="row=>openEdit(row)"
-        @row-click="row=>updateEdit(row)"
-        :show-header-overflow="false"
-        :show-overflow="false"
-    >
+    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '30px'}" @sort-change="sort" @table-body-scroll="(_,e)=>scrollChange(e)" :height="remainHeight" width="100vh" stripe @select-all="toolbar.show=true" :edit-config="{trigger: 'dblclick', mode: 'cell',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="row=>updateEdit(row)" :show-header-overflow="false" :show-overflow="false">
       <ux-table-column type="checkbox" width="40" fixed="left" />
-      <ux-table-column type="index" width="40" 
-                       :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined"/>
-      <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())"
-                       v-for="(field,index) in result.fields"
-                       :key="index"
-                       :resizable="true"
-                       :field="field.name"
-                       :title="field.name"
-                       :sortable="true"
-                       :width="computeWidth(field.name,0,index,toolbar.filter[field.name])">
+      <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined" />
+      <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field.name,0,index,toolbar.filter[field.name])" edit-render>
         <template slot="header" slot-scope="scope">
           <el-tooltip class="item" effect="dark" :content="scope.column.title" placement="left-start">
             <span v-text="scope.column.title">
@@ -98,10 +70,12 @@
           </el-tooltip>
         </template>
         <template slot-scope="scope">
-          <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter"
-                    v-on:keyup.enter.native="filter($event,scope.column.title)">
+          <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter" v-on:keyup.enter.native="filter($event,scope.column.title)">
           </el-input>
           <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[scope.column.title])'></span>
+        </template>
+        <template slot="edit" slot-scope="scope">
+          <el-input v-model="update.currentNew[scope.column.title]" @keypress.enter.native="confirmUpdate"></el-input>
         </template>
       </ux-table-column>
     </ux-grid>
@@ -118,17 +92,16 @@
               <span>{{ column.extra == "auto_increment" ? ` AUTO_INCREMENT` : "" }}</span>
             </span>
             <template v-if="column.type=='date'">
-              <br/>
+              <br />
               <el-date-picker value-format="yyyy-MM-dd" v-model="update.currentNew[column.name]"></el-date-picker>
             </template>
             <template v-else-if="column.type=='time'">
-              <br/>
+              <br />
               <el-time-picker value-format="HH:mm:ss" v-model="update.currentNew[column.name]"></el-time-picker>
             </template>
             <template v-else-if="column.type=='datetime'">
-              <br/>
-              <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" type="datetime"
-                              v-model="update.currentNew[column.name]"></el-date-picker>
+              <br />
+              <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" type="datetime" v-model="update.currentNew[column.name]"></el-date-picker>
             </template>
             <el-input v-else="column.type" v-model="update.currentNew[column.name]"></el-input>
           </template>
@@ -147,7 +120,7 @@
 
 <script>
 const vscode =
-    typeof acquireVsCodeApi != "undefined" ? acquireVsCodeApi() : null;
+  typeof acquireVsCodeApi != "undefined" ? acquireVsCodeApi() : null;
 const postMessage = message => {
   if (vscode) {
     vscode.postMessage(message);
@@ -184,7 +157,7 @@ export default {
       toolbar: {
         row: {},
         sql: null,
-        show:false,
+        show: false,
         costTime: 0,
         filter: {},
         showColumns: []
@@ -225,7 +198,7 @@ export default {
       // this.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
     };
 
-    window.addEventListener("message", ({data}) => {
+    window.addEventListener("message", ({ data }) => {
       if (!data) return;
       if (data.type == "theme") {
         this.theme.select = data.res;
@@ -278,7 +251,7 @@ export default {
           this.$message(JSON.stringify(data));
       }
     });
-    postMessage({type: "init"});
+    postMessage({ type: "init" });
     window.addEventListener("keyup", event => {
       if (event.key == "c" && event.ctrlKey) {
         document.execCommand("copy");
@@ -287,12 +260,16 @@ export default {
   },
   methods: {
     output(obj) {
-      console.log(obj)
+      console.log(obj);
     },
     scrollChange(event) {
-      const table = event.target
-      if (table.scrollHeight - table.scrollTop
-          - document.documentElement.clientHeight <= 50) {
+      const table = event.target;
+      if (
+        table.scrollHeight -
+          table.scrollTop -
+          document.documentElement.clientHeight <=
+        50
+      ) {
         this.nextPage();
       }
     },
@@ -308,55 +285,57 @@ export default {
         confirmButtonText: "Yes",
         cancelButtonText: "No",
         type: "warning"
-      }).then(() => {
-        postMessage({
-          type: "export",
-          sql: this.result.sql.replace(/\blimit\b.+/gi, "")
+      })
+        .then(() => {
+          postMessage({
+            type: "export",
+            sql: this.result.sql.replace(/\blimit\b.+/gi, "")
+          });
+        })
+        .catch(() => {
+          postMessage({
+            type: "export",
+            sql: this.result.sql
+          });
         });
-      }).catch(() => {
-        postMessage({
-          type: "export",
-          sql: this.result.sql
-        });
-      });
     },
     filter(event, column) {
       let inputvalue = "" + event.target.value;
 
       let filterSql =
-          this.result.sql.replace(/\n/, " ").replace(";", " ") + " ";
+        this.result.sql.replace(/\n/, " ").replace(";", " ") + " ";
 
       let existsCheck = new RegExp(
-          `(WHERE|AND)?\\s*\`?${column}\`?\\s*(=|is)\\s*.+?\\s`,
-          "igm"
+        `(WHERE|AND)?\\s*\`?${column}\`?\\s*(=|is)\\s*.+?\\s`,
+        "igm"
       );
 
       if (inputvalue) {
         const condition =
-            inputvalue.toLowerCase() === "null"
-                ? `${column} is null`
-                : `\`${column}\`='${inputvalue}'`;
+          inputvalue.toLowerCase() === "null"
+            ? `${column} is null`
+            : `\`${column}\`='${inputvalue}'`;
         if (existsCheck.exec(filterSql)) {
           // condition present
           filterSql = filterSql.replace(existsCheck, `$1 ${condition} `);
         } else if (filterSql.match(/\bwhere\b/gi)) {
           //have where
           filterSql = filterSql.replace(
-              /\b(where)\b/gi,
-              `\$1 ${condition} AND `
+            /\b(where)\b/gi,
+            `\$1 ${condition} AND `
           );
         } else {
           //have not where
           filterSql = filterSql.replace(
-              new RegExp(`(from\\s*.+?)\\s`, "ig"),
-              `\$1 WHERE ${condition} `
+            new RegExp(`(from\\s*.+?)\\s`, "ig"),
+            `\$1 WHERE ${condition} `
           );
         }
       } else {
         // empty value, clear filter
         let beforeAndCheck = new RegExp(
-            `\\b${column}\\b\\s*(=|is)\\s*.+?\\s*AND`,
-            "igm"
+          `\\b${column}\\b\\s*(=|is)\\s*.+?\\s*AND`,
+          "igm"
         );
         if (beforeAndCheck.exec(filterSql)) {
           filterSql = filterSql.replace(beforeAndCheck, "");
@@ -369,18 +348,15 @@ export default {
     },
     resetFilter() {
       this.execute(
-          this.result.sql.replace(/where.+?\b(order|limit|group)\b/gi, "$1")
+        this.result.sql.replace(/where.+?\b(order|limit|group)\b/gi, "$1")
       );
     },
     sort(row) {
       let sortSql = this.result.sql
-          .replace(/\n/, " ")
-          .replace(";", "")
-          .replace(/order by .+? (desc|asc)?/gi, "")
-          .replace(
-              /\s?(limit.+)?$/i,
-              ` ORDER BY ${row.prop} ${row.order} \$1 `
-          );
+        .replace(/\n/, " ")
+        .replace(";", "")
+        .replace(/order by .+? (desc|asc)?/gi, "")
+        .replace(/\s?(limit.+)?$/i, ` ORDER BY ${row.prop} ${row.order} \$1 `);
       this.execute(sortSql + ";");
     },
     insertRequest() {
@@ -408,9 +384,9 @@ export default {
           return `'${value}'`;
         default:
           if (
-              type.indexOf("text") !== -1 ||
-              type.indexOf("blob") !== -1 ||
-              type.indexOf("binary") !== -1
+            type.indexOf("text") !== -1 ||
+            type.indexOf("blob") !== -1 ||
+            type.indexOf("binary") !== -1
           ) {
             return `'${value}'`;
           }
@@ -437,8 +413,8 @@ export default {
       }
       if (values) {
         const insertSql = `INSERT INTO ${this.result.table}(${columns.replace(
-            /,$/,
-            ""
+          /,$/,
+          ""
         )}) VALUES(${values.replace(/,$/, "")})`;
         this.execute(insertSql);
       } else {
@@ -456,11 +432,11 @@ export default {
       }
       if (change) {
         const updateSql = `UPDATE ${this.result.table} SET ${change.replace(
-            /,$/,
-            ""
+          /,$/,
+          ""
         )} WHERE ${this.result.primaryKey}=${this.wrapQuote(
-            this.result.primaryKey,
-            this.update.primary
+          this.result.primaryKey,
+          this.update.primary
         )}`;
         this.execute(updateSql);
       } else {
@@ -492,25 +468,40 @@ export default {
         confirmButtonText: "OK",
         cancelButtonText: "Cancel",
         type: "warning"
-      }).then(() => {
-        let checkboxRecords = this.$refs.dataTable.getCheckboxRecords();
-        if (checkboxRecords.length > 0) {
-          checkboxRecords = checkboxRecords.filter(checkboxRecord=>checkboxRecord[this.result.primaryKey]!=null).map(checkboxRecord =>
-              this.wrapQuote(this.result.primaryKey, checkboxRecord[this.result.primaryKey])
-          )
-        }
-        const deleteSql = (checkboxRecords.length > 0) ? `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey} in (${checkboxRecords.join(',')})`
-            : `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}=${this.wrapQuote(this.result.primaryKey, primaryValue)}`;
-        this.execute(deleteSql);
-      }).catch((e) => {
-        if (e) {
-          this.$message.error(e);
-        } else {
-          this.$message({type: "warning", message: "Delete canceled"});
-        }
-      });
+      })
+        .then(() => {
+          let checkboxRecords = this.$refs.dataTable.getCheckboxRecords();
+          if (checkboxRecords.length > 0) {
+            checkboxRecords = checkboxRecords
+              .filter(
+                checkboxRecord => checkboxRecord[this.result.primaryKey] != null
+              )
+              .map(checkboxRecord =>
+                this.wrapQuote(
+                  this.result.primaryKey,
+                  checkboxRecord[this.result.primaryKey]
+                )
+              );
+          }
+          const deleteSql =
+            checkboxRecords.length > 0
+              ? `DELETE FROM ${this.result.table} WHERE ${
+                  this.result.primaryKey
+                } in (${checkboxRecords.join(",")})`
+              : `DELETE FROM ${this.result.table} WHERE ${
+                  this.result.primaryKey
+                }=${this.wrapQuote(this.result.primaryKey, primaryValue)}`;
+          this.execute(deleteSql);
+        })
+        .catch(e => {
+          if (e) {
+            this.$message.error(e);
+          } else {
+            this.$message({ type: "warning", message: "Delete canceled" });
+          }
+        });
     },
-    tableRowClassName({row, rowIndex}) {
+    tableRowClassName({ row, rowIndex }) {
       if (!this.result.primaryKey || !this.update.primary) return "";
       if (row[this.result.primaryKey] === this.update.primary) {
         return "edit-row";
@@ -549,8 +540,8 @@ export default {
     count(sql) {
       this.info.visible = false;
       let countSql = sql
-          .replace(/select (.+?) from/i, "SELECT count(*) FROM")
-          .replace(/\blimit\b.+$/gi, "");
+        .replace(/select (.+?) from/i, "SELECT count(*) FROM")
+        .replace(/\blimit\b.+$/gi, "");
       this.execute(countSql);
     },
     execute(sql) {
@@ -577,8 +568,8 @@ export default {
       }
 
       if (
-          origin.match(/\b[-\.]\b/gi) ||
-          origin.match(/^(if|key|desc|length)$/i)
+        origin.match(/\b[-\.]\b/gi) ||
+        origin.match(/^(if|key|desc|length)$/i)
       ) {
         return `\`${origin}\``;
       }
@@ -658,7 +649,7 @@ export default {
       this.initShowColumn();
       // add filter row
       if (this.result.columnList) {
-        this.result.data.unshift({isFilter: true, content: ""});
+        this.result.data.unshift({ isFilter: true, content: "" });
       }
       // toolbar
       if (!this.result.sql.match(/\bwhere\b/gi)) {
@@ -678,12 +669,12 @@ export default {
         return "Insert To " + this.result.table;
       }
       return (
-          "Edit For " +
-          this.result.table +
-          " : " +
-          this.result.primaryKey +
-          "=" +
-          this.update.primary
+        "Edit For " +
+        this.result.table +
+        " : " +
+        this.result.primaryKey +
+        "=" +
+        this.update.primary
       );
     },
     remainHeight() {
@@ -698,7 +689,7 @@ body {
   /* background-color: var(--vscode-editor-background); */
   background-color: #f8f6f6;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
-  "Microsoft YaHei", Arial, sans-serif;
+    "Microsoft YaHei", Arial, sans-serif;
   padding: 0;
 }
 
@@ -714,7 +705,8 @@ body {
   margin-top: 8px;
 }
 
-.plx-cell, .plx-cell--title {
+.plx-cell,
+.plx-cell--title {
   text-overflow: unset !important;
 }
 
@@ -759,21 +751,21 @@ body {
   border-radius: 8px;
   background-color: #ccc;
 }
-.plx-cell{
+.plx-cell {
   padding: 0px !important;
   text-align: center !important;
 }
-.plx-table--body .el-input__inner{
+.plx-table--body .el-input__inner {
   line-height: 30px !important;
-  height:  30px !important;
+  height: 30px !important;
 }
 
-.plx-cell span{
-    margin: auto !important;
+.plx-cell span {
+  margin: auto !important;
 }
 .plx-table.size--small .plx-cell--checkbox .plx-checkbox--icon,
-.plx-table .plx-cell--checkbox .plx-checkbox--icon:before{
+.plx-table .plx-cell--checkbox .plx-checkbox--icon:before {
   height: 1.3em !important;
-    width: 1.3em !important;
+  width: 1.3em !important;
 }
 </style>
