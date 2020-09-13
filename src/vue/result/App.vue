@@ -75,7 +75,9 @@
           <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[scope.column.title])'></span>
         </template>
         <template slot="edit" slot-scope="scope">
-          <el-input v-model="update.currentNew[scope.column.title]" @keypress.enter.native="confirmUpdate"></el-input>
+          <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter" v-on:keyup.enter.native="filter($event,scope.column.title)">
+          </el-input>
+          <el-input v-if="!scope.row.isFilter" v-model="update.currentNew[scope.column.title]" @keypress.enter.native="confirmUpdate"></el-input>
         </template>
       </ux-table-column>
     </ux-grid>
@@ -171,7 +173,7 @@ export default {
         message: null,
         visible: false,
         error: false,
-        needRefresh:true
+        needRefresh: true
       },
       update: {
         current: {},
@@ -232,7 +234,7 @@ export default {
         case "DDL":
           handlerCommon(response);
           this.info.error = false;
-          this.info.needRefresh=false;
+          this.info.needRefresh = false;
           this.refresh();
           break;
         case "ERROR":
@@ -637,10 +639,10 @@ export default {
       this.page.lock = false;
       this.page.pageSize = this.result.pageSize;
       // info
-      if(this.info.needRefresh){
+      if (this.info.needRefresh) {
         this.info.visible = false;
-      }else{
-        this.info.needRefresh=true;
+      } else {
+        this.info.needRefresh = true;
       }
       // loading
       this.table.loading = false;
