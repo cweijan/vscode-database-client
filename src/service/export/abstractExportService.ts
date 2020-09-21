@@ -3,18 +3,23 @@ import { ExportService } from "./exportService";
 import { FieldInfo } from "mysql";
 import * as fs from "fs";
 import { Console } from "../../common/outputChannel";
+import { ExportOption } from "./exportOption";
 
 export abstract class AbstractExportService implements ExportService {
-    public export(sql: string): void {
+    public export(exportOption: ExportOption): void {
         vscode.window.showOpenDialog({ canSelectMany: false, openLabel: "Select export file path", canSelectFiles: false, canSelectFolders: true }).then((folderPath) => {
             if (folderPath) {
-                this.exportExcel(folderPath[0].fsPath, sql)
+                exportOption.folderPath=folderPath[0].fsPath;
+                if(exportOption.withOutLimit){
+                    exportOption.sql=exportOption.sql.replace(/\blimit\b.+/gi, "")
+                }
+                this.exportExcel(exportOption)
             }
         });
     }
 
 
-    protected abstract exportExcel(folderPath: string, sql: string): void;
+    protected abstract exportExcel(exportOption:ExportOption): void;
 
     protected exportByNodeXlsx(folderPath: string, fields: FieldInfo[], rows: any) {
         Console.log("start export data...")

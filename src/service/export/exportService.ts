@@ -1,3 +1,5 @@
+import { ExportOption } from "./exportOption";
+
 export interface ExportService {
-    export(sql: string): void;
+    export(exportOption:ExportOption): void;
 }

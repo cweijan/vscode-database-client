@@ -94,7 +94,7 @@ export class QueryPage {
                         })
                         break;
                     case OperateType.export:
-                        this.exportService.export(params.sql)
+                        this.exportService.export(params.option)
                         break;
                     case OperateType.changeTheme:
                         await Global.updateConfig(ConfigKey.REULST_THEME, params.theme)

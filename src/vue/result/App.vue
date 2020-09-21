@@ -34,7 +34,7 @@
     <!-- toolbar -->
     <div style="margin:8px">
       <el-input v-model="table.search" placeholder="Input To Search Data" style="width:200px" />
-      <el-button @click="exportData()" type="primary" size="small" icon="el-icon-orange" circle title="Export"></el-button>
+      <el-button @click="exportData()" type="primary" size="small" icon="el-icon-share" circle title="Export"></el-button>
       <el-button type="info" icon="el-icon-circle-plus-outline" size="small" circle @click="insertRequest">
       </el-button>
       <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
@@ -116,7 +116,7 @@
           Insert</el-button>
       </span>
     </el-dialog>
-    <el-dialog :title="'Export Option'" :visible.sync="exportOption.visible" width="90%" top="3vh" size="small">
+    <el-dialog :title="'Export Option'" :visible.sync="exportOption.visible" width="30%" top="3vh" size="small">
       <el-form :model="exportOption">
         <el-form-item label="Export File Type">
           <el-radio v-model="exportOption.type" label="excel">Excel</el-radio>
@@ -304,19 +304,15 @@ export default {
         sql: this.result.sql
       });
     },
-    confirmExport(){
-      if(this.exportOption.withOutLimit){
-         postMessage({
-            type: "export",
-            sql: this.result.sql.replace(/\blimit\b.+/gi, "")
-          });
-      }else{
-        postMessage({
-            type: "export",
-            sql: this.result.sql
-          });
-      }
-      this.exportOption.visible=false;
+    confirmExport() {
+      postMessage({
+        type: "export",
+        option: {
+          ...this.exportOption,
+          sql: this.result.sql
+        }
+      });
+      this.exportOption.visible = false;
     },
     exportData() {
       this.exportOption.visible = true;
