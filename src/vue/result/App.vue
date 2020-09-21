@@ -82,7 +82,6 @@
       </ux-table-column>
     </ux-grid>
     <!-- talbe result -->
-
     <el-dialog ref="editDialog" :title="editorTilte" :visible.sync="editor.visible" width="90%" top="3vh" size="small">
       <el-form ref="infoForm" :model="update.currentNew" :inline="true">
         <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
@@ -115,6 +114,21 @@
           Update</el-button>
         <el-button v-if="update.primary==null" type="primary" :loading="editor.loading" @click="confirmInsert">
           Insert</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog :title="'Export Option'" :visible.sync="exportOption.visible" width="90%" top="3vh" size="small">
+      <el-form :model="exportOption">
+        <el-form-item label="Export File Type">
+          <el-radio v-model="exportOption.type" label="excel">Excel</el-radio>
+          <el-radio v-model="exportOption.type" label="sql" disabled="disabled">Sql</el-radio>
+        </el-form-item>
+        <el-form-item label="With Out Limit">
+          <el-switch v-model="exportOption.withOutLimit"></el-switch>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" :loading="exportOption.loading" @click="confirmExport">Export</el-button>
+        <el-button @click="exportOption.visible = false">Cancel</el-button>
       </span>
     </el-dialog>
   </div>
@@ -167,6 +181,12 @@ export default {
       editor: {
         visible: false,
         loading: false
+      },
+      exportOption: {
+        visible: false,
+        loading: false,
+        type: "excel",
+        withOutLimit: true
       },
       info: {
         sql: null,
@@ -284,24 +304,22 @@ export default {
         sql: this.result.sql
       });
     },
-    exportData() {
-      this.$confirm("Export without limit?", "Export", {
-        confirmButtonText: "Yes",
-        cancelButtonText: "No",
-        type: "warning"
-      })
-        .then(() => {
-          postMessage({
+    confirmExport(){
+      if(this.exportOption.withOutLimit){
+         postMessage({
             type: "export",
             sql: this.result.sql.replace(/\blimit\b.+/gi, "")
           });
-        })
-        .catch(() => {
-          postMessage({
+      }else{
+        postMessage({
             type: "export",
             sql: this.result.sql
           });
-        });
+      }
+      this.exportOption.visible=false;
+    },
+    exportData() {
+      this.exportOption.visible = true;
     },
     filter(event, column) {
       let inputvalue = "" + event.target.value;
@@ -409,7 +427,7 @@ export default {
       let columns = "";
       let values = "";
       for (const key in this.update.currentNew) {
-        if(this.getTypeByColumn(key)==null)continue;
+        if (this.getTypeByColumn(key) == null) continue;
         const newEle = this.update.currentNew[key];
         if (newEle != null) {
           columns += `\`${key}\`,`;
@@ -429,7 +447,7 @@ export default {
     confirmUpdate() {
       let change = "";
       for (const key in this.update.currentNew) {
-        if(this.getTypeByColumn(key)==null)continue;
+        if (this.getTypeByColumn(key) == null) continue;
         const oldEle = this.update.current[key];
         const newEle = this.update.currentNew[key];
         if (oldEle !== newEle) {
