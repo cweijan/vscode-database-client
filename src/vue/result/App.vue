@@ -409,6 +409,7 @@ export default {
       let columns = "";
       let values = "";
       for (const key in this.update.currentNew) {
+        if(this.getTypeByColumn(key)==null)continue;
         const newEle = this.update.currentNew[key];
         if (newEle != null) {
           columns += `\`${key}\`,`;
@@ -428,6 +429,7 @@ export default {
     confirmUpdate() {
       let change = "";
       for (const key in this.update.currentNew) {
+        if(this.getTypeByColumn(key)==null)continue;
         const oldEle = this.update.current[key];
         const newEle = this.update.currentNew[key];
         if (oldEle !== newEle) {
