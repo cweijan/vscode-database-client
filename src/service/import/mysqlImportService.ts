@@ -13,8 +13,9 @@ export class MysqlImportService implements ImportService {
         NodeUtil.of(node)
         node = DatabaseCache.getDatabase(node.getConnectId(),node.database)
 
+        const host = node.usingSSH ? "127.0.0.1" : node.host
         const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
-        const command = `mysql -h ${node.host} -P ${port} -u ${node.user} ${node.password ? `-p${node.password}` : ""} ${node.database} < ${importPath}`
+        const command = `mysql -h ${host} -P ${port} -u ${node.user} ${node.password ? `-p${node.password}` : ""} ${node.database} < ${importPath}`
         Console.log(`
         Ensure you has been install mysql.\n
         Executing: \`${command.replace(/-p.+? /, "-p****** ")}\``);

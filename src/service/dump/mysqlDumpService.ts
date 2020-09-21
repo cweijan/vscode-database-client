@@ -11,16 +11,18 @@ import path = require('path');
 export class MysqlDumpService extends AbstractDumpService {
     protected dumpData(node: Node, exportPath: string, withData: boolean): void {
 
+        const host = node.usingSSH ? "127.0.0.1" : node.host
         const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
         const tableName = node instanceof TableNode ? node.table : null;
         const dumpFilePath = path.join(exportPath, `${node.database}${tableName ? "_" + tableName : ''}_${format('yyyy-MM-dd_hhmmss', new Date())}.sql`);
 
-        Console.log(`Doing backup ${node.host}_${node.database}...
-Origin command : \`mysqldump -h ${node.host} -P ${port} -u ${node.user} -p --database ${node.database} > ${dumpFilePath}\`.`);
+
+        Console.log(`Doing backup ${host}_${node.database}...
+Origin command : \`mysqldump -h ${host} -P ${port} -u ${node.user} -p --database ${node.database} > ${dumpFilePath}\`.`);
 
         const option: Options = {
             connection: {
-                host: node.host,
+                host: host,
                 user: node.user,
                 password: node.password,
                 database: node.database,
@@ -44,7 +46,7 @@ Origin command : \`mysqldump -h ${node.host} -P ${port} -u ${node.user} -p --dat
         } else {
             option.dump.data = {
                 format: false,
-                maxRowsPerInsertStatement:5000
+                maxRowsPerInsertStatement: 5000
             }
         }
         mysqldump(option).then(() => {
