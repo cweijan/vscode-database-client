@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.5.7 - 2020/9/21
+- Refacotr export panel.
+
 ## 2.5.5 - 2020/9/6
 - Change update as edit in same view.
 
