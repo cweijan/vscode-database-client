@@ -1,4 +1,4 @@
-import mysqldump, { Options } from 'mysqldump';
+import mysqldump, { Options } from 'mysqldump_plus';
 import * as vscode from "vscode";
 import { Console } from "../../common/outputChannel";
 import { Node } from "../../model/interface/node";
@@ -29,6 +29,7 @@ Origin command : \`mysqldump -h ${host} -P ${port} -u ${node.user} -p --database
                 port: port,
             },
             dump: {
+                withDatabase: true,
                 tables: tableName ? [tableName] : [],
                 schema: {
                     format: false,
