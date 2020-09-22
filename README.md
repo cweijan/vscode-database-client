@@ -23,6 +23,8 @@ alter user my_user@'%' identified with mysql_native_password by "myPassword";
 **Features**
 
 - [MySQL Client](#mysql-client)
+  - [Regarding MySQL 8.0 support](#regarding-mysql-80-support)
+  - [Coffee](#coffee)
   - [Connect](#connect)
   - [View Tables](#view-tables)
   - [Execute Sql](#execute-sql)
@@ -31,6 +33,12 @@ alter user my_user@'%' identified with mysql_native_password by "myPassword";
   - [Backup/Import](#backupimport)
   - [Setting](#setting)
   - [Other](#other)
+  - [RoadMap](#roadmap)
+  - [Sponsor](#sponsor)
+
+## Coffee
+
+If you like this this extension, consider [buying me a coffee](https://www.buymeacoffee.com/cweijan). Thank you!
 
 ## Connect
 
@@ -78,10 +86,11 @@ OpenSetting -> extensions -> Mysql
 
 ![suprise](images/surprise.jpg)
 
-## Coffee
-
-If you like this this extension, consider [buying me a coffee](https://www.buymeacoffee.com/cweijan). Thank you!
+## RoadMap
+- Sync table struct from diffrent connection.
+- Fix Intetllisense sql.
+- Better sql formatter.
 
 ## Sponsor
-- [IDEA](https://www.jetbrains.com/)
+- [Jetbrains](https://www.jetbrains.com/)
 
