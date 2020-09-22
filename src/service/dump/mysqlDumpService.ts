@@ -9,7 +9,7 @@ import format = require('date-format');
 import path = require('path');
 
 export class MysqlDumpService extends AbstractDumpService {
-    protected dumpData(node: Node, exportPath: string, withData: boolean): void {
+    protected dumpData(node: Node, exportPath: string, withData: boolean,tables:string[]): void {
 
         const host = node.usingSSH ? "127.0.0.1" : node.host
         const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
@@ -30,7 +30,7 @@ Origin command : \`mysqldump -h ${host} -P ${port} -u ${node.user} -p --database
             },
             dump: {
                 withDatabase: true,
-                tables: tableName ? [tableName] : [],
+                tables,
                 schema: {
                     format: false,
                     table: {

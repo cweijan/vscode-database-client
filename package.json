@@ -861,7 +861,7 @@
 		"element-ui": "^2.13.2",
 		"mockjs": "^1.1.0",
 		"mysql": "^2.18.1",
-		"mysqldump_plus": "^3.2.2",
+		"mysqldump_plus": "^3.2.3",
 		"node-xlsx": "^0.15.0",
 		"portfinder": "^1.0.26",
 		"pretty-bytes": "^5.3.0",
