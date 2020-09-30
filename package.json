@@ -868,6 +868,7 @@
 		"sql-formatter": "^2.3.3",
 		"tunnel-ssh": "^4.1.4",
 		"umy-ui": "1.0.8",
+		"umy-table": "1.0.8",
 		"vue": "^2.6.11",
 		"vue-router": "^3.4.1"
 	},
