@@ -4,26 +4,11 @@
 
 MySQL Client For Visual Studio Code
 
-
-> This plugin was inspired by [MySQL](https://github.com/formulahendry/vscode-mysql).
-> 
-> Give [project](https://github.com/cweijan/vscode-mysql) a star to keep me motivated to keep updating.
-
-## Regarding MySQL 8.0 support
-
-While this plugin can connect to a MySQL 8.0 server, the newer authentication methods are not supported.
-
-To change a user's authentication method to the older one supported by this plugin, run the following query:
-
-```sql
-alter user my_user@'%' identified with mysql_native_password by "myPassword";
-```
-
+> Project site: [vscode-mysql](https://github.com/cweijan/vscode-mysql)
 
 **Features**
 
 - [MySQL Client](#mysql-client)
-  - [Regarding MySQL 8.0 support](#regarding-mysql-80-support)
   - [Coffee](#coffee)
   - [Connect](#connect)
   - [View Tables](#view-tables)
@@ -33,8 +18,13 @@ alter user my_user@'%' identified with mysql_native_password by "myPassword";
   - [Backup/Import](#backupimport)
   - [Setting](#setting)
   - [Other](#other)
+  - [Regarding MySQL 8.0 support](#regarding-mysql-80-support)
   - [RoadMap](#roadmap)
   - [Sponsor](#sponsor)
+
+## Installation
+
+Install from vscode marketplace [vscode-mysql](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2).
 
 ## Coffee
 
@@ -85,6 +75,16 @@ OpenSetting -> extensions -> Mysql
 * Find a suprise when you right click on a node.
 
 ![suprise](images/surprise.jpg)
+
+## Regarding MySQL 8.0 support
+
+While this plugin can connect to a MySQL 8.0 server, the newer authentication methods are not supported.
+
+To change a user's authentication method to the older one supported by this plugin, run the following query:
+
+```sql
+alter user my_user@'%' identified with mysql_native_password by "myPassword";
+```
 
 ## RoadMap
 - Sync table struct from diffrent connection.
