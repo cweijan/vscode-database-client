@@ -9,7 +9,6 @@ MySQL Client For Visual Studio Code
 **Features**
 
 - [MySQL Client](#mysql-client)
-  - [Coffee](#coffee)
   - [Connect](#connect)
   - [View Tables](#view-tables)
   - [Execute Sql](#execute-sql)
@@ -17,9 +16,8 @@ MySQL Client For Visual Studio Code
   - [History](#history)
   - [Backup/Import](#backupimport)
   - [Setting](#setting)
-  - [Other](#other)
-  - [Regarding MySQL 8.0 support](#regarding-mysql-80-support)
   - [RoadMap](#roadmap)
+  - [Filter](#filter)
   - [Sponsor](#sponsor)
 
 ## Regarding MySQL 8.0 support
