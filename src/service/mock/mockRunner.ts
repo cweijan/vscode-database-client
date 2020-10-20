@@ -22,6 +22,7 @@ export class MockRunner {
     public async create(tableNode: TableNode) {
         const columnList = (await tableNode.getChildren()) as ColumnNode[]
         const mockModel: MockModel = {
+            mode: tableNode.global === false ? 'workspace' : 'global',
             host: tableNode.getHost(), port: tableNode.getPort(), user: tableNode.getUser(), database: tableNode.database, table: tableNode.table,
             mockStartIndex: MockRunner.primaryKeyMap[tableNode.getConnectId()] ? 'auto' : 1
             , mockCount: 50, examples: "http://mockjs.com/examples.html#DPD", mock: {}
@@ -58,7 +59,10 @@ export class MockRunner {
         const content = vscode.window.activeTextEditor.document.getText()
 
         const mockModel = JSON.parse(content) as MockModel;
-        const databaseid = `${mockModel.host}_${mockModel.port}_${mockModel.user}_${mockModel.database}`;
+        if(!mockModel.mode){
+            mockModel.mode='global'
+        }
+        const databaseid = `${mockModel.mode}_${mockModel.host}_${mockModel.port}_${mockModel.user}_${mockModel.database}`;
         const tableList = DatabaseCache.getChildListOfDatabase(databaseid) as TableNode[]
         if (!tableList) {
             vscode.window.showErrorMessage(`Database ${mockModel.database} not found!`)

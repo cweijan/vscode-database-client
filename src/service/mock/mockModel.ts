@@ -1,4 +1,5 @@
 export interface MockModel {
+    mode: string;
     host: string;
     port: number;
     user: string;
