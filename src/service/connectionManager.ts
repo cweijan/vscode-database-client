@@ -11,6 +11,7 @@ import { DatabaseCache } from "./common/databaseCache";
 import { NodeUtil } from "../model/nodeUtil";
 import { SSHTunnelService } from "./common/sshTunnelService";
 import { DbTreeDataProvider } from "../provider/treeDataProvider";
+import { debug } from "util";
 
 interface ConnectionWrapper {
     connection: mysql.Connection;
@@ -101,7 +102,7 @@ export class ConnectionManager {
                 } else {
                     this.activeConnection[key] = null;
                     this.tunnelService.closeTunnel(key)
-                    Console.log(`${err.stack}\n${err.message}`);
+                    console.error(err.stack)
                     reject(err.message);
                 }
             });
