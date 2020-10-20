@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.6.0 - 2020/10/20
+- Support config connection per workspace.
+- Hide error messages.
+
 ## 2.5.7 - 2020/9/21
 - Refacotr export panel.
 
