@@ -22,8 +22,9 @@ export class ConnectionNode extends Node implements CopyAble {
     constructor(readonly id: string, readonly parent: Node) {
         super(id)
         this.init(parent)
+        this.id=this.getConnectId()
         if (parent.name) {
-            this.label = `${parent.name}_${id}`
+            this.label = `${parent.name}_${this.id}`
             this.name = parent.name
         }
         const lcp = ConnectionManager.getLastConnectionOption(false);
@@ -109,11 +110,12 @@ export class ConnectionNode extends Node implements CopyAble {
     public async deleteConnection(context: vscode.ExtensionContext) {
 
         Util.confirm(`Are you want to Delete Connection ${this.id} ? `, async () => {
-            const connections = context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
+            const targetContext = this.global === false ? context.workspaceState : context.globalState;
+            const connections = targetContext.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
             ConnectionManager.removeConnection(this.id)
             DatabaseCache.clearDatabaseCache(this.id)
             delete connections[this.id];
-            await context.globalState.update(CacheKey.ConectionsKey, connections);
+            await targetContext.update(CacheKey.ConectionsKey, connections);
             DbTreeDataProvider.refresh();
         })
 

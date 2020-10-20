@@ -802,7 +802,7 @@
 			"properties": {
 				"vscode-mysql.maxTableCount": {
 					"type": "integer",
-					"default": 500,
+					"default": 1000,
 					"description": "The maximum table count shown in the tree view"
 				},
 				"vscode-mysql.enableDelimiter": {

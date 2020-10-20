@@ -13,7 +13,7 @@ export abstract class AbstractConnectService {
     public async openConnect(provider: DbTreeDataProvider, connectionNode?: ConnectionNode) {
         let node: any;
         if (connectionNode) {
-            node = { ...connectionNode }
+            node = { ...connectionNode ,isGlobal:connectionNode.global }
             if (node.ssh) {
                 node.ssh.tunnelPort = null
             }

@@ -53,7 +53,19 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async addConnection(connectionNode: Node) {
 
-        let connections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
+
+        // if is add from edit, clear previous connection info.
+        const editGlobal = (connectionNode as any).isGlobal;
+        if (editGlobal != null) {
+            const oldContext = editGlobal === false ? this.context.workspaceState : this.context.globalState;
+            const oldConnections = oldContext.get<{ [key: string]: Node }>(CacheKey.ConectionsKey)
+            delete oldConnections[connectionNode.getConnectId(editGlobal)]
+            await oldContext.update(CacheKey.ConectionsKey, oldConnections);
+        }
+        
+        const targetContext = connectionNode.global === false ? this.context.workspaceState : this.context.globalState;
+
+        let connections = targetContext.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
 
         if (!connections) {
             connections = {};
@@ -64,7 +76,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         ConnectionManager.removeConnection(connectId)
 
 
-        await this.context.globalState.update(CacheKey.ConectionsKey, connections);
+        await targetContext.update(CacheKey.ConectionsKey, connections);
         DbTreeDataProvider.refresh();
     }
 
@@ -81,7 +93,13 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async getConnectionNodes(): Promise<ConnectionNode[]> {
         const connectionNodes = [];
-        const connections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
+        let connections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
+        if (connections) {
+            for (const key of Object.keys(connections)) {
+                connectionNodes.push(new ConnectionNode(key, connections[key]));
+            }
+        }
+        connections = this.context.workspaceState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
         if (connections) {
             for (const key of Object.keys(connections)) {
                 connectionNodes.push(new ConnectionNode(key, connections[key]));
@@ -94,7 +112,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
         const dbIdList: string[] = [];
         const dbIdMap = new Map<string, DatabaseNode>();
-        const numbers=(await this.getConnectionNodes()).length>1
+        const numbers = (await this.getConnectionNodes()).length > 1
         for (const dbNode of DatabaseCache.getDatabaseNodeList()) {
             if (dbNode instanceof UserGroup) { continue }
             const id = numbers ? dbNode.id : dbNode.database

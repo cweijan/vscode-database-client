@@ -58,6 +58,12 @@
     </el-row>
     <el-row>
       <div class="field field__input">
+        Global:
+        <el-switch v-model="connectionOption.global"></el-switch>
+      </div>
+    </el-row>
+    <el-row>
+      <div class="field field__input">
         usingSSH:
         <el-switch v-model="connectionOption.usingSSH"></el-switch>
       </div>
@@ -127,6 +133,7 @@ export default {
         password: "",
         database: null,
         usingSSH: false,
+        global: true,
         excludeDatabases: "mysql,performance_schema,information_schema,sys",
         timezone: "+00:00",
         ssh: {

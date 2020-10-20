@@ -68,7 +68,10 @@ export class DatabaseCache {
         }
 
         if (!this.collpaseState || Object.keys(this.collpaseState).length == 0) {
-            this.collpaseState = this.context.globalState.get(CacheKey.CollapseSate);
+            this.collpaseState =
+                (element.global === false) ?
+                    this.context.workspaceState.get(CacheKey.CollapseSate) : this.context.globalState.get(CacheKey.CollapseSate)
+                ;
         }
 
         if (!this.collpaseState) {
@@ -98,7 +101,11 @@ export class DatabaseCache {
         }
 
         this.collpaseState[element.id] = collapseState;
-        this.context.globalState.update(CacheKey.CollapseSate, this.collpaseState);
+        if (element.global === false) {
+            this.context.workspaceState.update(CacheKey.CollapseSate, this.collpaseState);
+        } else {
+            this.context.globalState.update(CacheKey.CollapseSate, this.collpaseState);
+        }
 
     }
 

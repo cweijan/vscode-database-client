@@ -14,7 +14,8 @@ import { DbTreeDataProvider } from "../provider/treeDataProvider";
 
 interface ConnectionWrapper {
     connection: mysql.Connection;
-    ssh: SSHConfig
+    ssh: SSHConfig;
+    createTime: Date
 }
 
 export class ConnectionManager {
@@ -92,7 +93,7 @@ export class ConnectionManager {
                     return;
                 }
             }
-            this.activeConnection[key] = { connection: this.createConnection(connectOption), ssh };
+            this.activeConnection[key] = { connection: this.createConnection(connectOption), ssh, createTime: new Date() };
             this.activeConnection[key].connection.connect((err: Error) => {
                 if (!err) {
                     this.lastConnectionNode = NodeUtil.of(connectionNode);
@@ -127,12 +128,13 @@ export class ConnectionManager {
             if (fileName.includes('cweijan.vscode-mysql-client2')) {
                 const queryName = path.basename(fileName, path.extname(fileName))
                 const filePattern = queryName.split('_');
-                const [host, port, user] = filePattern
+                const [mode, host, port, user] = filePattern
                 let database: string;
-                if (filePattern.length >= 4) {
-                    database = filePattern[3]
-                    if (filePattern.length >= 4) {
-                        for (let index = 4; index < filePattern.length; index++) {
+                if (filePattern.length >= 5) {
+                    database = filePattern[4]
+                    // fix if database name has _, loop append
+                    if (filePattern.length >= 5) {
+                        for (let index = 5; index < filePattern.length; index++) {
                             database = `${database}_${filePattern[index]}`
                         }
                     }

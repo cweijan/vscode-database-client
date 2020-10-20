@@ -14,6 +14,7 @@ export abstract class Node extends vscode.TreeItem {
     public certPath?: string;
     public excludeDatabases?: string;
 
+    public global?: boolean;
     public usingSSH?: boolean;
     public ssh?: SSHConfig;
 
@@ -31,6 +32,7 @@ export abstract class Node extends vscode.TreeItem {
         this.certPath = source.certPath
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
+        this.global = source.global
         this.excludeDatabases = source.excludeDatabases
         this.collapsibleState = DatabaseCache.getElementState(this)
     }
@@ -39,11 +41,15 @@ export abstract class Node extends vscode.TreeItem {
         return []
     }
 
-    public getConnectId(): string {
+    public getConnectId(SpecGlobal?: boolean): string {
+
+        const targetGlobal = SpecGlobal != null ? SpecGlobal : this.global;
+        const prefix = targetGlobal === false ? "workspace" : "global";
+
         if (this.usingSSH && this.ssh) {
-            return `${this.ssh.host}_${this.ssh.port}_${this.ssh.username}`;
+            return `${prefix}_${this.ssh.host}_${this.ssh.port}_${this.ssh.username}`;
         }
-        return `${this.host}_${this.port}_${this.user}`;
+        return `${prefix}_${this.host}_${this.port}_${this.user}`;
     }
 
     public getHost(): string { return this.usingSSH ? this.ssh.host : this.host }
