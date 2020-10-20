@@ -96,6 +96,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         let connections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
         if (connections) {
             for (const key of Object.keys(connections)) {
+                connections[key].global = true;
                 const connection = new ConnectionNode(key, connections[key]);
                 delete connections[key]
                 connections[connection.getConnectId()] = connection
@@ -107,6 +108,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         connections = this.context.workspaceState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
         if (connections) {
             for (const key of Object.keys(connections)) {
+                connections[key].global = false;
                 const connection = new ConnectionNode(key, connections[key]);
                 delete connections[key]
                 connections[connection.getConnectId()] = connection
