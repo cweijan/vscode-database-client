@@ -93,13 +93,19 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async getConnectionNodes(): Promise<ConnectionNode[]> {
         const connectionNodes = [];
+        const map={};
         let connections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
         if (connections) {
             for (const key of Object.keys(connections)) {
                 connections[key].global = true;
                 const connection = new ConnectionNode(key, connections[key]);
                 delete connections[key]
-                connections[connection.getConnectId()] = connection
+                const connectId = connection.getConnectId();
+                if(map[connectId]){
+                    continue;
+                }
+                map[connectId] = connection
+                connections[connectId] = connection
                 connectionNodes.push(connection);
             }
         }
@@ -111,7 +117,12 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
                 connections[key].global = false;
                 const connection = new ConnectionNode(key, connections[key]);
                 delete connections[key]
-                connections[connection.getConnectId()] = connection
+                const connectId = connection.getConnectId();
+                if(map[connectId]){
+                    continue;
+                }
+                map[connectId] = connection
+                connections[connectId] = connection
                 connectionNodes.push(connection);
             }
         }
