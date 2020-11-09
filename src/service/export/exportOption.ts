@@ -2,7 +2,7 @@ export class ExportOption {
     type: ExportType;
     withOutLimit: boolean;
     sql: string;
-    folderPath: string;
+    exportPath: string;
 }
 
 export enum ExportType {

@@ -8,7 +8,7 @@ export class MysqlExportService extends AbstractExportService {
 
     protected async exportExcel(exportOption: ExportOption) {
 
-        const folderPath = exportOption.folderPath
+        const filePath = exportOption.exportPath
         const sql = exportOption.sql
         const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())
         connection.query(sql, (err, rows, fields?: FieldInfo[]) => {
@@ -16,7 +16,7 @@ export class MysqlExportService extends AbstractExportService {
                 Console.log(err)
                 return;
             }
-            super.exportByNodeXlsx(folderPath, fields, rows);
+            super.exportByNodeXlsx(filePath, fields, rows);
         })
 
     }

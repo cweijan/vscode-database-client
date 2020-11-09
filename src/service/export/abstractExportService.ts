@@ -7,24 +7,26 @@ import { ExportOption } from "./exportOption";
 
 export abstract class AbstractExportService implements ExportService {
     public export(exportOption: ExportOption): void {
-        vscode.window.showOpenDialog({ canSelectMany: false, openLabel: "Select export file path", canSelectFiles: false, canSelectFolders: true }).then((folderPath) => {
-            if (folderPath) {
-                exportOption.folderPath=folderPath[0].fsPath;
+        const randomFileName=`${new Date().getTime()}.xlsx`
+
+        vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(randomFileName), filters: { 'xlsx': ['xlsx'] } }).then((filePath) => {
+            if (filePath) {
+                exportOption.exportPath=filePath.fsPath;
                 if(exportOption.withOutLimit){
                     exportOption.sql=exportOption.sql.replace(/\blimit\b.+/gi, "")
                 }
                 this.exportExcel(exportOption)
             }
-        });
+        })
     }
 
 
     protected abstract exportExcel(exportOption:ExportOption): void;
 
-    protected exportByNodeXlsx(folderPath: string, fields: FieldInfo[], rows: any) {
+    protected exportByNodeXlsx(filePath: string, fields: FieldInfo[], rows: any) {
         Console.log("start export data...")
         const nodeXlsx = require('node-xlsx');
-        fs.writeFileSync(`${folderPath}/${new Date().getTime()}.xlsx`, nodeXlsx.build([{
+        fs.writeFileSync(filePath, nodeXlsx.build([{
             name: "sheet1",
             data: [
                 fields.map((field) => field.name),
