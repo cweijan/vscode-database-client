@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.7.0 -2020/11/9
+- Resule view theme follow vscode theme.
+
 ## 2.6.0 - 2020/10/20
 - Support config connection per workspace.
 - Hide error messages.
