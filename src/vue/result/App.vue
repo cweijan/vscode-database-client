@@ -64,7 +64,7 @@
         </el-button>
       </template>
     </div>
-    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" @table-body-scroll="(_,e)=>scrollChange(e)" :height="remainHeight" width="100vh" stripe @select-all="toolbar.show=true" :edit-config="{trigger: 'click', mode: 'row',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="row=>updateEdit(row)" :show-header-overflow="false" :show-overflow="false">
+    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" @table-body-scroll="(_,e)=>scrollChange(e)" :height="remainHeight" width="100vh" stripe @select-all="toolbar.show=true" :edit-config="{trigger: 'click', mode: 'row',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="updateEdit" :show-header-overflow="false" :show-overflow="false">
       <ux-table-column type="checkbox" width="40" fixed="left" />
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined" />
       <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field.name,0,index,toolbar.filter[field.name])" edit-render>
@@ -468,8 +468,8 @@ export default {
         this.$message("Not any change, update fail!");
       }
     },
-    updateEdit(row) {
-      if (row.isFilter) {
+    updateEdit(row,column,event) {
+      if (row.isFilter || column.type=="checkbox") {
         return;
       }
       this.toolbar.row = row;
@@ -478,8 +478,9 @@ export default {
         currentNew: this.clone(row),
         primary: row[this.result.primaryKey],
       };
-      if (parseInt(row._XID.replace("row_", "")) > 20) {
+      if (this.result.data.length > 24) {
         this.openEdit();
+        event.stopPropagation()
       }
     },
     openEdit(row) {
