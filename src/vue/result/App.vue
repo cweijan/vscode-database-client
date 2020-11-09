@@ -10,11 +10,11 @@
       <el-row id="tool-panel">
         <el-button type="success" size="small" @click='count(toolbar.sql);'>Count</el-button>
         <el-button type="primary" size="small" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
-        <el-tag>Theme :</el-tag>
+        <!-- <el-tag>Theme :</el-tag>
         <el-select v-model="theme.select" @change="changeTheme">
           <el-option v-for="theme in theme.list" :key="theme" :label="theme" :value="theme">
           </el-option>
-        </el-select>
+        </el-select> -->
         <template v-if="result.table">
           <el-tag>Table :</el-tag>
           <span>
@@ -58,7 +58,7 @@
         </el-button>
       </template>
     </div>
-    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '40px'}" @sort-change="sort" @table-body-scroll="(_,e)=>scrollChange(e)" :height="remainHeight" width="100vh" stripe @select-all="toolbar.show=true" :edit-config="{trigger: 'click', mode: 'row',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="row=>updateEdit(row)" :show-header-overflow="false" :show-overflow="false">
+    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" @table-body-scroll="(_,e)=>scrollChange(e)" :height="remainHeight" width="100vh" stripe @select-all="toolbar.show=true" :edit-config="{trigger: 'click', mode: 'row',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="row=>updateEdit(row)" :show-header-overflow="false" :show-overflow="false">
       <ux-table-column type="checkbox" width="40" fixed="left" />
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined" />
       <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field.name,0,index,toolbar.filter[field.name])" edit-render>
@@ -136,7 +136,7 @@
 <script>
 const vscode =
   typeof acquireVsCodeApi != "undefined" ? acquireVsCodeApi() : null;
-const postMessage = message => {
+const postMessage = (message) => {
   if (vscode) {
     vscode.postMessage(message);
   }
@@ -146,8 +146,8 @@ export default {
   data() {
     return {
       theme: {
-        list: ["Auto","Default", "Dark"],
-        select: "Auto"
+        list: ["Auto", "Default", "Dark"],
+        select: "Auto",
       },
       result: {
         data: [],
@@ -156,18 +156,18 @@ export default {
         columnList: null,
         database: null,
         table: null,
-        pageSize: null
+        pageSize: null,
       },
       page: {
         pageNum: 1,
         pageSize: -1,
         isEnd: false,
-        lock: false
+        lock: false,
       },
       table: {
         search: "",
         loading: true,
-        widthItem: {}
+        widthItem: {},
       },
       toolbar: {
         row: {},
@@ -175,30 +175,30 @@ export default {
         show: false,
         costTime: 0,
         filter: {},
-        showColumns: []
+        showColumns: [],
       },
       editor: {
         visible: false,
-        loading: false
+        loading: false,
       },
       exportOption: {
         visible: false,
         loading: false,
         type: "excel",
-        withOutLimit: true
+        withOutLimit: true,
       },
       info: {
         sql: null,
         message: null,
         visible: false,
         error: false,
-        needRefresh: true
+        needRefresh: true,
       },
       update: {
         current: {},
         currentNew: {},
-        primary: null
-      }
+        primary: null,
+      },
     };
   },
   mounted() {
@@ -212,7 +212,7 @@ export default {
         this.reset();
       }
     };
-    const handlerCommon = res => {
+    const handlerCommon = (res) => {
       this.editor.loading = false;
       this.editor.visible = false;
       this.info.visible = true;
@@ -275,7 +275,7 @@ export default {
       }
     });
     postMessage({ type: "init" });
-    window.addEventListener("keyup", event => {
+    window.addEventListener("keyup", (event) => {
       if (event.key == "c" && event.ctrlKey) {
         document.execCommand("copy");
       }
@@ -300,7 +300,7 @@ export default {
       postMessage({
         type: "changeTheme",
         theme,
-        sql: this.result.sql
+        sql: this.result.sql,
       });
     },
     confirmExport() {
@@ -308,8 +308,8 @@ export default {
         type: "export",
         option: {
           ...this.exportOption,
-          sql: this.result.sql
-        }
+          sql: this.result.sql,
+        },
       });
       this.exportOption.visible = false;
     },
@@ -466,11 +466,15 @@ export default {
       if (row.isFilter) {
         return;
       }
+      if (parseInt(row._XID.replace("row_", "")) > 20) {
+        this.openEdit(row);
+        return;
+      }
       this.toolbar.row = row;
       this.update = {
         current: row,
         currentNew: this.clone(row),
-        primary: row[this.result.primaryKey]
+        primary: row[this.result.primaryKey],
       };
     },
     openEdit(row) {
@@ -486,16 +490,17 @@ export default {
       this.$confirm("Are you sure you want to delete this data?", "Warning", {
         confirmButtonText: "OK",
         cancelButtonText: "Cancel",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           let checkboxRecords = this.$refs.dataTable.getCheckboxRecords();
           if (checkboxRecords.length > 0) {
             checkboxRecords = checkboxRecords
               .filter(
-                checkboxRecord => checkboxRecord[this.result.primaryKey] != null
+                (checkboxRecord) =>
+                  checkboxRecord[this.result.primaryKey] != null
               )
-              .map(checkboxRecord =>
+              .map((checkboxRecord) =>
                 this.wrapQuote(
                   this.result.primaryKey,
                   checkboxRecord[this.result.primaryKey]
@@ -512,7 +517,7 @@ export default {
                 }=${this.wrapQuote(this.result.primaryKey, primaryValue)}`;
           this.execute(deleteSql);
         })
-        .catch(e => {
+        .catch((e) => {
           if (e) {
             this.$message.error(e);
           } else {
@@ -567,7 +572,7 @@ export default {
       if (!sql) return;
       postMessage({
         type: "execute",
-        sql: sql.replace(/ +/gi, " ")
+        sql: sql.replace(/ +/gi, " "),
       });
       this.table.loading = true;
     },
@@ -611,7 +616,7 @@ export default {
         type: "next",
         sql: this.result.sql,
         pageNum: ++this.page.pageNum,
-        pageSize: this.page.pageSize
+        pageSize: this.page.pageSize,
       });
       this.table.loading = true;
       this.page.lock = true;
@@ -679,7 +684,7 @@ export default {
         this.toolbar.filter = {};
         this.$refs.dataTable.clearSort();
       }
-    }
+    },
   },
   computed: {
     columnCount() {
@@ -702,8 +707,8 @@ export default {
     },
     remainHeight() {
       return window.outerHeight - 320;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -779,8 +784,8 @@ body {
   text-align: center !important;
 }
 .plx-table--body .el-input__inner {
-  line-height: 40px !important;
-  height: 40px !important;
+  line-height: 35px !important;
+  height: 35px !important;
 }
 
 .plx-cell span {
