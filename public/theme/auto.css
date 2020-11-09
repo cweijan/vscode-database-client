@@ -42203,7 +42203,7 @@ html, body {
     box-sizing: border-box;
     width: 100%;
     font-size: inherit;
-    color: var(--vscode-editor-foreground) !important;
+    color: var(--vscode-editor-foreground);
     background-color: var(--vscode-editor-background) !important;
     background-image: none;
     border: 1px solid var(--vscode-menubar-selectionForeground);

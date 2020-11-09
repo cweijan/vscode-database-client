@@ -2,20 +2,14 @@
   <div id="app">
     <div class="hint">
       <!-- sql input -->
-      <el-row style="margin-bottom: 10px;">
-        <el-input type="textarea" :autosize="{ minRows:3, maxRows:5}" v-model="toolbar.sql" style="width:90vw">
-        </el-input>
-      </el-row>
-      <!-- tool panel -->
-      <el-row id="tool-panel">
-        <el-button type="success" size="small" @click='count(toolbar.sql);'>Count</el-button>
-        <el-button type="primary" size="small" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
-        <!-- <el-tag>Theme :</el-tag>
-        <el-select v-model="theme.select" @change="changeTheme">
-          <el-option v-for="theme in theme.list" :key="theme" :label="theme" :value="theme">
-          </el-option>
-        </el-select> -->
-        <template v-if="result.table">
+      <el-row>
+        <el-col :span="12">
+          <el-input type="textarea" :autosize="{ minRows:3, maxRows:5}" v-model="toolbar.sql" style="width:100%">
+          </el-input>
+        </el-col>
+        <el-col :span="11">
+        <div style="width:80%;margin-left: 20px; height: 60px; line-height: 60px;">
+            <template v-if="result.table">
           <el-tag>Table :</el-tag>
           <span>
             {{ result.table }}
@@ -24,15 +18,27 @@
         <el-tag type="success">CostTime :</el-tag>
         <span v-text="toolbar.costTime"></span>ms
         <span v-if="result.table">, <el-tag type="warning">Row :</el-tag>{{ result.data.length - 1 }}, <el-tag type="danger"> Col :</el-tag> {{ columnCount }}</span>
+        </div>
+        </el-col>
       </el-row>
+      <!-- tool panel -->
+      <!-- <el-row id="tool-panel">
+        <el-tag>Theme :</el-tag>
+        <el-select v-model="theme.select" @change="changeTheme">
+          <el-option v-for="theme in theme.list" :key="theme" :label="theme" :value="theme">
+          </el-option>
+        </el-select>
+      </el-row> -->
       <!-- info panel -->
-      <div v-if="info.visible ">
+      <div v-if="info.visible " >
         <div v-if="info.error" class="info-panel" style="color:red" v-html="info.message"></div>
         <div v-if="!info.error" class="info-panel" style="color: green;" v-html="info.message"></div>
       </div>
     </div>
     <!-- toolbar -->
-    <div style="margin:8px">
+    <div style="margin-bottom: 8px; margin-left: 20px;">
+      <el-button type="success" size="small" @click='count(toolbar.sql);'>Count</el-button>
+        <el-button type="primary" size="small" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
       <el-input v-model="table.search" placeholder="Input To Search Data" style="width:200px" />
       <el-button @click="exportData()" type="primary" size="small" icon="el-icon-share" circle title="Export"></el-button>
       <el-button type="info" icon="el-icon-circle-plus-outline" size="small" circle @click="insertRequest">
@@ -466,16 +472,15 @@ export default {
       if (row.isFilter) {
         return;
       }
-      if (parseInt(row._XID.replace("row_", "")) > 20) {
-        this.openEdit(row);
-        return;
-      }
       this.toolbar.row = row;
       this.update = {
         current: row,
         currentNew: this.clone(row),
         primary: row[this.result.primaryKey],
       };
+      if (parseInt(row._XID.replace("row_", "")) > 20) {
+        this.openEdit();
+      }
     },
     openEdit(row) {
       this.editor.visible = true;
@@ -706,7 +711,7 @@ export default {
       );
     },
     remainHeight() {
-      return window.outerHeight - 320;
+      return window.outerHeight - 250;
     },
   },
 };
@@ -726,9 +731,12 @@ body {
 }
 
 .hint {
+  box-sizing: border-box;
   padding: 5px;
+  padding-left: 20px;
   font-size: 17px;
   color: #444;
+  width: 100vw;
   display: inline-block;
   margin-top: 8px;
 }
@@ -757,7 +765,7 @@ body {
 
 /* 滚动条样式（高宽及背景）*/
 ::-webkit-scrollbar {
-  background-color: #ccc;
+  background-color: var(--vscode-scrollbarSlider-background);
   width: 12px;
   height: 12px;
 }
@@ -765,19 +773,20 @@ body {
 /* 滚动条轨道（凹槽）样式*/
 ::-webkit-scrollbar-track {
   /* -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);   */
-  border-radius: 8px;
-  background-color: #424242;
+  /* border-radius: 8px; */
+  /* background-color: #424242; */
+  background-color:  var(--vscode-editor-background);;
 }
 
 /* 滑块样式*/
 ::-webkit-scrollbar-thumb {
   border-radius: 8px;
-  background-color: #b0b0b0;
+  background-color: var(--vscode-scrollbarSlider-background);
 }
 
 ::-webkit-scrollbar-thumb:hover {
   border-radius: 8px;
-  background-color: #ccc;
+  background-color: var(--vscode-scrollbarSlider-hoverBackground);
 }
 .plx-cell {
   padding: 0px !important;
