@@ -2,20 +2,14 @@ import mysqldump, { Options } from 'mysqldump_plus';
 import * as vscode from "vscode";
 import { Console } from "../../common/outputChannel";
 import { Node } from "../../model/interface/node";
-import { TableNode } from "../../model/main/tableNode";
 import { NodeUtil } from "../../model/nodeUtil";
 import { AbstractDumpService } from "./abstractDumpService";
-import format = require('date-format');
-import path = require('path');
 
 export class MysqlDumpService extends AbstractDumpService {
-    protected dumpData(node: Node, exportPath: string, withData: boolean,tables:string[]): void {
+    protected dumpData(node: Node, dumpFilePath: string, withData: boolean,tables:string[]): void {
 
         const host = node.usingSSH ? "127.0.0.1" : node.host
         const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
-        const tableName = node instanceof TableNode ? node.table : null;
-        const dumpFilePath = path.join(exportPath, `${node.database}${tableName ? "_" + tableName : ''}_${format('yyyy-MM-dd_hhmmss', new Date())}.sql`);
-
 
         Console.log(`Doing backup ${host}_${node.database}...
 Origin command : \`mysqldump -h ${host} -P ${port} -u ${node.user} -p --database ${node.database} > ${dumpFilePath}\`.`);
