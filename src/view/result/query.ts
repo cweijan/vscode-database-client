@@ -50,12 +50,8 @@ export class QueryPage {
         }
 
 
-        const themeMap = { "Dark": "result-dark", "Default": "result" }
         const themeName: string = Global.getConfig(ConfigKey.REULST_THEME)
-        let path = themeMap[themeName]
-        if (!path) {
-            path = "result"
-        }
+        
         let title = queryParam.singlePage ? "Query" : "Query" + new Date().getTime();
         const olderTitle = this.hodlder.get(queryParam.res.sql);
         if (olderTitle) {
@@ -69,8 +65,11 @@ export class QueryPage {
         ViewManager.createWebviewPanel({
             singlePage: true,
             splitView: this.isActiveSql(),
-            path, title,
+            path:'result', title,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
+            handleHtml:(html)=>{
+                return html.replace("empty.css",`theme/${themeName.toLowerCase()}.css`);
+            },
             initListener: (webviewPanel) => {
                 if (queryParam.res?.table) {
                     webviewPanel.title = queryParam.res.table

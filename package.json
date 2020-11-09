@@ -841,6 +841,7 @@
 		"@types/ssh2": "^0.5.43",
 		"@types/vscode": "1.38.0",
 		"cardinal": "^2.1.1",
+		"copy-webpack-plugin": "^6.3.0",
 		"css-loader": "^3.5.3",
 		"file-loader": "^6.0.0",
 		"html-webpack-plugin": "^4.3.0",

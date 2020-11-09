@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
 import { Console } from "../common/outputChannel";
 import { EventEmitter } from 'events'
+import webpack = require("webpack");
 
 export class ViewOption {
     public iconPath?: string;
@@ -18,6 +19,10 @@ export class ViewOption {
      * kill exists panel
      */
     public killHidden?: boolean;
+    /**
+     * receive webview send message 
+     */
+    public handleHtml?: (html:string,viewPanel: WebviewPanel) => string;
     /**
      * receive webview send message 
      */
@@ -113,6 +118,9 @@ export class ViewManager {
                 }
                 this.viewStatu[viewOption.title].instance = webviewPanel
                 const contextPath = path.resolve(targetPath, "..");
+                if(viewOption.handleHtml){
+                    data=viewOption.handleHtml(data,webviewPanel)
+                }
                 webviewPanel.webview.html = this.buildPath(data, webviewPanel.webview, contextPath);
 
                 webviewPanel.onDidDispose(() => {

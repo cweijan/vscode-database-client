@@ -1,6 +1,7 @@
 const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const isProd = process.argv.indexOf('-p') >= 0;
 
 module.exports = [
@@ -34,14 +35,14 @@ module.exports = [
     {
         entry: {
             app: './src/vue/main.js',
-            query: './src/vue/result/main.js',
-            queryDark: './src/vue/result/main-dark.js'
+            query: './src/vue/result/main.js'
         },
         plugins: [
             new VueLoaderPlugin(),
             new HtmlWebpackPlugin({ inject: true, template: './src/vue/index.html', chunks: ['app'], filename: 'webview/app.html' }),
-            new HtmlWebpackPlugin({ inject: true, template: './src/vue/index.html', chunks: ['query'], filename: 'webview/result.html' }),
-            new HtmlWebpackPlugin({ inject: true, template: './src/vue/index.html', chunks: ['queryDark'], filename: 'webview/result-dark.html' }),
+            new CopyWebpackPlugin({
+                patterns: [{ from: 'public', to: './webview' }]
+            }),
         ],
         output: {
             path: path.resolve(__dirname, 'out'),
