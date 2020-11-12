@@ -824,10 +824,10 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run build",
 		"dev": "webpack --progress",
 		"build": "webpack -p --progress",
-		"tslint": "tslint -t verbose src/**/*.ts"
+		"publich": "vsce publish",
+		"vscode:prepublish": "npm run build"
 	},
 	"devDependencies": {
 		"@types/mockjs": "^1.0.2",
