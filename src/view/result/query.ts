@@ -50,8 +50,6 @@ export class QueryPage {
         }
 
 
-        const themeName: string = Global.getConfig(ConfigKey.REULST_THEME)
-        
         let title = queryParam.singlePage ? "Query" : "Query" + new Date().getTime();
         const olderTitle = this.hodlder.get(queryParam.res.sql);
         if (olderTitle) {
@@ -67,15 +65,11 @@ export class QueryPage {
             splitView: this.isActiveSql(),
             path:'result', title,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
-            handleHtml:(html)=>{
-                return html.replace("empty.css",`theme/${themeName.toLowerCase()}.css`);
-            },
             initListener: (webviewPanel) => {
                 if (queryParam.res?.table) {
                     webviewPanel.title = queryParam.res.table
                 }
                 webviewPanel.webview.postMessage(queryParam);
-                webviewPanel.webview.postMessage({ type: MessageType.THEME, res: themeName } as QueryParam<string>);
             },
             receiveListener: async (viewPanel, params) => {
                 switch (params.type) {
@@ -94,11 +88,6 @@ export class QueryPage {
                         break;
                     case OperateType.export:
                         this.exportService.export(params.option)
-                        break;
-                    case OperateType.changeTheme:
-                        await Global.updateConfig(ConfigKey.REULST_THEME, params.theme)
-                        viewPanel.dispose()
-                        QueryUnit.runQuery(params.sql)
                         break;
                 }
             }

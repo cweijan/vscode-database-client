@@ -8,7 +8,7 @@
           </el-input>
         </el-col>
         <el-col :span="11">
-        <div style="width:80%;margin-left: 20px; height: 60px; line-height: 60px;">
+        <div style="width:90%;margin-left: 20px; height: 60px; line-height: 60px;">
             <template v-if="result.table">
           <el-tag>Table :</el-tag>
           <span>
@@ -21,15 +21,6 @@
         </div>
         </el-col>
       </el-row>
-      <!-- tool panel -->
-      <!-- <el-row id="tool-panel">
-        <el-tag>Theme :</el-tag>
-        <el-select v-model="theme.select" @change="changeTheme">
-          <el-option v-for="theme in theme.list" :key="theme" :label="theme" :value="theme">
-          </el-option>
-        </el-select>
-      </el-row> -->
-      <!-- info panel -->
       <div v-if="info.visible " >
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
         <div v-if="!info.error" class="info-panel" style="color: green !important;" v-html="info.message"></div>
@@ -152,10 +143,6 @@ export default {
   name: "App",
   data() {
     return {
-      theme: {
-        list: ["Auto", "Default", "Dark"],
-        select: "Auto",
-      },
       result: {
         data: [],
         sql: "",
@@ -229,10 +216,6 @@ export default {
 
     window.addEventListener("message", ({ data }) => {
       if (!data) return;
-      if (data.type == "theme") {
-        this.theme.select = data.res;
-        return;
-      }
       const response = data.res;
       this.table.loading = false;
       if (response && response.costTime) {
@@ -302,13 +285,6 @@ export default {
       ) {
         this.nextPage();
       }
-    },
-    changeTheme(theme) {
-      postMessage({
-        type: "changeTheme",
-        theme,
-        sql: this.result.sql,
-      });
     },
     confirmExport() {
       postMessage({
@@ -450,6 +426,10 @@ export default {
       }
     },
     confirmUpdate() {
+      if(!this.result.primaryKey){
+        this.$message.error("This table has not primary key, update fail!")
+        return;
+      }
       let change = "";
       for (const key in this.update.currentNew) {
         if (this.getTypeByColumn(key) == null) continue;

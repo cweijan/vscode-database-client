@@ -5,6 +5,8 @@ Vue.use(ElementUI);
 
 import UmyUi from 'umy-ui'
 import 'umy-ui/lib/theme-chalk/index.css'; // 引入样式
+import '@/../public/theme/auto.css'
+import '@/../public/theme/result.css'
 Vue.use(UmyUi);
 
 Vue.config.productionTip = false

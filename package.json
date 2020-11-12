@@ -819,12 +819,6 @@
 					"type": "integer",
 					"default": 100,
 					"description": "Default limit of query sql."
-				},
-				"vscode-mysql.queryResultTheme": {
-					"type": "string",
-					"default": "Auto",
-					"description": "Theme of result view.",
-					"enum": ["Auto","Default","Dark"]
 				}
 			}
 		}

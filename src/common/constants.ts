@@ -26,7 +26,6 @@ export enum ConfigKey {
     MAX_TABLE_COUNT = "maxTableCount",
     ENABLE_DELIMITER = "enableDelimiter",
     LOAD_META_ON_CONNECT = "loadMetaOnConnect",
-    REULST_THEME = "queryResultTheme",
     DEFAULT_LIMIT = "defaultSelectLimit",
 }
 
