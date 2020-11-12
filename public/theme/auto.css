@@ -1331,7 +1331,7 @@ body {
 .el-pagination__sizes {
     margin: 0 10px 0 0;
     font-weight: 400;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-pagination__sizes .el-input .el-input__inner {
@@ -1346,13 +1346,13 @@ body {
 .el-pagination__total {
     margin-right: 10px;
     font-weight: 400;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-pagination__jump {
     margin-left: 24px;
     font-weight: 400;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-pagination__jump .el-input__inner {
@@ -1413,7 +1413,7 @@ body {
 }
 
 .el-dialog, .el-pager li {
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     -webkit-box-sizing: border-box
 }
 
@@ -2218,7 +2218,7 @@ body {
 
 .el-radio-button__inner {
     white-space: nowrap;
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     border: 1px solid var(--border-color);
     font-weight: 500;
     border-left: 0;
@@ -2740,7 +2740,7 @@ body {
     width: 100%;
     max-width: 100%;
     font-size: 14px;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-table--mini, .el-table--small, .el-table__expand-icon {
@@ -3058,7 +3058,7 @@ body {
 .el-table__fixed-footer-wrapper tbody td {
     border-top: 1px solid #EBEEF5;
     background-color: #F5F7FA;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-table__fixed-body-wrapper {
@@ -3092,7 +3092,7 @@ body {
 
 .el-table__footer-wrapper tbody td, .el-table__header-wrapper tbody td {
     background-color: #F5F7FA;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-table__body-wrapper {
@@ -3164,19 +3164,23 @@ body {
 }
 
 .el-table--striped .el-table__body tr.el-table__row--striped td {
-    background: #FAFAFA
+    background: var(--vscode-editorSuggestWidget-background) !important;
+    color: var(--primary-color) !important;
 }
 
 .el-table--striped .el-table__body tr.el-table__row--striped.current-row td {
-    background-color: #ecf5ff
+    background: var(--vscode-editorSuggestWidget-background) !important;
+    color: var(--primary-color) !important;
 }
 
 .el-table__body tr.hover-row.current-row > td, .el-table__body tr.hover-row.el-table__row--striped.current-row > td, .el-table__body tr.hover-row.el-table__row--striped > td, .el-table__body tr.hover-row > td {
-    background-color: #F5F7FA
+    background: var(--vscode-tab-hoverBackground) !important;
+    color: var(--primary-color) !important;
 }
 
 .el-table__body tr.current-row > td {
-    background-color: #ecf5ff
+    background: var(--vscode-editorSuggestWidget-background) !important;
+    color: var(--primary-color) !important;
 }
 
 .el-table__column-resize-proxy {
@@ -3208,7 +3212,7 @@ body {
 }
 
 .el-table--enable-row-hover .el-table__body tr:hover > td {
-    background-color: #F5F7FA
+    background: var(--vscode-tab-hoverBackground) !important;
 }
 
 .el-table--fluid-height .el-table__fixed, .el-table--fluid-height .el-table__fixed-right {
@@ -3330,7 +3334,7 @@ body {
 }
 
 .el-date-table.is-week-mode .el-date-table__row:hover td.available:hover {
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-date-table.is-week-mode .el-date-table__row:hover td:first-child div {
@@ -3444,7 +3448,7 @@ body {
 
 .el-date-table td.week {
     font-size: 80%;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-month-table, .el-year-table {
@@ -3743,7 +3747,7 @@ body {
     line-height: 22px;
     text-align: center;
     cursor: pointer;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-date-picker__header-label.active, .el-date-picker__header-label:hover {
@@ -3857,7 +3861,7 @@ body {
     outline: 0;
     padding: 0;
     width: 39%;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-date-editor .el-range-input::-webkit-input-placeholder {
@@ -3994,7 +3998,7 @@ body {
     color: var(--input-color);
     border: 1px solid var(--border-color);
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     border-radius: 4px;
     line-height: 30px;
     margin: 5px 0
@@ -4142,7 +4146,7 @@ body {
 }
 
 .el-time-spinner__wrapper.is-arrow .el-time-spinner__item:hover:not(.disabled):not(.active) {
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     cursor: default
 }
 
@@ -4191,7 +4195,7 @@ body {
     height: 32px;
     line-height: 32px;
     font-size: 12px;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-time-spinner__item:hover:not(.disabled):not(.active) {
@@ -4336,7 +4340,7 @@ body {
 
 .el-popover {
     position: absolute;
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     min-width: 150px;
     border: 1px solid #EBEEF5;
     padding: 12px;
@@ -4681,7 +4685,7 @@ body {
 }
 
 .el-breadcrumb__inner {
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-breadcrumb__inner a, .el-breadcrumb__inner.is-link {
@@ -5101,7 +5105,7 @@ body {
 }
 
 .el-tabs--border-card {
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     border: 1px solid var(--border-color);
     -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04)
@@ -5554,8 +5558,8 @@ body {
 .el-tree {
     position: relative;
     cursor: default;
-    background: #FFF;
-    color: #606266
+    background-color: var(--vscode-editor-background);
+    color: var(--primary-color);
 }
 
 .el-tree__empty-block {
@@ -5882,7 +5886,7 @@ body {
 }
 
 .el-notification__closeBtn:hover {
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-notification .el-icon-success {
@@ -6189,7 +6193,7 @@ body {
 }
 
 .el-tooltip__popper.is-light {
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     border: 1px solid #303133
 }
 
@@ -9492,7 +9496,7 @@ body {
     right: 5px;
     cursor: pointer;
     opacity: .75;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-upload-list__item .el-icon-close:hover {
@@ -10476,7 +10480,7 @@ body {
     font-size: 14px;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     -webkit-transition: .15s ease-out;
     transition: .15s ease-out
 }
@@ -11656,7 +11660,7 @@ body {
 .el-cascader__dropdown {
     margin: 5px 0;
     font-size: 14px;
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     border: 1px solid var(--border-color);
     border-radius: 4px;
     -webkit-box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
@@ -11868,7 +11872,7 @@ body {
     width: 4px;
     height: 100%;
     border-radius: 1px;
-    background: #fff;
+    background-color: var(--vscode-editor-background);
     border: 1px solid #f0f0f0;
     -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, .6);
     box-shadow: 0 0 2px rgba(0, 0, 0, .6);
@@ -11958,7 +11962,7 @@ body {
     width: 4px;
     height: 100%;
     border-radius: 1px;
-    background: #fff;
+    background-color: var(--vscode-editor-background);
     border: 1px solid #f0f0f0;
     -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, .6);
     box-shadow: 0 0 2px rgba(0, 0, 0, .6);
@@ -12240,7 +12244,7 @@ body {
 
 .el-textarea .el-input__count {
     color: #909399;
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     position: absolute;
     font-size: 12px;
     bottom: 5px;
@@ -12305,7 +12309,7 @@ body {
 }
 
 .el-input::-webkit-scrollbar-track-piece {
-    background: #fff;
+    background-color: var(--vscode-editor-background);
     width: 6px
 }
 
@@ -12334,7 +12338,7 @@ body {
 }
 
 .el-input .el-input__count .el-input__count-inner {
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     line-height: initial;
     display: inline-block;
     padding: 0 5px
@@ -12632,7 +12636,7 @@ body {
     border: 1px solid #EBEEF5;
     border-radius: 4px;
     overflow: hidden;
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     display: inline-block;
     vertical-align: middle;
     width: 200px;
@@ -12673,7 +12677,7 @@ body {
 }
 
 .el-transfer-panel__item.el-checkbox {
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-transfer-panel__item:hover {
@@ -12760,7 +12764,7 @@ body {
 
 .el-transfer-panel .el-transfer-panel__footer {
     height: 40px;
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     margin: 0;
     padding: 0;
     border-top: 1px solid #EBEEF5;
@@ -12785,7 +12789,7 @@ body {
 
 .el-transfer-panel .el-transfer-panel__footer .el-checkbox {
     padding-left: 20px;
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-transfer-panel .el-transfer-panel__empty {
@@ -13037,7 +13041,7 @@ body {
 }
 
 .el-link.el-link--default {
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-link.el-link--default:hover {
@@ -13401,7 +13405,7 @@ body {
     line-height: 1;
     white-space: nowrap;
     cursor: pointer;
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     border: 1px solid var(--border-color);
     color: var(--input-color);
     -webkit-appearance: none;
@@ -13443,7 +13447,7 @@ body {
 }
 
 .el-button.is-plain:focus, .el-button.is-plain:hover {
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     border-color: #409EFF;
     color: #409EFF
 }
@@ -13454,7 +13458,7 @@ body {
 }
 
 .el-button.is-plain:active {
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     outline: 0
 }
 
@@ -14365,7 +14369,7 @@ body {
     white-space: nowrap;
     vertical-align: middle;
     cursor: pointer;
-    background: #FFF;
+    background-color: var(--vscode-editor-background);
     border: 1px solid var(--border-color);
     border-left: 0;
     color: var(--input-color);
@@ -14821,7 +14825,7 @@ body {
 }
 
 .el-cascader-node.is-selectable.in-active-path {
-    color: #606266
+    color: var(--primary-color);
 }
 
 .el-cascader-node.in-active-path, .el-cascader-node.is-active, .el-cascader-node.is-selectable.in-checked-path {
