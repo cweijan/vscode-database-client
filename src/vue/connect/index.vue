@@ -40,7 +40,7 @@
       <div>
         <div class="field field__input">
           <strong>includeDatabases:</strong>
-          <input class="field__input" v-model="connectionOption.includeDatabases" />
+          <input class="field__input" v-model="connectionOption.includeDatabases" placeholder="default is all databases" />
         </div>
       </div>
       <div>

@@ -1,11 +1,15 @@
 /* https://code.visualstudio.com/api/references/theme-color */
 
+/**
+.el-tag 11253
+*/
+
 :root {
     --editor-color: var(--vscode-menu-foreground);
     --input-color: var(--vscode-tab-activeForeground);
     --primary-color: var(--vscode-tab-activeForeground);
     --second-color: var(--vscode-input-placeholderForeground);
-    --border-color: var(--vscode-editor-foreground);
+    --border-color: rgb(26, 25, 25);
     --bg-color: var(--vscode-editor-background);
     --second-bg-color: var(--vscode-editorSuggestWidget-background);
 }
@@ -11251,8 +11255,8 @@ body {
 }
 
 .el-tag {
-    background-color: #ecf5ff;
-    border-color: #d9ecff;
+    background-color: rgba(0, 173, 255, 0.1) !important;
+    border: 1px solid rgba(0, 173, 255, 0.2) !important;
     display: inline-block;
     height: 32px;
     padding: 0 10px;
