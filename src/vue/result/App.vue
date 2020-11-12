@@ -95,7 +95,7 @@
           <template>
             <span>
               {{ column.name }} : {{ column.type }} &nbsp;
-              <span style="color: red;">{{ column.key }}{{ column.nullable == 'YES' ? '' : ' NOT NULL' }}</span>&nbsp;
+              <span style="color: red !important;">{{ column.key }}{{ column.nullable == 'YES' ? '' : ' NOT NULL' }}</span>&nbsp;
               <span>{{ column.defaultValue ? ` Default : ${column.defaultValue}` : "" }}</span>
               <span>{{ column.extra == "auto_increment" ? ` AUTO_INCREMENT` : "" }}</span>
             </span>
@@ -392,6 +392,9 @@ export default {
       if (value === "") {
         return "null";
       }
+      if(/\(.*?\)/.exec(value)){
+        return value;
+      }
       if (typeof value == "string") {
         value = value.replace(/'/g, "\\'");
       }
@@ -453,6 +456,7 @@ export default {
         const oldEle = this.update.current[key];
         const newEle = this.update.currentNew[key];
         if (oldEle !== newEle) {
+          console.log(newEle)
           change += `\`${key}\`=${this.wrapQuote(key, newEle)},`;
         }
       }
@@ -730,6 +734,12 @@ body {
 #tool-panel * {
   margin-right: 10px;
 }
+
+.title-info,
+.plx-cell--title {
+  user-select: all;
+}
+
 
 .hint {
   box-sizing: border-box;
