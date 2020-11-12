@@ -3,7 +3,7 @@ import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class FunctionChain implements ComplectionChain {
     private functionList: string[] = ["CHAR_LENGTH", "CONCAT", "NOW", "DATE_ADD", "DATE_SUB", "MAX", "COUNT", "MIN", "SUM", "AVG", "LENGTH", "IF", "IFNULL",
-        "MD5", "SHA", "CURRENT_DATE", "DATE_FORMAT", "CAST", "TRIM"];
+        "MD5", "SHA", "CURRENT_DATE", "DATE_FORMAT", "CAST", "TRIM","LAST_INSERT_ID","MOD"];
     private functionComplectionItems: vscode.CompletionItem[] = [];
     constructor() {
         this.functionList.forEach((keyword) => {
