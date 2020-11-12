@@ -12,6 +12,7 @@ export abstract class Node extends vscode.TreeItem {
     public name?: string;
     public timezone?: string;
     public certPath?: string;
+    public includeDatabases?: string;
     public excludeDatabases?: string;
 
     public global?: boolean;
@@ -33,6 +34,7 @@ export abstract class Node extends vscode.TreeItem {
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
         this.global = source.global
+        this.includeDatabases = source.includeDatabases
         this.excludeDatabases = source.excludeDatabases
         this.collapsibleState = DatabaseCache.getElementState(this)
     }

@@ -39,8 +39,8 @@
       </div>
       <div>
         <div class="field field__input">
-          <strong>database:</strong>
-          <input class="field__input" placeholder="database, can be empty" v-model="connectionOption.database" />
+          <strong>includeDatabases:</strong>
+          <input class="field__input" v-model="connectionOption.includeDatabases" />
         </div>
       </div>
       <div>

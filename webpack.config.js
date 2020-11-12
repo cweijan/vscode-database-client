@@ -39,8 +39,8 @@ module.exports = [
         },
         plugins: [
             new VueLoaderPlugin(),
-            new HtmlWebpackPlugin({ inject: true, template: './src/vue/index.html', chunks: ['app'], filename: 'webview/app.html' }),
-            new HtmlWebpackPlugin({ inject: true, template: './src/vue/index.html', chunks: ['query'], filename: 'webview/result.html' }),
+            new HtmlWebpackPlugin({ inject: true, template: './public/index.html', chunks: ['app'], filename: 'webview/app.html' }),
+            new HtmlWebpackPlugin({ inject: true, template: './public/index.html', chunks: ['query'], filename: 'webview/result.html' }),
             new CopyWebpackPlugin({
                 patterns: [{ from: 'public', to: './webview' }]
             }),

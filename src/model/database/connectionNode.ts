@@ -46,9 +46,14 @@ export class ConnectionNode extends Node implements CopyAble {
         return QueryUnit.queryPromise<any[]>(connection, "show databases")
             .then((databases) => {
                 const databaseNodes = databases.filter((db) => {
-                    if (this.database) {
-                        return db.Database == this.database;
+
+                    if (this.includeDatabases) {
+                        for (const includeDatabase of this.includeDatabases.split(",")) {
+                            if (db.Database == includeDatabase.trim()) { return true; }
+                        }
+                        return false;
                     }
+
                     if (this.excludeDatabases) {
                         for (const excludeDatabase of this.excludeDatabases.split(",")) {
                             if (db.Database == excludeDatabase.trim()) { return false; }
