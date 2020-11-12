@@ -1,6 +1,6 @@
 import tunnel = require('tunnel-ssh')
 import { Node } from '../../model/interface/node';
-import { Console } from '../../common/outputChannel';
+import { Console } from '../../common/Console';
 import { existsSync } from 'fs';
 import * as portfinder from 'portfinder'
 

@@ -3,7 +3,7 @@ import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
 import { Global } from "../common/global";
-import { Console } from "../common/outputChannel";
+import { Console } from "../common/Console";
 import { Node } from "../model/interface/node";
 import { QueryUnit } from "./queryUnit";
 import { SSHConfig } from "../model/interface/sshConfig";
@@ -102,7 +102,7 @@ export class ConnectionManager {
                 } else {
                     this.activeConnection[key] = null;
                     this.tunnelService.closeTunnel(key)
-                    console.error(err.stack)
+                    Console.log(err.stack)
                     reject(err.message);
                 }
             });

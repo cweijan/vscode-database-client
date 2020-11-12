@@ -17,7 +17,7 @@ import { TriggerGroup } from "./model/main/triggerGroup";
 import { ViewGroup } from "./model/main/viewGroup";
 import { ViewNode } from "./model/main/viewNode";
 import { ColumnNode } from "./model/other/columnNode";
-import { Console } from "./common/outputChannel";
+import { Console } from "./common/Console";
 // Don't change last order, it will occur circular reference
 import { ServiceManager } from "./service/serviceManager";
 import { QueryUnit } from "./service/queryUnit";

@@ -1,7 +1,7 @@
 import { Node } from "../../model/interface/node";
 import * as vscode from "vscode";
 import { DatabaseCache } from "../common/databaseCache";
-import { Console } from "../../common/outputChannel";
+import { Console } from "../../common/Console";
 import { DatabaseNode } from "../../model/database/databaseNode";
 import format = require('date-format');
 import path = require('path');

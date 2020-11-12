@@ -1,6 +1,6 @@
 import { Node } from "../../model/interface/node";
 import { exec } from "child_process";
-import { Console } from "../../common/outputChannel";
+import { Console } from "../../common/Console";
 import { NodeUtil } from "../../model/nodeUtil";
 import { ImportService } from "./importService";
 

@@ -5,7 +5,7 @@ import { Connection } from "mysql";
 import * as vscode from "vscode";
 import { CommandKey, ConfigKey, Cursor, MessageType, Pattern, Constants } from "../common/constants";
 import { Global } from "../common/global";
-import { Console } from "../common/outputChannel";
+import { Console } from "../common/Console";
 import { FileManager, FileModel } from "../common/filesManager";
 import { Node } from "../model/interface/node";
 import { QueryPage } from "../view/result/query";

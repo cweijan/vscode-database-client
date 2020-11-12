@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { ExportService } from "./exportService";
 import { FieldInfo } from "mysql";
 import * as fs from "fs";
-import { Console } from "../../common/outputChannel";
+import { Console } from "../../common/Console";
 import { ExportOption } from "./exportOption";
 
 export abstract class AbstractExportService implements ExportService {

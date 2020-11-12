@@ -1,5 +1,5 @@
 import { FieldInfo } from "mysql";
-import { Console } from "../../common/outputChannel";
+import { Console } from "../../common/Console";
 import { ConnectionManager } from "../connectionManager";
 import { AbstractExportService } from "./abstractExportService";
 import { ExportOption } from "./exportOption";

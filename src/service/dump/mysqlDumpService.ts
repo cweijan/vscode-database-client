@@ -1,6 +1,6 @@
 import mysqldump, { Options } from 'mysqldump_plus';
 import * as vscode from "vscode";
-import { Console } from "../../common/outputChannel";
+import { Console } from "../../common/Console";
 import { Node } from "../../model/interface/node";
 import { NodeUtil } from "../../model/nodeUtil";
 import { AbstractDumpService } from "./abstractDumpService";

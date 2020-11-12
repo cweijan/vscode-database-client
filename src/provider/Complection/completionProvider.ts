@@ -8,7 +8,7 @@ import { TypeKeywordChain } from "./chain/typeKeywordChain";
 import { ComplectionChain, ComplectionContext } from "./complectionContext";
 import { TableDetecherChain } from "./chain/tableDetecherChain";
 import { FunctionChain } from "./chain/functionChain";
-import { Console } from "../../common/outputChannel";
+import { Console } from "../../common/Console";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
     constructor() {

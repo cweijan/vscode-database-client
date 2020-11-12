@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
-import { Console } from "../common/outputChannel";
+import { Console } from "../common/Console";
 import { EventEmitter } from 'events'
 import webpack = require("webpack");
 
