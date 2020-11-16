@@ -16,9 +16,7 @@ MySQL Client For Visual Studio Code
   - [History](#history)
   - [Backup/Import](#backupimport)
   - [Setting](#setting)
-  - [RoadMap](#roadmap)
   - [Filter](#filter)
-  - [Sponsor](#sponsor)
 
 ## Regarding MySQL 8.0 support
 
@@ -84,14 +82,13 @@ OpenSetting -> extensions -> Mysql
 
 ![suprise](images/surprise.jpg)
 
+## Filter 
+![filter](images/filter.gif)
+
 ## RoadMap
 - Sync table struct from diffrent connection.
 - Fix Intetllisense sql.
 - Better sql formatter.
-
-## Filter 
-![filter](images/filter.gif)
-
-## Sponsor
-- [Jetbrains](https://www.jetbrains.com/)
+- Add i18n.
+- Change database from status bar.
 
