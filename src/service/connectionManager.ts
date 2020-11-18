@@ -3,7 +3,6 @@ import * as mysql from "mysql";
 import * as path from "path";
 import * as vscode from "vscode";
 import { Global } from "../common/global";
-import { Console } from "../common/Console";
 import { Node } from "../model/interface/node";
 import { QueryUnit } from "./queryUnit";
 import { SSHConfig } from "../model/interface/sshConfig";
@@ -11,7 +10,6 @@ import { DatabaseCache } from "./common/databaseCache";
 import { NodeUtil } from "../model/nodeUtil";
 import { SSHTunnelService } from "./common/sshTunnelService";
 import { DbTreeDataProvider } from "../provider/treeDataProvider";
-import { debug } from "util";
 
 interface ConnectionWrapper {
     connection: mysql.Connection;
@@ -102,7 +100,7 @@ export class ConnectionManager {
                 } else {
                     this.activeConnection[key] = null;
                     this.tunnelService.closeTunnel(key)
-                    Console.log(err.stack)
+                    console.error(err.stack)
                     reject(err.message);
                 }
             });
