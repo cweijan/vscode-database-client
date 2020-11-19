@@ -448,6 +448,10 @@ export default {
       if (row.isFilter) {
         return;
       }
+      if(this.$refs.dataTable.getCheckboxRecords().length==0){
+        this.toolbar.row = {};
+        return;
+      }
       this.toolbar.row = row;
       this.update = {
         current: row,
