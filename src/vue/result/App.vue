@@ -8,17 +8,17 @@
           </el-input>
         </el-col>
         <el-col :span="11">
-        <div style="width:90%;margin-left: 20px; height: 60px; line-height: 60px;">
+          <div style="width:90%;margin-left: 20px; height: 60px; line-height: 60px;">
             <template v-if="result.table">
-          <el-tag>Table :</el-tag>
-          <span>
-            {{ result.table }}
-          </span>
-        </template>
-        <el-tag type="success">CostTime :</el-tag>
-        <span v-text="toolbar.costTime"></span>ms
-        <span v-if="result.table">, <el-tag type="warning">Row :</el-tag>{{ result.data.length - 1 }}, <el-tag type="danger"> Col :</el-tag> {{ columnCount }}</span>
-        </div>
+              <el-tag>Table :</el-tag>
+              <span>
+                {{ result.table }}
+              </span>
+            </template>
+            <el-tag type="success">CostTime :</el-tag>
+            <span v-text="toolbar.costTime"></span>ms
+            <span v-if="result.table">, <el-tag type="warning">Row :</el-tag>{{ result.data.length - 1 }}, <el-tag type="danger"> Col :</el-tag> {{ columnCount }}</span>
+          </div>
         </el-col>
       </el-row>
       <div v-if="info.visible " >
@@ -29,7 +29,7 @@
     <!-- toolbar -->
     <div style="margin-bottom: 8px; margin-left: 20px;">
       <el-button type="success" size="small" @click='count(toolbar.sql);'>Count</el-button>
-        <el-button type="primary" size="small" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
+      <el-button type="primary" size="small" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
       <el-input v-model="table.search" placeholder="Input To Search Data" style="width:200px" />
       <el-button @click="exportData()" type="primary" size="small" icon="el-icon-share" circle title="Export"></el-button>
       <el-button type="info" icon="el-icon-circle-plus-outline" size="small" circle @click="insertRequest">
@@ -132,13 +132,9 @@
 </template>
 
 <script>
-const vscode =
-  typeof acquireVsCodeApi != "undefined" ? acquireVsCodeApi() : null;
-const postMessage = (message) => {
-  if (vscode) {
-    vscode.postMessage(message);
-  }
-};
+import { getVscodeEvent } from "../util/vscode";
+let vscodeEvent;
+
 export default {
   name: "App",
   data() {
@@ -213,10 +209,10 @@ export default {
       this.info.message = res.message;
       // this.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
     };
-
+    vscodeEvent = getVscodeEvent();
     window.addEventListener("message", ({ data }) => {
       if (!data) return;
-      const response = data.res;
+      const response = data.content;
       this.table.loading = false;
       if (response && response.costTime) {
         this.toolbar.costTime = response.costTime;
@@ -264,7 +260,7 @@ export default {
           this.$message(JSON.stringify(data));
       }
     });
-    postMessage({ type: "init" });
+    vscodeEvent.emit("init");
     window.addEventListener("keyup", (event) => {
       if (event.key == "c" && event.ctrlKey) {
         document.execCommand("copy");
@@ -287,8 +283,7 @@ export default {
       }
     },
     confirmExport() {
-      postMessage({
-        type: "export",
+      vscodeEvent.emit("export", {
         option: {
           ...this.exportOption,
           sql: this.result.sql,
@@ -368,7 +363,7 @@ export default {
       if (value === "") {
         return "null";
       }
-      if(/\(.*?\)/.exec(value)){
+      if (/\(.*?\)/.exec(value)) {
         return value;
       }
       if (typeof value == "string") {
@@ -426,8 +421,8 @@ export default {
       }
     },
     confirmUpdate() {
-      if(!this.result.primaryKey){
-        this.$message.error("This table has not primary key, update fail!")
+      if (!this.result.primaryKey) {
+        this.$message.error("This table has not primary key, update fail!");
         return;
       }
       let change = "";
@@ -436,7 +431,6 @@ export default {
         const oldEle = this.update.current[key];
         const newEle = this.update.currentNew[key];
         if (oldEle !== newEle) {
-          console.log(newEle)
           change += `\`${key}\`=${this.wrapQuote(key, newEle)},`;
         }
       }
@@ -453,7 +447,7 @@ export default {
         this.$message("Not any change, update fail!");
       }
     },
-    updateEdit(row,column,event) {
+    updateEdit(row, column, event) {
       if (row.isFilter) {
         return;
       }
@@ -463,7 +457,7 @@ export default {
         currentNew: this.clone(row),
         primary: row[this.result.primaryKey],
       };
-      if (this.result.data.length > 24 && column.type!="checkbox") {
+      if (this.result.data.length > 24 && column.type != "checkbox") {
         // this.openEdit();
       }
     },
@@ -560,8 +554,7 @@ export default {
     },
     execute(sql) {
       if (!sql) return;
-      postMessage({
-        type: "execute",
+      vscodeEvent.emit("execute", {
         sql: sql.replace(/ +/gi, " "),
       });
       this.table.loading = true;
@@ -602,8 +595,7 @@ export default {
         return;
       }
 
-      postMessage({
-        type: "next",
+      vscodeEvent.emit("next", {
         sql: this.result.sql,
         pageNum: ++this.page.pageNum,
         pageSize: this.page.pageSize,
@@ -720,7 +712,6 @@ body {
   user-select: all;
 }
 
-
 .hint {
   box-sizing: border-box;
   padding: 5px;
@@ -766,7 +757,7 @@ body {
   /* -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);   */
   /* border-radius: 8px; */
   /* background-color: #424242; */
-  background-color:  var(--vscode-editor-background);;
+  background-color: var(--vscode-editor-background);
 }
 
 /* 滑块样式*/

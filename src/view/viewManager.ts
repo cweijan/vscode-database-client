@@ -4,7 +4,6 @@ import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
 import { Console } from "../common/Console";
 import { EventEmitter } from 'events'
-import webpack = require("webpack");
 
 export class ViewOption {
     public iconPath?: string;
@@ -22,22 +21,14 @@ export class ViewOption {
     /**
      * receive webview send message 
      */
-    public handleHtml?: (html:string,viewPanel: WebviewPanel) => string;
-    /**
-     * receive webview send message 
-     */
-    public receiveListener?: (viewPanel: WebviewPanel, message: any) => void;
-    /**
-     * callback when init success.
-     */
-    public initListener?: (viewPanel: WebviewPanel) => void;
+    public handleHtml?: (html: string, viewPanel: WebviewPanel) => string;
     public eventHandler?: (handler: Hanlder) => void;
 }
 
 export class Hanlder {
-    
+
     constructor(public panel: WebviewPanel, private eventEmitter: EventEmitter) { }
-    
+
     on(event: string, callback: (content: any) => void): this {
         this.eventEmitter.on(event, callback)
         return this;
@@ -53,8 +44,6 @@ interface ViewState {
     instance: WebviewPanel;
     creating: boolean;
     eventEmitter: EventEmitter;
-    initListener: (viewPanel: WebviewPanel) => void;
-    receiveListener: (viewPanel: WebviewPanel, message: any) => void;
 }
 
 export class ViewManager {
@@ -81,12 +70,6 @@ export class ViewManager {
                 if (viewOption.killHidden && currentStatus.instance?.visible == false) {
                     currentStatus.instance.dispose()
                 } else {
-                    if (currentStatus.creating) {
-                        currentStatus.initListener = viewOption.initListener
-                    } else if (viewOption.initListener) {
-                        viewOption.initListener(currentStatus.instance)
-                    }
-                    if (viewOption.receiveListener) { currentStatus.receiveListener = viewOption.receiveListener }
                     currentStatus.eventEmitter.removeAllListeners()
                     if (viewOption.eventHandler) {
                         viewOption.eventHandler(new Hanlder(currentStatus.instance, currentStatus.eventEmitter))
@@ -95,7 +78,7 @@ export class ViewManager {
                     return Promise.resolve(currentStatus.instance);
                 }
             }
-            const newStatus = { creating: true, instance: null, eventEmitter: new EventEmitter(), initListener: viewOption.initListener, receiveListener: viewOption.receiveListener }
+            const newStatus = { creating: true, instance: null, eventEmitter: new EventEmitter() }
             this.viewStatu[viewOption.title] = newStatus
             const targetPath = `${this.webviewPath}/${viewOption.path}.html`;
             fs.readFile(targetPath, 'utf8', async (err, data) => {
@@ -118,8 +101,8 @@ export class ViewManager {
                 }
                 this.viewStatu[viewOption.title].instance = webviewPanel
                 const contextPath = path.resolve(targetPath, "..");
-                if(viewOption.handleHtml){
-                    data=viewOption.handleHtml(data,webviewPanel)
+                if (viewOption.handleHtml) {
+                    data = viewOption.handleHtml(data, webviewPanel)
                 }
                 webviewPanel.webview.html = this.buildPath(data, webviewPanel.webview, contextPath);
 
@@ -133,11 +116,6 @@ export class ViewManager {
                     newStatus.eventEmitter.emit(message.type, message.content)
                     if (message.type == 'init') {
                         newStatus.creating = false
-                        if (newStatus.initListener) {
-                            newStatus.initListener(webviewPanel)
-                        }
-                    } else if (newStatus.receiveListener) {
-                        newStatus.receiveListener(webviewPanel, message)
                     }
                 })
                 resolve(webviewPanel);

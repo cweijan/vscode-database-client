@@ -55,7 +55,7 @@ export class QueryPage {
         if (olderTitle) {
             title = olderTitle
             queryParam.singlePage = false
-            if(queryParam.type==MessageType.DATA){
+            if (queryParam.type == MessageType.DATA) {
                 this.hodlder.delete(queryParam.res.sql)
             }
         }
@@ -63,33 +63,28 @@ export class QueryPage {
         ViewManager.createWebviewPanel({
             singlePage: true,
             splitView: this.isActiveSql(),
-            path:'result', title,
+            path: 'result', title,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
-            initListener: (webviewPanel) => {
-                if (queryParam.res?.table) {
-                    webviewPanel.title = queryParam.res.table
-                }
-                webviewPanel.webview.postMessage(queryParam);
-            },
-            receiveListener: async (viewPanel, params) => {
-                switch (params.type) {
-                    case OperateType.execute:
-                        if (!queryParam.singlePage) {
-                            this.hodlder.set(params.sql.trim(), title)
-                        }
-                        QueryUnit.runQuery(params.sql);
-                        break;
-                    case OperateType.next:
-                        const sql = this.pageService.build(params.sql, params.pageNum, params.pageSize)
-                        const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())
-                        QueryUnit.queryPromise(connection, sql).then((rows) => {
-                            viewPanel.webview.postMessage({ type: MessageType.NEXT_PAGE, res: { sql, data: rows } as DataResponse });
-                        })
-                        break;
-                    case OperateType.export:
-                        this.exportService.export(params.option)
-                        break;
-                }
+            eventHandler: async (handler) => {
+                handler.on("init", () => {
+                    if (queryParam.res?.table) {
+                        handler.panel.title = queryParam.res.table
+                    }
+                    handler.emit(queryParam.type, queryParam.res)
+                }).on(OperateType.execute, (params) => {
+                    if (!queryParam.singlePage) {
+                        this.hodlder.set(params.sql.trim(), title)
+                    }
+                    QueryUnit.runQuery(params.sql);
+                }).on(OperateType.next,async (params) => {
+                    const sql = this.pageService.build(params.sql, params.pageNum, params.pageSize)
+                    const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())
+                    QueryUnit.queryPromise(connection, sql).then((rows) => {
+                        handler.panel.webview.postMessage({ type: MessageType.NEXT_PAGE, res: { sql, data: rows } as DataResponse });
+                    })
+                }).on(OperateType.export,(params)=>{
+                    this.exportService.export(params.option)
+                })
             }
         });
 
