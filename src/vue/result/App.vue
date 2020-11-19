@@ -1,59 +1,46 @@
 <template>
   <div id="app">
     <div class="hint">
-      <!-- sql input -->
       <el-row>
-        <el-col :span="12">
+         <el-col :span="12">
           <el-input type="textarea" :autosize="{ minRows:3, maxRows:5}" v-model="toolbar.sql" style="width:100%">
           </el-input>
         </el-col>
-        <el-col :span="11">
-          <div style="width:90%;margin-left: 20px; height: 60px; line-height: 60px;">
-            <template v-if="result.table">
-              <el-tag>Table :</el-tag>
-              <span>
-                {{ result.table }}
-              </span>
-            </template>
-            <el-tag type="success">CostTime :</el-tag>
-            <span v-text="toolbar.costTime"></span>ms
-            <span v-if="result.table">, <el-tag type="warning">Row :</el-tag>{{ result.data.length - 1 }}, <el-tag type="danger"> Col :</el-tag> {{ columnCount }}</span>
-          </div>
+        <el-col :span="10" style="margin-left:20px;">
+          <!-- toolbar -->
+          
         </el-col>
       </el-row>
-      <div v-if="info.visible " >
+      <div>
+            <el-input v-model="table.search" placeholder="Input To Search Data" style="width:200px" />
+            <el-button @click="exportData()" type="primary" size="small" icon="el-icon-share" circle title="Export"></el-button>
+            <el-button type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="small" circle @click="insertRequest">
+            </el-button>
+            <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
+              <el-checkbox-group v-model="toolbar.showColumns">
+                <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
+                  {{ column.name }}
+                </el-checkbox>
+              </el-checkbox-group>
+              <el-button icon="el-icon-search" circle title="Select columns to show" size="small" slot="reference">
+              </el-button>
+            </el-popover>
+            <el-button type="success" size="small" icon="el-icon-s-help" circle title="Count" @click='count(toolbar.sql);'></el-button>
+            <el-button @click="resetFilter" title="Reset filter" type="warning" size="small" icon="el-icon-refresh" circle> </el-button>
+            <el-button type="danger" size="small" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
+            <template v-if="result.primaryKey && (toolbar.row[result.primaryKey]||toolbar.show)">
+              <el-button @click="openEdit(toolbar.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
+              </el-button>
+              <el-button @click.stop="openCopy(toolbar.row)" type="info" size="small" title="copy" icon="el-icon-document-copy" circle>
+              </el-button>
+              <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="small" icon="el-icon-delete" circle>
+              </el-button>
+            </template>
+          </div>
+      <div v-if="info.visible ">
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
         <div v-if="!info.error" class="info-panel" style="color: green !important;" v-html="info.message"></div>
       </div>
-    </div>
-    <!-- toolbar -->
-    <div style="margin-bottom: 8px; margin-left: 20px;">
-      <el-button type="success" size="small" @click='count(toolbar.sql);'>Count</el-button>
-      <el-button type="primary" size="small" @click='info.visible = false;execute(toolbar.sql);'>Execute</el-button>
-      <el-input v-model="table.search" placeholder="Input To Search Data" style="width:200px" />
-      <el-button @click="exportData()" type="primary" size="small" icon="el-icon-share" circle title="Export"></el-button>
-      <el-button type="info" icon="el-icon-circle-plus-outline" size="small" circle @click="insertRequest">
-      </el-button>
-      <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
-        <el-checkbox-group v-model="toolbar.showColumns">
-          <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
-            {{ column.name }}
-          </el-checkbox>
-        </el-checkbox-group>
-        <el-button icon="el-icon-search" circle title="Select columns to show" size="small" slot="reference">
-        </el-button>
-      </el-popover>
-      <el-button @click="resetFilter" title="Reset filter" type="warning" size="small" icon="el-icon-refresh" circle>
-      </el-button>
-      <template v-if="result.primaryKey && (toolbar.row[result.primaryKey]||toolbar.show)">
-        <el-tag type="warning" style="margin:0 10px">Row :</el-tag>
-        <el-button @click="openEdit(toolbar.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
-        </el-button>
-        <el-button @click.stop="openCopy(toolbar.row)" type="info" size="small" title="copy" icon="el-icon-document-copy" circle>
-        </el-button>
-        <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="small" icon="el-icon-delete" circle>
-        </el-button>
-      </template>
     </div>
     <!-- trigger when click -->
     <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" @table-body-scroll="(_,e)=>scrollChange(e)" :height="remainHeight" width="100vh" stripe @select-all="toolbar.show=true" :edit-config="{trigger: 'click', mode: 'cell',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="updateEdit" :show-header-overflow="false" :show-overflow="false">
@@ -210,13 +197,30 @@ export default {
       // this.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
     };
     vscodeEvent = getVscodeEvent();
+    window.onblur = () => {
+      vscodeEvent.emit("blur");
+    };
+    window.onfocus = () => {
+      vscodeEvent.emit("showInfo", {
+        table: this.result.table,
+        row: this.result.data.length - 1,
+        col: this.columnCount,
+      });
+      vscodeEvent.emit("showCost", { cost: this.toolbar.costTime });
+    };
     window.addEventListener("message", ({ data }) => {
       if (!data) return;
       const response = data.content;
       this.table.loading = false;
       if (response && response.costTime) {
         this.toolbar.costTime = response.costTime;
+        vscodeEvent.emit("showCost", { cost: this.toolbar.costTime });
       }
+      vscodeEvent.emit("showInfo", {
+        table: this.result.table,
+        row: this.result.data.length - 1,
+        col: this.columnCount,
+      });
       switch (data.type) {
         case "RUN":
           this.toolbar.sql = response.sql;

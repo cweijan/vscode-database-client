@@ -1,5 +1,5 @@
 import { extname, basename } from "path";
-import { window } from "vscode";
+import { StatusBarAlignment, StatusBarItem, window } from "vscode";
 import { MessageType, OperateType, ConfigKey } from "../../common/constants";
 import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
@@ -29,6 +29,8 @@ export class QueryPage {
     private static exportService: ExportService = new MysqlExportService()
     private static pageService: PageService = new MysqlPageSerivce()
     private static hodlder: Map<string, string> = new Map()
+    private static statusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -200);
+    private static costStatusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -250);
 
     public static async send(queryParam: QueryParam<any>) {
 
@@ -71,18 +73,27 @@ export class QueryPage {
                         handler.panel.title = queryParam.res.table
                     }
                     handler.emit(queryParam.type, queryParam.res)
+                }).on("showCost", ({ cost }) => {
+                    this.costStatusBar.text = `CostTime : ${cost}ms`
+                    this.costStatusBar.show()
+                }).on("showInfo", ({ table, row, col }) => {
+                    this.statusBar.text = `Table : ${table}       Row : ${row} Col : ${col}`
+                    this.statusBar.show()
+                }).on("blur", () => {
+                    this.statusBar.hide()
+                    this.costStatusBar.hide()
                 }).on(OperateType.execute, (params) => {
                     if (!queryParam.singlePage) {
                         this.hodlder.set(params.sql.trim(), title)
                     }
                     QueryUnit.runQuery(params.sql);
-                }).on(OperateType.next,async (params) => {
+                }).on(OperateType.next, async (params) => {
                     const sql = this.pageService.build(params.sql, params.pageNum, params.pageSize)
                     const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())
                     QueryUnit.queryPromise(connection, sql).then((rows) => {
                         handler.panel.webview.postMessage({ type: MessageType.NEXT_PAGE, res: { sql, data: rows } as DataResponse });
                     })
-                }).on(OperateType.export,(params)=>{
+                }).on(OperateType.export, (params) => {
                     this.exportService.export(params.option)
                 })
             }
