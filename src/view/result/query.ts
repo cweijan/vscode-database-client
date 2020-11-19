@@ -68,20 +68,23 @@ export class QueryPage {
             path: 'result', title,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
             eventHandler: async (handler) => {
+                handler.panel.onDidChangeViewState(e => {
+                    if (!e.webviewPanel.visible) {
+                        this.statusBar.hide()
+                        this.costStatusBar.hide()
+                    }
+                })
                 handler.on("init", () => {
                     if (queryParam.res?.table) {
                         handler.panel.title = queryParam.res.table
                     }
                     handler.emit(queryParam.type, queryParam.res)
                 }).on("showCost", ({ cost }) => {
-                    this.costStatusBar.text = `CostTime : ${cost}ms`
+                    this.costStatusBar.text = `$(scrollbar-button-right) ${cost}ms`
                     this.costStatusBar.show()
                 }).on("showInfo", ({ table, row, col }) => {
-                    this.statusBar.text = `Table : ${table}       Row : ${row} Col : ${col}`
+                    this.statusBar.text = `$(list-flat) ${table}       Row ${row}, Col ${col}`
                     this.statusBar.show()
-                }).on("blur", () => {
-                    this.statusBar.hide()
-                    this.costStatusBar.hide()
                 }).on(OperateType.execute, (params) => {
                     if (!queryParam.singlePage) {
                         this.hodlder.set(params.sql.trim(), title)

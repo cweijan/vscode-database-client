@@ -2,41 +2,37 @@
   <div id="app">
     <div class="hint">
       <el-row>
-         <el-col :span="12">
+        <el-col :span="12">
           <el-input type="textarea" :autosize="{ minRows:3, maxRows:5}" v-model="toolbar.sql" style="width:100%">
           </el-input>
         </el-col>
-        <el-col :span="10" style="margin-left:20px;">
-          <!-- toolbar -->
-          
-        </el-col>
       </el-row>
-      <div>
-            <el-input v-model="table.search" placeholder="Input To Search Data" style="width:200px" />
-            <el-button @click="exportData()" type="primary" size="small" icon="el-icon-share" circle title="Export"></el-button>
-            <el-button type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="small" circle @click="insertRequest">
-            </el-button>
-            <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
-              <el-checkbox-group v-model="toolbar.showColumns">
-                <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
-                  {{ column.name }}
-                </el-checkbox>
-              </el-checkbox-group>
-              <el-button icon="el-icon-search" circle title="Select columns to show" size="small" slot="reference">
-              </el-button>
-            </el-popover>
-            <el-button type="success" size="small" icon="el-icon-s-help" circle title="Count" @click='count(toolbar.sql);'></el-button>
-            <el-button @click="resetFilter" title="Reset filter" type="warning" size="small" icon="el-icon-refresh" circle> </el-button>
-            <el-button type="danger" size="small" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
-            <template v-if="result.primaryKey && (toolbar.row[result.primaryKey]||toolbar.show)">
-              <el-button @click="openEdit(toolbar.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
-              </el-button>
-              <el-button @click.stop="openCopy(toolbar.row)" type="info" size="small" title="copy" icon="el-icon-document-copy" circle>
-              </el-button>
-              <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="small" icon="el-icon-delete" circle>
-              </el-button>
-            </template>
-          </div>
+      <div class="toolbar">
+        <el-input v-model="table.search" size="small" placeholder="Input To Search Data" style="width:200px" />
+        <el-button @click="exportData()" type="primary" size="small" icon="el-icon-share" circle title="Export"></el-button>
+        <el-button type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="small" circle @click="insertRequest">
+        </el-button>
+        <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
+          <el-checkbox-group v-model="toolbar.showColumns">
+            <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
+              {{ column.name }}
+            </el-checkbox>
+          </el-checkbox-group>
+          <el-button icon="el-icon-search" circle title="Select columns to show" size="small" slot="reference">
+          </el-button>
+        </el-popover>
+        <el-button type="success" size="small" icon="el-icon-s-help" circle title="Count" @click='count(toolbar.sql);'></el-button>
+        <el-button @click="resetFilter" title="Reset filter" type="warning" size="small" icon="el-icon-refresh" circle> </el-button>
+        <el-button type="danger" size="small" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
+        <template v-if="result.primaryKey && (toolbar.row[result.primaryKey]||toolbar.show)">
+          <el-button @click="openEdit(toolbar.row)" type="primary" size="small" icon="el-icon-edit" title="edit" circle>
+          </el-button>
+          <el-button @click.stop="openCopy(toolbar.row)" type="info" size="small" title="copy" icon="el-icon-document-copy" circle>
+          </el-button>
+          <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="small" icon="el-icon-delete" circle>
+          </el-button>
+        </template>
+      </div>
       <div v-if="info.visible ">
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
         <div v-if="!info.error" class="info-panel" style="color: green !important;" v-html="info.message"></div>
@@ -197,9 +193,6 @@ export default {
       // this.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
     };
     vscodeEvent = getVscodeEvent();
-    window.onblur = () => {
-      vscodeEvent.emit("blur");
-    };
     window.onfocus = () => {
       vscodeEvent.emit("showInfo", {
         table: this.result.table,
@@ -709,6 +702,11 @@ body {
 
 #tool-panel * {
   margin-right: 10px;
+}
+
+.toolbar{
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 
 .title-info,

@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.7.5 - 2020/11/19
+- Migrate status to status bar.
+
 ## 2.7.0 -2020/11/9
 - Resule view theme follow vscode theme.
 
