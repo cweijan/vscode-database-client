@@ -94,7 +94,7 @@ export class QueryPage {
                     const sql = this.pageService.build(params.sql, params.pageNum, params.pageSize)
                     const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())
                     QueryUnit.queryPromise(connection, sql).then((rows) => {
-                        handler.panel.webview.postMessage({ type: MessageType.NEXT_PAGE, res: { sql, data: rows } as DataResponse });
+                        handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
                     })
                 }).on(OperateType.export, (params) => {
                     this.exportService.export(params.option)
