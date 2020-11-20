@@ -448,7 +448,7 @@ export default {
       if (row.isFilter) {
         return;
       }
-      if(this.$refs.dataTable.getCheckboxRecords().length==0){
+      if(column.type == "checkbox" && this.$refs.dataTable.getCheckboxRecords().length==0){
         this.toolbar.row = {};
         return;
       }
