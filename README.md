@@ -85,6 +85,10 @@ OpenSetting -> extensions -> Mysql
 ## Filter 
 ![filter](images/filter.gif)
 
+# Credits
+- [vscode-mysql](https://github.com/formulahendry/vscode-mysql): The original version of this extension.
+- [mysqldump](https://github.com/bradzacher/mysqldum): Use it to export data.
+
 ## RoadMap
 - Sync table struct from diffrent connection.
 - Fix Intetllisense sql.
