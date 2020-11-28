@@ -20,6 +20,16 @@ interface DumpReturn {
          * Null if configured not to dump.
          */
         trigger: string | null;
+        /**
+         * The concatenated SQL procedure dump for the entire database.
+         * Null if configured not to dump.
+         */
+        procedure: string | null;
+        /**
+         * The concatenated SQL procedure dump for the entire database.
+         * Null if configured not to dump.
+         */
+        function: string | null;
     };
     tables: Array<Table>;
 }

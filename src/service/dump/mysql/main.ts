@@ -10,6 +10,8 @@ import { DumpReturn } from './interfaces/DumpReturn';
 import { getTables } from './getTables';
 import { getSchemaDump } from './getSchemaDump';
 import { getTriggerDump } from './getTriggerDump';
+import { getProcedureDump } from './getProcedureDump';
+import { getFunctionDump } from './getFunctionDump';
 import { getDataDump } from './getDataDump';
 import { compressFile } from './compressFile';
 import { DB } from './DB';
@@ -131,6 +133,8 @@ export default async function main(inputOptions: Options): Promise<DumpReturn> {
                 schema: null,
                 data: null,
                 trigger: null,
+                procedure: null,
+                function:null
             },
             tables: await getTables(
                 connection,
@@ -182,6 +186,31 @@ USE \`${options.connection.database}\`;\n`);
                 .trim();
         }
 
+        // dump the procedures if requested
+        if (options.dump.procedure !== false) {
+            const procedures = await getProcedureDump(
+                connection,
+                options.connection.database,
+                options.dump.procedure,
+            );
+            res.dump.procedure = procedures
+                .map(proc => proc)
+                .join('\n')
+                .trim();
+        }
+
+        // dump the functions if requested
+        if (options.dump.procedure !== false) {
+            const functions = await getFunctionDump(
+                connection,
+                options.connection.database,
+                options.dump.function,
+            );
+            res.dump.function = functions
+                .join('\n')
+                .trim();
+        }
+
         // data dump uses its own connection so kill ours
         await connection.end();
 
@@ -205,6 +234,16 @@ USE \`${options.connection.database}\`;\n`);
         // write the triggers to the file
         if (options.dumpToFile && res.dump.trigger) {
             fs.appendFileSync(options.dumpToFile, `${res.dump.trigger}\n\n`);
+        }
+
+         // write the procedures to the file
+        if (options.dumpToFile && res.dump.procedure) {
+            fs.appendFileSync(options.dumpToFile, `${res.dump.procedure}\n\n`);
+        }
+
+        // write the functions to the file
+        if (options.dumpToFile && res.dump.function) {
+            fs.appendFileSync(options.dumpToFile, `${res.dump.function}\n\n`);
         }
 
         // reset all of the variables
