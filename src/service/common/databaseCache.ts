@@ -186,6 +186,11 @@ export class DatabaseCache {
         return tableList;
     }
 
+    public static getViewListOfDatabase(databaseid: string): Node[] {
+        const viewList = this.databaseNodeMapTableNode[databaseid + "_" + ModelType.VIEW_GROUP];
+        return viewList;
+    }
+
     public static getDatabase(connectId: string, dbName: string): DatabaseNode {
         const dbList = this.connectionNodeMapDatabaseNode[connectId];
         if (!dbList) { return null; }

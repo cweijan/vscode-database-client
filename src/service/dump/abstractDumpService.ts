@@ -11,13 +11,15 @@ export abstract class AbstractDumpService {
 
     public async dump(node: Node, withData: boolean) {
 
-        const tableList = DatabaseCache.getTableListOfDatabase(node.id);
-
+        
         let tables = []
         if (node instanceof TableNode) {
             tables = [node.table]
         } else {
-            tables = await vscode.window.showQuickPick(tableList.map(table => table.label), { canPickMany: true, placeHolder: "Select databases to export, default is all" })
+            const tableList = DatabaseCache.getTableListOfDatabase(node.id);
+            const viewList = DatabaseCache.getViewListOfDatabase(node.id);
+            const tableAndViewList=tableList.concat(viewList)
+            tables = await vscode.window.showQuickPick(tableAndViewList.map(table => table.label), { canPickMany: true, placeHolder: "Select databases to export, default is all" })
             if (!tables) {
                 return;
             }

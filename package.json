@@ -182,7 +182,7 @@
 			},
 			{
 				"command": "mysql.data.import",
-				"title": "Import Data",
+				"title": "Import Sql",
 				"category": "MySQL"
 			},
 			{
@@ -192,7 +192,7 @@
 			},
 			{
 				"command": "mysql.struct.export",
-				"title": "Export Table Struct",
+				"title": "Export Struct",
 				"category": "MySQL"
 			},
 			{
