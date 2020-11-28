@@ -1,5 +1,5 @@
 import * as path from "path";
-import * as mysql from "mysql";
+import * as mysql from "mysql2";
 import * as vscode from "vscode";
 import { Constants, ModelType, Template, MessageType, ConfigKey } from "../../common/constants";
 import { Util } from "../../common/util";

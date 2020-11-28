@@ -12,7 +12,7 @@ import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
 import { DatabaseNode } from "./databaseNode";
 import { UserGroup } from "./userGroup";
-import { Connection } from "mysql";
+import { Connection } from "mysql2";
 import { CopyAble } from "../interface/copyAble";
 
 export class ConnectionNode extends Node implements CopyAble {

@@ -1,4 +1,4 @@
-import { FieldInfo } from "mysql";
+import { FieldInfo } from "mysql2";
 import { Console } from "../../common/Console";
 import { ConnectionManager } from "../connectionManager";
 import { AbstractExportService } from "./abstractExportService";

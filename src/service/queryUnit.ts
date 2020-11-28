@@ -1,7 +1,7 @@
 "use strict";
 import * as fs from "fs";
-import * as mysql from "mysql";
-import { Connection } from "mysql";
+import * as mysql from "mysql2";
+import { Connection } from "mysql2";
 import * as vscode from "vscode";
 import { CommandKey, ConfigKey, Cursor, MessageType, Pattern, Constants } from "../common/constants";
 import { Global } from "../common/global";

@@ -4,6 +4,7 @@
 - Support change active database from status bar.
 -  Support export view, procedure, function.
 -  Fix multi query page database change.
+-  Change mysql client to mysql2, now support mysql8.
 
 ## 2.7.5 - 2020/11/19
 - Migrate status to status bar.

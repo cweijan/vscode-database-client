@@ -831,7 +831,6 @@
 	},
 	"devDependencies": {
 		"@types/mockjs": "^1.0.2",
-		"@types/mysql": "^2.15.10",
 		"@types/node": "^7.10.10",
 		"@types/ssh2": "^0.5.43",
 		"@types/vscode": "1.38.0",
@@ -856,7 +855,6 @@
 		"deepmerge": "^3.2.0",
 		"element-ui": "^2.13.2",
 		"mockjs": "^1.1.0",
-		"mysql": "^2.18.1",
 		"mysql2": "^2.2.5",
 		"node-xlsx": "^0.15.0",
 		"portfinder": "^1.0.26",

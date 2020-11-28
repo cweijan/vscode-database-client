@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import * as mysql from "mysql";
+import * as mysql from "mysql2";
 import * as path from "path";
 import * as vscode from "vscode";
 import { Global } from "../common/global";
