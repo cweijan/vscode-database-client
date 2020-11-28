@@ -13,6 +13,7 @@ import { DataResponse, DMLResponse, ErrorResponse, MessageResponse, RunResponse 
 import { ConnectionManager } from "./connectionManager";
 import { DelimiterHolder } from "./common/delimiterHolder";
 import { ServiceManager } from "./serviceManager";
+import { NodeUtil } from "~/model/nodeUtil";
 import { Trans } from "~/common/trans";
 
 export class QueryUnit {
@@ -33,41 +34,23 @@ export class QueryUnit {
         });
     }
 
-    private static ddlPattern = /^\s*(alter|create|drop)/ig;
-    private static dmlPattern = /^\s*(insert|update|delete)/ig;
+
     private static selectPattern = /^\s*\bselect\b.+/ig;
     private static importPattern = /^\s*\bsource\b\s+(.+)/i;
     protected static delimiterHodler = new DelimiterHolder()
-    public static async runQuery(sql?: string, connectionNode?: Node): Promise<null> {
-        if (!sql && !vscode.window.activeTextEditor) {
-            vscode.window.showWarningMessage("No SQL file selected");
-            return;
-        }
+    public static async runQuery(sql?: string, connectionNode: Node = ConnectionManager.getLastConnectionOption()): Promise<null> {
+
+
         Trans.begin()
-        if (!connectionNode) {
-            connectionNode = ConnectionManager.getLastConnectionOption();
-        }
-        const connection = await ConnectionManager.getConnection(connectionNode, true);
-        if (!connection) {
-            vscode.window.showWarningMessage("No MySQL Server or Database selected");
-            return;
-        }
+        connectionNode = NodeUtil.of(connectionNode)
 
         let fromEditor = false;
         if (!sql) {
+            sql = this.getSqlFromEditor(connectionNode);
             fromEditor = true;
-            const activeTextEditor = vscode.window.activeTextEditor;
-            const selection = activeTextEditor.selection;
-            if (selection.isEmpty) {
-                sql = this.obtainSql(activeTextEditor, this.delimiterHodler.get(connectionNode.getConnectId()));
-            } else {
-                sql = activeTextEditor.document.getText(selection);
-            }
         }
         sql = sql.replace(/^\s*--.+/igm, '').trim();
-        const executeTime = new Date().getTime();
-        const isDDL = sql.match(this.ddlPattern);
-        const isDML = sql.match(this.dmlPattern);
+
         const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
         sql = parseResult.sql
         if (!sql && parseResult.replace) {
@@ -75,32 +58,21 @@ export class QueryUnit {
             return;
         }
 
-        const importMatch=sql.match(this.importPattern);
-        if(importMatch){
+        const importMatch = sql.match(this.importPattern);
+        if (importMatch) {
             ServiceManager.instance.importService.import(importMatch[1], ConnectionManager.getLastConnectionOption())
             return;
         }
 
-        if (isDDL == null && isDML == null && sql) {
-            QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
+        const sqlList: string[] = sql.match(/(?:[^;"']+|["'][^"']*["'])+/g).filter((s) => (s.trim() != '' && s.trim() != ';'))
+        if (sqlList.length == 0 && sql.match(this.selectPattern) && !sql.match(/\blimit\b/i) && !sql.match(/;\s*$/) && !sql.match(/[count|sum|min|max]\(/i)) {
+            sql += ` LIMIT ${Global.getConfig(ConfigKey.DEFAULT_LIMIT)}`;
         }
 
-        const isMulti = sql.match(Pattern.MULTI_PATTERN);
-        if (!isMulti) {
+        QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
 
-            if(sql.match(this.selectPattern) && !sql.match(/\blimit\b/i) && !sql.match(/;\s*$/) && !sql.match(/[count|sum|min|max]\(/i)){
-                sql+=` LIMIT ${Global.getConfig(ConfigKey.DEFAULT_LIMIT)}`;
-            }
-
-            const sqlList: string[] = sql.match(/(?:[^;"']+|["'][^"']*["'])+/g).filter((s) => (s.trim() != '' && s.trim() != ';'))
-            if (sqlList.length > 1) {
-                const success = await this.runBatch(connection, sqlList)
-                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Batch execute sql ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
-                return;
-            }
-        }
-
-        connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
+        const executeTime = new Date().getTime();
+        (await ConnectionManager.getConnection(connectionNode, true)).query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
             if (err) {
                 QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
                 return;
@@ -109,29 +81,26 @@ export class QueryUnit {
             if (fromEditor) {
                 vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime);
             }
-            if (isMulti) {
-                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
-                vscode.commands.executeCommand(CommandKey.Refresh);
-                return;
-            }
-            if (isDDL) {
+            if (data.affectedRows) {
                 QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
                 vscode.commands.executeCommand(CommandKey.Refresh);
                 return;
             }
-            if (isDML) {
-                QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
-                return;
-            }
+
+            // query result or multi statement.
             if (Array.isArray(data)) {
-                if (data[1] && data[1].__proto__.constructor.name == "OkPacket") {
+                // not query result
+                if (data[1] && (
+                    data[1].__proto__.constructor.name == "array" || data[1].__proto__.constructor.name == "OkPacket" || data[1].__proto__.constructor.name == "ResultSetHeader")
+                ) {
                     QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
                     return;
                 }
                 QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
-                return;
+            } else {
+                // unknow result, send sql success
+                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
             }
-            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
 
         });
     }
@@ -155,8 +124,21 @@ export class QueryUnit {
 
     }
 
-
+    
     private static batchPattern = /\s+(TRIGGER|PROCEDURE|FUNCTION)\s+/ig;
+    
+    private static getSqlFromEditor(connectionNode: Node): string {
+        if (!vscode.window.activeTextEditor) {
+            throw new Error("No SQL file selected!");
+
+        }
+        const activeTextEditor = vscode.window.activeTextEditor;
+        const selection = activeTextEditor.selection;
+        const newLocal = !selection.isEmpty ? activeTextEditor.document.getText(selection) :
+            this.obtainSql(activeTextEditor, this.delimiterHodler.get(connectionNode.getConnectId()));
+        return newLocal;
+    }
+
     public static obtainSql(activeTextEditor: vscode.TextEditor, delimiter?: string): string {
 
         const content = activeTextEditor.document.getText();
@@ -202,53 +184,6 @@ export class QueryUnit {
 
         return this.sqlDocument;
     }
-
-    public static async runFile(connection: Connection, fsPath: string) {
-        const stats = fs.statSync(fsPath);
-        const startTime = new Date();
-        const fileSize = stats.size;
-        if (fileSize > 1024 * 1024 * 200) {
-            vscode.window.showErrorMessage(`Import sql exceed max limit 200M!`)
-            // if (await this.executeByLine(connection, fsPath)) {
-            //     Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
-            // }
-        } else {
-            let fileContent = fs.readFileSync(fsPath, 'utf8');
-            if (Global.getConfig<boolean>(ConfigKey.ENABLE_DELIMITER)) {
-                const parse = this.delimiterHodler.parseBatch(fileContent)
-                fileContent = parse.sql
-            }
-            if (fileContent.match(Pattern.MULTI_PATTERN)) {
-                await this.queryPromise(connection, fileContent)
-            } else {
-                const sqlList = fileContent.split(";")
-                await this.runBatch(connection, sqlList)
-            }
-            Console.log(`import success, cost time : ${new Date().getTime() - startTime.getTime()}ms`);
-            vscode.commands.executeCommand(CommandKey.Refresh)
-        }
-
-    }
-
-    /**
-     * TODO: have problem, fail
-     * @param connection 
-     * @param fsPath 
-     */
-    // private static async executeByLine(connection: any, fsPath: string) {
-    //     const readline = require('readline');
-    //     const rl = readline.createInterface({
-    //         input: fs.createReadStream(fsPath.replace("\\", "/")),
-    //         terminal: false,
-    //     });
-    //     rl.on('line', (chunk) => {
-    //         const sql = chunk.toString('utf8');
-    //         connection.query(sql, (err, sets, fields) => {
-    //             if (err) { Console.log(`execute sql ${sql} fail,${err}`); }
-    //         });
-    //     });
-    //     return true;
-    // }
 
 }
 

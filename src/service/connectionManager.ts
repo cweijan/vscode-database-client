@@ -54,7 +54,11 @@ export class ConnectionManager {
     }
 
     public static getConnection(connectionNode: Node, changeActive: boolean = false): Promise<mysql.Connection> {
-        if (!connectionNode) { return Promise.resolve(null) }
+        if (!connectionNode) {
+            // TODO add button to create
+            vscode.window.showWarningMessage("No MySQL Server or Database selected!");
+            throw new Error("No MySQL Server or Database selected!")
+        }
         return new Promise(async (resolve, reject) => {
 
             NodeUtil.of(connectionNode)

@@ -126,13 +126,6 @@ export class ConnectionNode extends Node implements CopyAble {
 
     }
 
-    public importData(fsPath: string) {
-        Console.log(`Doing import ${this.getHost()}:${this.getPort()}...`);
-        ConnectionManager.getConnection(this).then((connection) => {
-            QueryUnit.runFile(connection, fsPath);
-        });
-    }
-
     public static init() { }
 
 
