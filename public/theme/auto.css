@@ -4410,8 +4410,8 @@ body {
     padding-bottom: 10px;
     vertical-align: middle;
     background-color: var(--vscode-editor-background);;
-    border-radius: 4px;
-    border: 1px solid #EBEEF5;
+    /* border-radius: 4px;
+    border: 1px solid #EBEEF5; */
     font-size: 18px;
     -webkit-box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
