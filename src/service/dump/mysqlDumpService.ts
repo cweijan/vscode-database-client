@@ -1,4 +1,4 @@
-import mysqldump, { Options } from 'mysqldump_plus';
+import mysqldump, { Options } from './mysql/main';
 import * as vscode from "vscode";
 import { Console } from "../../common/Console";
 import { Node } from "../../model/interface/node";
