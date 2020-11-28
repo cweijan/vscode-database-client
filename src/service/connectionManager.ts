@@ -32,7 +32,7 @@ export class ConnectionManager {
 
         const node = this.lastConnectionNode;
         if(node==null){
-            ConnectionManager.checkConnection();
+            // ConnectionManager.checkConnection();
         }
 
         return node;
