@@ -45,7 +45,11 @@ Origin command : \`mysqldump -h ${host} -P ${port} -u ${node.user} -p --database
             }
         }
         mysqldump(option).then(() => {
-            vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.database} success!`);
+            vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.database} success!`,'open').then(action=>{
+                if(action=='open'){
+                    vscode.commands.executeCommand('vscode.open', vscode.Uri.file(dumpFilePath));
+                }
+            })
         }).catch((err) => {
             vscode.window.showErrorMessage(`Backup ${node.getHost()}_${node.database} fail!\n${err}`);
         }).then(() => {
