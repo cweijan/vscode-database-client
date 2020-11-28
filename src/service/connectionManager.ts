@@ -30,7 +30,12 @@ export class ConnectionManager {
             if (fileNode) { return fileNode }
         }
 
-        return this.lastConnectionNode;
+        const node = this.lastConnectionNode;
+        if(node==null){
+            ConnectionManager.checkConnection();
+        }
+
+        return node;
     }
 
     public static getActiveConnectByKey(key: string): ConnectionWrapper {
@@ -55,8 +60,7 @@ export class ConnectionManager {
 
     public static getConnection(connectionNode: Node, changeActive: boolean = false): Promise<mysql.Connection> {
         if (!connectionNode) {
-            // TODO add button to create
-            vscode.window.showWarningMessage("No MySQL Server or Database selected!");
+            this.checkConnection()
             throw new Error("No MySQL Server or Database selected!")
         }
         return new Promise(async (resolve, reject) => {
@@ -152,5 +156,14 @@ export class ConnectionManager {
         }
         return null;
     }
+
+    private static checkConnection() {
+        vscode.window.showErrorMessage("Please create database connection.", "Config").then(action => {
+            if (action == "Config") {
+                vscode.commands.executeCommand('mysql.connection.add');
+            }
+        });
+    }
+
 
 }
