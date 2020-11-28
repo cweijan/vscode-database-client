@@ -65,16 +65,11 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
         const targetContext = connectionNode.global === false ? this.context.workspaceState : this.context.globalState;
 
-        let connections = targetContext.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
-
-        if (!connections) {
-            connections = {};
-        }
+        let connections = targetContext.get<{ [key: string]: Node }>(CacheKey.ConectionsKey, {});
 
         const connectId = connectionNode.getConnectId();
         connections[connectId] = connectionNode;
         ConnectionManager.removeConnection(connectId)
-
 
         await targetContext.update(CacheKey.ConectionsKey, connections);
         DbTreeDataProvider.refresh();
@@ -93,7 +88,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async getConnectionNodes(): Promise<ConnectionNode[]> {
         const connectionNodes = [];
-        const map={};
+        const map = {};
         let connections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
         if (connections) {
             for (const key of Object.keys(connections)) {
@@ -101,7 +96,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
                 const connection = new ConnectionNode(key, connections[key]);
                 delete connections[key]
                 const connectId = connection.getConnectId();
-                if(map[connectId]){
+                if (map[connectId]) {
                     continue;
                 }
                 map[connectId] = connection
@@ -118,7 +113,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
                 const connection = new ConnectionNode(key, connections[key]);
                 delete connections[key]
                 const connectId = connection.getConnectId();
-                if(map[connectId]){
+                if (map[connectId]) {
                     continue;
                 }
                 map[connectId] = connection

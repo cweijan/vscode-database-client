@@ -13,6 +13,7 @@ import { QueryUnit } from "../../service/queryUnit";
 import { ViewManager } from "../viewManager";
 import { DataResponse } from "./queryResponse";
 import { Global } from "../../common/global";
+import { NodeUtil } from "@/model/nodeUtil";
 
 export class QueryParam<T> {
     /**
@@ -78,6 +79,7 @@ export class QueryPage {
                     if (queryParam.res?.table) {
                         handler.panel.title = queryParam.res.table
                     }
+                    queryParam.res.dbInfo={...ConnectionManager.getLastConnectionOption(),command:null,info:null }
                     handler.emit(queryParam.type, queryParam.res)
                 }).on("showCost", ({ cost }) => {
                     this.costStatusBar.text = `$(scrollbar-button-right) ${cost}ms`
@@ -89,7 +91,7 @@ export class QueryPage {
                     if (!queryParam.singlePage) {
                         this.hodlder.set(params.sql.trim(), title)
                     }
-                    QueryUnit.runQuery(params.sql);
+                    QueryUnit.runQuery(params.sql,params.dbInfo);
                 }).on(OperateType.next, async (params) => {
                     const sql = this.pageService.build(params.sql, params.pageNum, params.pageSize)
                     const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())

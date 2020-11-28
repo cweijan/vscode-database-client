@@ -24,7 +24,8 @@ module.exports = [
             vscode: 'commonjs vscode'
         },
         resolve: {
-            extensions: ['.ts', '.js']
+            extensions: ['.ts', '.js'],
+            alias: { '@': path.resolve('src'), }
         },
         module: { rules: [{ test: /\.ts$/, exclude: /node_modules/, use: ['ts-loader'] }] },
         optimization: { minimize: false },

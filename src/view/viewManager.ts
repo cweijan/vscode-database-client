@@ -78,7 +78,16 @@ export class ViewManager {
                     return Promise.resolve(currentStatus.instance);
                 }
             }
-            const newStatus = { creating: true, instance: null, eventEmitter: new EventEmitter() }
+            const webviewPanel = vscode.window.createWebviewPanel(
+                viewOption.title,
+                viewOption.title,
+                {
+                    viewColumn: viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One,
+                    preserveFocus: true
+                },
+                { enableScripts: true, retainContextWhenHidden: true },
+            );
+            const newStatus = { creating: true, instance: webviewPanel, eventEmitter: new EventEmitter() }
             this.viewStatu[viewOption.title] = newStatus
             const targetPath = `${this.webviewPath}/${viewOption.path}.html`;
             fs.readFile(targetPath, 'utf8', async (err, data) => {
@@ -87,19 +96,9 @@ export class ViewManager {
                     reject(err);
                     return;
                 }
-                const webviewPanel = vscode.window.createWebviewPanel(
-                    viewOption.title,
-                    viewOption.title,
-                    {
-                        viewColumn: viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One,
-                        preserveFocus: true
-                    },
-                    { enableScripts: true, retainContextWhenHidden: true },
-                );
                 if (viewOption.iconPath) {
                     webviewPanel.iconPath = vscode.Uri.file(viewOption.iconPath)
                 }
-                this.viewStatu[viewOption.title].instance = webviewPanel
                 const contextPath = path.resolve(targetPath, "..");
                 if (viewOption.handleHtml) {
                     data = viewOption.handleHtml(data, webviewPanel)

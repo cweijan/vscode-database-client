@@ -122,6 +122,7 @@ export default {
   name: "App",
   data() {
     return {
+      dbInfo:{},
       result: {
         data: [],
         sql: "",
@@ -176,6 +177,10 @@ export default {
   },
   mounted() {
     const handlerData = (data, sameTable) => {
+      console.log('data')
+      if(data.dbInfo){
+        this.dbInfo=data.dbInfo;
+      }
       this.result = data;
       this.toolbar.sql = data.sql;
 
@@ -202,6 +207,7 @@ export default {
       vscodeEvent.emit("showCost", { cost: this.toolbar.costTime });
     };
     window.addEventListener("message", ({ data }) => {
+      console.log(data)
       if (!data) return;
       const response = data.content;
       this.table.loading = false;
@@ -257,7 +263,7 @@ export default {
           this.$message(JSON.stringify(data));
       }
     });
-    vscodeEvent.emit("init");
+      vscodeEvent.emit("init");
     window.addEventListener("keyup", (event) => {
       if (event.key == "c" && event.ctrlKey) {
         document.execCommand("copy");
@@ -557,6 +563,7 @@ export default {
       if (!sql) return;
       vscodeEvent.emit("execute", {
         sql: sql.replace(/ +/gi, " "),
+        dbInfo:this.dbInfo
       });
       this.table.loading = true;
     },

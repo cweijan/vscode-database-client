@@ -3,6 +3,9 @@ import { ConnectionManager } from "../service/connectionManager";
 
 export abstract class NodeUtil {
     public static of(node: any): Node {
+        if(!node){
+            return null;
+        }
         if (node && !(node instanceof Node)) {
             node.__proto__ = Node.prototype
         }

@@ -3,6 +3,7 @@
 ## 2.7.8 - 2020/11/29
 - Support change active database from status bar.
 -  Support export view, procedure, function.
+-  Fix multi query page database change.
 
 ## 2.7.5 - 2020/11/19
 - Migrate status to status bar.
