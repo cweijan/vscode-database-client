@@ -13,6 +13,7 @@ import { DataResponse, DMLResponse, ErrorResponse, MessageResponse, RunResponse 
 import { ConnectionManager } from "./connectionManager";
 import { DelimiterHolder } from "./common/delimiterHolder";
 import { ServiceManager } from "./serviceManager";
+import { Trans } from "~/common/trans";
 
 export class QueryUnit {
 
@@ -42,6 +43,7 @@ export class QueryUnit {
             vscode.window.showWarningMessage("No SQL file selected");
             return;
         }
+        Trans.begin()
         if (!connectionNode) {
             connectionNode = ConnectionManager.getLastConnectionOption();
         }

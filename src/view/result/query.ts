@@ -14,6 +14,7 @@ import { ViewManager } from "../viewManager";
 import { DataResponse } from "./queryResponse";
 import { Global } from "../../common/global";
 import { NodeUtil } from "@/model/nodeUtil";
+import { Trans } from "~/common/trans";
 
 export class QueryParam<T> {
     /**
@@ -80,6 +81,7 @@ export class QueryPage {
                         handler.panel.title = queryParam.res.table
                     }
                     queryParam.res.dbInfo={...ConnectionManager.getLastConnectionOption(),command:null,info:null }
+                    queryParam.res.transId=Trans.transId;
                     handler.emit(queryParam.type, queryParam.res)
                 }).on("showCost", ({ cost }) => {
                     this.costStatusBar.text = `$(scrollbar-button-right) ${cost}ms`

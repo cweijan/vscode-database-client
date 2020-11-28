@@ -122,7 +122,7 @@ export default {
   name: "App",
   data() {
     return {
-      dbInfo:{},
+      dbInfo: {},
       result: {
         data: [],
         sql: "",
@@ -177,9 +177,8 @@ export default {
   },
   mounted() {
     const handlerData = (data, sameTable) => {
-      console.log('data')
-      if(data.dbInfo){
-        this.dbInfo=data.dbInfo;
+      if (data.dbInfo) {
+        this.dbInfo = data.dbInfo;
       }
       this.result = data;
       this.toolbar.sql = data.sql;
@@ -207,8 +206,8 @@ export default {
       vscodeEvent.emit("showCost", { cost: this.toolbar.costTime });
     };
     window.addEventListener("message", ({ data }) => {
-      console.log(data)
       if (!data) return;
+      console.log(data);
       const response = data.content;
       this.table.loading = false;
       if (response && response.costTime) {
@@ -223,7 +222,7 @@ export default {
       switch (data.type) {
         case "RUN":
           this.toolbar.sql = response.sql;
-          this.table.loading = true;
+          this.table.loading = response.transId != this.result.transId;
           break;
         case "DATA":
           handlerData(response);
@@ -263,7 +262,7 @@ export default {
           this.$message(JSON.stringify(data));
       }
     });
-      vscodeEvent.emit("init");
+    vscodeEvent.emit("init");
     window.addEventListener("keyup", (event) => {
       if (event.key == "c" && event.ctrlKey) {
         document.execCommand("copy");
@@ -454,7 +453,10 @@ export default {
       if (row.isFilter) {
         return;
       }
-      if(column.type == "checkbox" && this.$refs.dataTable.getCheckboxRecords().length==0){
+      if (
+        column.type == "checkbox" &&
+        this.$refs.dataTable.getCheckboxRecords().length == 0
+      ) {
         this.toolbar.row = {};
         return;
       }
@@ -563,7 +565,7 @@ export default {
       if (!sql) return;
       vscodeEvent.emit("execute", {
         sql: sql.replace(/ +/gi, " "),
-        dbInfo:this.dbInfo
+        dbInfo: this.dbInfo,
       });
       this.table.loading = true;
     },
@@ -715,7 +717,7 @@ body {
   margin-right: 10px;
 }
 
-.toolbar{
+.toolbar {
   margin-top: 3px;
   margin-bottom: 3px;
 }

@@ -67,7 +67,7 @@ export class ConnectionManager {
             }
             const key = connectionNode.getConnectId();
             const connection = this.activeConnection[key];
-            if (connection && connection.connection.state == 'authenticated') {
+            if (connection && (connection.connection.state == 'authenticated' || connection.connection.authorized)) {
                 if (connectionNode.database) {
                     try {
                         await QueryUnit.queryPromise(connection.connection, `use \`${connectionNode.database}\``)

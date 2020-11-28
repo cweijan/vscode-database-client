@@ -101,6 +101,8 @@ declare module 'mysql2' {
 
         state: 'connected' | 'authenticated' | 'disconnected' | 'protocol_error' | string;
 
+        authorized: boolean;
+
         threadId: number | null;
 
         createQuery: QueryFunction;
