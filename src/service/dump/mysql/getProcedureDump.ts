@@ -30,6 +30,11 @@ async function getProcedureDump(
 
     // we create a multi query here so we can query all at once rather than in individual connections
     const getSchemaMultiQuery: Array<string> = [];
+    if(getSchemaMultiQuery.length==0){
+        return [];
+    }
+
+
     procedures.forEach(proc => {
         getSchemaMultiQuery.push(`SHOW CREATE PROCEDURE \`${proc.Name}\`;`);
     });
