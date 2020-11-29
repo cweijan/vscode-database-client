@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2..8 - 2020/11/29
+## 2.8 - 2020/11/29
 - Support change active database from status bar.
 -  Support export view, procedure, function.
 -  Fix multi query page database change.

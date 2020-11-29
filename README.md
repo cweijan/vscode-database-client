@@ -77,6 +77,7 @@ OpenSetting -> extensions -> Mysql
 
 # Credits
 - [vscode-mysql](https://github.com/formulahendry/vscode-mysql): The original version of this extension.
+- [node-mysql2](https://github.com/sidorares/node-mysql2) : Core connect lib.
 - [mysqldump](https://github.com/bradzacher/mysqldum): Use it to export data.
 
 ## RoadMap
