@@ -123,7 +123,7 @@ export class QueryPage {
         const conn = queryParam.connection;
         if (!fields || fields.length == 0) { return; }
         const tableName = fields[0].orgTable;
-        const database = fields[0].db;
+        const database = fields[0].schema || fields[0].db;
         if (tableName == null || conn == null) { return; }
         // load table infomation
         const tableNode = DatabaseCache.getTable(`${conn.getConnectId()}_${database ? database : conn.database}`, tableName);

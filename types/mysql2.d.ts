@@ -766,6 +766,7 @@ declare module 'mysql2' {
     export interface UntypedFieldInfo {
         catalog: string;
         db: string;
+        schema: string;
         table: string;
         orgTable: string;
         name: string;
