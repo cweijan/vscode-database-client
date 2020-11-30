@@ -31,7 +31,7 @@ export class ConnectionManager {
         }
 
         const node = this.lastConnectionNode;
-        if(node==null){
+        if (node == null) {
             // ConnectionManager.checkConnection();
         }
 
@@ -76,16 +76,14 @@ export class ConnectionManager {
             const key = connectionNode.getConnectId();
             const connection = this.activeConnection[key];
             if (connection && (connection.connection.state == 'authenticated' || connection.connection.authorized)) {
-                if (connectionNode.database) {
-                    try {
-                        await QueryUnit.queryPromise(connection.connection, `use \`${connectionNode.database}\``)
-                    } catch (err) {
-                        this.activeConnection[key] = null
-                        reject(err);
-                    }
+                const sql = connectionNode.database ? `use \`${connectionNode.database}\`` : `SHOW STATUS WHERE variable_name = 'Max_used_connections';`;
+                try {
+                    await QueryUnit.queryPromise(connection.connection, sql)
+                    resolve(connection.connection);
+                    return;
+                } catch (err) {
+                    this.activeConnection[key] = null
                 }
-                resolve(connection.connection);
-                return;
             }
 
             const ssh = connectionNode.ssh;
