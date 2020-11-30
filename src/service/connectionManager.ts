@@ -78,7 +78,7 @@ export class ConnectionManager {
             if (connection && (connection.connection.state == 'authenticated' || connection.connection.authorized)) {
                 const sql = connectionNode.database ? `use \`${connectionNode.database}\`` : `SHOW STATUS WHERE variable_name = 'Max_used_connections';`;
                 try {
-                    await QueryUnit.queryPromise(connection.connection, sql)
+                    await QueryUnit.queryPromise(connection.connection, sql,false)
                     resolve(connection.connection);
                     return;
                 } catch (err) {

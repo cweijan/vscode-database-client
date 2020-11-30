@@ -20,12 +20,14 @@ export class QueryUnit {
 
     public static readonly maxTableCount = Global.getConfig<number>(ConfigKey.MAX_TABLE_COUNT);
 
-    public static queryPromise<T>(connection: mysql.Connection, sql: string): Promise<T> {
+    public static queryPromise<T>(connection: mysql.Connection, sql: string,showError=true): Promise<T> {
         return new Promise((resolve, reject) => {
             connection.query(sql, (err: mysql.MysqlError, rows) => {
                 if (err) {
-                    Console.log(`Execute sql fail : ${sql}`);
-                    Console.log(err);
+                    if(showError){
+                        Console.log(`Execute sql fail : ${sql}`);
+                        Console.log(err);
+                    }
                     reject(err);
                 } else {
                     resolve(rows);
