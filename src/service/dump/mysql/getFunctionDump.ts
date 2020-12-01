@@ -30,13 +30,13 @@ async function getFunctionDump(
 
     // we create a multi query here so we can query all at once rather than in individual connections
     const getSchemaMultiQuery: Array<string> = [];
-    if(getSchemaMultiQuery.length==0){
-        return [];
-    }
-    
     Functions.forEach(proc => {
         getSchemaMultiQuery.push(`SHOW CREATE Function \`${proc.Name}\`;`);
     });
+
+    if(getSchemaMultiQuery.length==0){
+        return [];
+    }
 
     const result = await connection.multiQuery<ShowCreateFunction>(
         getSchemaMultiQuery.join('\n'),
