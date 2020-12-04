@@ -14,6 +14,7 @@ import { DatabaseNode } from "./databaseNode";
 import { UserGroup } from "./userGroup";
 import { Connection } from "mysql2";
 import { CopyAble } from "../interface/copyAble";
+import { NodeUtil } from "../nodeUtil";
 
 export class ConnectionNode extends Node implements CopyAble {
 
@@ -120,7 +121,7 @@ export class ConnectionNode extends Node implements CopyAble {
             ConnectionManager.removeConnection(this.id)
             DatabaseCache.clearDatabaseCache(this.id)
             delete connections[this.id];
-            await targetContext.update(CacheKey.ConectionsKey, connections);
+            await targetContext.update(CacheKey.ConectionsKey, NodeUtil.removeParent(connections));
             DbTreeDataProvider.refresh();
         })
 

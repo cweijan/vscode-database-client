@@ -25,8 +25,10 @@ module.exports = [
         },
         resolve: {
             extensions: ['.ts', '.js'],
-            alias: { '@': path.resolve('src'), },
-            alias: { '~': path.resolve('src'), }
+            alias: {
+                '@': path.resolve(__dirname, './src'),
+                '~': path.resolve(__dirname, './src')
+            }
         },
         module: { rules: [{ test: /\.ts$/, exclude: /node_modules/, use: ['ts-loader'] }] },
         optimization: { minimize: false },

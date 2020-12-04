@@ -7,6 +7,7 @@ import { DatabaseNode } from "../model/database/databaseNode";
 import { Node } from "../model/interface/node";
 import { UserGroup } from "../model/database/userGroup";
 import { Global } from "../common/global";
+import { NodeUtil } from "@/model/nodeUtil";
 
 export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
@@ -53,14 +54,13 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async addConnection(connectionNode: Node) {
 
-
         // if is add from edit, clear previous connection info.
         const editGlobal = (connectionNode as any).isGlobal;
         if (editGlobal != null) {
             const oldContext = editGlobal === false ? this.context.workspaceState : this.context.globalState;
             const oldConnections = oldContext.get<{ [key: string]: Node }>(CacheKey.ConectionsKey)
             delete oldConnections[connectionNode.getConnectId(editGlobal)]
-            await oldContext.update(CacheKey.ConectionsKey, oldConnections);
+            await oldContext.update(CacheKey.ConectionsKey, NodeUtil.removeParent(oldConnections));
         }
 
         const targetContext = connectionNode.global === false ? this.context.workspaceState : this.context.globalState;
@@ -71,7 +71,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         connections[connectId] = connectionNode;
         ConnectionManager.removeConnection(connectId)
 
-        await targetContext.update(CacheKey.ConectionsKey, connections);
+        await targetContext.update(CacheKey.ConectionsKey, NodeUtil.removeParent(connections));
         DbTreeDataProvider.refresh();
     }
 
@@ -87,43 +87,21 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     }
 
     public async getConnectionNodes(): Promise<ConnectionNode[]> {
-        const connectionNodes = [];
-        const map = {};
-        let connections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
-        if (connections) {
-            for (const key of Object.keys(connections)) {
+
+        let globalConnections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey, {});
+        let workspaceConnections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey, {});
+
+        const connections = { ...globalConnections, ...workspaceConnections };
+      
+        return Object.keys(connections).map(key => {
+            const connection = new ConnectionNode(key, connections[key]);
+            if (typeof connections[key].global == "undefined") {
+                // Compatible with older versions, will remove in the feature
                 connections[key].global = true;
-                const connection = new ConnectionNode(key, connections[key]);
-                delete connections[key]
-                const connectId = connection.getConnectId();
-                if (map[connectId]) {
-                    continue;
-                }
-                map[connectId] = connection
-                connections[connectId] = connection
-                connectionNodes.push(connection);
             }
-        }
-        await this.context.globalState.update(CacheKey.ConectionsKey, connections);
+            return connection;
+        })
 
-        connections = this.context.workspaceState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
-        if (connections) {
-            for (const key of Object.keys(connections)) {
-                connections[key].global = false;
-                const connection = new ConnectionNode(key, connections[key]);
-                delete connections[key]
-                const connectId = connection.getConnectId();
-                if (map[connectId]) {
-                    continue;
-                }
-                map[connectId] = connection
-                connections[connectId] = connection
-                connectionNodes.push(connection);
-            }
-        }
-        await this.context.workspaceState.update(CacheKey.ConectionsKey, connections);
-
-        return connectionNodes;
     }
 
     public async activeDb() {

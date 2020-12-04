@@ -454,7 +454,7 @@ export default {
         return;
       }
       if (
-        column.type == "checkbox" &&
+        column && column.type == "checkbox" &&
         this.$refs.dataTable.getCheckboxRecords().length == 0
       ) {
         this.toolbar.row = {};
