@@ -7,11 +7,20 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { TableNode } from "./tableNode";
+import sqlFormatter = require('sql-formatter');
 
 export class ViewNode extends TableNode {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/view.png");
     public contextValue: string = ModelType.VIEW;
+
+    public async showSource() {
+        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), `SHOW CREATE VIEW  \`${this.database}\`.\`${this.table}\``)
+            .then((sourceResule) => {
+                const sql   =`DROP VIEW ${this.table};${sourceResule[0]['Create View']}`
+                QueryUnit.showSQLTextDocument(sqlFormatter.format(sql));
+            });
+    }
 
     public drop() {
 

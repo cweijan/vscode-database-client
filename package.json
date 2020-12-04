@@ -269,8 +269,23 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.column.up",
+				"title": "Move Column Up",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.column.down",
+				"title": "Move Column Down",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.table.source",
 				"title": "Show Table Source",
+				"category": "MySQL"
+			},
+			{
+				"command": "mysql.view.source",
+				"title": "Show View Source",
 				"category": "MySQL"
 			},
 			{
@@ -606,22 +621,22 @@
 				},
 				{
 					"command": "mysql.name.copy",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/",
 					"group": "1_inline@-1"
 				},
 				{
 					"command": "mysql.table.source",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/",
 					"group": "1_inline@0"
 				},
 				{
 					"command": "mysql.table.show",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/ ",
 					"group": "1_inline@2"
 				},
 				{
 					"command": "mysql.count.sql",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/",
 					"group": "1_inline@3"
 				},
 				{
@@ -636,12 +651,12 @@
 				},
 				{
 					"command": "mysql.data.export",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/",
 					"group": "1_inline1@2"
 				},
 				{
 					"command": "mysql.struct.export",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/",
 					"group": "1_inline1@3"
 				},
 				{

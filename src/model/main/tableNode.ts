@@ -67,8 +67,8 @@ ADD
 
     public async showSource() {
         QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), `SHOW CREATE TABLE \`${this.database}\`.\`${this.table}\``)
-            .then((procedDtail) => {
-                QueryUnit.showSQLTextDocument(procedDtail[0]['Create Table']);
+            .then((sourceResule) => {
+                QueryUnit.showSQLTextDocument(sourceResule[0]['Create Table']);
             });
     }
 

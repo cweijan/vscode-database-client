@@ -6,6 +6,7 @@ import { DatabaseNode } from "../../model/database/databaseNode";
 import format = require('date-format');
 import path = require('path');
 import { TableNode } from "../../model/main/tableNode";
+import { ViewNode } from "@/model/main/viewNode";
 
 export abstract class AbstractDumpService {
 
@@ -13,7 +14,7 @@ export abstract class AbstractDumpService {
 
         
         let tables = []
-        if (node instanceof TableNode) {
+        if (node instanceof TableNode || node instanceof ViewNode) {
             tables = [node.table]
         } else {
             const tableList = DatabaseCache.getTableListOfDatabase(node.id);
