@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.8.5 Unpublish
+## 2.8.5 2020/12/6
 
 - Add more feature to view node.
 - Support change column position.
