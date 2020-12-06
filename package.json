@@ -271,12 +271,20 @@
 			{
 				"command": "mysql.column.up",
 				"title": "Move Column Up",
-				"category": "MySQL"
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/up.png",
+					"dark": "resources/dark/up.png"
+				}
 			},
 			{
 				"command": "mysql.column.down",
 				"title": "Move Column Down",
-				"category": "MySQL"
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/down.png",
+					"dark": "resources/dark/down.png"
+				}
 			},
 			{
 				"command": "mysql.table.source",
@@ -710,9 +718,19 @@
 					"group": "inline"
 				},
 				{
+					"command": "mysql.column.up",
+					"when": "view == github.cweijan.mysql && viewItem == column",
+					"group": "inline@0"
+				},
+				{
+					"command": "mysql.column.down",
+					"when": "view == github.cweijan.mysql && viewItem == column",
+					"group": "inline@2"
+				},
+				{
 					"command": "mysql.column.changeName",
 					"when": "view == github.cweijan.mysql && viewItem == column",
-					"group": "inline"
+					"group": "inline@4"
 				},
 				{
 					"command": "mysql.name.copy",

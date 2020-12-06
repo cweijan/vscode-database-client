@@ -16,7 +16,7 @@ export class ColumnNode extends Node implements CopyAble {
     public type: string;
     public contextValue: string = ModelType.COLUMN;
     public isPrimaryKey = false;
-    constructor(private readonly table: string, readonly column: ColumnMeta, readonly info: Node) {
+    constructor(private readonly table: string, readonly column: ColumnMeta, readonly info: Node, readonly index: number) {
         super(column.name)
         this.init(info)
         this.type = `${this.column.type}`
@@ -82,5 +82,28 @@ export class ColumnNode extends Node implements CopyAble {
 
     }
 
+
+    public async moveDown() {
+        const columns = (await this.info.getChildren()) as ColumnNode[]
+        const afterColumnNode = columns[this.index + 1];
+        if (!afterColumnNode) {
+            vscode.window.showErrorMessage("Column is at last.")
+            return;
+        }
+        const sql = `ALTER TABLE ${this.database}.${this.table} MODIFY COLUMN ${this.column.name} ${this.column.type} AFTER ${afterColumnNode.column.name};`
+        await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
+        DbTreeDataProvider.refresh()
+    }
+    public async moveUp() {
+        const columns = (await this.info.getChildren()) as ColumnNode[]
+        const beforeColumnNode = columns[this.index - 1];
+        if (!beforeColumnNode) {
+            vscode.window.showErrorMessage("Column is at first.")
+            return;
+        }
+        const sql = `ALTER TABLE ${this.database}.${this.table} MODIFY COLUMN ${beforeColumnNode.column.name} ${beforeColumnNode.column.type} AFTER ${this.column.name};`
+        await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
+        DbTreeDataProvider.refresh()
+    }
 
 }

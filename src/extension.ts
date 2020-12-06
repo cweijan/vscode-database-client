@@ -107,6 +107,12 @@ export function activate(context: vscode.ExtensionContext) {
             "mysql.column.changeName": (columnNode: ColumnNode) => {
                 columnNode.changeColumnName();
             },
+            "mysql.column.up": (columnNode: ColumnNode) => {
+                columnNode.moveUp();
+            },
+            "mysql.column.down": (columnNode: ColumnNode) => {
+                columnNode.moveDown();
+            },
             "mysql.column.add": (tableNode: TableNode) => {
                 tableNode.addColumnTemplate();
             },
