@@ -1,129 +1,213 @@
 <template>
-  <div class="container" id='app'>
-    <h1>Connect to MySQL server</h1>
-    <blockquote class="panel" id="error" v-if="error">
-      <p class="panel__text">
-        Connection error! <span id="errorMessage" v-text="errorMessage"></span><br />
-      </p>
+  <div class="container flex flex-col mx-auto">
+    <h1 class="py-4 text-2xl">Connect to MySQL server</h1>
+
+    <!-- ERRORS SHOWS HERE -->
+    <blockquote class="p-3 mb-2 panel" id="error" v-if="error">
+      <section class="panel__text">
+        <div class="block font-bold">Connection error!</div>
+        <span id="errorMessage" v-text="errorMessage"></span>
+      </section>
     </blockquote>
-    <el-row>
-      <div>
-        <div class="field field__input">
-          <strong>name:</strong>
-          <input class="field__input" placeholder="connection name, can be empty" v-model="connectionOption.name" />
-        </div>
+
+    <!-- CONNECTION NAME -->
+    <section class="mb-2">
+      <label class="block font-bold" for="connection-name">Connection Name</label>
+      <input
+        class="w-full field__input"
+        id="connection-name"
+        placeholder="The name of connection, it can be empty"
+        v-model="connectionOption.name"
+      />
+    </section>
+
+    <!-- HOST -->
+    <section class="mb-2">
+      <label class="block font-bold" for="connection-host">Host</label>
+      <input
+        class="w-full field__input"
+        id="connection-host"
+        placeholder="The host of connection"
+        required
+        v-model="connectionOption.host"
+      />
+    </section>
+
+    <!-- PORT -->
+    <section class="mb-2">
+      <label class="block font-bold" for="connection-port">Port</label>
+      <input
+        class="w-full field__input"
+        id="connection-port"
+        placeholder="The port of connection"
+        required
+        type="number"
+        v-model="connectionOption.port"
+      />
+    </section>
+
+    <!-- USER -->
+    <section class="mb-2">
+      <label class="block font-bold" for="connection-user">Username</label>
+      <input
+        class="w-full field__input"
+        id="connection-user"
+        placeholder="Username"
+        required
+        v-model="connectionOption.user"
+      />
+    </section>
+
+    <!-- PASSWORD -->
+    <section class="mb-2">
+      <label class="block font-bold" for="connection-password">Password</label>
+      <input
+        class="w-full field__input"
+        id="connection-password"
+        placeholder="Password"
+        type="password"
+        v-model="connectionOption.password"
+      />
+    </section>
+
+    <!-- DATABASES -->
+    <section class="mb-2">
+      <label class="block font-bold" for="databases">Databases</label>
+      <input
+        class="w-full field__input"
+        id="databases"
+        placeholder="Default is all databases"
+        v-model="connectionOption.database"
+      />
+    </section>
+
+    <!-- EXCLUDED DATABASES -->
+    <section class="mb-2">
+      <label class="block font-bold" for="excluded-databases">Excluded Databases</label>
+      <input
+        class="w-full field__input"
+        id="excluded-databases"
+        placeholder="Databases to excluded"
+        v-model="connectionOption.excludeDatabases"
+      />
+    </section>
+
+    <!-- TIMEZONE -->
+    <section class="mb-2">
+      <label class="block font-bold" for="timezone">Timezone</label>
+      <input class="w-full field__input" id="timezone" placeholder="+HH:MM" v-model="connectionOption.timezone" />
+    </section>
+
+    <!-- GLOBAL? -->
+    <section class="flex items-center mb-2">
+      <label class="mr-2 font-bold" for="global">Global</label>
+      <el-switch id="global" v-model="connectionOption.global"></el-switch>
+    </section>
+
+    <!-- SSH? -->
+    <section class="flex items-center mb-2">
+      <label class="mr-2 font-bold" for="ssh-connection">Using SSH</label>
+      <el-switch id="ssh-connection" v-model="connectionOption.usingSSH"></el-switch>
+    </section>
+
+    <!-- SSH CONNECTION FIELDS -->
+    <div v-if="connectionOption.usingSSH">
+      <!-- SSH HOST -->
+      <section class="mb-2">
+        <label class="block font-bold" for="connection-ssh-host">SSH Host</label>
+        <input
+          class="w-full field__input"
+          id="connection-ssh-host"
+          placeholder="SSH Host"
+          required
+          v-model="connectionOption.ssh.host"
+        />
+      </section>
+
+      <!-- SSH PORT -->
+      <section class="mb-2">
+        <label class="block font-bold" for="connection-ssh-port">SSH Port</label>
+        <input
+          class="w-full field__input"
+          id="connection-ssh-port"
+          placeholder="SSH Port"
+          required
+          type="number"
+          v-model="connectionOption.ssh.port"
+        />
+      </section>
+
+      <!-- SSH USERNAME -->
+      <section class="mb-2">
+        <label class="block font-bold" for="connection-ssh-username">SSH Username</label>
+        <input
+          class="w-full field__input"
+          id="connection-ssh-username"
+          placeholder="SSH Username"
+          required
+          v-model="connectionOption.ssh.username"
+        />
+      </section>
+
+      <!-- SELECT SSH PASSWORD TYPE -->
+      <section class="mb-2">
+        <label class="block font-bold" for="connection-ssh-type">Type</label>
+        <select class="w-full field__input" v-model="type">
+          <option class="p-1" value="password">Password</option>
+          <option class="p-1" value="privateKey">Private Key</option>
+        </select>
+      </section>
+
+      <div v-if="type == 'password'">
+        <!-- SSH PASSWORD -->
+        <section class="mb-2">
+          <label class="block font-bold" for="connection-ssh-password">Password</label>
+          <input
+            class="w-full field__input"
+            id="connection-ssh-password"
+            placeholder="Password"
+            required
+            type="password"
+            v-model="connectionOption.ssh.password"
+          />
+        </section>
       </div>
-      <div>
-        <div class="field field__input">
-          <strong>host:</strong>
-          <input class="field__input" v-model="connectionOption.host" />
-        </div>
+      <div v-else>
+        <!-- SSH PRIVATE KEY PATH -->
+        <section class="mb-2">
+          <label class="block font-bold" for="connection-ssh-private-key-path">Private Key Path</label>
+          <input
+            class="w-full field__input"
+            id="connection-ssh-private-key-path"
+            placeholder="Private Key Path"
+            v-model="connectionOption.ssh.privateKeyPath"
+          />
+        </section>
+        <!-- SSH PASSPHRASE -->
+        <section class="mb-2">
+          <label class="block font-bold" for="connection-ssh-passphrase">Passphrase</label>
+          <input
+            class="w-full field__input"
+            id="connection-ssh-passphrase"
+            placeholder="Passphrase"
+            type="passphrase"
+            v-model="connectionOption.ssh.passphrase"
+          />
+        </section>
       </div>
-      <div>
-        <div class="field field__input">
-          <strong>port:</strong>
-          <input class="field__input" v-model="connectionOption.port" />
-        </div>
-      </div>
-      <div>
-        <div class="field field__input">
-          <strong>username:</strong>
-          <input class="field__input" v-model="connectionOption.user" />
-        </div>
-      </div>
-      <div>
-        <div class="field field__input">
-          <strong>password:</strong>
-          <input class="field__input" type="password" v-model="connectionOption.password" />
-        </div>
-      </div>
-      <div>
-        <div class="field field__input">
-          <strong>includeDatabases:</strong>
-          <input class="field__input" v-model="connectionOption.includeDatabases" placeholder="default is all databases" />
-        </div>
-      </div>
-      <div>
-        <div class="field field__input">
-          <strong>excludeDatabases:</strong>
-          <input class="field__input" v-model="connectionOption.excludeDatabases" />
-        </div>
-      </div>
-      <div>
-        <div class="field field__input">
-          <strong>timezone:</strong>
-          <input class="field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
-        </div>
-      </div>
-    </el-row>
-    <el-row>
-      <div class="field field__input">
-        Global:
-        <el-switch v-model="connectionOption.global"></el-switch>
-      </div>
-    </el-row>
-    <el-row>
-      <div class="field field__input">
-        usingSSH:
-        <el-switch v-model="connectionOption.usingSSH"></el-switch>
-      </div>
-      <div v-if="connectionOption.usingSSH">
-        <div class="field field__input">
-          <strong>ssh-host:</strong>
-          <input class="field__input" v-model="connectionOption.ssh.host" />
-        </div>
-        <div class="field field__input">
-          <strong>ssh-port:</strong>
-          <input class="field__input" v-model="connectionOption.ssh.port" />
-        </div>
-        <div class="field field__input">
-          <strong>ssh-username:</strong>
-          <input class="field__input" v-model="connectionOption.ssh.username" />
-        </div>
-        <div>
-          <div class="field field__input">
-            <strong>type:</strong>
-            <select v-model="type">
-              <option value="password">password</option>
-              <option value="privateKey">privateKey</option>
-            </select>
-          </div>
-        </div>
-        <div v-if="type=='password'">
-          <div class="field field__input">
-            <strong>password:</strong>
-            <input class="field__input" type="password" v-model="connectionOption.ssh.password" />
-          </div>
-        </div>
-        <div v-if="type=='privateKey'">
-          <div>
-            <div class="field field__input">
-              <strong>privateKeyPath:</strong>
-              <input class="field__input" placeholder="input your private key path" v-model="connectionOption.ssh.privateKeyPath" />
-            </div>
-          </div>
-          <div>
-            <div class="field field__input">
-              <strong>passphrase:</strong>
-              <input class="field__input" type="passphrase" v-model="connectionOption.ssh.passphrase" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </el-row>
+    </div>
 
     <div id="fields" data-type="none"></div>
 
     <button class="button button--primary" @click="tryConnect">Connect</button>
-
   </div>
 </template>
 
 <script>
-import { getVscodeEvent } from "../util/vscode";
-let vscodeEvent;
+import { getVscodeEvent } from "../util/vscode"
+let vscodeEvent
 export default {
-  name: "connect",
+  name: "Connect",
   data() {
     return {
       connectionOption: {
@@ -139,51 +223,43 @@ export default {
         ssh: {
           host: "",
           port: 22,
-          username: "root"
-        }
+          username: "root",
+        },
       },
       type: "password",
       databaseType: "mysql",
       error: false,
-      errorMessage: ""
-    };
+      errorMessage: "",
+    }
   },
   mounted() {
-    vscodeEvent = getVscodeEvent();
+    vscodeEvent = getVscodeEvent()
     vscodeEvent
-      .on("edit", node => {
-        this.connectionOption = node;
+      .on("edit", (node) => {
+        this.connectionOption = node
       })
-      .on("error", err => {
-        this.error = true;
-        this.errorMessage = err;
-      });
-    vscodeEvent.emit("route-" + this.$route.name);
+      .on("error", (err) => {
+        this.error = true
+        this.errorMessage = err
+      })
+    vscodeEvent.emit("route-" + this.$route.name)
   },
-  destroyed(){
+  destroyed() {
     vscodeEvent.destroy()
   },
   methods: {
     tryConnect() {
       vscodeEvent.emit("connecting", {
         databaseType: this.databaseType,
-        connectionOption: this.connectionOption
-      });
-    }
-  }
-};
+        connectionOption: this.connectionOption,
+      })
+    },
+  },
+}
 </script>
 
 <style scoped>
-.container {
-  margin: auto;
-  padding-left: 24px;
-  padding-right: 24px;
-  max-width: 1000px;
-  box-sizing: border-box;
-}
-
-.tab {
+/* .tab {
   border-bottom: 1px solid var(--vscode-dropdown-border);
   display: flex;
   padding: 0;
@@ -206,31 +282,12 @@ export default {
 .tab__item--active {
   color: var(--vscode-panelTitle-activeForeground);
   border-bottom-color: var(--vscode-panelTitle-activeForeground);
-}
+} */
 
-.field {
-  padding: 1em 0;
-}
-
-.field--checkbox {
-  display: flex;
-  justify-content: flex-end;
-  flex-direction: row-reverse;
-  align-items: center;
-}
-
-.field__label {
-  display: block;
-  margin: 2px 0;
-  cursor: pointer;
-}
-
-.field--checkbox .field__label {
-  margin: 2px 4px;
-}
-
-.field input {
-  width: 50vw;
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .field__input {
@@ -242,15 +299,17 @@ export default {
 }
 
 .field__input:focus {
-  border-color: var(--vscode-focusBorder);
+  border-color: inherit;
   outline: 0;
 }
 
 .button {
   width: auto;
-  padding: 2px 14px;
+  padding: 4px 14px;
   border: 0;
   display: inline-block;
+  outline: none;
+  @apply font-bold;
   cursor: pointer;
 }
 
@@ -264,8 +323,6 @@ export default {
 }
 
 .panel {
-  margin: 0 7px 0 5px;
-  padding: 0 16px 0 10px;
   border-left-width: 5px;
   border-left-style: solid;
   background: var(--vscode-textBlockQuote-background);

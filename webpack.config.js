@@ -60,7 +60,7 @@ module.exports = [
         module: {
             rules: [
                 { test: /\.vue$/, loader: 'vue-loader', options: { loaders: { css: ["vue-style-loader", "css-loader"] } } },
-                { test: /(\.css|\.cssx)$/, use: ["vue-style-loader", "css-loader"] },
+                { test: /(\.css|\.cssx)$/, use: ["vue-style-loader", "css-loader", { loader: "postcss-loader" }] },
                 { test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/, loader: 'url-loader', options: { limit: 80000 } }
             ]
         },

@@ -4,6 +4,7 @@ import ElementUI from 'element-ui';
 import VueRouter from 'vue-router'
 
 import '@/../public/theme/auto.css'
+import "tailwindcss/tailwind.css"
 // import 'element-ui/lib/theme-chalk/index.css';
 
 Vue.use(VueRouter)

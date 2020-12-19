@@ -3,30 +3,24 @@
 </template>
 
 <script>
-import { getVscodeEvent } from "./util/vscode";
+import { getVscodeEvent } from "./util/vscode"
 
-const vscodeEvent = getVscodeEvent();
+const vscodeEvent = getVscodeEvent()
 
 export default {
   name: "App",
   mounted() {
-    vscodeEvent.on("route", path => {
+    vscodeEvent.on("route", (path) => {
       if (this.$route.name == path) {
-        vscodeEvent.emit("route-" + this.$route.name);
+        vscodeEvent.emit("route-" + this.$route.name)
       } else {
-        this.$router.push("/" + path);
+        this.$router.push("/" + path)
       }
-    });
-    vscodeEvent.emit("init");
+    })
+    vscodeEvent.emit("init")
   },
   destroyed() {
-    vscodeEvent.destroy();
-  }
-};
-</script>
-
-<style>
-body{
-  padding: 0;
+    vscodeEvent.destroy()
+  },
 }
-</style>
+</script>
