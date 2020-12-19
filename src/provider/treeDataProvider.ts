@@ -92,12 +92,18 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         let workspaceConnections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey, {});
 
         const connections = { ...globalConnections, ...workspaceConnections };
-      
+        // temp duplicate id solution
+        const idMap = {};
+
         return Object.keys(connections).map(key => {
             const connection = new ConnectionNode(key, connections[key]);
+            idMap[connection.id] = true;
             if (typeof connections[key].global == "undefined") {
                 // Compatible with older versions, will remove in the feature
                 connections[key].global = true;
+            }
+            if (idMap[connection.id]) {
+                idMap[connection.id] = idMap[connection.id] + new Date().getTime()
             }
             return connection;
         })
