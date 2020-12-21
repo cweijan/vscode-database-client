@@ -7,11 +7,29 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
+            "args": [
+                "--extensionDevelopmentPath=${workspaceRoot}"
+            ],
             "stopOnEntry": false,
             "sourceMaps": true,
-            "outFiles": [ "${workspaceRoot}/out/**/*.js" ],
+            "outFiles": [
+                "${workspaceRoot}/out/**/*.js"
+            ],
             "preLaunchTask": "webpack-dev"
+        },
+        {
+            "name": "Extension Without Prelaunch Task",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceRoot}"
+            ],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceRoot}/out/**/*.js"
+            ],
         }
     ]
 }
