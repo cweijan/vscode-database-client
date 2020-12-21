@@ -22,10 +22,10 @@ export class UserGroup extends DatabaseNode {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         let userNodes = [];
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT DISTINCT USER FROM mysql.user;`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT host,user FROM mysql.user;`)
             .then((tables) => {
                 userNodes = tables.map<UserNode>((table) => {
-                    return new UserNode(table.USER, this.info);
+                    return new UserNode(table.user,table.host, this.info);
                 });
                 return userNodes;
             })
@@ -46,8 +46,8 @@ export class UserNode extends Node implements CopyAble {
 
     public contextValue = ModelType.USER;
     public iconPath = path.join(Constants.RES_PATH, "icon/user.svg")
-    constructor(readonly username: string, readonly info: Node) {
-        super(username)
+    constructor(readonly username: string,readonly host:string, readonly info: Node) {
+        super(`${username}@${host}`)
         this.init(info)
         this.command = {
             command: "mysql.user.sql",
