@@ -1,7 +1,7 @@
 {
 	"name": "vscode-mysql-client2",
 	"displayName": "MySQL",
-	"description": "MySQL Client for vscode",
+	"description": "MySQL/MariaDB Client for vscode",
 	"version": "2.8.6",
 	"publisher": "cweijan",
 	"icon": "resources/logo.png",
@@ -15,6 +15,7 @@
 	"keywords": [
 		"SQL",
 		"MySQL",
+		"MariaDB",
 		"Database",
 		"DB",
 		"RDBMS"
