@@ -12,6 +12,23 @@ import { DiagramNode } from "./diagramNode";
 import { Global } from "../../common/global";
 
 export class DiagramGroup extends Node {
+   
+    public contextValue = ModelType.DIAGRAM_GROUP;
+    public iconPath = path.join(Constants.RES_PATH, "icon/diagram.svg")
+    constructor(readonly info: Node) {
+        super("DIAGRAM")
+        // this.id = `${this.getConnectId()}_${info.database}_${ModelType.DIAGRAM_GROUP}`;
+        this.init(info)
+    }
+
+    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
+        const path = `${FileManager.storagePath}/diagram/${this.getConnectId()}_${this.database}`;
+        if (!existsSync(path)) {
+            return []
+        }
+        return readdirSync(path).map(fileName => new DiagramNode(fileName.replace(/\.[^/.]+$/, ""), this))
+    }
+
     public openAdd() {
         ViewManager.createWebviewPanel({
             path: "app", title: "new",
@@ -29,23 +46,6 @@ export class DiagramGroup extends Node {
             }
         })
     }
-
-    public contextValue = ModelType.DIAGRAM_GROUP;
-    public iconPath = path.join(Constants.RES_PATH, "icon/diagram.svg")
-    constructor(readonly info: Node) {
-        super("DIAGRAM")
-        // this.id = `${this.getConnectId()}_${info.database}_${ModelType.DIAGRAM_GROUP}`;
-        this.init(info)
-    }
-
-    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        const path = `${FileManager.storagePath}/diagram/${this.getConnectId()}_${this.database}`;
-        if (!existsSync(path)) {
-            return []
-        }
-        return readdirSync(path).map(fileName => new DiagramNode(fileName.replace(/\.[^/.]+$/, ""), this))
-    }
-
 
     public async getData() {
         const nodeDataArray = await this.getTableInfos()

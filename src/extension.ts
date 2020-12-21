@@ -25,6 +25,8 @@ import { FileManager } from "./common/filesManager";
 import { ConnectionManager } from "./service/connectionManager";
 import { DiagramNode } from "./model/diagram/diagramNode";
 import { DiagramGroup } from "./model/diagram/diagramGroup";
+import { QueryNode } from "./model/query/queryNode";
+import { QueryGroup } from "./model/query/queryGroup";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -85,6 +87,12 @@ export function activate(context: vscode.ExtensionContext) {
             },
             "mysql.changeTableName": (tableNode: TableNode) => {
                 tableNode.changeTableName();
+            },
+            "mysql.query.open": (queryNode: QueryNode) => {
+                queryNode.open()
+            },
+            "mysql.query.add": (queryGroup: QueryGroup) => {
+                queryGroup.add();
             },
             "mysql.index.template": (tableNode: TableNode) => {
                 tableNode.indexTemplate();

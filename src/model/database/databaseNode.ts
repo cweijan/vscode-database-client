@@ -18,6 +18,7 @@ import { NodeUtil } from '../nodeUtil';
 import { DiagramGroup } from "../diagram/diagramGroup";
 import { OverviewService } from "../../view/overview/overviewService";
 import { ServiceManager } from "../../service/serviceManager";
+import { QueryGroup } from "../query/queryGroup";
 
 export class DatabaseNode extends Node implements CopyAble {
 
@@ -38,6 +39,7 @@ export class DatabaseNode extends Node implements CopyAble {
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         return [new TableGroup(this.info),
         new ViewGroup(this.info),
+        new QueryGroup(this.info),
         new DiagramGroup(this.info),
         new ProcedureGroup(this.info),
         new FunctionGroup(this.info),

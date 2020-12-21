@@ -99,6 +99,15 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.query.add",
+				"title": "Create Query",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				},
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.diagram.open",
 				"title": "Open Diagram",
 				"category": "MySQL"
@@ -493,6 +502,11 @@
 					"group": "2_mysql@0"
 				},
 				{
+					"command": "mysql.query.add",
+					"when": "view == github.cweijan.mysql && viewItem == queryGroup",
+					"group": "2_mysql@0"
+				},
+				{
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "2_mysql@1"
@@ -525,6 +539,11 @@
 				{
 					"command": "mysql.diagram.add",
 					"when": "view == github.cweijan.mysql && viewItem == diagramGroup",
+					"group": "inline@0"
+				},
+				{
+					"command": "mysql.query.add",
+					"when": "view == github.cweijan.mysql && viewItem == queryGroup",
 					"group": "inline@0"
 				},
 				{
@@ -864,7 +883,7 @@
 	},
 	"devDependencies": {
 		"@types/mockjs": "^1.0.2",
-		"@types/node": "^7.10.10",
+		"@types/node": "^12.12.6",
 		"@types/ssh2": "^0.5.43",
 		"@types/vscode": "1.38.0",
 		"cardinal": "^2.1.1",
