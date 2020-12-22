@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.8.7 2020/12/22
+
+- Resign connect page @donnisnoni.
+- Reduce resource consumption when node change.
+- Support save query as query node.
+
 ## 2.8.5 2020/12/6
 
 - Add more feature to view node.
