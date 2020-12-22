@@ -243,6 +243,11 @@ export default {
         this.errorMessage = err
       })
     vscodeEvent.emit("route-" + this.$route.name)
+    window.onkeydown=e=>{
+      if(e.key=="Enter" && e.target.tagName=="INPUT"){
+        this.tryConnect()
+      }
+    }
   },
   destroyed() {
     vscodeEvent.destroy()
