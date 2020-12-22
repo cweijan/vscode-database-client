@@ -41,193 +41,238 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }),
         ...initCommand({
-            "mysql.history.open": () => serviceManager.historyService.showHistory(),
-            [CommandKey.Refresh]: () => { serviceManager.provider.init(); },
-            [CommandKey.RecordHistory]: (sql: string, costTime: number) => {
-                serviceManager.historyService.recordHistory(sql, costTime);
+            // util
+            ...{
+                "mysql.history.open": () => serviceManager.historyService.showHistory(),
+                [CommandKey.Refresh]: () => { serviceManager.provider.init(); },
+                [CommandKey.RecordHistory]: (sql: string, costTime: number) => {
+                    serviceManager.historyService.recordHistory(sql, costTime);
+                },
+                "mysql.setting.open": () => {
+                    serviceManager.settingService.open();
+                },
+                "mysql.server.info": (connectionNode: ConnectionNode) => {
+                    serviceManager.statusService.show(connectionNode)
+                },
+                "mysql.name.copy": (copyAble: CopyAble) => {
+                    copyAble.copyName();
+                },
             },
-            "mysql.setting.open": () => {
-                serviceManager.settingService.open();
+            // connection
+            ...{
+                "mysql.connection.add": () => {
+                    serviceManager.connectService.openConnect(serviceManager.provider)
+                },
+                "mysql.connection.edit": (connectionNode: ConnectionNode) => {
+                    serviceManager.connectService.openConnect(serviceManager.provider, connectionNode)
+                },
+                "mysql.connection.delete": (connectionNode: ConnectionNode) => {
+                    connectionNode.deleteConnection(context);
+                },
+                "mysql.host.copy": (connectionNode: ConnectionNode) => {
+                    connectionNode.copyName();
+                },
             },
-            "mysql.diagram.add": (diagramNode:DiagramGroup) => {
-                diagramNode.openAdd()
+            // externel data
+            ...{
+                "mysql.data.export": (node: DatabaseNode | TableNode) => {
+                    serviceManager.dumpService.dump(node, true)
+                },
+                "mysql.struct.export": (node: DatabaseNode | TableNode) => {
+                    serviceManager.dumpService.dump(node, false)
+                },
+                "mysql.data.import": (node: DatabaseNode | ConnectionNode) => {
+                    vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
+                        if (filePath) {
+                            serviceManager.importService.import(filePath[0].fsPath, node)
+                        }
+                    });
+                },
             },
-            "mysql.diagram.open": (node:DiagramNode) => {
-                node.open()
+            // database
+            ...{
+                "mysql.db.active": () => {
+                    serviceManager.provider.activeDb();
+                },
+                "mysql.db.truncate": (databaseNode: DatabaseNode) => {
+                    databaseNode.truncateDb();
+                },
+                "mysql.database.add": (connectionNode: ConnectionNode) => {
+                    connectionNode.createDatabase();
+                },
+                "mysql.db.drop": (databaseNode: DatabaseNode) => {
+                    databaseNode.dropDatatabase();
+                },
+                "mysql.db.overview": (databaseNode: DatabaseNode) => {
+                    databaseNode.openOverview();
+                },
             },
-            "mysql.diagram.drop": (node:DiagramNode) => {
-                node.drop()
+            // mock
+            ...{
+                "mysql.mock.table": (tableNode: TableNode) => {
+                    serviceManager.mockRunner.create(tableNode)
+                },
+                "mysql.mock.run": () => {
+                    serviceManager.mockRunner.runMock()
+                },
             },
-            "mysql.db.active": () => {
-                serviceManager.provider.activeDb();
+            // user node
+            ...{
+                "mysql.change.user": (userNode: UserNode) => {
+                    userNode.changePasswordTemplate();
+                },
+                "mysql.user.grant": (userNode: UserNode) => {
+                    userNode.grandTemplate();
+                },
+                "mysql.user.sql": (userNode: UserNode) => {
+                    userNode.selectSqlTemplate();
+                },
             },
-            "mysql.mock.table": (tableNode: TableNode) => {
-                serviceManager.mockRunner.create(tableNode)
+            // diagram node
+            ...{
+                "mysql.diagram.add": (diagramNode: DiagramGroup) => {
+                    diagramNode.openAdd()
+                },
+                "mysql.diagram.open": (node: DiagramNode) => {
+                    node.open()
+                },
+                "mysql.diagram.drop": (node: DiagramNode) => {
+                    node.drop()
+                },
             },
-            "mysql.mock.run": () => {
-                serviceManager.mockRunner.runMock()
-            },
-            "mysql.connection.add": () => {
-                serviceManager.connectService.openConnect(serviceManager.provider)
-            },
-            "mysql.connection.edit": (connectionNode: ConnectionNode) => {
-                serviceManager.connectService.openConnect(serviceManager.provider, connectionNode)
-            },
-            "mysql.host.copy": (connectionNode: ConnectionNode) => {
-                connectionNode.copyName();
-            },
-            "mysql.database.add": (connectionNode: ConnectionNode) => {
-                connectionNode.createDatabase();
-            },
-            "mysql.db.drop": (databaseNode: DatabaseNode) => {
-                databaseNode.dropDatatabase();
-            },
-            "mysql.db.overview": (databaseNode: DatabaseNode) => {
-                databaseNode.openOverview();
-            },
-            "mysql.changeTableName": (tableNode: TableNode) => {
-                tableNode.changeTableName();
-            },
-            "mysql.query.open": (queryNode: QueryNode) => {
-                queryNode.open()
-            },
-            "mysql.query.add": (queryGroup: QueryGroup) => {
-                queryGroup.add();
-            },
-            "mysql.index.template": (tableNode: TableNode) => {
-                tableNode.indexTemplate();
-            },
-            "mysql.table.truncate": (tableNode: TableNode) => {
-                tableNode.truncateTable();
-            },
-            "mysql.db.truncate": (databaseNode: DatabaseNode) => {
-                databaseNode.truncateDb();
-            },
-            "mysql.table.drop": (tableNode: TableNode) => {
-                tableNode.dropTable();
-            },
-            "mysql.table.source": (tableNode: TableNode) => {
-                if (tableNode) { tableNode.showSource(); }
-            },
-            "mysql.table.show": (tableNode: TableNode) => {
-                if (tableNode) { tableNode.openInNew(); }
-            },
-            "mysql.column.changeName": (columnNode: ColumnNode) => {
-                columnNode.changeColumnName();
-            },
-            "mysql.column.up": (columnNode: ColumnNode) => {
-                columnNode.moveUp();
-            },
-            "mysql.column.down": (columnNode: ColumnNode) => {
-                columnNode.moveDown();
-            },
-            "mysql.column.add": (tableNode: TableNode) => {
-                tableNode.addColumnTemplate();
-            },
-            "mysql.column.update": (columnNode: ColumnNode) => {
-                columnNode.updateColumnTemplate();
-            },
-            "mysql.column.drop": (columnNode: ColumnNode) => {
-                columnNode.dropColumnTemplate();
-            },
-            "mysql.connection.delete": (connectionNode: ConnectionNode) => {
-                connectionNode.deleteConnection(context);
-            },
-            "mysql.runQuery": (sql) => {
-                if (typeof sql != 'string') { sql = null; }
-                QueryUnit.runQuery(sql);
-            },
-            "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
-                if (databaseOrConnectionNode) {
-                    await databaseOrConnectionNode.newQuery();
-                } else {
-                    FileManager.show(`sql/${new Date().getTime()}.sql`)
-                }
-            },
-            "mysql.count.sql": (tableNode: TableNode) => {
-                tableNode.countSql()
-            },
-            "mysql.template.sql": (tableNode: TableNode, run: boolean) => {
-                tableNode.selectSqlTemplate(run);
-            },
-            "mysql.name.copy": (copyAble: CopyAble) => {
-                copyAble.copyName();
-            },
-            "mysql.data.import": (node: DatabaseNode | ConnectionNode) => {
-                vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
-                    if (filePath) {
-                        serviceManager.importService.import(filePath[0].fsPath, node)
+            // query node
+            ...{
+                "mysql.runQuery": (sql) => {
+                    if (typeof sql != 'string') { sql = null; }
+                    QueryUnit.runQuery(sql);
+                },
+                "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
+                    if (databaseOrConnectionNode) {
+                        await databaseOrConnectionNode.newQuery();
+                    } else {
+                        FileManager.show(`sql/${new Date().getTime()}.sql`)
                     }
-                });
+                },
+                "mysql.query.open": (queryNode: QueryNode) => {
+                    queryNode.open()
+                },
+                "mysql.query.add": (queryGroup: QueryGroup) => {
+                    queryGroup.add();
+                },
+                "mysql.query.rename": (queryNode: QueryNode) => {
+                    queryNode.rename()
+                },
+                "mysql.count.sql": (tableNode: TableNode) => {
+                    tableNode.countSql()
+                },
             },
-            "mysql.data.export": (node: DatabaseNode | TableNode) => {
-                serviceManager.dumpService.dump(node, true)
+            // table node
+            ...{
+                "mysql.table.truncate": (tableNode: TableNode) => {
+                    tableNode.truncateTable();
+                },
+                "mysql.table.drop": (tableNode: TableNode) => {
+                    tableNode.dropTable();
+                },
+                "mysql.table.source": (tableNode: TableNode) => {
+                    if (tableNode) { tableNode.showSource(); }
+                },
+                "mysql.changeTableName": (tableNode: TableNode) => {
+                    tableNode.changeTableName();
+                },
+                "mysql.table.show": (tableNode: TableNode) => {
+                    if (tableNode) { tableNode.openInNew(); }
+                },
             },
-            "mysql.struct.export": (node: DatabaseNode | TableNode) => {
-                serviceManager.dumpService.dump(node, false)
+            // column node
+            ...{
+                "mysql.column.changeName": (columnNode: ColumnNode) => {
+                    columnNode.changeColumnName();
+                },
+                "mysql.column.up": (columnNode: ColumnNode) => {
+                    columnNode.moveUp();
+                },
+                "mysql.column.down": (columnNode: ColumnNode) => {
+                    columnNode.moveDown();
+                },
+                "mysql.column.add": (tableNode: TableNode) => {
+                    tableNode.addColumnTemplate();
+                },
+                "mysql.column.update": (columnNode: ColumnNode) => {
+                    columnNode.updateColumnTemplate();
+                },
+                "mysql.column.drop": (columnNode: ColumnNode) => {
+                    columnNode.dropColumnTemplate();
+                },
             },
-            "mysql.template.delete": (tableNode: TableNode) => {
-                tableNode.deleteSqlTemplate();
+            // template
+            ...{
+                "mysql.template.sql": (tableNode: TableNode, run: boolean) => {
+                    tableNode.selectSqlTemplate(run);
+                },
+                "mysql.index.template": (tableNode: TableNode) => {
+                    tableNode.indexTemplate();
+                },
+                "mysql.template.delete": (tableNode: TableNode) => {
+                    tableNode.deleteSqlTemplate();
+                },
+                "mysql.copy.insert": (tableNode: TableNode) => {
+                    tableNode.insertSqlTemplate();
+                },
+                "mysql.copy.update": (tableNode: TableNode) => {
+                    tableNode.updateSqlTemplate();
+                },
             },
-            "mysql.copy.insert": (tableNode: TableNode) => {
-                tableNode.insertSqlTemplate();
+            // show source
+            ...{
+                "mysql.show.procedure": (procedureNode: ProcedureNode) => {
+                    procedureNode.showSource();
+                },
+                "mysql.show.function": (functionNode: FunctionNode) => {
+                    functionNode.showSource();
+                },
+                "mysql.show.trigger": (triggerNode: TriggerNode) => {
+                    triggerNode.showSource();
+                },
             },
-            "mysql.copy.update": (tableNode: TableNode) => {
-                tableNode.updateSqlTemplate();
+            // create template
+            ...{
+                "mysql.template.table": (tableGroup: TableGroup) => {
+                    tableGroup.createTemplate();
+                },
+                "mysql.template.procedure": (procedureGroup: ProcedureGroup) => {
+                    procedureGroup.createTemplate();
+                },
+                "mysql.template.view": (viewGroup: ViewGroup) => {
+                    viewGroup.createTemplate();
+                },
+                "mysql.template.trigger": (triggerGroup: TriggerGroup) => {
+                    triggerGroup.createTemplate();
+                },
+                "mysql.template.function": (functionGroup: FunctionGroup) => {
+                    functionGroup.createTemplate();
+                },
+                "mysql.template.user": (userGroup: UserGroup) => {
+                    userGroup.createTemplate();
+                },
             },
-            "mysql.show.procedure": (procedureNode: ProcedureNode) => {
-                procedureNode.showSource();
-            },
-            "mysql.show.function": (functionNode: FunctionNode) => {
-                functionNode.showSource();
-            },
-            "mysql.show.trigger": (triggerNode: TriggerNode) => {
-                triggerNode.showSource();
-            },
-            "mysql.user.sql": (userNode: UserNode) => {
-                userNode.selectSqlTemplate();
-            },
-            "mysql.template.table": (tableGroup: TableGroup) => {
-                tableGroup.createTemplate();
-            },
-            "mysql.template.procedure": (procedureGroup: ProcedureGroup) => {
-                procedureGroup.createTemplate();
-            },
-            "mysql.template.view": (viewGroup: ViewGroup) => {
-                viewGroup.createTemplate();
-            },
-            "mysql.template.trigger": (triggerGroup: TriggerGroup) => {
-                triggerGroup.createTemplate();
-            },
-            "mysql.template.function": (functionGroup: FunctionGroup) => {
-                functionGroup.createTemplate();
-            },
-            "mysql.template.user": (userGroup: UserGroup) => {
-                userGroup.createTemplate();
-            },
-            "mysql.delete.user": (userNode: UserNode) => {
-                userNode.drop();
-            },
-            "mysql.delete.view": (viewNode: ViewNode) => {
-                viewNode.drop();
-            },
-            "mysql.delete.procedure": (procedureNode: ProcedureNode) => {
-                procedureNode.drop();
-            },
-            "mysql.server.info": (connectionNode: ConnectionNode) => {
-                serviceManager.statusService.show(connectionNode)
-            },
-            "mysql.delete.function": (functionNode: FunctionNode) => {
-                functionNode.drop();
-            },
-            "mysql.delete.trigger": (triggerNode: TriggerNode) => {
-                triggerNode.drop();
-            },
-            "mysql.change.user": (userNode: UserNode) => {
-                userNode.changePasswordTemplate();
-            },
-            "mysql.user.grant": (userNode: UserNode) => {
-                userNode.grandTemplate();
+            // drop template
+            ...{
+                "mysql.delete.user": (userNode: UserNode) => {
+                    userNode.drop();
+                },
+                "mysql.delete.view": (viewNode: ViewNode) => {
+                    viewNode.drop();
+                },
+                "mysql.delete.procedure": (procedureNode: ProcedureNode) => {
+                    procedureNode.drop();
+                },
+                "mysql.delete.function": (functionNode: FunctionNode) => {
+                    functionNode.drop();
+                },
+                "mysql.delete.trigger": (triggerNode: TriggerNode) => {
+                    triggerNode.drop();
+                },
             },
         }),
 

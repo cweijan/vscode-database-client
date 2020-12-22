@@ -2,15 +2,16 @@ import * as vscode from "vscode";
 import { ModelType, Constants } from "@/common/constants";
 import { FileManager } from "@/common/filesManager";
 import { QueryUnit } from "@/service/queryUnit";
-import { readFileSync } from "fs";
+import { readFileSync, renameSync } from "fs";
 import * as path from "path";
 import { TreeItemCollapsibleState, window } from "vscode";
 import { Node } from "../interface/node";
+import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 
 export class QueryNode extends Node {
     public contextValue = ModelType.QUERY;
     public iconPath = path.join(Constants.RES_PATH, "icon/select.svg")
-    constructor(public name: string,  readonly info: Node) {
+    constructor(public name: string, readonly info: Node) {
         super(name)
         this.init(info)
         this.collapsibleState = TreeItemCollapsibleState.None
@@ -27,8 +28,17 @@ export class QueryNode extends Node {
         );
     }
 
-    private getFilePath(): string {
-        return `${FileManager.storagePath}/query/${this.getConnectId()}_${this.database}/${this.name}.sql`;
+    public async rename() {
+        vscode.window.showInputBox({ placeHolder: "Input new name" }).then(newName => {
+            if (newName) {
+                renameSync(this.getFilePath(),this.getFilePath(newName))
+                DbTreeDataProvider.refresh(this.info)
+            }
+        })
+    }
+
+    private getFilePath(newName?: string): string {
+        return `${FileManager.storagePath}/query/${this.getConnectId()}_${this.database}/${newName || this.name}.sql`;
     }
 
 

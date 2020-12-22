@@ -108,6 +108,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.query.rename",
+				"title": "Rename Query",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.diagram.open",
 				"title": "Open Diagram",
 				"category": "MySQL"
@@ -504,6 +509,11 @@
 				{
 					"command": "mysql.query.add",
 					"when": "view == github.cweijan.mysql && viewItem == queryGroup",
+					"group": "2_mysql@0"
+				},
+				{
+					"command": "mysql.query.rename",
+					"when": "view == github.cweijan.mysql && viewItem == query",
 					"group": "2_mysql@0"
 				},
 				{

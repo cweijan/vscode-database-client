@@ -57,10 +57,10 @@ export class DatabaseNode extends Node implements CopyAble {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE \`${this.database}\``).then(() => {
                     DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`)
                     DbTreeDataProvider.refresh();
-                    vscode.window.showInformationMessage(`Delete database ${this.database} success!`)
+                    vscode.window.showInformationMessage(`Drop database ${this.database} success!`)
                 })
             } else {
-                vscode.window.showInformationMessage(`Cancel delete database ${this.database}!`)
+                vscode.window.showInformationMessage(`Cancel drop database ${this.database}!`)
             }
         })
 

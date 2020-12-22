@@ -78,7 +78,7 @@ export class QueryPage {
                 })
                 handler.on("init", () => {
                     if (queryParam.res?.table) {
-                        handler.panel.title = `${queryParam.res.table} @${queryParam.res.database}`
+                        handler.panel.title = `${queryParam.res.table}@${queryParam.res.database}`
                     }
                     queryParam.res.dbInfo={...ConnectionManager.getLastConnectionOption(),command:null,info:null }
                     queryParam.res.transId=Trans.transId;
