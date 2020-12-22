@@ -73,7 +73,7 @@ export class UserNode extends Node implements CopyAble {
 
         Util.confirm(`Are you want to drop user ${this.username} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP user ${this.username}`).then(() => {
-                DbTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh(this.info);
                 vscode.window.showInformationMessage(`Drop user ${this.username} success!`);
             });
         })

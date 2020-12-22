@@ -58,7 +58,7 @@ export class ColumnNode extends Node implements CopyAble {
             const sql = `alter table ${wrap(this.database)}.${wrap(this.table)} change column ${wrap(columnName)} ${wrap(newColumnName)} ${this.column.type} comment '${this.column.comment}'`;
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearColumnCache(`${this.getConnectId()}_${this.database}_${this.table}`);
-                DbTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh(this.info);
             });
 
         });
@@ -75,10 +75,13 @@ export class ColumnNode extends Node implements CopyAble {
     ${wrap(this.database)}.${wrap(this.table)} CHANGE ${wrap(this.column.name)} ${wrap(this.column.name)} ${this.column.type}${defaultDefinition}${comment};`, Template.alter);
 
     }
-    public dropColumnTemplate() {
+    public async dropColumnTemplate() {
 
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t${wrap(this.database)}.${wrap(this.table)} DROP COLUMN ${wrap(this.column.name)};`, Template.alter);
+        await QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t${wrap(this.database)}.${wrap(this.table)} DROP COLUMN ${wrap(this.column.name)};`, Template.alter);
+        Util.confirm(`Are you want to drop column ${this.column.name} ? `, async () => {
+            QueryUnit.runQuery(null,this)
+        })
 
     }
 
@@ -90,9 +93,9 @@ export class ColumnNode extends Node implements CopyAble {
             vscode.window.showErrorMessage("Column is at last.")
             return;
         }
-        const sql = `ALTER TABLE ${this.database}.${this.table} MODIFY COLUMN ${this.column.name} ${this.column.type} AFTER ${afterColumnNode.column.name};`
+        const sql = `ALTER TABLE \`${this.database}\`.\`${this.table}\` MODIFY COLUMN ${this.column.name} ${this.column.type} AFTER ${afterColumnNode.column.name};`
         await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
-        DbTreeDataProvider.refresh()
+        DbTreeDataProvider.refresh(this.info)
     }
     public async moveUp() {
         const columns = (await this.info.getChildren()) as ColumnNode[]
@@ -101,9 +104,9 @@ export class ColumnNode extends Node implements CopyAble {
             vscode.window.showErrorMessage("Column is at first.")
             return;
         }
-        const sql = `ALTER TABLE ${this.database}.${this.table} MODIFY COLUMN ${beforeColumnNode.column.name} ${beforeColumnNode.column.type} AFTER ${this.column.name};`
+        const sql = `ALTER TABLE \`${this.database}\`.\`${this.table}\` MODIFY COLUMN ${beforeColumnNode.column.name} ${beforeColumnNode.column.type} AFTER ${this.column.name};`
         await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
-        DbTreeDataProvider.refresh()
+        DbTreeDataProvider.refresh(this.info)
     }
 
 }

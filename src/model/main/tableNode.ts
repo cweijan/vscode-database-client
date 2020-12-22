@@ -79,7 +79,7 @@ ADD
             const sql = `RENAME TABLE \`${this.database}\`.\`${this.table}\` to \`${this.database}\`.\`${newTableName}\``;
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
-                DbTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh(this.info);
             });
 
         });
@@ -91,7 +91,7 @@ ADD
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE \`${this.database}\`.\`${this.table}\``).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
-                DbTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh(this.info);
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
             });
         })

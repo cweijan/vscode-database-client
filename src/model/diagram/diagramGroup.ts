@@ -41,7 +41,7 @@ export class DiagramGroup extends Node {
                 }).on("save", ({ name, data }) => {
                     const diagramPath = `diagram/${this.getConnectId()}_${this.database}/${name}.json`;
                     FileManager.record(diagramPath, data, FileModel.WRITE)
-                    DbTreeDataProvider.refresh()
+                    DbTreeDataProvider.refresh(this)
                 })
             }
         })

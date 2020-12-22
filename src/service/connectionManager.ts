@@ -78,7 +78,7 @@ export class ConnectionManager {
             if (connection && (connection.connection.state == 'authenticated' || connection.connection.authorized)) {
                 const sql = connectionNode.database ? `use \`${connectionNode.database}\`` : `SHOW STATUS WHERE variable_name = 'Max_used_connections';`;
                 try {
-                    await QueryUnit.queryPromise(connection.connection, sql,false)
+                    await QueryUnit.queryPromise(connection.connection, sql, false)
                     resolve(connection.connection);
                     return;
                 } catch (err) {
@@ -115,12 +115,17 @@ export class ConnectionManager {
 
     }
 
-    public static createConnection(connectionOptions: Node): mysql.Connection {
+    public static createConnection(opt: Node): mysql.Connection {
 
-        const newConnectionOptions = { ...connectionOptions, useConnectionPooling: true, multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true } as any as mysql.ConnectionConfig;
-        if (connectionOptions.certPath && fs.existsSync(connectionOptions.certPath)) {
+        const newConnectionOptions = {
+            host: opt.host, port: opt.port, user: opt.user, password: opt.password, database: opt.database,
+            timezone:opt.timezone,
+            useConnectionPooling: true, multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
+
+        } as mysql.ConnectionConfig;
+        if (opt.certPath && fs.existsSync(opt.certPath)) {
             newConnectionOptions.ssl = {
-                ca: fs.readFileSync(connectionOptions.certPath),
+                ca: fs.readFileSync(opt.certPath),
             };
         }
         return mysql.createConnection(newConnectionOptions);

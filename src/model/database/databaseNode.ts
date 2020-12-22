@@ -56,7 +56,7 @@ export class DatabaseNode extends Node implements CopyAble {
             if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE \`${this.database}\``).then(() => {
                     DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`)
-                    DbTreeDataProvider.refresh();
+                    DbTreeDataProvider.refresh(this.info);
                     vscode.window.showInformationMessage(`Drop database ${this.database} success!`)
                 })
             } else {

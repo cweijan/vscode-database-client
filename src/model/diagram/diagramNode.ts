@@ -41,7 +41,7 @@ export class DiagramNode extends Node {
                     this.name = name
                     const diagramPath = `diagram/${this.getConnectId()}_${this.database}/${name}.json`;
                     FileManager.record(diagramPath, data, FileModel.WRITE)
-                    DbTreeDataProvider.refresh()
+                    DbTreeDataProvider.refresh(this.info)
                 })
             }
         })
@@ -60,7 +60,7 @@ export class DiagramNode extends Node {
 
         Util.confirm(`Are you want to drop diagram ${this.name} ?`, async () => {
             unlinkSync(this.getFilePath())
-            DbTreeDataProvider.refresh()
+            DbTreeDataProvider.refresh(this.info)
         })
 
     }

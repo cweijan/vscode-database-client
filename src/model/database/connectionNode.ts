@@ -107,7 +107,7 @@ export class ConnectionNode extends Node implements CopyAble {
             if (!inputContent) { return; }
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `create database \`${inputContent}\` default character set = 'utf8mb4' `).then(() => {
                 DatabaseCache.clearDatabaseCache(this.id);
-                DbTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh(this);
                 vscode.window.showInformationMessage(`create database ${inputContent} success!`);
             });
         });
@@ -122,7 +122,7 @@ export class ConnectionNode extends Node implements CopyAble {
             DatabaseCache.clearDatabaseCache(this.id)
             delete connections[this.id];
             await targetContext.update(CacheKey.ConectionsKey, NodeUtil.removeParent(connections));
-            DbTreeDataProvider.refresh();
+            DbTreeDataProvider.refresh(this);
         })
 
     }

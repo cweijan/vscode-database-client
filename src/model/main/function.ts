@@ -41,7 +41,7 @@ export class FunctionNode extends Node {
         Util.confirm(`Are you want to drop function ${this.name} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function \`${this.database}\`.\`${this.name}\``).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.name}_${ModelType.FUNCTION_GROUP}`);
-                DbTreeDataProvider.refresh();
+                DbTreeDataProvider.refresh(this.info);
                 vscode.window.showInformationMessage(`Drop function ${this.name} success!`);
             });
         })
