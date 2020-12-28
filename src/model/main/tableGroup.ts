@@ -27,7 +27,7 @@ export class TableGroup extends Node {
             `SELECT table_comment comment,TABLE_NAME tableName FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' and TABLE_TYPE<>'VIEW' order by table_name LIMIT ${QueryUnit.maxTableCount} ;`)
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
-                    return new TableNode(table.tableName, table.comment, this.info);
+                    return new TableNode(table.tableName, table.comment, this);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {

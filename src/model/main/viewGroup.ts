@@ -28,7 +28,7 @@ export class ViewGroup extends Node {
             `SELECT TABLE_NAME FROM information_schema.VIEWS  WHERE TABLE_SCHEMA = '${this.database}' LIMIT ${QueryUnit.maxTableCount}`)
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
-                    return new ViewNode(table.TABLE_NAME, '', this.info);
+                    return new ViewNode(table.TABLE_NAME, '', this);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {

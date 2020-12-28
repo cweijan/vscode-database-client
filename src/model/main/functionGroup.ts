@@ -26,7 +26,7 @@ export class FunctionGroup extends Node {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT ROUTINE_NAME FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${this.database}' and ROUTINE_TYPE='FUNCTION'`)
             .then((tables) => {
                 tableNodes = tables.map<FunctionNode>((table) => {
-                    return new FunctionNode(table.ROUTINE_NAME, this.info);
+                    return new FunctionNode(table.ROUTINE_NAME, this);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {

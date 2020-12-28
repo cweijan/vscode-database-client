@@ -27,7 +27,7 @@ export class TriggerGroup extends Node {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = '${this.database}'`)
             .then((tables) => {
                 tableNodes = tables.map<TriggerNode>((table) => {
-                    return new TriggerNode(table.TRIGGER_NAME, this.info);
+                    return new TriggerNode(table.TRIGGER_NAME, this);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {
