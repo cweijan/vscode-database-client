@@ -2,38 +2,37 @@
   <div id="app">
     <div class="hint">
       <el-row>
-        <el-col :span="12">
+        <el-col :span="16">
           <el-input type="textarea" :autosize="{ minRows:3, maxRows:5}" v-model="toolbar.sql" style="width:100%">
           </el-input>
         </el-col>
       </el-row>
       <div class="toolbar">
-        <div style="display:inline-block">
-          <el-pagination @size-change="size=>{page.pageSize=size;changePage(0);}" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="100" :page-sizes="[100,200,300,400,500,1000]" layout="prev,sizes, next, jumper" :total="1000">
-          </el-pagination>
-        </div>
-        <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" />
-        <el-button @click="exportData()" type="primary" size="mini" icon="el-icon-share" circle title="Export"></el-button>
-        <el-button type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest">
-        </el-button>
+        <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true"/>
         <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
           <el-checkbox-group v-model="toolbar.showColumns">
             <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
               {{ column.name }}
             </el-checkbox>
           </el-checkbox-group>
-          <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference">
+          <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference" >
           </el-button>
         </el-popover>
         <el-button type="success" size="mini" icon="el-icon-s-help" circle title="Count" @click='count(toolbar.sql);'></el-button>
-        <el-button @click="resetFilter" title="Reset filter" type="warning" size="mini" icon="el-icon-refresh" circle> </el-button>
-        <el-button type="danger" size="mini" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
+        <el-button type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest">
+        </el-button>
         <el-button @click="openEdit(toolbar.row)" type="primary" size="mini" icon="el-icon-edit" title="edit" circle :disabled="!selectRow">
         </el-button>
         <el-button @click.stop="openCopy(toolbar.row)" type="info" size="mini" title="copy" icon="el-icon-document-copy" circle :disabled="!selectRow">
         </el-button>
         <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!selectRow">
         </el-button>
+         <el-button @click="exportData()" type="primary" size="mini" icon="el-icon-share" circle title="Export"></el-button>
+         <el-button type="danger" size="mini" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
+         <div style="display:inline-block">
+          <el-pagination @size-change="size=>{page.pageSize=size;changePage(0);}" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="100" :page-sizes="[100,200,300,400,500,1000]" layout="prev,sizes, next, jumper" :total="1000">
+          </el-pagination>
+        </div>
       </div>
       <div v-if="info.visible ">
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
@@ -53,7 +52,7 @@
           </el-tooltip>
         </template>
         <template slot-scope="scope">
-          <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter" v-on:keyup.enter.native="filter($event,scope.column.title)">
+          <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" :clearable='true' placeholder="Filter" @clear="filter(null,scope.column.title)" @keyup.enter.native="filter($event,scope.column.title)">
           </el-input>
           <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[scope.column.title])'></span>
         </template>
@@ -280,7 +279,7 @@ export default {
       this.exportOption.visible = true
     },
     filter(event, column) {
-      let inputvalue = "" + event.target.value
+      let inputvalue = "" + (event?event.target.value:"")
 
       let filterSql = this.result.sql.replace(/\n/, " ").replace(";", " ") + " "
 
@@ -309,9 +308,6 @@ export default {
       }
 
       this.execute(filterSql + ";")
-    },
-    resetFilter() {
-      this.execute(this.result.sql.replace(/where.+?\b(order|limit|group)\b/gi, "$1"))
     },
     sort(row) {
       let sortSql = this.result.sql
