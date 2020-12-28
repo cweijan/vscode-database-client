@@ -1281,7 +1281,7 @@ body {
 }
 
 .el-pagination .btn-next, .el-pagination .btn-prev {
-    background: center center no-repeat #FFF;
+    background: center center no-repeat var(--vscode-editor-background);
     background-size: 16px;
     cursor: pointer;
     margin: 0;
@@ -2533,7 +2533,7 @@ body {
 }
 
 .el-select-dropdown__item.hover, .el-select-dropdown__item:hover {
-    background-color: #F5F7FA
+    background-color: var(--second-bg-color);
 }
 
 .el-select-dropdown__item.selected {
