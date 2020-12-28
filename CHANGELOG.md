@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# 2.8.8 2020/12/28
+
+- Resign result page.
+
 ## 2.8.7 2020/12/22
 
 - Resign connect page @donnisnoni.
