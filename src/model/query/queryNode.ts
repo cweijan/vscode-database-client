@@ -11,9 +11,9 @@ import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 export class QueryNode extends Node {
     public contextValue = ModelType.QUERY;
     public iconPath = path.join(Constants.RES_PATH, "icon/select.svg")
-    constructor(public name: string, readonly info: Node) {
+    constructor(public name: string, readonly parent: Node) {
         super(name)
-        this.init(info)
+        this.init(parent)
         this.collapsibleState = TreeItemCollapsibleState.None
         this.command = {
             command: "mysql.query.open",
@@ -32,7 +32,7 @@ export class QueryNode extends Node {
         vscode.window.showInputBox({ placeHolder: "Input new name" }).then(newName => {
             if (newName) {
                 renameSync(this.getFilePath(),this.getFilePath(newName))
-                DbTreeDataProvider.refresh(this.info)
+                DbTreeDataProvider.refresh(this.parent)
             }
         })
     }

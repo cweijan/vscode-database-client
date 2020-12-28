@@ -66,7 +66,6 @@ export enum MessageType {
 }
 
 export enum Template {
-    create = "create-template.sql",
     table = "sql-template.sql",
     alter = "alter-template.sql"
 }

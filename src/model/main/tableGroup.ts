@@ -6,6 +6,7 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { TableNode } from "./tableNode";
 import { Constants, ModelType, Template } from "../../common/constants";
+import { FileManager, FileModel } from "@/common/filesManager";
 
 export class TableGroup extends Node {
 
@@ -40,13 +41,15 @@ export class TableGroup extends Node {
             });
     }
 
-    public createTemplate() {
+    public async createTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`CREATE TABLE [name](  
-  id int NOT NULL primary key AUTO_INCREMENT comment 'primary key',
-  created_time DATETIME COMMENT 'created tiem',
-  updated_time DATETIME COMMENT 'updated tiem',
-  [column] varchar(255) comment ''
-) default charset utf8 comment '';`, Template.create);
+        const filePath=await FileManager.record(`${this.info.id}#create-table-template.sql`,`CREATE TABLE [name](  
+    id int NOT NULL primary key AUTO_INCREMENT comment 'primary key',
+    created_time DATETIME COMMENT 'created tiem',
+    updated_time DATETIME COMMENT 'updated tiem',
+    [column] varchar(255) comment ''
+) default charset utf8 comment '';`,FileModel.WRITE)
+        FileManager.show(filePath)
+        
     }
 }

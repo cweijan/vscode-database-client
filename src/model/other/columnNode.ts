@@ -16,9 +16,9 @@ export class ColumnNode extends Node implements CopyAble {
     public type: string;
     public contextValue: string = ModelType.COLUMN;
     public isPrimaryKey = false;
-    constructor(private readonly table: string, readonly column: ColumnMeta, readonly info: Node, readonly index: number) {
+    constructor(private readonly table: string, readonly column: ColumnMeta, readonly parent: Node, readonly index: number) {
         super(column.name)
-        this.init(info)
+        this.init(parent)
         this.type = `${this.column.type}`
         this.description = `${this.column.comment}`
         this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)}`
@@ -58,7 +58,7 @@ export class ColumnNode extends Node implements CopyAble {
             const sql = `alter table ${wrap(this.database)}.${wrap(this.table)} change column ${wrap(columnName)} ${wrap(newColumnName)} ${this.column.type} comment '${this.column.comment}'`;
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearColumnCache(`${this.getConnectId()}_${this.database}_${this.table}`);
-                DbTreeDataProvider.refresh(this.info);
+                DbTreeDataProvider.refresh(this.parent);
             });
 
         });
@@ -87,7 +87,7 @@ export class ColumnNode extends Node implements CopyAble {
 
 
     public async moveDown() {
-        const columns = (await this.info.getChildren()) as ColumnNode[]
+        const columns = (await this.parent.getChildren()) as ColumnNode[]
         const afterColumnNode = columns[this.index + 1];
         if (!afterColumnNode) {
             vscode.window.showErrorMessage("Column is at last.")
@@ -95,10 +95,10 @@ export class ColumnNode extends Node implements CopyAble {
         }
         const sql = `ALTER TABLE \`${this.database}\`.\`${this.table}\` MODIFY COLUMN ${this.column.name} ${this.column.type} AFTER ${afterColumnNode.column.name};`
         await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
-        DbTreeDataProvider.refresh(this.info)
+        DbTreeDataProvider.refresh(this.parent)
     }
     public async moveUp() {
-        const columns = (await this.info.getChildren()) as ColumnNode[]
+        const columns = (await this.parent.getChildren()) as ColumnNode[]
         const beforeColumnNode = columns[this.index - 1];
         if (!beforeColumnNode) {
             vscode.window.showErrorMessage("Column is at first.")
@@ -106,7 +106,7 @@ export class ColumnNode extends Node implements CopyAble {
         }
         const sql = `ALTER TABLE \`${this.database}\`.\`${this.table}\` MODIFY COLUMN ${beforeColumnNode.column.name} ${beforeColumnNode.column.type} AFTER ${this.column.name};`
         await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
-        DbTreeDataProvider.refresh(this.info)
+        DbTreeDataProvider.refresh(this.parent)
     }
 
 }

@@ -7,15 +7,16 @@ import { ConnectionManager } from "../../service/connectionManager";
 import { TableNode } from "./tableNode";
 import { Constants, ModelType, Template } from "../../common/constants";
 import { ViewNode } from "./viewNode";
+import { FileManager, FileModel } from "@/common/filesManager";
 
 export class ViewGroup extends Node {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/view.png");
     public contextValue = ModelType.VIEW_GROUP
-    constructor(readonly info: Node) {
+    constructor(readonly parent: Node) {
         super("VIEW")
-        this.id = `${info.getConnectId()}_${info.database}_${ModelType.VIEW_GROUP}`;
-        this.init(info)
+        this.id = `${parent.getConnectId()}_${parent.database}_${ModelType.VIEW_GROUP}`;
+        this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -41,13 +42,16 @@ export class ViewGroup extends Node {
             });
     }
 
-    public createTemplate() {
+    public async createTemplate() {
+
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`CREATE
+        const filePath = await FileManager.record(`${this.parent.id}#create-view-template.sql`, `CREATE
 /* [DEFINER = { user | CURRENT_USER }]*/
 VIEW [name]
 AS
-(SELECT * FROM ...);`, Template.create);
+(SELECT * FROM ...);`, FileModel.WRITE)
+        FileManager.show(filePath)
+
     }
 
 }

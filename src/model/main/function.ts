@@ -12,10 +12,10 @@ export class FunctionNode extends Node {
 
     public contextValue: string = ModelType.FUNCTION;
     public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
-    constructor(readonly name: string, readonly info: Node) {
+    constructor(readonly name: string, readonly parent: Node) {
         super(name)
-        this.id = `${info.getConnectId()}_${info.database}_${name}`
-        this.init(info)
+        this.id = `${parent.getConnectId()}_${parent.database}_${name}`
+        this.init(parent)
         this.command = {
             command: "mysql.show.function",
             title: "Show Function Create Source",
@@ -41,7 +41,7 @@ export class FunctionNode extends Node {
         Util.confirm(`Are you want to drop function ${this.name} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function \`${this.database}\`.\`${this.name}\``).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.name}_${ModelType.FUNCTION_GROUP}`);
-                DbTreeDataProvider.refresh(this.info);
+                DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop function ${this.name} success!`);
             });
         })

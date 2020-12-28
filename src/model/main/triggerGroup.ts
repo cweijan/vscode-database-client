@@ -6,16 +6,17 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { Constants, ModelType, Template } from "../../common/constants";
 import { TriggerNode } from "./trigger";
+import { FileManager, FileModel } from "@/common/filesManager";
 
 export class TriggerGroup extends Node {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/trigger.svg");
     public contextValue = ModelType.TRIGGER_GROUP
 
-    constructor(readonly info: Node) {
+    constructor(readonly parent: Node) {
         super("TRIGGER")
-        this.id = `${info.getConnectId()}_${info.database}_${ModelType.TRIGGER_GROUP}`;
-        this.init(info)
+        this.id = `${parent.getConnectId()}_${parent.database}_${ModelType.TRIGGER_GROUP}`;
+        this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -41,15 +42,18 @@ export class TriggerGroup extends Node {
     }
 
 
-    public createTemplate() {
+    public async createTemplate() {
+
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`CREATE
+        const filePath = await FileManager.record(`${this.parent.id}#create-trigger-template.sql`, `CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
 TRIGGER [name] BEFORE/AFTER INSERT/UPDATE/DELETE
 ON [table]
 FOR EACH ROW BEGIN
 
-END;`, Template.create);
+END;`, FileModel.WRITE)
+        FileManager.show(filePath)
+
     }
 
 }

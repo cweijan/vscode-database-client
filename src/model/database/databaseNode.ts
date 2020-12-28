@@ -24,11 +24,11 @@ export class DatabaseNode extends Node implements CopyAble {
 
     public contextValue: string = ModelType.DATABASE;
     public iconPath: string = path.join(Constants.RES_PATH, "icon/database.svg");
-    constructor(name: string, readonly info: Node) {
+    constructor(name: string, readonly parent: Node) {
         super(name)
-        this.id = `${info.getConnectId()}_${name}`
-        this.info = NodeUtil.of({ ...info, database: name } as Node)
-        this.init(this.info)
+        this.id = `${parent.getConnectId()}_${name}`
+        this.parent = NodeUtil.of({ ...parent, database: name } as Node)
+        this.init(this.parent)
         const lcp = ConnectionManager.getLastConnectionOption(false);
         if (lcp && lcp.getConnectId() == this.getConnectId() && lcp.database == this.database) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/database-active.svg");
@@ -37,13 +37,13 @@ export class DatabaseNode extends Node implements CopyAble {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        return [new TableGroup(this.info),
-        new ViewGroup(this.info),
-        new QueryGroup(this.info),
-        new DiagramGroup(this.info),
-        new ProcedureGroup(this.info),
-        new FunctionGroup(this.info),
-        new TriggerGroup(this.info)];
+        return [new TableGroup(this),
+        new ViewGroup(this),
+        new QueryGroup(this),
+        new DiagramGroup(this),
+        new ProcedureGroup(this),
+        new FunctionGroup(this),
+        new TriggerGroup(this)];
     }
 
     public openOverview() {
@@ -56,7 +56,7 @@ export class DatabaseNode extends Node implements CopyAble {
             if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
                 QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE \`${this.database}\``).then(() => {
                     DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`)
-                    DbTreeDataProvider.refresh(this.info);
+                    DbTreeDataProvider.refresh(this.parent);
                     vscode.window.showInformationMessage(`Drop database ${this.database} success!`)
                 })
             } else {

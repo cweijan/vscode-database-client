@@ -12,7 +12,7 @@ export class FileManager {
     public static show(fileName: string): Promise<vscode.TextEditor> {
         if (!this.storagePath) { vscode.window.showErrorMessage("FileManager is not init!") }
         if (!fileName) { return; }
-        const recordPath = `${this.storagePath}/${fileName}`;
+        const recordPath = path.isAbsolute(fileName) ? fileName : `${this.storagePath}/${fileName}`;
         this.check(path.resolve(recordPath, '..'))
         if (!fs.existsSync(recordPath)) {
             fs.appendFileSync(recordPath, "");
@@ -33,7 +33,7 @@ export class FileManager {
             const recordPath = `${this.storagePath}/${fileName}`;
             this.check(path.resolve(recordPath, '..'))
             if (!fs.existsSync(this.storagePath)) {
-                fs.mkdirSync(this.storagePath,{recursive:true});
+                fs.mkdirSync(this.storagePath, { recursive: true });
             }
             if (model == FileModel.WRITE) {
                 fs.writeFileSync(recordPath, `${content}`, { encoding: 'utf8' });
@@ -62,7 +62,7 @@ export class FileManager {
             .reduce((prevPath, folder) => {
                 const currentPath = path.join(prevPath, folder, path.sep);
                 if (!fs.existsSync(currentPath)) {
-                    fs.mkdirSync(currentPath,{recursive:true});
+                    fs.mkdirSync(currentPath, { recursive: true });
                 }
                 return currentPath;
             }, '');

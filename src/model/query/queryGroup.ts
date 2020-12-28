@@ -11,9 +11,9 @@ export class QueryGroup extends Node {
     public contextValue = ModelType.QUERY_GROUP;
     public iconPath = path.join(Constants.RES_PATH, "icon/select.svg")
     private storePath: string;
-    constructor(readonly info: Node) {
+    constructor(readonly parent: Node) {
         super("Query")
-        this.init(info)
+        this.init(parent)
         this.storePath = `${FileManager.storagePath}/query/${this.getConnectId()}_${this.database}`;
     }
 

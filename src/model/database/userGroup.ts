@@ -9,13 +9,14 @@ import { InfoNode } from "../other/infoNode";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { DatabaseNode } from "./databaseNode";
+import { FileManager, FileModel } from "@/common/filesManager";
 
 export class UserGroup extends DatabaseNode {
 
     public contextValue: string = ModelType.USER_GROUP;
     public iconPath = path.join(Constants.RES_PATH, "icon/userGroup.svg")
-    constructor(readonly name: string, readonly info: Node) {
-        super(name, info)
+    constructor(readonly name: string, readonly parent: Node) {
+        super(name, parent)
         this.id = `${this.getConnectId()}_${ModelType.USER_GROUP}`;
         this.database = null
     }
@@ -25,7 +26,7 @@ export class UserGroup extends DatabaseNode {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT host,user FROM mysql.user;`)
             .then((tables) => {
                 userNodes = tables.map<UserNode>((table) => {
-                    return new UserNode(table.user,table.host, this.info);
+                    return new UserNode(table.user,table.host, this.parent);
                 });
                 return userNodes;
             })
@@ -34,9 +35,11 @@ export class UserGroup extends DatabaseNode {
             });
     }
 
-    public createTemplate() {
+    public async createTemplate() {
+
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`, Template.create);
+        const filePath = await FileManager.record(`${this.parent.id}#create-view-template.sql`,`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`, FileModel.WRITE)
+        FileManager.show(filePath)
     }
 
 }

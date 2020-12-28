@@ -22,11 +22,11 @@ export class TableNode extends Node implements CopyAble {
     public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.TABLE;
 
-    constructor(public readonly table: string, readonly comment: string, readonly info: Node) {
+    constructor(public readonly table: string, readonly comment: string, readonly parent: Node) {
         super(`${table}`)
         this.description = comment
-        this.id = `${info.getConnectId()}_${info.database}_${table}`
-        this.init(info)
+        this.id = `${parent.getConnectId()}_${parent.database}_${table}`
+        this.init(parent)
         this.command = {
             command: "mysql.template.sql",
             title: "Run Select Statement",
@@ -79,7 +79,7 @@ ADD
             const sql = `RENAME TABLE \`${this.database}\`.\`${this.table}\` to \`${this.database}\`.\`${newTableName}\``;
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
-                DbTreeDataProvider.refresh(this.info);
+                DbTreeDataProvider.refresh(this.parent);
             });
 
         });
@@ -91,7 +91,7 @@ ADD
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE \`${this.database}\`.\`${this.table}\``).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
-                DbTreeDataProvider.refresh(this.info);
+                DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
             });
         })

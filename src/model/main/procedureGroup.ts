@@ -6,15 +6,16 @@ import { QueryUnit } from "../../service/queryUnit";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
 import { ProcedureNode } from "./procedure";
+import { FileManager, FileModel } from "@/common/filesManager";
 
 export class ProcedureGroup extends Node  {
     
     public contextValue = ModelType.PROCEDURE_GROUP
     public iconPath = path.join(Constants.RES_PATH, "icon/procedure.png")
-    constructor(readonly info: Node) {
+    constructor(readonly parent: Node) {
         super("PROCEDURE")
-        this.id = `${info.getConnectId()}_${info.database}_${ModelType.PROCEDURE_GROUP}`;
-        this.init(info)
+        this.id = `${parent.getConnectId()}_${parent.database}_${ModelType.PROCEDURE_GROUP}`;
+        this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -39,14 +40,16 @@ export class ProcedureGroup extends Node  {
             });
     }
 
-    public createTemplate() {
+    public async createTemplate() {
+
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`CREATE
+        const filePath = await FileManager.record(`${this.parent.id}#create-procedure-template.sql`, `CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
 PROCEDURE [name]()
 BEGIN
 
-END;`, Template.create);
+END;`, FileModel.WRITE)
+        FileManager.show(filePath)
     }
 
 }

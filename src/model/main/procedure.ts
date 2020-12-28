@@ -13,9 +13,9 @@ export class ProcedureNode extends Node {
 
     public contextValue: string = ModelType.PROCEDURE;
     public iconPath = path.join(Constants.RES_PATH, "icon/procedure.png")
-    constructor(readonly name: string, readonly info: Node) {
+    constructor(readonly name: string, readonly parent: Node) {
         super(name)
-        this.init(info)
+        this.init(parent)
         // this.id = `${info.getConnectKey()}_${info.database}_${name}`
         this.command = {
             command: "mysql.show.procedure",
@@ -42,7 +42,7 @@ export class ProcedureNode extends Node {
         Util.confirm(`Are you want to drop procedure ${this.name} ? `, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP procedure \`${this.database}\`.\`${this.name}\``).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}_${ModelType.PROCEDURE_GROUP}`)
-                DbTreeDataProvider.refresh(this.info)
+                DbTreeDataProvider.refresh(this.parent)
                 vscode.window.showInformationMessage(`Drop procedure ${this.name} success!`)
             })
         })

@@ -120,7 +120,7 @@ export class ConnectionManager {
         const newConnectionOptions = {
             host: opt.host, port: opt.port, user: opt.user, password: opt.password, database: opt.database,
             timezone:opt.timezone,
-            useConnectionPooling: true, multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
+             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
 
         } as mysql.ConnectionConfig;
         if (opt.certPath && fs.existsSync(opt.certPath)) {
@@ -137,7 +137,7 @@ export class ConnectionManager {
             const fileName = vscode.window.activeTextEditor.document.fileName;
             if (fileName.includes('cweijan.vscode-mysql-client2')) {
                 const queryName = path.basename(fileName, path.extname(fileName))
-                const filePattern = queryName.split('_');
+                const filePattern = queryName.replace(/#.+$/,'').split('_');
                 const [mode, host, port, user] = filePattern
                 let database: string;
                 if (filePattern.length >= 5) {

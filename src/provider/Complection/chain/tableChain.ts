@@ -46,7 +46,7 @@ export class TableChain implements ComplectionChain {
                 if (databaseNode.database === inputWord) {
                     tableNodes = DatabaseCache.getChildListOfDatabase(databaseNode.id);
                     if (tableNodes == null || tableNodes.length == 0) {
-                        tableNodes = await new TableGroup(databaseNode.info).getChildren()
+                        tableNodes = await new TableGroup(databaseNode.parent).getChildren()
                     }
                 }
             }
@@ -57,7 +57,7 @@ export class TableChain implements ComplectionChain {
             tableNodes = tableList.filter((tableNode: TableNode) => {
                 const included = tableNames.includes(tableNode.table);
                 tableNames.push(tableNode.table);
-                return !included && !tableNode.info.database.match(/\b(mysql|performance_schema|information_schema|sys)\b/ig);
+                return !included && !tableNode.parent.database.match(/\b(mysql|performance_schema|information_schema|sys)\b/ig);
             });
         }
 

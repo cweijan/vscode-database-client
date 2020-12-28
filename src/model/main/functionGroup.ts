@@ -6,15 +6,16 @@ import { QueryUnit } from "../../service/queryUnit";
 import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
 import { FunctionNode } from "./function";
+import { FileManager, FileModel } from "@/common/filesManager";
 
 export class FunctionGroup extends Node {
 
     public contextValue = ModelType.FUNCTION_GROUP;
     public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
-    constructor(readonly info: Node) {
+    constructor(readonly parent: Node) {
         super("FUNCTION")
-        this.id = `${info.getConnectId()}_${info.database}_${ModelType.FUNCTION_GROUP}`;
-        this.init(info)
+        this.id = `${parent.getConnectId()}_${parent.database}_${ModelType.FUNCTION_GROUP}`;
+        this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -39,14 +40,17 @@ export class FunctionGroup extends Node {
             });
     }
 
-    public createTemplate() {
+    public async createTemplate() {
+
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`CREATE
+        const filePath = await FileManager.record(`${this.parent.id}#create-function-template.sql`, `CREATE
 /*[DEFINER = { user | CURRENT_USER }]*/
 FUNCTION [name]() RETURNS [TYPE]
 BEGIN
     return [value];
-END;`, Template.create);
+END;`, FileModel.WRITE)
+        FileManager.show(filePath)
+
     }
 
 }
