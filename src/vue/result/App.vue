@@ -8,14 +8,14 @@
         </el-col>
       </el-row>
       <div class="toolbar">
-        <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true"/>
+        <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
         <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
           <el-checkbox-group v-model="toolbar.showColumns">
             <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
               {{ column.name }}
             </el-checkbox>
           </el-checkbox-group>
-          <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference" >
+          <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference">
           </el-button>
         </el-popover>
         <el-button type="success" size="mini" icon="el-icon-s-help" circle title="Count" @click='count(toolbar.sql);'></el-button>
@@ -27,10 +27,10 @@
         </el-button>
         <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!selectRow">
         </el-button>
-         <el-button @click="exportData()" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
-         <el-button type="success" size="mini" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
-         <div style="display:inline-block">
-          <el-pagination @size-change="size=>{page.pageSize=size;changePage(0);}" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="100" :page-sizes="[100,200,300,400,500,1000]" :layout="page.total?'total,prev,sizes, next, jumper':'prev,sizes, next, jumper'" :total="page.total">
+        <el-button @click="exportData()" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
+        <el-button type="success" size="mini" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
+        <div style="display:inline-block">
+          <el-pagination @size-change="size=>{page.pageSize=size;changePage(0);}" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,200,300,400,500,1000]" :layout="page.total?'total,prev,sizes, next, jumper':'prev,sizes, next, jumper'" :total="page.total">
           </el-pagination>
         </div>
       </div>
@@ -138,7 +138,7 @@ export default {
       page: {
         pageNum: 1,
         pageSize: -1,
-        total:null
+        total: null,
       },
       table: {
         search: "",
@@ -233,6 +233,9 @@ export default {
           this.result.data = response.data
           this.toolbar.sql = response.sql
           break
+        case "COUNT":
+          this.page.total=parseInt(response.data)
+          break
         case "DML":
         case "DDL":
           handlerCommon(response)
@@ -274,7 +277,7 @@ export default {
         option: {
           ...this.exportOption,
           sql: this.result.sql,
-          table:this.result.table
+          table: this.result.table,
         },
       })
       this.exportOption.visible = false
@@ -283,7 +286,7 @@ export default {
       this.exportOption.visible = true
     },
     filter(event, column) {
-      let inputvalue = "" + (event?event.target.value:"")
+      let inputvalue = "" + (event ? event.target.value : "")
 
       let filterSql = this.result.sql.replace(/\n/, " ").replace(";", " ") + " "
 
@@ -501,8 +504,8 @@ export default {
     },
     count(sql) {
       this.info.visible = false
-      let countSql = sql.replace(/select (.+?) from/i, "SELECT count(*) FROM").replace(/\blimit\b.+$/gi, "")
-      vscodeEvent.emit("count", {sql:countSql})
+      let countSql = sql.replace(/select (.+?) from/i, "SELECT count(*) count FROM").replace(/\blimit\b.+$/gi, "")
+      vscodeEvent.emit("count", { sql: countSql })
     },
     execute(sql) {
       if (!sql) return
@@ -580,6 +583,7 @@ export default {
       // reset page
       this.page.pageNum = 1
       this.page.pageSize = this.result.pageSize
+      this.page.total=null
       // info
       if (this.info.needRefresh) {
         this.info.visible = false

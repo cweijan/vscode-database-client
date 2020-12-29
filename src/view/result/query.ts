@@ -104,7 +104,7 @@ export class QueryPage {
                     const sql = params.sql
                     const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())
                     QueryUnit.queryPromise(connection, sql).then((rows) => {
-                        handler.emit('count', { data: rows })
+                        handler.emit('COUNT', { data: rows[0].count })
                     })
                 }).on(OperateType.export, (params) => {
                     this.exportService.export(params.option)
