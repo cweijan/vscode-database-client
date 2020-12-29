@@ -1,5 +1,5 @@
-import { ExportOption } from "./exportOption";
+import { ExportContext } from "./exportContext";
 
 export interface ExportService {
-    export(exportOption:ExportOption): void;
+    export(exportOption:ExportContext): void;
 }

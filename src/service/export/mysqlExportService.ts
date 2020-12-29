@@ -2,13 +2,12 @@ import { FieldInfo } from "mysql2";
 import { Console } from "../../common/Console";
 import { ConnectionManager } from "../connectionManager";
 import { AbstractExportService } from "./abstractExportService";
-import { ExportOption, ExportType } from "./exportOption";
+import { ExportContext, ExportType } from "./exportContext";
 
 export class MysqlExportService extends AbstractExportService {
 
-    protected async exportData(exportOption: ExportOption) {
+    protected async exportData(exportOption: ExportContext) {
 
-        const filePath = exportOption.exportPath
         const sql = exportOption.sql
         const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())
         connection.query(sql, (err, rows, fields?: FieldInfo[]) => {
@@ -16,15 +15,9 @@ export class MysqlExportService extends AbstractExportService {
                 Console.log(err)
                 return;
             }
-            switch (exportOption.type) {
-                case ExportType.excel:
-                    super.exportByNodeXlsx(filePath, fields, rows);
-                    break;
-                case ExportType.csv:
-                    super.exportToCsv(filePath, fields, rows);
-                    break;
-            }
-            
+            exportOption.fields=fields;
+            exportOption.rows=rows;
+            super.delegateExport(exportOption,rows,fields)
         })
 
     }
