@@ -5,13 +5,17 @@ export class ExportContext {
     sql: string;
     exportPath: string;
     /**
-     * fields, from intenel
+     * intenel: fields 
      */
     fields: any[];
     /**
-     * result,from intenel
+     * intenel: result
      */
     rows:any;
+    /**
+     * intenel: trigger when export done
+     */
+    done: (value?: any) => void;
 }
 
 export enum ExportType {

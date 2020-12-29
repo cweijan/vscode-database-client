@@ -27,10 +27,10 @@
         </el-button>
         <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!selectRow">
         </el-button>
-         <el-button @click="exportData()" type="primary" size="mini" icon="el-icon-share" circle title="Export"></el-button>
-         <el-button type="danger" size="mini" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
+         <el-button @click="exportData()" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
+         <el-button type="success" size="mini" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
          <div style="display:inline-block">
-          <el-pagination @size-change="size=>{page.pageSize=size;changePage(0);}" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="100" :page-sizes="[100,200,300,400,500,1000]" layout="prev,sizes, next, jumper" :total="1000">
+          <el-pagination @size-change="size=>{page.pageSize=size;changePage(0);}" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="100" :page-sizes="[100,200,300,400,500,1000]" :layout="page.total?'total,prev,sizes, next, jumper':'prev,sizes, next, jumper'" :total="page.total">
           </el-pagination>
         </div>
       </div>
@@ -105,7 +105,7 @@
           <el-radio v-model="exportOption.type" label="csv">Csv</el-radio>
           <el-radio v-model="exportOption.type" label="sql">Sql</el-radio>
         </el-form-item>
-        <el-form-item label="With Out Limit">
+        <el-form-item label="Remove Limit">
           <el-switch v-model="exportOption.withOutLimit"></el-switch>
         </el-form-item>
       </el-form>
@@ -138,6 +138,7 @@ export default {
       page: {
         pageNum: 1,
         pageSize: -1,
+        total:null
       },
       table: {
         search: "",

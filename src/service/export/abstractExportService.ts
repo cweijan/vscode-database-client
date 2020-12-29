@@ -4,19 +4,25 @@ import { FieldInfo } from "mysql2";
 import * as fs from "fs";
 import { Console } from "../../common/Console";
 import { ExportContext, ExportType } from "./exportContext";
+import { ProgressLocation } from "vscode";
 
 export abstract class AbstractExportService implements ExportService {
 
-    public export(exportOption: ExportContext): void {
-        const randomFileName = `${new Date().getTime()}.${exportOption.type}`
+    public export(context: ExportContext): void {
+        const randomFileName = `${new Date().getTime()}.${context.type}`
 
-        vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(randomFileName), filters: { 'file': [exportOption.type] } }).then((filePath) => {
+        vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(randomFileName), filters: { 'file': [context.type] } }).then((filePath) => {
             if (filePath) {
-                exportOption.exportPath = filePath.fsPath;
-                if (exportOption.withOutLimit) {
-                    exportOption.sql = exportOption.sql.replace(/\blimit\b.+/gi, "")
+                context.exportPath = filePath.fsPath;
+                if (context.withOutLimit) {
+                    context.sql = context.sql.replace(/\blimit\b.+/gi, "")
                 }
-                this.exportData(exportOption)
+                vscode.window.withProgress({ title: `Start exporting data to ${context.type}...`, location: ProgressLocation.Notification },  () => {
+                    return new Promise((resolve)=>{
+                        context.done=resolve
+                        this.exportData(context)
+                    })
+                })
             }
         })
     }
@@ -26,24 +32,29 @@ export abstract class AbstractExportService implements ExportService {
 
     protected delegateExport(context: ExportContext, rows: any, fields: FieldInfo[]) {
         const filePath = context.exportPath;
-        Console.log(`start export data to ${context.type}...`)
-        switch (context.type) {
-            case ExportType.excel:
-                this.exportByNodeXlsx(filePath, fields, rows);
-                break;
-            case ExportType.csv:
-                this.exportToCsv(filePath, fields, rows);
-                break;
-            case ExportType.sql:
-                this.exportToSql(context);
-                break;
-        }
-        Console.log(`export ${context.type} success, path is ${context.exportPath}!`)
+            switch (context.type) {
+                case ExportType.excel:
+                    this.exportByNodeXlsx(filePath, fields, rows);
+                    break;
+                case ExportType.csv:
+                    this.exportToCsv(filePath, fields, rows);
+                    break;
+                case ExportType.sql:
+                    this.exportToSql(context);
+                    break;
+            }
+            context.done()
+            vscode.window.showInformationMessage(`export ${context.type} success, path is ${context.exportPath}!`, 'Open').then(action => {
+                if (action) {
+                    vscode.commands.executeCommand('vscode.open', vscode.Uri.file(context.exportPath));
+                }
+            })
+        
     }
 
     private exportToSql(exportContext: ExportContext) {
 
-        const {rows,exportPath}=exportContext;
+        const { rows, exportPath } = exportContext;
         if (rows.length == 0) {
             // show waraing
             return;
@@ -60,7 +71,7 @@ export abstract class AbstractExportService implements ExportService {
             sql += `insert into ${exportContext.table}(${columns.replace(/.$/, '')}) values(${values.replace(/.$/, '')});\n`
         }
         fs.writeFileSync(exportPath, sql);
-        
+
 
     }
 
