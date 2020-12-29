@@ -30,7 +30,7 @@
         <el-button @click="exportData()" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
         <el-button type="success" size="mini" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
         <div style="display:inline-block">
-          <el-pagination @size-change="size=>{page.pageSize=size;changePage(0);}" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,200,300,400,500,1000]" :layout="page.total?'total,prev,sizes, next, jumper':'prev,sizes, next, jumper'" :total="page.total">
+          <el-pagination @size-change="size=>{page.pageSize=size;changePage(0);}" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,200,300,400,500,1000]" :layout="page.total?'sizes,prev,pager, next, total, jumper':'sizes,prev, next, jumper'" :total="page.total">
           </el-pagination>
         </div>
       </div>
