@@ -2,11 +2,11 @@ import { FieldInfo } from "mysql2";
 import { Console } from "../../common/Console";
 import { ConnectionManager } from "../connectionManager";
 import { AbstractExportService } from "./abstractExportService";
-import { ExportOption } from "./exportOption";
+import { ExportOption, ExportType } from "./exportOption";
 
 export class MysqlExportService extends AbstractExportService {
 
-    protected async exportExcel(exportOption: ExportOption) {
+    protected async exportData(exportOption: ExportOption) {
 
         const filePath = exportOption.exportPath
         const sql = exportOption.sql
@@ -16,7 +16,15 @@ export class MysqlExportService extends AbstractExportService {
                 Console.log(err)
                 return;
             }
-            super.exportByNodeXlsx(filePath, fields, rows);
+            switch (exportOption.type) {
+                case ExportType.excel:
+                    super.exportByNodeXlsx(filePath, fields, rows);
+                    break;
+                case ExportType.csv:
+                    super.exportToCsv(filePath, fields, rows);
+                    break;
+            }
+            
         })
 
     }

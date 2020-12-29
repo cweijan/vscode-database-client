@@ -6,5 +6,5 @@ export class ExportOption {
 }
 
 export enum ExportType {
-    excel = "excel", sql = "sql"
+    excel = "excel", sql = "sql", csv = "csv"
 }

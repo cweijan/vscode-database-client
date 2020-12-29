@@ -102,6 +102,7 @@
       <el-form :model="exportOption">
         <el-form-item label="Export File Type">
           <el-radio v-model="exportOption.type" label="excel">Excel</el-radio>
+          <el-radio v-model="exportOption.type" label="csv">Csv</el-radio>
         </el-form-item>
         <el-form-item label="With Out Limit">
           <el-switch v-model="exportOption.withOutLimit"></el-switch>
