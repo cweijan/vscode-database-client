@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 2.8.9 2020/12/29
+
+- Support export as csv、json.
+- Enhance result UX.
+
 # 2.8.8 2020/12/28
 
 - Resign result page.
