@@ -101,9 +101,12 @@
     <el-dialog :title="'Export Option'" :visible.sync="exportOption.visible" width="30%" top="3vh" size="mini">
       <el-form :model="exportOption">
         <el-form-item label="Export File Type">
-          <el-radio v-model="exportOption.type" label="excel">Excel</el-radio>
-          <el-radio v-model="exportOption.type" label="csv">Csv</el-radio>
-          <el-radio v-model="exportOption.type" label="sql">Sql</el-radio>
+          <el-select v-model="exportOption.type">
+            <el-option :label="'Xlsx'" value="xlsx"></el-option>
+            <el-option :label="'Insert Sql'" value="sql"></el-option>
+            <el-option :label="'Json'" value="json"></el-option>
+            <el-option :label="'Csv'" value="csv"> </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="Remove Limit">
           <el-switch v-model="exportOption.withOutLimit"></el-switch>
@@ -160,7 +163,7 @@ export default {
       exportOption: {
         visible: false,
         loading: false,
-        type: "excel",
+        type: "xlsx",
         withOutLimit: true,
       },
       info: {
@@ -234,7 +237,7 @@ export default {
           this.toolbar.sql = response.sql
           break
         case "COUNT":
-          this.page.total=parseInt(response.data)
+          this.page.total = parseInt(response.data)
           break
         case "DML":
         case "DDL":
@@ -583,7 +586,7 @@ export default {
       // reset page
       this.page.pageNum = 1
       this.page.pageSize = this.result.pageSize
-      this.page.total=null
+      this.page.total = null
       // info
       if (this.info.needRefresh) {
         this.info.visible = false

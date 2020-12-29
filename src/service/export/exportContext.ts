@@ -19,5 +19,5 @@ export class ExportContext {
 }
 
 export enum ExportType {
-    excel = "excel", sql = "sql", csv = "csv"
+    excel = "xlsx", sql = "sql", csv = "csv",json = "json"
 }

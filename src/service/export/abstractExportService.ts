@@ -17,9 +17,9 @@ export abstract class AbstractExportService implements ExportService {
                 if (context.withOutLimit) {
                     context.sql = context.sql.replace(/\blimit\b.+/gi, "")
                 }
-                vscode.window.withProgress({ title: `Start exporting data to ${context.type}...`, location: ProgressLocation.Notification },  () => {
-                    return new Promise((resolve)=>{
-                        context.done=resolve
+                vscode.window.withProgress({ title: `Start exporting data to ${context.type}...`, location: ProgressLocation.Notification }, () => {
+                    return new Promise((resolve) => {
+                        context.done = resolve
                         this.exportData(context)
                     })
                 })
@@ -32,24 +32,31 @@ export abstract class AbstractExportService implements ExportService {
 
     protected delegateExport(context: ExportContext, rows: any, fields: FieldInfo[]) {
         const filePath = context.exportPath;
-            switch (context.type) {
-                case ExportType.excel:
-                    this.exportByNodeXlsx(filePath, fields, rows);
-                    break;
-                case ExportType.csv:
-                    this.exportToCsv(filePath, fields, rows);
-                    break;
-                case ExportType.sql:
-                    this.exportToSql(context);
-                    break;
+        switch (context.type) {
+            case ExportType.excel:
+                this.exportByNodeXlsx(filePath, fields, rows);
+                break;
+            case ExportType.csv:
+                this.exportToCsv(filePath, fields, rows);
+                break;
+            case ExportType.json:
+                this.exportToJson(context);
+                break;
+            case ExportType.sql:
+                this.exportToSql(context);
+                break;
+        }
+        context.done()
+        vscode.window.showInformationMessage(`export ${context.type} success, path is ${context.exportPath}!`, 'Open').then(action => {
+            if (action) {
+                vscode.commands.executeCommand('vscode.open', vscode.Uri.file(context.exportPath));
             }
-            context.done()
-            vscode.window.showInformationMessage(`export ${context.type} success, path is ${context.exportPath}!`, 'Open').then(action => {
-                if (action) {
-                    vscode.commands.executeCommand('vscode.open', vscode.Uri.file(context.exportPath));
-                }
-            })
-        
+        })
+
+    }
+
+    private exportToJson(context: ExportContext) {
+        fs.writeFileSync(context.exportPath, JSON.stringify(context.rows,null,2));
     }
 
     private exportToSql(exportContext: ExportContext) {
@@ -100,7 +107,7 @@ export abstract class AbstractExportService implements ExportService {
             }
             csvContent = csvContent.replace(/.$/, "") + "\n"
         }
-        fs.writeFileSync(filePath, csvContent);
+        fs.writeFileSync(filePath, csvContent, { encoding: "utf8" });
     }
 
 
