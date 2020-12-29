@@ -502,7 +502,7 @@ export default {
     count(sql) {
       this.info.visible = false
       let countSql = sql.replace(/select (.+?) from/i, "SELECT count(*) FROM").replace(/\blimit\b.+$/gi, "")
-      this.execute(countSql)
+      vscodeEvent.emit("count", {sql:countSql})
     },
     execute(sql) {
       if (!sql) return
@@ -628,102 +628,3 @@ export default {
   },
 }
 </script>
-
-<style>
-body {
-  /* background-color: var(--vscode-editor-background); */
-  background-color: #f8f6f6;
-  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
-  padding: 0;
-}
-
-#tool-panel * {
-  margin-right: 10px;
-}
-
-.toolbar {
-  margin-top: 3px;
-  margin-bottom: 3px;
-}
-
-.title-info,
-.plx-cell--title {
-  user-select: all;
-}
-
-.hint {
-  box-sizing: border-box;
-  padding: 5px;
-  padding-left: 20px;
-  font-size: 17px;
-  color: #444;
-  width: 100vw;
-  display: inline-block;
-  margin-top: 8px;
-}
-
-.plx-cell,
-.plx-cell--title {
-  text-overflow: unset !important;
-}
-
-.cell {
-  overflow: hidden !important;
-  text-overflow: unset !important;
-  white-space: nowrap !important;
-  user-select: text !important;
-  padding: 1px !important;
-}
-
-.info-panel {
-  color: #444;
-  font-size: 14px;
-  border: 1px solid #dcdfe6;
-  border-radius: 5px;
-  padding: 10px;
-  margin-left: 6px;
-}
-
-/* 滚动条样式（高宽及背景）*/
-::-webkit-scrollbar {
-  background-color: var(--vscode-scrollbarSlider-background);
-  width: 12px;
-  height: 12px;
-}
-
-/* 滚动条轨道（凹槽）样式*/
-::-webkit-scrollbar-track {
-  /* -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);   */
-  /* border-radius: 8px; */
-  /* background-color: #424242; */
-  background-color: var(--vscode-editor-background);
-}
-
-/* 滑块样式*/
-::-webkit-scrollbar-thumb {
-  border-radius: 8px;
-  background-color: var(--vscode-scrollbarSlider-background);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  border-radius: 8px;
-  background-color: var(--vscode-scrollbarSlider-hoverBackground);
-}
-.plx-cell {
-  padding: 0px !important;
-  text-align: center !important;
-}
-.plx-table--body .el-input__inner {
-  line-height: 35px !important;
-  height: 35px !important;
-}
-
-.plx-cell span {
-  margin: auto !important;
-}
-.plx-table.size--small .plx-cell--checkbox .plx-checkbox--icon,
-.plx-table .plx-cell--checkbox .plx-checkbox--icon:before {
-  height: 1.3em !important;
-  width: 1.3em !important;
-}
-</style>
