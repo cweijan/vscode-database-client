@@ -80,8 +80,8 @@ export class QueryPage {
                     if (queryParam.res?.table) {
                         handler.panel.title = `${queryParam.res.table}@${queryParam.res.database}`
                     }
-                    queryParam.res.dbInfo={...ConnectionManager.getLastConnectionOption(),command:null,info:null }
-                    queryParam.res.transId=Trans.transId;
+                    queryParam.res.dbInfo = { ...ConnectionManager.getLastConnectionOption(), command: null, info: null }
+                    queryParam.res.transId = Trans.transId;
                     handler.emit(queryParam.type, queryParam.res)
                 }).on("showCost", ({ cost }) => {
                     this.costStatusBar.text = `$(scrollbar-button-right) ${cost}ms`
@@ -93,7 +93,7 @@ export class QueryPage {
                     if (!queryParam.singlePage) {
                         this.hodlder.set(params.sql.trim(), title)
                     }
-                    QueryUnit.runQuery(params.sql,params.dbInfo);
+                    QueryUnit.runQuery(params.sql, params.dbInfo);
                 }).on(OperateType.next, async (params) => {
                     const sql = this.pageService.build(params.sql, params.pageNum, params.pageSize)
                     const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())
@@ -108,6 +108,8 @@ export class QueryPage {
                     })
                 }).on(OperateType.export, (params) => {
                     this.exportService.export(params.option)
+                }).on('changePageSize', (pageSize) => {
+                    Global.updateConfig(ConfigKey.DEFAULT_LIMIT, pageSize)
                 })
             }
         });
