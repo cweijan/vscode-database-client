@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 2.9.0 2020/12/31
+
+- Better update operation interactive.
+- Support auto show total.
+- Show column require hint.
+
 # 2.8.9 2020/12/29
 
 - Support export as csv、json.
