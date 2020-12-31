@@ -64,6 +64,7 @@ export class QueryPage {
             }
         }
 
+        const dbOption = ConnectionManager.getLastConnectionOption();
         ViewManager.createWebviewPanel({
             singlePage: true,
             splitView: this.isActiveSql(),
@@ -80,7 +81,6 @@ export class QueryPage {
                     if (queryParam.res?.table) {
                         handler.panel.title = `${queryParam.res.table}@${queryParam.res.database}`
                     }
-                    queryParam.res.dbInfo = { ...ConnectionManager.getLastConnectionOption(), command: null, info: null }
                     queryParam.res.transId = Trans.transId;
                     handler.emit(queryParam.type, queryParam.res)
                 }).on("showCost", ({ cost }) => {
@@ -93,17 +93,16 @@ export class QueryPage {
                     if (!queryParam.singlePage) {
                         this.hodlder.set(params.sql.trim(), title)
                     }
-                    QueryUnit.runQuery(params.sql, params.dbInfo);
+                    QueryUnit.runQuery(params.sql, dbOption);
                 }).on(OperateType.next, async (params) => {
                     const sql = this.pageService.build(params.sql, params.pageNum, params.pageSize)
-                    const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())
+                    const connection = await ConnectionManager.getConnection(dbOption)
                     QueryUnit.queryPromise(connection, sql).then((rows) => {
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
                     })
                 }).on('count', async (params) => {
-                    const sql = params.sql
-                    const connection = await ConnectionManager.getConnection(ConnectionManager.getLastConnectionOption())
-                    QueryUnit.queryPromise(connection, sql).then((rows) => {
+                    const connection = await ConnectionManager.getConnection(dbOption)
+                    QueryUnit.queryPromise(connection,  params.sql).then((rows) => {
                         handler.emit('COUNT', { data: rows[0].count })
                     })
                 }).on(OperateType.export, (params) => {

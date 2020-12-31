@@ -128,7 +128,6 @@ export default {
   name: "App",
   data() {
     return {
-      dbInfo: {},
       result: {
         data: [],
         sql: "",
@@ -182,9 +181,6 @@ export default {
   },
   mounted() {
     const handlerData = (data, sameTable) => {
-      if (data.dbInfo) {
-        this.dbInfo = data.dbInfo
-      }
       this.result = data
       this.toolbar.sql = data.sql
 
@@ -503,8 +499,7 @@ export default {
     execute(sql) {
       if (!sql) return
       vscodeEvent.emit("execute", {
-        sql: sql.replace(/ +/gi, " "),
-        dbInfo: this.dbInfo,
+        sql: sql.replace(/ +/gi, " ")
       })
       this.table.loading = true
     },
