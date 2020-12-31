@@ -31,7 +31,7 @@
     </div>
     <!-- trigger when click -->
     <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe @selection-change="selectionChange" :edit-config="{trigger: 'click', mode: 'row',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="updateEdit" :show-header-overflow="false" :show-overflow="false">
-      <ux-table-column type="checkbox" width="40" fixed="left" />
+      <ux-table-column type="checkbox" width="40" fixed="left" > </ux-table-column>
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined">
         <template slot="header" slot-scope="scope">
           <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click" type="primary">
@@ -49,7 +49,7 @@
         <template slot="header" slot-scope="scope">
           <el-tooltip class="item" effect="dark" :content="scope.column.title" placement="left-start">
             <span>
-              <span  v-if="result.columnList[index].nullable != 'YES'" style="color: #f94e4e; position: relative; top: .2em;">
+              <span v-if="result.columnList[index].nullable != 'YES'" style="color: #f94e4e; position: relative; top: .2em;">
                 *
               </span>
               {{ scope.column.title }}
@@ -61,10 +61,11 @@
           </el-input>
           <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[scope.column.title])'></span>
         </template>
-        <template slot="edit" slot-scope="scope">
+        <template slot="edit" slot-scope="scope" v-if="result.tableCount==1">
           <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter" v-on:keyup.enter.native="filter($event,scope.column.title)">
           </el-input>
           <el-input v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" @keypress.enter.native="confirmUpdate(scope.row)"></el-input>
+          <!-- <CellEditor v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" :type="result.columnList[index].type" @keypress.enter.native="confirmUpdate(scope.row)"></CellEditor> -->
         </template>
       </ux-table-column>
     </ux-grid>
@@ -79,19 +80,7 @@
               <span>{{ column.defaultValue ? ` Default : ${column.defaultValue}` : "" }}</span>
               <span>{{ column.extra == "auto_increment" ? ` AUTO_INCREMENT` : "" }}</span>
             </span>
-            <template v-if="column.type=='date'">
-              <br />
-              <el-date-picker value-format="yyyy-MM-dd" v-model="update.currentNew[column.name]"></el-date-picker>
-            </template>
-            <template v-else-if="column.type=='time'">
-              <br />
-              <el-time-picker value-format="HH:mm:ss" v-model="update.currentNew[column.name]"></el-time-picker>
-            </template>
-            <template v-else-if="column.type=='datetime'">
-              <br />
-              <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" type="datetime" v-model="update.currentNew[column.name]"></el-date-picker>
-            </template>
-            <el-input v-else="column.type" v-model="update.currentNew[column.name]"></el-input>
+            <CellEditor v-model="update.currentNew[column.name]" :type="column.type"></CellEditor>
           </template>
         </el-form-item>
       </el-form>
@@ -127,10 +116,14 @@
 
 <script>
 import { getVscodeEvent } from "../util/vscode"
+import CellEditor from "./component/CellEditor.vue"
 let vscodeEvent
 
 export default {
   name: "App",
+  components: {
+    CellEditor,
+  },
   data() {
     return {
       result: {
@@ -195,7 +188,7 @@ export default {
       } else {
         this.reset()
       }
-      if(this.result.tableCount==1){
+      if (this.result.tableCount == 1) {
         this.count()
       }
     }
@@ -500,7 +493,7 @@ export default {
       }
     },
     count() {
-      if(!this.result.table)return;
+      if (!this.result.table) return
       this.info.visible = false
       vscodeEvent.emit("count", { sql: `SELECT count(*) count FROM ${this.result.table}` })
     },
@@ -593,7 +586,7 @@ export default {
       this.toolbar.row = {}
     },
     selectionChange(selection) {
-      this.toolbar.show = this.result.primaryKey && selection.length > 0
+      this.toolbar.show = this.result.primaryKey && selection.length > 0 && this.result.tableCount == 1
     },
     // show call when change table
     reset() {
