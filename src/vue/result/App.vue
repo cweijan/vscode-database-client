@@ -21,11 +21,11 @@
         <el-button type="success" size="mini" icon="el-icon-s-help" circle title="Count" @click='count(toolbar.sql);'></el-button>
         <el-button type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest">
         </el-button>
-        <el-button @click="openEdit(toolbar.row)" type="primary" size="mini" icon="el-icon-edit" title="edit" circle :disabled="!selectRow">
+        <el-button @click="openEdit" type="primary" size="mini" icon="el-icon-edit" title="edit" circle :disabled="!toolbar.show">
         </el-button>
-        <el-button @click.stop="openCopy(toolbar.row)" type="info" size="mini" title="copy" icon="el-icon-document-copy" circle :disabled="!selectRow">
+        <el-button @click.stop="openCopy" type="info" size="mini" title="copy" icon="el-icon-document-copy" circle :disabled="!toolbar.show">
         </el-button>
-        <el-button @click="deleteConfirm(toolbar.row[result.primaryKey])" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!selectRow">
+        <el-button @click="deleteConfirm" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!toolbar.show">
         </el-button>
         <el-button @click="exportData()" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
         <el-button type="success" size="mini" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
@@ -40,7 +40,7 @@
       </div>
     </div>
     <!-- trigger when click -->
-    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe @select-all="toolbar.show=true" :edit-config="{trigger: 'click', mode: 'cell',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="updateEdit" :show-header-overflow="false" :show-overflow="false">
+    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe @selection-change="selectionChange" :edit-config="{trigger: 'click', mode: 'row',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="updateEdit" :show-header-overflow="false" :show-overflow="false">
       <ux-table-column type="checkbox" width="40" fixed="left" />
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined" />
       <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field.name,0,index,toolbar.filter[field.name])" edit-render>
@@ -59,11 +59,11 @@
         <template slot="edit" slot-scope="scope">
           <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter" v-on:keyup.enter.native="filter($event,scope.column.title)">
           </el-input>
-          <el-input v-if="!scope.row.isFilter" v-model="update.currentNew[scope.column.title]" @keypress.enter.native="confirmUpdate"></el-input>
+          <el-input v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" @keypress.enter.native="confirmUpdate(scope.row)"></el-input>
         </template>
       </ux-table-column>
     </ux-grid>
-    <!-- talbe result -->
+    <!-- table result -->
     <el-dialog ref="editDialog" :title="editorTilte" :visible.sync="editor.visible" width="90%" top="3vh" size="mini">
       <el-form ref="infoForm" :model="update.currentNew" :inline="true">
         <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
@@ -92,9 +92,9 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editor.visible = false">Cancel</el-button>
-        <el-button v-if="update.primary!=null" type="primary" :loading="editor.loading" @click="confirmUpdate">
+        <el-button v-if="update.currentNew[result.primaryKey]!=null" type="primary" :loading="editor.loading" @click="confirmUpdate(update.currentNew)">
           Update</el-button>
-        <el-button v-if="update.primary==null" type="primary" :loading="editor.loading" @click="confirmInsert">
+        <el-button v-if="update.currentNew[result.primaryKey]==null" type="primary" :loading="editor.loading" @click="confirmInsert(update.currentNew)">
           Insert</el-button>
       </span>
     </el-dialog>
@@ -174,7 +174,7 @@ export default {
         needRefresh: true,
       },
       update: {
-        current: {},
+        current: null,
         currentNew: {},
         primary: null,
       },
@@ -215,6 +215,7 @@ export default {
       console.log(data)
       const response = data.content
       this.table.loading = false
+      this.update.current = null
       if (response && response.costTime) {
         this.toolbar.costTime = response.costTime
         vscodeEvent.emit("showCost", { cost: this.toolbar.costTime })
@@ -272,9 +273,6 @@ export default {
     })
   },
   methods: {
-    output(obj) {
-      console.log(obj)
-    },
     confirmExport() {
       vscodeEvent.emit("export", {
         option: {
@@ -319,10 +317,10 @@ export default {
 
       this.execute(filterSql + ";")
     },
-    changePageSize(size){
-      this.page.pageSize=size;
-      vscodeEvent.emit("changePageSize",size)
-      this.changePage(0);
+    changePageSize(size) {
+      this.page.pageSize = size
+      vscodeEvent.emit("changePageSize", size)
+      this.changePage(0)
     },
     sort(row) {
       let sortSql = this.result.sql
@@ -394,16 +392,19 @@ export default {
         this.$message("Not any input, update fail!")
       }
     },
-    confirmUpdate() {
+    confirmUpdate(row) {
       if (!this.result.primaryKey) {
         this.$message.error("This table has not primary key, update fail!")
         return
       }
+      const currentNew = row ? row : this.update.currentNew
+      const primary = this.update.current[this.result.primaryKey]
       let change = ""
-      for (const key in this.update.currentNew) {
+      console.log("update")
+      for (const key in currentNew) {
         if (this.getTypeByColumn(key) == null) continue
         const oldEle = this.update.current[key]
-        const newEle = this.update.currentNew[key]
+        const newEle = currentNew[key]
         if (oldEle !== newEle) {
           change += `\`${key}\`=${this.wrapQuote(key, newEle)},`
         }
@@ -411,59 +412,43 @@ export default {
       if (change) {
         const updateSql = `UPDATE ${this.result.table} SET ${change.replace(/,$/, "")} WHERE ${
           this.result.primaryKey
-        }=${this.wrapQuote(this.result.primaryKey, this.update.primary)}`
+        }=${this.wrapQuote(this.result.primaryKey, primary)}`
         this.execute(updateSql)
       } else {
         this.$message("Not any change, update fail!")
       }
     },
     updateEdit(row, column, event) {
-      if (row.isFilter) {
+      if (row.isFilter || this.update.current) {
         return
       }
-      if (column && column.type == "checkbox" && this.$refs.dataTable.getCheckboxRecords().length == 0) {
-        this.toolbar.row = {}
-        return
-      }
-      this.toolbar.row = row
-      this.update = {
-        current: row,
-        currentNew: this.clone(row),
-        primary: row[this.result.primaryKey],
-      }
-      if (this.result.data.length > 24 && column.type != "checkbox") {
-        // this.openEdit();
-      }
+      this.update.current = { ...row }
     },
     openEdit(row) {
       this.editor.visible = true
+      this.update.currentNew={...this.update.current}
     },
-    openCopy(row) {
-      this.updateEdit(row)
+    openCopy() {
+      this.update.currentNew={...this.update.current}
       this.update.currentNew[this.result.primaryKey] = null
       this.update.primary = null
       this.editor.visible = true
     },
-    deleteConfirm(primaryValue) {
+    deleteConfirm() {
       this.$confirm("Are you sure you want to delete this data?", "Warning", {
         confirmButtonText: "OK",
         cancelButtonText: "Cancel",
         type: "warning",
       })
         .then(() => {
-          let checkboxRecords = this.$refs.dataTable.getCheckboxRecords()
-          if (checkboxRecords.length > 0) {
-            checkboxRecords = checkboxRecords
-              .filter((checkboxRecord) => checkboxRecord[this.result.primaryKey] != null)
-              .map((checkboxRecord) => this.wrapQuote(this.result.primaryKey, checkboxRecord[this.result.primaryKey]))
-          }
+          let checkboxRecords = this.$refs.dataTable
+            .getCheckboxRecords()
+            .filter((checkboxRecord) => checkboxRecord[this.result.primaryKey] != null)
+            .map((checkboxRecord) => this.wrapQuote(this.result.primaryKey, checkboxRecord[this.result.primaryKey]))
           const deleteSql =
-            checkboxRecords.length > 0
+            checkboxRecords.length > 1
               ? `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey} in (${checkboxRecords.join(",")})`
-              : `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}=${this.wrapQuote(
-                  this.result.primaryKey,
-                  primaryValue
-                )}`
+              : `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}=${checkboxRecords[0]}`
           this.execute(deleteSql)
         })
         .catch((e) => {
@@ -601,7 +586,11 @@ export default {
       // loading
       this.table.loading = false
       // toolbar
+      this.toolbar.show = false
       this.toolbar.row = {}
+    },
+    selectionChange(selection) {
+      this.toolbar.show = this.result.primaryKey && selection.length > 0
     },
     // show call when change table
     reset() {
@@ -626,16 +615,13 @@ export default {
       return Object.keys(this.result.data[0]).length
     },
     editorTilte() {
-      if (this.update.primary == null) {
+      if (this.update.currentNew[this.result.primaryKey] == null) {
         return "Insert To " + this.result.table
       }
       return "Edit For " + this.result.table + " : " + this.result.primaryKey + "=" + this.update.primary
     },
     remainHeight() {
       return window.outerHeight - 250
-    },
-    selectRow() {
-      return this.result.primaryKey && (this.toolbar.row[this.result.primaryKey] || this.toolbar.show)
     },
   },
 }
