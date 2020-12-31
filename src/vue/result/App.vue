@@ -195,7 +195,6 @@ export default {
       this.editor.visible = false
       this.info.visible = true
       this.info.message = res.message
-      // this.$message({ type: 'success', message: `EXECUTE ${res.sql} SUCCESS, affectedRows:${res.affectedRows}` });
     }
     vscodeEvent = getVscodeEvent()
     window.onfocus = () => {
