@@ -102,7 +102,7 @@ export class QueryPage {
                     })
                 }).on('count', async (params) => {
                     const connection = await ConnectionManager.getConnection(dbOption)
-                    QueryUnit.queryPromise(connection,  params.sql).then((rows) => {
+                    QueryUnit.queryPromise(connection, params.sql).then((rows) => {
                         handler.emit('COUNT', { data: rows[0].count })
                     })
                 }).on(OperateType.export, (params) => {
@@ -129,6 +129,11 @@ export class QueryPage {
         const fields = queryParam.res.fields;
         const conn = queryParam.connection;
         if (!fields || fields.length == 0) { return; }
+
+        let mark = {};
+        for (const field of fields) {
+            mark[field.orgTable] = true
+        }
         const tableName = fields[0].orgTable;
         const database = fields[0].schema || fields[0].db;
         if (tableName == null || conn == null) { return; }
@@ -144,6 +149,7 @@ export class QueryPage {
             });
             queryParam.res.primaryKey = primaryKey;
             queryParam.res.columnList = columnList;
+            queryParam.res.tableCount = Object.keys(mark).length;
         }
         queryParam.res.table = tableName;
         queryParam.res.database = conn.database;

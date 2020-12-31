@@ -9,7 +9,6 @@
       </el-row>
       <div class="toolbar">
         <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
-        <el-button type="success" size="mini" icon="el-icon-s-help" circle title="Count" @click='count(toolbar.sql);'></el-button>
         <el-button type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest">
         </el-button>
         <el-button @click="openEdit" type="primary" size="mini" icon="el-icon-edit" title="edit" circle :disabled="!toolbar.show">
@@ -141,6 +140,7 @@ export default {
         columnList: null,
         database: null,
         table: null,
+        tableCount: null,
         pageSize: null,
       },
       page: {
@@ -194,6 +194,9 @@ export default {
         this.clear()
       } else {
         this.reset()
+      }
+      if(this.result.tableCount==1){
+        this.count()
       }
     }
     const handlerCommon = (res) => {
@@ -496,10 +499,10 @@ export default {
         this.execute(this.result.sql)
       }
     },
-    count(sql) {
+    count() {
+      if(!this.result.table)return;
       this.info.visible = false
-      let countSql = sql.replace(/select (.+?) from/i, "SELECT count(*) count FROM").replace(/\blimit\b.+$/gi, "")
-      vscodeEvent.emit("count", { sql: countSql })
+      vscodeEvent.emit("count", { sql: `SELECT count(*) count FROM ${this.result.table}` })
     },
     execute(sql) {
       if (!sql) return

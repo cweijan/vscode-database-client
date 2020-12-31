@@ -876,6 +876,11 @@
 					"type": "integer",
 					"default": 100,
 					"description": "Default limit of query sql."
+				},
+				"vscode-mysql.showTotal": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show total on result view."
 				}
 			}
 		}

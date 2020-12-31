@@ -20,6 +20,7 @@ export class DataResponse {
     public data: any[];
     public fields: mysql.FieldInfo[];
     public pageSize: number;
+    public tableCount: number;
 }
 export class ErrorResponse {
     public sql: string;
