@@ -642,11 +642,6 @@
 					"group": "mysql@6"
 				},
 				{
-					"command": "mysql.changeTableName",
-					"when": "view == github.cweijan.mysql && viewItem == table",
-					"group": "inline@0"
-				},
-				{
 					"command": "mysql.table.show",
 					"when": "view == github.cweijan.mysql && viewItem == table",
 					"group": "inline@3"

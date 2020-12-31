@@ -9,15 +9,6 @@
       </el-row>
       <div class="toolbar">
         <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
-        <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click">
-          <el-checkbox-group v-model="toolbar.showColumns">
-            <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
-              {{ column.name }}
-            </el-checkbox>
-          </el-checkbox-group>
-          <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference">
-          </el-button>
-        </el-popover>
         <el-button type="success" size="mini" icon="el-icon-s-help" circle title="Count" @click='count(toolbar.sql);'></el-button>
         <el-button type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest">
         </el-button>
@@ -42,7 +33,19 @@
     <!-- trigger when click -->
     <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe @selection-change="selectionChange" :edit-config="{trigger: 'click', mode: 'row',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="updateEdit" :show-header-overflow="false" :show-overflow="false">
       <ux-table-column type="checkbox" width="40" fixed="left" />
-      <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined" />
+      <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined">
+        <template slot="header" slot-scope="scope">
+          <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click" type="primary">
+            <el-checkbox-group v-model="toolbar.showColumns">
+              <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
+                {{ column.name }}
+              </el-checkbox>
+            </el-checkbox-group>
+            <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference">
+            </el-button>
+          </el-popover>
+        </template>
+      </ux-table-column>
       <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field.name,0,index,toolbar.filter[field.name])" edit-render>
         <template slot="header" slot-scope="scope">
           <el-tooltip class="item" effect="dark" :content="scope.column.title" placement="left-start">
@@ -421,10 +424,10 @@ export default {
     },
     openEdit(row) {
       this.editor.visible = true
-      this.update.currentNew={...this.update.current}
+      this.update.currentNew = { ...this.update.current }
     },
     openCopy() {
-      this.update.currentNew={...this.update.current}
+      this.update.currentNew = { ...this.update.current }
       this.update.currentNew[this.result.primaryKey] = null
       this.update.primary = null
       this.editor.visible = true
@@ -498,7 +501,7 @@ export default {
     execute(sql) {
       if (!sql) return
       vscodeEvent.emit("execute", {
-        sql: sql.replace(/ +/gi, " ")
+        sql: sql.replace(/ +/gi, " "),
       })
       this.table.loading = true
     },

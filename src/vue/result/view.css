@@ -32,6 +32,15 @@ body {
   margin-left: 6px;
 }
 
+.el-popover__reference{
+  background-color: #409EFF;
+}
+
+/* umyui */
+
+.plx-edit-icon{
+  display: none;
+}
 
 .title-info,
 .plx-cell--title {
