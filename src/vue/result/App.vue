@@ -49,7 +49,10 @@
       <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field.name,0,index,toolbar.filter[field.name])" edit-render>
         <template slot="header" slot-scope="scope">
           <el-tooltip class="item" effect="dark" :content="scope.column.title" placement="left-start">
-            <span v-text="scope.column.title">
+            <span>
+              <span  v-if="result.columnList[index].nullable != 'YES'" style="color: #f94e4e; position: relative; top: .2em;">
+                *
+              </span>
               {{ scope.column.title }}
             </span>
           </el-tooltip>
