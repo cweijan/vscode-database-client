@@ -17,7 +17,7 @@
         </el-button>
         <el-button @click="deleteConfirm" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!toolbar.show">
         </el-button>
-        <el-button @click="exportData()" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
+        <el-button @click="exportOption.visible = true" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
         <el-button type="success" size="mini" icon="el-icon-caret-right" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
         <div style="display:inline-block">
           <el-pagination @size-change="changePageSize" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,200,300,400,500,1000]" :layout="page.total?'sizes,prev,pager, next, total, jumper':'sizes,prev, next, jumper'" :total="page.total">
@@ -92,37 +92,21 @@
           Insert</el-button>
       </span>
     </el-dialog>
-    <el-dialog :title="'Export Option'" :visible.sync="exportOption.visible" width="30%" top="3vh" size="mini">
-      <el-form :model="exportOption">
-        <el-form-item label="Export File Type">
-          <el-select v-model="exportOption.type">
-            <el-option :label="'Xlsx'" value="xlsx"></el-option>
-            <el-option :label="'Insert Sql'" value="sql"></el-option>
-            <el-option :label="'Json'" value="json"></el-option>
-            <el-option :label="'Csv'" value="csv"> </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Remove Limit">
-          <el-switch v-model="exportOption.withOutLimit"></el-switch>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" :loading="exportOption.loading" @click="confirmExport">Export</el-button>
-        <el-button @click="exportOption.visible = false">Cancel</el-button>
-      </span>
-    </el-dialog>
+    <ExportDialog :visible.sync="exportOption.visible" :loading.sync="exportOption.loading" @exportHandle="confirmExport"/>
   </div>
 </template>
 
 <script>
 import { getVscodeEvent } from "../util/vscode"
 import CellEditor from "./component/CellEditor.vue"
+import ExportDialog from "./component/ExportDialog.vue"
 let vscodeEvent
 
 export default {
   name: "App",
   components: {
     CellEditor,
+    ExportDialog
   },
   data() {
     return {
@@ -160,9 +144,7 @@ export default {
       },
       exportOption: {
         visible: false,
-        loading: false,
-        type: "xlsx",
-        withOutLimit: true,
+        loading: false
       },
       info: {
         sql: null,
@@ -270,18 +252,15 @@ export default {
     })
   },
   methods: {
-    confirmExport() {
+    confirmExport(exportOption) {
       vscodeEvent.emit("export", {
         option: {
-          ...this.exportOption,
+          ...exportOption,
           sql: this.result.sql,
           table: this.result.table,
         },
       })
       this.exportOption.visible = false
-    },
-    exportData() {
-      this.exportOption.visible = true
     },
     filter(event, column) {
       let inputvalue = "" + (event ? event.target.value : "")
@@ -546,17 +525,6 @@ export default {
       if (preFormat != origin) return preFormat
 
       return origin
-    },
-    clone(obj) {
-      let objClone = Array.isArray(obj) ? [] : {}
-      if (obj && typeof obj === "object") {
-        for (let key in obj) {
-          if (obj.hasOwnProperty(key)) {
-            objClone[key] = this.dataformat0(obj[key])
-          }
-        }
-      }
-      return objClone
     },
     initShowColumn() {
       const fields = this.result.fields

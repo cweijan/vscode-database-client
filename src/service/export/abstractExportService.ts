@@ -20,7 +20,11 @@ export abstract class AbstractExportService implements ExportService {
                 vscode.window.withProgress({ title: `Start exporting data to ${context.type}...`, location: ProgressLocation.Notification }, () => {
                     return new Promise((resolve) => {
                         context.done = resolve
-                        this.exportData(context)
+                        try {
+                            this.exportData(context)
+                        } catch (error) {
+                            resolve(null)
+                        }
                     })
                 })
             }
