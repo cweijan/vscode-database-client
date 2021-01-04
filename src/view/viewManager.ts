@@ -9,6 +9,7 @@ export class ViewOption {
     public iconPath?: string;
     public path: string;
     public title: string;
+    public type?: string;
     public splitView: boolean = false;
     /**
      * keep single page by viewType
@@ -61,11 +62,14 @@ export class ViewManager {
             if (typeof (viewOption.singlePage) == 'undefined') { viewOption.singlePage = true }
             if (typeof (viewOption.killHidden) == 'undefined') { viewOption.killHidden = true }
 
+            if(!viewOption.type){
+                viewOption.type=viewOption.title
+            }
             if (!viewOption.singlePage) {
-                viewOption.title = viewOption.title + new Date().getTime()
+                viewOption.type = viewOption.type + new Date().getTime()
             }
 
-            const currentStatus = this.viewStatu[viewOption.title]
+            const currentStatus = this.viewStatu[viewOption.type]
             if (viewOption.singlePage && currentStatus) {
                 if (viewOption.killHidden && currentStatus.instance?.visible == false) {
                     currentStatus.instance.dispose()
@@ -79,7 +83,7 @@ export class ViewManager {
                 }
             }
             const webviewPanel = vscode.window.createWebviewPanel(
-                viewOption.title,
+                viewOption.type,
                 viewOption.title,
                 {
                     viewColumn: viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One,
@@ -88,7 +92,7 @@ export class ViewManager {
                 { enableScripts: true, retainContextWhenHidden: true },
             );
             const newStatus = { creating: true, instance: webviewPanel, eventEmitter: new EventEmitter() }
-            this.viewStatu[viewOption.title] = newStatus
+            this.viewStatu[viewOption.type] = newStatus
             const targetPath = `${this.webviewPath}/${viewOption.path}.html`;
             fs.readFile(targetPath, 'utf8', async (err, data) => {
                 if (err) {
@@ -106,7 +110,7 @@ export class ViewManager {
                 webviewPanel.webview.html = this.buildPath(data, webviewPanel.webview, contextPath);
 
                 webviewPanel.onDidDispose(() => {
-                    this.viewStatu[viewOption.title] = null
+                    this.viewStatu[viewOption.type] = null
                 })
                 if (viewOption.eventHandler) {
                     viewOption.eventHandler(new Hanlder(webviewPanel, newStatus.eventEmitter))

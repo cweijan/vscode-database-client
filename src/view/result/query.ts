@@ -54,10 +54,10 @@ export class QueryPage {
         }
 
 
-        let title = queryParam.singlePage ? "Query" : "Query" + new Date().getTime();
+        let type = queryParam.singlePage ? "Query" : "Query" + new Date().getTime();
         const olderTitle = this.hodlder.get(queryParam.res.sql);
         if (olderTitle) {
-            title = olderTitle
+            type = olderTitle
             queryParam.singlePage = false
             if (queryParam.type == MessageType.DATA) {
                 this.hodlder.delete(queryParam.res.sql)
@@ -68,7 +68,7 @@ export class QueryPage {
         ViewManager.createWebviewPanel({
             singlePage: true,
             splitView: this.isActiveSql(),
-            path: 'result', title,
+            path: 'result', title:'Query', type,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
             eventHandler: async (handler) => {
                 handler.panel.onDidChangeViewState(e => {
@@ -91,7 +91,7 @@ export class QueryPage {
                     this.statusBar.show()
                 }).on(OperateType.execute, (params) => {
                     if (!queryParam.singlePage) {
-                        this.hodlder.set(params.sql.trim(), title)
+                        this.hodlder.set(params.sql.trim(), type)
                     }
                     QueryUnit.runQuery(params.sql, dbOption);
                 }).on(OperateType.next, async (params) => {

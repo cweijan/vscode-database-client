@@ -24,6 +24,7 @@
     border-color: var(--vscode-editor-foreground) !important;
 }
 
+.col--gutter,
 .plx-table.border--full .plx-table--header-wrapper,
 .plx-table--body-wrapper {
     background: var(--vscode-editor-background) !important;
