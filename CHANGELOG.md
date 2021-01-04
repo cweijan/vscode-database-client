@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 2.9.1 unpublish
+
+- Better result view border color.
+- Remember page size.
+
 # 2.9.0 2020/12/31
 
 - Better update operation interactive.
