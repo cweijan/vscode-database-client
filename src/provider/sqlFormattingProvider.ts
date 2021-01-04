@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import sqlFormatter = require('sql-formatter');
+import sqlFormatter from "@/service/format/sqlFormatter";
 
 export class SqlFormattingProvider implements vscode.DocumentRangeFormattingEditProvider {
 

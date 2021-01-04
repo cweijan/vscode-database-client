@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as mysql from 'mysql2';
-import * as sqlformatter from 'sql-formatter';
 import { all as merge } from 'deepmerge';
 
 import { ConnectionOptions, DataDumpOptions } from './interfaces/Options';
@@ -11,19 +10,13 @@ interface QueryRes {
     [k: string]: unknown;
 }
 
-function buildInsert(
-    table: Table,
-    values: Array<string>,
-    format: (s: string) => string,
-): string {
-    const sql = format(
-        [
-            `INSERT INTO \`${table.name}\` (\`${table.columnsOrdered.join(
-                '`,`',
-            )}\`)`,
-            `VALUES ${values.join(',')};`,
-        ].join(' '),
-    );
+function buildInsert(table: Table, values: Array<string>): string {
+    const sql = [
+        `INSERT INTO \`${table.name}\` (\`${table.columnsOrdered.join(
+            '`,`',
+        )}\`)`,
+        `VALUES ${values.join(',')};`,
+    ].join(' ')
 
     // sql-formatter lib doesn't support the X'aaff' or b'01010' literals, and it adds a space in and breaks them
     // this undoes the wrapping we did to get around the formatting
@@ -56,11 +49,6 @@ async function getDataDump(
 
     // clone the array
     tables = [...tables];
-
-    // build the format function if requested
-    const format = options.format
-        ? (sql: string) => sqlformatter.format(sql)
-        : (sql: string) => sql;
 
     // we open a new connection with a special typecast function for dumping data
     const connection = mysql.createConnection(
@@ -168,7 +156,7 @@ async function getDataDump(
                     // if we've got a full queue
                     if (rowQueue.length === options.maxRowsPerInsertStatement) {
                         // create and write a fresh statement
-                        const insert = buildInsert(table, rowQueue, format);
+                        const insert = buildInsert(table, rowQueue);
                         saveChunk(insert);
                         rowQueue = [];
                     }
@@ -176,12 +164,12 @@ async function getDataDump(
                 query.on('end', () => {
                     // write the remaining rows to disk
                     if (rowQueue.length > 0) {
-                        const insert = buildInsert(table, rowQueue, format);
+                        const insert = buildInsert(table, rowQueue);
                         saveChunk(insert);
                         rowQueue = [];
                     }
 
-                    resolve();
+                    resolve(null);
                 });
                 query.on(
                     'error',
@@ -218,7 +206,7 @@ async function getDataDump(
         // tidy up the file stream, making sure writes are 100% flushed before continuing
         await new Promise(resolve => {
             outFileStream.once('finish', () => {
-                resolve();
+                resolve(null);
             });
             outFileStream.end();
         });

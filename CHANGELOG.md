@@ -4,6 +4,7 @@
 
 - Better result view border color.
 - Remember page size.
+- Fix sql formatter could not be detect comment correctly.
 
 # 2.9.0 2020/12/31
 

@@ -7,7 +7,7 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { TableNode } from "./tableNode";
-import sqlFormatter = require('sql-formatter');
+import sqlFormatter from "@/service/format/sqlFormatter";
 
 export class ViewNode extends TableNode {
 

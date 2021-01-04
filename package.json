@@ -924,7 +924,6 @@
 		"node-xlsx": "^0.15.0",
 		"portfinder": "^1.0.26",
 		"pretty-bytes": "^5.3.0",
-		"sql-formatter": "^2.3.3",
 		"sqlstring": "^2.3.2",
 		"tunnel-ssh": "^4.1.4",
 		"umy-table": "1.0.8",

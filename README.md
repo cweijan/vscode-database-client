@@ -82,14 +82,13 @@ OpenSetting -> extensions -> Mysql
 # Credits
 
 - [vscode-mysql](https://github.com/formulahendry/vscode-mysql): The original version of this extension.
-- [node-mysql2](https://github.com/sidorares/node-mysql2) : Core connect lib.
-- [mysqldump](https://github.com/bradzacher/mysqldum): Use it to export data.
+- [node-mysql2](https://github.com/sidorares/node-mysql2) : Core mysql client lib.
+- [mysqldump](https://github.com/bradzacher/mysqldum): Data dump lib.
+- [sql-formatter](https://github.com/zeroturnaround/sql-formatter) Sql format lib.
 - [umy-ui](https://github.com/u-leo/umy-ui): Result view render.
 
 ## RoadMap
 
 - Sync table struct from diffrent connection.
-- Fix Intetllisense sql.
-- Better sql formatter.
+- Better Intetllisense sql.
 - Add i18n.
-- Change database from status bar.
