@@ -38,6 +38,10 @@ body {
 
 /* umyui */
 
+.plx-header--column.col--ellipsis>.plx-cell .plx-cell--title{
+font-weight: 400;
+}
+
 .plx-cell .el-input input{
   padding: 10px;
 }
