@@ -395,7 +395,7 @@ export default {
       }
     },
     updateEdit(row, column, event) {
-      if (row.isFilter || this.update.current) {
+      if (row.isFilter) {
         return
       }
       this.update.current = { ...row }
