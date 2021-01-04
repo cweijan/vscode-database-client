@@ -1,7 +1,8 @@
 .plx-body--column.col--edit,
 .plx-body--column.col--index,
 .plx-body--column.col--checkbox,
-.plx-table .plx-table--border-line{
+/* header */
+.plx-table .plx-table--header-wrapper .plx-table--header-border-line{
     border: 1px solid var(--vscode-textBlockQuote-background) !important;
 }
 
@@ -11,17 +12,16 @@
     border: 1px solid var(--vscode-textBlockQuote-background) !important;
 }
 
-.plx-table .plx-table--header-wrapper .plx-table--header-border-line {
-    border-bottom: 1px solid #7d8084 !important;
+/* result outline */
+.plx-table .plx-table--border-line,
+/* filter */
+.plx-body--column .edit-filter input{
+    border: none !important;
 }
 
+/* table edit input */
 .plx-body--column.col--actived input{
     border-color: var(--vscode-editor-foreground) !important;
-}
-
-.plx-header--column {
-    border-radius: 3px;
-    border: 1px solid #121820 !important;
 }
 
 .plx-table.border--full .plx-table--header-wrapper,

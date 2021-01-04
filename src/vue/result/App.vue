@@ -57,7 +57,7 @@
           </el-tooltip>
         </template>
         <template slot-scope="scope">
-          <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" :clearable='true' placeholder="Filter" @clear="filter(null,scope.column.title)" @keyup.enter.native="filter($event,scope.column.title)">
+          <el-input class='edit-filter' v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" :clearable='true' placeholder="Filter" @clear="filter(null,scope.column.title)" @keyup.enter.native="filter($event,scope.column.title)">
           </el-input>
           <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[scope.column.title])'></span>
         </template>
