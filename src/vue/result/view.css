@@ -38,6 +38,10 @@ body {
 
 /* umyui */
 
+.plx-cell .el-input input{
+  padding: 10px;
+}
+
 .plx-edit-icon{
   display: none;
 }
