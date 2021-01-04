@@ -1,26 +1,32 @@
 .plx-body--column.col--edit,
 .plx-body--column.col--index,
-.plx-body--column.col--checkbox {
-    border: 1px solid rgb(26, 25, 25) !important;
+.plx-body--column.col--checkbox,
+.plx-table .plx-table--border-line{
+    border: 1px solid var(--vscode-textBlockQuote-background) !important;
+}
+
+.plx-table .plx-table--fixed-left-wrapper,
+.plx-body--column, .plx-header--column {
+    background: none !important;
+    border: 1px solid var(--vscode-textBlockQuote-background) !important;
 }
 
 .plx-table .plx-table--header-wrapper .plx-table--header-border-line {
     border-bottom: 1px solid #7d8084 !important;
 }
 
-.plx-table.border--full .plx-table--header-wrapper,
-.plx-table--body-wrapper {
-    background: var(--vscode-editor-background) !important;
-}
-
-.plx-table .plx-table--border-line,
-.plx-table--fixed-left-wrapper {
-    border: 1px solid var(--vscode-editor-background) !important;
+.plx-body--column.col--actived input{
+    border-color: var(--vscode-editor-foreground) !important;
 }
 
 .plx-header--column {
     border-radius: 3px;
     border: 1px solid #121820 !important;
+}
+
+.plx-table.border--full .plx-table--header-wrapper,
+.plx-table--body-wrapper {
+    background: var(--vscode-editor-background) !important;
 }
 
 .plx-table .plx-body--row {
@@ -38,9 +44,4 @@
 .plx-table .plx-body--row.row--current {
     background: var(--vscode-tab-hoverBackground) !important;
     color: var(--primary-color) !important;
-}
-
-.plx-body--column, .plx-header--column {
-    background: none !important;
-    border: 1px solid rgb(26, 25, 25) !important;
 }

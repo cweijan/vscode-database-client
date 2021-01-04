@@ -9,6 +9,7 @@
     --input-color: var(--vscode-tab-activeForeground);
     --primary-color: var(--vscode-tab-activeForeground);
     --second-color: var(--vscode-input-placeholderForeground);
+    --border-color: var(--vscode-textBlockQuote-background);
     --border-color: rgb(26, 25, 25);
     --bg-color: var(--vscode-editor-background);
     --second-bg-color: var(--vscode-editorSuggestWidget-background);
