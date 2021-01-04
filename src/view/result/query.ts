@@ -1,5 +1,5 @@
 import { extname, basename } from "path";
-import { StatusBarAlignment, StatusBarItem, window } from "vscode";
+import { env, StatusBarAlignment, StatusBarItem, Uri, window } from "vscode";
 import { MessageType, OperateType, ConfigKey } from "../../common/constants";
 import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
@@ -109,6 +109,8 @@ export class QueryPage {
                     this.exportService.export(params.option)
                 }).on('changePageSize', (pageSize) => {
                     Global.updateConfig(ConfigKey.DEFAULT_LIMIT, pageSize)
+                }).on('openCoffee', () => {
+                    env.openExternal(Uri.parse('https://www.buymeacoffee.com/cweijan'));
                 })
             }
         });

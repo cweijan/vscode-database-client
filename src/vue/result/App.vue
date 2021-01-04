@@ -2,12 +2,15 @@
   <div id="app">
     <div class="hint">
       <el-row>
-        <el-col :span="16">
+        <el-col :span="18">
           <el-input type="textarea" :autosize="{ minRows:3, maxRows:5}" v-model="toolbar.sql" style="width:100%">
           </el-input>
         </el-col>
       </el-row>
       <div class="toolbar">
+        <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
+        <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
+        <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
         <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
         <el-button type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest">
         </el-button>
@@ -23,6 +26,9 @@
           <el-pagination @size-change="changePageSize" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,200,300,400,500,1000]" :layout="page.total!=null?'sizes,prev,pager, next, total, jumper':'sizes,prev, next, jumper'" :total="page.total">
           </el-pagination>
         </div>
+        <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
+        <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
+        <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
       </div>
       <div v-if="info.visible ">
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
@@ -252,6 +258,9 @@ export default {
     })
   },
   methods: {
+    openCoffee(){
+      vscodeEvent.emit("openCoffee")
+    },
     confirmExport(exportOption) {
       vscodeEvent.emit("export", {
         option: {
