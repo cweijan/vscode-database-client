@@ -9,8 +9,7 @@
     --input-color: var(--vscode-tab-activeForeground);
     --primary-color: var(--vscode-tab-activeForeground);
     --second-color: var(--vscode-input-placeholderForeground);
-    --border-color: var(--vscode-textBlockQuote-background);
-    --border-color: rgb(26, 25, 25);
+    --border-color: var(--vscode-button-background);
     --bg-color: var(--vscode-editor-background);
     --second-bg-color: var(--vscode-editorSuggestWidget-background);
 }
@@ -2590,7 +2589,7 @@ body {
 }
 
 .el-select:hover .el-input__inner {
-    border-color: var(--editor-color)
+    border-color: var(--border-color)
 }
 
 .el-select .el-input__inner {
@@ -6272,7 +6271,7 @@ body {
 }
 
 .el-slider__runway.disabled .el-slider__button {
-    border-color: var(--editor-color)
+    border-color: var(--border-color)
 }
 
 .el-slider__runway.disabled .el-slider__button-wrapper.dragging, .el-slider__runway.disabled .el-slider__button-wrapper.hover, .el-slider__runway.disabled .el-slider__button-wrapper:hover {
@@ -6473,7 +6472,7 @@ body {
 }
 
 .el-slider.is-vertical.el-slider--with-input .el-slider__input:hover .el-input-number__decrease, .el-slider.is-vertical.el-slider--with-input .el-slider__input:hover .el-input-number__increase {
-    border-color: var(--editor-color)
+    border-color: var(--border-color)
 }
 
 .el-slider.is-vertical.el-slider--with-input .el-slider__input:active .el-input-number__decrease, .el-slider.is-vertical.el-slider--with-input .el-slider__input:active .el-input-number__increase {
@@ -10445,12 +10444,12 @@ body {
 
 .el-step__head.is-process {
     color: var(--editor-color);;
-    border-color: var(--editor-color);
+    border-color: var(--border-color);
 }
 
 .el-step__head.is-wait {
     color: var(--editor-color);
-    border-color: var(--editor-color)
+    border-color: var(--border-color)
 }
 
 .el-step__head.is-success {
@@ -11610,7 +11609,7 @@ body {
 
 .el-cascader:not(.is-disabled):hover .el-input__inner {
     cursor: pointer;
-    border-color: var(--editor-color)
+    border-color: var(--border-color)
 }
 
 .el-cascader .el-input .el-input__inner:focus, .el-cascader .el-input.is-focus .el-input__inner {
@@ -12239,7 +12238,7 @@ body {
 }
 
 .el-textarea__inner:hover {
-    border-color: var(--editor-color)
+    border-color: var(--border-color)
 }
 
 .el-textarea__inner:focus {
@@ -12391,7 +12390,7 @@ body {
 }
 
 .el-input__inner:hover {
-    border-color: var(--editor-color)
+    border-color: var(--border-color)
 }
 
 .el-input.is-active .el-input__inner, .el-input__inner:focus {
@@ -14236,7 +14235,7 @@ body {
 
 .el-checkbox__input.is-disabled .el-checkbox__inner::after {
     cursor: not-allowed;
-    border-color: var(--editor-color)
+    border-color: var(--border-color)
 }
 
 .el-checkbox__input.is-disabled .el-checkbox__inner + .el-checkbox__label {
@@ -14249,7 +14248,7 @@ body {
 }
 
 .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after {
-    border-color: var(--editor-color)
+    border-color: var(--border-color)
 }
 
 .el-checkbox__input.is-disabled.is-indeterminate .el-checkbox__inner {
@@ -14259,7 +14258,7 @@ body {
 
 .el-checkbox__input.is-disabled.is-indeterminate .el-checkbox__inner::before {
     background-color: var(--editor-color);
-    border-color: var(--editor-color)
+    border-color: var(--border-color)
 }
 
 .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
