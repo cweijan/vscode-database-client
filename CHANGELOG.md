@@ -1,6 +1,6 @@
 # CHANGELOG
 
-# 2.9.1 unpublish
+# 2.9.1 2021/1/4
 
 - Better result view border color.
 - Remember page size.
