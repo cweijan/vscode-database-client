@@ -60,19 +60,19 @@
 		"commands": [
 			{
 				"command": "mysql.history.open",
-				"title": "Open History",
+				"title": "%command.history.open%",
 				"category": "MySQL",
 				"icon": "resources/icon/history.svg"
 			},
 			{
 				"command": "mysql.setting.open",
-				"title": "Open Setting",
+				"title": "%command.setting.open%",
 				"category": "MySQL",
 				"icon": "resources/icon/settings.svg"
 			},
 			{
 				"command": "mysql.refresh",
-				"title": "Refresh",
+				"title": "%command.refresh%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -81,17 +81,17 @@
 			},
 			{
 				"command": "mysql.host.copy",
-				"title": "Copy Host",
+				"title": "%command.host.copy%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.name.copy",
-				"title": "Copy Name",
+				"title": "%command.name.copy%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.diagram.add",
-				"title": "Create Diagram",
+				"title": "%command.diagram.add%",
 				"icon": {
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
@@ -100,7 +100,7 @@
 			},
 			{
 				"command": "mysql.query.add",
-				"title": "Create Query",
+				"title": "%command.query.add%",
 				"icon": {
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
@@ -109,23 +109,23 @@
 			},
 			{
 				"command": "mysql.query.rename",
-				"title": "Rename Query",
+				"title": "%command.query.rename%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.diagram.open",
-				"title": "Open Diagram",
+				"title": "%command.diagram.open%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.diagram.drop",
-				"title": "Drop Diagram",
+				"title": "%command.diagram.drop%",
 				"category": "MySQL",
 				"icon": "resources/icon/criss-cross.svg"
 			},
 			{
 				"command": "mysql.connection.add",
-				"title": "Add Connection",
+				"title": "%command.connection.add%",
 				"icon": {
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
@@ -134,22 +134,22 @@
 			},
 			{
 				"command": "mysql.connection.edit",
-				"title": "Edit Connection",
+				"title": "%command.connection.edit%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.server.info",
-				"title": "Server Status",
+				"title": "%command.server.info%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.connection.delete",
-				"title": "Delete Connection",
+				"title": "%command.connection.delete%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.database.add",
-				"title": "New Database",
+				"title": "%command.database.add%",
 				"icon": {
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
@@ -158,17 +158,17 @@
 			},
 			{
 				"command": "mysql.db.overview",
-				"title": "Overview",
+				"title": "%command.db.overview%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.db.drop",
-				"title": "Drop Database",
+				"title": "%command.db.drop%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.runQuery",
-				"title": "Run MySQL Query",
+				"title": "%command.runQuery%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/run.png",
@@ -177,7 +177,7 @@
 			},
 			{
 				"command": "mysql.query.switch",
-				"title": "Open Query",
+				"title": "%command.query.switch%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/query.svg",
@@ -186,63 +186,63 @@
 			},
 			{
 				"command": "mysql.template.sql",
-				"title": "Select SQL",
+				"title": "%command.template.sql%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.template.delete",
-				"title": "Delete SQL",
+				"title": "%command.template.delete%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.data.import",
-				"title": "Import Sql",
+				"title": "%command.data.import%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.data.export",
-				"title": "Export Data",
+				"title": "%command.data.export%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.struct.export",
-				"title": "Export Struct",
+				"title": "%command.struct.export%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.copy.insert",
-				"title": "Insert SQL",
+				"title": "%command.copy.insert%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.copy.update",
-				"title": "Update SQL",
+				"title": "%command.copy.update%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.db.active",
-				"title": "Change Active Database",
+				"title": "%command.db.active%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.table.truncate",
-				"title": "Truncate Table",
+				"title": "%command.table.truncate%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.db.truncate",
-				"title": "Truncate Database",
+				"title": "%command.db.truncate%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.table.drop",
-				"title": "Drop table",
+				"title": "%command.table.drop%",
 				"category": "MySQL",
 				"icon": "resources/icon/criss-cross.svg"
 			},
 			{
 				"command": "mysql.mock.run",
-				"title": "Start Generate",
+				"title": "%command.mock.run%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/run.png",
@@ -251,12 +251,12 @@
 			},
 			{
 				"command": "mysql.mock.table",
-				"title": "Generate Mock Data",
+				"title": "%command.mock.table%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.changeTableName",
-				"title": "Change Name",
+				"title": "%command.changeTableName%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/edit.svg",
@@ -265,12 +265,12 @@
 			},
 			{
 				"command": "mysql.index.template",
-				"title": "Index Manage",
+				"title": "%command.index.template%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.column.changeName",
-				"title": "Change Column Name",
+				"title": "%command.column.changeName%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/edit.svg",
@@ -279,12 +279,12 @@
 			},
 			{
 				"command": "mysql.column.add",
-				"title": "Add Column",
+				"title": "%command.column.add%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.column.up",
-				"title": "Move Column Up",
+				"title": "%command.column.up%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/up.png",
@@ -293,7 +293,7 @@
 			},
 			{
 				"command": "mysql.column.down",
-				"title": "Move Column Down",
+				"title": "%command.column.down%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/down.png",
@@ -302,38 +302,38 @@
 			},
 			{
 				"command": "mysql.table.source",
-				"title": "Show Table Source",
+				"title": "%command.table.source%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.view.source",
-				"title": "Show View Source",
+				"title": "%command.view.source%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.count.sql",
-				"title": "Show Count",
+				"title": "%command.count.sql%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.table.show",
-				"title": "Open In New Panel",
+				"title": "%command.table.show%",
 				"category": "MySQL",
 				"icon": "resources/icon/analysis.svg"
 			},
 			{
 				"command": "mysql.column.update",
-				"title": "Modify Column",
+				"title": "%command.column.update%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.column.drop",
-				"title": "Drop column",
+				"title": "%command.column.drop%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.template.table",
-				"title": "Create New Table",
+				"title": "%command.template.table%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/add.svg",
@@ -342,7 +342,7 @@
 			},
 			{
 				"command": "mysql.template.view",
-				"title": "Create New View",
+				"title": "%command.template.view%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/add.svg",
@@ -351,7 +351,7 @@
 			},
 			{
 				"command": "mysql.template.procedure",
-				"title": "Create New Procedure",
+				"title": "%command.template.procedure%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/add.svg",
@@ -360,7 +360,7 @@
 			},
 			{
 				"command": "mysql.template.trigger",
-				"title": "Create New Trigger",
+				"title": "%command.template.trigger%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/add.svg",
@@ -369,7 +369,7 @@
 			},
 			{
 				"command": "mysql.template.function",
-				"title": "Create New Function",
+				"title": "%command.template.function%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/add.svg",
@@ -378,7 +378,7 @@
 			},
 			{
 				"command": "mysql.template.user",
-				"title": "Create New User",
+				"title": "%command.template.user%",
 				"category": "MySQL",
 				"icon": {
 					"light": "resources/light/add.svg",
@@ -387,37 +387,37 @@
 			},
 			{
 				"command": "mysql.delete.user",
-				"title": "Drop User",
+				"title": "%command.delete.user%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.user.grant",
-				"title": "Grant Privileges",
+				"title": "%command.user.grant%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.change.user",
-				"title": "Change User Password",
+				"title": "%command.change.user%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.delete.view",
-				"title": "Drop View",
+				"title": "%command.delete.view%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.delete.procedure",
-				"title": "Drop Procedure",
+				"title": "%command.delete.procedure%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.delete.function",
-				"title": "Drop Function",
+				"title": "%command.delete.function%",
 				"category": "MySQL"
 			},
 			{
 				"command": "mysql.delete.trigger",
-				"title": "Drop Trigger",
+				"title": "%command.delete.trigger%",
 				"category": "MySQL"
 			}
 		],

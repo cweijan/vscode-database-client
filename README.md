@@ -91,4 +91,3 @@ OpenSetting -> extensions -> Mysql
 
 - Sync table struct from diffrent connection.
 - Better Intetllisense sql.
-- Add i18n.
