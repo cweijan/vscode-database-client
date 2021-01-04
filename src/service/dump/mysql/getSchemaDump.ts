@@ -1,5 +1,3 @@
-import * as sqlformatter from 'sql-formatter';
-
 import { SchemaDumpOptions } from './interfaces/Options';
 import { Table } from './interfaces/Table';
 import { DB } from './DB';
@@ -20,15 +18,7 @@ function isCreateView(v: ShowCreateTableStatementRes): v is ShowCreateView {
     return 'View' in v;
 }
 
-async function getSchemaDump(
-    connection: DB,
-    options: Required<SchemaDumpOptions>,
-    tables: Array<Table>,
-): Promise<Array<Table>> {
-    const format = options.format
-        ? (sql: string) => sqlformatter.format(sql)
-        : (sql: string) => sql;
-
+async function getSchemaDump( connection: DB, options: Required<SchemaDumpOptions>, tables: Array<Table> ): Promise<Array<Table>> {
     // we create a multi query here so we can query all at once rather than in individual connections
     const getSchemaMultiQuery = tables
         .map(t => `SHOW CREATE TABLE \`${t.name}\`;`)
@@ -44,7 +34,7 @@ async function getSchemaDump(
                 return {
                     ...table,
                     name: res.View,
-                    schema: format(res['Create View']),
+                    schema: res['Create View'],
                     data: null,
                     isView: true,
                 };
@@ -53,7 +43,7 @@ async function getSchemaDump(
             return {
                 ...table,
                 name: res.Table,
-                schema: format(res['Create Table']),
+                schema: res['Create Table'],
                 data: null,
                 isView: false,
             };
