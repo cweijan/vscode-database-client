@@ -68,7 +68,7 @@ export class QueryPage {
         ViewManager.createWebviewPanel({
             singlePage: true,
             splitView: this.isActiveSql(),
-            path: 'result', title:'Query', type,
+            path: 'result', title: 'Query', type,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
             eventHandler: async (handler) => {
                 handler.panel.onDidChangeViewState(e => {
@@ -130,7 +130,11 @@ export class QueryPage {
     private static async loadColumnList(queryParam: QueryParam<DataResponse>) {
         const fields = queryParam.res.fields;
         const conn = queryParam.connection;
-        if (!fields || fields.length == 0) { return; }
+        if (!fields || fields.length == 0) {
+            // fix null point on result view
+            queryParam.res.columnList = []
+            return;
+        }
 
         let mark = {};
         for (const field of fields) {
