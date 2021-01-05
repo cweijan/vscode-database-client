@@ -5,13 +5,22 @@ body {
 
 .hint {
   box-sizing: border-box;
-  padding: 5px;
-  padding-left: 20px;
+  padding-left: 5px;
   font-size: 17px;
   color: #444;
-  width: 100vw;
+  width: 95vw;
   display: inline-block;
   margin-top: 8px;
+}
+
+.sql-pannel{
+  width:100%;
+  font-size: 14px;
+}
+.sql-pannel textarea{
+  font-family: "Segoe UI"; 
+  padding-top: 0;
+  padding-left: 10px;
 }
 
 .toolbar {

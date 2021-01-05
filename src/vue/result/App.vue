@@ -1,15 +1,10 @@
 <template>
   <div id="app">
     <div class="hint">
-      <el-row>
-        <el-col :span="18">
-          <el-input type="textarea" :autosize="{ minRows:3, maxRows:5}" v-model="toolbar.sql" style="width:100%">
-          </el-input>
-        </el-col>
-      </el-row>
+      <div style="width:95%;">
+        <el-input type="textarea" :autosize="{ minRows:2, maxRows:5}" v-model="toolbar.sql" class="sql-pannel"/>
+      </div>
       <div class="toolbar">
-        <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
-        <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
         <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
         <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
         <el-button type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest">
@@ -27,8 +22,6 @@
           </el-pagination>
         </div>
         <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
-        <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
-        <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
       </div>
       <div v-if="info.visible ">
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
@@ -37,7 +30,7 @@
     </div>
     <!-- trigger when click -->
     <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe @selection-change="selectionChange" :edit-config="{trigger: 'click', mode: 'row',autoClear:false}" :checkboxConfig="{ highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="updateEdit" :show-header-overflow="false" :show-overflow="false">
-      <ux-table-column type="checkbox" width="40" fixed="left" > </ux-table-column>
+      <ux-table-column type="checkbox" width="40" fixed="left"> </ux-table-column>
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined">
         <template slot="header" slot-scope="scope">
           <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click" type="primary">
@@ -98,7 +91,7 @@
           Insert</el-button>
       </span>
     </el-dialog>
-    <ExportDialog :visible.sync="exportOption.visible" :loading.sync="exportOption.loading" @exportHandle="confirmExport"/>
+    <ExportDialog :visible.sync="exportOption.visible" :loading.sync="exportOption.loading" @exportHandle="confirmExport" />
   </div>
 </template>
 
@@ -112,7 +105,7 @@ export default {
   name: "App",
   components: {
     CellEditor,
-    ExportDialog
+    ExportDialog,
   },
   data() {
     return {
@@ -150,7 +143,7 @@ export default {
       },
       exportOption: {
         visible: false,
-        loading: false
+        loading: false,
       },
       info: {
         sql: null,
@@ -258,7 +251,7 @@ export default {
     })
   },
   methods: {
-    openCoffee(){
+    openCoffee() {
       vscodeEvent.emit("openCoffee")
     },
     confirmExport(exportOption) {
@@ -594,7 +587,7 @@ export default {
       return "Edit For " + this.result.table + " : " + this.result.primaryKey + "=" + this.update.primary
     },
     remainHeight() {
-      return window.outerHeight - 250
+      return window.outerHeight - 200
     },
   },
 }
