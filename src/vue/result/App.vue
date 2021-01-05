@@ -21,7 +21,6 @@
           <el-pagination @size-change="changePageSize" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,200,300,400,500,1000]" :layout="page.total!=null?'sizes,prev,pager, next, total, jumper':'sizes,prev, next, jumper'" :total="page.total">
           </el-pagination>
         </div>
-        <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
       </div>
       <div v-if="info.visible ">
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
