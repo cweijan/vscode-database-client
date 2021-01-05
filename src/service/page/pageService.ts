@@ -1,3 +1,6 @@
+import { DatabaseType } from "@/common/constants";
+import { MssqlPageService } from "./mssqlPageService";
+import { MysqlPageSerivce } from "./mysqlPageSerivce";
 
 export interface PageService {
     /**
@@ -8,6 +11,16 @@ export interface PageService {
      * @return paginationSql
      */
     build(sql: string, page: number, pageSize: number): string;
+}
+
+export function getPageService(databaseType: DatabaseType):PageService {
+
+    switch (databaseType) {
+        case DatabaseType.MSSQL:
+            return new MssqlPageService();
+    }
+
+    return new MysqlPageSerivce();
 }
 
 export abstract class AbstractPageSerivce implements PageService {

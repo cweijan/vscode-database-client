@@ -38,7 +38,7 @@ export class TableNode extends Node implements CopyAble {
         if (columnNodes && !isRresh && this.collapsibleState != vscode.TreeItemCollapsibleState.Expanded) {
             return columnNodes;
         }
-        return QueryUnit.queryPromise<ColumnMeta[]>(await ConnectionManager.getConnection(this), `SELECT COLUMN_NAME name,DATA_TYPE simpleType,COLUMN_TYPE type,COLUMN_COMMENT comment,COLUMN_KEY \`key\`,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength,COLUMN_DEFAULT defaultValue,EXTRA extra FROM information_schema.columns WHERE table_schema = '${this.database}' AND table_name = '${this.table}' ORDER BY ORDINAL_POSITION;`)
+        return QueryUnit.queryPromise<ColumnMeta[]>(await ConnectionManager.getConnection(this), this.dialect.showColumns(this.database,this.table))
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column, index) => {
                     if (column && column.key == "PRI") {

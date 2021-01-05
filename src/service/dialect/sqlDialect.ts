@@ -5,6 +5,7 @@ import { MysqlDialect } from "./mysqlDialect";
 export interface SqlDialect {
     showDatabases(): string;
     showTables(database:string): string;
+    showColumns(database:string,table:string): string;
     showViews(database:string): string;
     showTriggers(database:string): string;
     showProcedures(database:string): string;

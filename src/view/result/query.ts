@@ -8,7 +8,7 @@ import { ConnectionManager } from "../../service/connectionManager";
 import { ExportService } from "../../service/export/exportService";
 import { MysqlExportService } from "../../service/export/mysqlExportService";
 import { MysqlPageSerivce } from "../../service/page/mysqlPageSerivce";
-import { PageService } from "../../service/page/pageService";
+import { getPageService, PageService } from "../../service/page/pageService";
 import { QueryUnit } from "../../service/queryUnit";
 import { ViewManager } from "../viewManager";
 import { DataResponse } from "./queryResponse";
@@ -29,7 +29,6 @@ export class QueryParam<T> {
 export class QueryPage {
 
     private static exportService: ExportService = new MysqlExportService()
-    private static pageService: PageService = new MysqlPageSerivce()
     private static hodlder: Map<string, string> = new Map()
     private static statusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -200);
     private static costStatusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -250);
@@ -95,7 +94,7 @@ export class QueryPage {
                     }
                     QueryUnit.runQuery(params.sql, dbOption);
                 }).on(OperateType.next, async (params) => {
-                    const sql = this.pageService.build(params.sql, params.pageNum, params.pageSize)
+                    const sql = getPageService(dbOption.dbType).build(params.sql, params.pageNum, params.pageSize)
                     const connection = await ConnectionManager.getConnection(dbOption)
                     QueryUnit.queryPromise(connection, sql).then((rows) => {
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })

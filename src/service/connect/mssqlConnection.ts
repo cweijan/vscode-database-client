@@ -52,6 +52,9 @@ export class MSSqlConnnection implements IConnection {
         this.con = new Connection({
             server: opt.host,
             options: {
+                database:opt.database,
+                connectTimeout:10000,
+                requestTimeout:10000,
             },
             authentication: {
                 type: "default",
