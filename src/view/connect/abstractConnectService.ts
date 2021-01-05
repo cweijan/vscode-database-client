@@ -19,6 +19,9 @@ export abstract class AbstractConnectService {
             node = { ...connectionNode, isGlobal: connectionNode.global !== false }
             if (node.ssh) {
                 node.ssh.tunnelPort = null
+                if(!node.ssh.algorithms){
+                    node.ssh.algorithms={ cipher:[] }
+                }
             }
         }
         ViewManager.createWebviewPanel({

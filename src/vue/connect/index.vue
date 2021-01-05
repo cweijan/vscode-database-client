@@ -13,83 +13,43 @@
     <!-- CONNECTION NAME -->
     <section class="mb-2">
       <label class="block font-bold" for="connection-name">Connection Name</label>
-      <input
-        class="w-full field__input"
-        id="connection-name"
-        placeholder="The name of connection, it can be empty"
-        v-model="connectionOption.name"
-      />
+      <input class="w-full field__input" id="connection-name" placeholder="The name of connection, it can be empty" v-model="connectionOption.name" />
     </section>
 
     <!-- HOST -->
     <section class="mb-2">
       <label class="block font-bold" for="connection-host">Host</label>
-      <input
-        class="w-full field__input"
-        id="connection-host"
-        placeholder="The host of connection"
-        required
-        v-model="connectionOption.host"
-      />
+      <input class="w-full field__input" id="connection-host" placeholder="The host of connection" required v-model="connectionOption.host" />
     </section>
 
     <!-- PORT -->
     <section class="mb-2">
       <label class="block font-bold" for="connection-port">Port</label>
-      <input
-        class="w-full field__input"
-        id="connection-port"
-        placeholder="The port of connection"
-        required
-        type="number"
-        v-model="connectionOption.port"
-      />
+      <input class="w-full field__input" id="connection-port" placeholder="The port of connection" required type="number" v-model="connectionOption.port" />
     </section>
 
     <!-- USER -->
     <section class="mb-2">
       <label class="block font-bold" for="connection-user">Username</label>
-      <input
-        class="w-full field__input"
-        id="connection-user"
-        placeholder="Username"
-        required
-        v-model="connectionOption.user"
-      />
+      <input class="w-full field__input" id="connection-user" placeholder="Username" required v-model="connectionOption.user" />
     </section>
 
     <!-- PASSWORD -->
     <section class="mb-2">
       <label class="block font-bold" for="connection-password">Password</label>
-      <input
-        class="w-full field__input"
-        id="connection-password"
-        placeholder="Password"
-        type="password"
-        v-model="connectionOption.password"
-      />
+      <input class="w-full field__input" id="connection-password" placeholder="Password" type="password" v-model="connectionOption.password" />
     </section>
 
     <!-- DATABASES -->
     <section class="mb-2">
       <label class="block font-bold" for="databases">Databases</label>
-      <input
-        class="w-full field__input"
-        id="databases"
-        placeholder="Default is all databases"
-        v-model="connectionOption.database"
-      />
+      <input class="w-full field__input" id="databases" placeholder="Default is all databases" v-model="connectionOption.database" />
     </section>
 
     <!-- EXCLUDED DATABASES -->
     <section class="mb-2">
       <label class="block font-bold" for="excluded-databases">Excluded Databases</label>
-      <input
-        class="w-full field__input"
-        id="excluded-databases"
-        placeholder="Databases to excluded"
-        v-model="connectionOption.excludeDatabases"
-      />
+      <input class="w-full field__input" id="excluded-databases" placeholder="Databases to excluded" v-model="connectionOption.excludeDatabases" />
     </section>
 
     <!-- TIMEZONE -->
@@ -115,38 +75,33 @@
       <!-- SSH HOST -->
       <section class="mb-2">
         <label class="block font-bold" for="connection-ssh-host">SSH Host</label>
-        <input
-          class="w-full field__input"
-          id="connection-ssh-host"
-          placeholder="SSH Host"
-          required
-          v-model="connectionOption.ssh.host"
-        />
+        <input class="w-full field__input" id="connection-ssh-host" placeholder="SSH Host" required v-model="connectionOption.ssh.host" />
       </section>
 
       <!-- SSH PORT -->
       <section class="mb-2">
         <label class="block font-bold" for="connection-ssh-port">SSH Port</label>
-        <input
-          class="w-full field__input"
-          id="connection-ssh-port"
-          placeholder="SSH Port"
-          required
-          type="number"
-          v-model="connectionOption.ssh.port"
-        />
+        <input class="w-full field__input" id="connection-ssh-port" placeholder="SSH Port" required type="number" v-model="connectionOption.ssh.port" />
       </section>
 
       <!-- SSH USERNAME -->
       <section class="mb-2">
         <label class="block font-bold" for="connection-ssh-username">SSH Username</label>
-        <input
-          class="w-full field__input"
-          id="connection-ssh-username"
-          placeholder="SSH Username"
-          required
-          v-model="connectionOption.ssh.username"
-        />
+        <input class="w-full field__input" id="connection-ssh-username" placeholder="SSH Username" required v-model="connectionOption.ssh.username" />
+      </section>
+
+      <!-- SSH CIPHER -->
+      <section class="mb-2">
+        <label class="block font-bold" for="connection-ssh-username">SSH Cipher</label>
+        <el-select v-model="connectionOption.ssh.algorithms.cipher[0]" placeholder="Default">
+           <el-option value="aes128-cbc">aes128-cbc</el-option>
+          <el-option value="aes192-cbc">aes192-cbc</el-option>
+          <el-option value="aes256-cbc">aes256-cbc</el-option>
+          <el-option value="3des-cbc">3des-cbc</el-option>
+          <el-option value="aes128-ctr">aes128-ctr</el-option>
+          <el-option value="aes192-ctr">aes192-ctr</el-option>
+          <el-option value="aes256-ctr">aes256-ctr</el-option>
+        </el-select>
       </section>
 
       <!-- SELECT SSH PASSWORD TYPE -->
@@ -162,37 +117,19 @@
         <!-- SSH PASSWORD -->
         <section class="mb-2">
           <label class="block font-bold" for="connection-ssh-password">Password</label>
-          <input
-            class="w-full field__input"
-            id="connection-ssh-password"
-            placeholder="Password"
-            required
-            type="password"
-            v-model="connectionOption.ssh.password"
-          />
+          <input class="w-full field__input" id="connection-ssh-password" placeholder="Password" required type="password" v-model="connectionOption.ssh.password" />
         </section>
       </div>
       <div v-else>
         <!-- SSH PRIVATE KEY PATH -->
         <section class="mb-2">
           <label class="block font-bold" for="connection-ssh-private-key-path">Private Key Path</label>
-          <input
-            class="w-full field__input"
-            id="connection-ssh-private-key-path"
-            placeholder="Private Key Path"
-            v-model="connectionOption.ssh.privateKeyPath"
-          />
+          <input class="w-full field__input" id="connection-ssh-private-key-path" placeholder="Private Key Path" v-model="connectionOption.ssh.privateKeyPath" />
         </section>
         <!-- SSH PASSPHRASE -->
         <section class="mb-2">
           <label class="block font-bold" for="connection-ssh-passphrase">Passphrase</label>
-          <input
-            class="w-full field__input"
-            id="connection-ssh-passphrase"
-            placeholder="Passphrase"
-            type="passphrase"
-            v-model="connectionOption.ssh.passphrase"
-          />
+          <input class="w-full field__input" id="connection-ssh-passphrase" placeholder="Passphrase" type="passphrase" v-model="connectionOption.ssh.passphrase" />
         </section>
       </div>
     </div>
@@ -224,6 +161,9 @@ export default {
           host: "",
           port: 22,
           username: "root",
+          algorithms: {
+            cipher: [],
+          },
         },
       },
       type: "password",
@@ -243,8 +183,8 @@ export default {
         this.errorMessage = err
       })
     vscodeEvent.emit("route-" + this.$route.name)
-    window.onkeydown=e=>{
-      if(e.key=="Enter" && e.target.tagName=="INPUT"){
+    window.onkeydown = (e) => {
+      if (e.key == "Enter" && e.target.tagName == "INPUT") {
         this.tryConnect()
       }
     }
