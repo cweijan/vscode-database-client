@@ -25,7 +25,7 @@ export class TriggerGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = '${this.database}'`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), this.dialect.showTriggers(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TriggerNode>((table) => {
                     return new TriggerNode(table.TRIGGER_NAME, this);

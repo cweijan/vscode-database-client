@@ -28,6 +28,7 @@ export class DatabaseNode extends Node implements CopyAble {
         this.id = `${parent.getConnectId()}_${name}`
         this.parent = NodeUtil.of({ ...parent, database: name } as Node)
         this.init(this.parent)
+        this.cacheSelf()
         const lcp = ConnectionManager.getLastConnectionOption(false);
         if (lcp && lcp.getConnectId() == this.getConnectId() && lcp.database == this.database) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/database-active.svg");
@@ -42,7 +43,8 @@ export class DatabaseNode extends Node implements CopyAble {
         new DiagramGroup(this),
         new ProcedureGroup(this),
         new FunctionGroup(this),
-        new TriggerGroup(this)];
+        new TriggerGroup(this)
+    ];
     }
 
     public openOverview() {

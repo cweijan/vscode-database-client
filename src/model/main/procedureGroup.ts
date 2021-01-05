@@ -24,7 +24,7 @@ export class ProcedureGroup extends Node  {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT ROUTINE_NAME FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${this.database}' and ROUTINE_TYPE='PROCEDURE'`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), this.dialect.showProcedures(this.database))
             .then((tables) => {
                 tableNodes = tables.map<Node>((table) => {
                     return new ProcedureNode(table.ROUTINE_NAME, this);

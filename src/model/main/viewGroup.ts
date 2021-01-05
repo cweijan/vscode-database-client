@@ -26,7 +26,7 @@ export class ViewGroup extends Node {
             return tableNodes;
         }
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this),
-            `SELECT TABLE_NAME FROM information_schema.VIEWS  WHERE TABLE_SCHEMA = '${this.database}' LIMIT ${QueryUnit.maxTableCount}`)
+            this.dialect.showViews(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new ViewNode(table.TABLE_NAME, '', this);

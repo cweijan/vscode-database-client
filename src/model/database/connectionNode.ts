@@ -23,6 +23,7 @@ export class ConnectionNode extends Node implements CopyAble {
     constructor(readonly id: string, readonly parent: Node) {
         super(id)
         this.init(parent)
+        this.cacheSelf()
         this.id=this.getConnectId()
         if (parent.name) {
             this.label = `${parent.name}_${this.id}`

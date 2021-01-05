@@ -5,6 +5,11 @@ import { MysqlDialect } from "./mysqlDialect";
 export interface SqlDialect {
     showDatabases(): string;
     showTables(database:string): string;
+    showViews(database:string): string;
+    showTriggers(database:string): string;
+    showProcedures(database:string): string;
+    showFunctions(database:string): string;
+    buildPageSql(database:string,table:string,pageSize:number):string;
 }
 
 export function getDialect(dbType: DatabaseType): SqlDialect {

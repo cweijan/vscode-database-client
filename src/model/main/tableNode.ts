@@ -58,7 +58,7 @@ export class TableNode extends Node implements CopyAble {
     public addColumnTemplate() {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`ALTER TABLE
-    ${Util.wrap(this.database)}.${Util.wrap(this.table)} 
+    ${this.wrap(this.database)}.${this.wrap(this.table)} 
 ADD 
     COLUMN [column] [type] NOT NULL comment '';`, Template.alter);
     }
@@ -110,8 +110,8 @@ ADD
 
     public indexTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`-- ALTER TABLE ${Util.wrap(this.database)}.${Util.wrap(this.table)} DROP INDEX [indexName];
--- ALTER TABLE ${Util.wrap(this.database)}.${Util.wrap(this.table)} ADD [UNIQUE|INDEX|PRIMARY KEY] ([columns]);`, Template.alter);
+        QueryUnit.showSQLTextDocument(`-- ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} DROP INDEX [indexName];
+-- ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} ADD [UNIQUE|INDEX|PRIMARY KEY] ([columns]);`, Template.alter);
         setTimeout(() => {
             QueryUnit.runQuery(`SELECT COLUMN_NAME name,table_schema,index_name,non_unique FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${this.database}' and table_name='${this.table}';`, this);
         }, 10);
@@ -119,8 +119,9 @@ ADD
     }
 
     public async openInNew() {
-        const pageSize = Global.getConfig(ConfigKey.DEFAULT_LIMIT);
-        const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${pageSize};`;
+        const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
+        const sql = this.dialect.buildPageSql(this.wrap(this.database),this.wrap(this.table),pageSize);
+
         const connection = await ConnectionManager.getConnection(this);
         const executeTime = new Date().getTime();
         connection.query(sql, (err: Error, data, fields) => {
@@ -131,11 +132,12 @@ ADD
     }
 
     public async countSql() {
-        QueryUnit.runQuery(`SELECT count(*) FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)};`, this);
+        QueryUnit.runQuery(`SELECT count(*) FROM ${this.wrap(this.database)}.${this.wrap(this.table)};`, this);
     }
 
     public async selectSqlTemplate(run: boolean) {
-        const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${Global.getConfig(ConfigKey.DEFAULT_LIMIT)};`;
+        const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
+        const sql = this.dialect.buildPageSql(this.wrap(this.database),this.wrap(this.table),pageSize);
 
         if (run) {
             QueryUnit.runQuery(sql, this);
@@ -150,9 +152,9 @@ ADD
             this
                 .getChildren()
                 .then((children: Node[]) => {
-                    const childrenNames = children.map((child: any) => "\n    " + Util.wrap(child.column.name));
+                    const childrenNames = children.map((child: any) => "\n    " + this.wrap(child.column.name));
                     const childrenValues = children.map((child: any) => "\n    $" + child.column.name);
-                    let sql = `insert into \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} `;
+                    let sql = `insert into \n  ${this.wrap(this.database)}.${this.wrap(this.table)} `;
                     sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  )\n`;
                     sql += "values\n  ";
                     sql += `(${childrenValues.toString().replace(/,/g, ", ")}\n  );`;
@@ -170,9 +172,9 @@ ADD
             .then((children: Node[]) => {
                 const keysNames = children.filter((child: any) => child.column.key).map((child: any) => child.column.name);
 
-                const where = keysNames.map((name: string) => `${Util.wrap(name)} = \$${name}`);
+                const where = keysNames.map((name: string) => `${this.wrap(name)} = \$${name}`);
 
-                let sql = `delete from \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \n`;
+                let sql = `delete from \n  ${this.wrap(this.database)}.${this.wrap(this.table)} \n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and")}`;
                 QueryUnit.showSQLTextDocument(sql, Template.table);
             });
@@ -188,7 +190,7 @@ ADD
                 const sets = childrenNames.map((name: string) => `${name} = ${name}`);
                 const where = keysNames.map((name: string) => `${name} = '${name}'`);
 
-                let sql = `update \n  ${Util.wrap(this.database)}.${Util.wrap(this.table)} \nset \n  ${sets.toString().replace(/,/g, ",\n  ")}\n`;
+                let sql = `update \n  ${this.wrap(this.database)}.${this.wrap(this.table)} \nset \n  ${sets.toString().replace(/,/g, ",\n  ")}\n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and ")}`;
                 QueryUnit.showSQLTextDocument(sql, Template.table);
             });

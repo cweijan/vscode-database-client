@@ -1,4 +1,5 @@
 import { DatabaseType } from "@/common/constants";
+import { Util } from "@/common/util";
 import { getDialect, SqlDialect } from "@/service/dialect/sqlDialect";
 import * as vscode from "vscode";
 import { DatabaseCache } from "../../service/common/databaseCache";
@@ -47,6 +48,14 @@ export abstract class Node extends vscode.TreeItem {
         this.collapsibleState = DatabaseCache.getElementState(this)
     }
 
+    private static nodeCache = {};
+    public cacheSelf(){
+        Node.nodeCache[this.getConnectId()]=this;
+    }
+    public getCache(){
+        return Node.nodeCache[this.getConnectId()]
+    }
+
     public getChildren(isRresh?: boolean): Node[] | Promise<Node[]> {
         return []
     }
@@ -62,8 +71,17 @@ export abstract class Node extends vscode.TreeItem {
         return `${prefix}_${this.host}_${this.port}_${this.user}`;
     }
 
+
     public getHost(): string { return this.usingSSH ? this.ssh.host : this.host }
     public getPort(): number { return this.usingSSH ? this.ssh.port : this.port }
     public getUser(): string { return this.usingSSH ? this.ssh.username : this.user }
+
+
+    protected wrap(origin: string){
+        if(this.dbType==DatabaseType.MYSQL){
+            return Util.wrap(origin)
+        }
+        return origin;
+    }
 
 }

@@ -128,14 +128,13 @@ export class QueryPage {
     }
 
     private static async loadColumnList(queryParam: QueryParam<DataResponse>) {
+        // fix null point on result view
+        queryParam.res.columnList = []
         const fields = queryParam.res.fields;
         const conn = queryParam.connection;
         if (!fields || fields.length == 0) {
-            // fix null point on result view
-            queryParam.res.columnList = []
             return;
         }
-
         let mark = {};
         for (const field of fields) {
             mark[field.orgTable] = true

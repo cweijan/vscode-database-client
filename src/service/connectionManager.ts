@@ -39,7 +39,7 @@ export class ConnectionManager {
     }
 
     public static getActiveConnectByKey(key: string): ConnectionWrapper {
-        return this.activeConnection[key]
+        return this.activeConnection[key] 
     }
 
     public static removeConnection(id: string) {
@@ -135,8 +135,8 @@ export class ConnectionManager {
                 }
                 if (host != null && port != null && user != null) {
                     const node = NodeUtil.of({ host, port: parseInt(port), user, database,dbType });
-                    if (this.getActiveConnectByKey(node.getConnectId())) {
-                        return node;
+                    if (node.getCache()) {
+                        return node.getCache();
                     }
                 }
             }
