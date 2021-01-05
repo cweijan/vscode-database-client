@@ -9,7 +9,6 @@ import { ViewManager } from "../view/viewManager";
 import { AbstractConnectService } from "../view/connect/abstractConnectService";
 import { MysqlConnectService } from "../view/connect/mysqlConnectService";
 import { DatabaseCache } from "./common/databaseCache";
-import { DatabaseType } from "./common/databaseType";
 import { AbstractDumpService } from "./dump/abstractDumpService";
 import { MysqlDumpService } from "./dump/mysqlDumpService";
 import { MockRunner } from "./mock/mockRunner";
@@ -22,6 +21,10 @@ import { Global } from "../common/global";
 import { ImportService } from "./import/importService";
 import { MysqlImportService } from "./import/mysqlImportService";
 import { OverviewService } from "../view/overview/overviewService";
+import { MssqlPageService } from "./page/mssqlPageService";
+import { MysqlPageSerivce } from "./page/mysqlPageSerivce";
+import { PageService } from "./page/pageService";
+import { DatabaseType } from "@/common/constants";
 
 export class ServiceManager {
 
@@ -35,7 +38,7 @@ export class ServiceManager {
     public statusService: StatusService;
     public importService: ImportService;
     public dumpService: AbstractDumpService;
-    private type: DatabaseType = DatabaseType.mysql;
+    private type: DatabaseType = DatabaseType.MYSQL;
     private isInit = false;
 
     constructor(private readonly context: ExtensionContext) {
@@ -56,7 +59,7 @@ export class ServiceManager {
         ]
 
         switch (this.type) {
-            case DatabaseType.mysql:
+            case DatabaseType.MYSQL:
                 this.initMysqlService();
                 break;
         }
@@ -89,6 +92,16 @@ export class ServiceManager {
         this.connectService = new MysqlConnectService();
         this.statusService = new MysqlStatusService()
         this.importService = new MysqlImportService();
+    }
+
+    public static getPageService(databaseType: DatabaseType): PageService {
+
+        switch (databaseType) {
+            case DatabaseType.MSSQL:
+                return new MssqlPageService();
+        }
+    
+        return new MysqlPageSerivce();
     }
 
 }
