@@ -46,6 +46,23 @@ export enum Confirm {
     YES = "YES", NO = "NO"
 }
 
+export enum DatabaseType{
+    MYSQL="mysql",
+    /**
+     * https://www.npmjs.com/package/pg pg-hstore
+     */
+    PG="postgresql",ORACLE="oracle",
+    /**
+     * https://www.npmjs.com/package/mssql
+     * https://www.npmjs.com/package/tedious 
+     */
+    MSSQL="SqlServer",
+    /**
+     * https://www.npmjs.com/package/sqlite3
+     */
+    SQLite="SQLite"
+}
+
 export enum ModelType {
     CONNECTION = "connection", DATABASE = "database", USER_GROUP = "userGroup", USER = "user",
     TABLE = "table", COLUMN = "column", INFO = "info", TABLE_GROUP = "tableGroup",

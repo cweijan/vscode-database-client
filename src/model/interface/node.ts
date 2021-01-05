@@ -1,3 +1,4 @@
+import { DatabaseType } from "@/common/constants";
 import * as vscode from "vscode";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { SSHConfig } from "./sshConfig";
@@ -18,6 +19,7 @@ export abstract class Node extends vscode.TreeItem {
     public global?: boolean;
     public usingSSH?: boolean;
     public ssh?: SSHConfig;
+    public dbType?: DatabaseType;
 
     constructor(id: string) {
         super(id)
@@ -34,6 +36,7 @@ export abstract class Node extends vscode.TreeItem {
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
         this.global = source.global
+        this.dbType=source.dbType
         this.includeDatabases = source.includeDatabases
         this.excludeDatabases = source.excludeDatabases
         this.collapsibleState = DatabaseCache.getElementState(this)
