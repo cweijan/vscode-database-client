@@ -520,7 +520,7 @@ export default {
     },
     dataformat(origin) {
       if (origin == undefined || origin == null) {
-        return "<b>(NULL)</b>"
+        return "<span class='null-column'>(NULL)</span>"
       }
 
       const preFormat = this.dataformat0(origin)

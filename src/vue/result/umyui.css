@@ -19,6 +19,11 @@
     border: none !important;
 }
 
+.null-column{
+    color: #666;
+    font-weight: 400;
+}
+
 /* table edit input */
 .plx-body--column.col--actived input{
     border-color: var(--vscode-editor-foreground) !important;
