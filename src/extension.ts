@@ -27,6 +27,7 @@ import { DiagramNode } from "./model/diagram/diagramNode";
 import { DiagramGroup } from "./model/diagram/diagramGroup";
 import { QueryNode } from "./model/query/queryNode";
 import { QueryGroup } from "./model/query/queryGroup";
+import { Node } from "./model/interface/node";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -44,7 +45,13 @@ export function activate(context: vscode.ExtensionContext) {
             // util
             ...{
                 "mysql.history.open": () => serviceManager.historyService.showHistory(),
-                [CommandKey.Refresh]: () => { serviceManager.provider.init(); },
+                [CommandKey.Refresh]: (node:Node) => {
+                    if(node){
+                        node.getChildren(true)
+                    }else{
+                        serviceManager.provider.init(); 
+                    }
+                },
                 [CommandKey.RecordHistory]: (sql: string, costTime: number) => {
                     serviceManager.historyService.recordHistory(sql, costTime);
                 },

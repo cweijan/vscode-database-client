@@ -64,7 +64,6 @@
           <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter" v-on:keyup.enter.native="filter($event,scope.column.title)">
           </el-input>
           <el-input v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" @keypress.enter.native="confirmUpdate(scope.row)"></el-input>
-          <!-- <CellEditor v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" :type="result.columnList[index].type" @keypress.enter.native="confirmUpdate(scope.row)"></CellEditor> -->
         </template>
       </ux-table-column>
     </ux-grid>

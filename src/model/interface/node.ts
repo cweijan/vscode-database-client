@@ -1,4 +1,5 @@
 import { DatabaseType } from "@/common/constants";
+import { getDialect, SqlDialect } from "@/service/dialect/sqlDialect";
 import * as vscode from "vscode";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { SSHConfig } from "./sshConfig";
@@ -20,6 +21,7 @@ export abstract class Node extends vscode.TreeItem {
     public usingSSH?: boolean;
     public ssh?: SSHConfig;
     public dbType?: DatabaseType;
+    public dialect?: SqlDialect;
 
     constructor(id: string) {
         super(id)
@@ -37,6 +39,9 @@ export abstract class Node extends vscode.TreeItem {
         this.usingSSH = source.usingSSH
         this.global = source.global
         this.dbType=source.dbType
+        if(!this.dialect){
+            this.dialect=getDialect(this.dbType)
+        }
         this.includeDatabases = source.includeDatabases
         this.excludeDatabases = source.excludeDatabases
         this.collapsibleState = DatabaseCache.getElementState(this)

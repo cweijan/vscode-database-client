@@ -1,5 +1,4 @@
 import * as path from "path";
-import * as mysql from "mysql2";
 import * as vscode from "vscode";
 import { Constants, ModelType, Template, MessageType, ConfigKey } from "../../common/constants";
 import { Util } from "../../common/util";
@@ -124,7 +123,7 @@ ADD
         const sql = `SELECT * FROM ${Util.wrap(this.database)}.${Util.wrap(this.table)} LIMIT ${pageSize};`;
         const connection = await ConnectionManager.getConnection(this);
         const executeTime = new Date().getTime();
-        connection.query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
+        connection.query(sql, (err: Error, data, fields) => {
             const costTime = new Date().getTime() - executeTime;
             QueryPage.send({ singlePage: false, type: MessageType.DATA, connection: this, res: { sql, costTime, data, fields, pageSize: pageSize } as DataResponse });
         })

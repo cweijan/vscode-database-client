@@ -12,9 +12,9 @@ import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
 import { DatabaseNode } from "./databaseNode";
 import { UserGroup } from "./userGroup";
-import { Connection } from "mysql2";
 import { CopyAble } from "../interface/copyAble";
 import { NodeUtil } from "../nodeUtil";
+import { IConnection } from "@/service/connect/connection";
 
 export class ConnectionNode extends Node implements CopyAble {
 
@@ -37,14 +37,14 @@ export class ConnectionNode extends Node implements CopyAble {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let connection: Connection;
+        let connection: IConnection;
         try {
             connection = await ConnectionManager.getConnection(this);
         } catch (err) {
             return [new InfoNode(err)];
         }
 
-        return QueryUnit.queryPromise<any[]>(connection, "show databases")
+        return QueryUnit.queryPromise<any[]>(connection, this.dialect.showDatabases())
             .then((databases) => {
                 const databaseNodes = databases.filter((db) => {
 
@@ -85,7 +85,7 @@ export class ConnectionNode extends Node implements CopyAble {
     public async newQuery() {
 
         const key = `${this.getConnectId()}`;
-        await FileManager.show(`${key}.sql`);
+        await FileManager.show(`${this.dbType}_${key}.sql`);
         const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
         let dbName;
         if (dbNameList.length == 1) {

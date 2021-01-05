@@ -24,8 +24,7 @@ export class TableGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this),
-            `SELECT table_comment comment,TABLE_NAME tableName FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${this.database}' and TABLE_TYPE<>'VIEW' order by table_name LIMIT ${QueryUnit.maxTableCount} ;`)
+        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this),this.dialect.showTables(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new TableNode(table.tableName, table.comment, this);

@@ -1,5 +1,3 @@
-import * as fs from "fs";
-import * as mysql from "mysql2";
 import * as path from "path";
 import * as vscode from "vscode";
 import { Global } from "../common/global";
@@ -10,9 +8,11 @@ import { DatabaseCache } from "./common/databaseCache";
 import { NodeUtil } from "../model/nodeUtil";
 import { SSHTunnelService } from "./common/sshTunnelService";
 import { DbTreeDataProvider } from "../provider/treeDataProvider";
+import { create, IConnection } from "./connect/connection";
+import { MysqlConnection } from "./connect/mysqlConnection";
 
 interface ConnectionWrapper {
-    connection: mysql.Connection;
+    connection: IConnection;
     ssh: SSHConfig;
     createTime: Date
 }
@@ -58,7 +58,7 @@ export class ConnectionManager {
 
     }
 
-    public static getConnection(connectionNode: Node, changeActive: boolean = false): Promise<mysql.Connection> {
+    public static getConnection(connectionNode: Node, changeActive: boolean = false): Promise<IConnection> {
         if (!connectionNode) {
             this.checkConnection()
             throw new Error("No MySQL Server or Database selected!")
@@ -75,8 +75,9 @@ export class ConnectionManager {
             }
             const key = connectionNode.getConnectId();
             const connection = this.activeConnection[key];
-            if (connection && (connection.connection.state == 'authenticated' || connection.connection.authorized)) {
-                const sql = connectionNode.database ? `use \`${connectionNode.database}\`` : `SHOW STATUS WHERE variable_name = 'Max_used_connections';`;
+            if (connection && connection.connection.isAlive()) {
+                // TODO change to ping.
+                const sql = connectionNode.database ? `use \`${connectionNode.database}\`` : `select 1;`;
                 try {
                     await QueryUnit.queryPromise(connection.connection, sql, false)
                     resolve(connection.connection);
@@ -98,7 +99,7 @@ export class ConnectionManager {
                     return;
                 }
             }
-            this.activeConnection[key] = { connection: this.createConnection(connectOption), ssh, createTime: new Date() };
+            this.activeConnection[key] = { connection: create(connectOption), ssh, createTime: new Date() };
             this.activeConnection[key].connection.connect((err: Error) => {
                 if (!err) {
                     this.lastConnectionNode = NodeUtil.of(connectionNode);
@@ -115,30 +116,13 @@ export class ConnectionManager {
 
     }
 
-    public static createConnection(opt: Node): mysql.Connection {
-
-        const newConnectionOptions = {
-            host: opt.host, port: opt.port, user: opt.user, password: opt.password, database: opt.database,
-            timezone:opt.timezone,
-             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
-
-        } as mysql.ConnectionConfig;
-        if (opt.certPath && fs.existsSync(opt.certPath)) {
-            newConnectionOptions.ssl = {
-                ca: fs.readFileSync(opt.certPath),
-            };
-        }
-        return mysql.createConnection(newConnectionOptions);
-
-    }
-
     public static getByActiveFile(): Node {
         if (vscode.window.activeTextEditor) {
             const fileName = vscode.window.activeTextEditor.document.fileName;
             if (fileName.includes('cweijan.vscode-mysql-client2')) {
                 const queryName = path.basename(fileName, path.extname(fileName))
                 const filePattern = queryName.replace(/#.+$/,'').split('_');
-                const [mode, host, port, user] = filePattern
+                const [dbType,mode, host, port, user] = filePattern
                 let database: string;
                 if (filePattern.length >= 5) {
                     database = filePattern[4]
@@ -150,7 +134,7 @@ export class ConnectionManager {
                     }
                 }
                 if (host != null && port != null && user != null) {
-                    const node = NodeUtil.of({ host, port: parseInt(port), user, database });
+                    const node = NodeUtil.of({ host, port: parseInt(port), user, database,dbType });
                     if (this.getActiveConnectByKey(node.getConnectId())) {
                         return node;
                     }

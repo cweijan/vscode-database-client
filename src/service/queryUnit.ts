@@ -1,7 +1,4 @@
 "use strict";
-import * as fs from "fs";
-import * as mysql from "mysql2";
-import { Connection } from "mysql2";
 import * as vscode from "vscode";
 import { CommandKey, ConfigKey, Cursor, MessageType, Pattern, Constants } from "../common/constants";
 import { Global } from "../common/global";
@@ -15,14 +12,15 @@ import { DelimiterHolder } from "./common/delimiterHolder";
 import { ServiceManager } from "./serviceManager";
 import { NodeUtil } from "~/model/nodeUtil";
 import { Trans } from "~/common/trans";
+import { IConnection } from "./connect/connection";
 
 export class QueryUnit {
 
     public static readonly maxTableCount = Global.getConfig<number>(ConfigKey.MAX_TABLE_COUNT);
 
-    public static queryPromise<T>(connection: mysql.Connection, sql: string,showError=true): Promise<T> {
+    public static queryPromise<T>(connection: IConnection, sql: string,showError=true): Promise<T> {
         return new Promise((resolve, reject) => {
-            connection.query(sql, (err: mysql.MysqlError, rows) => {
+            connection.query(sql, (err: Error, rows) => {
                 if (err) {
                     if(showError){
                         Console.log(`Execute sql fail : ${sql}`);
@@ -66,7 +64,7 @@ export class QueryUnit {
             return;
         }
 
-        const sqlList: string[] = sql.match(/(?:[^;"']+|["'][^"']*["'])+/g).filter((s) => (s.trim() != '' && s.trim() != ';'))
+        const sqlList: string[] = sql.match(/(?:[^;"']+|["'][^"']*["'])+/g)?.filter((s) => (s.trim() != '' && s.trim() != ';'))
         if (sqlList.length == 0 && sql.match(this.selectPattern) && !sql.match(/\blimit\b/i) && !sql.match(/;\s*$/) && !sql.match(/[count|sum|min|max]\(/i)) {
             sql += ` LIMIT ${Global.getConfig(ConfigKey.DEFAULT_LIMIT)}`;
         }
@@ -74,39 +72,43 @@ export class QueryUnit {
         QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
 
         const executeTime = new Date().getTime();
-        (await ConnectionManager.getConnection(connectionNode, true)).query(sql, (err: mysql.MysqlError, data, fields?: mysql.FieldInfo[]) => {
-            if (err) {
-                QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
-                return;
-            }
-            const costTime = new Date().getTime() - executeTime;
-            if (fromEditor) {
-                vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime);
-            }
-            if (data.affectedRows) {
-                QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
-                vscode.commands.executeCommand(CommandKey.Refresh);
-                return;
-            }
-
-            // query result or multi statement.
-            if (Array.isArray(data)) {
-                // not query result
-                if (data[1] && (
-                    data[1].__proto__.constructor.name == "array" || data[1].__proto__.constructor.name == "OkPacket" || data[1].__proto__.constructor.name == "ResultSetHeader")
-                ) {
-                    QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
+        try {
+            (await ConnectionManager.getConnection(connectionNode, true)).query(sql, (err: Error, data, fields) => {
+                if (err) {
+                    QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
                     return;
                 }
-                QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
-            } else {
-                // unknow result, send sql success
-                QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
-            }
-
-        });
+                const costTime = new Date().getTime() - executeTime;
+                if (fromEditor) {
+                    vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime);
+                }
+                if (data.affectedRows) {
+                    QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
+                    vscode.commands.executeCommand(CommandKey.Refresh);
+                    return;
+                }
+    
+                // query result or multi statement.
+                if (Array.isArray(data)) {
+                    // not query result
+                    if (data[1] && (
+                        data[1].__proto__.constructor.name == "array" || data[1].__proto__.constructor.name == "OkPacket" || data[1].__proto__.constructor.name == "ResultSetHeader")
+                    ) {
+                        QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
+                        return;
+                    }
+                    QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+                } else {
+                    // unknow result, send sql success
+                    QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
+                }
+    
+            });
+        } catch (error) {
+            console.log(error)
+        }
     }
-    public static runBatch(connection: mysql.Connection, sqlList: string[]) {
+    public static runBatch(connection: IConnection, sqlList: string[]) {
         return new Promise((resolve) => {
             connection.beginTransaction(async () => {
                 try {
@@ -156,6 +158,7 @@ export class QueryUnit {
             content = content.replace(new RegExp(delimiter, 'g'), ";")
         }
         const sqlList = content.match(/(?:[^;"']+|["'][^"']*["'])+/g);
+        if(!sqlList)return "";
         if (sqlList.length == 1) return sqlList[0];
 
         const trimSqlList = []

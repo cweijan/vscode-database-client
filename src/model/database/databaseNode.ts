@@ -16,7 +16,6 @@ import { TriggerGroup } from "../main/triggerGroup";
 import { ViewGroup } from "../main/viewGroup";
 import { NodeUtil } from '../nodeUtil';
 import { DiagramGroup } from "../diagram/diagramGroup";
-import { OverviewService } from "../../view/overview/overviewService";
 import { ServiceManager } from "../../service/serviceManager";
 import { QueryGroup } from "../query/queryGroup";
 
@@ -86,7 +85,7 @@ export class DatabaseNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        FileManager.show(`${this.id}.sql`)
+        FileManager.show(`${this.dbType}_${this.id}.sql`)
         ConnectionManager.getConnection(this, true);
 
     }

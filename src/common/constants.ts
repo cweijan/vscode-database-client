@@ -53,14 +53,9 @@ export enum DatabaseType{
      */
     PG="postgresql",ORACLE="oracle",
     /**
-     * https://www.npmjs.com/package/mssql
-     * https://www.npmjs.com/package/tedious 
+     * http://tediousjs.github.io/tedious/getting-started.html
      */
-    MSSQL="SqlServer",
-    /**
-     * https://www.npmjs.com/package/sqlite3
-     */
-    SQLite="SQLite"
+    MSSQL="SqlServer"
 }
 
 export enum ModelType {
