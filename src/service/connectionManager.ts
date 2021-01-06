@@ -102,7 +102,9 @@ export class ConnectionManager {
             this.activeConnection[key] = { connection: create(connectOption), ssh, createTime: new Date() };
             this.activeConnection[key].connection.connect((err: Error) => {
                 if (!err) {
-                    this.lastConnectionNode = NodeUtil.of(connectionNode);
+                    if(changeActive){
+                        this.lastConnectionNode = NodeUtil.of(connectionNode);
+                    }
                     resolve(this.activeConnection[key].connection);
                 } else {
                     this.activeConnection[key] = null;

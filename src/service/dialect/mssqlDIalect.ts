@@ -1,8 +1,11 @@
+import { window } from "vscode";
+import { version } from "vue/types/umd";
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect implements SqlDialect {
     showTableSource(database: string, table: string): string {
-        return `SELECT definition 'Create Table' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${table}')`
+        window.showErrorMessage("Show Source Not Support Sql Server.")
+        throw new Error("Show Source Not Support Sql Server.")
     }
     showViewSource(database: string, table: string): string {
         return `SELECT definition 'Create View' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${table}')`
@@ -34,6 +37,9 @@ export class MssqlDIalect implements SqlDialect {
         return `SELECT concat(ROUTINE_SCHEMA,'.',ROUTINE_NAME) ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_CATALOG = '${database}' and ROUTINE_TYPE='FUNCTION'`;
     }
     showViews(database: string): string {
+        if (database.toLowerCase() == 'master') {
+            return `SELECT concat(SCHEMA_NAME(schema_id),'.',name) TABLE_NAME FROM [sys].[all_views] ORDER BY TABLE_NAME`;
+        }
         return `SELECT concat(TABLE_SCHEMA,'.',TABLE_NAME) TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS  WHERE TABLE_CATALOG = '${database}' `;
     }
     buildPageSql(database: string, table: string, pageSize: number): string {

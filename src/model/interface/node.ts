@@ -50,10 +50,10 @@ export abstract class Node extends vscode.TreeItem {
 
     private static nodeCache = {};
     public cacheSelf(){
-        Node.nodeCache[this.getConnectId()]=this;
+        Node.nodeCache[`${this.getConnectId()}_${this.database}`]=this;
     }
     public getCache(){
-        return Node.nodeCache[this.getConnectId()]
+        return Node.nodeCache[`${this.getConnectId()}_${this.database}`]
     }
 
     public getChildren(isRresh?: boolean): Node[] | Promise<Node[]> {
