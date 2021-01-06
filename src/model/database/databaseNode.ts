@@ -87,7 +87,7 @@ export class DatabaseNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        FileManager.show(`${this.dbType}_${this.id}.sql`)
+        FileManager.show(`${this.id}.sql`)
         ConnectionManager.getConnection(this, true);
 
     }

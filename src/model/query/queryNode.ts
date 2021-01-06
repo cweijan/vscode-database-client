@@ -38,7 +38,7 @@ export class QueryNode extends Node {
     }
 
     private getFilePath(newName?: string): string {
-        return `${FileManager.storagePath}/query/${this.dbType}_${this.getConnectId()}_${this.database}/${newName || this.name}.sql`;
+        return `${FileManager.storagePath}/query/${this.getConnectId()}_${this.database}/${newName || this.name}.sql`;
     }
 
 

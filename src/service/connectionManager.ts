@@ -122,7 +122,7 @@ export class ConnectionManager {
             if (fileName.includes('cweijan.vscode-mysql-client2')) {
                 const queryName = path.basename(fileName, path.extname(fileName))
                 const filePattern = queryName.replace(/#.+$/,'').split('_');
-                const [dbType,mode, host, port, user] = filePattern
+                const [mode, host, port, user] = filePattern
                 let database: string;
                 if (filePattern.length >= 5) {
                     database = filePattern[4]
@@ -134,7 +134,7 @@ export class ConnectionManager {
                     }
                 }
                 if (host != null && port != null && user != null) {
-                    const node = NodeUtil.of({ host, port: parseInt(port), user, database,dbType });
+                    const node = NodeUtil.of({ host, port: parseInt(port), user, database });
                     if (node.getCache()) {
                         return node.getCache();
                     }

@@ -86,7 +86,7 @@ export class ConnectionNode extends Node implements CopyAble {
     public async newQuery() {
 
         const key = `${this.getConnectId()}`;
-        await FileManager.show(`${this.dbType}_${key}.sql`);
+        await FileManager.show(`${key}.sql`);
         const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
         let dbName;
         if (dbNameList.length == 1) {
