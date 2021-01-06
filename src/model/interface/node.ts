@@ -78,7 +78,7 @@ export abstract class Node extends vscode.TreeItem {
 
 
     protected wrap(origin: string){
-        if(this.dbType==DatabaseType.MYSQL){
+        if(this.dbType==DatabaseType.MYSQL || this.dbType==null){
             return Util.wrap(origin)
         }
         return origin;

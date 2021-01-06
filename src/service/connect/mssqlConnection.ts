@@ -11,11 +11,11 @@ export class MSSqlConnnection implements IConnection {
         if (!callback && values instanceof Function) {
             callback = values;
         }
-        let fields = null;
+        let fields = [];
         let datas = [];
         this.init()
-        this.con.on("connect",err=>{
-            if(err){
+        this.con.on("connect", err => {
+            if (err) {
                 callback(err)
                 return;
             }
@@ -26,18 +26,16 @@ export class MSSqlConnnection implements IConnection {
                     callback(null, datas, fields)
                     this.end()
                 }
+            }).on('columnMetadata', (columns) => {
+                columns.forEach((column) => {
+                    fields.push({
+                        name: column.colName,
+                        orgTable: ((column) as any).tableName
+                    })
+                });
             }).on('row', columns => {
-                if (!fields) {
-                    fields = [];
-                    columns.forEach(function (column) {
-                        fields.push({
-                            name: column.metadata.colName,
-                            orgTable: ((column.metadata) as any).tableName
-                        })
-                    });
-                }
                 let temp = {};
-                columns.forEach(function (column) {
+                columns.forEach((column) => {
                     temp[column.metadata.colName] = column.value
                 });
                 datas.push(temp)
@@ -47,14 +45,14 @@ export class MSSqlConnnection implements IConnection {
     connect(callback: (err: Error) => void): void {
         callback(null)
     }
-    init(){
-        const opt=this.opt;
+    init() {
+        const opt = this.opt;
         this.con = new Connection({
             server: opt.host,
             options: {
-                database:opt.database,
-                connectTimeout:10000,
-                requestTimeout:10000,
+                database: opt.database || undefined,
+                connectTimeout: 10000,
+                requestTimeout: 10000,
             },
             authentication: {
                 type: "default",

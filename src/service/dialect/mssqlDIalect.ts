@@ -1,8 +1,11 @@
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect implements SqlDialect {
+    /**
+     * remove extra、COLUMN_COMMENT(comment)、COLUMN_KEY(key)
+     */
     showColumns(database: string,table:string): string {
-        return `SELECT COLUMN_NAME name,DATA_TYPE simpleType,COLUMN_TYPE type,COLUMN_COMMENT comment,COLUMN_KEY \`key\`,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength,COLUMN_DEFAULT defaultValue,EXTRA extra FROM information_schema.columns WHERE TABLE_CATALOG = '${database}' AND table_name = '${table}' ORDER BY ORDINAL_POSITION;`;
+        return `SELECT COLUMN_NAME name,DATA_TYPE simpleType,DATA_TYPE type,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength,COLUMN_DEFAULT defaultValue,'' comment FROM information_schema.columns WHERE TABLE_CATALOG = '${database}' AND table_name = '${table}' ORDER BY ORDINAL_POSITION;`;
     }
     showTriggers(database: string): string {
         // throw new Error("Unimplments!")
@@ -22,7 +25,7 @@ export class MssqlDIalect implements SqlDialect {
         return  `SELECT TOP ${pageSize} * FROM ${table};`;
     }
     showTables(database: string): string {
-        return `SELECT TABLE_NAME tableName FROM master.INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_CATALOG='${database}'`
+        return `SELECT TABLE_NAME tableName FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_CATALOG='${database}'`
     }
     showDatabases(): string {
         return "SELECT name 'Database' FROM master.sys.databases"
