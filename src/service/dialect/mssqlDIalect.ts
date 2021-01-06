@@ -23,7 +23,7 @@ export class MssqlDIalect implements SqlDialect {
      * remove extra、COLUMN_COMMENT(comment)、COLUMN_KEY(key)
      */
     showColumns(database: string, table: string): string {
-        return `SELECT COLUMN_NAME name,DATA_TYPE simpleType,DATA_TYPE type,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength,COLUMN_DEFAULT defaultValue,'' comment FROM information_schema.columns WHERE TABLE_CATALOG = '${database}' AND table_name = '${table}' ORDER BY ORDINAL_POSITION;`;
+        return `SELECT COLUMN_NAME name,DATA_TYPE simpleType,DATA_TYPE type,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength,COLUMN_DEFAULT defaultValue,'' comment FROM information_schema.columns WHERE TABLE_CATALOG = '${database}' AND table_name = '${table.split('.')[1]}' ORDER BY ORDINAL_POSITION;`;
     }
     showTriggers(database: string): string {
         // throw new Error("Unimplments!")

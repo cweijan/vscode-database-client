@@ -654,6 +654,11 @@
 				{
 					"command": "mysql.name.copy",
 					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/",
+					"group": "1_inline@-2"
+				},
+				{
+					"command": "mysql.refresh",
+					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/",
 					"group": "1_inline@-1"
 				},
 				{
