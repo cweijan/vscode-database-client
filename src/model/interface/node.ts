@@ -77,11 +77,8 @@ export abstract class Node extends vscode.TreeItem {
     public getUser(): string { return this.usingSSH ? this.ssh.username : this.user }
 
 
-    protected wrap(origin: string){
-        if(this.dbType==DatabaseType.MYSQL || this.dbType==null){
-            return Util.wrap(origin)
-        }
-        return origin;
+    public wrap(origin: string){
+        return Util.wrap(origin,this.dbType)
     }
 
 }

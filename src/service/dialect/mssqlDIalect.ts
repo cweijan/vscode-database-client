@@ -1,8 +1,16 @@
 import { window } from "vscode";
-import { version } from "vue/types/umd";
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect implements SqlDialect {
+    renameTable(database: string, tableName: string, newName: string): string {
+        return `sp_rename '${tableName}', '${newName}'`;
+    }
+    truncateDatabase(database: string): string {
+        return `SELECT Concat('TRUNCATE TABLE [',table_schema,'].[',TABLE_NAME, '];') trun FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_CATALOG='${database}'`
+    }
+    createDatabase(database: string): string {
+        return `create database ${database}`;
+    }
     showTableSource(database: string, table: string): string {
         window.showErrorMessage("Show Source Not Support Sql Server.")
         throw new Error("Show Source Not Support Sql Server.")

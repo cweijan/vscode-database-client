@@ -2,6 +2,15 @@ import { QueryUnit } from "../queryUnit";
 import { SqlDialect } from "./sqlDialect";
 
 export class MysqlDialect implements SqlDialect{
+    renameTable(database: string, tableName: string, newName: string): string {
+        return `RENAME TABLE \`${database}\`.\`${tableName}\` to \`${database}\`.\`${newName}\``;
+    }
+    truncateDatabase(database: string): string {
+        return `SELECT Concat('TRUNCATE TABLE \`',table_schema,'\`.\`',TABLE_NAME, '\`;') trun FROM INFORMATION_SCHEMA.TABLES where  table_schema ='${database}' and TABLE_TYPE<>'VIEW';`
+    }
+    createDatabase(database: string): string {
+        return `create database \`${database}\` default character set = 'utf8mb4' `;
+    }
     showTableSource(database: string, table: string): string {
         return `SHOW CREATE TABLE \`${database}\`.\`${table}\``
     }

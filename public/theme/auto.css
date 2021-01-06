@@ -11,6 +11,7 @@
     --second-color: var(--vscode-input-placeholderForeground);
     --border-color: var(--vscode-button-background);
     --bg-color: var(--vscode-editor-background);
+    --disable-bg-color: var(--vscode-editor-background);
     --second-bg-color: var(--vscode-editorSuggestWidget-background);
 }
 
@@ -3061,7 +3062,7 @@ body {
 
 .el-table__fixed-footer-wrapper tbody td {
     border-top: 1px solid #EBEEF5;
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     color: var(--primary-color);
 }
 
@@ -3095,7 +3096,7 @@ body {
 }
 
 .el-table__footer-wrapper tbody td, .el-table__header-wrapper tbody td {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     color: var(--primary-color);
 }
 
@@ -3427,7 +3428,7 @@ body {
 }
 
 .el-date-table td.disabled div {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     opacity: 1;
     cursor: not-allowed;
     color: var(--editor-color)
@@ -3494,7 +3495,7 @@ body {
 }
 
 .el-month-table td.disabled .cell {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     cursor: not-allowed;
     color: var(--editor-color)
 }
@@ -3564,7 +3565,7 @@ body {
 }
 
 .el-year-table td.disabled .cell {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     cursor: not-allowed;
     color: var(--editor-color)
 }
@@ -3805,7 +3806,7 @@ body {
 }
 
 .time-select-item:hover {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     font-weight: 700;
     cursor: pointer
 }
@@ -3966,7 +3967,7 @@ body {
 }
 
 .el-range-editor.is-disabled {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     border-color: var(--border-color);
     color: var(--editor-color);
     cursor: not-allowed
@@ -3977,7 +3978,7 @@ body {
 }
 
 .el-range-editor.is-disabled input {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     color: var(--editor-color);
     cursor: not-allowed
 }
@@ -5120,7 +5121,7 @@ body {
 }
 
 .el-tabs--border-card > .el-tabs__header {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     border-bottom: 1px solid var(--border-color);
     margin: 0
 }
@@ -12256,7 +12257,7 @@ body {
 }
 
 .el-textarea.is-disabled .el-textarea__inner {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     border-color: var(--border-color);
     color: var(--editor-color);
     cursor: not-allowed
@@ -12434,7 +12435,7 @@ body {
 }
 
 .el-input.is-disabled .el-input__inner {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     border-color: var(--border-color);
     color: var(--editor-color);
     cursor: not-allowed
@@ -12529,7 +12530,7 @@ body {
 }
 
 .el-input-group__append, .el-input-group__prepend {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     color: #909399;
     vertical-align: middle;
     display: table-cell;
@@ -12620,7 +12621,7 @@ body {
 
 .el-transfer__button.is-disabled, .el-transfer__button.is-disabled:hover {
     border: 1px solid var(--border-color);
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     color: var(--editor-color)
 }
 
@@ -14533,7 +14534,7 @@ body {
 }
 
 .el-radio__input.is-disabled .el-radio__inner, .el-radio__input.is-disabled.is-checked .el-radio__inner {
-    background-color: #F5F7FA;
+    background-color: var(--disable-bg-color);
     border-color: var(--border-color)
 }
 

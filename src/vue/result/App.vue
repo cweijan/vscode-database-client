@@ -59,10 +59,10 @@
           </el-input>
           <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[scope.column.title])'></span>
         </template>
-        <template slot="edit" slot-scope="scope" v-if="result.tableCount==1">
+        <template slot="edit" slot-scope="scope">
           <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter" v-on:keyup.enter.native="filter($event,scope.column.title)">
           </el-input>
-          <el-input v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" @keypress.enter.native="confirmUpdate(scope.row)"></el-input>
+          <el-input v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" @keypress.enter.native="confirmUpdate(scope.row)" :disabled="result.tableCount!=1"></el-input>
         </template>
       </ux-table-column>
     </ux-grid>

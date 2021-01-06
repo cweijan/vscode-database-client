@@ -75,7 +75,7 @@ ADD
 
         vscode.window.showInputBox({ value: this.table, placeHolder: 'newTableName', prompt: `You will changed ${this.database}.${this.table} to new table name!` }).then(async (newTableName) => {
             if (!newTableName) { return; }
-            const sql = `RENAME TABLE \`${this.database}\`.\`${this.table}\` to \`${this.database}\`.\`${newTableName}\``;
+            const sql = this.dialect.renameTable(this.database,this.table,newTableName);
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
                 DbTreeDataProvider.refresh(this.parent);
@@ -88,7 +88,7 @@ ADD
     public dropTable() {
 
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE \`${this.database}\`.\`${this.table}\``).then(() => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE ${this.wrap(this.database)}.${this.wrap(this.table)}`).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
                 DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
@@ -101,7 +101,7 @@ ADD
     public truncateTable() {
 
         Util.confirm(`Are you want to clear table ${this.table} all data ?`, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `truncate table \`${this.database}\`.\`${this.table}\``).then(() => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `truncate table ${this.wrap(this.database)}.${this.wrap(this.table)}`).then(() => {
                 vscode.window.showInformationMessage(`Clear table ${this.table} all data success!`);
             });
         })

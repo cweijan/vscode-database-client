@@ -35,7 +35,6 @@ export class QueryUnit {
     }
 
 
-    private static selectPattern = /^\s*\bselect\b.+/ig;
     private static importPattern = /^\s*\bsource\b\s+(.+)/i;
     protected static delimiterHodler = new DelimiterHolder()
     public static async runQuery(sql?: string, connectionNode: Node = ConnectionManager.getLastConnectionOption()): Promise<null> {

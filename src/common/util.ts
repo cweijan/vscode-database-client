@@ -1,7 +1,7 @@
 
 import * as vscode from "vscode";
 import { Position, TextDocument } from "vscode";
-import { Confirm } from "./constants";
+import { Confirm, DatabaseType } from "./constants";
 
 export class Util {
 
@@ -22,11 +22,13 @@ export class Util {
      * wrap origin with ` if is unusual identifier
      * @param origin any string
      */
-    public static wrap(origin: string) {
+    public static wrap(origin: string,databaseType?:DatabaseType) {
         if (origin == null) { return origin; }
 
-        if (origin.match(/\b[-\.]\b/ig)
-            || origin.match(/^(if|key|desc|length)$/i)) {
+        if (origin.match(/\b[-\.]\b/ig) || origin.match(/^(if|key|desc|length)$/i)) {
+            if(databaseType==DatabaseType.MSSQL){
+                return origin.split(".").map(text=>`[${text}]`).join(".")
+            }
             return `\`${origin}\``;
         }
 

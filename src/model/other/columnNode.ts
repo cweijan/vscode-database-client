@@ -9,8 +9,6 @@ import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { CopyAble } from "../interface/copyAble";
 import { Util } from "../../common/util";
 import { ColumnMeta } from "./columnMeta";
-const wrap = Util.wrap;
-
 
 export class ColumnNode extends Node implements CopyAble {
     public type: string;
@@ -55,7 +53,7 @@ export class ColumnNode extends Node implements CopyAble {
         const columnName = this.column.name;
         vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(async (newColumnName) => {
             if (!newColumnName) { return; }
-            const sql = `alter table ${wrap(this.database)}.${wrap(this.table)} change column ${wrap(columnName)} ${wrap(newColumnName)} ${this.column.type} comment '${this.column.comment}'`;
+            const sql = `alter table ${this.wrap(this.database)}.${this.wrap(this.table)} change column ${this.wrap(columnName)} ${this.wrap(newColumnName)} ${this.column.type} comment '${this.column.comment}'`;
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearColumnCache(`${this.getConnectId()}_${this.database}_${this.table}`);
                 DbTreeDataProvider.refresh(this.parent);
@@ -72,13 +70,13 @@ export class ColumnNode extends Node implements CopyAble {
         const defaultDefinition = this.column.nullable == "YES" ? "" : " NOT NULL";
 
         QueryUnit.showSQLTextDocument(`ALTER TABLE 
-    ${wrap(this.database)}.${wrap(this.table)} CHANGE ${wrap(this.column.name)} ${wrap(this.column.name)} ${this.column.type}${defaultDefinition}${comment};`, Template.alter);
+    ${this.wrap(this.database)}.${this.wrap(this.table)} CHANGE ${this.wrap(this.column.name)} ${this.wrap(this.column.name)} ${this.column.type}${defaultDefinition}${comment};`, Template.alter);
 
     }
     public async dropColumnTemplate() {
 
         ConnectionManager.getConnection(this, true);
-        await QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t${wrap(this.database)}.${wrap(this.table)} DROP COLUMN ${wrap(this.column.name)};`, Template.alter);
+        await QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t${this.wrap(this.database)}.${this.wrap(this.table)} DROP COLUMN ${this.wrap(this.column.name)};`, Template.alter);
         Util.confirm(`Are you want to drop column ${this.column.name} ? `, async () => {
             QueryUnit.runQuery(null,this)
         })
@@ -93,7 +91,7 @@ export class ColumnNode extends Node implements CopyAble {
             vscode.window.showErrorMessage("Column is at last.")
             return;
         }
-        const sql = `ALTER TABLE \`${this.database}\`.\`${this.table}\` MODIFY COLUMN ${this.column.name} ${this.column.type} AFTER ${afterColumnNode.column.name};`
+        const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(this.column.name)} ${this.column.type} AFTER ${this.wrap(afterColumnNode.column.name)};`
         await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
         DbTreeDataProvider.refresh(this.parent)
     }
@@ -104,7 +102,7 @@ export class ColumnNode extends Node implements CopyAble {
             vscode.window.showErrorMessage("Column is at first.")
             return;
         }
-        const sql = `ALTER TABLE \`${this.database}\`.\`${this.table}\` MODIFY COLUMN ${beforeColumnNode.column.name} ${beforeColumnNode.column.type} AFTER ${this.column.name};`
+        const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(beforeColumnNode.column.name)} ${beforeColumnNode.column.type} AFTER ${this.wrap(this.column.name)};`
         await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
         DbTreeDataProvider.refresh(this.parent)
     }

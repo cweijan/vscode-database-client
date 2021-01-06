@@ -76,7 +76,7 @@ export abstract class AbstractExportService implements ExportService {
             let columns = "";
             let values = "";
             for (const key in row) {
-                columns += `\`${key}\`,`
+                columns += `${key},`
                 values += `'${row[key]}',`
             }
             sql += `insert into ${exportContext.table}(${columns.replace(/.$/, '')}) values(${values.replace(/.$/, '')});\n`

@@ -40,7 +40,7 @@ export class ProcedureNode extends Node {
     public drop() {
 
         Util.confirm(`Are you want to drop procedure ${this.name} ? `, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP procedure \`${this.database}\`.\`${this.name}\``).then(() => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP procedure ${this.wrap(this.database)}.${this.wrap(this.name)}`).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}_${ModelType.PROCEDURE_GROUP}`)
                 DbTreeDataProvider.refresh(this.parent)
                 vscode.window.showInformationMessage(`Drop procedure ${this.name} success!`)
