@@ -24,6 +24,9 @@ export class MssqlDIalect implements SqlDialect {
     buildPageSql(database: string, table: string, pageSize: number): string {
         return `SELECT TOP ${pageSize} * FROM ${table};`;
     }
+    countSql(database: string, table: string): string {
+        return `SELECT count(*) count FROM ${table};`;
+    }
     showTables(database: string): string {
         return `SELECT TABLE_NAME tableName FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_CATALOG='${database}'`
     }

@@ -132,7 +132,7 @@ ADD
     }
 
     public async countSql() {
-        QueryUnit.runQuery(`SELECT count(*) FROM ${this.wrap(this.database)}.${this.wrap(this.table)};`, this);
+        QueryUnit.runQuery(this.dialect.countSql(this.wrap(this.database),this.wrap(this.table)), this);
     }
 
     public async selectSqlTemplate(run: boolean) {

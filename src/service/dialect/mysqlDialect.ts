@@ -20,6 +20,9 @@ export class MysqlDialect implements SqlDialect{
     buildPageSql(database: string, table: string, pageSize: number):string {
         return  `SELECT * FROM ${database}.${table} LIMIT ${pageSize};`;
     }
+    countSql(database: string, table: string): string {
+        return `SELECT count(*) FROM ${database}.${table};`;
+    }
     showTables(database: string): string {
         return `SELECT table_comment comment,TABLE_NAME tableName FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' order by table_name LIMIT ${QueryUnit.maxTableCount} ;`
     }
