@@ -45,13 +45,7 @@ export class TriggerGroup extends Node {
     public async createTemplate() {
 
         ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.id}#create-trigger-template.sql`, `CREATE
-/*[DEFINER = { user | CURRENT_USER }]*/
-TRIGGER [name] BEFORE/AFTER INSERT/UPDATE/DELETE
-ON [table]
-FOR EACH ROW BEGIN
-
-END;`, FileModel.WRITE)
+        const filePath = await FileManager.record(`${this.parent.id}#create-trigger-template.sql`, this.dialect.triggerTemplate(), FileModel.WRITE)
         FileManager.show(filePath)
 
     }

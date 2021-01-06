@@ -43,12 +43,7 @@ export class ProcedureGroup extends Node  {
     public async createTemplate() {
 
         ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.id}#create-procedure-template.sql`, `CREATE
-/*[DEFINER = { user | CURRENT_USER }]*/
-PROCEDURE [name]()
-BEGIN
-
-END;`, FileModel.WRITE)
+        const filePath = await FileManager.record(`${this.parent.id}#create-procedure-template.sql`, this.dialect.procedureTemplate(), FileModel.WRITE)
         FileManager.show(filePath)
     }
 

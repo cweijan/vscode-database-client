@@ -43,12 +43,7 @@ export class FunctionGroup extends Node {
     public async createTemplate() {
 
         ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.id}#create-function-template.sql`, `CREATE
-/*[DEFINER = { user | CURRENT_USER }]*/
-FUNCTION [name]() RETURNS [TYPE]
-BEGIN
-    return [value];
-END;`, FileModel.WRITE)
+        const filePath = await FileManager.record(`${this.parent.id}#create-function-template.sql`, this.dialect.functionTemplate(), FileModel.WRITE)
         FileManager.show(filePath)
 
     }

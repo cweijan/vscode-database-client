@@ -45,11 +45,7 @@ export class ViewGroup extends Node {
     public async createTemplate() {
 
         ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.id}#create-view-template.sql`, `CREATE
-/* [DEFINER = { user | CURRENT_USER }]*/
-VIEW [name]
-AS
-(SELECT * FROM ...);`, FileModel.WRITE)
+        const filePath = await FileManager.record(`${this.parent.id}#create-view-template.sql`, this.dialect.viewTemplate(), FileModel.WRITE)
         FileManager.show(filePath)
 
     }

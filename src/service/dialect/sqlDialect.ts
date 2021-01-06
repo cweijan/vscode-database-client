@@ -11,6 +11,11 @@ export interface SqlDialect {
     showProcedures(database:string): string;
     showFunctions(database:string): string;
     buildPageSql(database:string,table:string,pageSize:number):string;
+    tableTemplate():string;
+    viewTemplate():string;
+    procedureTemplate():string;
+    triggerTemplate():string;
+    functionTemplate():string;
 }
 
 export function getDialect(dbType: DatabaseType): SqlDialect {

@@ -42,12 +42,7 @@ export class TableGroup extends Node {
 
     public async createTemplate() {
         ConnectionManager.getConnection(this, true);
-        const filePath=await FileManager.record(`${this.info.id}#create-table-template.sql`,`CREATE TABLE [name](  
-    id int NOT NULL primary key AUTO_INCREMENT comment 'primary key',
-    created_time DATETIME COMMENT 'created tiem',
-    updated_time DATETIME COMMENT 'updated tiem',
-    [column] varchar(255) comment ''
-) default charset utf8 comment '';`,FileModel.WRITE)
+        const filePath=await FileManager.record(`${this.info.id}#create-table-template.sql`,this.dialect.tableTemplate(),FileModel.WRITE)
         FileManager.show(filePath)
         
     }

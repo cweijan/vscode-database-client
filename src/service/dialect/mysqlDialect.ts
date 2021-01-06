@@ -26,4 +26,40 @@ export class MysqlDialect implements SqlDialect{
     showDatabases(): string {
         return "show databases"
     }
+    tableTemplate(): string {
+        return `CREATE TABLE [name](  
+    id int NOT NULL primary key AUTO_INCREMENT comment 'primary key',
+    created_time DATETIME COMMENT 'created tiem',
+    updated_time DATETIME COMMENT 'updated tiem',
+    [column] varchar(255) comment ''
+) default charset utf8 comment '';`
+    }
+    viewTemplate(): string {
+        return `CREATE
+VIEW [name]
+AS
+(SELECT * FROM ...);`
+    }
+    procedureTemplate(): string {
+        return `CREATE
+PROCEDURE [name]()
+BEGIN
+
+END;`;
+    }
+    triggerTemplate(): string {
+        return `CREATE
+TRIGGER [name] [BEFORE/AFTER] [INSERT/UPDATE/DELETE]
+ON [table]
+FOR EACH ROW BEGIN
+
+END;`
+    }
+    functionTemplate(): string {
+        return `CREATE
+FUNCTION [name]() RETURNS [TYPE]
+BEGIN
+    return [value];
+END;`
+    }
 }
