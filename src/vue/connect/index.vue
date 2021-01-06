@@ -16,7 +16,12 @@
 
     <section class="mb-2">
       <label class="block font-bold" for="connection-type">Connection Type</label>
-      <input class="w-full field__input" id="connection-type" placeholder="The name of connection, it can be empty" v-model="connectionOption.dbType" />
+      <el-select id="connection-type" v-model="connectionOption.dbType">
+        <el-option value="MySQL">MySQL</el-option>
+        <el-option value="PostgreSQL">PostgreSQL</el-option>
+        <el-option value="Oracle">Oracle</el-option>
+        <el-option value="SqlServer">SQL Server</el-option>
+      </el-select>
     </section>
 
     <section class="mb-2">
@@ -139,6 +144,7 @@ export default {
         password: "",
         database: null,
         usingSSH: false,
+        dbType: "MySQL",
         global: true,
         excludeDatabases: "mysql,performance_schema,information_schema,sys",
         timezone: "+00:00",
@@ -183,6 +189,32 @@ export default {
         databaseType: this.databaseType,
         connectionOption: this.connectionOption,
       })
+    },
+  },
+  watch: {
+    "connectionOption.dbType"(value) {
+      switch (value) {
+        case "MySQL":
+          this.connectionOption.user='root';
+          this.connectionOption.port=3306;
+          this.connectionOption.excludeDatabases="mysql,performance_schema,information_schema,sys";
+          break
+        case "PostgreSQL":
+          this.connectionOption.user='postgres';
+          this.connectionOption.port=5432;
+          this.connectionOption.excludeDatabases="";
+          break
+        case "Oracle":
+          this.connectionOption.user='system';
+          this.connectionOption.port=1521;
+          this.connectionOption.excludeDatabases="";
+          break
+        case "SqlServer":
+          this.connectionOption.user='sa';
+          this.connectionOption.port=1433;
+          this.connectionOption.excludeDatabases="";
+          break
+      }
     },
   },
 }

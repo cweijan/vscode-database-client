@@ -47,11 +47,11 @@ export enum Confirm {
 }
 
 export enum DatabaseType{
-    MYSQL="mysql",
+    MYSQL="MySQL",
     /**
      * https://www.npmjs.com/package/pg pg-hstore
      */
-    PG="postgresql",ORACLE="oracle",
+    PG="PostgreSQL",ORACLE="Oracle",
     /**
      * http://tediousjs.github.io/tedious/getting-started.html
      */

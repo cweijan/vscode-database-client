@@ -58,12 +58,7 @@ export class ServiceManager {
             vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.', ">", "<", "=", "(")
         ]
 
-        switch (this.type) {
-            case DatabaseType.MYSQL:
-                this.initMysqlService();
-                break;
-        }
-
+        this.initMysqlService();
         res.push(this.initTreeView())
         ServiceManager.instance=this;
         this.isInit = true
