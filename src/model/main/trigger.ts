@@ -27,7 +27,7 @@ export class TriggerNode extends Node  {
         QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), this.dialect.showTriggerSource(this.database,this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0]
-                QueryUnit.showSQLTextDocument(`\n\nDROP TRIGGER IF EXISTS ${this.name}; \n\n${procedDtail['SQL Original Statement']}`);
+                QueryUnit.showSQLTextDocument(`\n\nDROP TRIGGER IF EXISTS ${this.name};\n${procedDtail['SQL Original Statement']}`);
             });
     }
 

@@ -27,7 +27,7 @@ export class FunctionNode extends Node {
         QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), this.dialect.showFunctionSource(this.database,this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0];
-                QueryUnit.showSQLTextDocument(`DROP FUNCTION IF EXISTS ${this.name}; \n\n${procedDtail['Create Function']}`);
+                QueryUnit.showSQLTextDocument(`DROP FUNCTION IF EXISTS ${this.name};\n${procedDtail['Create Function']}`);
             });
     }
 

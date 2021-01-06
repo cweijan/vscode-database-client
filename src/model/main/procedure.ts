@@ -28,7 +28,7 @@ export class ProcedureNode extends Node {
         QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), this.dialect.showProcedureSource(this.database,this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0]
-                QueryUnit.showSQLTextDocument(`DROP PROCEDURE IF EXISTS ${this.name}; \n\n${procedDtail['Create Procedure']}`);
+                QueryUnit.showSQLTextDocument(`DROP PROCEDURE IF EXISTS ${this.name};\n${procedDtail['Create Procedure']}`);
             });
     }
 
