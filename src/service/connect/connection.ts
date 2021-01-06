@@ -3,6 +3,7 @@ import { Node } from "@/model/interface/node";
 import { FieldInfo } from "mysql2";
 import { MSSqlConnnection } from "./mssqlConnection";
 import { MysqlConnection } from "./mysqlConnection";
+import { PostgreSqlConnection } from "./postgresqlConnection";
 
 export interface IConnection {
     query(sql: string, callback?: queryCallback): void;
@@ -33,6 +34,8 @@ export function create(opt: Node) {
     switch (opt.dbType) {
         case DatabaseType.MSSQL:
             return new MSSqlConnnection(opt)
+        case DatabaseType.PG:
+            return new PostgreSqlConnection(opt)
     }
     return new MysqlConnection(opt)
 }

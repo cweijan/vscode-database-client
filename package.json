@@ -921,6 +921,7 @@
 	},
 	"dependencies": {
 		"@antv/g2": "^4.0.9",
+		"@types/pg": "^7.14.7",
 		"@types/tedious": "^4.0.3",
 		"date-format": "^3.0.0",
 		"deepmerge": "^3.2.0",
@@ -929,6 +930,7 @@
 		"mockjs": "^1.1.0",
 		"mysql2": "^2.2.5",
 		"node-xlsx": "^0.15.0",
+		"pg": "^8.5.1",
 		"portfinder": "^1.0.26",
 		"pretty-bytes": "^5.3.0",
 		"sqlstring": "^2.3.2",

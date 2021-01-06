@@ -3,6 +3,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const isProd = process.argv.indexOf('-p') >= 0;
+var webpack = require('webpack');
 
 module.exports = [
     {
@@ -30,6 +31,9 @@ module.exports = [
                 '~': path.resolve(__dirname, './src')
             }
         },
+        plugins: [
+            new webpack.IgnorePlugin(/^pg-native$/)
+        ],
         module: { rules: [{ test: /\.ts$/, exclude: /node_modules/, use: ['ts-loader'] }] },
         optimization: { minimize: false },
         watch: !isProd,

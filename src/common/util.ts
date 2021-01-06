@@ -29,6 +29,9 @@ export class Util {
             if(databaseType==DatabaseType.MSSQL){
                 return origin.split(".").map(text=>`[${text}]`).join(".")
             }
+            if(databaseType==DatabaseType.PG){
+                return `"${origin}"`;
+            }
             return `\`${origin}\``;
         }
 

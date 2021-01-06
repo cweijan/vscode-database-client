@@ -19,7 +19,6 @@
       <el-select id="connection-type" v-model="connectionOption.dbType">
         <el-option value="MySQL">MySQL</el-option>
         <el-option value="PostgreSQL">PostgreSQL</el-option>
-        <el-option value="Oracle">Oracle</el-option>
         <el-option value="SqlServer">SQL Server</el-option>
       </el-select>
     </section>

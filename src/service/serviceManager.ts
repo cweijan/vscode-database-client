@@ -25,10 +25,11 @@ import { MssqlPageService } from "./page/mssqlPageService";
 import { MysqlPageSerivce } from "./page/mysqlPageSerivce";
 import { PageService } from "./page/pageService";
 import { DatabaseType } from "@/common/constants";
+import { PostgreSqlPageService } from "./page/postgreSqlPageService";
 
 export class ServiceManager {
 
-    public static instance:ServiceManager;
+    public static instance: ServiceManager;
     public mockRunner: MockRunner;
     public provider: DbTreeDataProvider;
     public historyService: HistoryRecorder;
@@ -60,7 +61,7 @@ export class ServiceManager {
 
         this.initMysqlService();
         res.push(this.initTreeView())
-        ServiceManager.instance=this;
+        ServiceManager.instance = this;
         this.isInit = true
         return res
     }
@@ -94,8 +95,10 @@ export class ServiceManager {
         switch (databaseType) {
             case DatabaseType.MSSQL:
                 return new MssqlPageService();
+            case DatabaseType.PG:
+                return new PostgreSqlPageService();
         }
-    
+
         return new MysqlPageSerivce();
     }
 
