@@ -24,10 +24,10 @@ export class TriggerNode extends Node  {
     }
 
     public async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), `SHOW CREATE TRIGGER \`${this.database}\`.\`${this.name}\``)
+        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), this.dialect.showTriggerSource(this.database,this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0]
-                QueryUnit.showSQLTextDocument(`\n\nDROP TRIGGER IF EXISTS ${procedDtail.Trigger}; \n\n${procedDtail['SQL Original Statement']}`);
+                QueryUnit.showSQLTextDocument(`\n\nDROP TRIGGER IF EXISTS ${this.name}; \n\n${procedDtail['SQL Original Statement']}`);
             });
     }
 

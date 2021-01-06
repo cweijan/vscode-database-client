@@ -2,6 +2,21 @@ import { QueryUnit } from "../queryUnit";
 import { SqlDialect } from "./sqlDialect";
 
 export class MysqlDialect implements SqlDialect{
+    showTableSource(database: string, table: string): string {
+        return `SHOW CREATE TABLE \`${database}\`.\`${table}\``
+    }
+    showViewSource(database: string, table: string): string {
+        return `SHOW CREATE VIEW  \`${database}\`.\`${table}\``
+    }
+    showProcedureSource(database: string, name: string): string {
+        return `SHOW CREATE PROCEDURE \`${database}\`.\`${name}\``
+    }
+    showFunctionSource(database: string, name: string): string {
+        return `SHOW CREATE FUNCTION \`${database}\`.\`${name}\``;
+    }
+    showTriggerSource(database: string, name: string): string {
+        return `SHOW CREATE TRIGGER \`${database}\`.\`${name}\``;
+    }
     showColumns(database: string,table:string): string {
         return `SELECT COLUMN_NAME name,DATA_TYPE simpleType,COLUMN_TYPE type,COLUMN_COMMENT comment,COLUMN_KEY \`key\`,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength,COLUMN_DEFAULT defaultValue,EXTRA extra FROM information_schema.columns WHERE table_schema = '${database}' AND table_name = '${table}' ORDER BY ORDINAL_POSITION;`;
     }

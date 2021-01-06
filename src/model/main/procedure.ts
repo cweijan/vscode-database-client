@@ -25,10 +25,10 @@ export class ProcedureNode extends Node {
     }
 
     public async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), `SHOW CREATE PROCEDURE \`${this.database}\`.\`${this.name}\``)
+        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), this.dialect.showProcedureSource(this.database,this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0]
-                QueryUnit.showSQLTextDocument(`DROP PROCEDURE IF EXISTS ${procedDtail.Procedure}; \n\n${procedDtail['Create Procedure']}`);
+                QueryUnit.showSQLTextDocument(`DROP PROCEDURE IF EXISTS ${this.name}; \n\n${procedDtail['Create Procedure']}`);
             });
     }
 

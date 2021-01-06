@@ -585,7 +585,7 @@ export default {
       return "Edit For " + this.result.table + " : " + this.result.primaryKey + "=" + this.update.primary
     },
     remainHeight() {
-      return window.outerHeight - 200
+      return window.outerHeight - 230
     },
   },
 }

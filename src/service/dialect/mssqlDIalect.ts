@@ -1,6 +1,21 @@
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect implements SqlDialect {
+    showTableSource(database: string, table: string): string {
+        return `SELECT definition 'Create Table' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${table}')`
+    }
+    showViewSource(database: string, table: string): string {
+        return `SELECT definition 'Create View' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${table}')`
+    }
+    showProcedureSource(database: string, name: string): string {
+        return `SELECT definition 'Create Procedure' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}')`
+    }
+    showFunctionSource(database: string, name: string): string {
+        return `SELECT definition 'Create Function' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}')`
+    }
+    showTriggerSource(database: string, name: string): string {
+        return `SELECT definition 'SQL Original Statement' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}')`
+    }
     /**
      * remove extra、COLUMN_COMMENT(comment)、COLUMN_KEY(key)
      */
@@ -13,13 +28,13 @@ export class MssqlDIalect implements SqlDialect {
         return `SELECT OBJECT_NAME(parent_id) as Table_Name, * FROM [${database}].sys.triggers`;
     }
     showProcedures(database: string): string {
-        return `SELECT ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_CATALOG = '${database}' and ROUTINE_TYPE='PROCEDURE'`;
+        return `SELECT concat(ROUTINE_SCHEMA,'.',ROUTINE_NAME) ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_CATALOG = '${database}' and ROUTINE_TYPE='PROCEDURE'`;
     }
     showFunctions(database: string): string {
-        return `SELECT ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_CATALOG = '${database}' and ROUTINE_TYPE='FUNCTION'`;
+        return `SELECT concat(ROUTINE_SCHEMA,'.',ROUTINE_NAME) ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_CATALOG = '${database}' and ROUTINE_TYPE='FUNCTION'`;
     }
     showViews(database: string): string {
-        return `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS  WHERE TABLE_CATALOG = '${database}' `;
+        return `SELECT concat(TABLE_SCHEMA,'.',TABLE_NAME) TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS  WHERE TABLE_CATALOG = '${database}' `;
     }
     buildPageSql(database: string, table: string, pageSize: number): string {
         return `SELECT TOP ${pageSize} * FROM ${table};`;
@@ -28,7 +43,7 @@ export class MssqlDIalect implements SqlDialect {
         return `SELECT count(*) count FROM ${table};`;
     }
     showTables(database: string): string {
-        return `SELECT TABLE_NAME tableName FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_CATALOG='${database}'`
+        return `SELECT concat(TABLE_SCHEMA,'.',TABLE_NAME) tableName FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_CATALOG='${database}'`
     }
     showDatabases(): string {
         return "SELECT name 'Database' FROM master.sys.databases"

@@ -12,6 +12,11 @@ export interface SqlDialect {
     showFunctions(database:string): string;
     buildPageSql(database:string,table:string,pageSize:number):string;
     countSql(database:string,table:string):string;
+    showTableSource(database:string,table:string):string;
+    showViewSource(database:string,table:string):string;
+    showProcedureSource(database:string,name:string):string;
+    showFunctionSource(database:string,name:string):string;
+    showTriggerSource(database:string,name:string):string;
     tableTemplate():string;
     viewTemplate():string;
     procedureTemplate():string;
