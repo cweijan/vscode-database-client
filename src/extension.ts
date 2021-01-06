@@ -28,6 +28,7 @@ import { DiagramGroup } from "./model/diagram/diagramGroup";
 import { QueryNode } from "./model/query/queryNode";
 import { QueryGroup } from "./model/query/queryGroup";
 import { Node } from "./model/interface/node";
+import { DbTreeDataProvider } from "./provider/treeDataProvider";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -48,6 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
                 [CommandKey.Refresh]: (node:Node) => {
                     if(node){
                         node.getChildren(true)
+                        DbTreeDataProvider.refresh(node)
                     }else{
                         serviceManager.provider.init(); 
                     }

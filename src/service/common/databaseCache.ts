@@ -191,6 +191,10 @@ export class DatabaseCache {
         return viewList;
     }
 
+    public static getChildListOfId(id: string): Node[] {
+        return this.databaseNodeMapTableNode[id];
+    }
+
     public static getDatabase(connectId: string, dbName: string): DatabaseNode {
         const dbList = this.connectionNodeMapDatabaseNode[connectId];
         if (!dbList) { return null; }

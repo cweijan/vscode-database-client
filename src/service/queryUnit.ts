@@ -64,11 +64,6 @@ export class QueryUnit {
             return;
         }
 
-        // const sqlList: string[] = sql.match(/(?:[^;"']+|["'][^"']*["'])+/g)?.filter((s) => (s.trim() != '' && s.trim() != ';'))
-        // if (sqlList?.length == 0 && sql.match(this.selectPattern) && !sql.match(/\blimit\b/i) && !sql.match(/;\s*$/) && !sql.match(/[count|sum|min|max]\(/i)) {
-        //     sql += ` LIMIT ${Global.getConfig(ConfigKey.DEFAULT_LIMIT)}`;
-        // }
-
         QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
 
         const executeTime = new Date().getTime();
