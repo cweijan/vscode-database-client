@@ -125,7 +125,7 @@ ADD
         const executeTime = new Date().getTime();
         connection.query(sql, (err: Error, data, fields) => {
             const costTime = new Date().getTime() - executeTime;
-            QueryPage.send({ singlePage: false, type: MessageType.DATA, connection: this, res: { sql, costTime, data, fields, pageSize: pageSize } as DataResponse });
+            QueryPage.send({ singlePage: false, type: MessageType.DATA, connection: this, res: { sql, costTime, data, fields, pageSize: pageSize } as DataResponse },this);
         })
 
     }

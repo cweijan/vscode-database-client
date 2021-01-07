@@ -34,7 +34,7 @@ export class QueryPage {
     private static statusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -200);
     private static costStatusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -250);
 
-    public static async send(queryParam: QueryParam<any>) {
+    public static async send(queryParam: QueryParam<any>,dbOption:Node) {
 
         if (typeof queryParam.singlePage == 'undefined') {
             queryParam.singlePage = true;
@@ -64,7 +64,6 @@ export class QueryPage {
             }
         }
 
-        const dbOption = ConnectionManager.getLastConnectionOption();
         ViewManager.createWebviewPanel({
             singlePage: true,
             splitView: this.isActiveSql(),

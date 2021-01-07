@@ -16,6 +16,9 @@ import { CopyAble } from "../interface/copyAble";
 import { NodeUtil } from "../nodeUtil";
 import { IConnection } from "@/service/connect/connection";
 
+/**
+ * TODO: 切换为使用连接池, 现在会导致消费队列不正确, 导致视图失去响应
+ */
 export class ConnectionNode extends Node implements CopyAble {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/server.png");
@@ -40,7 +43,13 @@ export class ConnectionNode extends Node implements CopyAble {
 
         let dbNodes = DatabaseCache.getDatabaseListOfConnection(this.uid);
         if (dbNodes && !isRresh) {
-            return dbNodes;
+            // update active state.
+            return dbNodes.map(dbNode=>{
+                if(dbNode.contextValue==ModelType.USER_GROUP){
+                    return new UserGroup(dbNode.label,this)
+                }
+                return new DatabaseNode(dbNode.label,this)
+            });
         }
 
         const connection= await ConnectionManager.getConnection(this)

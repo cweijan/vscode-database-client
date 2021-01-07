@@ -87,8 +87,6 @@ export class ConnectionManager {
                     } catch (err) {
                         ConnectionManager.end(key, connection);
                     }
-                }else{
-                    ConnectionManager.end(key, connection);
                 }
             }
 

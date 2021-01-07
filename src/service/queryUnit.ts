@@ -59,7 +59,7 @@ export class QueryUnit {
         const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
         sql = parseResult.sql
         if (!sql && parseResult.replace) {
-            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
+            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse },connectionNode);
             return;
         }
 
@@ -69,13 +69,13 @@ export class QueryUnit {
             return;
         }
 
-        QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse });
+        QueryPage.send({ type: MessageType.RUN, res: { sql } as RunResponse },connectionNode);
 
         const executeTime = new Date().getTime();
         try {
             (await ConnectionManager.getConnection(connectionNode, true)).query(sql, (err: Error, data, fields) => {
                 if (err) {
-                    QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
+                    QueryPage.send({ type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse },connectionNode);
                     return;
                 }
                 const costTime = new Date().getTime() - executeTime;
@@ -83,7 +83,7 @@ export class QueryUnit {
                     vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime);
                 }
                 if (data.affectedRows) {
-                    QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
+                    QueryPage.send({ type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse },connectionNode);
                     vscode.commands.executeCommand(CommandKey.Refresh);
                     return;
                 }
@@ -94,13 +94,13 @@ export class QueryUnit {
                     if (data[1] && (
                         data[1].__proto__.constructor.name == "array" || data[1].__proto__.constructor.name == "OkPacket" || data[1].__proto__.constructor.name == "ResultSetHeader")
                     ) {
-                        QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
+                        QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse },connectionNode);
                         return;
                     }
-                    QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+                    QueryPage.send({ type: MessageType.DATA, connection: connectionNode, res: { sql, costTime, data, fields, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse },connectionNode);
                 } else {
                     // unknow result, send sql success
-                    QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
+                    QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse },connectionNode);
                 }
     
             });
