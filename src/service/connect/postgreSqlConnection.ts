@@ -1,5 +1,5 @@
 import { Node } from "@/model/interface/node";
-import { Client } from "pg";
+import { Client, QueryArrayResult } from "pg";
 import { IConnection, queryCallback } from "./connection";
 
 export class PostgreSqlConnection implements IConnection {
@@ -9,8 +9,8 @@ export class PostgreSqlConnection implements IConnection {
             host: opt.host, port: opt.port,
             user: opt.user, password: opt.password,
             database: opt.database,
-            connectionTimeoutMillis:5000,
-            statement_timeout:10000,
+            connectionTimeoutMillis: 5000,
+            statement_timeout: 10000,
         };
         this.client = new Client(config);
     }
@@ -21,7 +21,7 @@ export class PostgreSqlConnection implements IConnection {
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
     query(sql: any, values?: any, callback?: any) {
-        
+
         if (!callback && values instanceof Function) {
             callback = values;
         }
@@ -30,15 +30,22 @@ export class PostgreSqlConnection implements IConnection {
                 callback(err)
             } else {
                 if (res instanceof Array) {
-                    callback(null, res.map(row => row.rows), res.map(row => row.fields))
+                    callback(null, res.map(row => this.adaptResult(row)), res.map(row => row.fields))
                 } else {
-                    callback(null, res.rows, res.fields)
+                    callback(null, this.adaptResult(res), res.fields)
                 }
             }
         })
     }
+    adaptResult(res: QueryArrayResult<any>) {
+        if (res.command != 'SELECT') {
+            return { affectedRows: res.rowCount }
+        }
+        return res.rows;
+    }
+
     connect(callback: (err: Error) => void): void {
-        this.client.connect(err=>{
+        this.client.connect(err => {
             callback(err)
         })
     }

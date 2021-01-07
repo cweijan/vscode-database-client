@@ -47,6 +47,10 @@ body {
 
 /* umyui */
 
+.el-input.is-disabled input{
+border: none !important;
+}
+
 .plx-header--column.col--ellipsis>.plx-cell .plx-cell--title{
 font-weight: 400;
 }
