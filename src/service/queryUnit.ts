@@ -50,6 +50,12 @@ export class QueryUnit {
         }
         sql = sql.replace(/^\s*--.+/igm, '').trim();
 
+        const sqlList: string[] = sql?.match(/(?:[^;"']+|["'][^"']*["'])+/g)?.filter((s) => (s.trim() != '' && s.trim() != ';'))
+        // Fix posible sql run fail.
+        if(sqlList?.length==1){
+            sql=sqlList[0]
+        }
+
         const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
         sql = parseResult.sql
         if (!sql && parseResult.replace) {
