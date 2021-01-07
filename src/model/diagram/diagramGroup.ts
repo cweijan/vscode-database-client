@@ -10,23 +10,33 @@ import { TableNode } from "../main/tableNode";
 import { ColumnNode } from "../other/columnNode";
 import { DiagramNode } from "./diagramNode";
 import { Global } from "../../common/global";
+import { InfoNode } from "../other/infoNode";
 
 export class DiagramGroup extends Node {
-   
+
     public contextValue = ModelType.DIAGRAM_GROUP;
     public iconPath = path.join(Constants.RES_PATH, "icon/diagram.svg")
     constructor(readonly info: Node) {
         super("DIAGRAM")
-        // this.id = `${this.getConnectId()}_${info.database}_${ModelType.DIAGRAM_GROUP}`;
+        // this.uid = `${this.getConnectId()}_${info.database}_${ModelType.DIAGRAM_GROUP}`;
         this.init(info)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         const path = `${FileManager.storagePath}/diagram/${this.getConnectId()}_${this.database}`;
-        if (!existsSync(path)) {
-            return []
+        const diagrams = this.readdir(path)?.map(fileName => new DiagramNode(fileName.replace(/\.[^/.]+$/, ""), this));
+        if (!diagrams || diagrams.length == 0) {
+            return [new InfoNode("This database has no created diagram.")]
         }
-        return readdirSync(path).map(fileName => new DiagramNode(fileName.replace(/\.[^/.]+$/, ""), this))
+        return diagrams
+    }
+
+    readdir(path:string):string[]{
+        try {
+            return readdirSync(path)
+        } catch (error) {
+            return null;
+        }
     }
 
     public openAdd() {

@@ -24,7 +24,7 @@ export class TableNode extends Node implements CopyAble {
     constructor(public readonly table: string, readonly comment: string, readonly parent: Node) {
         super(`${table}`)
         this.description = comment
-        this.id = `${parent.getConnectId()}_${parent.database}_${table}`
+        this.uid = `${parent.getConnectId()}_${parent.database}_${table}`
         this.init(parent)
         this.command = {
             command: "mysql.template.sql",
@@ -34,7 +34,7 @@ export class TableNode extends Node implements CopyAble {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        let columnNodes = DatabaseCache.getColumnListOfTable(this.id);
+        let columnNodes = DatabaseCache.getColumnListOfTable(this.uid);
         if (columnNodes && !isRresh && this.collapsibleState != vscode.TreeItemCollapsibleState.Expanded) {
             return columnNodes;
         }
@@ -46,8 +46,7 @@ export class TableNode extends Node implements CopyAble {
                     }
                     return new ColumnNode(this.table, column, this, index);
                 });
-                DatabaseCache.setColumnListOfTable(this.id, columnNodes);
-
+                DatabaseCache.setColumnListOfTable(this.uid, columnNodes);
                 return columnNodes;
             })
             .catch((err) => {

@@ -8,6 +8,7 @@ import { Node } from "../model/interface/node";
 import { UserGroup } from "../model/database/userGroup";
 import { Global } from "../common/global";
 import { NodeUtil } from "@/model/nodeUtil";
+import { InfoNode } from "@/model/other/infoNode";
 
 export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
@@ -48,8 +49,11 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         if (!element) {
             return this.getConnectionNodes();
         }
-
-        return element.getChildren();
+        try {
+            return element.getChildren();
+        } catch (error) {
+            return [new InfoNode(error)]
+        }
     }
 
     public async addConnection(connectionNode: Node) {
@@ -98,18 +102,18 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         let workspaceConnections = this.context.workspaceState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey, {});
 
         const connections = { ...globalConnections, ...workspaceConnections };
-        // temp duplicate id solution
+        // temp duplicate uid solution
         const idMap = {};
 
         return Object.keys(connections).map(key => {
             const connection = new ConnectionNode(key, connections[key]);
-            idMap[connection.id] = true;
+            idMap[connection.uid] = true;
             if (typeof connections[key].global == "undefined") {
                 // Compatible with older versions, will remove in the feature
                 connections[key].global = true;
             }
-            if (idMap[connection.id]) {
-                idMap[connection.id] = idMap[connection.id] + new Date().getTime()
+            if (idMap[connection.uid]) {
+                idMap[connection.uid] = idMap[connection.uid] + new Date().getTime()
             }
             return connection;
         })
@@ -123,9 +127,9 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         const numbers = (await this.getConnectionNodes()).length > 1
         for (const dbNode of DatabaseCache.getDatabaseNodeList()) {
             if (dbNode instanceof UserGroup) { continue }
-            const id = numbers ? dbNode.id : dbNode.database
-            dbIdList.push(id)
-            dbIdMap.set(id, dbNode)
+            const uid = numbers ? dbNode.uid : dbNode.database
+            dbIdList.push(uid)
+            dbIdMap.set(uid, dbNode)
         }
         if (dbIdList) {
             vscode.window.showQuickPick(dbIdList).then(async (dbId) => {

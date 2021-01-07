@@ -44,7 +44,7 @@ export class TableChain implements ComplectionChain {
             const connectcionid = lcp.getConnectId();
             for (const databaseNode of DatabaseCache.getDatabaseListOfConnection(connectcionid)) {
                 if (databaseNode.database === inputWord) {
-                    tableNodes = DatabaseCache.getChildListOfDatabase(databaseNode.id);
+                    tableNodes = DatabaseCache.getChildListOfDatabase(databaseNode.uid);
                     if (tableNodes == null || tableNodes.length == 0) {
                         tableNodes = await new TableGroup(databaseNode.parent).getChildren()
                     }

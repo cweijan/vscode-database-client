@@ -25,7 +25,7 @@ export class DatabaseNode extends Node implements CopyAble {
     public iconPath: string = path.join(Constants.RES_PATH, "icon/database.svg");
     constructor(name: string, readonly parent: Node) {
         super(name)
-        this.id = `${parent.getConnectId()}_${name}`
+        this.uid = `${parent.getConnectId()}_${name}`
         this.parent = NodeUtil.of({ ...parent, database: name } as Node)
         this.init(this.parent)
         this.cacheSelf()
@@ -87,7 +87,7 @@ export class DatabaseNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        FileManager.show(`${this.id}.sql`)
+        FileManager.show(`${this.uid}.sql`)
         ConnectionManager.getConnection(this, true);
 
     }

@@ -78,8 +78,8 @@ export class DatabaseCache {
             this.collpaseState = {};
         }
 
-        if (element.id && this.collpaseState[element.id]) {
-            return this.collpaseState[element.id];
+        if (element.uid && this.collpaseState[element.uid]) {
+            return this.collpaseState[element.uid];
         } else if (element.contextValue == ModelType.CONNECTION || element.contextValue == ModelType.TABLE_GROUP) {
             return TreeItemCollapsibleState.Expanded;
         } else {
@@ -100,7 +100,7 @@ export class DatabaseCache {
             return;
         }
 
-        this.collpaseState[element.id] = collapseState;
+        this.collpaseState[element.uid] = collapseState;
         if (element.global === false) {
             this.context.workspaceState.update(CacheKey.CollapseSate, this.collpaseState);
         } else {
@@ -191,8 +191,8 @@ export class DatabaseCache {
         return viewList;
     }
 
-    public static getChildListOfId(id: string): Node[] {
-        return this.databaseNodeMapTableNode[id];
+    public static getChildListOfId(uid: string): Node[] {
+        return this.databaseNodeMapTableNode[uid];
     }
 
     public static getDatabase(connectId: string, dbName: string): DatabaseNode {

@@ -12,6 +12,8 @@ export interface SwitchOpt {
 
 export abstract class Node extends vscode.TreeItem {
 
+    public uid: string;
+
     public host: string;
     public port: number;
     public user: string;
@@ -29,8 +31,8 @@ export abstract class Node extends vscode.TreeItem {
     public dbType?: DatabaseType;
     public dialect?: SqlDialect;
 
-    constructor(id: string) {
-        super(id)
+    constructor(uid: string) {
+        super(uid)
     }
 
     protected init(source: Node) {
@@ -70,17 +72,17 @@ export abstract class Node extends vscode.TreeItem {
         const targetGlobal = opt?.isGlobal != null ? opt.isGlobal : this.global;
         const prefix = targetGlobal === false ? "workspace" : "global";
 
-        let id = (this.usingSSH && this.ssh) ? `${prefix}_${this.ssh.host}_${this.ssh.port}_${this.ssh.username}`
+        let uid = (this.usingSSH && this.ssh) ? `${prefix}_${this.ssh.host}_${this.ssh.port}_${this.ssh.username}`
             : `${prefix}_${this.host}_${this.port}_${this.user}`;
 
         /**
          * mssql and postgres must special database when connect.
          */
         if (opt?.withDb && this.database && this.dbType == DatabaseType.PG) {
-            return `${id}_${this.database}`
+            return `${uid}_${this.database}`
         }
 
-        return id;
+        return uid;
     }
 
 

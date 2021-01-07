@@ -61,11 +61,11 @@ export class ColumnChain implements ComplectionChain {
 
         const lcp = ConnectionManager.getLastConnectionOption()
         if (!lcp) { return []; }
-        const id = `${lcp.getConnectId()}_${lcp.database}_${tableName}`;
+        const uid = `${lcp.getConnectId()}_${lcp.database}_${tableName}`;
 
         for (const tableNode of DatabaseCache.getTableNodeList()) {
             if ((tableNode.table == tableName) ||
-                (tableNode.id === id)) {
+                (tableNode.uid === uid)) {
                 columnNodes = (await tableNode.getChildren()) as ColumnNode[];
                 break;
             }

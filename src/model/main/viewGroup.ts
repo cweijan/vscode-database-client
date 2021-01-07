@@ -15,13 +15,13 @@ export class ViewGroup extends Node {
     public contextValue = ModelType.VIEW_GROUP
     constructor(readonly parent: Node) {
         super("VIEW")
-        this.id = `${parent.getConnectId()}_${parent.database}_${ModelType.VIEW_GROUP}`;
+        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.VIEW_GROUP}`;
         this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let tableNodes = DatabaseCache.getChildListOfId(this.id);
+        let tableNodes = DatabaseCache.getChildListOfId(this.uid);
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
@@ -31,10 +31,10 @@ export class ViewGroup extends Node {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new ViewNode(table.name, '', this);
                 });
-                DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {
-                    return [new InfoNode("This database has no view")];
+                    tableNodes=[new InfoNode("This database has no view")];
                 }
+                DatabaseCache.setTableListOfDatabase(this.uid, tableNodes);
                 return tableNodes;
             })
             .catch((err) => {
@@ -45,7 +45,7 @@ export class ViewGroup extends Node {
     public async createTemplate() {
 
         ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.id}#create-view-template.sql`, this.dialect.viewTemplate(), FileModel.WRITE)
+        const filePath = await FileManager.record(`${this.parent.uid}#create-view-template.sql`, this.dialect.viewTemplate(), FileModel.WRITE)
         FileManager.show(filePath)
 
     }

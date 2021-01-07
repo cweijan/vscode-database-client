@@ -22,11 +22,15 @@ export class PostgreSqlConnection implements IConnection {
         if (!callback && values instanceof Function) {
             callback = values;
         }
-        this.client.query(sql, values, (err, res) => {
+        this.client.query(sql, (err, res) => {
             if (err) {
                 callback(err)
             } else {
-                callback(null, res.rows, res.fields)
+                if (res instanceof Array) {
+                    callback(null, res.map(row => row.rows), res.map(row => row.fields))
+                } else {
+                    callback(null, res.rows, res.fields)
+                }
             }
         })
     }

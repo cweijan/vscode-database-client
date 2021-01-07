@@ -14,13 +14,13 @@ export class FunctionGroup extends Node {
     public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
     constructor(readonly parent: Node) {
         super("FUNCTION")
-        this.id = `${parent.getConnectId()}_${parent.database}_${ModelType.FUNCTION_GROUP}`;
+        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.FUNCTION_GROUP}`;
         this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let tableNodes = DatabaseCache.getChildListOfId(this.id);
+        let tableNodes = DatabaseCache.getChildListOfId(this.uid);
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
@@ -29,10 +29,10 @@ export class FunctionGroup extends Node {
                 tableNodes = tables.map<FunctionNode>((table) => {
                     return new FunctionNode(table.ROUTINE_NAME, this);
                 });
-                DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {
-                    return [new InfoNode("This database has no function")];
+                    tableNodes = [new InfoNode("This database has no function")];
                 }
+                DatabaseCache.setTableListOfDatabase(this.uid, tableNodes);
                 return tableNodes;
             })
             .catch((err) => {
@@ -43,7 +43,7 @@ export class FunctionGroup extends Node {
     public async createTemplate() {
 
         ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.id}#create-function-template.sql`, this.dialect.functionTemplate(), FileModel.WRITE)
+        const filePath = await FileManager.record(`${this.parent.uid}#create-function-template.sql`, this.dialect.functionTemplate(), FileModel.WRITE)
         FileManager.show(filePath)
 
     }

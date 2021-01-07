@@ -17,7 +17,7 @@ export class UserGroup extends DatabaseNode {
     public iconPath = path.join(Constants.RES_PATH, "icon/userGroup.svg")
     constructor(readonly name: string, readonly parent: Node) {
         super(name, parent)
-        this.id = `${this.getConnectId()}_${ModelType.USER_GROUP}`;
+        this.uid = `${this.getConnectId()}_${ModelType.USER_GROUP}`;
         this.database = null
     }
 
@@ -38,7 +38,7 @@ export class UserGroup extends DatabaseNode {
     public async createTemplate() {
 
         ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.id}#create-view-template.sql`,`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`, FileModel.WRITE)
+        const filePath = await FileManager.record(`${this.parent.uid}#create-view-template.sql`,`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`, FileModel.WRITE)
         FileManager.show(filePath)
     }
 

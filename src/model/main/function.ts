@@ -14,7 +14,7 @@ export class FunctionNode extends Node {
     public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
     constructor(readonly name: string, readonly parent: Node) {
         super(name)
-        this.id = `${parent.getConnectId()}_${parent.database}_${name}`
+        this.uid = `${parent.getConnectId()}_${parent.database}_${name}`
         this.init(parent)
         this.command = {
             command: "mysql.show.function",

@@ -6,6 +6,7 @@ import { QueryNode } from "./queryNode";
 import { FileManager } from "@/common/filesManager";
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "fs";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
+import { InfoNode } from "../other/infoNode";
 
 export class QueryGroup extends Node {
     public contextValue = ModelType.QUERY_GROUP;
@@ -18,10 +19,19 @@ export class QueryGroup extends Node {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        if (!existsSync(this.storePath)) {
-            return []
+        const queries = this.readdir(this.storePath)?.map(fileName => new QueryNode(fileName.replace(/\.[^/.]+$/, ""), this));
+        if (!queries || queries.length == 0) {
+            return [new InfoNode("This database has no saved query.")]
         }
-        return readdirSync(this.storePath).map(fileName => new QueryNode(fileName.replace(/\.[^/.]+$/, ""), this))
+        return queries
+    }
+
+    readdir(path:string):string[]{
+        try {
+            return readdirSync(path)
+        } catch (error) {
+            return null;
+        }
     }
 
     public add() {

@@ -15,13 +15,13 @@ export class TriggerGroup extends Node {
 
     constructor(readonly parent: Node) {
         super("TRIGGER")
-        this.id = `${parent.getConnectId()}_${parent.database}_${ModelType.TRIGGER_GROUP}`;
+        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.TRIGGER_GROUP}`;
         this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let tableNodes = DatabaseCache.getChildListOfId(this.id);
+        let tableNodes = DatabaseCache.getChildListOfId(this.uid);
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
@@ -30,10 +30,10 @@ export class TriggerGroup extends Node {
                 tableNodes = tables.map<TriggerNode>((table) => {
                     return new TriggerNode(table.TRIGGER_NAME, this);
                 });
-                DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {
-                    return [new InfoNode("This database has no trigger")];
+                    tableNodes = [new InfoNode("This database has no trigger")];
                 }
+                DatabaseCache.setTableListOfDatabase(this.uid, tableNodes);
                 return tableNodes;
             })
             .catch((err) => {
@@ -45,7 +45,7 @@ export class TriggerGroup extends Node {
     public async createTemplate() {
 
         ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.id}#create-trigger-template.sql`, this.dialect.triggerTemplate(), FileModel.WRITE)
+        const filePath = await FileManager.record(`${this.parent.uid}#create-trigger-template.sql`, this.dialect.triggerTemplate(), FileModel.WRITE)
         FileManager.show(filePath)
 
     }

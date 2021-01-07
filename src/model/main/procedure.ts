@@ -16,7 +16,7 @@ export class ProcedureNode extends Node {
     constructor(readonly name: string, readonly parent: Node) {
         super(name)
         this.init(parent)
-        // this.id = `${info.getConnectKey()}_${info.database}_${name}`
+        // this.uid = `${info.getConnectKey()}_${info.database}_${name}`
         this.command = {
             command: "mysql.show.procedure",
             title: "Show Procedure Create Source",

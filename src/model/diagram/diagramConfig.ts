@@ -1,6 +1,6 @@
 export interface DiagramConfig {
     name: string,
-    id: string,
+    uid: string,
     gojsConfig: {
         copiesArrays: boolean,
         copiesArrayObjects: boolean,

@@ -17,8 +17,8 @@ export abstract class AbstractDumpService {
         if (node instanceof TableNode || node instanceof ViewNode) {
             tables = [node.table]
         } else {
-            const tableList = DatabaseCache.getTableListOfDatabase(node.id);
-            const viewList = DatabaseCache.getViewListOfDatabase(node.id) || [];
+            const tableList = DatabaseCache.getTableListOfDatabase(node.uid);
+            const viewList = DatabaseCache.getViewListOfDatabase(node.uid) || [];
             const tableAndViewList=tableList.concat(viewList)
             tables = await vscode.window.showQuickPick(tableAndViewList.map(table => table.label), { canPickMany: true, placeHolder: "Select databases to export, default is all" })
             if (!tables) {

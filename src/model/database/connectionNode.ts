@@ -20,13 +20,13 @@ export class ConnectionNode extends Node implements CopyAble {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/server.png");
     public contextValue: string = ModelType.CONNECTION;
-    constructor(readonly id: string, readonly parent: Node) {
-        super(id)
+    constructor(readonly uid: string, readonly parent: Node) {
+        super(uid)
         this.init(parent)
         this.cacheSelf()
-        this.id=this.getConnectId()
+        this.uid=this.getConnectId()
         if (parent.name) {
-            this.label = `${parent.name}_${this.id}`
+            this.label = `${parent.name}_${this.uid}`
             this.name = parent.name
         }
         const lcp = ConnectionManager.getLastConnectionOption(false);
@@ -70,7 +70,7 @@ export class ConnectionNode extends Node implements CopyAble {
                     // databaseNodes.unshift(new UserGroup("USER", this));
                 }
 
-                DatabaseCache.setDataBaseListOfConnection(this.id, databaseNodes);
+                DatabaseCache.setDataBaseListOfConnection(this.uid, databaseNodes);
 
                 return databaseNodes;
             })
@@ -107,7 +107,7 @@ export class ConnectionNode extends Node implements CopyAble {
         vscode.window.showInputBox({ placeHolder: 'Input you want to create new database name.' }).then(async (inputContent) => {
             if (!inputContent) { return; }
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), this.dialect.createDatabase(inputContent)).then(() => {
-                DatabaseCache.clearDatabaseCache(this.id);
+                DatabaseCache.clearDatabaseCache(this.uid);
                 DbTreeDataProvider.refresh(this);
                 vscode.window.showInformationMessage(`create database ${inputContent} success!`);
             });
@@ -116,14 +116,14 @@ export class ConnectionNode extends Node implements CopyAble {
 
     public async deleteConnection(context: vscode.ExtensionContext) {
 
-        Util.confirm(`Are you want to Delete Connection ${this.id} ? `, async () => {
+        Util.confirm(`Are you want to Delete Connection ${this.uid} ? `, async () => {
             const targetContext = this.global === false ? context.workspaceState : context.globalState;
             const connections = targetContext.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
-            ConnectionManager.removeConnection(this.id)
-            DatabaseCache.clearDatabaseCache(this.id)
-            delete connections[this.id];
+            ConnectionManager.removeConnection(this.uid)
+            DatabaseCache.clearDatabaseCache(this.uid)
+            delete connections[this.uid];
             await targetContext.update(CacheKey.ConectionsKey, NodeUtil.removeParent(connections));
-            DbTreeDataProvider.refresh(this);
+            DbTreeDataProvider.refresh();
         })
 
     }
