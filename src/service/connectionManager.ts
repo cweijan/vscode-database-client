@@ -77,9 +77,11 @@ export class ConnectionManager {
             const connection = this.activeConnection[key];
             if (connection ) {
                 if(connection.connection.isAlive()){
-                    const sql = connectionNode.database ? connectionNode.dialect.switchDataBase(connectionNode.database) : `select 1;`;
+                    const sql = connectionNode.database ? connectionNode.dialect.switchDataBase(connectionNode.database) : '';
                     try {
-                        await QueryUnit.queryPromise(connection.connection, sql, false)
+                        if(sql){
+                            await QueryUnit.queryPromise(connection.connection, sql, false)
+                        }
                         resolve(connection.connection);
                         return;
                     } catch (err) {

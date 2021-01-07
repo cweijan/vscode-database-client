@@ -38,6 +38,11 @@ export class ConnectionNode extends Node implements CopyAble {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
+        let dbNodes = DatabaseCache.getDatabaseListOfConnection(this.uid);
+        if (dbNodes && !isRresh) {
+            return dbNodes;
+        }
+
         const connection= await ConnectionManager.getConnection(this)
 
         return QueryUnit.queryPromise<any[]>(connection, this.dialect.showDatabases())

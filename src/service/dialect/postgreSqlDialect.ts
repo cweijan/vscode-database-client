@@ -9,7 +9,7 @@ export class PostgreSqlDialect implements SqlDialect{
      * postgre cannot change database.
      */
     switchDataBase(database: string): string {
-        return "select 1;";
+        return null;
     }
     renameTable(database: string, tableName: string, newName: string): string {
         return `RENAME TABLE "${database}"."${tableName}" to "${database}"."${newName}"`;
