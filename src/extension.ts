@@ -46,9 +46,9 @@ export function activate(context: vscode.ExtensionContext) {
             // util
             ...{
                 "mysql.history.open": () => serviceManager.historyService.showHistory(),
-                [CommandKey.Refresh]: (node:Node) => {
+                [CommandKey.Refresh]: async (node:Node) => {
                     if(node){
-                        node.getChildren(true)
+                        await node.getChildren(true)
                         DbTreeDataProvider.refresh(node)
                     }else{
                         serviceManager.provider.init(); 

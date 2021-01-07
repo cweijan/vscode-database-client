@@ -46,9 +46,9 @@ export class MssqlDIalect implements SqlDialect {
     }
     showViews(database: string): string {
         if (database.toLowerCase() == 'master') {
-            return `SELECT concat(SCHEMA_NAME(schema_id),'.',name) TABLE_NAME FROM [sys].[all_views] ORDER BY TABLE_NAME`;
+            return `SELECT concat(SCHEMA_NAME(schema_id),'.',name) name FROM [sys].[all_views] ORDER BY name`;
         }
-        return `SELECT concat(TABLE_SCHEMA,'.',TABLE_NAME) TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS  WHERE TABLE_CATALOG = '${database}' `;
+        return `SELECT concat(TABLE_SCHEMA,'.',TABLE_NAME) name FROM INFORMATION_SCHEMA.VIEWS  WHERE TABLE_CATALOG = '${database}' `;
     }
     buildPageSql(database: string, table: string, pageSize: number): string {
         return `SELECT TOP ${pageSize} * FROM ${table};`;
@@ -57,7 +57,7 @@ export class MssqlDIalect implements SqlDialect {
         return `SELECT count(*) count FROM ${table};`;
     }
     showTables(database: string): string {
-        return `SELECT concat(TABLE_SCHEMA,'.',TABLE_NAME) tableName FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_CATALOG='${database}'`
+        return `SELECT concat(TABLE_SCHEMA,'.',TABLE_NAME) 'name' FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_CATALOG='${database}'`
     }
     showDatabases(): string {
         return "SELECT name 'Database' FROM master.sys.databases"

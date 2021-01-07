@@ -29,7 +29,7 @@ export class ViewGroup extends Node {
             this.dialect.showViews(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
-                    return new ViewNode(table.TABLE_NAME, '', this);
+                    return new ViewNode(table.name, '', this);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {

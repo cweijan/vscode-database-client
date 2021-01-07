@@ -39,7 +39,7 @@ export class ConnectionManager {
     }
 
     public static getActiveConnectByKey(key: string): ConnectionWrapper {
-        return this.activeConnection[key] 
+        return this.activeConnection[key]
     }
 
     public static removeConnection(id: string) {
@@ -51,7 +51,7 @@ export class ConnectionManager {
         const activeConnect = this.activeConnection[id];
         if (activeConnect) {
             this.activeConnection[id] = null
-            this.tunnelService.closeTunnel(lcp.getConnectId())
+            this.tunnelService.closeTunnel(id)
             activeConnect.connection.end()
         }
         DatabaseCache.clearDatabaseCache(id)
@@ -83,7 +83,7 @@ export class ConnectionManager {
                     resolve(connection.connection);
                     return;
                 } catch (err) {
-                    this.activeConnection[key] = null
+                    ConnectionManager.end(key, connection);
                 }
             }
 
@@ -101,16 +101,16 @@ export class ConnectionManager {
             }
             this.activeConnection[key] = { connection: create(connectOption), ssh, createTime: new Date() };
             this.activeConnection[key].connection.connect((err: Error) => {
-                if (!err) {
-                    if(changeActive){
-                        this.lastConnectionNode = NodeUtil.of(connectionNode);
-                    }
-                    resolve(this.activeConnection[key].connection);
-                } else {
+                if (err) {
                     this.activeConnection[key] = null;
                     this.tunnelService.closeTunnel(key)
                     console.error(err.stack)
                     reject(err.message);
+                } else {
+                    if (changeActive) {
+                        this.lastConnectionNode = NodeUtil.of(connectionNode);
+                    }
+                    resolve(this.activeConnection[key].connection);
                 }
             });
 
@@ -118,12 +118,21 @@ export class ConnectionManager {
 
     }
 
+    private static end(key: string, connection: ConnectionWrapper) {
+        this.activeConnection[key] = null
+        try {
+            connection.connection.end();
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     public static getByActiveFile(): Node {
         if (vscode.window.activeTextEditor) {
             const fileName = vscode.window.activeTextEditor.document.fileName;
             if (fileName.includes('cweijan.vscode-mysql-client2')) {
                 const queryName = path.basename(fileName, path.extname(fileName))
-                const filePattern = queryName.replace(/#.+$/,'').split('_');
+                const filePattern = queryName.replace(/#.+$/, '').split('_');
                 const [mode, host, port, user] = filePattern
                 let database: string;
                 if (filePattern.length >= 5) {

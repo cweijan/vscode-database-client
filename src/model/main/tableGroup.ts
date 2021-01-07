@@ -27,7 +27,7 @@ export class TableGroup extends Node {
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this),this.dialect.showTables(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
-                    return new TableNode(table.tableName, table.comment, this);
+                    return new TableNode(table.name, table.comment, this);
                 });
                 DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {

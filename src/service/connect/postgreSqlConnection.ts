@@ -5,23 +5,30 @@ import { IConnection, queryCallback } from "./connection";
 export class PostgreSqlConnection implements IConnection {
     private client: Client;
     constructor(opt: Node) {
-        this.client = new Client({
+        const config = {
             host: opt.host, port: opt.port,
             user: opt.user, password: opt.password,
             database: opt.database
-        });
+        };
+        this.client = new Client(config);
     }
     isAlive(): boolean {
-        // return this.con.state == 'authenticated' || this.con.authorized
-        return false;
+        const temp = this.client as any;
+        return temp._connected && (!temp._ending);
     }
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
     query(sql: any, values?: any, callback?: any) {
-        /**
-         * convert result value
-         */
-        this.client.query(sql, values, callback)
+        if (!callback && values instanceof Function) {
+            callback = values;
+        }
+        this.client.query(sql, values, (err, res) => {
+            if (err) {
+                callback(err)
+            } else {
+                callback(null, res.rows, res.fields)
+            }
+        })
     }
     connect(callback: (err: Error) => void): void {
         this.client.connect(callback)

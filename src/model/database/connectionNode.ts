@@ -67,7 +67,7 @@ export class ConnectionNode extends Node implements CopyAble {
                 });
 
                 if (this.user.toLocaleLowerCase() == "root") {
-                    databaseNodes.unshift(new UserGroup("USER", this));
+                    // databaseNodes.unshift(new UserGroup("USER", this));
                 }
 
                 DatabaseCache.setDataBaseListOfConnection(this.id, databaseNodes);

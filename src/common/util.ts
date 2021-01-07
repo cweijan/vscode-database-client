@@ -30,7 +30,7 @@ export class Util {
                 return origin.split(".").map(text=>`[${text}]`).join(".")
             }
             if(databaseType==DatabaseType.PG){
-                return `"${origin}"`;
+                return origin.split(".").map(text=>`"${text}"`).join(".")
             }
             return `\`${origin}\``;
         }

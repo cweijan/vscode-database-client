@@ -65,10 +65,14 @@ export abstract class Node extends vscode.TreeItem {
         const targetGlobal = SpecGlobal != null ? SpecGlobal : this.global;
         const prefix = targetGlobal === false ? "workspace" : "global";
 
-        if (this.usingSSH && this.ssh) {
-            return `${prefix}_${this.ssh.host}_${this.ssh.port}_${this.ssh.username}`;
+        let id = (this.usingSSH && this.ssh)?`${prefix}_${this.ssh.host}_${this.ssh.port}_${this.ssh.username}`
+        :`${prefix}_${this.host}_${this.port}_${this.user}`;
+
+        if(this.database && this.dbType==DatabaseType.PG){
+            return `${id}_${this.database}`
         }
-        return `${prefix}_${this.host}_${this.port}_${this.user}`;
+
+        return id;
     }
 
 
