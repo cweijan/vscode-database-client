@@ -49,6 +49,7 @@ body {
 
 .el-input.is-disabled input{
 border: none !important;
+user-select: all;
 }
 
 .plx-header--column.col--ellipsis>.plx-cell .plx-cell--title{
