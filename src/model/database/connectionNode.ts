@@ -38,12 +38,7 @@ export class ConnectionNode extends Node implements CopyAble {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let connection: IConnection;
-        try {
-            connection = await ConnectionManager.getConnection(this);
-        } catch (err) {
-            return [new InfoNode(err)];
-        }
+        const connection= await ConnectionManager.getConnection(this)
 
         return QueryUnit.queryPromise<any[]>(connection, this.dialect.showDatabases())
             .then((databases) => {
@@ -66,9 +61,7 @@ export class ConnectionNode extends Node implements CopyAble {
                     return new DatabaseNode(database.Database, this);
                 });
 
-                if (this.user.toLocaleLowerCase() == "root") {
-                    // databaseNodes.unshift(new UserGroup("USER", this));
-                }
+                databaseNodes.unshift(new UserGroup("USER", this));
 
                 DatabaseCache.setDataBaseListOfConnection(this.uid, databaseNodes);
 

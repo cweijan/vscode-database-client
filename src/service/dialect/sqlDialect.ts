@@ -10,6 +10,7 @@ export interface SqlDialect {
     showTables(database: string): string;
     showColumns(database: string, table: string): string;
     showViews(database: string): string;
+    showUsers(): string;
     showTriggers(database: string): string;
     showProcedures(database: string): string;
     showFunctions(database: string): string;

@@ -2,6 +2,9 @@ import { QueryUnit } from "../queryUnit";
 import { SqlDialect } from "./sqlDialect";
 
 export class PostgreSqlDialect implements SqlDialect{
+    showUsers(): string {
+        return `SELECT usename "user" from pg_user `;
+    }
     /**
      * postgre cannot change database.
      */
@@ -26,7 +29,7 @@ export class PostgreSqlDialect implements SqlDialect{
     showProcedureSource(database: string, name: string): string {
         return `SELECT CONCAT('CREATE PROCEDURE ',ROUTINE_NAME,'()\nLANGUAGE ',routine_body,'\nAS $$',routine_definition,'$$;') "Create Procedure",ROUTINE_NAME,routine_definition,routine_body,data_type FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public'  and ROUTINE_TYPE='PROCEDURE' and routine_body!='EXTERNAL' AND ROUTINE_NAME='${name}'
         union
-        SELECT CONCAT('CREATE PROCEDURE ',ROUTINE_NAME,'()\nLANGUAGE plpgsql\nAS $$',routine_definition,'$$;') "Create Procedure",ROUTINE_NAME,routine_definition,routine_body,data_type FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public'  and ROUTINE_TYPE='PROCEDURE' and routine_body='EXTERNAL AND ROUTINE_NAME='${name}'`;
+        SELECT CONCAT('CREATE PROCEDURE ',ROUTINE_NAME,'()\nLANGUAGE plpgsql\nAS $$',routine_definition,'$$;') "Create Procedure",ROUTINE_NAME,routine_definition,routine_body,data_type FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public'  and ROUTINE_TYPE='PROCEDURE' and routine_body='EXTERNAL' AND ROUTINE_NAME='${name}'`;
     }
     showFunctionSource(database: string, name: string): string {
         return `SELECT CONCAT('CREATE FUNCTION ',ROUTINE_NAME,'()\nRETURNS ',data_type,'\nAS $$',

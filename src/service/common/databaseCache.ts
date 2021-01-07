@@ -1,9 +1,10 @@
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
-import { CacheKey, ModelType } from "../../common/constants";
+import { CacheKey, ConfigKey, ModelType } from "../../common/constants";
 import { ColumnNode } from "../../model/other/columnNode";
 import { DatabaseNode } from "../../model/database/databaseNode";
 import { Node } from "../../model/interface/node";
 import { TableNode } from "../../model/main/tableNode";
+import { Global } from "@/common/global";
 
 export class DatabaseCache {
 
@@ -60,6 +61,10 @@ export class DatabaseCache {
 
         if (!element.contextValue) {
             return TreeItemCollapsibleState.None
+        }
+
+        if(!Global.getConfig<boolean>(ConfigKey.LOAD_META_ON_CONNECT)){
+            return TreeItemCollapsibleState.Collapsed;
         }
 
         if (element.contextValue == ModelType.COLUMN || element.contextValue == ModelType.INFO || element.contextValue == ModelType.FUNCTION

@@ -2,6 +2,9 @@ import { QueryUnit } from "../queryUnit";
 import { SqlDialect } from "./sqlDialect";
 
 export class MysqlDialect implements SqlDialect{
+    showUsers(): string {
+        return `SELECT concat(user,'@',host) user FROM mysql.user;`;
+    }
     switchDataBase(database: string): string {
         return `use \`${database}\``;
     }

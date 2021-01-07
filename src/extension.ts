@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { CommandKey } from "./common/constants";
 import { ConnectionNode } from "./model/database/connectionNode";
 import { DatabaseNode } from "./model/database/databaseNode";
-import { UserGroup, UserNode } from "./model/database/userGroup";
+import { UserGroup } from "./model/database/userGroup";
 import { CopyAble } from "./model/interface/copyAble";
 import { FunctionNode } from "./model/main/function";
 import { FunctionGroup } from "./model/main/functionGroup";
@@ -29,6 +29,7 @@ import { QueryNode } from "./model/query/queryNode";
 import { QueryGroup } from "./model/query/queryGroup";
 import { Node } from "./model/interface/node";
 import { DbTreeDataProvider } from "./provider/treeDataProvider";
+import { UserNode } from "./model/database/userNode";
 
 export function activate(context: vscode.ExtensionContext) {
 

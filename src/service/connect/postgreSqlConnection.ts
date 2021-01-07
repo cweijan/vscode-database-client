@@ -8,7 +8,9 @@ export class PostgreSqlConnection implements IConnection {
         const config = {
             host: opt.host, port: opt.port,
             user: opt.user, password: opt.password,
-            database: opt.database
+            database: opt.database,
+            connectionTimeoutMillis:5000,
+            statement_timeout:10000,
         };
         this.client = new Client(config);
     }
@@ -19,6 +21,7 @@ export class PostgreSqlConnection implements IConnection {
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
     query(sql: any, values?: any, callback?: any) {
+        
         if (!callback && values instanceof Function) {
             callback = values;
         }
@@ -35,7 +38,9 @@ export class PostgreSqlConnection implements IConnection {
         })
     }
     connect(callback: (err: Error) => void): void {
-        this.client.connect(callback)
+        this.client.connect(err=>{
+            callback(err)
+        })
     }
     async beginTransaction() {
         await this.client.query("BEGIN")

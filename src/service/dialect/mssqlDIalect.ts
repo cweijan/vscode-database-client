@@ -2,6 +2,9 @@ import { window } from "vscode";
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect implements SqlDialect {
+    showUsers(): string {
+        throw new Error("Method not implemented.");
+    }
     /**
      * sql server cannot change database.
      */

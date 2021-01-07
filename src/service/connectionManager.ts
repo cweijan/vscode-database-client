@@ -75,13 +75,17 @@ export class ConnectionManager {
             }
             const key = connectionNode.getConnectId({ withDb: true });
             const connection = this.activeConnection[key];
-            if (connection && connection.connection.isAlive()) {
-                const sql = connectionNode.database ? connectionNode.dialect.switchDataBase(connectionNode.database) : `select 1;`;
-                try {
-                    await QueryUnit.queryPromise(connection.connection, sql, false)
-                    resolve(connection.connection);
-                    return;
-                } catch (err) {
+            if (connection ) {
+                if(connection.connection.isAlive()){
+                    const sql = connectionNode.database ? connectionNode.dialect.switchDataBase(connectionNode.database) : `select 1;`;
+                    try {
+                        await QueryUnit.queryPromise(connection.connection, sql, false)
+                        resolve(connection.connection);
+                        return;
+                    } catch (err) {
+                        ConnectionManager.end(key, connection);
+                    }
+                }else{
                     ConnectionManager.end(key, connection);
                 }
             }
@@ -101,8 +105,8 @@ export class ConnectionManager {
             this.activeConnection[key] = { connection: create(connectOption), ssh, createTime: new Date() };
             this.activeConnection[key].connection.connect((err: Error) => {
                 if (err) {
-                    this.activeConnection[key] = null;
                     this.tunnelService.closeTunnel(key)
+                    this.end(key,this.activeConnection[key])
                     console.error(err.stack)
                     reject(err.message);
                 } else {
@@ -122,7 +126,6 @@ export class ConnectionManager {
         try {
             connection.connection.end();
         } catch (error) {
-            console.log(error)
         }
     }
 
