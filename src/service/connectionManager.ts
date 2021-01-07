@@ -73,7 +73,7 @@ export class ConnectionManager {
                     DbTreeDataProvider.refresh()
                 }, 100);
             }
-            const key = connectionNode.getConnectId();
+            const key = connectionNode.getConnectId({ withDb: true });
             const connection = this.activeConnection[key];
             if (connection && connection.connection.isAlive()) {
                 const sql = connectionNode.database ? connectionNode.dialect.switchDataBase(connectionNode.database) : `select 1;`;

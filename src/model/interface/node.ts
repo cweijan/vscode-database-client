@@ -1,9 +1,14 @@
-import { DatabaseType } from "@/common/constants";
+import { DatabaseType, ModelType } from "@/common/constants";
 import { Util } from "@/common/util";
 import { getDialect, SqlDialect } from "@/service/dialect/sqlDialect";
 import * as vscode from "vscode";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { SSHConfig } from "./sshConfig";
+
+export interface SwitchOpt {
+    isGlobal?: boolean;
+    withDb?: boolean;
+}
 
 export abstract class Node extends vscode.TreeItem {
 
@@ -39,9 +44,9 @@ export abstract class Node extends vscode.TreeItem {
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
         this.global = source.global
-        this.dbType=source.dbType
-        if(!this.dialect){
-            this.dialect=getDialect(this.dbType)
+        this.dbType = source.dbType
+        if (!this.dialect) {
+            this.dialect = getDialect(this.dbType)
         }
         this.includeDatabases = source.includeDatabases
         this.excludeDatabases = source.excludeDatabases
@@ -49,10 +54,10 @@ export abstract class Node extends vscode.TreeItem {
     }
 
     private static nodeCache = {};
-    public cacheSelf(){
-        Node.nodeCache[`${this.getConnectId()}_${this.database}`]=this;
+    public cacheSelf() {
+        Node.nodeCache[`${this.getConnectId()}_${this.database}`] = this;
     }
-    public getCache(){
+    public getCache() {
         return Node.nodeCache[`${this.getConnectId()}_${this.database}`]
     }
 
@@ -60,15 +65,18 @@ export abstract class Node extends vscode.TreeItem {
         return []
     }
 
-    public getConnectId(SpecGlobal?: boolean): string {
+    public getConnectId(opt?: SwitchOpt): string {
 
-        const targetGlobal = SpecGlobal != null ? SpecGlobal : this.global;
+        const targetGlobal = opt?.isGlobal != null ? opt.isGlobal : this.global;
         const prefix = targetGlobal === false ? "workspace" : "global";
 
-        let id = (this.usingSSH && this.ssh)?`${prefix}_${this.ssh.host}_${this.ssh.port}_${this.ssh.username}`
-        :`${prefix}_${this.host}_${this.port}_${this.user}`;
+        let id = (this.usingSSH && this.ssh) ? `${prefix}_${this.ssh.host}_${this.ssh.port}_${this.ssh.username}`
+            : `${prefix}_${this.host}_${this.port}_${this.user}`;
 
-        if(this.database && this.dbType==DatabaseType.PG){
+        /**
+         * mssql and postgres must special database when connect.
+         */
+        if (opt?.withDb && this.database && this.dbType == DatabaseType.PG) {
             return `${id}_${this.database}`
         }
 
@@ -81,8 +89,8 @@ export abstract class Node extends vscode.TreeItem {
     public getUser(): string { return this.usingSSH ? this.ssh.username : this.user }
 
 
-    public wrap(origin: string){
-        return Util.wrap(origin,this.dbType)
+    public wrap(origin: string) {
+        return Util.wrap(origin, this.dbType)
     }
 
 }

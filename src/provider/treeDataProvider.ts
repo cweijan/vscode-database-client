@@ -54,25 +54,31 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async addConnection(connectionNode: Node) {
 
-        // if is add from edit, clear previous connection info.
-        const editGlobal = (connectionNode as any).isGlobal;
-        if (editGlobal != null) {
-            const oldContext = editGlobal === false ? this.context.workspaceState : this.context.globalState;
-            const oldConnections = oldContext.get<{ [key: string]: Node }>(CacheKey.ConectionsKey)
-            delete oldConnections[connectionNode.getConnectId(editGlobal)]
-            await oldContext.update(CacheKey.ConectionsKey, NodeUtil.removeParent(oldConnections));
-        }
+        await this.removeOldConnection(connectionNode);
 
         const targetContext = connectionNode.global === false ? this.context.workspaceState : this.context.globalState;
-
         let connections = targetContext.get<{ [key: string]: Node }>(CacheKey.ConectionsKey, {});
-
         const connectId = connectionNode.getConnectId();
         connections[connectId] = connectionNode;
         ConnectionManager.removeConnection(connectId)
-
         await targetContext.update(CacheKey.ConectionsKey, NodeUtil.removeParent(connections));
         DbTreeDataProvider.refresh();
+        
+    }
+
+    /**
+     * if is add from edit, clear previous connection info.
+     * isGlobal is a temp properties.
+     */
+    private async removeOldConnection(connectionNode: Node) {
+        const editGlobal = (connectionNode as any).isGlobal;
+        if (editGlobal != null) {
+            const isGlobal = editGlobal !== false;
+            const oldContext = isGlobal ? this.context.globalState : this.context.workspaceState;
+            const oldConnections = oldContext.get<{ [key: string]: Node; }>(CacheKey.ConectionsKey);
+            delete oldConnections[connectionNode.getConnectId({ isGlobal })];
+            await oldContext.update(CacheKey.ConectionsKey, NodeUtil.removeParent(oldConnections));
+        }
     }
 
     /**
