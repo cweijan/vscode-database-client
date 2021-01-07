@@ -2,6 +2,12 @@ import { window } from "vscode";
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect implements SqlDialect {
+    /**
+     * sql server cannot change database.
+     */
+    switchDataBase(database: string): string {
+        return "select 1;";
+    }
     renameTable(database: string, tableName: string, newName: string): string {
         return `sp_rename '${tableName}', '${newName}'`;
     }

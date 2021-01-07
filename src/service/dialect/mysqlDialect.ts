@@ -2,6 +2,9 @@ import { QueryUnit } from "../queryUnit";
 import { SqlDialect } from "./sqlDialect";
 
 export class MysqlDialect implements SqlDialect{
+    switchDataBase(database: string): string {
+        return `use \`${database}\``;
+    }
     renameTable(database: string, tableName: string, newName: string): string {
         return `RENAME TABLE \`${database}\`.\`${tableName}\` to \`${database}\`.\`${newName}\``;
     }

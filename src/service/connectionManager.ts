@@ -76,8 +76,7 @@ export class ConnectionManager {
             const key = connectionNode.getConnectId();
             const connection = this.activeConnection[key];
             if (connection && connection.connection.isAlive()) {
-                // TODO change to ping.
-                const sql = connectionNode.database ? `use ${connectionNode.wrap(connectionNode.database)}` : `select 1;`;
+                const sql = connectionNode.database ? connectionNode.dialect.switchDataBase(connectionNode.database) : `select 1;`;
                 try {
                     await QueryUnit.queryPromise(connection.connection, sql, false)
                     resolve(connection.connection);

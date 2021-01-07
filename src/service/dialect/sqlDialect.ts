@@ -1,9 +1,11 @@
 import { DatabaseType } from "@/common/constants";
+import { abort } from "process";
 import { MssqlDIalect } from "./mssqlDIalect";
 import { MysqlDialect } from "./mysqlDialect";
 import { PostgreSqlDialect } from "./postgreSqlDialect";
 
 export interface SqlDialect {
+    switchDataBase(database: string): string;
     showDatabases(): string;
     showTables(database: string): string;
     showColumns(database: string, table: string): string;
