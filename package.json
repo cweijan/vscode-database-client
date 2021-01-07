@@ -862,11 +862,6 @@
 			"type": "object",
 			"title": "MySQL",
 			"properties": {
-				"vscode-mysql.maxTableCount": {
-					"type": "integer",
-					"default": 1000,
-					"description": "The maximum table count shown in the tree view"
-				},
 				"vscode-mysql.enableDelimiter": {
 					"type": "boolean",
 					"default": false,

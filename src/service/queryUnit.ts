@@ -16,8 +16,6 @@ import { IConnection } from "./connect/connection";
 
 export class QueryUnit {
 
-    public static readonly maxTableCount = Global.getConfig<number>(ConfigKey.MAX_TABLE_COUNT);
-
     public static queryPromise<T>(connection: IConnection, sql: string,showError=true): Promise<T> {
         return new Promise((resolve, reject) => {
             connection.query(sql, (err: Error, rows) => {

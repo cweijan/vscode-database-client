@@ -45,7 +45,7 @@ export class MysqlDialect implements SqlDialect{
         return `SELECT ROUTINE_NAME FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${database}' and ROUTINE_TYPE='FUNCTION'`;
     }
     showViews(database: string): string {
-        return `SELECT TABLE_NAME name FROM information_schema.VIEWS  WHERE TABLE_SCHEMA = '${database}' LIMIT ${QueryUnit.maxTableCount}`;
+        return `SELECT TABLE_NAME name FROM information_schema.VIEWS  WHERE TABLE_SCHEMA = '${database}'`;
     }
     buildPageSql(database: string, table: string, pageSize: number):string {
         return  `SELECT * FROM ${database}.${table} LIMIT ${pageSize};`;
@@ -54,7 +54,7 @@ export class MysqlDialect implements SqlDialect{
         return `SELECT count(*) FROM ${database}.${table};`;
     }
     showTables(database: string): string {
-        return `SELECT table_comment comment,TABLE_NAME as name FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' order by table_name LIMIT ${QueryUnit.maxTableCount} ;`
+        return `SELECT table_comment comment,TABLE_NAME as name FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' order by table_name;`
     }
     showDatabases(): string {
         return "show databases"
