@@ -63,13 +63,13 @@ export class DatabaseCache {
             return TreeItemCollapsibleState.None
         }
 
-        if(!Global.getConfig<boolean>(ConfigKey.LOAD_META_ON_CONNECT)){
-            return TreeItemCollapsibleState.Collapsed;
-        }
-
         if (element.contextValue == ModelType.COLUMN || element.contextValue == ModelType.INFO || element.contextValue == ModelType.FUNCTION
             || element.contextValue == ModelType.TRIGGER || element.contextValue == ModelType.PROCEDURE || element.contextValue == ModelType.USER) {
             return TreeItemCollapsibleState.None;
+        }
+
+        if (!Global.getConfig<boolean>(ConfigKey.LOAD_META_ON_CONNECT)) {
+            return TreeItemCollapsibleState.Collapsed;
         }
 
         if (!this.collpaseState || Object.keys(this.collpaseState).length == 0) {
