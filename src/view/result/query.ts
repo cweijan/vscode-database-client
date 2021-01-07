@@ -21,7 +21,7 @@ export class QueryParam<T> {
     /**
      * using in loadColumnList.
      */
-    public connection?: Node;
+    public connection: Node;
     public singlePage?: boolean;
     public type: MessageType;
     public res: T;
@@ -34,8 +34,8 @@ export class QueryPage {
     private static statusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -200);
     private static costStatusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -250);
 
-    public static async send(queryParam: QueryParam<any>,dbOption:Node) {
-
+    public static async send(queryParam: QueryParam<any>) {
+        const dbOption: Node = queryParam.connection;
         if (typeof queryParam.singlePage == 'undefined') {
             queryParam.singlePage = true;
         }

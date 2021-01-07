@@ -15,6 +15,7 @@ import { QueryPage } from "../../view/result/query";
 import { DataResponse } from "../../view/result/queryResponse";
 import { ColumnMeta } from "../other/columnMeta";
 import { Global } from "../../common/global";
+import { TableCache } from "@/service/common/tableCache";
 
 export class TableNode extends Node implements CopyAble {
 
@@ -31,6 +32,7 @@ export class TableNode extends Node implements CopyAble {
             title: "Run Select Statement",
             arguments: [this, true],
         }
+        TableCache.put(this.id,this)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -125,7 +127,7 @@ ADD
         const executeTime = new Date().getTime();
         connection.query(sql, (err: Error, data, fields) => {
             const costTime = new Date().getTime() - executeTime;
-            QueryPage.send({ singlePage: false, type: MessageType.DATA, connection: this, res: { sql, costTime, data, fields, pageSize: pageSize } as DataResponse },this);
+            QueryPage.send({ singlePage: false, type: MessageType.DATA, connection: this, res: { sql, costTime, data, fields, pageSize: pageSize } as DataResponse });
         })
 
     }

@@ -106,7 +106,7 @@ export class MockRunner {
 
             const success = await QueryUnit.runBatch(connection, sqlList)
             vscode.commands.executeCommand("mysql.template.sql", tableNode, true)
-            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse },tableNode);
+            QueryPage.send({ connection:tableNode,type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
 
         }
     }
