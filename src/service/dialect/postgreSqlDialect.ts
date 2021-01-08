@@ -78,11 +78,13 @@ export class PostgreSqlDialect implements SqlDialect{
     }
     tableTemplate(): string {
         return `CREATE TABLE [name](  
-    id int NOT NULL primary key,
+    id SERIAL NOT NULL primary key,
     created_time DATETIME,
     updated_time DATETIME,
     [column] varchar(255)
-);`
+);
+COMMENT ON TABLE [table] IS '[comment'];
+COMMENT ON COLUMN [table].[column] IS '[comment]';`
     }
     viewTemplate(): string {
         return `CREATE VIEW [name]

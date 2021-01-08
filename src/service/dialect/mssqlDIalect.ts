@@ -81,7 +81,10 @@ export class MssqlDIalect implements SqlDialect {
     created_time DATETIME,
     updated_time DATETIME,
     [column] varchar(255)
-);`
+);
+EXECUTE sp_addextendedproperty N'MS_Description', '[table_comment]', N'user', N'dbo', N'table', N'[table_name]', NULL, NULL;
+EXECUTE sp_addextendedproperty N'MS_Description', '[column_comment]', N'user', N'dbo', N'table', N'[table_name]', N'column', N'[column_name]';
+`
     }
     viewTemplate(): string {
         return `CREATE
