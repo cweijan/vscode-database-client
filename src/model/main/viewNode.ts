@@ -25,7 +25,7 @@ export class ViewNode extends TableNode {
     public drop() {
 
         Util.confirm(`Are you want to drop view ${this.table} ? `, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP view ${this.wrap(this.database)}.${this.wrap(this.table)}`).then(() => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP view ${this.wrap(this.table)}`).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
                 DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop view ${this.table} success!`);

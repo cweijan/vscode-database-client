@@ -54,7 +54,7 @@ export class TableNode extends Node implements CopyAble {
     public addColumnTemplate() {
         ConnectionManager.getConnection(this, true);
         QueryUnit.showSQLTextDocument(`ALTER TABLE
-    ${this.wrap(this.database)}.${this.wrap(this.table)} 
+    ${this.wrap(this.table)} 
 ADD 
     COLUMN [column] [type] NOT NULL comment '';`, Template.alter);
     }
@@ -105,7 +105,7 @@ ADD
     public dropTable() {
 
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE ${this.wrap(this.database)}.${this.wrap(this.table)}`).then(() => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE ${this.wrap(this.table)}`).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
                 DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
@@ -118,7 +118,7 @@ ADD
     public truncateTable() {
 
         Util.confirm(`Are you want to clear table ${this.table} all data ?`, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `truncate table ${this.wrap(this.database)}.${this.wrap(this.table)}`).then(() => {
+            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `truncate table ${this.wrap(this.table)}`).then(() => {
                 vscode.window.showInformationMessage(`Clear table ${this.table} all data success!`);
             });
         })
@@ -127,8 +127,8 @@ ADD
 
     public indexTemplate() {
         ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`-- ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} DROP INDEX [indexName];
--- ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} ADD [UNIQUE|INDEX|PRIMARY KEY] ([columns]);`, Template.alter);
+        QueryUnit.showSQLTextDocument(`-- ALTER TABLE ${this.wrap(this.table)} DROP INDEX [indexName];
+-- ALTER TABLE ${this.wrap(this.table)} ADD [UNIQUE|INDEX|PRIMARY KEY] ([columns]);`, Template.alter);
         setTimeout(() => {
             QueryUnit.runQuery(`SELECT COLUMN_NAME name,table_schema,index_name,non_unique FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${this.database}' and table_name='${this.table}';`, this);
         }, 10);
@@ -171,7 +171,7 @@ ADD
                 .then((children: Node[]) => {
                     const childrenNames = children.map((child: any) => "\n    " + this.wrap(child.column.name));
                     const childrenValues = children.map((child: any) => "\n    $" + child.column.name);
-                    let sql = `insert into \n  ${this.wrap(this.database)}.${this.wrap(this.table)} `;
+                    let sql = `insert into \n  ${this.wrap(this.table)} `;
                     sql += `(${childrenNames.toString().replace(/,/g, ", ")}\n  )\n`;
                     sql += "values\n  ";
                     sql += `(${childrenValues.toString().replace(/,/g, ", ")}\n  );`;
@@ -191,7 +191,7 @@ ADD
 
                 const where = keysNames.map((name: string) => `${this.wrap(name)} = \$${name}`);
 
-                let sql = `delete from \n  ${this.wrap(this.database)}.${this.wrap(this.table)} \n`;
+                let sql = `delete from \n  ${this.wrap(this.table)} \n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and")}`;
                 QueryUnit.showSQLTextDocument(sql, Template.table);
             });
@@ -207,7 +207,7 @@ ADD
                 const sets = childrenNames.map((name: string) => `${name} = ${name}`);
                 const where = keysNames.map((name: string) => `${name} = '${name}'`);
 
-                let sql = `update \n  ${this.wrap(this.database)}.${this.wrap(this.table)} \nset \n  ${sets.toString().replace(/,/g, ",\n  ")}\n`;
+                let sql = `update \n  ${this.wrap(this.table)} \nset \n  ${sets.toString().replace(/,/g, ",\n  ")}\n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and ")}`;
                 QueryUnit.showSQLTextDocument(sql, Template.table);
             });
