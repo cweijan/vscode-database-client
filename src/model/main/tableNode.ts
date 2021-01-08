@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType, Template, MessageType, ConfigKey } from "../../common/constants";
+import { Constants, ModelType, Template, MessageType, ConfigKey, DatabaseType } from "../../common/constants";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { DatabaseCache } from "../../service/common/databaseCache";
@@ -38,7 +38,7 @@ export class TableNode extends Node implements CopyAble {
         if (columnNodes && !isRresh && this.collapsibleState != vscode.TreeItemCollapsibleState.Expanded) {
             return columnNodes;
         }
-        return QueryUnit.queryPromise<ColumnMeta[]>(await ConnectionManager.getConnection(this), this.dialect.showColumns(this.database,this.table))
+        return QueryUnit.queryPromise<ColumnMeta[]>(await ConnectionManager.getConnection(this), this.dialect.showColumns(this.database, this.table))
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column, index) => {
                     return new ColumnNode(this.table, column, this, index);
@@ -61,17 +61,38 @@ ADD
 
 
     public async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), this.dialect.showTableSource(this.database,this.table))
-            .then((sourceResule) => {
-                QueryUnit.showSQLTextDocument(sourceResule[0]['Create Table']);
-            });
+        if (this.dbType == DatabaseType.MYSQL || !this.dbType) {
+            QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), this.dialect.showTableSource(this.database, this.table))
+                .then((sourceResule) => {
+                    QueryUnit.showSQLTextDocument(sourceResule[0]['Create Table']);
+                });
+        } else {
+            const childs = await this.getChildren()
+            let table = this.table;
+            if (this.dbType == DatabaseType.MSSQL) {
+                const tables = this.table.split(".")
+                tables.shift()
+                table=tables.join(".")
+            }
+            let sql = `create table ${table}(\n`
+            for (let i = 0; i < childs.length; i++) {
+                const child: ColumnNode = childs[i] as ColumnNode;
+                if (i == childs.length - 1) {
+                    sql += `    ${child.column.name} ${child.type}${child.isPrimaryKey ? ' PRIMARY KEY' : ''}\n`
+                } else {
+                    sql += `    ${child.column.name} ${child.type}${child.isPrimaryKey ? ' PRIMARY KEY' : ''},\n`
+                }
+            }
+            sql += ");"
+            QueryUnit.showSQLTextDocument(sql);
+        }
     }
 
     public changeTableName() {
 
         vscode.window.showInputBox({ value: this.table, placeHolder: 'newTableName', prompt: `You will changed ${this.database}.${this.table} to new table name!` }).then(async (newTableName) => {
             if (!newTableName) { return; }
-            const sql = this.dialect.renameTable(this.database,this.table,newTableName);
+            const sql = this.dialect.renameTable(this.database, this.table, newTableName);
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
                 DbTreeDataProvider.refresh(this.parent);
@@ -116,7 +137,7 @@ ADD
 
     public async openInNew() {
         const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
-        const sql = this.dialect.buildPageSql(this.wrap(this.database),this.wrap(this.table),pageSize);
+        const sql = this.dialect.buildPageSql(this.wrap(this.database), this.wrap(this.table), pageSize);
 
         const connection = await ConnectionManager.getConnection(this);
         const executeTime = new Date().getTime();
@@ -128,12 +149,12 @@ ADD
     }
 
     public async countSql() {
-        QueryUnit.runQuery(this.dialect.countSql(this.wrap(this.database),this.wrap(this.table)), this);
+        QueryUnit.runQuery(this.dialect.countSql(this.wrap(this.database), this.wrap(this.table)), this);
     }
 
     public async selectSqlTemplate(run: boolean) {
         const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
-        const sql = this.dialect.buildPageSql(this.wrap(this.database),this.wrap(this.table),pageSize);
+        const sql = this.dialect.buildPageSql(this.wrap(this.database), this.wrap(this.table), pageSize);
 
         if (run) {
             QueryUnit.runQuery(sql, this);

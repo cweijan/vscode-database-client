@@ -38,7 +38,9 @@ export class ColumnNode extends Node implements CopyAble {
 
     private getIndex(columnKey: string) {
         switch (columnKey) {
-            case 'UNI': return "UniqueKey";
+            case 'UNI':
+            case 'UNIQUE':
+                return "UniqueKey";
             case 'MUL': return "IndexKey";
             case 'PRI':
             case 'PRIMARY KEY':

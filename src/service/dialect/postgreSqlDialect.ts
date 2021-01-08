@@ -50,7 +50,7 @@ export class PostgreSqlDialect implements SqlDialect{
         on c.COLUMN_NAME=ccu.column_name and c.table_name=ccu.table_name and ccu.table_catalog=c.TABLE_CATALOG
         left join  information_schema.table_constraints tc
         on tc.constraint_name=ccu.constraint_name
-        and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name and constraint_type = 'PRIMARY KEY' WHERE c.TABLE_CATALOG = '${database}' AND c.table_name = '${view?view:table}' ORDER BY ORDINAL_POSITION;`;
+        and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name WHERE c.TABLE_CATALOG = '${database}' AND c.table_name = '${view?view:table}' ORDER BY ORDINAL_POSITION;`;
     }
     showTriggers(database: string): string {
         return `SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = '${database}'`;

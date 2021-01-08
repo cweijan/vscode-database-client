@@ -15,10 +15,6 @@ types.setTypeParser(1082, (val) => val)
 
 /**
  * https://www.npmjs.com/package/pg
- * TODO 
- * 1. 表、列增加注释
- * 2. column相关语句适配
- * 3. user适配
  */
 export class PostgreSqlConnection implements IConnection {
     private client: Pool;

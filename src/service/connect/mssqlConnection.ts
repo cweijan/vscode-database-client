@@ -5,9 +5,6 @@ var ConnectionPool = require('./mssql/connection-pool');
 
 /**
  * http://tediousjs.github.io/tedious/getting-started.html
- * 3. column相关语句适配
- * 4. user适配
- * 5. 表、列增加注释
  */
 export class MSSqlConnnection implements IConnection {
     private pool;

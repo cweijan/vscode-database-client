@@ -4,6 +4,11 @@ import { MssqlDIalect } from "./mssqlDIalect";
 import { MysqlDialect } from "./mysqlDialect";
 import { PostgreSqlDialect } from "./postgreSqlDialect";
 
+/**
+ * TODO
+ * 1. column相关语句适配
+ * 2. user语句适配
+ */
 export interface SqlDialect {
     switchDataBase(database: string): string;
     showDatabases(): string;

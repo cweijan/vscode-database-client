@@ -38,6 +38,7 @@ export class MssqlDIalect implements SqlDialect {
     }
     /**
      * remove extra、COLUMN_COMMENT(comment)、COLUMN_KEY(key)
+     * mssql table column has primary and unique in same column, so it occur duplicate column.
      */
     showColumns(database: string, table: string): string {
         return `SELECT c.COLUMN_NAME "name", DATA_TYPE "simpleType", DATA_TYPE "type", IS_NULLABLE nullable, CHARACTER_MAXIMUM_LENGTH "maxLength", COLUMN_DEFAULT "defaultValue", '' "comment", tc.constraint_type "key" FROM
@@ -46,7 +47,7 @@ export class MssqlDIalect implements SqlDialect {
         on c.COLUMN_NAME=ccu.column_name and c.table_name=ccu.table_name and ccu.table_catalog=c.TABLE_CATALOG
         left join  information_schema.table_constraints tc
         on tc.constraint_name=ccu.constraint_name
-        and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name and constraint_type = 'PRIMARY KEY' WHERE c.TABLE_CATALOG = '${database}' AND c.table_name = '${table.split('.')[1]}' ORDER BY ORDINAL_POSITION;`;
+        and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name WHERE c.TABLE_CATALOG = '${database}' AND c.table_name = '${table.split('.')[1]}' ORDER BY ORDINAL_POSITION`;
     }
     showTriggers(database: string): string {
         return `SELECT OBJECT_NAME(PARENT_OBJECT_ID) AS PARENT_TABLE, concat(SCHEMA_NAME(schema_id),'.',name) TRIGGER_NAME FROM SYS.OBJECTS WHERE TYPE = 'TR'`;
