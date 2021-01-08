@@ -9,6 +9,7 @@ import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { CopyAble } from "../interface/copyAble";
 import { Util } from "../../common/util";
 import { ColumnMeta } from "./columnMeta";
+import { MockRunner } from "@/service/mock/mockRunner";
 
 export class ColumnNode extends Node implements CopyAble {
     public type: string;
@@ -20,6 +21,9 @@ export class ColumnNode extends Node implements CopyAble {
         this.type = `${this.column.type}`
         this.description = `${this.column.comment}`
         this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)}`
+        if (column && this.isPrimaryKey) {
+            MockRunner.primaryKeyMap[this.getConnectId()] = column.name
+        }
         this.collapsibleState = vscode.TreeItemCollapsibleState.None
         this.iconPath = path.join(Constants.RES_PATH, this.isPrimaryKey ? "icon/b_primary.png" : "icon/b_props.png");
         this.command = {
@@ -39,6 +43,7 @@ export class ColumnNode extends Node implements CopyAble {
             case 'PRI':
             case 'PRIMARY KEY':
                 this.isPrimaryKey = true
+                this.column.isPrimary = true
                 return "PrimaryKey";
         }
         return '';
@@ -79,7 +84,7 @@ export class ColumnNode extends Node implements CopyAble {
         ConnectionManager.getConnection(this, true);
         await QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t${this.wrap(this.database)}.${this.wrap(this.table)} DROP COLUMN ${this.wrap(this.column.name)};`, Template.alter);
         Util.confirm(`Are you want to drop column ${this.column.name} ? `, async () => {
-            QueryUnit.runQuery(null,this)
+            QueryUnit.runQuery(null, this)
         })
 
     }

@@ -38,4 +38,5 @@ export interface ColumnMeta {
      * extra info, auto_increment
      */
     extra:any;
+    isPrimary:boolean;
 }

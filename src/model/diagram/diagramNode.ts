@@ -13,10 +13,10 @@ export class DiagramNode extends Node {
 
     public contextValue: string = ModelType.DIAGRAM;
     public iconPath = path.join(Constants.RES_PATH, "icon/diagram-node.svg")
-    constructor(public name: string, readonly info: Node) {
+    constructor(public name: string, readonly parent: Node) {
         super(name)
-        // this.uid = `${info.getConnectId()}_${info.database}_diragram_${name}`
-        this.init(info)
+        this.uid = `${parent.getConnectId()}_${parent.database}_diragram_${name}`
+        this.init(parent)
         this.collapsibleState = TreeItemCollapsibleState.None
         this.command = {
             command: "mysql.diagram.open",
@@ -41,7 +41,7 @@ export class DiagramNode extends Node {
                     this.name = name
                     const diagramPath = `diagram/${this.getConnectId()}_${this.database}/${name}.json`;
                     FileManager.record(diagramPath, data, FileModel.WRITE)
-                    DbTreeDataProvider.refresh(this.info)
+                    DbTreeDataProvider.refresh(this.parent)
                 })
             }
         })
@@ -60,7 +60,7 @@ export class DiagramNode extends Node {
 
         Util.confirm(`Are you want to drop diagram ${this.name} ?`, async () => {
             unlinkSync(this.getFilePath())
-            DbTreeDataProvider.refresh(this.info)
+            DbTreeDataProvider.refresh(this.parent)
         })
 
     }

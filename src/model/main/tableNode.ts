@@ -15,7 +15,6 @@ import { QueryPage } from "../../view/result/query";
 import { DataResponse } from "../../view/result/queryResponse";
 import { ColumnMeta } from "../other/columnMeta";
 import { Global } from "../../common/global";
-import { TableCache } from "@/service/common/tableCache";
 
 export class TableNode extends Node implements CopyAble {
 
@@ -32,7 +31,6 @@ export class TableNode extends Node implements CopyAble {
             title: "Run Select Statement",
             arguments: [this, true],
         }
-        TableCache.put(this.id,this)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -43,9 +41,6 @@ export class TableNode extends Node implements CopyAble {
         return QueryUnit.queryPromise<ColumnMeta[]>(await ConnectionManager.getConnection(this), this.dialect.showColumns(this.database,this.table))
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column, index) => {
-                    if (column && column.key == "PRI") {
-                        MockRunner.primaryKeyMap[this.getConnectId()] = column.name
-                    }
                     return new ColumnNode(this.table, column, this, index);
                 });
                 DatabaseCache.setColumnListOfTable(this.uid, columnNodes);

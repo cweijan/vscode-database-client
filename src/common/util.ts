@@ -2,6 +2,7 @@
 import * as vscode from "vscode";
 import { Position, TextDocument } from "vscode";
 import { Confirm, DatabaseType } from "./constants";
+import {wrapByDb } from "./wrapper.js";
 
 export class Util {
 
@@ -23,19 +24,7 @@ export class Util {
      * @param origin any string
      */
     public static wrap(origin: string,databaseType?:DatabaseType) {
-        if (origin == null) { return origin; }
-
-        if (origin.match(/\b[-\.]\b/ig) || origin.match(/^(if|key|desc|length)$/i)) {
-            if(databaseType==DatabaseType.MSSQL){
-                return origin.split(".").map(text=>`[${text}]`).join(".")
-            }
-            if(databaseType==DatabaseType.PG){
-                return origin.split(".").map(text=>`"${text}"`).join(".")
-            }
-            return `\`${origin}\``;
-        }
-
-        return origin;
+        return wrapByDb(origin,databaseType)
     }
 
     public static trim(origin: any): any {

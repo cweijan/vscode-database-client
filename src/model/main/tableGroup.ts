@@ -12,10 +12,10 @@ export class TableGroup extends Node {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.TABLE_GROUP;
-    constructor(readonly info: Node) {
+    constructor(readonly parent: Node) {
         super("TABLE")
-        this.uid = `${info.getConnectId()}_${info.database}_${ModelType.TABLE_GROUP}`;
-        this.init(info)
+        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.TABLE_GROUP}`;
+        this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -42,7 +42,7 @@ export class TableGroup extends Node {
 
     public async createTemplate() {
         ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.info.uid}#create-table-template.sql`, this.dialect.tableTemplate(), FileModel.WRITE)
+        const filePath = await FileManager.record(`${this.parent.uid}#create-table-template.sql`, this.dialect.tableTemplate(), FileModel.WRITE)
         FileManager.show(filePath)
 
     }

@@ -14,7 +14,7 @@
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button type="primary" :loading="loading" @click="$emit('exportHandle',exportOption)">Export</el-button>
+      <el-button type="primary" :loading="loading" @click="loading=true;$emit('exportHandle',exportOption);">Export</el-button>
       <el-button @click="$emit('update:visible',false)">Cancel</el-button>
     </span>
   </el-dialog>
@@ -22,15 +22,21 @@
 
 <script>
 export default {
-  props: ["visible", "loading"],
+  props: ["visible"],
   data() {
     return {
+      loading: false,
       exportOption: {
         withOutLimit: true,
         type: "xlsx",
       },
     }
   },
+  watch:{
+    visible(){
+      this.loading=false;
+    }
+  }
 }
 </script>
 

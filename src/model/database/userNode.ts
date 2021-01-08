@@ -12,9 +12,9 @@ export class UserNode extends Node implements CopyAble {
 
     public contextValue = ModelType.USER;
     public iconPath = path.join(Constants.RES_PATH, "icon/user.svg")
-    constructor(readonly username: string,readonly host:string, readonly info: Node) {
+    constructor(readonly username: string,readonly host:string, readonly parent: Node) {
         super(username)
-        this.init(info)
+        this.init(parent)
         this.command = {
             command: "mysql.user.sql",
             title: "Run User Detail Statement",
@@ -39,7 +39,7 @@ export class UserNode extends Node implements CopyAble {
 
         Util.confirm(`Are you want to drop user ${this.username} ?`, async () => {
             QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP user ${this.username}`).then(() => {
-                DbTreeDataProvider.refresh(this.info);
+                DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop user ${this.username} success!`);
             });
         })

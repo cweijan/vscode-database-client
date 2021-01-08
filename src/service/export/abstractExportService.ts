@@ -8,26 +8,32 @@ import { ProgressLocation } from "vscode";
 
 export abstract class AbstractExportService implements ExportService {
 
-    public export(context: ExportContext): void {
+    public export(context: ExportContext): Thenable<any> {
         const randomFileName = `${new Date().getTime()}.${context.type}`
 
-        vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(randomFileName), filters: { 'file': [context.type] } }).then((filePath) => {
-            if (filePath) {
-                context.exportPath = filePath.fsPath;
-                if (context.withOutLimit) {
-                    context.sql = context.sql.replace(/\blimit\b.+/gi, "")
-                }
-                vscode.window.withProgress({ title: `Start exporting data to ${context.type}...`, location: ProgressLocation.Notification }, () => {
-                    return new Promise((resolve) => {
-                        context.done = resolve
-                        try {
-                            this.exportData(context)
-                        } catch (error) {
-                            resolve(null)
-                        }
+        return vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(randomFileName), filters: { 'file': [context.type] } }).then((filePath) => {
+            return new Promise((res, rej) => {
+                if (filePath) {
+                    context.exportPath = filePath.fsPath;
+                    if (context.withOutLimit) {
+                        context.sql = context.sql.replace(/\blimit\b.+/gi, "")
+                    }
+                    vscode.window.withProgress({ title: `Start exporting data to ${context.type}...`, location: ProgressLocation.Notification }, () => {
+                        return new Promise((resolve) => {
+                            context.done = resolve
+                            try {
+                                this.exportData(context)
+                            } catch (error) {
+                                resolve(null)
+                            }finally{
+                                res(null)
+                            }
+                        })
                     })
-                })
-            }
+                }else{
+                    res(null)
+                }
+            })
         })
     }
 
@@ -60,7 +66,7 @@ export abstract class AbstractExportService implements ExportService {
     }
 
     private exportToJson(context: ExportContext) {
-        fs.writeFileSync(context.exportPath, JSON.stringify(context.rows,null,2));
+        fs.writeFileSync(context.exportPath, JSON.stringify(context.rows, null, 2));
     }
 
     private exportToSql(exportContext: ExportContext) {

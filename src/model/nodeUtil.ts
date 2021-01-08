@@ -13,6 +13,7 @@ export abstract class NodeUtil {
     }
 
     public static removeParent(nodes: any): any {
+        if(!nodes)return null;
         let result = {};
         for (const nodeKey of Object.keys(nodes)) {
             if(!nodes[nodeKey])continue;

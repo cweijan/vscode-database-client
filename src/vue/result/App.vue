@@ -2,16 +2,16 @@
   <div id="app">
     <div class="hint">
       <div style="width:95%;">
-        <el-input type="textarea" :autosize="{ minRows:2, maxRows:5}" v-model="toolbar.sql" class="sql-pannel"/>
+        <el-input type="textarea" :autosize="{ minRows:2, maxRows:5}" v-model="toolbar.sql" class="sql-pannel" />
       </div>
       <div class="toolbar">
         <el-button size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
         <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
-        <el-button type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle @click="insertRequest">
+        <el-button @click="$refs.editor.openInsert()" type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle>
         </el-button>
-        <el-button @click="openEdit" type="primary" size="mini" icon="el-icon-edit" title="edit" circle :disabled="!toolbar.show">
+        <el-button @click="$refs.editor.openEdit(update.current)" type="primary" size="mini" icon="el-icon-edit" title="edit" circle :disabled="!toolbar.show">
         </el-button>
-        <el-button @click.stop="openCopy" type="info" size="mini" title="copy" icon="el-icon-document-copy" circle :disabled="!toolbar.show">
+        <el-button @click.stop="$refs.editor.openCopy(update.current)" type="info" size="mini" title="copy" icon="el-icon-document-copy" circle :disabled="!toolbar.show">
         </el-button>
         <el-button @click="deleteConfirm" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!toolbar.show">
         </el-button>
@@ -62,34 +62,13 @@
         <template slot="edit" slot-scope="scope">
           <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter" v-on:keyup.enter.native="filter($event,scope.column.title)">
           </el-input>
-          <el-input v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" @keypress.enter.native="confirmUpdate(scope.row)" :disabled="result.tableCount!=1"></el-input>
+          <el-input v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" @keypress.enter.native="$refs.editor.confirmUpdate(scope.row)" :disabled="result.tableCount!=1"></el-input>
         </template>
       </ux-table-column>
     </ux-grid>
     <!-- table result -->
-    <el-dialog ref="editDialog" :title="editorTilte" :visible.sync="editor.visible" width="90%" top="3vh" size="mini">
-      <el-form ref="infoForm" :model="update.currentNew" :inline="true">
-        <el-form-item :prop="column.name" :key="column.name" v-for="column in result.columnList" size="mini">
-          <template>
-            <span>
-              {{ column.name }} : {{ column.type }} &nbsp;
-              <span style="color: red !important;">{{ column.key }}{{ column.nullable == 'YES' ? '' : ' NOT NULL' }}</span>&nbsp;
-              <span>{{ column.defaultValue ? ` Default : ${column.defaultValue}` : "" }}</span>
-              <span>{{ column.extra == "auto_increment" ? ` AUTO_INCREMENT` : "" }}</span>
-            </span>
-            <CellEditor v-model="update.currentNew[column.name]" :type="column.type"></CellEditor>
-          </template>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="editor.visible = false">Cancel</el-button>
-        <el-button v-if="update.currentNew[result.primaryKey]!=null" type="primary" :loading="editor.loading" @click="confirmUpdate(update.currentNew)">
-          Update</el-button>
-        <el-button v-if="update.currentNew[result.primaryKey]==null" type="primary" :loading="editor.loading" @click="confirmInsert(update.currentNew)">
-          Insert</el-button>
-      </span>
-    </el-dialog>
-    <ExportDialog :visible.sync="exportOption.visible" :loading.sync="exportOption.loading" @exportHandle="confirmExport" />
+    <EditDialog ref="editor" :dbType="result.dbType" :table="result.table" :primaryKey="result.primaryKey" :columnList="result.columnList" @execute="execute" />
+    <ExportDialog :visible.sync="exportOption.visible" @exportHandle="confirmExport" />
   </div>
 </template>
 
@@ -97,18 +76,24 @@
 import { getVscodeEvent } from "../util/vscode"
 import CellEditor from "./component/CellEditor.vue"
 import ExportDialog from "./component/ExportDialog.vue"
+import EditDialog from "./component/EditDialog.vue"
+import { util } from "./mixin/util"
+import { wrapByDb } from '@/common/wrapper'
 let vscodeEvent
 
 export default {
-  name: "App",
+  mixins: [util],
   components: {
     CellEditor,
     ExportDialog,
+    EditDialog,
   },
   data() {
     return {
+      connection:{},
       result: {
         data: [],
+        dbType: "",
         sql: "",
         primaryKey: null,
         columnList: null,
@@ -128,20 +113,13 @@ export default {
         widthItem: {},
       },
       toolbar: {
-        row: {},
         sql: null,
         show: false,
-        costTime: 0,
         filter: {},
         showColumns: [],
       },
-      editor: {
-        visible: false,
-        loading: false,
-      },
       exportOption: {
         visible: false,
-        loading: false,
       },
       info: {
         sql: null,
@@ -152,7 +130,6 @@ export default {
       },
       update: {
         current: null,
-        currentNew: {},
         primary: null,
       },
     }
@@ -172,36 +149,21 @@ export default {
       }
     }
     const handlerCommon = (res) => {
-      this.editor.loading = false
-      this.editor.visible = false
+      if (this.$refs.editor) {
+        this.$refs.editor.close()
+      }
       this.info.visible = true
       this.info.message = res.message
     }
     vscodeEvent = getVscodeEvent()
-    window.onfocus = () => {
-      vscodeEvent.emit("showInfo", {
-        table: this.result.table,
-        row: this.result.data.length - 1,
-        col: this.columnCount,
-      })
-      vscodeEvent.emit("showCost", { cost: this.toolbar.costTime })
-    }
     window.addEventListener("message", ({ data }) => {
       if (!data) return
-      console.log(data)
       const response = data.content
       this.table.loading = false
-      this.update.current = null
-      if (response && response.costTime) {
-        this.toolbar.costTime = response.costTime
-        vscodeEvent.emit("showCost", { cost: this.toolbar.costTime })
-      }
-      vscodeEvent.emit("showInfo", {
-        table: this.result.table,
-        row: this.result.data.length - 1,
-        col: this.columnCount,
-      })
       switch (data.type) {
+        case "EXPORT_DONE":
+          this.exportOption.visible = false
+          break
         case "RUN":
           this.toolbar.sql = response.sql
           this.table.loading = response.transId != this.result.transId
@@ -260,7 +222,6 @@ export default {
           table: this.result.table,
         },
       })
-      this.exportOption.visible = false
     },
     filter(event, column) {
       let inputvalue = "" + (event ? event.target.value : "")
@@ -270,7 +231,7 @@ export default {
       let existsCheck = new RegExp(`(WHERE|AND)?\\s*\`?${column}\`?\\s*(=|is)\\s*.+?\\s`, "igm")
 
       if (inputvalue) {
-        const condition = inputvalue.toLowerCase() === "null" ? `${column} is null` : `\`${column}\`='${inputvalue}'`
+        const condition = inputvalue.toLowerCase() === "null" ? `${column} is null` : `${wrapByDb(column,this.result.dbType)}='${inputvalue}'`
         if (existsCheck.exec(filterSql)) {
           // condition present
           filterSql = filterSql.replace(existsCheck, `$1 ${condition} `)
@@ -306,39 +267,6 @@ export default {
         .replace(/\s?(limit.+)?$/i, ` ORDER BY ${row.prop} ${row.order} \$1 `)
       this.execute(sortSql + ";")
     },
-    insertRequest() {
-      this.editor.visible = true
-      this.update.primary = null
-      this.update.currentNew = {}
-    },
-    wrapQuote(columnName, value) {
-      if (value === "") {
-        return "null"
-      }
-      if (/\(.*?\)/.exec(value)) {
-        return value
-      }
-      if (typeof value == "string") {
-        value = value.replace(/'/g, "\\'")
-      }
-      const type = this.getTypeByColumn(columnName).toLowerCase()
-      switch (type) {
-        case "varchar":
-        case "char":
-        case "date":
-        case "time":
-        case "timestamp":
-        case "datetime":
-        case "set":
-        case "json":
-          return `'${value}'`
-        default:
-          if (type.indexOf("text") !== -1 || type.indexOf("blob") !== -1 || type.indexOf("binary") !== -1) {
-            return `'${value}'`
-          }
-      }
-      return value
-    },
     getTypeByColumn(key) {
       if (!this.result.columnList) return
       for (const column of this.result.columnList) {
@@ -347,68 +275,11 @@ export default {
         }
       }
     },
-    confirmInsert() {
-      let columns = ""
-      let values = ""
-      for (const key in this.update.currentNew) {
-        if (this.getTypeByColumn(key) == null) continue
-        const newEle = this.update.currentNew[key]
-        if (newEle != null) {
-          columns += `\`${key}\`,`
-          values += `${this.wrapQuote(key, newEle)},`
-        }
-      }
-      if (values) {
-        const insertSql = `INSERT INTO ${this.result.table}(${columns.replace(/,$/, "")}) VALUES(${values.replace(
-          /,$/,
-          ""
-        )})`
-        this.execute(insertSql)
-      } else {
-        this.$message("Not any input, update fail!")
-      }
-    },
-    confirmUpdate(row) {
-      if (!this.result.primaryKey) {
-        this.$message.error("This table has not primary key, update fail!")
-        return
-      }
-      const currentNew = row ? row : this.update.currentNew
-      const primary = this.update.current[this.result.primaryKey]
-      let change = ""
-      console.log("update")
-      for (const key in currentNew) {
-        if (this.getTypeByColumn(key) == null) continue
-        const oldEle = this.update.current[key]
-        const newEle = currentNew[key]
-        if (oldEle !== newEle) {
-          change += `\`${key}\`=${this.wrapQuote(key, newEle)},`
-        }
-      }
-      if (change) {
-        const updateSql = `UPDATE ${this.result.table} SET ${change.replace(/,$/, "")} WHERE ${
-          this.result.primaryKey
-        }=${this.wrapQuote(this.result.primaryKey, primary)}`
-        this.execute(updateSql)
-      } else {
-        this.$message("Not any change, update fail!")
-      }
-    },
     updateEdit(row, column, event) {
       if (row.isFilter) {
         return
       }
       this.update.current = { ...row }
-    },
-    openEdit(row) {
-      this.editor.visible = true
-      this.update.currentNew = { ...this.update.current }
-    },
-    openCopy() {
-      this.update.currentNew = { ...this.update.current }
-      this.update.currentNew[this.result.primaryKey] = null
-      this.update.primary = null
-      this.editor.visible = true
     },
     deleteConfirm() {
       this.$confirm("Are you sure you want to delete this data?", "Warning", {
@@ -420,7 +291,9 @@ export default {
           let checkboxRecords = this.$refs.dataTable
             .getCheckboxRecords()
             .filter((checkboxRecord) => checkboxRecord[this.result.primaryKey] != null)
-            .map((checkboxRecord) => this.wrapQuote(this.result.primaryKey, checkboxRecord[this.result.primaryKey]))
+            .map((checkboxRecord) =>
+              this.wrapQuote(this.getTypeByColumn(this.result.primaryKey), checkboxRecord[this.result.primaryKey])
+            )
           const deleteSql =
             checkboxRecords.length > 1
               ? `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey} in (${checkboxRecords.join(",")})`
@@ -434,13 +307,6 @@ export default {
             this.$message({ type: "warning", message: "Delete canceled" })
           }
         })
-    },
-    tableRowClassName({ row, rowIndex }) {
-      if (!this.result.primaryKey || !this.update.primary) return ""
-      if (row[this.result.primaryKey] === this.update.primary) {
-        return "edit-row"
-      }
-      return ""
     },
     computeWidth(key, index, keyIndex, value) {
       if (this.table.widthItem[keyIndex]) return this.table.widthItem[keyIndex]
@@ -456,15 +322,6 @@ export default {
       if (dynamic < nextDynamic) dynamic = nextDynamic
       this.table.widthItem[keyIndex] = dynamic
       return dynamic
-    },
-    celledit(row, column, cell, event) {
-      if (row.isFilter) {
-        return
-      }
-      cell.contentEditable = true
-      if (this.result.primaryKey) {
-        this.update.primary = row[this.result.primaryKey]
-      }
     },
     refresh() {
       if (this.result.sql) {
@@ -483,25 +340,11 @@ export default {
       })
       this.table.loading = true
     },
-    deleteTemplate() {
-      this.result.sql = `DELETE FROM [table] WHERE id= `
-    },
     dataformat0(origin) {
       if (origin == null) return null
       if (origin.hasOwnProperty("type")) {
         return String.fromCharCode.apply(null, new Uint16Array(origin.data))
       }
-      return origin
-    },
-    wrap(origin) {
-      if (origin == null) {
-        return origin
-      }
-
-      if (origin.match(/\b[-\.]\b/gi) || origin.match(/^(if|key|desc|length)$/i)) {
-        return `\`${origin}\``
-      }
-
       return origin
     },
     changePage(pageNum, jump) {
@@ -551,7 +394,6 @@ export default {
       this.table.loading = false
       // toolbar
       this.toolbar.show = false
-      this.toolbar.row = {}
     },
     selectionChange(selection) {
       this.toolbar.show = this.result.primaryKey && selection.length > 0 && this.result.tableCount == 1
@@ -577,12 +419,6 @@ export default {
     columnCount() {
       if (this.result.data == undefined || this.result.data[0] == undefined) return 0
       return Object.keys(this.result.data[0]).length
-    },
-    editorTilte() {
-      if (this.update.currentNew[this.result.primaryKey] == null) {
-        return "Insert To " + this.result.table
-      }
-      return "Edit For " + this.result.table + " : " + this.result.primaryKey + "=" + this.update.primary
     },
     remainHeight() {
       return window.outerHeight - 230

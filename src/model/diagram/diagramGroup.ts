@@ -16,10 +16,10 @@ export class DiagramGroup extends Node {
 
     public contextValue = ModelType.DIAGRAM_GROUP;
     public iconPath = path.join(Constants.RES_PATH, "icon/diagram.svg")
-    constructor(readonly info: Node) {
+    constructor(readonly parent: Node) {
         super("DIAGRAM")
-        // this.uid = `${this.getConnectId()}_${info.database}_${ModelType.DIAGRAM_GROUP}`;
-        this.init(info)
+        this.uid = `${this.getConnectId()}_${parent.database}_${ModelType.DIAGRAM_GROUP}`;
+        this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {

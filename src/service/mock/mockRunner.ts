@@ -157,7 +157,7 @@ export class MockRunner {
         if (numericMatch) {
             length = 1 << (parseInt(numericMatch[1]) - 1)
         }
-        if (column.key == "PRI") {
+        if (column.isPrimary) {
             return this.MOCK_INDEX;
         }
         switch (type) {
