@@ -25,11 +25,14 @@ export class MSSqlConnnection implements IConnection {
         let fields = [];
         let datas = [];
         this.getConnection().then(connection => {
+            const isSelect=sql.match(/^\s*\bselect\b/i)
             connection.execSql(new Request(sql, err => {
                 if (err) {
                     callback(err, null)
-                } else {
+                } else if(isSelect){
                     callback(null, datas, fields)
+                }else{
+                    callback(null, { affectedRows: datas.length})
                 }
                 if(!this.inTrans){
                     this.pool.release(connection)
@@ -63,7 +66,7 @@ export class MSSqlConnnection implements IConnection {
     init() {
         const opt = this.opt;
         this.pool = new ConnectionPool(
-            { min: 2, max: 10, log: true },
+            { min: 2, max: 10, log: false },
             {
                 server: opt.host,
                 options: {

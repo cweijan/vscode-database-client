@@ -141,7 +141,7 @@ export class QueryPage {
         // fix null point on result view
         queryParam.res.columnList = []
         const sqlList = queryParam.res.sql.match(/(?<=\b(from|join)\b\s*)(\S+)/gi)
-        if (sqlList.length == 0) {
+        if (!sqlList || sqlList.length == 0) {
             return;
         }
 

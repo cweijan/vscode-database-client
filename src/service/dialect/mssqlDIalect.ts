@@ -40,7 +40,13 @@ export class MssqlDIalect implements SqlDialect {
      * remove extra、COLUMN_COMMENT(comment)、COLUMN_KEY(key)
      */
     showColumns(database: string, table: string): string {
-        return `SELECT COLUMN_NAME name,DATA_TYPE simpleType,DATA_TYPE type,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength,COLUMN_DEFAULT defaultValue,'' comment FROM information_schema.columns WHERE TABLE_CATALOG = '${database}' AND table_name = '${table.split('.')[1]}' ORDER BY ORDINAL_POSITION;`;
+        return `SELECT c.COLUMN_NAME "name", DATA_TYPE "simpleType", DATA_TYPE "type", IS_NULLABLE nullable, CHARACTER_MAXIMUM_LENGTH "maxLength", COLUMN_DEFAULT "defaultValue", '' "comment", tc.constraint_type "key" FROM
+        information_schema.columns c
+        left join  information_schema.constraint_column_usage ccu
+        on c.COLUMN_NAME=ccu.column_name and c.table_name=ccu.table_name and ccu.table_catalog=c.TABLE_CATALOG
+        left join  information_schema.table_constraints tc
+        on tc.constraint_name=ccu.constraint_name
+        and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name and constraint_type = 'PRIMARY KEY' WHERE c.TABLE_CATALOG = '${database}' AND c.table_name = '${table.split('.')[1]}' ORDER BY ORDINAL_POSITION;`;
     }
     showTriggers(database: string): string {
         return `SELECT OBJECT_NAME(PARENT_OBJECT_ID) AS PARENT_TABLE, concat(SCHEMA_NAME(schema_id),'.',name) TRIGGER_NAME FROM SYS.OBJECTS WHERE TYPE = 'TR'`;
