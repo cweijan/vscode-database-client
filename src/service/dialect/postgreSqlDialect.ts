@@ -33,10 +33,10 @@ export class PostgreSqlDialect implements SqlDialect{
     }
     showFunctionSource(database: string, name: string): string {
         return `SELECT CONCAT('CREATE FUNCTION ',ROUTINE_NAME,'()\nRETURNS ',data_type,'\nAS $$',
-        routine_definition,'$$  LANGUAGE ',routine_body,';') "Create Function",ROUTINE_NAME,routine_definition,routine_body,data_type FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public'  and ROUTINE_TYPE='FUNCTION' and routine_body!='EXTERNAL'
+        routine_definition,'$$ LANGUAGE ',routine_body,';') "Create Function",ROUTINE_NAME,routine_definition,routine_body,data_type FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public'  and ROUTINE_TYPE='FUNCTION' and routine_body!='EXTERNAL'
         AND ROUTINE_NAME='${name}'
         union 
-        SELECT CONCAT('CREATE FUNCTION ',ROUTINE_NAME,'()\nRETURNS ',data_type,'\nAS $$',routine_definition,'$$  LANGUAGE plpgsql;') "Create Function",ROUTINE_NAME,routine_definition,routine_body,data_type FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public'  and ROUTINE_TYPE='FUNCTION' and routine_body='EXTERNAL'
+        SELECT CONCAT('CREATE FUNCTION ',ROUTINE_NAME,'()\nRETURNS ',data_type,'\nAS $$',routine_definition,'$$ LANGUAGE plpgsql;') "Create Function",ROUTINE_NAME,routine_definition,routine_body,data_type FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public'  and ROUTINE_TYPE='FUNCTION' and routine_body='EXTERNAL'
         AND ROUTINE_NAME='${name}'`;
     }
     showTriggerSource(database: string, name: string): string {

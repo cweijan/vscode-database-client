@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { CacheKey, Constants, ModelType } from "../../common/constants";
+import { CacheKey, Constants, DatabaseType, ModelType } from "../../common/constants";
 import { FileManager } from "../../common/filesManager";
 import { Console } from "../../common/Console";
 import { Util } from "../../common/util";
@@ -31,6 +31,11 @@ export class ConnectionNode extends Node implements CopyAble {
         if (parent.name) {
             this.label = `${parent.name}_${this.uid}`
             this.name = parent.name
+        }
+        if(this.dbType==DatabaseType.PG){
+            this.iconPath = path.join(Constants.RES_PATH, "icon/pg_server.svg");
+        }else if(this.dbType==DatabaseType.MSSQL){
+            this.iconPath = path.join(Constants.RES_PATH, "icon/mssql_server.png");
         }
         const lcp = ConnectionManager.getLastConnectionOption(false);
         if (lcp && lcp.getConnectId() == this.getConnectId()) {

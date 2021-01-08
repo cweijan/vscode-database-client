@@ -11,7 +11,7 @@ import { Node } from "../interface/node";
 export class UserNode extends Node implements CopyAble {
 
     public contextValue = ModelType.USER;
-    public iconPath = path.join(Constants.RES_PATH, "icon/user.svg")
+    public iconPath = path.join(Constants.RES_PATH, "icon/user2.png")
     constructor(readonly username: string,readonly host:string, readonly parent: Node) {
         super(username)
         this.init(parent)

@@ -643,7 +643,7 @@
 				},
 				{
 					"command": "mysql.table.show",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/",
 					"group": "inline@3"
 				},
 				{
@@ -657,19 +657,14 @@
 					"group": "1_inline@-2"
 				},
 				{
-					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/",
-					"group": "1_inline@-1"
-				},
-				{
 					"command": "mysql.table.source",
 					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/",
 					"group": "1_inline@0"
 				},
 				{
-					"command": "mysql.table.show",
-					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/ ",
-					"group": "1_inline@2"
+					"command": "mysql.refresh",
+					"when": "view == github.cweijan.mysql && viewItem =~ /(table|view)/",
+					"group": "1_inline@1"
 				},
 				{
 					"command": "mysql.count.sql",
