@@ -78,7 +78,7 @@ import CellEditor from "./component/CellEditor.vue"
 import ExportDialog from "./component/ExportDialog.vue"
 import EditDialog from "./component/EditDialog.vue"
 import { util } from "./mixin/util"
-import { wrapByDb } from '@/common/wrapper'
+import { wrapByDb } from "@/common/wrapper"
 let vscodeEvent
 
 export default {
@@ -90,7 +90,7 @@ export default {
   },
   data() {
     return {
-      connection:{},
+      connection: {},
       result: {
         data: [],
         dbType: "",
@@ -231,7 +231,10 @@ export default {
       let existsCheck = new RegExp(`(WHERE|AND)?\\s*\`?${column}\`?\\s*(=|is)\\s*.+?\\s`, "igm")
 
       if (inputvalue) {
-        const condition = inputvalue.toLowerCase() === "null" ? `${column} is null` : `${wrapByDb(column,this.result.dbType)}='${inputvalue}'`
+        const condition =
+          inputvalue.toLowerCase() === "null"
+            ? `${column} is null`
+            : `${wrapByDb(column, this.result.dbType)}='${inputvalue}'`
         if (existsCheck.exec(filterSql)) {
           // condition present
           filterSql = filterSql.replace(existsCheck, `$1 ${condition} `)
@@ -340,18 +343,10 @@ export default {
       })
       this.table.loading = true
     },
-    dataformat0(origin) {
-      if (origin == null) return null
-      if (origin.hasOwnProperty("type")) {
-        return String.fromCharCode.apply(null, new Uint16Array(origin.data))
-      }
-      return origin
-    },
     changePage(pageNum, jump) {
       if (!this.result.sql.match(/^\s*select/i)) {
         return
       }
-
       vscodeEvent.emit("next", {
         sql: this.result.sql,
         pageNum: jump ? pageNum : this.page.pageNum + pageNum,
@@ -363,10 +358,9 @@ export default {
       if (origin == undefined || origin == null) {
         return "<span class='null-column'>(NULL)</span>"
       }
-
-      const preFormat = this.dataformat0(origin)
-      if (preFormat != origin) return preFormat
-
+      if (origin.hasOwnProperty("type")) {
+        return String.fromCharCode.apply(null, new Uint16Array(origin.data))
+      }
       return origin
     },
     initShowColumn() {

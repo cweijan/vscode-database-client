@@ -163,8 +163,8 @@ export class QueryPage {
             });
             queryParam.res.primaryKey = primaryKey;
             queryParam.res.columnList = columnList;
-            queryParam.res.tableCount = sqlList.length;
         }
+        queryParam.res.tableCount = sqlList.length;
         queryParam.res.table = tableName;
     }
 

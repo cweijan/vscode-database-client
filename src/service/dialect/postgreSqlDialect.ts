@@ -85,8 +85,7 @@ export class PostgreSqlDialect implements SqlDialect{
 );`
     }
     viewTemplate(): string {
-        return `CREATE
-VIEW [name]
+        return `CREATE VIEW [name]
 AS
 (SELECT * FROM ...);`
     }
@@ -98,8 +97,8 @@ as $$
 $$`;
     }
     triggerTemplate(): string {
-        return `CREATE
-TRIGGER [name] [BEFORE/AFTER] [INSERT/UPDATE/DELETE]
+        return `CREATE TRIGGER [name] 
+[BEFORE/AFTER] [INSERT/UPDATE/DELETE]
 ON [table]
 FOR EACH ROW BEGIN
 

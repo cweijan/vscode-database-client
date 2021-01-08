@@ -1,6 +1,7 @@
 export const util = {
     methods: {
         wrapQuote(type, value) {
+            console.log(type)
             type = type.toLowerCase()
             if (value === "") {
                 return "null"
@@ -12,6 +13,21 @@ export const util = {
                 value = value.replace(/'/g, "\\'")
             }
             switch (type) {
+                // sql server
+                case "nvarchar":
+                case "nchar":
+                case "nvarchar":
+                case "datetimeoffset":
+                case "smalldatetime":
+                case "datetime2":
+                // pg
+                case "character":
+                case "xml":
+                case "uuid":
+                case "jsonb":
+                case "character varying":
+                case "timestamp with time zone":
+                // mysql
                 case "varchar":
                 case "char":
                 case "date":

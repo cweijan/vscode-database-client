@@ -68,29 +68,26 @@ export class MysqlDialect implements SqlDialect{
 ) default charset utf8 comment '';`
     }
     viewTemplate(): string {
-        return `CREATE
-VIEW [name]
+        return `CREATE VIEW [name]
 AS
 (SELECT * FROM ...);`
     }
     procedureTemplate(): string {
-        return `CREATE
-PROCEDURE [name]()
+        return `CREATE PROCEDURE [name]()
 BEGIN
 
 END;`;
     }
     triggerTemplate(): string {
-        return `CREATE
-TRIGGER [name] [BEFORE/AFTER] [INSERT/UPDATE/DELETE]
+        return `CREATE TRIGGER [name] 
+[BEFORE/AFTER] [INSERT/UPDATE/DELETE]
 ON [table]
 FOR EACH ROW BEGIN
 
 END;`
     }
     functionTemplate(): string {
-        return `CREATE
-FUNCTION [name]() RETURNS [TYPE]
+        return `CREATE FUNCTION [name]() RETURNS [TYPE]
 BEGIN
     return [value];
 END;`

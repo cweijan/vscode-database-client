@@ -3,7 +3,7 @@ import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect implements SqlDialect {
     showUsers(): string {
-        throw new Error("Method not implemented.");
+        return `SELECT name [user] from sys.database_principals where type='S'`
     }
     /**
      * sql server cannot change database.
@@ -43,9 +43,7 @@ export class MssqlDIalect implements SqlDialect {
         return `SELECT COLUMN_NAME name,DATA_TYPE simpleType,DATA_TYPE type,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength,COLUMN_DEFAULT defaultValue,'' comment FROM information_schema.columns WHERE TABLE_CATALOG = '${database}' AND table_name = '${table.split('.')[1]}' ORDER BY ORDINAL_POSITION;`;
     }
     showTriggers(database: string): string {
-        // throw new Error("Unimplments!")
-        // https://stackoverflow.com/questions/4305691/need-to-list-all-triggers-in-sql-server-database-with-table-name-and-tables-sch
-        return `SELECT OBJECT_NAME(parent_id) as Table_Name, * FROM [${database}].sys.triggers`;
+        return `SELECT OBJECT_NAME(PARENT_OBJECT_ID) AS PARENT_TABLE, concat(SCHEMA_NAME(schema_id),'.',name) TRIGGER_NAME FROM SYS.OBJECTS WHERE TYPE = 'TR'`;
     }
     showProcedures(database: string): string {
         return `SELECT concat(ROUTINE_SCHEMA,'.',ROUTINE_NAME) ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_CATALOG = '${database}' and ROUTINE_TYPE='PROCEDURE'`;
@@ -94,17 +92,16 @@ BEGIN
 END;`;
     }
     triggerTemplate(): string {
-        return `CREATE
-TRIGGER [name] 
+        return `CREATE TRIGGER [name] 
 ON [table]
 [INSTEAD OF/AFTER] [INSERT/UPDATE/DELETE]
 AS
+BEGIN
 
 END;`
     }
     functionTemplate(): string {
-        return `CREATE
-FUNCTION [name]() RETURNS [TYPE]
+        return `CREATE FUNCTION [name]() RETURNS [TYPE]
 BEGIN
     return [value];
 END;`

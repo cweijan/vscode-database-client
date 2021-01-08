@@ -82,10 +82,13 @@ OpenSetting -> extensions -> Mysql
 # Credits
 
 - [vscode-mysql](https://github.com/formulahendry/vscode-mysql): The original version of this extension.
-- [node-mysql2](https://github.com/sidorares/node-mysql2) : Core mysql client lib.
 - [mysqldump](https://github.com/bradzacher/mysqldum): Data dump lib.
 - [sql-formatter](https://github.com/zeroturnaround/sql-formatter) Sql format lib.
 - [umy-ui](https://github.com/u-leo/umy-ui): Result view render.
+- Core Lib:
+  - [node-mysql2](https://github.com/sidorares/node-mysql2) : Mysql client.
+  - [node-postgres](https://github.com/brianc/node-postgres): PostgreSql client.
+  - [tedious](https://github.com/tediousjs/tedious): SqlServer client.
 
 ## RoadMap
 

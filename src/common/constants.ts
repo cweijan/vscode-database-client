@@ -14,7 +14,7 @@ export class Pattern {
 
 export enum OperateType {
     execute = 'execute', export = 'export',
-    next = 'next', init = 'init', changeTheme="changeTheme"
+    next = 'next', init = 'init', changeTheme = "changeTheme"
 }
 
 export enum CacheKey {
@@ -45,16 +45,9 @@ export enum Confirm {
     YES = "YES", NO = "NO"
 }
 
-export enum DatabaseType{
-    MYSQL="MySQL",
-    /**
-     * https://www.npmjs.com/package/pg pg-hstore
-     */
-    PG="PostgreSQL",ORACLE="Oracle",
-    /**
-     * http://tediousjs.github.io/tedious/getting-started.html
-     */
-    MSSQL="SqlServer"
+export enum DatabaseType {
+    MYSQL = "MySQL", PG = "PostgreSQL",
+    MSSQL = "SqlServer", ORACLE = "Oracle",
 }
 
 export enum ModelType {
@@ -62,7 +55,7 @@ export enum ModelType {
     TABLE = "table", COLUMN = "column", INFO = "info", TABLE_GROUP = "tableGroup",
     VIEW = "view", VIEW_GROUP = "viewGroup", TRIGGER_GROUP = "triggerGroup", TRIGGER = "trigger",
     PROCEDURE_GROUP = "procedureGroup", PROCEDURE = "procedure", FUNCTION_GROUP = "functionGroup", FUNCTION = "function",
-    QUERY_GROUP = "queryGroup",QUERY = "query",
+    QUERY_GROUP = "queryGroup", QUERY = "query",
     DIAGRAM_GROUP = "diagramGroup", DIAGRAM = "diagram"
 }
 

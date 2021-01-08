@@ -1,9 +1,27 @@
 import { Node } from "@/model/interface/node";
-import { Client, QueryArrayResult } from "pg";
+import { types, QueryArrayResult, Pool } from "pg";
+import { TypesBuiltins } from "pg-types";
+
+
 import { IConnection, queryCallback } from "./connection";
 
+// convert date type from Date to string.
+types.setTypeParser(1082, (val) => val)
+// timestamp, untest.
+// types.setTypeParser(1114, (val)=>{
+//     console.log(val)
+//     return val;
+// })
+
+/**
+ * https://www.npmjs.com/package/pg
+ * TODO 
+ * 1. 表、列增加注释
+ * 2. column相关语句适配
+ * 3. user适配
+ */
 export class PostgreSqlConnection implements IConnection {
-    private client: Client;
+    private client: Pool;
     constructor(opt: Node) {
         const config = {
             host: opt.host, port: opt.port,
@@ -11,8 +29,10 @@ export class PostgreSqlConnection implements IConnection {
             database: opt.database,
             connectionTimeoutMillis: 5000,
             statement_timeout: 10000,
+            min: 2, max: 10
         };
-        this.client = new Client(config);
+        this.client = new Pool(config);
+
     }
     isAlive(): boolean {
         const temp = this.client as any;

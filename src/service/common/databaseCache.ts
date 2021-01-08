@@ -210,10 +210,10 @@ export class DatabaseCache {
     }
 
     public static getTable(databaseid: string, tableName: string): TableNode {
-        const tableList = this.databaseNodeMapTableNode[databaseid + "_" + ModelType.TABLE_GROUP];
+        const tableList: TableNode[] = this.databaseNodeMapTableNode[databaseid + "_" + ModelType.TABLE_GROUP];
         if (!tableList) { return null; }
         for (const tableNode of tableList) {
-            if (tableNode.table == tableName) { return tableNode; }
+            if (tableNode.table == tableName || tableNode.wrap(tableNode.table) == tableName) { return tableNode; }
         }
         return null;
     }

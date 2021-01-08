@@ -78,7 +78,7 @@ export abstract class Node extends vscode.TreeItem {
         /**
          * mssql and postgres must special database when connect.
          */
-        if (opt?.withDb && this.database && this.dbType == DatabaseType.PG) {
+        if (opt?.withDb && this.database && (this.dbType == DatabaseType.PG||this.dbType==DatabaseType.MSSQL)) {
             return `${uid}_${this.database}`
         }
 
