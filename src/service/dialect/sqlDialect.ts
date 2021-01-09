@@ -1,15 +1,15 @@
 import { DatabaseType } from "@/common/constants";
-import { abort } from "process";
 import { MssqlDIalect } from "./mssqlDIalect";
 import { MysqlDialect } from "./mysqlDialect";
 import { PostgreSqlDialect } from "./postgreSqlDialect";
 
 /**
  * TODO
- * 1. column相关语句适配
- * 2. user语句适配
+ * 1. 增加用户角色分配视图
+ * 2. 增加system view节点
  */
 export interface SqlDialect {
+    updateColumn(table:string,column:string,type:string,comment:string,nullable:string): string;
     switchDataBase(database: string): string;
     showDatabases(): string;
     showTables(database: string): string;

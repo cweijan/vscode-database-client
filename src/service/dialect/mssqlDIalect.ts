@@ -2,6 +2,13 @@ import { window } from "vscode";
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect implements SqlDialect {
+    updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
+        const defaultDefinition = nullable == "YES" ? "NULL":"NOT NULL" ;
+        comment = comment ? ` comment '${comment}'` : "";
+        return `EXEC sp_rename '${table}.${column}', '${column}', 'COLUMN'
+ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
+`;
+    }
     showUsers(): string {
         return `SELECT name [user] from sys.database_principals where type='S'`
     }

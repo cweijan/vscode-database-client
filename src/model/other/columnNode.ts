@@ -20,7 +20,7 @@ export class ColumnNode extends Node implements CopyAble {
         this.init(parent)
         this.type = `${this.column.type}`
         this.description = `${this.column.comment}`
-        this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)}`
+        this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)} ${this.column.nullable=="YES"?"Nullable":"NotNull"}`
         if (column && this.isPrimaryKey) {
             MockRunner.primaryKeyMap[this.getConnectId()] = column.name
         }
@@ -74,11 +74,7 @@ export class ColumnNode extends Node implements CopyAble {
 
         ConnectionManager.getConnection(this, true);
 
-        const comment = this.column.comment ? ` comment '${this.column.comment}'` : "";
-        const defaultDefinition = this.column.nullable == "YES" ? "" : " NOT NULL";
-
-        QueryUnit.showSQLTextDocument(`ALTER TABLE 
-    ${this.wrap(this.table)} CHANGE ${this.wrap(this.column.name)} ${this.wrap(this.column.name)} ${this.column.type}${defaultDefinition}${comment};`, Template.alter);
+        QueryUnit.showSQLTextDocument(this.dialect.updateColumn(this.table,this.column.name,this.column.type,this.column.type,this.column.nullable), Template.alter);
 
     }
     public async dropColumnTemplate() {

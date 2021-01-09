@@ -1,7 +1,13 @@
-import { QueryUnit } from "../queryUnit";
 import { SqlDialect } from "./sqlDialect";
 
 export class PostgreSqlDialect implements SqlDialect{
+    updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
+        const defaultDefinition = nullable == "YES" ? "DROP NOT NULL":"SET NOT NULL" ;
+        comment = comment ? ` comment '${comment}'` : "";
+        return `ALTER TABLE ${table} RENAME ${column} TO [newName]; -- update column name
+ALTER TABLE ${table} ALTER COLUMN ${column} TYPE ${type}; -- update column type
+ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update column nullable`;
+    }
     showUsers(): string {
         return `SELECT usename "user" from pg_user `;
     }

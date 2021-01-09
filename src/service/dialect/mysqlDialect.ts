@@ -1,7 +1,11 @@
-import { QueryUnit } from "../queryUnit";
 import { SqlDialect } from "./sqlDialect";
 
 export class MysqlDialect implements SqlDialect{
+    updateColumn( table: string, column: string, type: string, comment: string, nullable: string): string {
+        const defaultDefinition = nullable == "YES" ? "" : " NOT NULL";
+        comment = comment ? ` comment '${comment}'` : "";
+        return `ALTER TABLE\n\t${table} CHANGE ${column} ${column} ${type}${defaultDefinition}${comment};`;
+    }
     showUsers(): string {
         return `SELECT concat(user,'@',host) user FROM mysql.user;`;
     }
