@@ -1,17 +1,9 @@
 import { Node } from "@/model/interface/node";
-import { types, QueryArrayResult, Pool } from "pg";
-import { TypesBuiltins } from "pg-types";
-
-
+import { Pool, QueryArrayResult, types } from "pg";
 import { IConnection, queryCallback } from "./connection";
 
 // convert date type from Date to string.
 types.setTypeParser(1082, (val) => val)
-// timestamp, untest.
-// types.setTypeParser(1114, (val)=>{
-//     console.log(val)
-//     return val;
-// })
 
 /**
  * https://www.npmjs.com/package/pg
