@@ -3,7 +3,7 @@ import { Node } from "@/model/interface/node";
 import { FieldInfo } from "mysql2";
 import { MSSqlConnnection } from "./mssqlConnection";
 import { MysqlConnection } from "./mysqlConnection";
-import { PostgreSqlConnection } from "./postgresqlConnection";
+import { PostgreSqlConnection } from "./postgreSqlConnection";
 
 export interface IConnection {
     query(sql: string, callback?: queryCallback): void;
