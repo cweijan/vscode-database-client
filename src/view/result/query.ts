@@ -142,9 +142,18 @@ export class QueryPage {
             return;
         }
 
-        const conn = queryParam.connection;
-        const tableName = sqlList[0]
-        let tableNode = DatabaseCache.getTable(`${conn.getConnectId()}_${conn.database}`, tableName);
+        let conn = queryParam.connection;
+        let tableName = sqlList[0]
+        let database: string;
+
+        // mysql直接从结果集拿
+        const fields = queryParam.res.fields
+        if (fields && fields[0]?.orgTable) {
+            tableName = fields[0].orgTable;
+            database = fields[0].schema || fields[0].db;
+        }
+
+        let tableNode = DatabaseCache.getTable(`${conn.getConnectId()}_${database ? database : conn.database}`, tableName);
         if (!tableNode) {
             const tables = tableName.split('.')
             tableNode = DatabaseCache.getTable(`${conn.getConnectId()}_${tables.unshift()}`, tables.join("."));
