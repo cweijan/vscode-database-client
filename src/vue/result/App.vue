@@ -62,7 +62,7 @@
         <template slot="edit" slot-scope="scope">
           <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter" v-on:keyup.enter.native="filter($event,scope.column.title)">
           </el-input>
-          <el-input v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" @keypress.enter.native="$refs.editor.confirmUpdate(scope.row)" :disabled="result.tableCount!=1"></el-input>
+          <el-input v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" @keypress.enter.native="$refs.editor.confirmUpdate(scope.row,update.current)" :disabled="result.tableCount!=1"></el-input>
         </template>
       </ux-table-column>
     </ux-grid>

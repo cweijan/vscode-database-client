@@ -26,12 +26,12 @@
 <script>
 import CellEditor from "./CellEditor.vue"
 import { util } from "../mixin/util"
-import { wrapByDb } from '@/common/wrapper'
+import { wrapByDb } from "@/common/wrapper"
 
 export default {
   mixins: [util],
   components: { CellEditor },
-  props: ["dbType","table", "primaryKey", "columnList"],
+  props: ["dbType", "table", "primaryKey", "columnList"],
   data() {
     return {
       model: "insert",
@@ -50,7 +50,7 @@ export default {
       this.originModel = originModel
       this.editModel = { ...originModel }
       this.model = "update"
-      this.loading=false
+      this.loading = false
       this.visible = true
     },
     openCopy(originModel) {
@@ -60,14 +60,15 @@ export default {
       }
       this.originModel = originModel
       this.editModel = { ...originModel }
+      this.editModel[this.primaryKey] = null
       this.model = "copy"
-      this.loading=false
+      this.loading = false
       this.visible = true
     },
     openInsert() {
       this.model = "insert"
       this.editModel = {}
-      this.loading=false
+      this.loading = false
       this.visible = true
     },
     close() {
@@ -88,19 +89,22 @@ export default {
         if (this.getTypeByColumn(key) == null) continue
         const newEle = this.editModel[key]
         if (newEle != null) {
-          columns += `${wrapByDb(key,this.dbType)},`
+          columns += `${wrapByDb(key, this.dbType)},`
           values += `${this.wrapQuote(this.getTypeByColumn(key), newEle)},`
         }
       }
       if (values) {
         const insertSql = `INSERT INTO ${this.table}(${columns.replace(/,$/, "")}) VALUES(${values.replace(/,$/, "")})`
-        this.loading=true;
+        this.loading = true
         this.$emit("execute", insertSql)
       } else {
         this.$message("Not any input, update fail!")
       }
     },
-    confirmUpdate(row) {
+    confirmUpdate(row, oldRow) {
+      if (oldRow) {
+        this.originModel = oldRow
+      }
       if (!this.primaryKey) {
         this.$message.error("This table has not primary key, update fail!")
         return
@@ -113,7 +117,7 @@ export default {
         const oldEle = this.originModel[key]
         const newEle = currentNew[key]
         if (oldEle !== newEle) {
-          change += `${wrapByDb(key,this.dbType)}=${this.wrapQuote(this.getTypeByColumn(key), newEle)},`
+          change += `${wrapByDb(key, this.dbType)}=${this.wrapQuote(this.getTypeByColumn(key), newEle)},`
         }
       }
       if (change) {
@@ -121,7 +125,7 @@ export default {
           this.primaryKey
         }=${this.wrapQuote(this.getTypeByColumn(this.primaryKey), primary)}`
         this.$emit("execute", updateSql)
-        this.loading=true;
+        this.loading = true
       } else {
         this.$message("Not any change, update fail!")
       }
