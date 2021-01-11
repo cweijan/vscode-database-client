@@ -70,6 +70,7 @@ export class ConnectionManager {
                 this.lastConnectionNode = connectionNode;
                 Global.updateStatusBarItems(connectionNode);
                 setTimeout(() => {
+                    // TODO, 这里导致缓存失效
                     DbTreeDataProvider.refresh()
                 }, 100);
             }

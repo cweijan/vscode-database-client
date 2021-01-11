@@ -1,3 +1,5 @@
+import { DatabaseChain } from "@/provider/complete/chain/databaseChain";
+import { DatabaseCache } from "@/service/common/databaseCache";
 import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/constants";
@@ -38,8 +40,9 @@ export class UserNode extends Node implements CopyAble {
 
         Util.confirm(`Are you want to drop user ${this.username} ?`, async () => {
             this.execute(`DROP user ${this.username}`).then(() => {
-                DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop user ${this.username} success!`);
+                DatabaseCache.clearTableCache(this.parent.uid)
+                DbTreeDataProvider.refresh(this.parent);
             });
         })
     }

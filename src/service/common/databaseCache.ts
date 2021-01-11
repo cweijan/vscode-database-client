@@ -136,11 +136,11 @@ export class DatabaseCache {
 
     /**
      * clear table data for database
-     * @param databaseid 
+     * @param dbChildid 
      */
-    public static clearTableCache(databaseid?: string) {
-        if (databaseid) {
-            delete this.databaseNodeMapTableNode[databaseid];
+    public static clearTableCache(dbChildid?: string) {
+        if (dbChildid) {
+            delete this.databaseNodeMapTableNode[dbChildid];
         } else {
             this.databaseNodeMapTableNode = {};
         }

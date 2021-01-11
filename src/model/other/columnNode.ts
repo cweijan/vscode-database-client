@@ -62,7 +62,7 @@ export class ColumnNode extends Node implements CopyAble {
             if (!newColumnName) { return; }
             const sql = `alter table ${this.wrap(this.table)} change column ${this.wrap(columnName)} ${this.wrap(newColumnName)} ${this.column.type} comment '${this.column.comment}'`;
             this.execute(sql).then((rows) => {
-                DatabaseCache.clearColumnCache(`${this.getConnectId()}_${this.database}_${this.table}`);
+                DatabaseCache.clearColumnCache(`${this.parent.uid}`);
                 DbTreeDataProvider.refresh(this.parent);
             });
 
@@ -94,6 +94,7 @@ export class ColumnNode extends Node implements CopyAble {
         }
         const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(this.column.name)} ${this.column.type} AFTER ${this.wrap(afterColumnNode.column.name)};`
         await this.execute(sql)
+        DatabaseCache.clearColumnCache(this.parent.uid)
         DbTreeDataProvider.refresh(this.parent)
     }
     public async moveUp() {
@@ -106,6 +107,7 @@ export class ColumnNode extends Node implements CopyAble {
         }
         const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(beforeColumnNode.column.name)} ${beforeColumnNode.column.type} AFTER ${this.wrap(this.column.name)};`
         await this.execute(sql)
+        DatabaseCache.clearColumnCache(this.parent.uid)
         DbTreeDataProvider.refresh(this.parent)
     }
 

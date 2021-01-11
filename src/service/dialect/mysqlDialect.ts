@@ -1,6 +1,9 @@
 import { SqlDialect } from "./sqlDialect";
 
 export class MysqlDialect extends SqlDialect{
+    createUser(): string {
+        return `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`;
+    }
     showSystemViews(database: string): string {
         throw new Error("Method not implemented.");
     }

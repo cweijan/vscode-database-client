@@ -12,6 +12,7 @@ export abstract class SqlDialect {
     abstract showViews(database: string): string;
     abstract showSystemViews(database: string): string;
     abstract showUsers(): string;
+    abstract createUser(): string;
     abstract showTriggers(database: string): string;
     abstract showProcedures(database: string): string;
     abstract showFunctions(database: string): string;

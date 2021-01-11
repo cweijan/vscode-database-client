@@ -2,6 +2,9 @@ import { window } from "vscode";
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect extends SqlDialect {
+    createUser(): string {
+        return `CREATE LOGIN [name] WITH PASSWORD = 'password'`;
+    }
     updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
         const defaultDefinition = nullable == "YES" ? "NULL":"NOT NULL" ;
         comment = comment ? ` comment '${comment}'` : "";

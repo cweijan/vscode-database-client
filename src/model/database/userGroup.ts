@@ -1,3 +1,4 @@
+import { DatabaseCache } from "@/service/common/databaseCache";
 import * as path from "path";
 import { Constants, ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
@@ -17,12 +18,16 @@ export class UserGroup extends DatabaseNode {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        let userNodes = [];
+        let userNodes = DatabaseCache.getChildListOfId(this.uid);
+        if (userNodes && !isRresh) {
+            return userNodes;
+        }
         return this.execute<any[]>(this.dialect.showUsers())
             .then((tables) => {
                 userNodes = tables.map<UserNode>((table) => {
-                    return new UserNode(table.user,table.host, this.parent);
+                    return new UserNode(table.user, table.host, this);
                 });
+                DatabaseCache.setTableListOfDatabase(this.uid, userNodes);
                 return userNodes;
             })
             .catch((err) => {
@@ -32,7 +37,7 @@ export class UserGroup extends DatabaseNode {
 
     public async createTemplate() {
 
-        QueryUnit.showSQLTextDocument(this, `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`, 'create-user-template.sql')
+        QueryUnit.showSQLTextDocument(this, this.dialect.createUser(), 'create-user-template.sql')
 
     }
 
