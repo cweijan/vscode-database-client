@@ -16,10 +16,9 @@
 
     <section class="mb-2">
       <label class="block font-bold" for="connection-type">Connection Type</label>
-      <el-select id="connection-type" v-model="connectionOption.dbType">
-        <el-option value="MySQL">MySQL</el-option>
-        <el-option value="PostgreSQL">PostgreSQL</el-option>
-        <el-option value="SqlServer">SQL Server</el-option>
+        <el-radio v-model="connectionOption.dbType" label="MySQL">MySQL</el-radio>
+        <el-radio v-model="connectionOption.dbType" label="PostgreSQL">PostgreSQL</el-radio>
+        <el-radio v-model="connectionOption.dbType" label="SqlServer">SQL Server</el-radio>
       </el-select>
     </section>
 
