@@ -1,7 +1,7 @@
 import { window } from "vscode";
 import { SqlDialect } from "./sqlDialect";
 
-export class MssqlDIalect implements SqlDialect {
+export class MssqlDIalect extends SqlDialect {
     updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
         const defaultDefinition = nullable == "YES" ? "NULL":"NOT NULL" ;
         comment = comment ? ` comment '${comment}'` : "";
@@ -66,10 +66,10 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         return `SELECT concat(ROUTINE_SCHEMA,'.',ROUTINE_NAME) ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_CATALOG = '${database}' and ROUTINE_TYPE='FUNCTION'`;
     }
     showViews(database: string): string {
-        if (database.toLowerCase() == 'master') {
-            return `SELECT concat(SCHEMA_NAME(schema_id),'.',name) name FROM [sys].[all_views] ORDER BY name`;
-        }
-        return `SELECT concat(TABLE_SCHEMA,'.',TABLE_NAME) name FROM INFORMATION_SCHEMA.VIEWS  WHERE TABLE_CATALOG = '${database}' `;
+        return `SELECT concat(TABLE_SCHEMA,'.',TABLE_NAME) name FROM INFORMATION_SCHEMA.VIEWS`;
+    }
+    showSystemViews(database: string): string {
+        return `SELECT concat(SCHEMA_NAME(schema_id),'.',name) name FROM [sys].[system_views] ORDER BY name`;
     }
     buildPageSql(database: string, table: string, pageSize: number): string {
         return `SELECT TOP ${pageSize} * FROM ${table};`;

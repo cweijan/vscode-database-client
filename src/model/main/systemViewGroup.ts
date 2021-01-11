@@ -5,18 +5,17 @@ import { Node } from "../interface/node";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { TableNode } from "./tableNode";
-import { Constants, DatabaseType, ModelType, Template } from "../../common/constants";
+import { Constants, ModelType, Template } from "../../common/constants";
 import { ViewNode } from "./viewNode";
 import { FileManager, FileModel } from "@/common/filesManager";
-import { SystemViewGroup } from "./systemViewGroup";
 
-export class ViewGroup extends Node {
+export class SystemViewGroup extends Node {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/view.png");
-    public contextValue = ModelType.VIEW_GROUP
+    public contextValue = ModelType.SYSTEM_VIEW_GROUP
     constructor(readonly parent: Node) {
-        super("VIEW")
-        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.VIEW_GROUP}`;
+        super("SYSTEM_VIEW")
+        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.SYSTEM_VIEW_GROUP}`;
         this.init(parent)
     }
 
@@ -27,15 +26,13 @@ export class ViewGroup extends Node {
             return tableNodes;
         }
         return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this),
-            this.dialect.showViews(this.database))
+            this.dialect.showSystemViews(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new ViewNode(table.name, '', this);
                 });
-                if(this.dbType==DatabaseType.MSSQL || this.dbType==DatabaseType.PG){
-                    tableNodes.unshift(new SystemViewGroup(this))
-                }else if (tableNodes.length == 0) {
-                    tableNodes=[new InfoNode("This database has no view")];
+                if (tableNodes.length == 0) {
+                    tableNodes=[new InfoNode("This database has no system view")];
                 }
                 DatabaseCache.setTableListOfDatabase(this.uid, tableNodes);
                 return tableNodes;
@@ -43,14 +40,6 @@ export class ViewGroup extends Node {
             .catch((err) => {
                 return [new InfoNode(err)];
             });
-    }
-
-    public async createTemplate() {
-
-        ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.uid}#create-view-template.sql`, this.dialect.viewTemplate(), FileModel.WRITE)
-        FileManager.show(filePath)
-
     }
 
 }

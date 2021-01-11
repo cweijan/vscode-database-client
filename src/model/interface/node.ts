@@ -1,6 +1,10 @@
-import { DatabaseType, ModelType } from "@/common/constants";
+import { DatabaseType } from "@/common/constants";
 import { Util } from "@/common/util";
-import { getDialect, SqlDialect } from "@/service/dialect/sqlDialect";
+import { MssqlDIalect } from "@/service/dialect/mssqlDIalect";
+import { MysqlDialect } from "@/service/dialect/mysqlDialect";
+import { PostgreSqlDialect } from "@/service/dialect/postgreSqlDialect";
+import {  SqlDialect } from "@/service/dialect/sqlDialect";
+import { ServiceManager } from "@/service/serviceManager";
 import * as vscode from "vscode";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { SSHConfig } from "./sshConfig";
@@ -48,7 +52,7 @@ export abstract class Node extends vscode.TreeItem {
         this.global = source.global
         this.dbType = source.dbType
         if (!this.dialect) {
-            this.dialect = getDialect(this.dbType)
+            this.dialect = ServiceManager.getDialect(this.dbType)
         }
         this.includeDatabases = source.includeDatabases
         this.excludeDatabases = source.excludeDatabases

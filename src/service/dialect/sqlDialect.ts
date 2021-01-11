@@ -1,47 +1,38 @@
-import { DatabaseType } from "@/common/constants";
-import { MssqlDIalect } from "./mssqlDIalect";
-import { MysqlDialect } from "./mysqlDialect";
-import { PostgreSqlDialect } from "./postgreSqlDialect";
 
 /**
  * TODO
  * 1. 增加用户角色分配视图
  * 2. 增加system view节点
  */
-export interface SqlDialect {
-    updateColumn(table:string,column:string,type:string,comment:string,nullable:string): string;
-    switchDataBase(database: string): string;
-    showDatabases(): string;
-    showTables(database: string): string;
-    showColumns(database: string, table: string): string;
-    showViews(database: string): string;
-    showUsers(): string;
-    showTriggers(database: string): string;
-    showProcedures(database: string): string;
-    showFunctions(database: string): string;
-    buildPageSql(database: string, table: string, pageSize: number): string;
-    countSql(database: string, table: string): string;
-    createDatabase(database: string): string;
-    truncateDatabase(database: string): string;
-    renameTable(database: string, tableName: string, newName: string): string;
-    showTableSource(database: string, table: string): string;
-    showViewSource(database: string, table: string): string;
-    showProcedureSource(database: string, name: string): string;
-    showFunctionSource(database: string, name: string): string;
-    showTriggerSource(database: string, name: string): string;
-    tableTemplate(): string;
-    viewTemplate(): string;
-    procedureTemplate(): string;
-    triggerTemplate(): string;
-    functionTemplate(): string;
+export abstract class SqlDialect {
+    abstract updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string;
+    abstract switchDataBase(database: string): string;
+    abstract showDatabases(): string;
+    abstract showTables(database: string): string;
+    abstract showColumns(database: string, table: string): string;
+    abstract showViews(database: string): string;
+    abstract showSystemViews(database: string): string;
+    abstract showUsers(): string;
+    abstract showTriggers(database: string): string;
+    abstract showProcedures(database: string): string;
+    abstract showFunctions(database: string): string;
+    abstract buildPageSql(database: string, table: string, pageSize: number): string;
+    abstract countSql(database: string, table: string): string;
+    abstract createDatabase(database: string): string;
+    abstract truncateDatabase(database: string): string;
+    abstract renameTable(database: string, tableName: string, newName: string): string;
+    abstract showTableSource(database: string, table: string): string;
+    abstract showViewSource(database: string, table: string): string;
+    abstract showProcedureSource(database: string, name: string): string;
+    abstract showFunctionSource(database: string, name: string): string;
+    abstract showTriggerSource(database: string, name: string): string;
+    abstract tableTemplate(): string;
+    abstract viewTemplate(): string;
+    abstract procedureTemplate(): string;
+    abstract triggerTemplate(): string;
+    abstract functionTemplate(): string;
+    dropTriggerTemplate(name:string): string{
+        return `DROP IF EXISTS TRIGGER ${name}`
+    }
 }
 
-export function getDialect(dbType: DatabaseType): SqlDialect {
-    switch (dbType) {
-        case DatabaseType.MSSQL:
-            return new MssqlDIalect()
-        case DatabaseType.PG:
-            return new PostgreSqlDialect();
-    }
-    return new MysqlDialect()
-}

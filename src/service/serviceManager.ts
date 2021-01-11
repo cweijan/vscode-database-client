@@ -26,6 +26,10 @@ import { MysqlPageSerivce } from "./page/mysqlPageSerivce";
 import { PageService } from "./page/pageService";
 import { DatabaseType } from "@/common/constants";
 import { PostgreSqlPageService } from "./page/postgreSqlPageService";
+import { MssqlDIalect } from "./dialect/mssqlDIalect";
+import { MysqlDialect } from "./dialect/mysqlDialect";
+import { PostgreSqlDialect } from "./dialect/postgreSqlDialect";
+import { SqlDialect } from "./dialect/sqlDialect";
 
 export class ServiceManager {
 
@@ -88,6 +92,16 @@ export class ServiceManager {
         this.connectService = new MysqlConnectService();
         this.statusService = new MysqlStatusService()
         this.importService = new MysqlImportService();
+    }
+
+    public static getDialect(dbType: DatabaseType): SqlDialect {
+        switch (dbType) {
+            case DatabaseType.MSSQL:
+                return new MssqlDIalect()
+            case DatabaseType.PG:
+                return new PostgreSqlDialect();
+        }
+        return new MysqlDialect()
     }
 
     public static getPageService(databaseType: DatabaseType): PageService {

@@ -53,7 +53,7 @@ export enum DatabaseType {
 export enum ModelType {
     CONNECTION = "connection", DATABASE = "database", USER_GROUP = "userGroup", USER = "user",
     TABLE = "table", COLUMN = "column", INFO = "info", TABLE_GROUP = "tableGroup",
-    VIEW = "view", VIEW_GROUP = "viewGroup", TRIGGER_GROUP = "triggerGroup", TRIGGER = "trigger",
+    VIEW = "view", VIEW_GROUP = "viewGroup",SYSTEM_VIEW_GROUP = "systemViewGroup", TRIGGER_GROUP = "triggerGroup", TRIGGER = "trigger",
     PROCEDURE_GROUP = "procedureGroup", PROCEDURE = "procedure", FUNCTION_GROUP = "functionGroup", FUNCTION = "function",
     QUERY_GROUP = "queryGroup", QUERY = "query",
     DIAGRAM_GROUP = "diagramGroup", DIAGRAM = "diagram"

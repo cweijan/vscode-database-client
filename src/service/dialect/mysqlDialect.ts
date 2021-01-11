@@ -1,6 +1,9 @@
 import { SqlDialect } from "./sqlDialect";
 
-export class MysqlDialect implements SqlDialect{
+export class MysqlDialect extends SqlDialect{
+    showSystemViews(database: string): string {
+        throw new Error("Method not implemented.");
+    }
     updateColumn( table: string, column: string, type: string, comment: string, nullable: string): string {
         const defaultDefinition = nullable == "YES" ? "" : " NOT NULL";
         comment = comment ? ` comment '${comment}'` : "";

@@ -1,6 +1,6 @@
 import { SqlDialect } from "./sqlDialect";
 
-export class PostgreSqlDialect implements SqlDialect{
+export class PostgreSqlDialect extends SqlDialect{
     updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
         const defaultDefinition = nullable == "YES" ? "DROP NOT NULL":"SET NOT NULL" ;
         comment = comment ? ` comment '${comment}'` : "";
@@ -30,23 +30,16 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
         return `SHOW CREATE TABLE "${database}"."${table}"`
     }
     showViewSource(database: string, table: string): string {
-        return `SELECT CONCAT('CREATE VIEW ',table_name,'\nAS\n(',view_definition,');') "Create View",table_name,view_definition from information_schema.views where table_name=${table};`
+        return `SELECT CONCAT('CREATE VIEW ',table_name,'\nAS\n(',view_definition,');') "Create View",table_name,view_definition from information_schema.views where table_name='${table}';` 
     }
     showProcedureSource(database: string, name: string): string {
-        return `SELECT CONCAT('CREATE PROCEDURE ',ROUTINE_NAME,'()\nLANGUAGE ',routine_body,'\nAS $$',routine_definition,'$$;') "Create Procedure",ROUTINE_NAME,routine_definition,routine_body,data_type FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public'  and ROUTINE_TYPE='PROCEDURE' and routine_body!='EXTERNAL' AND ROUTINE_NAME='${name}'
-        union
-        SELECT CONCAT('CREATE PROCEDURE ',ROUTINE_NAME,'()\nLANGUAGE plpgsql\nAS $$',routine_definition,'$$;') "Create Procedure",ROUTINE_NAME,routine_definition,routine_body,data_type FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public'  and ROUTINE_TYPE='PROCEDURE' and routine_body='EXTERNAL' AND ROUTINE_NAME='${name}'`;
+        return `select pg_get_functiondef('${name}' :: regproc) "Create Procedure"`;
     }
     showFunctionSource(database: string, name: string): string {
-        return `SELECT CONCAT('CREATE FUNCTION ',ROUTINE_NAME,'()\nRETURNS ',data_type,'\nAS $$',
-        routine_definition,'$$ LANGUAGE ',routine_body,';') "Create Function",ROUTINE_NAME,routine_definition,routine_body,data_type FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public'  and ROUTINE_TYPE='FUNCTION' and routine_body!='EXTERNAL'
-        AND ROUTINE_NAME='${name}'
-        union 
-        SELECT CONCAT('CREATE FUNCTION ',ROUTINE_NAME,'()\nRETURNS ',data_type,'\nAS $$',routine_definition,'$$ LANGUAGE plpgsql;') "Create Function",ROUTINE_NAME,routine_definition,routine_body,data_type FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public'  and ROUTINE_TYPE='FUNCTION' and routine_body='EXTERNAL'
-        AND ROUTINE_NAME='${name}'`;
+        return `select pg_get_functiondef('${name}' :: regproc) "Create Function"`;
     }
     showTriggerSource(database: string, name: string): string {
-        return `SHOW CREATE TRIGGER "${database}"."${name}"`;
+        return `select pg_get_triggerdef(oid) "SQL Original Statement" from pg_trigger where tgname = '${name}';`;
     }
     showColumns(database: string,table:string): string {
         const view = table.split('.')[1];
@@ -59,7 +52,7 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
         and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name WHERE c.TABLE_CATALOG = '${database}' AND c.table_name = '${view?view:table}' ORDER BY ORDINAL_POSITION;`;
     }
     showTriggers(database: string): string {
-        return `SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = '${database}'`;
+        return `SELECT TRIGGER_NAME "TRIGGER_NAME" FROM information_schema.TRIGGERS WHERE trigger_catalog = '${database}'`;
     }
     showProcedures(database: string): string {
         return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public' and ROUTINE_TYPE='PROCEDURE'`;
@@ -69,6 +62,9 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
     }
     showViews(database: string): string {
         return `select table_name "name" from information_schema.tables where table_schema='public' and table_type='VIEW';`
+    }
+    showSystemViews(database: string): string {
+        return `select table_name "name" from information_schema.tables where table_schema!='public' and table_type='VIEW';`
     }
     buildPageSql(database: string, table: string, pageSize: number):string {
         return  `SELECT * FROM ${table} LIMIT ${pageSize};`;
@@ -105,12 +101,22 @@ as $$
 $$`;
     }
     triggerTemplate(): string {
-        return `CREATE TRIGGER [name] 
-[BEFORE/AFTER] [INSERT/UPDATE/DELETE]
-ON [table]
-FOR EACH ROW BEGIN
+        return `CREATE FUNCTION [tri_fun]() RETURNS TRIGGER AS 
+$body$
+BEGIN
+    RETURN [value];
+END;
+$body$ 
+LANGUAGE plpgsql;
 
-END;`
+CREATE TRIGGER [name] 
+[BEFORE/AFTER/INSTEAD OF] [INSERT/UPDATE/DELETE]
+ON [table]
+FOR EACH ROW
+EXECUTE PROCEDURE [tri_fun]();`
+    }
+    dropTriggerTemplate(name:string){
+        return `DROP TRIGGER ${name} on [table_name]`;
     }
     functionTemplate(): string {
         return `CREATE FUNCTION [name]() 
