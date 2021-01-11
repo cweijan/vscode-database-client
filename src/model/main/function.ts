@@ -2,10 +2,9 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
-import { ConnectionManager } from "../../service/connectionManager";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
-import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { Node } from "../interface/node";
 
 export class FunctionNode extends Node {
@@ -24,10 +23,10 @@ export class FunctionNode extends Node {
     }
 
     public async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), this.dialect.showFunctionSource(this.database,this.name))
+        this.execute<any[]>( this.dialect.showFunctionSource(this.database,this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0];
-                QueryUnit.showSQLTextDocument(`DROP FUNCTION IF EXISTS ${this.name};\n${procedDtail['Create Function']}`);
+                QueryUnit.showSQLTextDocument(this,`DROP FUNCTION IF EXISTS ${this.name};\n${procedDtail['Create Function']}`);
             });
     }
 
@@ -39,7 +38,7 @@ export class FunctionNode extends Node {
     public drop() {
 
         Util.confirm(`Are you want to drop function ${this.name} ?`, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function ${this.wrap(this.name)}`).then(() => {
+            this.execute( `DROP function ${this.wrap(this.name)}`).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.name}_${ModelType.FUNCTION_GROUP}`);
                 DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop function ${this.name} success!`);

@@ -3,10 +3,12 @@ import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/constants";
 import { FileManager } from '../../common/filesManager';
 import { Util } from '../../common/util';
-import { ConnectionManager } from "../../service/connectionManager";
-import { DatabaseCache } from "../../service/common/databaseCache";
-import { QueryUnit } from "../../service/queryUnit";
 import { DbTreeDataProvider } from '../../provider/treeDataProvider';
+import { DatabaseCache } from "../../service/common/databaseCache";
+import { ConnectionManager } from "../../service/connectionManager";
+import { QueryUnit } from "../../service/queryUnit";
+import { ServiceManager } from "../../service/serviceManager";
+import { DiagramGroup } from "../diagram/diagramGroup";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { FunctionGroup } from "../main/functionGroup";
@@ -15,8 +17,6 @@ import { TableGroup } from "../main/tableGroup";
 import { TriggerGroup } from "../main/triggerGroup";
 import { ViewGroup } from "../main/viewGroup";
 import { NodeUtil } from '../nodeUtil';
-import { DiagramGroup } from "../diagram/diagramGroup";
-import { ServiceManager } from "../../service/serviceManager";
 import { QueryGroup } from "../query/queryGroup";
 
 export class DatabaseNode extends Node implements CopyAble {
@@ -44,7 +44,7 @@ export class DatabaseNode extends Node implements CopyAble {
         new ProcedureGroup(this),
         new FunctionGroup(this),
         new TriggerGroup(this)
-    ];
+        ];
     }
 
     public openOverview() {
@@ -55,7 +55,7 @@ export class DatabaseNode extends Node implements CopyAble {
 
         vscode.window.showInputBox({ prompt: `Are you want to drop database ${this.database} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
-                QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP DATABASE ${this.wrap(this.database)}`).then(() => {
+                this.execute(`DROP DATABASE ${this.wrap(this.database)}`).then(() => {
                     DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`)
                     DbTreeDataProvider.refresh(this.parent);
                     vscode.window.showInformationMessage(`Drop database ${this.database} success!`)
@@ -88,7 +88,6 @@ export class DatabaseNode extends Node implements CopyAble {
     public async newQuery() {
 
         FileManager.show(`${this.uid}.sql`)
-        ConnectionManager.getConnection(this, true);
 
     }
 

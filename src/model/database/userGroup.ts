@@ -1,15 +1,9 @@
 import * as path from "path";
-import * as vscode from "vscode";
-import { Constants, ModelType, Template } from "../../common/constants";
-import { Util } from "../../common/util";
-import { ConnectionManager } from "../../service/connectionManager";
+import { Constants, ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
-import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { InfoNode } from "../other/infoNode";
-import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
+import { InfoNode } from "../other/infoNode";
 import { DatabaseNode } from "./databaseNode";
-import { FileManager, FileModel } from "@/common/filesManager";
 import { UserNode } from "./userNode";
 
 export class UserGroup extends DatabaseNode {
@@ -24,7 +18,7 @@ export class UserGroup extends DatabaseNode {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         let userNodes = [];
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), this.dialect.showUsers())
+        return this.execute<any[]>(this.dialect.showUsers())
             .then((tables) => {
                 userNodes = tables.map<UserNode>((table) => {
                     return new UserNode(table.user,table.host, this.parent);
@@ -38,9 +32,8 @@ export class UserGroup extends DatabaseNode {
 
     public async createTemplate() {
 
-        ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.uid}#create-view-template.sql`,`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`, FileModel.WRITE)
-        FileManager.show(filePath)
+        QueryUnit.showSQLTextDocument(this, `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`, 'create-user-template.sql')
+
     }
 
 }

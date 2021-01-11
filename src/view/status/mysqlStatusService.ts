@@ -2,8 +2,7 @@ import { FieldInfo } from "mysql2";
 import { Console } from "../../common/Console";
 import { ConnectionNode } from "../../model/database/connectionNode";
 import { ConnectionManager } from "../../service/connectionManager";
-import { AbstractStatusService, DashBoardResponse, ProcessListResponse, DashBoardItem } from "./abstractStatusService";
-import { QueryUnit } from "../../service/queryUnit";
+import { AbstractStatusService, DashBoardItem, DashBoardResponse, ProcessListResponse } from "./abstractStatusService";
 import format = require('date-format');
 
 interface QueryResponse {
@@ -44,10 +43,9 @@ export class MysqlStatusService extends AbstractStatusService {
 
     protected async onDashBoard(connectionNode: ConnectionNode): Promise<DashBoardResponse> {
 
-        const connection = await ConnectionManager.getConnection(connectionNode)
         const now = format('hh:mm:ss', new Date())
 
-        const status = this.responseToObj((await QueryUnit.queryPromise(connection, "show global status ")));
+        const status = this.responseToObj((await connectionNode.execute("show global status ")));
 
         const sessions = await this.buildSession(status, now);
         const queries = await this.buildQueries(status, now);
@@ -60,14 +58,14 @@ export class MysqlStatusService extends AbstractStatusService {
         };
     }
 
-    private async buildTraffic(resposne:any, now: any): Promise<DashBoardItem[]> {
+    private async buildTraffic(resposne: any, now: any): Promise<DashBoardItem[]> {
         return [
             { now, type: 'received', value: resposne.Bytes_received },
             { now, type: 'sent', value: resposne.Bytes_sent }
         ];
     }
 
-    private async buildSession(resposne:any, now: any): Promise<DashBoardItem[]> {
+    private async buildSession(resposne: any, now: any): Promise<DashBoardItem[]> {
         return [
             { now, type: 'count', value: resposne.Threads_connected },
             { now, type: 'running', value: resposne.Threads_running },
@@ -75,7 +73,7 @@ export class MysqlStatusService extends AbstractStatusService {
         ];
     }
 
-    private async buildQueries(resposne:any, now: any): Promise<DashBoardItem[]> {
+    private async buildQueries(resposne: any, now: any): Promise<DashBoardItem[]> {
         return [
             { now, type: 'insert', value: resposne.Com_insert },
             { now, type: 'update', value: resposne.Com_update },

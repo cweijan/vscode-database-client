@@ -1,9 +1,8 @@
-import { DatabaseType } from "@/common/constants";
+import { DatabaseType, ModelType } from "@/common/constants";
 import { Util } from "@/common/util";
-import { MssqlDIalect } from "@/service/dialect/mssqlDIalect";
-import { MysqlDialect } from "@/service/dialect/mysqlDialect";
-import { PostgreSqlDialect } from "@/service/dialect/postgreSqlDialect";
-import {  SqlDialect } from "@/service/dialect/sqlDialect";
+import { ConnectionManager } from "@/service/connectionManager";
+import { SqlDialect } from "@/service/dialect/sqlDialect";
+import { QueryUnit } from "@/service/queryUnit";
 import { ServiceManager } from "@/service/serviceManager";
 import * as vscode from "vscode";
 import { DatabaseCache } from "../../service/common/databaseCache";
@@ -61,9 +60,16 @@ export abstract class Node extends vscode.TreeItem {
 
     private static nodeCache = {};
     public cacheSelf() {
-        Node.nodeCache[`${this.getConnectId()}_${this.database}`] = this;
+        if (this.contextValue == ModelType.CONNECTION) {
+            Node.nodeCache[`${this.getConnectId()}`] = this;
+        } else {
+            Node.nodeCache[`${this.getConnectId()}_${this.database}`] = this;
+        }
     }
     public getCache() {
+        if (this.contextValue == ModelType.CONNECTION) {
+            return Node.nodeCache[`${this.getConnectId()}`]
+        }
         return Node.nodeCache[`${this.getConnectId()}_${this.database}`]
     }
 
@@ -82,7 +88,7 @@ export abstract class Node extends vscode.TreeItem {
         /**
          * mssql and postgres must special database when connect.
          */
-        if (opt?.withDb && this.database && (this.dbType == DatabaseType.PG||this.dbType==DatabaseType.MSSQL)) {
+        if (opt?.withDb && this.database && (this.dbType == DatabaseType.PG || this.dbType == DatabaseType.MSSQL)) {
             return `${uid}_${this.database}`
         }
 
@@ -94,6 +100,9 @@ export abstract class Node extends vscode.TreeItem {
     public getPort(): number { return this.usingSSH ? this.ssh.port : this.port }
     public getUser(): string { return this.usingSSH ? this.ssh.username : this.user }
 
+    public async execute<T>(sql: string): Promise<T> {
+        return QueryUnit.queryPromise<T>(await ConnectionManager.getConnection(this, true), sql)
+    }
 
     public wrap(origin: string) {
         return Util.wrap(origin, this.dbType)

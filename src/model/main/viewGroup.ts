@@ -1,8 +1,6 @@
-import { FileManager, FileModel } from "@/common/filesManager";
 import * as path from "path";
 import { Constants, DatabaseType, ModelType } from "../../common/constants";
 import { DatabaseCache } from "../../service/common/databaseCache";
-import { ConnectionManager } from "../../service/connectionManager";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
@@ -29,7 +27,7 @@ export class ViewGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this),
+        return this.execute<any[]>(
             this.dialect.showViews(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
@@ -50,9 +48,7 @@ export class ViewGroup extends Node {
 
     public async createTemplate() {
 
-        ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.uid}#create-view-template.sql`, this.dialect.viewTemplate(), FileModel.WRITE)
-        FileManager.show(filePath)
+        QueryUnit.showSQLTextDocument(this, this.dialect.viewTemplate(), 'create-view-template.sql')
 
     }
 

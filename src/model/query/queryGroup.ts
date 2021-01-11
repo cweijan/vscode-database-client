@@ -1,12 +1,12 @@
-import * as vscode from "vscode";
-import { ModelType, Constants } from "@/common/constants";
-import * as path from "path";
-import { Node } from "../interface/node";
-import { QueryNode } from "./queryNode";
+import { Constants, ModelType } from "@/common/constants";
 import { FileManager } from "@/common/filesManager";
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from "fs";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from "fs";
+import * as path from "path";
+import * as vscode from "vscode";
+import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
+import { QueryNode } from "./queryNode";
 
 export class QueryGroup extends Node {
     public contextValue = ModelType.QUERY_GROUP;

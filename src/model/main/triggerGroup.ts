@@ -1,12 +1,10 @@
 import * as path from "path";
-import { QueryUnit } from "../../service/queryUnit";
-import { InfoNode } from "../other/infoNode";
-import { Node } from "../interface/node";
+import { Constants, ModelType } from "../../common/constants";
 import { DatabaseCache } from "../../service/common/databaseCache";
-import { ConnectionManager } from "../../service/connectionManager";
-import { Constants, ModelType, Template } from "../../common/constants";
+import { QueryUnit } from "../../service/queryUnit";
+import { Node } from "../interface/node";
+import { InfoNode } from "../other/infoNode";
 import { TriggerNode } from "./trigger";
-import { FileManager, FileModel } from "@/common/filesManager";
 
 export class TriggerGroup extends Node {
 
@@ -25,7 +23,7 @@ export class TriggerGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), this.dialect.showTriggers(this.database))
+        return this.execute<any[]>( this.dialect.showTriggers(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TriggerNode>((table) => {
                     return new TriggerNode(table.TRIGGER_NAME, this);
@@ -44,9 +42,7 @@ export class TriggerGroup extends Node {
 
     public async createTemplate() {
 
-        ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.uid}#create-trigger-template.sql`, this.dialect.triggerTemplate(), FileModel.WRITE)
-        FileManager.show(filePath)
+        QueryUnit.showSQLTextDocument(this, this.dialect.triggerTemplate(), 'create-trigger-template.sql')
 
     }
 

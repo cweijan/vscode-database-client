@@ -1,8 +1,6 @@
 import * as path from "path";
 import { Constants, ModelType } from "../../common/constants";
 import { DatabaseCache } from "../../service/common/databaseCache";
-import { ConnectionManager } from "../../service/connectionManager";
-import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
 import { TableNode } from "./tableNode";
@@ -27,7 +25,7 @@ export class SystemViewGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this),
+        return this.execute<any[]>(
             this.dialect.showSystemViews(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {

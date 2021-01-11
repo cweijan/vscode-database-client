@@ -1,12 +1,10 @@
 import * as path from "path";
-import { Constants, ModelType, Template } from "../../common/constants";
-import { ConnectionManager } from "../../service/connectionManager";
+import { Constants, ModelType } from "../../common/constants";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
-import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
+import { InfoNode } from "../other/infoNode";
 import { ProcedureNode } from "./procedure";
-import { FileManager, FileModel } from "@/common/filesManager";
 
 export class ProcedureGroup extends Node {
 
@@ -24,7 +22,7 @@ export class ProcedureGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), this.dialect.showProcedures(this.database))
+        return this.execute<any[]>( this.dialect.showProcedures(this.database))
             .then((tables) => {
                 tableNodes = tables.map<Node>((table) => {
                     return new ProcedureNode(table.ROUTINE_NAME, this);
@@ -42,9 +40,8 @@ export class ProcedureGroup extends Node {
 
     public async createTemplate() {
 
-        ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.uid}#create-procedure-template.sql`, this.dialect.procedureTemplate(), FileModel.WRITE)
-        FileManager.show(filePath)
+        QueryUnit.showSQLTextDocument(this, this.dialect.procedureTemplate(), 'create-procedure-template.sql')
+
     }
 
 }

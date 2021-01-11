@@ -1,20 +1,20 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType, Template, MessageType, ConfigKey, DatabaseType } from "../../common/constants";
+import { ConfigKey, Constants, DatabaseType, MessageType, ModelType, Template } from "../../common/constants";
+import { Global } from "../../common/global";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
-import { QueryUnit } from "../../service/queryUnit";
-import { CopyAble } from "../interface/copyAble";
-import { Node } from "../interface/node";
-import { ColumnNode } from "../other/columnNode";
-import { InfoNode } from "../other/infoNode";
 import { MockRunner } from "../../service/mock/mockRunner";
+import { QueryUnit } from "../../service/queryUnit";
 import { QueryPage } from "../../view/result/query";
 import { DataResponse } from "../../view/result/queryResponse";
+import { CopyAble } from "../interface/copyAble";
+import { Node } from "../interface/node";
 import { ColumnMeta } from "../other/columnMeta";
-import { Global } from "../../common/global";
+import { ColumnNode } from "../other/columnNode";
+import { InfoNode } from "../other/infoNode";
 
 export class TableNode extends Node implements CopyAble {
 
@@ -38,7 +38,7 @@ export class TableNode extends Node implements CopyAble {
         if (columnNodes && !isRresh && this.collapsibleState != vscode.TreeItemCollapsibleState.Expanded) {
             return columnNodes;
         }
-        return QueryUnit.queryPromise<ColumnMeta[]>(await ConnectionManager.getConnection(this), this.dialect.showColumns(this.database, this.table))
+        return this.execute<ColumnMeta[]>(this.dialect.showColumns(this.database, this.table))
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column, index) => {
                     return new ColumnNode(this.table, column, this, index);
@@ -52,8 +52,7 @@ export class TableNode extends Node implements CopyAble {
     }
 
     public addColumnTemplate() {
-        ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`ALTER TABLE
+        QueryUnit.showSQLTextDocument(this, `ALTER TABLE
     ${this.wrap(this.table)} 
 ADD 
     COLUMN [column] [type] NOT NULL comment '';`, Template.alter);
@@ -62,9 +61,9 @@ ADD
 
     public async showSource() {
         if (this.dbType == DatabaseType.MYSQL || !this.dbType) {
-            QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), this.dialect.showTableSource(this.database, this.table))
+            this.execute<any[]>(this.dialect.showTableSource(this.database, this.table))
                 .then((sourceResule) => {
-                    QueryUnit.showSQLTextDocument(sourceResule[0]['Create Table']);
+                    QueryUnit.showSQLTextDocument(this, sourceResule[0]['Create Table']);
                 });
         } else {
             const childs = await this.getChildren()
@@ -72,7 +71,7 @@ ADD
             if (this.dbType == DatabaseType.MSSQL) {
                 const tables = this.table.split(".")
                 tables.shift()
-                table=tables.join(".")
+                table = tables.join(".")
             }
             let sql = `create table ${table}(\n`
             for (let i = 0; i < childs.length; i++) {
@@ -84,7 +83,7 @@ ADD
                 }
             }
             sql += ");"
-            QueryUnit.showSQLTextDocument(sql);
+            QueryUnit.showSQLTextDocument(this, sql);
         }
     }
 
@@ -93,7 +92,7 @@ ADD
         vscode.window.showInputBox({ value: this.table, placeHolder: 'newTableName', prompt: `You will changed ${this.database}.${this.table} to new table name!` }).then(async (newTableName) => {
             if (!newTableName) { return; }
             const sql = this.dialect.renameTable(this.database, this.table, newTableName);
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
+            this.execute(sql).then((rows) => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
                 DbTreeDataProvider.refresh(this.parent);
             });
@@ -105,7 +104,7 @@ ADD
     public dropTable() {
 
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP TABLE ${this.wrap(this.table)}`).then(() => {
+            this.execute(`DROP TABLE ${this.wrap(this.table)}`).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
                 DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
@@ -118,7 +117,7 @@ ADD
     public truncateTable() {
 
         Util.confirm(`Are you want to clear table ${this.table} all data ?`, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `truncate table ${this.wrap(this.table)}`).then(() => {
+            this.execute(`truncate table ${this.wrap(this.table)}`).then(() => {
                 vscode.window.showInformationMessage(`Clear table ${this.table} all data success!`);
             });
         })
@@ -126,8 +125,7 @@ ADD
     }
 
     public indexTemplate() {
-        ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`-- ALTER TABLE ${this.wrap(this.table)} DROP INDEX [indexName];
+        QueryUnit.showSQLTextDocument(this, `-- ALTER TABLE ${this.wrap(this.table)} DROP INDEX [indexName];
 -- ALTER TABLE ${this.wrap(this.table)} ADD [UNIQUE|INDEX|PRIMARY KEY] ([columns]);`, Template.alter);
         setTimeout(() => {
             QueryUnit.runQuery(`SELECT COLUMN_NAME name,table_schema,index_name,non_unique FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${this.database}' and table_name='${this.table}';`, this);
@@ -159,7 +157,7 @@ ADD
         if (run) {
             QueryUnit.runQuery(sql, this);
         } else {
-            QueryUnit.showSQLTextDocument(sql, Template.table);
+            QueryUnit.showSQLTextDocument(this, sql, Template.table);
         }
 
     }
@@ -176,7 +174,7 @@ ADD
                     sql += "values\n  ";
                     sql += `(${childrenValues.toString().replace(/,/g, ", ")}\n  );`;
                     if (show) {
-                        QueryUnit.showSQLTextDocument(sql, Template.table);
+                        QueryUnit.showSQLTextDocument(this, sql, Template.table);
                     }
                     resolve(sql)
                 });
@@ -193,7 +191,7 @@ ADD
 
                 let sql = `delete from \n  ${this.wrap(this.table)} \n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and")}`;
-                QueryUnit.showSQLTextDocument(sql, Template.table);
+                QueryUnit.showSQLTextDocument(this, sql, Template.table);
             });
     }
 
@@ -209,17 +207,15 @@ ADD
 
                 let sql = `update \n  ${this.wrap(this.table)} \nset \n  ${sets.toString().replace(/,/g, ",\n  ")}\n`;
                 sql += `where \n  ${where.toString().replace(/,/g, "\n  and ")}`;
-                QueryUnit.showSQLTextDocument(sql, Template.table);
+                QueryUnit.showSQLTextDocument(this, sql, Template.table);
             });
     }
 
     public async getMaxPrimary(): Promise<number> {
 
-        const connection = await ConnectionManager.getConnection(this, false)
-
         const primaryKey = MockRunner.primaryKeyMap[this.getConnectId()];
         if (primaryKey != null) {
-            const count = await QueryUnit.queryPromise(connection, `select max(${primaryKey}) max from ${this.table}`);
+            const count = await this.execute(`select max(${primaryKey}) max from ${this.table}`);
             if (count && count[0]) { return count[0].max }
         }
 

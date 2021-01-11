@@ -1,12 +1,10 @@
 import * as path from "path";
-import { Constants, ModelType, Template } from "../../common/constants";
-import { ConnectionManager } from "../../service/connectionManager";
+import { Constants, ModelType } from "../../common/constants";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
-import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
+import { InfoNode } from "../other/infoNode";
 import { FunctionNode } from "./function";
-import { FileManager, FileModel } from "@/common/filesManager";
 
 export class FunctionGroup extends Node {
 
@@ -24,7 +22,7 @@ export class FunctionGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), this.dialect.showFunctions(this.database))
+        return this.execute<any[]>( this.dialect.showFunctions(this.database))
             .then((tables) => {
                 tableNodes = tables.map<FunctionNode>((table) => {
                     return new FunctionNode(table.ROUTINE_NAME, this);
@@ -42,9 +40,7 @@ export class FunctionGroup extends Node {
 
     public async createTemplate() {
 
-        ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.uid}#create-function-template.sql`, this.dialect.functionTemplate(), FileModel.WRITE)
-        FileManager.show(filePath)
+        QueryUnit.showSQLTextDocument(this, this.dialect.functionTemplate(), 'create-function-template.sql')
 
     }
 

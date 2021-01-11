@@ -1,12 +1,10 @@
 import * as path from "path";
-import { QueryUnit } from "../../service/queryUnit";
-import { InfoNode } from "../other/infoNode";
-import { Node } from "../interface/node";
+import { Constants, ModelType } from "../../common/constants";
 import { DatabaseCache } from "../../service/common/databaseCache";
-import { ConnectionManager } from "../../service/connectionManager";
+import { QueryUnit } from "../../service/queryUnit";
+import { Node } from "../interface/node";
+import { InfoNode } from "../other/infoNode";
 import { TableNode } from "./tableNode";
-import { Constants, ModelType, Template } from "../../common/constants";
-import { FileManager, FileModel } from "@/common/filesManager";
 
 export class TableGroup extends Node {
 
@@ -24,7 +22,7 @@ export class TableGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), this.dialect.showTables(this.database))
+        return this.execute<any[]>( this.dialect.showTables(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new TableNode(table.name, table.comment, this);
@@ -41,9 +39,8 @@ export class TableGroup extends Node {
     }
 
     public async createTemplate() {
-        ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.uid}#create-table-template.sql`, this.dialect.tableTemplate(), FileModel.WRITE)
-        FileManager.show(filePath)
+
+        QueryUnit.showSQLTextDocument(this, this.dialect.tableTemplate(), 'create-table-template.sql')
 
     }
 }

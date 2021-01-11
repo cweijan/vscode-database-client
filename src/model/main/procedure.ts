@@ -2,10 +2,9 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
-import { ConnectionManager } from "../../service/connectionManager";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
-import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { Node } from "../interface/node";
 
 
@@ -25,10 +24,10 @@ export class ProcedureNode extends Node {
     }
 
     public async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), this.dialect.showProcedureSource(this.database,this.name))
+        this.execute<any[]>( this.dialect.showProcedureSource(this.database,this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0]
-                QueryUnit.showSQLTextDocument(`DROP PROCEDURE IF EXISTS ${this.name};\n${procedDtail['Create Procedure']}`);
+                QueryUnit.showSQLTextDocument(this,`DROP PROCEDURE IF EXISTS ${this.name};\n${procedDtail['Create Procedure']}`);
             });
     }
 
@@ -40,7 +39,7 @@ export class ProcedureNode extends Node {
     public drop() {
 
         Util.confirm(`Are you want to drop procedure ${this.name} ? `, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP procedure ${this.wrap(this.name)}`).then(() => {
+            this.execute( `DROP procedure ${this.wrap(this.name)}`).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}_${ModelType.PROCEDURE_GROUP}`)
                 DbTreeDataProvider.refresh(this.parent)
                 vscode.window.showInformationMessage(`Drop procedure ${this.name} success!`)

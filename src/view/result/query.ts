@@ -7,7 +7,6 @@ import { Global } from "../../common/global";
 import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
 import { DatabaseCache } from "../../service/common/databaseCache";
-import { ConnectionManager } from "../../service/connectionManager";
 import { ExportService } from "../../service/export/exportService";
 import { MysqlExportService } from "../../service/export/mysqlExportService";
 import { QueryUnit } from "../../service/queryUnit";
@@ -30,7 +29,7 @@ export class QueryPage {
 
     public static async send(queryParam: QueryParam<any>) {
 
-        const dbOption: Node =queryParam.connection;
+        const dbOption: Node = queryParam.connection;
         await QueryPage.adaptData(queryParam);
         this.updateStatusBar(queryParam);
         const type = this.keepSingle(queryParam);
@@ -54,7 +53,7 @@ export class QueryPage {
                         handler.panel.title = `${queryParam.res.table}@${dbOption.database}`
                     }
                     queryParam.res.transId = Trans.transId;
-                    handler.emit(queryParam.type, { ...queryParam.res,dbType:dbOption.dbType })
+                    handler.emit(queryParam.type, { ...queryParam.res, dbType: dbOption.dbType })
                 }).on(OperateType.execute, (params) => {
                     if (!queryParam.singlePage) {
                         this.hodlder.set(params.sql.trim(), type)
@@ -62,13 +61,11 @@ export class QueryPage {
                     QueryUnit.runQuery(params.sql, dbOption);
                 }).on(OperateType.next, async (params) => {
                     const sql = ServiceManager.getPageService(dbOption.dbType).build(params.sql, params.pageNum, params.pageSize)
-                    const connection = await ConnectionManager.getConnection(dbOption)
-                    QueryUnit.queryPromise(connection, sql).then((rows) => {
+                    dbOption.execute(sql).then((rows) => {
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
                     })
                 }).on('count', async (params) => {
-                    const connection = await ConnectionManager.getConnection(dbOption)
-                    QueryUnit.queryPromise(connection, params.sql).then((rows) => {
+                    dbOption.execute(params.sql).then((rows) => {
                         handler.emit('COUNT', { data: rows[0].count })
                     })
                 }).on(OperateType.export, (params) => {

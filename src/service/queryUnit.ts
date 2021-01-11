@@ -1,6 +1,6 @@
 "use strict";
 import * as vscode from "vscode";
-import { CommandKey, ConfigKey, Cursor, MessageType, Pattern, Constants } from "../common/constants";
+import { CommandKey, ConfigKey, Cursor, MessageType } from "../common/constants";
 import { Global } from "../common/global";
 import { Console } from "../common/Console";
 import { FileManager, FileModel } from "../common/filesManager";
@@ -16,11 +16,11 @@ import { IConnection } from "./connect/connection";
 
 export class QueryUnit {
 
-    public static queryPromise<T>(connection: IConnection, sql: string,showError=true): Promise<T> {
+    public static queryPromise<T>(connection: IConnection, sql: string, showError = true): Promise<T> {
         return new Promise((resolve, reject) => {
             connection.query(sql, (err: Error, rows) => {
                 if (err) {
-                    if(showError){
+                    if (showError) {
                         Console.log(`Execute sql fail : ${sql}`);
                         Console.log(err);
                     }
@@ -50,14 +50,14 @@ export class QueryUnit {
 
         const sqlList: string[] = sql?.match(/(?:[^;"']+|["'][^"']*["'])+/g)?.filter((s) => (s.trim() != '' && s.trim() != ';'))
         // Fix posible sql run fail.
-        if(sqlList?.length==1){
-            sql=sqlList[0]
+        if (sqlList?.length == 1) {
+            sql = sqlList[0]
         }
 
         const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
         sql = parseResult.sql
         if (!sql && parseResult.replace) {
-            QueryPage.send({ connection:connectionNode,type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
+            QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
             return;
         }
 
@@ -67,13 +67,13 @@ export class QueryUnit {
             return;
         }
 
-        QueryPage.send({connection:connectionNode, type: MessageType.RUN, res: { sql } as RunResponse });
+        QueryPage.send({ connection: connectionNode, type: MessageType.RUN, res: { sql } as RunResponse });
 
         const executeTime = new Date().getTime();
         try {
             (await ConnectionManager.getConnection(connectionNode, true)).query(sql, (err: Error, data, fields) => {
                 if (err) {
-                    QueryPage.send({connection:connectionNode, type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
+                    QueryPage.send({ connection: connectionNode, type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
                     return;
                 }
                 const costTime = new Date().getTime() - executeTime;
@@ -81,26 +81,26 @@ export class QueryUnit {
                     vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime);
                 }
                 if (data.affectedRows) {
-                    QueryPage.send({connection:connectionNode, type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
+                    QueryPage.send({ connection: connectionNode, type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
                     vscode.commands.executeCommand(CommandKey.Refresh);
                     return;
                 }
-    
+
                 // query result or multi statement.
                 if (Array.isArray(data)) {
                     // not query result
                     if (data[1] && (
                         data[1].__proto__.constructor.name == "array" || data[1].__proto__.constructor.name == "OkPacket" || data[1].__proto__.constructor.name == "ResultSetHeader")
                     ) {
-                        QueryPage.send({connection:connectionNode, type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
+                        QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
                         return;
                     }
-                    QueryPage.send({ connection:connectionNode,type: MessageType.DATA,res: { sql, costTime, data, fields, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+                    QueryPage.send({ connection: connectionNode, type: MessageType.DATA, res: { sql, costTime, data, fields, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
                 } else {
                     // unknow result, send sql success
-                    QueryPage.send({connection:connectionNode, type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
+                    QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
                 }
-    
+
             });
         } catch (error) {
             console.log(error)
@@ -126,9 +126,9 @@ export class QueryUnit {
 
     }
 
-    
+
     private static batchPattern = /\s+(TRIGGER|PROCEDURE|FUNCTION)\s+/ig;
-    
+
     private static getSqlFromEditor(connectionNode: Node): string {
         if (!vscode.window.activeTextEditor) {
             throw new Error("No SQL file selected!");
@@ -156,7 +156,7 @@ export class QueryUnit {
             content = content.replace(new RegExp(delimiter, 'g'), ";")
         }
         const sqlList = content.match(/(?:[^;"']+|["'][^"']*["'])+/g);
-        if(!sqlList)return "";
+        if (!sqlList) return "";
         if (sqlList.length == 1) return sqlList[0];
 
         const trimSqlList = []
@@ -179,10 +179,10 @@ export class QueryUnit {
     }
 
     private static sqlDocument: vscode.TextEditor;
-    public static async showSQLTextDocument(sql: string = "", template = "template.sql") {
+    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql") {
 
         this.sqlDocument = await vscode.window.showTextDocument(
-            await vscode.workspace.openTextDocument(await FileManager.record(template, sql, FileModel.WRITE))
+            await vscode.workspace.openTextDocument(await FileManager.record(`${node.getConnectId()}#${template}`, sql, FileModel.WRITE))
         );
 
         return this.sqlDocument;

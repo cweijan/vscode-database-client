@@ -1,15 +1,14 @@
+import { MockRunner } from "@/service/mock/mockRunner";
 import * as path from "path";
 import * as vscode from "vscode";
-import { Node } from "../interface/node";
-import { ModelType, Constants, Template, DatabaseType } from "../../common/constants";
-import { QueryUnit } from "../../service/queryUnit";
-import { DatabaseCache } from "../../service/common/databaseCache";
-import { ConnectionManager } from "../../service/connectionManager";
-import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { CopyAble } from "../interface/copyAble";
+import { Constants, DatabaseType, ModelType, Template } from "../../common/constants";
 import { Util } from "../../common/util";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
+import { DatabaseCache } from "../../service/common/databaseCache";
+import { QueryUnit } from "../../service/queryUnit";
+import { CopyAble } from "../interface/copyAble";
+import { Node } from "../interface/node";
 import { ColumnMeta } from "./columnMeta";
-import { MockRunner } from "@/service/mock/mockRunner";
 
 export class ColumnNode extends Node implements CopyAble {
     public type: string;
@@ -20,7 +19,7 @@ export class ColumnNode extends Node implements CopyAble {
         this.init(parent)
         this.type = `${this.column.type}`
         this.description = `${this.column.comment}`
-        this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)} ${this.column.nullable=="YES"?"Nullable":"NotNull"}`
+        this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"}`
         if (column && this.isPrimaryKey) {
             MockRunner.primaryKeyMap[this.getConnectId()] = column.name
         }
@@ -62,7 +61,7 @@ export class ColumnNode extends Node implements CopyAble {
         vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(async (newColumnName) => {
             if (!newColumnName) { return; }
             const sql = `alter table ${this.wrap(this.table)} change column ${this.wrap(columnName)} ${this.wrap(newColumnName)} ${this.column.type} comment '${this.column.comment}'`;
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
+            this.execute(sql).then((rows) => {
                 DatabaseCache.clearColumnCache(`${this.getConnectId()}_${this.database}_${this.table}`);
                 DbTreeDataProvider.refresh(this.parent);
             });
@@ -71,18 +70,15 @@ export class ColumnNode extends Node implements CopyAble {
     }
 
     public updateColumnTemplate() {
-
-        ConnectionManager.getConnection(this, true);
-
-        QueryUnit.showSQLTextDocument(this.dialect.updateColumn(this.table,this.column.name,this.column.type,this.column.type,this.column.nullable), Template.alter);
+        QueryUnit.showSQLTextDocument(this, this.dialect.updateColumn(this.table, this.column.name, this.column.type, this.column.type, this.column.nullable), Template.alter);
 
     }
     public async dropColumnTemplate() {
 
-        ConnectionManager.getConnection(this, true);
-        await QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t${this.wrap(this.table)} DROP COLUMN ${this.wrap(this.column.name)};`, Template.alter);
+        const dropSql = `ALTER TABLE \n\t${this.wrap(this.table)} DROP COLUMN ${this.wrap(this.column.name)};`;
+        await QueryUnit.showSQLTextDocument(this, dropSql, Template.alter);
         Util.confirm(`Are you want to drop column ${this.column.name} ? `, async () => {
-            QueryUnit.runQuery(null, this)
+            QueryUnit.runQuery(dropSql, this)
         })
 
     }
@@ -97,7 +93,7 @@ export class ColumnNode extends Node implements CopyAble {
             return;
         }
         const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(this.column.name)} ${this.column.type} AFTER ${this.wrap(afterColumnNode.column.name)};`
-        await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
+        await this.execute(sql)
         DbTreeDataProvider.refresh(this.parent)
     }
     public async moveUp() {
@@ -109,12 +105,12 @@ export class ColumnNode extends Node implements CopyAble {
             return;
         }
         const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(beforeColumnNode.column.name)} ${beforeColumnNode.column.type} AFTER ${this.wrap(this.column.name)};`
-        await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
+        await this.execute(sql)
         DbTreeDataProvider.refresh(this.parent)
     }
 
     check() {
-        if(this.dbType==DatabaseType.MYSQL||!this.dbType){
+        if (this.dbType == DatabaseType.MYSQL || !this.dbType) {
             return;
         }
         vscode.window.showErrorMessage("Only mysql support change column position.")

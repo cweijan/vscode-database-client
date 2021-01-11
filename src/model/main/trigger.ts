@@ -1,12 +1,11 @@
 import * as path from "path";
 import * as vscode from "vscode";
+import { Constants, DatabaseType, ModelType } from "../../common/constants";
+import { Util } from "../../common/util";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
+import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
-import { DatabaseCache } from "../../service/common/databaseCache";
-import { ModelType, Constants, DatabaseType } from "../../common/constants";
-import { ConnectionManager } from "../../service/connectionManager";
-import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { Util } from "../../common/util";
 
 export class TriggerNode extends Node {
 
@@ -23,10 +22,10 @@ export class TriggerNode extends Node {
     }
 
     public async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), this.dialect.showTriggerSource(this.database, this.name))
+        this.execute( this.dialect.showTriggerSource(this.database, this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0]
-                QueryUnit.showSQLTextDocument(`${this.dialect.dropTriggerTemplate(this.wrap(this.name))};\n${procedDtail['SQL Original Statement']}`);
+                QueryUnit.showSQLTextDocument(this,`${this.dialect.dropTriggerTemplate(this.wrap(this.name))};\n${procedDtail['SQL Original Statement']}`);
             });
     }
 
@@ -41,7 +40,7 @@ export class TriggerNode extends Node {
             return;
         }
         Util.confirm(`Are you want to drop trigger ${this.name} ?`, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), this.dialect.dropTriggerTemplate(this.wrap(this.name))).then(() => {
+            this.execute(this.dialect.dropTriggerTemplate(this.wrap(this.name))).then(() => {
                 DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}_${ModelType.TRIGGER_GROUP}`)
                 DbTreeDataProvider.refresh(this.parent)
                 vscode.window.showInformationMessage(`Drop trigger ${this.name} success!`)

@@ -1,12 +1,11 @@
-import * as vscode from "vscode";
-import { ModelType, Constants } from "@/common/constants";
+import { Constants, ModelType } from "@/common/constants";
 import { FileManager } from "@/common/filesManager";
-import { QueryUnit } from "@/service/queryUnit";
-import { readFileSync, renameSync } from "fs";
-import * as path from "path";
-import { TreeItemCollapsibleState, window } from "vscode";
-import { Node } from "../interface/node";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
+import { renameSync } from "fs";
+import * as path from "path";
+import * as vscode from "vscode";
+import { TreeItemCollapsibleState } from "vscode";
+import { Node } from "../interface/node";
 
 export class QueryNode extends Node {
     public contextValue = ModelType.QUERY;
