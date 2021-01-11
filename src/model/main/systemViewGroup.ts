@@ -1,17 +1,19 @@
 import * as path from "path";
-import { QueryUnit } from "../../service/queryUnit";
-import { InfoNode } from "../other/infoNode";
-import { Node } from "../interface/node";
+import { Constants, ModelType } from "../../common/constants";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
+import { QueryUnit } from "../../service/queryUnit";
+import { Node } from "../interface/node";
+import { InfoNode } from "../other/infoNode";
 import { TableNode } from "./tableNode";
-import { Constants, ModelType, Template } from "../../common/constants";
 import { ViewNode } from "./viewNode";
-import { FileManager, FileModel } from "@/common/filesManager";
 
 export class SystemViewGroup extends Node {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "icon/view.png");
+    public iconPath: { light: string ; dark: string } = {
+        dark:  path.join(Constants.RES_PATH, "icon/table.svg"),
+        light: path.join(Constants.RES_PATH, "light/view_group.png")
+    };
     public contextValue = ModelType.SYSTEM_VIEW_GROUP
     constructor(readonly parent: Node) {
         super("SYSTEM_VIEW")

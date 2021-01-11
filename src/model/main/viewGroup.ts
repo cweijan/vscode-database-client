@@ -1,18 +1,21 @@
+import { FileManager, FileModel } from "@/common/filesManager";
 import * as path from "path";
-import { QueryUnit } from "../../service/queryUnit";
-import { InfoNode } from "../other/infoNode";
-import { Node } from "../interface/node";
+import { Constants, DatabaseType, ModelType } from "../../common/constants";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
-import { TableNode } from "./tableNode";
-import { Constants, DatabaseType, ModelType, Template } from "../../common/constants";
-import { ViewNode } from "./viewNode";
-import { FileManager, FileModel } from "@/common/filesManager";
+import { QueryUnit } from "../../service/queryUnit";
+import { Node } from "../interface/node";
+import { InfoNode } from "../other/infoNode";
 import { SystemViewGroup } from "./systemViewGroup";
+import { TableNode } from "./tableNode";
+import { ViewNode } from "./viewNode";
 
 export class ViewGroup extends Node {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "icon/view.png");
+    public iconPath: { light: string ; dark: string } = {
+        dark:  path.join(Constants.RES_PATH, "icon/table.svg"),
+        light: path.join(Constants.RES_PATH, "light/view_group.png")
+    };
     public contextValue = ModelType.VIEW_GROUP
     constructor(readonly parent: Node) {
         super("VIEW")
@@ -32,10 +35,10 @@ export class ViewGroup extends Node {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new ViewNode(table.name, '', this);
                 });
-                if(this.dbType==DatabaseType.MSSQL || this.dbType==DatabaseType.PG){
+                if (this.dbType == DatabaseType.MSSQL || this.dbType == DatabaseType.PG) {
                     tableNodes.unshift(new SystemViewGroup(this))
-                }else if (tableNodes.length == 0) {
-                    tableNodes=[new InfoNode("This database has no view")];
+                } else if (tableNodes.length == 0) {
+                    tableNodes = [new InfoNode("This database has no view")];
                 }
                 DatabaseCache.setTableListOfDatabase(this.uid, tableNodes);
                 return tableNodes;
