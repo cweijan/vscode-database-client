@@ -11,12 +11,6 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
     showUsers(): string {
         return `SELECT usename "user" from pg_user `;
     }
-    /**
-     * postgre cannot change database.
-     */
-    switchDataBase(database: string): string {
-        return null;
-    }
     renameTable(database: string, tableName: string, newName: string): string {
         return `RENAME TABLE "${database}"."${tableName}" to "${database}"."${newName}"`;
     }

@@ -6,7 +6,6 @@
  */
 export abstract class SqlDialect {
     abstract updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string;
-    abstract switchDataBase(database: string): string;
     abstract showDatabases(): string;
     abstract showTables(database: string): string;
     abstract showColumns(database: string, table: string): string;
@@ -31,6 +30,9 @@ export abstract class SqlDialect {
     abstract procedureTemplate(): string;
     abstract triggerTemplate(): string;
     abstract functionTemplate(): string;
+    pingDataBase(database: string): string{
+        return null;
+    }
     dropTriggerTemplate(name:string): string{
         return `DROP IF EXISTS TRIGGER ${name}`
     }

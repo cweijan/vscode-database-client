@@ -12,7 +12,11 @@ export class MysqlDialect extends SqlDialect{
     showUsers(): string {
         return `SELECT concat(user,'@',host) user FROM mysql.user;`;
     }
-    switchDataBase(database: string): string {
+    pingDataBase(database: string): string {
+        if(!database){
+            // mysql not using connection poll, so need ping connnection active.
+            return "select 1";
+        }
         return `use \`${database}\``;
     }
     renameTable(database: string, tableName: string, newName: string): string {

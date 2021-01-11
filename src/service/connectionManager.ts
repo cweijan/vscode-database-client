@@ -77,7 +77,7 @@ export class ConnectionManager {
             const connection = this.activeConnection[key];
             if (connection ) {
                 if(connection.connection.isAlive()){
-                    const sql = connectionNode.database ? connectionNode.dialect.switchDataBase(connectionNode.database) : '';
+                    const sql = connectionNode.dialect.pingDataBase(connectionNode.database);
                     try {
                         if(sql){
                             await QueryUnit.queryPromise(connection.connection, sql, false)

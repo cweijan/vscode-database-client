@@ -12,12 +12,6 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
     showUsers(): string {
         return `SELECT name [user] from sys.database_principals where type='S'`
     }
-    /**
-     * sql server cannot change database.
-     */
-    switchDataBase(database: string): string {
-        return null;
-    }
     renameTable(database: string, tableName: string, newName: string): string {
         return `sp_rename '${tableName}', '${newName}'`;
     }
