@@ -9,7 +9,6 @@ import { NodeUtil } from "../model/nodeUtil";
 import { SSHTunnelService } from "./common/sshTunnelService";
 import { DbTreeDataProvider } from "../provider/treeDataProvider";
 import { create, IConnection } from "./connect/connection";
-import { MysqlConnection } from "./connect/mysqlConnection";
 
 interface ConnectionWrapper {
     connection: IConnection;

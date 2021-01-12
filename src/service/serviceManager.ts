@@ -30,6 +30,8 @@ import { MssqlDIalect } from "./dialect/mssqlDIalect";
 import { MysqlDialect } from "./dialect/mysqlDialect";
 import { PostgreSqlDialect } from "./dialect/postgreSqlDialect";
 import { SqlDialect } from "./dialect/sqlDialect";
+import { PostgresqlImortService } from "./import/postgresqlImortService";
+import { SqlServerImportService } from "./import/sqlServerImportService";
 
 export class ServiceManager {
 
@@ -41,9 +43,7 @@ export class ServiceManager {
     public settingService: SettingService;
     public overviewService: OverviewService;
     public statusService: StatusService;
-    public importService: ImportService;
     public dumpService: AbstractDumpService;
-    private type: DatabaseType = DatabaseType.MYSQL;
     private isInit = false;
 
     constructor(private readonly context: ExtensionContext) {
@@ -91,7 +91,16 @@ export class ServiceManager {
         this.dumpService = new MysqlDumpService();
         this.connectService = new MysqlConnectService();
         this.statusService = new MysqlStatusService()
-        this.importService = new MysqlImportService();
+    }
+
+    public static getImportService(dbType:DatabaseType){
+        switch (dbType) {
+            case DatabaseType.MSSQL:
+                return new SqlServerImportService()
+            case DatabaseType.PG:
+                return new PostgresqlImortService();
+        }
+        return new MysqlImportService()
     }
 
     public static getDialect(dbType: DatabaseType): SqlDialect {

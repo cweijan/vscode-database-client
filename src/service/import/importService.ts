@@ -1,7 +1,14 @@
+import { readFileSync } from "fs";
 import { Node } from "../../model/interface/node";
+import { QueryUnit } from "../queryUnit";
 
-export interface ImportService {
+export abstract class ImportService {
 
-    import(importPath: string, node: Node):void ;
+    public importSql(importPath: string, node: Node): void {
+
+        const sql=readFileSync(importPath,'utf8')
+        QueryUnit.runQuery(sql,node)
+
+    }
 
 }

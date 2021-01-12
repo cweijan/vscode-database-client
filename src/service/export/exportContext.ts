@@ -1,4 +1,7 @@
+import { Node } from "@/model/interface/node";
+
 export class ExportContext {
+    dbOption: Node;
     type: ExportType;
     withOutLimit: boolean;
     table:string;

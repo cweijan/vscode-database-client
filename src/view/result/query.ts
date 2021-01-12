@@ -8,7 +8,6 @@ import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { ExportService } from "../../service/export/exportService";
-import { MysqlExportService } from "../../service/export/mysqlExportService";
 import { QueryUnit } from "../../service/queryUnit";
 import { ViewManager } from "../viewManager";
 import { DataResponse } from "./queryResponse";
@@ -22,7 +21,7 @@ export class QueryParam<T> {
 
 export class QueryPage {
 
-    private static exportService: ExportService = new MysqlExportService()
+    private static exportService: ExportService = new ExportService()
     private static hodlder: Map<string, string> = new Map()
     private static statusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -200);
     private static costStatusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -250);
@@ -69,7 +68,7 @@ export class QueryPage {
                         handler.emit('COUNT', { data: rows[0].count })
                     })
                 }).on(OperateType.export, (params) => {
-                    this.exportService.export(params.option).then(() => {
+                    this.exportService.export({ ...params.option, dbOption }).then(() => {
                         handler.emit('EXPORT_DONE')
                     })
                 }).on('changePageSize', (pageSize) => {

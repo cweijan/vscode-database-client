@@ -7,7 +7,7 @@ import { ImportService } from "./importService";
 
 export class MysqlImportService implements ImportService {
 
-    public import(importPath: string, node: Node): void {
+    public importSql(importPath: string, node: Node): void {
 
         NodeUtil.of(node)
 

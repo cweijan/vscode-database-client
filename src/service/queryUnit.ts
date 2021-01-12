@@ -48,8 +48,8 @@ export class QueryUnit {
         }
         sql = sql.replace(/^\s*--.+/igm, '').trim();
 
+        // Trim empty sql.
         const sqlList: string[] = sql?.match(/(?:[^;"']+|["'][^"']*["'])+/g)?.filter((s) => (s.trim() != '' && s.trim() != ';'))
-        // Fix posible sql run fail.
         if (sqlList?.length == 1) {
             sql = sqlList[0]
         }
@@ -63,7 +63,7 @@ export class QueryUnit {
 
         const importMatch = sql.match(this.importPattern);
         if (importMatch) {
-            ServiceManager.instance.importService.import(importMatch[1], ConnectionManager.getLastConnectionOption())
+            // ServiceManager.getImportService(connectionNode.dbType).importSql(importMatch[1], connectionNode)
             return;
         }
 
