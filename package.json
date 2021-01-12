@@ -482,6 +482,11 @@
 			],
 			"view/item/context": [
 				{
+					"command": "mysql.refresh",
+					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
+					"group": "inline@-2"
+				},
+				{
 					"command": "mysql.query.switch",
 					"when": "view == github.cweijan.mysql && viewItem == connection",
 					"group": "1_mysql@1"
