@@ -35,7 +35,7 @@ export class TableNode extends Node implements CopyAble {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         let columnNodes = DatabaseCache.getColumnListOfTable(this.uid);
-        if (columnNodes && !isRresh && this.collapsibleState != vscode.TreeItemCollapsibleState.Expanded) {
+        if (columnNodes && !isRresh) {
             return columnNodes;
         }
         return this.execute<ColumnMeta[]>(this.dialect.showColumns(this.database, this.table))

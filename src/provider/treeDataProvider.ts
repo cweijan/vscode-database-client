@@ -18,7 +18,6 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     constructor(private context: vscode.ExtensionContext) {
         DbTreeDataProvider.instance = this
-        this.init()
     }
 
     /**

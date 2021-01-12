@@ -101,7 +101,7 @@ export abstract class Node extends vscode.TreeItem {
     public getUser(): string { return this.usingSSH ? this.ssh.username : this.user }
 
     public async execute<T>(sql: string): Promise<T> {
-        return QueryUnit.queryPromise<T>(await ConnectionManager.getConnection(this, true), sql)
+        return QueryUnit.queryPromise<T>(await ConnectionManager.getConnection(this), sql)
     }
 
     public wrap(origin: string) {

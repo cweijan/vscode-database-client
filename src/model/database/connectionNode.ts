@@ -1,6 +1,7 @@
+import { Global } from "@/common/global";
 import * as path from "path";
 import * as vscode from "vscode";
-import { CacheKey, Constants, DatabaseType, ModelType } from "../../common/constants";
+import { CacheKey, ConfigKey, Constants, DatabaseType, ModelType } from "../../common/constants";
 import { FileManager } from "../../common/filesManager";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
@@ -18,6 +19,7 @@ import { UserGroup } from "./userGroup";
  */
 export class ConnectionNode extends Node implements CopyAble {
 
+    private static initMark = {}
     public iconPath: string = path.join(Constants.RES_PATH, "icon/server.png");
     public contextValue: string = ModelType.CONNECTION;
     constructor(readonly uid: string, readonly parent: Node) {
@@ -75,8 +77,15 @@ export class ConnectionNode extends Node implements CopyAble {
                     return new DatabaseNode(database.Database, this);
                 });
 
-                databaseNodes.unshift(new UserGroup("USER", this));
+                if (!ConnectionNode.initMark[this.uid] && Global.getConfig<boolean>(ConfigKey.LOAD_META_ON_CONNECT)) {
+                    for (const databaseNode of databaseNodes) {
+                        for (const groupNode of databaseNode.getChildren() as Node[]) {
+                            groupNode.getChildren(true);
+                        }
+                    }
+                }
 
+                databaseNodes.unshift(new UserGroup("USER", this));
                 DatabaseCache.setDataBaseListOfConnection(this.uid, databaseNodes);
 
                 return databaseNodes;

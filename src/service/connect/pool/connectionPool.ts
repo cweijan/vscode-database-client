@@ -9,7 +9,7 @@ export abstract class ConnectionPool<T> {
     constructor() {
     }
 
-    public async getConnection(callback?: (connection: IpoolConnection<T>) => void):Promise<IpoolConnection<T>> {
+    public async getConnection(callback?: (connection: IpoolConnection<T>) => void): Promise<IpoolConnection<T>> {
         for (let i = 0; i < this.connections.length; i++) {
             const connection = this.connections[i];
             if (connection && connection.status == pcStatus.FREE) {
@@ -85,7 +85,9 @@ export abstract class ConnectionPool<T> {
     public end() {
         for (let i = 0; i < this.connections.length; i++) {
             const con = this.connections[i];
-            (con.actual as any).end()
+            if (con?.actual) {
+                (con.actual as any).end()
+            }
         }
     }
 }

@@ -21,6 +21,7 @@ import { QueryGroup } from "../query/queryGroup";
 
 export class DatabaseNode extends Node implements CopyAble {
 
+    
     public contextValue: string = ModelType.DATABASE;
     public iconPath: string = path.join(Constants.RES_PATH, "icon/database.svg");
     constructor(name: string, readonly parent: Node) {
@@ -36,14 +37,11 @@ export class DatabaseNode extends Node implements CopyAble {
         }
     }
 
-    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        return [new TableGroup(this),
-        new ViewGroup(this),
-        new QueryGroup(this),
-        new DiagramGroup(this),
-        new ProcedureGroup(this),
-        new FunctionGroup(this),
-        new TriggerGroup(this)
+    public getChildren(): Promise<Node[]>|Node[] {
+        return [
+            new TableGroup(this), new ViewGroup(this),
+            new QueryGroup(this), new DiagramGroup(this),
+            new ProcedureGroup(this), new FunctionGroup(this), new TriggerGroup(this)
         ];
     }
 
