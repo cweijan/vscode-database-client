@@ -67,11 +67,6 @@ export class ConnectionNode extends Node implements CopyAble {
                         return false;
                     }
 
-                    if (this.excludeDatabases) {
-                        for (const excludeDatabase of this.excludeDatabases.split(",")) {
-                            if (db.Database == excludeDatabase.trim()) { return false; }
-                        }
-                    }
                     return true;
                 }).map<DatabaseNode>((database) => {
                     return new DatabaseNode(database.Database, this);

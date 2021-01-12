@@ -61,7 +61,7 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
         return `select table_name "name" from information_schema.tables where table_schema='public' and table_type='VIEW';`
     }
     showSystemViews(database: string): string {
-        return `select table_name "name" from information_schema.tables where table_schema!='public' and table_type='VIEW';`
+        return `select CONCAT(table_schema,'.',table_name) "name" from information_schema.tables where table_schema!='public' and table_type='VIEW';`
     }
     buildPageSql(database: string, table: string, pageSize: number):string {
         return  `SELECT * FROM ${table} LIMIT ${pageSize};`;

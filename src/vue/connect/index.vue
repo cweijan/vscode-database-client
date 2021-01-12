@@ -48,11 +48,6 @@
     </section>
 
     <section class="mb-2">
-      <label class="block font-bold" for="excluded-databases">Excluded Databases</label>
-      <input class="w-full field__input" id="excluded-databases" placeholder="Databases to excluded" v-model="connectionOption.excludeDatabases" />
-    </section>
-
-    <section class="mb-2">
       <label class="block font-bold" for="timezone">Timezone</label>
       <input class="w-full field__input" id="timezone" placeholder="+HH:MM" v-model="connectionOption.timezone" />
     </section>
@@ -144,7 +139,6 @@ export default {
         usingSSH: false,
         dbType: "MySQL",
         global: true,
-        excludeDatabases: "mysql,performance_schema,information_schema,sys",
         timezone: "+00:00",
         ssh: {
           host: "",
@@ -195,22 +189,18 @@ export default {
         case "MySQL":
           this.connectionOption.user='root';
           this.connectionOption.port=3306;
-          this.connectionOption.excludeDatabases="mysql,performance_schema,information_schema,sys";
           break
         case "PostgreSQL":
           this.connectionOption.user='postgres';
           this.connectionOption.port=5432;
-          this.connectionOption.excludeDatabases="";
           break
         case "Oracle":
           this.connectionOption.user='system';
           this.connectionOption.port=1521;
-          this.connectionOption.excludeDatabases="";
           break
         case "SqlServer":
           this.connectionOption.user='sa';
           this.connectionOption.port=1433;
-          this.connectionOption.excludeDatabases="";
           break
       }
     },

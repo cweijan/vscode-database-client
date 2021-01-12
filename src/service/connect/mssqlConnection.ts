@@ -1,39 +1,55 @@
 import { Node } from "@/model/interface/node";
-import { Connection, Request } from "tedious";
+import { Connection, ConnectionConfig, Request } from "tedious";
 import { IConnection, queryCallback } from "./connection";
-var ConnectionPool = require('./mssql/connection-pool');
+import { ConnectionPool } from "./pool/connectionPool";
 
 /**
+ * tedious not support connection queue, so need using pool.
  * http://tediousjs.github.io/tedious/getting-started.html
  */
-export class MSSqlConnnection implements IConnection {
-    private pool;
-    private inTrans: boolean = false;
-    private inTransConn: Connection;
-    constructor(private opt: Node) {
-        this.init()
+export class MSSqlConnnection extends ConnectionPool<Connection> implements IConnection {
+    private config: ConnectionConfig;
+    constructor(node: Node) {
+        super()
+        this.config = {
+            server: node.host,
+            options: {
+                database: node.database || undefined,
+                connectTimeout: 10000,
+                requestTimeout: 10000,
+            },
+            authentication: {
+                type: "default",
+                options: {
+                    userName: node.user,
+                    password: node.password,
+                }
+            }
+        };
     }
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
-    query(sql: any, values?: any, callback?: any) {
+    async query(sql: any, values?: any, callback?: any) {
         if (!callback && values instanceof Function) {
             callback = values;
         }
         let fields = [];
         let datas = [];
-        this.getConnection().then(connection => {
-            const isSelect=sql.match(/^\s*\bselect\b/i)
+
+        this.getConnection(poolConnection => {
+
+            const connection = poolConnection.actual;
+
+            const isSelect = sql.match(/^\s*\bselect\b/i)
             connection.execSql(new Request(sql, err => {
                 if (err) {
                     callback(err, null)
-                } else if(isSelect){
+                } else if (isSelect) {
                     callback(null, datas, fields)
-                }else{
-                    callback(null, { affectedRows: datas.length})
+                } else {
+                    callback(null, { affectedRows: datas.length })
                 }
-                if(!this.inTrans){
-                    this.pool.release(connection)
-                }
+                this.release(poolConnection)
             }).on('columnMetadata', (columns) => {
                 columns.forEach((column) => {
                     fields.push({
@@ -48,80 +64,42 @@ export class MSSqlConnnection implements IConnection {
                 });
                 datas.push(temp)
             }))
-        }).catch(callback)
+
+        })
     }
     connect(callback: (err: Error) => void): void {
-        this.pool.acquire(function (err, connection) {
-            if (err) {
-                callback(err)
-                return;
+        const con = new Connection(this.config)
+        con.on("connect", err => {
+            callback(err)
+            if (!err) {
+                this.fill()
             }
-            callback(null)
-            connection.release();
-        });
-    }
-    init() {
-        const opt = this.opt;
-        this.pool = new ConnectionPool(
-            { min: 2, max: 10, log: false },
-            {
-                server: opt.host,
-                options: {
-                    database: opt.database || undefined,
-                    connectTimeout: 10000,
-                    requestTimeout: 10000,
-                },
-                authentication: {
-                    type: "default",
-                    options: {
-                        userName: opt.user,
-                        password: opt.password,
-                    }
-                }
-            }
-        );
-    }
-    getConnection(): Promise<any> {
-        return new Promise((res, rej) => {
-            if (this.inTrans) {
-                res(this.inTransConn)
-                return;
-            }
-            this.pool.acquire((err, connection) => {
-                if (err) {
-                    rej(err)
-                } else {
-                    res(connection)
-                }
-            });
-        });
-    }
-    async beginTransaction(callback: (err: Error) => void) {
-        if (this.inTrans) return;
-        const conn = (await this.getConnection());
-        conn.beginTransaction(callback)
-        this.inTransConn = conn
-        this.inTrans = true;
-    }
-    async rollback() {
-        if(this.inTrans){
-            this.inTransConn.commitTransaction(null)
-            this.inTrans = false;
-            this.pool.release(this.inTransConn)
-        }
-    }
-    async commit() {
-        if(this.inTrans){
-            this.inTransConn.commitTransaction(null)
-            this.inTrans = false;
-            this.pool.release(this.inTransConn)
-        }
-    }
-    end(): void {
-        this.pool.drain()
-    }
-    isAlive(): boolean {
-        return true;
+        })
     }
 
+    protected newConnection(callback: (err: Error, connection: Connection) => void): void {
+        const connection = new Connection(this.config)
+        connection.on("connect", err => {
+            callback(err, connection)
+        })
+    }
+    async beginTransaction(callback: (err: Error) => void) {
+        const connection = await this.getConnection();
+        connection.actual.beginTransaction((err) => {
+            callback(err)
+            this.release(connection)
+        })
+    }
+    async rollback() {
+        const connection = await this.getConnection();
+        connection.actual.rollbackTransaction(() => {
+            this.release(connection)
+        })
+    }
+    async commit() {
+        const connection = await this.getConnection();
+        connection.actual.commitTransaction(() => {
+            this.release(connection)
+        })
+    }
 }
