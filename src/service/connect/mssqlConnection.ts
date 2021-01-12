@@ -16,7 +16,7 @@ export class MSSqlConnnection extends ConnectionPool<Connection> implements ICon
             server: node.host,
             options: {
                 database: node.database || undefined,
-                connectTimeout: 10000,
+                connectTimeout: 5000,
                 requestTimeout: 10000,
             },
             authentication: {

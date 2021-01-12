@@ -10,7 +10,7 @@ export class MysqlConnection implements IConnection {
             host: node.host, port: node.port, user: node.user, password: node.password, database: node.database,
             timezone: node.timezone,
             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
-
+            connectTimeout:5000
         } as mysql.ConnectionConfig;
         if (node.certPath && fs.existsSync(node.certPath)) {
             newConnectionOptions.ssl = {
