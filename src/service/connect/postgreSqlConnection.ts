@@ -1,49 +1,48 @@
 import { Node } from "@/model/interface/node";
-import { Pool, QueryArrayResult, types } from "pg";
+import { Client, ClientConfig, QueryArrayResult } from "pg";
 import { IConnection, queryCallback } from "./connection";
+import { ConnectionPool } from "./pool/connectionPool";
 
-// convert date type from Date to string.
-types.setTypeParser(1082, (val) => val)
-
-/**
- * https://www.npmjs.com/package/pg
- */
-export class PostgreSqlConnection implements IConnection {
-    private client: Pool;
+export class PostgreSqlConnection extends ConnectionPool<Client> implements IConnection {
+    private client: Client;
+    private config: ClientConfig;
     constructor(opt: Node) {
-        const config = {
+        super()
+        this.config = {
             host: opt.host, port: opt.port,
             user: opt.user, password: opt.password,
             database: opt.database,
             connectionTimeoutMillis: 5000,
             statement_timeout: 10000,
-            min: 2, max: 10
         };
-        this.client = new Pool(config);
-
+        this.client = new Client(this.config);
     }
-    isAlive(): boolean {
-        const temp = this.client as any;
-        return temp._connected && (!temp._ending);
+    newConnection(callback: (err: Error, connection: Client) => void) {
+        const client = new Client(this.config);
+        client.connect(err => {
+            callback(err, client)
+        })
     }
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
-    query(sql: any, values?: any, callback?: any) {
-
+    async query(sql: any, values?: any, callback?: any) {
         if (!callback && values instanceof Function) {
             callback = values;
         }
-        this.client.query(sql, (err, res) => {
-            if (err) {
-                callback(err)
-            } else {
-                if (res instanceof Array) {
-                    callback(null, res.map(row => this.adaptResult(row)), res.map(row => row.fields))
+        this.getConnection(connection => {
+            connection.actual.query(sql, (err, res) => {
+                this.release(connection)
+                if (err) {
+                    callback(err)
                 } else {
-                    callback(null, this.adaptResult(res), res.fields)
+                    if (res instanceof Array) {
+                        callback(null, res.map(row => this.adaptResult(row)), res.map(row => row.fields))
+                    } else {
+                        callback(null, this.adaptResult(res), res.fields)
+                    }
                 }
-            }
-        })
+            })
+        });
     }
     adaptResult(res: QueryArrayResult<any>) {
         if (res.command != 'SELECT') {
@@ -53,8 +52,13 @@ export class PostgreSqlConnection implements IConnection {
     }
 
     connect(callback: (err: Error) => void): void {
-        this.client.connect(err => {
+        const client = new Client(this.config);
+        client.connect(err => {
             callback(err)
+            client.end()
+            if (!err) {
+                this.fill()
+            }
         })
     }
     async beginTransaction() {
@@ -67,7 +71,7 @@ export class PostgreSqlConnection implements IConnection {
         await this.client.query("COMMIT")
     }
     end(): void {
-        this.client.end()
+        this.close()
     }
 
 }

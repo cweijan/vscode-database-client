@@ -103,18 +103,17 @@ export class ConnectionManager {
                     return;
                 }
             }
-            this.activeConnection[key] = { connection: create(connectOption), ssh, createTime: new Date() };
-            this.activeConnection[key].connection.connect((err: Error) => {
+            const newConnection = create(connectOption);
+            this.activeConnection[key] = { connection: newConnection, ssh, createTime: new Date() };
+            newConnection.connect(async (err: Error) => {
                 if (err) {
-                    this.tunnelService.closeTunnel(key)
                     this.end(key,this.activeConnection[key])
-                    console.error(err.stack)
-                    reject(err.message);
+                    resolve(await this.getConnection(connectionNode,changeActive))
                 } else {
                     if (changeActive) {
                         this.lastConnectionNode = NodeUtil.of(connectionNode);
                     }
-                    resolve(this.activeConnection[key].connection);
+                    resolve(newConnection);
                 }
             });
 
@@ -125,6 +124,7 @@ export class ConnectionManager {
     private static end(key: string, connection: ConnectionWrapper) {
         this.activeConnection[key] = null
         try {
+            this.tunnelService.closeTunnel(key)
             connection.connection.end();
         } catch (error) {
         }
