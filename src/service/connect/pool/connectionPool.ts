@@ -1,11 +1,6 @@
 import { EventEmitter } from "events";
 import { IpoolConnection, pcStatus } from "./poolConnection";
 
-export interface IPoolConfig {
-    min: number;
-    max: number;
-}
-
 export abstract class ConnectionPool<T> {
     private connections: IpoolConnection<T>[] = [];
     private conneted: boolean;
@@ -14,7 +9,7 @@ export abstract class ConnectionPool<T> {
     constructor() {
     }
 
-    public async getConnection(callback?: (connection: IpoolConnection<T>) => void) {
+    public async getConnection(callback?: (connection: IpoolConnection<T>) => void):Promise<IpoolConnection<T>> {
         for (let i = 0; i < this.connections.length; i++) {
             const connection = this.connections[i];
             if (connection && connection.status == pcStatus.FREE) {
@@ -25,7 +20,7 @@ export abstract class ConnectionPool<T> {
             }
         }
         this.waitQueue.push(callback)
-        this.fill(true)
+        this.fill()
     }
 
 
@@ -33,10 +28,9 @@ export abstract class ConnectionPool<T> {
         return this.conneted;
     }
 
-    public async fill(usingMax?: boolean) {
+    public async fill() {
         this.conneted = true;
-        const config: IPoolConfig = { min: 2, max: 5 }
-        const amount = usingMax ? config.max : config.min
+        const amount = 1
         for (let i = 0; i < amount; i++) {
             if (this.connections[i]) continue;
             const poolConnection = new IpoolConnection<T>(i, pcStatus.PEENDING);
@@ -54,11 +48,11 @@ export abstract class ConnectionPool<T> {
                 poolConnection.actual = con
                 if (con instanceof EventEmitter) {
                     con.on("error", () => {
-                         this.endConnnection(poolConnection) 
-                        })
-                    con.on("end", () => { 
                         this.endConnnection(poolConnection)
-                     })
+                    })
+                    con.on("end", () => {
+                        this.endConnnection(poolConnection)
+                    })
                 }
                 const waiter = this.waitQueue.shift()
                 if (waiter) {
@@ -73,7 +67,7 @@ export abstract class ConnectionPool<T> {
         }
     }
 
-    abstract newConnection(callback: (err: Error, connection: T) => void): void;
+    protected abstract newConnection(callback: (err: Error, connection: T) => void): void;
     public release(poolConnection: IpoolConnection<T>): void {
         poolConnection.status = pcStatus.FREE
         const waiter = this.waitQueue.shift()
@@ -83,11 +77,12 @@ export abstract class ConnectionPool<T> {
         }
     }
     public endConnnection(poolConnection: IpoolConnection<T>): void {
-        try { (poolConnection.actual as any).end(); 
+        try {
+            (poolConnection.actual as any).end();
         } catch (error) { }
         delete this.connections[poolConnection.id];
     }
-    public close() {
+    public end() {
         for (let i = 0; i < this.connections.length; i++) {
             const con = this.connections[i];
             (con.actual as any).end()
