@@ -1,6 +1,12 @@
 import { SqlDialect } from "./sqlDialect";
 
 export class MysqlDialect extends SqlDialect{
+    addColumn( table: string): string {
+        return `ALTER TABLE
+        ${table} 
+    ADD 
+        COLUMN [column] [type] NOT NULL comment '';`;
+    }
     createUser(): string {
         return `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`;
     }

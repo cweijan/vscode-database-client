@@ -182,7 +182,7 @@ export class QueryUnit {
     public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql") {
 
         this.sqlDocument = await vscode.window.showTextDocument(
-            await vscode.workspace.openTextDocument(await FileManager.record(`${node.getConnectId()}#${template}`, sql, FileModel.WRITE))
+            await vscode.workspace.openTextDocument(await FileManager.record(`${node.getConnectId({withDb:true})}#${template}`, sql, FileModel.WRITE))
         );
 
         return this.sqlDocument;

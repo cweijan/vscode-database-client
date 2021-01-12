@@ -52,10 +52,7 @@ export class TableNode extends Node implements CopyAble {
     }
 
     public addColumnTemplate() {
-        QueryUnit.showSQLTextDocument(this, `ALTER TABLE
-    ${this.wrap(this.table)} 
-ADD 
-    COLUMN [column] [type] NOT NULL comment '';`, Template.alter);
+        QueryUnit.showSQLTextDocument(this, this.dialect.addColumn(this.wrap(this.table)), Template.alter);
     }
 
 

@@ -1,6 +1,12 @@
 import { SqlDialect } from "./sqlDialect";
 
 export class PostgreSqlDialect extends SqlDialect{
+    addColumn(table: string): string {
+        return `ALTER TABLE
+        ${table} 
+    ADD 
+        COLUMN [column] [type];`;
+    }
     createUser(): string {
         return `CREATE USER [name] WITH PASSWORD 'password'`
     }
