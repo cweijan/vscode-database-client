@@ -93,7 +93,7 @@ ADD
             if (!newTableName) { return; }
             const sql = this.dialect.renameTable(this.database, this.table, newTableName);
             this.execute(sql).then((rows) => {
-                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
+                DatabaseCache.clearTableCache(this.parent.uid);
                 DbTreeDataProvider.refresh(this.parent);
             });
 
@@ -105,7 +105,7 @@ ADD
 
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
             this.execute(`DROP TABLE ${this.wrap(this.table)}`).then(() => {
-                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
+                DatabaseCache.clearTableCache(this.parent.uid);
                 DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
             });

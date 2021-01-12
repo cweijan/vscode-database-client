@@ -2,6 +2,7 @@ import { Node } from "@/model/interface/node";
 import { Connection, ConnectionConfig, Request } from "tedious";
 import { IConnection, queryCallback } from "./connection";
 import { ConnectionPool } from "./pool/connectionPool";
+import format = require('date-format');
 
 /**
  * tedious not support connection queue, so need using pool.
@@ -61,6 +62,9 @@ export class MSSqlConnnection extends ConnectionPool<Connection> implements ICon
                 let temp = {};
                 columns.forEach((column) => {
                     temp[column.metadata.colName] = column.value
+                    if (column.value instanceof Date) {
+                        temp[column.metadata.colName] = format("yyyy-MM-dd hh:mm:ss", column.value)
+                    }
                 });
                 datas.push(temp)
             }))
