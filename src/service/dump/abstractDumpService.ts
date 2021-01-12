@@ -7,12 +7,18 @@ import format = require('date-format');
 import path = require('path');
 import { TableNode } from "../../model/main/tableNode";
 import { ViewNode } from "@/model/main/viewNode";
+import { DatabaseType } from "@/common/constants";
 
 export abstract class AbstractDumpService {
 
     public async dump(node: Node, withData: boolean) {
 
-        
+        const dbType=node.dbType
+        if(dbType==DatabaseType.MSSQL||dbType==DatabaseType.PG){
+            vscode.window.showErrorMessage("Dump only support mysql.")
+            return;
+        }
+
         let tables = []
         if (node instanceof TableNode || node instanceof ViewNode) {
             tables = [node.table]
