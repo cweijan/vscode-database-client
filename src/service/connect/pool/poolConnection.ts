@@ -1,6 +1,6 @@
 
 export enum pcStatus {
-    PEENDING, FREE, BUSY
+    PEENDING="PEENDING", FREE="FREE", BUSY="BUSY"
 }
 
 export class IpoolConnection<T>  {

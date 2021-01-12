@@ -5,16 +5,16 @@ import { IConnection, queryCallback } from "./connection";
 
 export class MysqlConnection implements IConnection {
     private con: mysql.Connection;
-    constructor(opt: Node) {
+    constructor(node: Node) {
         const newConnectionOptions = {
-            host: opt.host, port: opt.port, user: opt.user, password: opt.password, database: opt.database,
-            timezone: opt.timezone,
+            host: node.host, port: node.port, user: node.user, password: node.password, database: node.database,
+            timezone: node.timezone,
             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
 
         } as mysql.ConnectionConfig;
-        if (opt.certPath && fs.existsSync(opt.certPath)) {
+        if (node.certPath && fs.existsSync(node.certPath)) {
             newConnectionOptions.ssl = {
-                ca: fs.readFileSync(opt.certPath),
+                ca: fs.readFileSync(node.certPath),
             };
         }
         this.con = mysql.createConnection(newConnectionOptions);
