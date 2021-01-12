@@ -59,8 +59,8 @@ export class PostgreSqlConnection implements IConnection {
             }
         })
     }
-    async beginTransaction() {
-        await this.client.query("BEGIN")
+    async beginTransaction(callback: (err: Error) => void) {
+        this.client.query("BEGIN", callback)
     }
     async rollback() {
         await this.client.query("ROLLBACK")

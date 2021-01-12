@@ -213,7 +213,7 @@ ADD
 
     public async getMaxPrimary(): Promise<number> {
 
-        const primaryKey = MockRunner.primaryKeyMap[this.getConnectId()];
+        const primaryKey = MockRunner.primaryKeyMap[this.uid];
         if (primaryKey != null) {
             const count = await this.execute(`select max(${primaryKey}) max from ${this.table}`);
             if (count && count[0]) { return count[0].max }

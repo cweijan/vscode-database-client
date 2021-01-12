@@ -21,7 +21,7 @@ export class ColumnNode extends Node implements CopyAble {
         this.description = `${this.column.comment}`
         this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"}`
         if (column && this.isPrimaryKey) {
-            MockRunner.primaryKeyMap[this.getConnectId()] = column.name
+            MockRunner.primaryKeyMap[this.parent.uid] = column.name
         }
         this.collapsibleState = vscode.TreeItemCollapsibleState.None
         this.iconPath = path.join(Constants.RES_PATH, this.isPrimaryKey ? "icon/b_primary.png" : "icon/b_props.png");
