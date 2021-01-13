@@ -20,13 +20,13 @@
 		"RDBMS"
 	],
 	"bugs": {
-		"url": "https://github.com/cweijan/vscode-mysql/issues",
+		"url": "https://github.com/cweijan/vscode-database-client/issues",
 		"email": "cweijan@163.com"
 	},
-	"homepage": "https://github.com/cweijan/vscode-mysql/blob/master/README.md",
+	"homepage": "https://github.com/cweijan/vscode-database-client/blob/master/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/cweijan/vscode-mysql.git"
+		"url": "https://github.com/cweijan/vscode-database-client.git"
 	},
 	"activationEvents": [
 		"*"

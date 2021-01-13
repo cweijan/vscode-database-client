@@ -1,14 +1,16 @@
-# MySQL Client
+# Database Client
 
 [![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2)
 
-MySQL Client For Visual Studio Code
+Database Client For Visual Studio Code
 
-> Project site: [vscode-mysql](https://github.com/cweijan/vscode-mysql)
+> Supported databases: Mysql/MariaDB、SqlServer、Postgresql
+> 
+> Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client)
 
 **Features**
 
-- [MySQL Client](#mysql-client)
+- [Database Client](#database-client)
   - [Connect](#connect)
   - [View Tables](#view-tables)
   - [Execute Sql](#execute-sql)
