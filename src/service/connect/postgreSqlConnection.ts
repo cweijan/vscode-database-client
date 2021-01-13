@@ -26,7 +26,7 @@ export class PostgreSqlConnection implements IConnection {
     }
     isAlive(): boolean {
         const temp = this.client as any;
-        return temp._connected && (!temp._ending);
+        return temp._connected && !temp._ending && temp._queryable;
     }
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
