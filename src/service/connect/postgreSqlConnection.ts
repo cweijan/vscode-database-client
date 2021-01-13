@@ -1,8 +1,12 @@
 import { Node } from "@/model/interface/node";
 import { Client, QueryArrayResult, types } from "pg";
 import { IConnection, queryCallback } from "./connection";
+import { TypeId } from "pg-types";
 
+// date
 types.setTypeParser(1082, (val) => val)
+// json
+types.setTypeParser(114, (val) => val)
 
 /**
  * https://www.npmjs.com/package/pg

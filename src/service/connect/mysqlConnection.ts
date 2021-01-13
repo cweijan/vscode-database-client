@@ -10,7 +10,15 @@ export class MysqlConnection implements IConnection {
             host: node.host, port: node.port, user: node.user, password: node.password, database: node.database,
             timezone: node.timezone,
             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
-            connectTimeout:5000
+            connectTimeout: 5000,
+            typeCast: function (field, next) {
+                // if (field.type === 'TINY' && field.length === 1) 
+                if (field.type === 'JSON') {
+                    return field.string();
+                } else {
+                    return next();
+                }
+            }
         } as mysql.ConnectionConfig;
         if (node.certPath && fs.existsSync(node.certPath)) {
             newConnectionOptions.ssl = {
