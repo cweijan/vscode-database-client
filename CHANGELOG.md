@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.0.0 2020/1/13
+- Support connect to postgresql and sqlserver.
+- Reduce resource consumption.
+- Fix cannot edit json column data.
+
 # 2.9.2 2021/1/4
 
 - Better result view border color.
