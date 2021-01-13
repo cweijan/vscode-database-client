@@ -16,9 +16,10 @@
 
     <section class="mb-2">
       <label class="block font-bold" for="connection-type">Connection Type</label>
-        <el-radio v-model="connectionOption.dbType" label="MySQL">MySQL</el-radio>
-        <el-radio v-model="connectionOption.dbType" label="PostgreSQL">PostgreSQL</el-radio>
-        <el-radio v-model="connectionOption.dbType" label="SqlServer">SQL Server</el-radio>
+      <el-radio v-model="connectionOption.dbType" label="MySQL">MySQL</el-radio>
+      <el-radio v-model="connectionOption.dbType" label="PostgreSQL">PostgreSQL</el-radio>
+      <el-radio v-model="connectionOption.dbType" label="SqlServer">SQL Server</el-radio>
+      <el-radio v-model="connectionOption.dbType" label="ElasticSearch">ElasticSearch</el-radio>
       </el-select>
     </section>
 
@@ -32,25 +33,29 @@
       <input class="w-full field__input" id="connection-port" placeholder="The port of connection" required type="number" v-model="connectionOption.port" />
     </section>
 
-    <section class="mb-2">
-      <label class="block font-bold" for="connection-user">Username</label>
-      <input class="w-full field__input" id="connection-user" placeholder="Username" required v-model="connectionOption.user" />
-    </section>
+    <template  v-if="connectionOption.dbType!='ElasticSearch'">
 
-    <section class="mb-2">
-      <label class="block font-bold" for="connection-password">Password</label>
-      <input class="w-full field__input" id="connection-password" placeholder="Password" type="password" v-model="connectionOption.password" />
-    </section>
+      <section class="mb-2">
+        <label class="block font-bold" for="connection-user">Username</label>
+        <input class="w-full field__input" id="connection-user" placeholder="Username" required v-model="connectionOption.user" />
+      </section>
 
-    <section class="mb-2">
-      <label class="block font-bold" for="databases">Databases</label>
-      <input class="w-full field__input" id="databases" placeholder="Default is all databases" v-model="connectionOption.database" />
-    </section>
+      <section class="mb-2">
+        <label class="block font-bold" for="connection-password">Password</label>
+        <input class="w-full field__input" id="connection-password" placeholder="Password" type="password" v-model="connectionOption.password" />
+      </section>
 
-    <section class="mb-2">
-      <label class="block font-bold" for="timezone">Timezone</label>
-      <input class="w-full field__input" id="timezone" placeholder="+HH:MM" v-model="connectionOption.timezone" />
-    </section>
+      <section class="mb-2">
+        <label class="block font-bold" for="databases">Databases</label>
+        <input class="w-full field__input" id="databases" placeholder="Default is all databases" v-model="connectionOption.database" />
+      </section>
+
+      <section class="mb-2">
+        <label class="block font-bold" for="timezone">Timezone</label>
+        <input class="w-full field__input" id="timezone" placeholder="+HH:MM" v-model="connectionOption.timezone" />
+      </section>
+
+    </template>
 
     <section class="flex items-center mb-2">
       <label class="mr-2 font-bold" for="global">Global</label>
@@ -187,20 +192,23 @@ export default {
     "connectionOption.dbType"(value) {
       switch (value) {
         case "MySQL":
-          this.connectionOption.user='root';
-          this.connectionOption.port=3306;
+          this.connectionOption.user = "root"
+          this.connectionOption.port = 3306
           break
         case "PostgreSQL":
-          this.connectionOption.user='postgres';
-          this.connectionOption.port=5432;
+          this.connectionOption.user = "postgres"
+          this.connectionOption.port = 5432
           break
         case "Oracle":
-          this.connectionOption.user='system';
-          this.connectionOption.port=1521;
+          this.connectionOption.user = "system"
+          this.connectionOption.port = 1521
           break
         case "SqlServer":
-          this.connectionOption.user='sa';
-          this.connectionOption.port=1433;
+          this.connectionOption.user = "sa"
+          this.connectionOption.port = 1433
+          break
+        case "ElasticSearch":
+          this.connectionOption.port = 9200
           break
       }
     },

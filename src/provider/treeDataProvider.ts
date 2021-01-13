@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { CacheKey, ConfigKey } from "../common/constants";
+import { CacheKey, ConfigKey, DatabaseType } from "../common/constants";
 import { ConnectionManager } from "../service/connectionManager";
 import { DatabaseCache } from "../service/common/databaseCache";
 import { ConnectionNode } from "../model/database/connectionNode";
@@ -9,6 +9,8 @@ import { UserGroup } from "../model/database/userGroup";
 import { Global } from "../common/global";
 import { NodeUtil } from "@/model/nodeUtil";
 import { InfoNode } from "@/model/other/infoNode";
+import { EsConnection } from "@/service/connect/esConnection";
+import { EsNode } from "@/model/es/esNode";
 
 export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
@@ -66,7 +68,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         ConnectionManager.removeConnection(connectId)
         await targetContext.update(CacheKey.ConectionsKey, NodeUtil.removeParent(connections));
         DbTreeDataProvider.refresh();
-        
+
     }
 
     /**
@@ -95,24 +97,18 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         return this.instance;
     }
 
-    public async getConnectionNodes(): Promise<ConnectionNode[]> {
+    public async getConnectionNodes(): Promise<Node[]> {
 
         let globalConnections = this.context.globalState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey, {});
         let workspaceConnections = this.context.workspaceState.get<{ [key: string]: Node }>(CacheKey.ConectionsKey, {});
 
         const connections = { ...globalConnections, ...workspaceConnections };
-        // temp duplicate uid solution
-        const idMap = {};
 
         return Object.keys(connections).map(key => {
-            const connection = new ConnectionNode(key, connections[key]);
-            idMap[connection.uid] = true;
+            const connection = connections[key].dbType == DatabaseType.ES ? new EsNode(key, connections[key]) : new ConnectionNode(key, connections[key]);
             if (typeof connections[key].global == "undefined") {
                 // Compatible with older versions, will remove in the feature
                 connections[key].global = true;
-            }
-            if (idMap[connection.uid]) {
-                idMap[connection.uid] = idMap[connection.uid] + new Date().getTime()
             }
             return connection;
         })

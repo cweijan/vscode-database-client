@@ -1,6 +1,7 @@
 import { DatabaseType } from "@/common/constants";
 import { Node } from "@/model/interface/node";
 import { FieldInfo } from "mysql2";
+import { EsConnection } from "./esConnection";
 import { MSSqlConnnection } from "./mssqlConnection";
 import { MysqlConnection } from "./mysqlConnection";
 import { PostgreSqlConnection } from "./postgreSqlConnection";
@@ -36,6 +37,8 @@ export function create(opt: Node) {
             return new MSSqlConnnection(opt)
         case DatabaseType.PG:
             return new PostgreSqlConnection(opt)
+        case DatabaseType.ES:
+            return new EsConnection(opt);
     }
     return new MysqlConnection(opt)
 }
