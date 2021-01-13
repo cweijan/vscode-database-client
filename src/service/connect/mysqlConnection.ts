@@ -14,7 +14,7 @@ export class MysqlConnection implements IConnection {
             typeCast: function (field, next) {
                 // if (field.type === 'TINY' && field.length === 1) 
                 if (field.type === 'JSON') {
-                    return field.string();
+                    return field.buffer().toString();
                 } else {
                     return next();
                 }
