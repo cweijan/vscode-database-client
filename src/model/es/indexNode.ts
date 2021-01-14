@@ -5,12 +5,14 @@ import { QueryPage } from "@/view/result/query";
 import { DataResponse, EsDataResponse, RunResponse } from "@/view/result/queryResponse";
 import axios from "axios";
 import * as path from "path";
+import { window } from "vscode";
+import { version } from "vue/types/umd";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
 import { EsColumnNode } from "./indexColumnNode";
 
 
-export class IndexNode extends Node{
+export class IndexNode extends Node {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.ES_INDEX;
@@ -49,7 +51,7 @@ export class IndexNode extends Node{
     }
 
 
-    loadData(request: any) {
+    async loadData(request: any, sendResult: boolean = true) {
 
         const pageSize = Global.getConfig(ConfigKey.DEFAULT_LIMIT);
         if (!request) {
@@ -61,12 +63,12 @@ export class IndexNode extends Node{
         }
 
         const start = new Date().getTime();
-        QueryPage.send({ connection: this, type: MessageType.RUN, res: { sql:'' } as RunResponse });
-        axios.get(`http://${this.host}:${this.port}/${this.label}/_search`, {
+        QueryPage.send({ connection: this, type: MessageType.RUN, res: { sql: '' } as RunResponse });
+        const response = await axios.get(`http://${this.host}:${this.port}/${this.label}/_search`, {
             data: request
         }).then(({ data }) => {
             let fields = [];
-            let result = data.hits.hits.map((hit: any) => {
+            let rows = data.hits.hits.map((hit: any) => {
                 if (fields.length == 0) {
                     fields.push({ name: "_index" }, { name: "_type" }, { name: "_id" }, { name: "_score" })
                     for (const key in hit._source) {
@@ -82,15 +84,23 @@ export class IndexNode extends Node{
                 }
                 return row
             })
-            QueryPage.send({
-                connection: this, type: request.from==0?MessageType.DATA:MessageType.NEXT_PAGE, res: {
-                    sql: "", costTime: new Date().getTime() - start,
-                    data: result, fields, pageSize,
-                    total: data.hits.total, request
-                } as EsDataResponse
-            });
+            return { rows, fields, total: data.hits.total }
+        }).catch(err => {
+            window.showErrorMessage(err)
+            throw err
         })
 
+        if (!sendResult) {
+            return response;
+        }
+
+        const { rows, fields, total } = response;
+        QueryPage.send({
+            connection: this, type: request.from == 0 ? MessageType.DATA : MessageType.NEXT_PAGE, res: {
+                sql: "", costTime: new Date().getTime() - start,
+                data: rows, fields, pageSize, total, request
+            } as EsDataResponse
+        });
 
     }
 

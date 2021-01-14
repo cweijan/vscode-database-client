@@ -74,7 +74,7 @@ export class QueryPage {
                         handler.emit('COUNT', { data: rows[0].count })
                     })
                 }).on(OperateType.export, (params) => {
-                    this.exportService.export({ ...params.option, dbOption }).then(() => {
+                    this.exportService.export({ ...params.option, request: queryParam.res.request, dbOption }).then(() => {
                         handler.emit('EXPORT_DONE')
                     })
                 }).on('changePageSize', (pageSize) => {

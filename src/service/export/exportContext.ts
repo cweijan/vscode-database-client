@@ -6,6 +6,10 @@ export class ExportContext {
     withOutLimit: boolean;
     table:string;
     sql: string;
+    /**
+     * es only
+     */
+    request?: any;
     exportPath: string;
     /**
      * intenel: fields 

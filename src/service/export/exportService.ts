@@ -5,6 +5,8 @@ import { Console } from "../../common/Console";
 import { ExportContext, ExportType } from "./exportContext";
 import { ProgressLocation } from "vscode";
 import { ConnectionManager } from "../connectionManager";
+import { DatabaseType } from "@/common/constants";
+import { IndexNode } from "@/model/es/indexNode";
 
 export class ExportService {
 
@@ -38,18 +40,25 @@ export class ExportService {
     }
 
 
-    private async exportData(exportOption: ExportContext) {
+    private async exportData(context: ExportContext) {
 
-        const sql = exportOption.sql
-        const connection = await ConnectionManager.getConnection(exportOption.dbOption)
+        if (context.dbOption.dbType == DatabaseType.ES) {
+            (context.dbOption as IndexNode).loadData(context.request,false).then(({ rows, fields }) => {
+                this.delegateExport(context, rows, fields)
+            })
+            return;
+        }
+
+        const sql = context.sql
+        const connection = await ConnectionManager.getConnection(context.dbOption)
         connection.query(sql, (err, rows, fields?: FieldInfo[]) => {
             if (err) {
                 Console.log(err)
                 return;
             }
-            exportOption.fields = fields;
-            exportOption.rows = rows;
-            this.delegateExport(exportOption, rows, fields)
+            context.fields = fields;
+            context.rows = rows;
+            this.delegateExport(context, rows, fields)
         })
 
     }

@@ -15,7 +15,7 @@
         </el-button>
         <el-button @click="deleteConfirm" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!toolbar.show">
         </el-button>
-        <el-button @click="exportOption.visible = true" type="primary" :disabled="!toolbar.sql" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
+        <el-button @click="exportOption.visible = true" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
         <el-button type="success" size="mini" icon="el-icon-caret-right" :disabled="!toolbar.sql" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
         <div style="display:inline-block">
           <el-pagination @size-change="changePageSize" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,200,300,400,500,1000]" :layout="page.total!=null?'sizes,prev,pager, next, total, jumper':'sizes,prev, next, jumper'" :total="page.total">
