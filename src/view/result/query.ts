@@ -1,4 +1,4 @@
-import { IndexNode } from "@/model/es/indexNode";
+import { IndexNode } from "@/model/es/model/indexNode";
 import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
 import { env, StatusBarAlignment, StatusBarItem, Uri, window } from "vscode";

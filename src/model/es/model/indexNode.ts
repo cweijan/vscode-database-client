@@ -7,8 +7,8 @@ import axios from "axios";
 import * as path from "path";
 import { window } from "vscode";
 import { version } from "vue/types/umd";
-import { Node } from "../interface/node";
-import { InfoNode } from "../other/infoNode";
+import { Node } from "../../interface/node";
+import { InfoNode } from "../../other/infoNode";
 import { EsColumnNode } from "./indexColumnNode";
 
 
@@ -51,7 +51,18 @@ export class IndexNode extends Node {
     }
 
 
-    async loadData(request: any, sendResult: boolean = true) {
+    async loadData(request?: any, sendResult: boolean = true) {
+
+        // "bool": { 
+        //     "must": [
+        //       { "match": { "title":   "Search"        }},
+        //       { "match": { "content": "Elasticsearch" }}
+        //     ],
+        //     "filter": [ 
+        //       { "term":  { "status": "published" }},
+        //       { "range": { "publish_date": { "gte": "2015-01-01" }}}
+        //     ]
+        //   }
 
         const pageSize = Global.getConfig(ConfigKey.DEFAULT_LIMIT);
         if (!request) {

@@ -1,9 +1,9 @@
 import * as path from "path";
-import { Constants, ModelType } from "../../common/constants";
-import { ConnectionManager } from "../../service/connectionManager";
-import { Node } from "../interface/node";
+import { Constants, ModelType } from "../../../common/constants";
+import { ConnectionManager } from "../../../service/connectionManager";
+import { Node } from "../../interface/node";
 import { IndexNode } from "./indexNode";
-import { InfoNode } from "../other/infoNode";
+import { InfoNode } from "../../other/infoNode";
 import axios from "axios";
 import { FileManager } from "@/common/filesManager";
 

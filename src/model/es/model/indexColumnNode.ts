@@ -1,7 +1,7 @@
 import { Constants, ModelType } from "@/common/constants";
 import * as path from "path";
 import { TreeItemCollapsibleState } from "vscode";
-import { Node } from "../interface/node";
+import { Node } from "../../interface/node";
 
 
 export class EsColumnNode extends Node {

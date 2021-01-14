@@ -30,12 +30,17 @@ import { QueryGroup } from "./model/query/queryGroup";
 import { Node } from "./model/interface/node";
 import { DbTreeDataProvider } from "./provider/treeDataProvider";
 import { UserNode } from "./model/database/userNode";
-import { EsNode } from "./model/es/esNode";
-import { IndexNode } from "./model/es/indexNode";
+import { EsNode } from "./model/es/model/esNode";
+import { IndexNode } from "./model/es/model/indexNode";
+import { activeEs } from "./model/es/provider/main";
 
 export function activate(context: vscode.ExtensionContext) {
 
     const serviceManager = new ServiceManager(context)
+
+    activeEs(context)
+
+
     ConnectionNode.init()
     context.subscriptions.push(
         ...serviceManager.init(),

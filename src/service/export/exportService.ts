@@ -6,7 +6,7 @@ import { ExportContext, ExportType } from "./exportContext";
 import { ProgressLocation } from "vscode";
 import { ConnectionManager } from "../connectionManager";
 import { DatabaseType } from "@/common/constants";
-import { IndexNode } from "@/model/es/indexNode";
+import { IndexNode } from "@/model/es/model/indexNode";
 
 export class ExportService {
 

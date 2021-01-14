@@ -33,11 +33,30 @@
 	],
 	"main": "./out/extension",
 	"contributes": {
+		"languages": [
+			{
+				"id": "es",
+				"aliases": [
+					"ElasticSearch",
+					"es",
+					"elasticsearch"
+				],
+				"extensions": [
+					"es"
+				],
+				"configuration": "./syntaxes/es.configuration.json"
+			}
+		],
 		"grammars": [
 			{
 				"language": "sql",
 				"scopeName": "source.sql",
 				"path": "./syntaxes/mysql.tmLanguage.json"
+			},
+			{
+				"language": "es",
+				"scopeName": "source.es",
+				"path": "./syntaxes/es.tmLanguage"
 			}
 		],
 		"viewsContainers": {
@@ -878,7 +897,14 @@
 		"umy-ui": "1.0.8",
 		"vue": "^2.6.11",
 		"vue-router": "^3.4.1",
-		"xe-utils": "2.7.14"
+		"xe-utils": "2.7.14",
+		"json-markup": "^1.1.0",
+		"jsonc-parser": "^0.3.0",
+		"path": "^0.12.7",
+		"request": "^2.79.0",
+		"routington": "^1.0.3",
+		"semver-closest": "^0.1.2",
+		"strip-json-comments": "^2.0.1"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",
