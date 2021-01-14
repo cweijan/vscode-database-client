@@ -43,7 +43,7 @@ export class ExportService {
     private async exportData(context: ExportContext) {
 
         if (context.dbOption.dbType == DatabaseType.ES) {
-            (context.dbOption as IndexNode).loadData(context.request,false).then(({ rows, fields }) => {
+            (context.dbOption as IndexNode).loadData(context.request, false).then(({ rows, fields }) => {
                 this.delegateExport(context, rows, fields)
             })
             return;
@@ -56,14 +56,14 @@ export class ExportService {
                 Console.log(err)
                 return;
             }
-            context.fields = fields;
-            context.rows = rows;
             this.delegateExport(context, rows, fields)
         })
 
     }
 
     private delegateExport(context: ExportContext, rows: any, fields: FieldInfo[]) {
+        context.fields = fields;
+        context.rows = rows;
         const filePath = context.exportPath;
         switch (context.type) {
             case ExportType.excel:
