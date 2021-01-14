@@ -30,6 +30,8 @@ import { QueryGroup } from "./model/query/queryGroup";
 import { Node } from "./model/interface/node";
 import { DbTreeDataProvider } from "./provider/treeDataProvider";
 import { UserNode } from "./model/database/userNode";
+import { EsNode } from "./model/es/esNode";
+import { IndexNode } from "./model/es/indexNode";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -47,12 +49,12 @@ export function activate(context: vscode.ExtensionContext) {
             // util
             ...{
                 "mysql.history.open": () => serviceManager.historyService.showHistory(),
-                [CommandKey.Refresh]: async (node:Node) => {
-                    if(node){
+                [CommandKey.Refresh]: async (node: Node) => {
+                    if (node) {
                         await node.getChildren(true)
                         DbTreeDataProvider.refresh(node)
-                    }else{
-                        serviceManager.provider.init(); 
+                    } else {
+                        serviceManager.provider.init();
                     }
                 },
                 [CommandKey.RecordHistory]: (sql: string, costTime: number) => {
@@ -156,7 +158,7 @@ export function activate(context: vscode.ExtensionContext) {
                     if (typeof sql != 'string') { sql = null; }
                     QueryUnit.runQuery(sql);
                 },
-                "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
+                "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode | EsNode) => {
                     if (databaseOrConnectionNode) {
                         await databaseOrConnectionNode.newQuery();
                     } else {
@@ -178,6 +180,9 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // table node
             ...{
+                "mysql.show.esIndex": (indexNode: IndexNode) => {
+                    indexNode.loadData()
+                },
                 "mysql.table.truncate": (tableNode: TableNode) => {
                     tableNode.truncateTable();
                 },

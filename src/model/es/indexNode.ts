@@ -21,11 +21,13 @@ export class IndexNode extends Node {
         this.init(parent)
         const [health, status, index, uuid, pri, rep, docsCount, docsDeleted, storeSize, priStoreSize] = info.split(/\s+/)
         this.label = index
-        const lcp = ConnectionManager.getLastConnectionOption(false);
-        if (lcp && lcp.getConnectId() == this.getConnectId()) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/connection-active.svg");
-            this.description = `Active`
+        this.command = {
+            command: "mysql.show.esIndex",
+            title: "Show ES Index Data",
+            arguments: [this, true],
         }
+        // this.iconPath = path.join(Constants.RES_PATH, "icon/connection-active.svg");
+        // this.description = `Active`
     }
 
     async getChildren(): Promise<Node[]> {
@@ -49,12 +51,46 @@ export class IndexNode extends Node {
 
     }
 
+
+    loadData() {
+
+        const start = new Date().getTime();
+        axios.get(`http://${this.host}:${this.port}/${this.label}/_search`, {
+            data: {
+                from: 0,
+                size: 10,
+                query: {
+                    "match_all": {}
+                }
+            }
+        }).then(({ data }) => {
+            let fields = [];
+            let result = data.hits.hits.map((hit: any) => {
+                if (fields.length == 0) {
+                    fields.push({ name: "_index" }, { name: "_type" }, { name: "_id" }, { name: "_score" })
+                    for (const key in hit._source) {
+                        fields.push({ name: key })
+                    }
+                }
+                return {
+                    _index: hit._index,
+                    _type: hit._type,
+                    _id: hit._id,
+                    _score: hit._score,
+                    ...hit._source
+                }
+            })
+            QueryPage.send({ connection: this, type: MessageType.DATA, res: { sql: "", costTime: new Date().getTime() - start, data: result, fields, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+        })
+
+
+    }
+
     public async countSql() {
 
         const start = new Date().getTime();
         return axios.get(`http://${this.host}:${this.port}/${this.label}/_count`).then(({ data }) => {
             QueryPage.send({ connection: this, type: MessageType.DATA, res: { sql: "", costTime: new Date().getTime() - start, data: [{ count: data.count }], fields: [{ name: 'count' }], pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
-
         })
 
     }

@@ -5,7 +5,11 @@ import { Node } from "../interface/node";
 import { IndexNode } from "./indexNode";
 import { InfoNode } from "../other/infoNode";
 import axios from "axios";
+import { FileManager } from "@/common/filesManager";
 
+/**
+ * https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
+ */
 export class EsNode extends Node {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/es.png");
@@ -22,6 +26,10 @@ export class EsNode extends Node {
     }
 
 
+    newQuery(){
+        FileManager.show(`${this.uid}.es`)
+    }
+    
     async getChildren(): Promise<Node[]> {
 
         return axios.get(`http://${this.host}:${this.port}/_cat/indices`).then(res => {
