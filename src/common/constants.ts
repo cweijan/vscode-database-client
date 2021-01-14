@@ -55,7 +55,7 @@ export enum ModelType {
     /**
      * ElasticSearch
      */
-    ES_CONNECTION = "esConnection",ES_INDEX="esIndex",
+    ES_CONNECTION = "esConnection",ES_INDEX="esIndex",ES_COLUMN="esColumn",
     /**
      * database
      */

@@ -2,9 +2,9 @@ import * as path from "path";
 import { Constants, ModelType } from "../../common/constants";
 import { ConnectionManager } from "../../service/connectionManager";
 import { Node } from "../interface/node";
-import axios from "axios";
 import { IndexNode } from "./indexNode";
 import { InfoNode } from "../other/infoNode";
+import axios from "axios";
 
 export class EsNode extends Node {
 
@@ -24,7 +24,7 @@ export class EsNode extends Node {
 
     async getChildren(): Promise<Node[]> {
 
-        return axios.get("http://localhost:9200/_cat/indices").then(res => {
+        return axios.get(`http://${this.host}:${this.port}/_cat/indices`).then(res => {
             let indexes = [];
             const results = res.data.match(/[^\r\n]+/g);
             for (const result of results) {

@@ -1,6 +1,6 @@
 <template>
   <div class="container flex flex-col mx-auto">
-    <h1 class="py-4 text-2xl">Connect to MySQL server</h1>
+    <h1 class="py-4 text-2xl">Connect to Database server</h1>
 
     <blockquote class="p-3 mb-2 panel" id="error" v-if="error">
       <section class="panel__text">

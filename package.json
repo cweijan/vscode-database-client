@@ -483,7 +483,7 @@
 			"view/item/context": [
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
+					"when": "view == github.cweijan.mysql && viewItem =~ /^(esIndex|esConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
 					"group": "inline@-2"
 				},
 				{
@@ -493,12 +493,12 @@
 				},
 				{
 					"command": "mysql.connection.edit",
-					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|esConnection)$/",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.host.copy",
-					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|esConnection)$/",
 					"group": "1_mysql@3"
 				},
 				{
@@ -523,7 +523,7 @@
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|esConnection)$/",
 					"group": "2_mysql@1"
 				},
 				{
@@ -538,7 +538,7 @@
 				},
 				{
 					"command": "mysql.connection.delete",
-					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|esConnection)$/",
 					"group": "10mysql@2"
 				},
 				{
@@ -667,13 +667,8 @@
 					"group": "1_inline@0"
 				},
 				{
-					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(table|view)$/",
-					"group": "1_inline@1"
-				},
-				{
 					"command": "mysql.count.sql",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(table|view)$/",
+					"when": "view == github.cweijan.mysql && viewItem =~ /^(table|view|esIndex)$/",
 					"group": "1_inline@3"
 				},
 				{
@@ -732,11 +727,6 @@
 					"group": "1_inline@7"
 				},
 				{
-					"command": "mysql.template.table",
-					"when": "view == github.cweijan.mysql && viewItem == tableGroup",
-					"group": "1_mysql@1"
-				},
-				{
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == tableGroup",
 					"group": "1_mysql@2"
@@ -772,11 +762,6 @@
 					"group": "3_mysql@1"
 				},
 				{
-					"command": "mysql.template.view",
-					"when": "view == github.cweijan.mysql && viewItem == viewGroup",
-					"group": "1_mysql@1"
-				},
-				{
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == viewGroup",
 					"group": "1_mysql@2"
@@ -797,11 +782,6 @@
 					"group": "inline@0"
 				},
 				{
-					"command": "mysql.template.procedure",
-					"when": "view == github.cweijan.mysql && viewItem == procedureGroup",
-					"group": "1_mysql@1"
-				},
-				{
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == procedureGroup",
 					"group": "1_mysql@2"
@@ -817,11 +797,6 @@
 					"group": "2_mysql@1"
 				},
 				{
-					"command": "mysql.template.function",
-					"when": "view == github.cweijan.mysql && viewItem == functionGroup",
-					"group": "1_mysql@1"
-				},
-				{
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == functionGroup",
 					"group": "1_mysql@2"
@@ -834,11 +809,6 @@
 				{
 					"command": "mysql.delete.function",
 					"when": "view == github.cweijan.mysql && viewItem == function",
-					"group": "1_mysql@1"
-				},
-				{
-					"command": "mysql.template.trigger",
-					"when": "view == github.cweijan.mysql && viewItem == triggerGroup",
 					"group": "1_mysql@1"
 				},
 				{
