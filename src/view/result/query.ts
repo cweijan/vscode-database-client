@@ -1,3 +1,4 @@
+import { IndexNode } from "@/model/es/indexNode";
 import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
 import { env, StatusBarAlignment, StatusBarItem, Uri, window } from "vscode";
@@ -75,6 +76,14 @@ export class QueryPage {
                     Global.updateConfig(ConfigKey.DEFAULT_LIMIT, pageSize)
                 }).on('openCoffee', () => {
                     env.openExternal(Uri.parse('https://www.buymeacoffee.com/cweijan'));
+                }).on('esLoad', ({ column, value }) => {
+                    const indexNode = dbOption as IndexNode;
+                    queryParam.res.request.query = {
+                        term: {
+                            [column]: value
+                        }
+                    }
+                    indexNode.loadData(queryParam.res.request)
                 })
             }
         });

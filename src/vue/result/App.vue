@@ -147,6 +147,10 @@ export default {
       if (this.result.tableCount == 1) {
         this.count()
       }
+      // only es have.
+      if (data.total) {
+        this.page.total = parseInt(data.total)
+      }
     }
     const handlerCommon = (res) => {
       if (this.$refs.editor) {
@@ -225,6 +229,10 @@ export default {
     },
     filter(event, column) {
       let inputvalue = "" + (event ? event.target.value : "")
+      if (this.result.dbType == "ElasticSearch") {
+        vscodeEvent.emit("esLoad", { column, value: inputvalue })
+        return
+      }
 
       let filterSql = this.result.sql.replace(/\n/, " ").replace(";", " ") + " "
 

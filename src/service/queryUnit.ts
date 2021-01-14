@@ -1,6 +1,6 @@
 "use strict";
 import * as vscode from "vscode";
-import { CommandKey, ConfigKey, Cursor, MessageType } from "../common/constants";
+import { CommandKey, ConfigKey, Cursor, DatabaseType, MessageType } from "../common/constants";
 import { Global } from "../common/global";
 import { Console } from "../common/Console";
 import { FileManager, FileModel } from "../common/filesManager";
@@ -48,26 +48,28 @@ export class QueryUnit {
         }
         sql = sql.replace(/^\s*--.+/igm, '').trim();
 
-        // Trim empty sql.
-        const sqlList: string[] = sql?.match(/(?:[^;"']+|["'][^"']*["'])+/g)?.filter((s) => (s.trim() != '' && s.trim() != ';'))
-        if (sqlList?.length == 1) {
-            sql = sqlList[0]
-        }
+        if (connectionNode.dbType != DatabaseType.ES) {
+            // Trim empty sql.
+            const sqlList: string[] = sql?.match(/(?:[^;"']+|["'][^"']*["'])+/g)?.filter((s) => (s.trim() != '' && s.trim() != ';'))
+            if (sqlList?.length == 1) {
+                sql = sqlList[0]
+            }
 
-        const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
-        sql = parseResult.sql
-        if (!sql && parseResult.replace) {
-            QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
-            return;
-        }
+            const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
+            sql = parseResult.sql
+            if (!sql && parseResult.replace) {
+                QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, res: { message: `change delimiter success`, success: true } as MessageResponse });
+                return;
+            }
 
-        const importMatch = sql.match(this.importPattern);
-        if (importMatch) {
-            // ServiceManager.getImportService(connectionNode.dbType).importSql(importMatch[1], connectionNode)
-            return;
-        }
+            const importMatch = sql.match(this.importPattern);
+            if (importMatch) {
+                ServiceManager.getImportService(connectionNode.dbType).importSql(importMatch[1], connectionNode)
+                return;
+            }
 
-        QueryPage.send({ connection: connectionNode, type: MessageType.RUN, res: { sql } as RunResponse });
+            QueryPage.send({ connection: connectionNode, type: MessageType.RUN, res: { sql } as RunResponse });
+        }
 
         const executeTime = new Date().getTime();
         try {
@@ -182,7 +184,7 @@ export class QueryUnit {
     public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql") {
 
         this.sqlDocument = await vscode.window.showTextDocument(
-            await vscode.workspace.openTextDocument(await FileManager.record(`${node.getConnectId({withDb:true})}#${template}`, sql, FileModel.WRITE))
+            await vscode.workspace.openTextDocument(await FileManager.record(`${node.getConnectId({ withDb: true })}#${template}`, sql, FileModel.WRITE))
         );
 
         return this.sqlDocument;

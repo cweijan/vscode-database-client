@@ -22,6 +22,7 @@ export class DataResponse {
     public pageSize: number;
     public tableCount: number;
 }
+
 export class ErrorResponse {
     public sql: string;
     public costTime: number;
@@ -33,4 +34,13 @@ export class DMLResponse {
     public costTime: number;
     public message?: string;
     public affectedRows: number;
+}
+
+/**
+ * Elastic Search Response
+ */
+
+export class EsDataResponse extends DataResponse{
+    public total?: number;
+    public request?: any;
 }
