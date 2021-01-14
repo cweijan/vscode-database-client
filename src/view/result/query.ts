@@ -3,7 +3,7 @@ import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
 import { env, StatusBarAlignment, StatusBarItem, Uri, window } from "vscode";
 import { Trans } from "~/common/trans";
-import { ConfigKey, MessageType, OperateType } from "../../common/constants";
+import { ConfigKey, DatabaseType, MessageType, OperateType } from "../../common/constants";
 import { Global } from "../../common/global";
 import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
@@ -60,6 +60,11 @@ export class QueryPage {
                     }
                     QueryUnit.runQuery(params.sql, dbOption);
                 }).on(OperateType.next, async (params) => {
+                    if (dbOption.dbType == DatabaseType.ES) {
+                        queryParam.res.request.from = (params.pageNum - 1) * params.pageSize;
+                        (dbOption as IndexNode).loadData(queryParam.res.request)
+                        return;
+                    }
                     const sql = ServiceManager.getPageService(dbOption.dbType).build(params.sql, params.pageNum, params.pageSize)
                     dbOption.execute(sql).then((rows) => {
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
@@ -77,13 +82,12 @@ export class QueryPage {
                 }).on('openCoffee', () => {
                     env.openExternal(Uri.parse('https://www.buymeacoffee.com/cweijan'));
                 }).on('esLoad', ({ column, value }) => {
-                    const indexNode = dbOption as IndexNode;
                     queryParam.res.request.query = {
                         term: {
                             [column]: value
                         }
-                    }
-                    indexNode.loadData(queryParam.res.request)
+                    };
+                    (dbOption as IndexNode).loadData(queryParam.res.request)
                 })
             }
         });

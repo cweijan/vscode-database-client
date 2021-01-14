@@ -352,7 +352,7 @@ export default {
       this.table.loading = true
     },
     changePage(pageNum, jump) {
-      if (!this.result.sql.match(/^\s*select/i)) {
+      if (this.result.sql && !this.result.sql.match(/^\s*select/i)) {
         return
       }
       vscodeEvent.emit("next", {

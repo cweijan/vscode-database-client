@@ -83,7 +83,7 @@ export class IndexNode extends Node {
                 return row
             })
             QueryPage.send({
-                connection: this, type: MessageType.DATA, res: {
+                connection: this, type: request.from==0?MessageType.DATA:MessageType.NEXT_PAGE, res: {
                     sql: "", costTime: new Date().getTime() - start,
                     data: result, fields, pageSize,
                     total: data.hits.total, request
