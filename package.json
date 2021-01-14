@@ -582,24 +582,19 @@
 					"group": "1_mysql@0"
 				},
 				{
-					"command": "mysql.name.copy",
-					"when": "view == github.cweijan.mysql && viewItem == user",
-					"group": "1_mysql@1"
-				},
-				{
 					"command": "mysql.delete.user",
 					"when": "view == github.cweijan.mysql && viewItem == user",
 					"group": "1_mysql@2"
 				},
 				{
+					"command": "mysql.name.copy",
+					"when": "view == github.cweijan.mysql && viewItem =~ /^(user|database|esColumn|column|table|view|esIndex|procedure|function|trigger)$/",
+					"group": "-1_mysql@-5"
+				},
+				{
 					"command": "mysql.refresh",
 					"when": "view == github.cweijan.mysql && viewItem == database",
 					"group": "3_mysql@0"
-				},
-				{
-					"command": "mysql.name.copy",
-					"when": "view == github.cweijan.mysql && viewItem == database",
-					"group": "3_mysql@1"
 				},
 				{
 					"command": "mysql.db.overview",
@@ -640,11 +635,6 @@
 					"command": "mysql.table.drop",
 					"when": "view == github.cweijan.mysql && viewItem == table && false",
 					"group": "inline@1"
-				},
-				{
-					"command": "mysql.name.copy",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(table|view)$/",
-					"group": "1_inline@-2"
 				},
 				{
 					"command": "mysql.table.source",
@@ -735,11 +725,6 @@
 					"command": "mysql.column.changeName",
 					"when": "view == github.cweijan.mysql && viewItem == column",
 					"group": "inline@4"
-				},
-				{
-					"command": "mysql.name.copy",
-					"when": "view == github.cweijan.mysql && viewItem == column",
-					"group": "3_mysql@0"
 				},
 				{
 					"command": "mysql.column.drop",

@@ -18,8 +18,7 @@ export class ColumnNode extends Node implements CopyAble {
         super(column.name)
         this.init(parent)
         this.type = `${this.column.type}`
-        this.description = `${this.column.comment}`
-        this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"}`
+        this.description = `${this.column.type} ${this.getIndex(this.column.key)} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"} ${this.column.comment}`
         if (column && this.isPrimaryKey) {
             MockRunner.primaryKeyMap[this.parent.uid] = column.name
         }

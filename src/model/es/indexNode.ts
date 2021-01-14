@@ -10,7 +10,7 @@ import { InfoNode } from "../other/infoNode";
 import { EsColumnNode } from "./indexColumnNode";
 
 
-export class IndexNode extends Node {
+export class IndexNode extends Node{
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.ES_INDEX;

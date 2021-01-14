@@ -6,6 +6,7 @@ import { QueryUnit } from "@/service/queryUnit";
 import { ServiceManager } from "@/service/serviceManager";
 import * as vscode from "vscode";
 import { DatabaseCache } from "../../service/common/databaseCache";
+import { CopyAble } from "./copyAble";
 import { SSHConfig } from "./sshConfig";
 
 export interface SwitchOpt {
@@ -13,7 +14,7 @@ export interface SwitchOpt {
     withDb?: boolean;
 }
 
-export abstract class Node extends vscode.TreeItem {
+export abstract class Node extends vscode.TreeItem implements CopyAble{
 
     public uid: string;
 
@@ -36,6 +37,9 @@ export abstract class Node extends vscode.TreeItem {
 
     constructor(uid: string) {
         super(uid)
+    }
+    copyName(): void {
+        Util.copyToBoard(this.label)
     }
 
     protected init(source: Node) {
