@@ -38,7 +38,7 @@ PUT /myIndex/_doc/1
 }
 
 // Update document
-POST /myIndex/_update/1
+POST /myIndex/_doc/1
 {
   "name": "John Doe"
 }

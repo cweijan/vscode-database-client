@@ -20,6 +20,7 @@ export class EsBaseNode extends Node {
 
     async loadData(request?: RestRequest, sendResult: boolean = true) {
 
+        const ES_DEFAULT_SIZE = 10;
         const pageSize = Global.getConfig(ConfigKey.DEFAULT_LIMIT);
         const type = request?.type || 'get';
         const path = request?.path ? request.path : `/${this.contextValue == ModelType.ES_CONNECTION ? '[index]' : this.label}/_search`;
@@ -33,6 +34,7 @@ export class EsBaseNode extends Node {
         if (path.indexOf("_search") != -1) {
             QueryPage.send({ connection: this, type: MessageType.RUN, res: { sql: '' } as RunResponse });
         }
+
         const response = await axios({
             method: type as Method,
             url: `${this.scheme}://${this.host}:${this.port}${path}`,
@@ -66,7 +68,7 @@ export class EsBaseNode extends Node {
             return { rows, fields, total: data.hits.total }
         }).catch(err => {
             const reason = err.response.data.error.reason;
-            if(reason){
+            if (reason) {
                 window.showErrorMessage(reason)
             }
             throw err
@@ -80,7 +82,7 @@ export class EsBaseNode extends Node {
         QueryPage.send({
             connection: this, type: request?.content?.from > 0 ? MessageType.NEXT_PAGE : MessageType.DATA, res: {
                 sql: "", costTime: new Date().getTime() - start,
-                data: rows, fields, pageSize, total, request: { type, path, content }
+                data: rows, fields, pageSize: request?.content?.size ? pageSize : ES_DEFAULT_SIZE, total, request: { type, path, content }
             } as EsDataResponse
         });
 
