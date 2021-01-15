@@ -3,6 +3,10 @@
   "scopeName": "source.es",
   "patterns": [
     {
+			"match": "(?i)^\\s*\\b(GET|post|header|put|delete)\\b",
+			"name": "keyword.es"
+		},
+    {
       "include": "#value"
     }
   ],

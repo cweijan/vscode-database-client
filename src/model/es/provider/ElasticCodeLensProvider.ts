@@ -1,18 +1,14 @@
 import * as vscode from 'vscode';
 import { DocumentFinder } from './documentFinder';
-import { ElasticDecoration } from './ElasticDecoration'
 import { ElasticMatches } from './ElasticMatches'
 
 export class ElasticCodeLensProvider implements vscode.CodeLensProvider {
-    private decoration: ElasticDecoration;
     public constructor(context: vscode.ExtensionContext) {
-        this.decoration = new ElasticDecoration(context)
     }
 
     public provideCodeLenses(document: vscode.TextDocument, _token: vscode.CancellationToken) {
 
         var esMatches = new ElasticMatches(vscode.window.activeTextEditor)
-        this.decoration.UpdateDecoration(esMatches)
 
         var ret = [];
 
