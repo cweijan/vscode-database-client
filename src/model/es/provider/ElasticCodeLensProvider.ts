@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { DocumentFinder } from './documentFinder';
 import { ElasticDecoration } from './ElasticDecoration'
 import { ElasticMatches } from './ElasticMatches'
 
@@ -19,14 +20,20 @@ export class ElasticCodeLensProvider implements vscode.CodeLensProvider {
             if (em.Error.Text == null) {
                 ret.push(new vscode.CodeLens(em.Method.Range, {
                     title: "▶ Run Query",
-                    command: "elastic.execute",
+                    command: "mysql.elastic.execute",
                     arguments: [em]
                 }))
-
+                if(DocumentFinder.find(em.Path.Text)){
+                    ret.push(new vscode.CodeLens(em.Method.Range, {
+                        title: "📃 Api Document",
+                        command: "mysql.elastic.document",
+                        arguments: [em]
+                    }))
+                }
                 if (em.HasBody) {
                     var command = {
                         title: "⚡Auto indent",
-                        command: "elastic.lint",
+                        command: "mysql.elastic.lint",
                         arguments: [em]
                     }
                     ret.push(new vscode.CodeLens(em.Method.Range, command))

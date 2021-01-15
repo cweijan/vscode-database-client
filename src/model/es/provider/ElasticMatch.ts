@@ -1,9 +1,10 @@
+import { parse } from 'comment-json';
 import * as vscode from 'vscode';
-import * as stripJsonComments from 'strip-json-comments';
 
 export class ElasticItem {
     public Range: vscode.Range
     public Text: string
+    public obj?: any
 }
 
 export class ElasticMatch {
@@ -33,7 +34,7 @@ export class ElasticMatch {
         let txt = ""
         let line = this.Method.Range.start.line + 1
         let ln = line
-        
+
         while (editor.document.lineCount > ln) {
             var t = editor.document.lineAt(ln).text
 
@@ -43,9 +44,9 @@ export class ElasticMatch {
             txt += t + "\n"
             lm = editor.document.lineAt(ln).text.length
             ln++;
-            var o = txt.split("{").length 
-            var c = txt.split("}").length 
-            if (o == c) break            
+            var o = txt.split("{").length
+            var c = txt.split("}").length
+            if (o == c) break
         }
 
         txt = txt.substring(0, txt.length - 1)
@@ -54,12 +55,10 @@ export class ElasticMatch {
         let ep = new vscode.Position(ln - 1, lm)
         this.Body.Range = new vscode.Range(sp, ep)
 
-        let jsonText = txt
-
         this.Body.Text = txt
 
         try {
-            JSON.parse(stripJsonComments(jsonText))
+            this.Body.obj = parse(txt)
             this.HasBody = true
             this.Range = new vscode.Range(this.Method.Range.start, this.Body.Range.end)
         } catch (error) {

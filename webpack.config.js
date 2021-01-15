@@ -32,7 +32,7 @@ module.exports = [
             }
         },
         plugins: [
-            new webpack.IgnorePlugin(/^pg-native$/)
+            new webpack.IgnorePlugin(/^(pg-native|supports-color)$/)
         ],
         module: { rules: [{ test: /\.ts$/, exclude: /node_modules/, use: ['ts-loader'] }] },
         optimization: { minimize: false },
