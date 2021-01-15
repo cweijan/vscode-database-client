@@ -41,7 +41,7 @@ export class EsConnectionNode extends EsBaseNode {
     
     async getChildren(): Promise<Node[]> {
 
-        return axios.get(`http://${this.host}:${this.port}/_cat/indices`).then(res => {
+        return axios.get(`${this.scheme}://${this.host}:${this.port}/_cat/indices`).then(res => {
             let indexes = [];
             const results = res.data.match(/[^\r\n]+/g);
             for (const result of results) {

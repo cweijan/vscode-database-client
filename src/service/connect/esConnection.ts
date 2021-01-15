@@ -7,7 +7,7 @@ export class EsConnection implements IConnection {
     private url: string;
     private conneted: boolean;
     constructor(opt: Node) {
-        this.url = `http://${opt.host}:${opt.port}`
+        this.url = `${opt.scheme}://${opt.host}:${opt.port}`
     }
 
     query(sql: string, callback?: queryCallback): void;

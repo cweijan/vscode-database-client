@@ -35,7 +35,7 @@ export class ESIndexNode extends EsBaseNode {
 
     async getChildren(): Promise<Node[]> {
 
-        return axios.get(`http://${this.host}:${this.port}/${this.label}/_mapping`).then(res => {
+        return axios.get(`${this.scheme}://${this.host}:${this.port}/${this.label}/_mapping`).then(res => {
             const mappings = res.data[this.label]?.mappings
             if (mappings) {
                 const properties = mappings[Object.keys(mappings)[0]]?.properties
@@ -66,7 +66,7 @@ export class ESIndexNode extends EsBaseNode {
     public async countSql() {
 
         const start = new Date().getTime();
-        return axios.get(`http://${this.host}:${this.port}/${this.label}/_count`).then(({ data }) => {
+        return axios.get(`${this.scheme}://${this.host}:${this.port}/${this.label}/_count`).then(({ data }) => {
             QueryPage.send({ connection: this, type: MessageType.DATA, res: { sql: "", costTime: new Date().getTime() - start, data: [{ count: data.count }], fields: [{ name: 'count' }], pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
         })
 

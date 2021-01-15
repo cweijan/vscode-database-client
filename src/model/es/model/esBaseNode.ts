@@ -15,7 +15,7 @@ export interface RestRequest {
 }
 export class EsBaseNode extends Node {
 
-
+    
 
     async loadData(request?: RestRequest, sendResult: boolean = true) {
 
@@ -43,7 +43,7 @@ export class EsBaseNode extends Node {
         QueryPage.send({ connection: this, type: MessageType.RUN, res: { sql: '' } as RunResponse });
         const response = await axios({
             method: type as Method,
-            url: `http://${this.host}:${this.port}${path}`,
+            url: `${this.scheme}://${this.host}:${this.port}${path}`,
             responseType: 'json',
             data: content
         }).then(({ data }) => {

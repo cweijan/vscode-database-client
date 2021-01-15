@@ -23,6 +23,14 @@
       </el-select>
     </section>
 
+    <template v-if="connectionOption.dbType=='ElasticSearch'">
+      <section class="mb-2">
+        <label class="block font-bold" for="connection-scheme">Scheme</label>
+        <el-radio v-model="connectionOption.scheme" label="http">Http</el-radio>
+        <el-radio v-model="connectionOption.scheme" label="https">Https</el-radio>
+      </section>
+    </template>
+
     <section class="mb-2">
       <label class="block font-bold" for="connection-host">Host</label>
       <input class="w-full field__input" id="connection-host" placeholder="The host of connection" required v-model="connectionOption.host" />
@@ -33,7 +41,7 @@
       <input class="w-full field__input" id="connection-port" placeholder="The port of connection" required type="number" v-model="connectionOption.port" />
     </section>
 
-    <template  v-if="connectionOption.dbType!='ElasticSearch'">
+    <template v-if="connectionOption.dbType!='ElasticSearch'">
 
       <section class="mb-2">
         <label class="block font-bold" for="connection-user">Username</label>
@@ -144,6 +152,7 @@ export default {
         usingSSH: false,
         dbType: "MySQL",
         global: true,
+        scheme:'http',
         timezone: "+00:00",
         ssh: {
           host: "",
