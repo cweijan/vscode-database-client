@@ -1,6 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
 import * as stripJsonComments from 'strip-json-comments';
 
 export class ElasticItem {
@@ -15,7 +13,6 @@ export class ElasticMatch {
     Path: ElasticItem
     Body: ElasticItem
     Method: ElasticItem
-    File: ElasticItem
     Range: vscode.Range
     HasBody: boolean = false
     Selected: boolean = false
@@ -58,20 +55,6 @@ export class ElasticMatch {
         this.Body.Range = new vscode.Range(sp, ep)
 
         let jsonText = txt
-
-        if (txt.startsWith("!")) {
-            this.File = new ElasticItem()
-            this.File.Range = new vscode.Range(line, 1, line, editor.document.lineAt(line).text.trim().length)
-            var fPath = txt.substring(1).trim()
-            if (!path.isAbsolute(fPath)) {
-                fPath = path.join(path.dirname(editor.document.uri.fsPath), fPath)
-            }
-
-            if (fs.existsSync(fPath)) {
-                jsonText = fs.readFileSync(fPath).toString()
-                this.File.Text = fPath
-            }
-        }
 
         this.Body.Text = txt
 

@@ -22,6 +22,7 @@ export class IndexNode extends Node {
         this.init(parent)
         const [health, status, index, uuid, pri, rep, docsCount, docsDeleted, storeSize, priStoreSize] = info.split(/\s+/)
         this.label = index
+        this.description = storeSize
         this.command = {
             command: "mysql.show.esIndex",
             title: "Show ES Index Data",

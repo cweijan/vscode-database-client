@@ -1,8 +1,5 @@
 import * as vscode from 'vscode';
-import { ElasticMatch } from './ElasticMatch'
-import { Range } from 'vscode';
-import { ElasticMatches } from './ElasticMatches'
-
+import { ElasticMatches } from './ElasticMatches';
 
 export class ElasticDecoration {
     pHighlight: vscode.TextEditorDecorationType;
@@ -15,8 +12,6 @@ export class ElasticDecoration {
 
     public constructor(context: vscode.ExtensionContext) {
         this.context = context
-        const host: string = this.context.workspaceState.get("elastic.host", null);
-
 
         this.pHighlight = vscode.window.createTextEditorDecorationType({          
             light: {
@@ -39,13 +34,13 @@ export class ElasticDecoration {
             dark: {
                 gutterIconSize: 'contain',
                 backgroundColor: 'rgba(50, 50, 50, 0.3)',
-                gutterIconPath: this.context.asAbsolutePath("./media/gutter-dis-dark.svg"),//vscode.Uri.parse('data:image/svg+xml;base64,PHN2ZyB4b+'),
+                gutterIconPath: vscode.Uri.parse('data:image/svg+xml;base64,PHN2ZyB4b+'),
             }
         });
 
         this.bHighlightSelected = vscode.window.createTextEditorDecorationType({
             isWholeLine: true,
-            gutterIconPath: this.context.asAbsolutePath("./media/gutter.svg"),//vscode.Uri.parse('data:image/svg+xml;base64,PHN2ZyB4b+'),
+            gutterIconPath: vscode.Uri.parse('data:image/svg+xml;base64,PHN2ZyB4b+'),
             gutterIconSize: 'contain',
             light: {
                 backgroundColor: 'rgba(200, 200, 200, 0.2)'
@@ -87,7 +82,6 @@ export class ElasticDecoration {
 
     public UpdateDecoration(esMatches: ElasticMatches) {
 
-        var host = this.context.workspaceState.get("elastic.host", "http://localhost:9200")
         var editor = esMatches.Editor
         var matches = esMatches.Matches
 

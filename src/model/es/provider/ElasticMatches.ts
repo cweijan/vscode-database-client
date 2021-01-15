@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
 import { ElasticMatch } from './ElasticMatch';
 
-
-
 export class ElasticMatches {
     Editor: vscode.TextEditor
     Matches: ElasticMatch[]

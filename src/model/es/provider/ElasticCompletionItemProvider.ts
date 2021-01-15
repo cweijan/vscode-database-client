@@ -1,15 +1,12 @@
+import * as os from 'os';
+import * as request from 'request';
+import * as vscode from 'vscode';
 import { ElasticMatch } from './ElasticMatch';
 import { ElasticMatches } from './ElasticMatches';
-'use script';
-
-import * as vscode from 'vscode';
-import * as request from 'request';
-import { Range, ParameterInformation, commands, Selection } from 'vscode';
 import url = require('url');
 import routington = require('routington');
 import closestSemver = require('semver-closest');
 
-import * as os from 'os';
 
 export class ElasticCompletionItemProvider implements vscode.CompletionItemProvider, vscode.HoverProvider  {
 
