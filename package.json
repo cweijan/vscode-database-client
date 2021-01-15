@@ -557,7 +557,7 @@
 				},
 				{
 					"command": "mysql.query.switch",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|database|esConnection)$/",
+					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|database|esConnection|esIndex)$/",
 					"group": "inline@1"
 				},
 				{

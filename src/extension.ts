@@ -163,7 +163,7 @@ export function activate(context: vscode.ExtensionContext) {
                     if (typeof sql != 'string') { sql = null; }
                     QueryUnit.runQuery(sql);
                 },
-                "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode | EsConnectionNode) => {
+                "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode | EsConnectionNode|ESIndexNode) => {
                     if (databaseOrConnectionNode) {
                         await databaseOrConnectionNode.newQuery();
                     } else {

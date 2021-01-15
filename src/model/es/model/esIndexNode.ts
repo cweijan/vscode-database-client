@@ -1,13 +1,17 @@
 import { ConfigKey, Constants, MessageType, ModelType } from "@/common/constants";
+import { FileManager } from "@/common/filesManager";
 import { Global } from "@/common/global";
 import { QueryPage } from "@/view/result/query";
 import { DataResponse } from "@/view/result/queryResponse";
 import axios from "axios";
+import { writeFileSync } from "fs";
 import * as path from "path";
+import { Range } from "vscode";
 import { Node } from "../../interface/node";
 import { InfoNode } from "../../other/infoNode";
 import { EsBaseNode } from "./esBaseNode";
 import { EsColumnNode } from "./esColumnNode";
+import { EsTemplate } from "./esTemplate";
 
 
 export class ESIndexNode extends EsBaseNode {
@@ -50,6 +54,15 @@ export class ESIndexNode extends EsBaseNode {
 
     }
 
+    public newQuery() {
+        FileManager.show(`${this.getConnectId()}#${this.label}.es`).then(editor => {
+            if (editor.document.getText().length == 0) {
+                editor.edit(editBuilder => {
+                    editBuilder.replace(new Range(0, 0, 0, 0), EsTemplate.query.replace(/myIndex/g,this.label))
+                });
+            }
+        })
+    }
     public async countSql() {
 
         const start = new Date().getTime();

@@ -7,6 +7,8 @@ import { InfoNode } from "../../other/infoNode";
 import axios from "axios";
 import { FileManager } from "@/common/filesManager";
 import { EsBaseNode } from "./esBaseNode";
+import { Range } from "vscode";
+import { EsTemplate } from "./esTemplate";
 
 /**
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
@@ -28,7 +30,13 @@ export class EsConnectionNode extends EsBaseNode {
 
 
     newQuery(){
-        FileManager.show(`${this.uid}.es`)
+        FileManager.show(`${this.uid}.es`).then(editor => {
+            if (editor.document.getText().length == 0) {
+                editor.edit(editBuilder => {
+                    editBuilder.replace(new Range(0, 0, 0, 0), EsTemplate.query)
+                });
+            }
+        })
     }
     
     async getChildren(): Promise<Node[]> {
