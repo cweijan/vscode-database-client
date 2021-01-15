@@ -44,14 +44,12 @@ export class ConnectionManager {
     public static removeConnection(uid: string) {
 
         const lcp = this.lastConnectionNode;
-        if (lcp && lcp.getConnectId() == uid) {
+        if (lcp?.getConnectId() == uid) {
             delete this.lastConnectionNode
         }
         const activeConnect = this.activeConnection[uid];
         if (activeConnect) {
-            this.activeConnection[uid] = null
-            this.tunnelService.closeTunnel(uid)
-            activeConnect.connection.end()
+            this.end(uid,activeConnect)
         }
         DatabaseCache.clearDatabaseCache(uid)
 
