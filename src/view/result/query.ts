@@ -1,4 +1,4 @@
-import { IndexNode } from "@/model/es/model/indexNode";
+import { ESIndexNode } from "@/model/es/model/esIndexNode";
 import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
 import { env, StatusBarAlignment, StatusBarItem, Uri, window } from "vscode";
@@ -61,8 +61,8 @@ export class QueryPage {
                     QueryUnit.runQuery(params.sql, dbOption);
                 }).on(OperateType.next, async (params) => {
                     if (dbOption.dbType == DatabaseType.ES) {
-                        queryParam.res.request.from = (params.pageNum - 1) * params.pageSize;
-                        (dbOption as IndexNode).loadData(queryParam.res.request)
+                        queryParam.res.request.content.from = (params.pageNum - 1) * params.pageSize;
+                        (dbOption as ESIndexNode).loadData(queryParam.res.request)
                         return;
                     }
                     const sql = ServiceManager.getPageService(dbOption.dbType).build(params.sql, params.pageNum, params.pageSize)
@@ -87,7 +87,7 @@ export class QueryPage {
                             [column]: value
                         }
                     };
-                    (dbOption as IndexNode).loadData(queryParam.res.request)
+                    (dbOption as ESIndexNode).loadData(queryParam.res.request)
                 })
             }
         });
@@ -143,7 +143,7 @@ export class QueryPage {
         const extName = extname(window.activeTextEditor.document.fileName)?.toLowerCase()
         const fileName = basename(window.activeTextEditor.document.fileName)?.toLowerCase()
 
-        return extName == '.sql' || fileName == 'mock.json';
+        return extName == '.sql' || fileName == 'mock.json' || extName == '.es';
     }
 
     private static async loadColumnList(queryParam: QueryParam<DataResponse>) {

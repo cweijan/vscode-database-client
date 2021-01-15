@@ -6,7 +6,7 @@ import { ExportContext, ExportType } from "./exportContext";
 import { ProgressLocation } from "vscode";
 import { ConnectionManager } from "../connectionManager";
 import { DatabaseType } from "@/common/constants";
-import { IndexNode } from "@/model/es/model/indexNode";
+import { ESIndexNode } from "@/model/es/model/esIndexNode";
 
 export class ExportService {
 
@@ -43,7 +43,7 @@ export class ExportService {
     private async exportData(context: ExportContext) {
 
         if (context.dbOption.dbType == DatabaseType.ES) {
-            (context.dbOption as IndexNode).loadData(context.request, false).then(({ rows, fields }) => {
+            (context.dbOption as ESIndexNode).loadData(context.request, false).then(({ rows, fields }) => {
                 this.delegateExport(context, rows, fields)
             })
             return;

@@ -10,7 +10,7 @@ import { Global } from "../common/global";
 import { NodeUtil } from "@/model/nodeUtil";
 import { InfoNode } from "@/model/other/infoNode";
 import { EsConnection } from "@/service/connect/esConnection";
-import { EsNode } from "@/model/es/model/esNode";
+import { EsConnectionNode } from "@/model/es/model/esConnectionNode";
 
 export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
@@ -105,7 +105,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         const connections = { ...globalConnections, ...workspaceConnections };
 
         return Object.keys(connections).map(key => {
-            const connection = connections[key].dbType == DatabaseType.ES ? new EsNode(key, connections[key]) : new ConnectionNode(key, connections[key]);
+            const connection = connections[key].dbType == DatabaseType.ES ? new EsConnectionNode(key, connections[key]) : new ConnectionNode(key, connections[key]);
             if (typeof connections[key].global == "undefined") {
                 // Compatible with older versions, will remove in the feature
                 connections[key].global = true;

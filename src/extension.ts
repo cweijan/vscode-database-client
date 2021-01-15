@@ -30,8 +30,8 @@ import { QueryGroup } from "./model/query/queryGroup";
 import { Node } from "./model/interface/node";
 import { DbTreeDataProvider } from "./provider/treeDataProvider";
 import { UserNode } from "./model/database/userNode";
-import { EsNode } from "./model/es/model/esNode";
-import { IndexNode } from "./model/es/model/indexNode";
+import { EsConnectionNode } from "./model/es/model/esConnectionNode";
+import { ESIndexNode } from "./model/es/model/esIndexNode";
 import { activeEs } from "./model/es/provider/main";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -163,7 +163,7 @@ export function activate(context: vscode.ExtensionContext) {
                     if (typeof sql != 'string') { sql = null; }
                     QueryUnit.runQuery(sql);
                 },
-                "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode | EsNode) => {
+                "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode | EsConnectionNode) => {
                     if (databaseOrConnectionNode) {
                         await databaseOrConnectionNode.newQuery();
                     } else {
@@ -185,7 +185,7 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // table node
             ...{
-                "mysql.show.esIndex": (indexNode: IndexNode) => {
+                "mysql.show.esIndex": (indexNode: ESIndexNode) => {
                     indexNode.loadData()
                 },
                 "mysql.table.truncate": (tableNode: TableNode) => {

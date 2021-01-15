@@ -14,7 +14,7 @@ export interface SwitchOpt {
     withDb?: boolean;
 }
 
-export abstract class Node extends vscode.TreeItem implements CopyAble{
+export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public uid: string;
 
@@ -64,7 +64,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble{
 
     private static nodeCache = {};
     public cacheSelf() {
-        if (this.contextValue == ModelType.CONNECTION) {
+        if (this.contextValue == ModelType.CONNECTION || this.contextValue == ModelType.ES_CONNECTION) {
             Node.nodeCache[`${this.getConnectId()}`] = this;
         } else {
             Node.nodeCache[`${this.getConnectId()}_${this.database}`] = this;
