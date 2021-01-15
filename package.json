@@ -56,7 +56,7 @@
 			{
 				"language": "es",
 				"scopeName": "source.es",
-				"path": "./syntaxes/es.tmLanguage"
+				"path": "./syntaxes/es.tmLanguage.json"
 			}
 		],
 		"viewsContainers": {
