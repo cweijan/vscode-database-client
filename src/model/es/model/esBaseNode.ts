@@ -1,4 +1,5 @@
 import { ConfigKey, MessageType, ModelType } from "@/common/constants";
+import { FileManager, FileModel } from "@/common/filesManager";
 import { Global } from "@/common/global";
 import { Node } from "@/model/interface/node";
 import { resolveType } from "@/service/dump/mysql/resolveType";
@@ -6,7 +7,7 @@ import { QueryPage } from "@/view/result/query";
 import { EsDataResponse, RunResponse } from "@/view/result/queryResponse";
 import axios, { Method } from "axios";
 import { pathToFileURL } from "url";
-import { window } from "vscode";
+import { ViewColumn, window, workspace } from "vscode";
 
 export interface RestRequest {
     content: any;
@@ -15,20 +16,9 @@ export interface RestRequest {
 }
 export class EsBaseNode extends Node {
 
-    
+
 
     async loadData(request?: RestRequest, sendResult: boolean = true) {
-
-        // "bool": { 
-        //     "must": [
-        //       { "match": { "title":   "Search"        }},
-        //       { "match": { "content": "Elasticsearch" }}
-        //     ],
-        //     "filter": [ 
-        //       { "term":  { "status": "published" }},
-        //       { "range": { "publish_date": { "gte": "2015-01-01" }}}
-        //     ]
-        //   }
 
         const pageSize = Global.getConfig(ConfigKey.DEFAULT_LIMIT);
         const type = request?.type || 'get';
@@ -40,13 +30,22 @@ export class EsBaseNode extends Node {
         }
 
         const start = new Date().getTime();
-        QueryPage.send({ connection: this, type: MessageType.RUN, res: { sql: '' } as RunResponse });
+        if (path.indexOf("_search") != -1) {
+            QueryPage.send({ connection: this, type: MessageType.RUN, res: { sql: '' } as RunResponse });
+        }
         const response = await axios({
             method: type as Method,
             url: `${this.scheme}://${this.host}:${this.port}${path}`,
             responseType: 'json',
             data: content
-        }).then(({ data }) => {
+        }).then(async ({ data }) => {
+            if (!data?.hits?.hits) {
+                window.showTextDocument(
+                    await workspace.openTextDocument(await FileManager.record(`${this.getConnectId()}#result.json`, JSON.stringify(data, null, 2), FileModel.WRITE)),
+                    ViewColumn.Two, true
+                )
+                return;
+            }
             let fields = [];
             let rows = data.hits.hits.map((hit: any) => {
                 if (fields.length == 0) {
@@ -66,11 +65,14 @@ export class EsBaseNode extends Node {
             })
             return { rows, fields, total: data.hits.total }
         }).catch(err => {
-            window.showErrorMessage(err)
+            const reason = err.response.data.error.reason;
+            if(reason){
+                window.showErrorMessage(reason)
+            }
             throw err
         })
 
-        if (!sendResult) {
+        if (path.indexOf("_search") == -1 || !sendResult) {
             return response;
         }
 
