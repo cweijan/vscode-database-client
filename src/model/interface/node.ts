@@ -57,6 +57,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.certPath = source.certPath
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
+        this.scheme=source.scheme
         this.global = source.global
         this.dbType = source.dbType
         if (!this.dialect) {

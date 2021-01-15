@@ -9,7 +9,7 @@ export class ElasticItem {
 
 export class ElasticMatch {
 
-    static RegexMatch: RegExp = /^(GET|POST|DELETE|PUT)\s+([A-Za-z0-9\-\._~:\/#\[\]@!$&'"%\(\)\*+,;=`?]+)\s*$/gim;
+    static RegexMatch: RegExp = /^(GET|POST|DELETE|PUT|HEADER)\s+([A-Za-z0-9\-\._~:\/#\[\]@!$&'"%\(\)\*+,;=`?]+)\s*$/gim;
     Error: ElasticItem
     Path: ElasticItem
     Body: ElasticItem

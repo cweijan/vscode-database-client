@@ -17,7 +17,6 @@ export async function activeEs(context: vscode.ExtensionContext) {
             node.loadData({
                 type: em.Method.Text,content:em.Body.obj,path:em.Path.Text
             })
-            // 操作em对象 em.Body.Text
         }),
         vscode.commands.registerCommand('mysql.elastic.lint', (em: ElasticMatch) => {
             if (em && em.HasBody) {
