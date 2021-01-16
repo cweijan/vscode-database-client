@@ -6,8 +6,10 @@ import { resolveType } from "@/service/dump/mysql/resolveType";
 import { QueryPage } from "@/view/result/query";
 import { EsDataResponse, RunResponse } from "@/view/result/queryResponse";
 import axios, { Method } from "axios";
+import { FieldInfo } from "mysql2";
 import { pathToFileURL } from "url";
 import { ViewColumn, window, workspace } from "vscode";
+import { indexOf } from "xe-utils/methods";
 import { ESIndexNode } from "./esIndexNode";
 
 export interface RestRequest {
@@ -53,13 +55,13 @@ export class EsBaseNode extends Node {
 
             const indexName = path.split('/')[1]
             const indexNode = Node.nodeCache[`${this.getConnectId()}_${indexName}`] as Node;
-            let fields = (await indexNode?.getChildren())?.map(node => { return { name: node.label } })
+            let fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' } }) as any
 
             let rows = data.hits.hits.map((hit: any) => {
                 if (!fields) {
                     fields = [];
                     for (const key in hit._source) {
-                        fields.push({ name: key })
+                        fields.push({ name: key, type: 'text', nullable: 'YES' })
                     }
                 }
                 let row = { _index: hit._index, _type: hit._type, _id: hit._id, _score: hit._score }
@@ -71,10 +73,13 @@ export class EsBaseNode extends Node {
                 }
                 return row
             })
-            fields.unshift({ name: "_index" }, { name: "_type" }, { name: "_id" }, { name: "_score" })
-            return { rows, fields, total: data.hits.total }
+            fields.unshift(
+                { name: "_index", type: 'text', nullable: 'YES' }, { name: "_type", type: 'text', nullable: 'YES' },
+                { name: "_id", type: 'text', nullable: 'YES' }, { name: "_score", type: 'text', nullable: 'YES' }
+            )
+            return { rows, fields, total: data.hits.total, indexName }
         }).catch(err => {
-            const reason = err.response.data.error.reason;
+            const reason = err.response.data?.error?.reason || err.response?.data?.error;
             if (reason) {
                 window.showErrorMessage(reason)
             }
@@ -85,10 +90,11 @@ export class EsBaseNode extends Node {
             return response;
         }
 
-        const { rows, fields, total } = response;
+        const { rows, fields, total, indexName } = response;
         QueryPage.send({
             connection: this, type: request?.content?.from > 0 ? MessageType.NEXT_PAGE : MessageType.DATA, res: {
-                sql: "", costTime: new Date().getTime() - start,
+                sql: "", costTime: new Date().getTime() - start,primaryKey:"_id",
+                table: indexName, database: "ElasticSearch", tableCount: 1, columnList: fields,
                 data: rows, fields, pageSize: request?.content?.size ? pageSize : ES_DEFAULT_SIZE, total, request: { type, path, content }
             } as EsDataResponse
         });

@@ -20,15 +20,15 @@ export class ElasticMatches {
 
         for (var i = 0; i < editor.document.lineCount; i++) {
             var line = editor.document.lineAt(i)
-            var trimedLine = line.text.trim()
-            if (trimedLine.length == 0)
+            var text = line.text.trim()
+            if (text.length == 0)
                 continue
 
-            if (matched && trimedLine.startsWith('{'))
+            if (matched && text.startsWith('{'))
                 this.Matches[this.Matches.length - 1].HasBody = true
 
             matched = false
-            var match = ElasticMatch.RegexMatch.exec(line.text);
+            var match = ElasticMatch.RegexMatch.exec(text);
 
             if (match != null) {
                 matched = true

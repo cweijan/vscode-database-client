@@ -21,7 +21,7 @@ export interface IConnection {
 /**
  * fieldInfo, need name/orgTable
  */
-export type queryCallback = (err: Error | null, results?: any, fields?: FieldInfo[]) => void;
+export type queryCallback = (err: Error | null, results?: any, fields?: FieldInfo[],total?:number) => void;
 
 export interface QueryFunction {
 

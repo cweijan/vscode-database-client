@@ -21,6 +21,7 @@ export class DataResponse {
     public fields: mysql.FieldInfo[];
     public pageSize: number;
     public tableCount: number;
+    public total?: number;
 }
 
 export class ErrorResponse {
@@ -41,6 +42,5 @@ export class DMLResponse {
  */
 
 export class EsDataResponse extends DataResponse{
-    public total?: number;
     public request?: any;
 }

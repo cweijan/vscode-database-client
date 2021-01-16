@@ -1,17 +1,20 @@
 export const util = {
     methods: {
         wrapQuote(type, value) {
-            console.log(type)
-            type = type.toLowerCase()
             if (value === "") {
                 return "null"
             }
+            // method call 
             if (/\(.*?\)/.exec(value)) {
                 return value
             }
             if (typeof value == "string") {
                 value = value.replace(/'/g, "\\'")
             }
+            if(!type){
+                return value;
+            }
+            type = type.toLowerCase()
             switch (type) {
                 // sql server
                 case "nvarchar":

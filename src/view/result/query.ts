@@ -97,7 +97,11 @@ export class QueryPage {
     private static async adaptData(queryParam: QueryParam<any>) {
         switch (queryParam.type) {
             case MessageType.DATA:
-                await this.loadColumnList(queryParam);
+                if (queryParam.connection.dbType == DatabaseType.ES) {
+                    await this.loadEsColumnList(queryParam);
+                } else {
+                    await this.loadColumnList(queryParam);
+                }
                 break;
             case MessageType.DML:
             case MessageType.DDL:
@@ -144,6 +148,18 @@ export class QueryPage {
         const fileName = basename(window.activeTextEditor.document.fileName)?.toLowerCase()
 
         return extName == '.sql' || fileName == 'mock.json' || extName == '.es';
+    }
+
+    private static async loadEsColumnList(queryParam: QueryParam<DataResponse>) {
+        queryParam.res.primaryKey = '_id'
+        queryParam.res.tableCount = 1
+        const indexName = queryParam.res.sql.split(' ')[1].split('/')[1];
+        queryParam.res.table = indexName
+
+        const indexNode = Node.nodeCache[`${queryParam.connection.getConnectId()}_${indexName}`] as Node;
+        let fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' }; }) as any;
+        queryParam.res.columnList = fields
+        queryParam.res.fields = [{ name: "_index" }, { name: "_type" }, { name: "_id" }, { name: "_score" }, ...fields] as any[]
     }
 
     private static async loadColumnList(queryParam: QueryParam<DataResponse>) {

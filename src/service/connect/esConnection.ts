@@ -6,15 +6,55 @@ export class EsConnection implements IConnection {
 
     private url: string;
     private conneted: boolean;
-    constructor(opt: Node) {
+    constructor(private opt: Node) {
         this.url = `${opt.scheme}://${opt.host}:${opt.port}`
     }
 
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
     query(sql: any, values?: any, callback?: any) {
-        throw new Error("Method not implemented.");
+        if (!callback && values instanceof Function) {
+            callback = values;
+        }
+        const splitIndex = sql.indexOf('\n')
+        let [type, path] = (splitIndex == -1 ? sql : sql.substring(0, splitIndex)).split(' ')
+        if (path?.charAt(0)!="/") {
+            path = "/" + path
+        }
+        const body = splitIndex == -1 ? null : sql.substring(splitIndex + 1)+"\n"
+
+        axios({
+            method: type,
+            url: `${this.url}${path}`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            responseType: 'json',
+            data: body
+        }).then(async ({ data }) => {
+            if (data.items || data?.result == 'created' || data?.result == 'updated' || data?.result == 'deleted') {
+                callback(null, { affectedRows: data.items?data.items.length:1 })
+            } else if (data?.hits?.hits) {
+                this.handleSearch(path, data, callback);
+            }
+        }).catch(err => {
+            console.log(err)
+        })
     }
+    private async handleSearch(path: any, data: any, callback: any) {
+        let rows = data.hits.hits.map((hit: any) => {
+            let row = { _index: hit._index, _type: hit._type, _id: hit._id, _score: hit._score };
+            for (const key in hit._source) {
+                row[key] = hit._source[key];
+                if (row[key] instanceof Object) {
+                    row[key] = JSON.stringify(row[key]);
+                }
+            }
+            return row;
+        });
+        callback(null, rows, null, data.hits.total.value || data.hits.total);
+    }
+
     connect(callback: (err: Error) => void): void {
         axios.get(`${this.url}/_cluster/health`).then(res => {
             this.conneted = true;
@@ -25,13 +65,10 @@ export class EsConnection implements IConnection {
 
     }
     beginTransaction(callback: (err: Error) => void): void {
-        throw new Error("Method not implemented.");
     }
     rollback(): void {
-        throw new Error("Method not implemented.");
     }
     commit(): void {
-        throw new Error("Method not implemented.");
     }
     end(): void {
     }

@@ -78,11 +78,15 @@ export default {
       if (!this.columnList) return
       for (const column of this.columnList) {
         if (column.name === key) {
-          return column.simpleType
+          return column.simpleType || column.type
         }
       }
     },
     confirmInsert() {
+      if (this.dbType == "ElasticSearch") {
+        this.confirmInsertEs()
+        return
+      }
       let columns = ""
       let values = ""
       for (const key in this.editModel) {
@@ -98,18 +102,22 @@ export default {
         this.loading = true
         this.$emit("execute", insertSql)
       } else {
-        this.$message("Not any input, update fail!")
+        this.$message("Not any input, insert fail!")
       }
     },
     confirmUpdate(row, oldRow) {
       if (oldRow) {
         this.originModel = oldRow
       }
+      const currentNew = row ? row : this.editModel
+      if (this.dbType == "ElasticSearch") {
+        this.confirmUpdateEs(currentNew)
+        return
+      }
       if (!this.primaryKey) {
         this.$message.error("This table has not primary key, update fail!")
         return
       }
-      const currentNew = row ? row : this.editModel
       const primary = this.originModel[this.primaryKey]
       let change = ""
       for (const key in currentNew) {
@@ -129,6 +137,19 @@ export default {
       } else {
         this.$message("Not any change, update fail!")
       }
+    },
+    confirmInsertEs() {
+      this.$emit("execute", `POST /${this.table}/_doc\n` + JSON.stringify(this.editModel))
+    },
+    confirmUpdateEs(row) {
+      let value = {}
+      for (const key in row) {
+        if (key == "_XID" || key == "_index" || key == "_type" || key == "_score" || key == "_id") {
+          continue
+        }
+        value[key] = row[key]
+      }
+      this.$emit("execute", `POST /${this.table}/_doc/${row._id}\n` + JSON.stringify(value))
     },
   },
   computed: {

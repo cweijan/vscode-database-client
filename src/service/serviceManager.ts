@@ -32,6 +32,7 @@ import { PostgreSqlDialect } from "./dialect/postgreSqlDialect";
 import { SqlDialect } from "./dialect/sqlDialect";
 import { PostgresqlImortService } from "./import/postgresqlImortService";
 import { SqlServerImportService } from "./import/sqlServerImportService";
+import { EsDialect } from "./dialect/esDialect";
 
 export class ServiceManager {
 
@@ -93,7 +94,7 @@ export class ServiceManager {
         this.statusService = new MysqlStatusService()
     }
 
-    public static getImportService(dbType:DatabaseType){
+    public static getImportService(dbType: DatabaseType) {
         switch (dbType) {
             case DatabaseType.MSSQL:
                 return new SqlServerImportService()
@@ -109,6 +110,8 @@ export class ServiceManager {
                 return new MssqlDIalect()
             case DatabaseType.PG:
                 return new PostgreSqlDialect();
+            case DatabaseType.ES:
+                return new EsDialect();
         }
         return new MysqlDialect()
     }

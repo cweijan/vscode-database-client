@@ -1,6 +1,7 @@
 import { ConfigKey, Constants, MessageType, ModelType } from "@/common/constants";
 import { FileManager } from "@/common/filesManager";
 import { Global } from "@/common/global";
+import { QueryUnit } from "@/service/queryUnit";
 import { QueryPage } from "@/view/result/query";
 import { DataResponse } from "@/view/result/queryResponse";
 import axios from "axios";
@@ -71,6 +72,16 @@ export class ESIndexNode extends EsBaseNode {
             QueryPage.send({ connection: this, type: MessageType.DATA, res: { sql: "", costTime: new Date().getTime() - start, data: [{ count: data.count }], fields: [{ name: 'count' }], pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
         })
 
+    }
+
+
+    viewData() {
+        QueryUnit.runQuery(`GET /${this.label}/_search
+{
+    "from": 0,
+    "size": ${Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT)},
+    "query": { "match_all": {} }   
+}`,this)
     }
 
 }

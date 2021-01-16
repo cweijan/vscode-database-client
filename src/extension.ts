@@ -186,7 +186,7 @@ export function activate(context: vscode.ExtensionContext) {
             // table node
             ...{
                 "mysql.show.esIndex": (indexNode: ESIndexNode) => {
-                    indexNode.loadData()
+                    indexNode.viewData()
                 },
                 "mysql.table.truncate": (tableNode: TableNode) => {
                     tableNode.truncateTable();

@@ -73,7 +73,7 @@ export class QueryUnit {
 
         const executeTime = new Date().getTime();
         try {
-            (await ConnectionManager.getConnection(connectionNode, true)).query(sql, (err: Error, data, fields) => {
+            (await ConnectionManager.getConnection(connectionNode, true)).query(sql, (err: Error, data, fields,total) => {
                 if (err) {
                     QueryPage.send({ connection: connectionNode, type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
                     return;
@@ -97,7 +97,7 @@ export class QueryUnit {
                         QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
                         return;
                     }
-                    QueryPage.send({ connection: connectionNode, type: MessageType.DATA, res: { sql, costTime, data, fields, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+                    QueryPage.send({ connection: connectionNode, type: MessageType.DATA, res: { sql, costTime, data, fields,total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
                 } else {
                     // unknow result, send sql success
                     QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });

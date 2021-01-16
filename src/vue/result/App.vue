@@ -144,12 +144,11 @@ export default {
       } else {
         this.reset()
       }
-      if (this.result.tableCount == 1) {
-        this.count()
-      }
       // only es have.
       if (data.total) {
         this.page.total = parseInt(data.total)
+      } else if (this.result.tableCount == 1) {
+        this.count()
       }
     }
     const handlerCommon = (res) => {
@@ -163,6 +162,7 @@ export default {
     window.addEventListener("message", ({ data }) => {
       if (!data) return
       const response = data.content
+      console.log(response)
       this.table.loading = false
       switch (data.type) {
         case "EXPORT_DONE":
@@ -282,7 +282,7 @@ export default {
       if (!this.result.columnList) return
       for (const column of this.result.columnList) {
         if (column.name === key) {
-          return column.simpleType
+          return column.simpleType || column.type
         }
       }
     },
@@ -305,10 +305,18 @@ export default {
             .map((checkboxRecord) =>
               this.wrapQuote(this.getTypeByColumn(this.result.primaryKey), checkboxRecord[this.result.primaryKey])
             )
-          const deleteSql =
-            checkboxRecords.length > 1
-              ? `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey} in (${checkboxRecords.join(",")})`
-              : `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}=${checkboxRecords[0]}`
+          let deleteSql = null
+          if (this.result.dbType == "ElasticSearch") {
+            deleteSql =
+              checkboxRecords.length > 1
+                ? `POST /_bulk\n${checkboxRecords.map(c=>`{ "delete" : { "_index" : "${this.result.table}", "_id" : "${c}" } }`).join("\n")}`
+                : `DELETE /${this.result.table}/_doc/${checkboxRecords[0]}`
+          } else {
+            deleteSql =
+              checkboxRecords.length > 1
+                ? `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey} in (${checkboxRecords.join(",")})`
+                : `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}=${checkboxRecords[0]}`
+          }
           this.execute(deleteSql)
         })
         .catch((e) => {
