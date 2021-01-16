@@ -1,6 +1,11 @@
 # CHANGELOG
 
+# 3.1.0 2020/1/17
+
+- Support connect to elasticsearch.
+
 # 3.0.0 2020/1/13
+
 - Support connect to postgresql and sqlserver.
 - Reduce resource consumption.
 - Fix cannot edit json column data.
