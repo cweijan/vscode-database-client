@@ -55,7 +55,7 @@ export class ConnectionManager {
 
     }
 
-    public static getConnection(connectionNode: Node, changeActive: boolean = false): Promise<IConnection> {
+    public static getConnection(connectionNode: Node, changeActive: boolean = false,connectCount:number=1): Promise<IConnection> {
         if (!connectionNode) {
             this.checkConnection()
             throw new Error("No MySQL Server or Database selected!")
@@ -105,7 +105,15 @@ export class ConnectionManager {
             newConnection.connect(async (err: Error) => {
                 if (err) {
                     this.end(key,this.activeConnection[key])
-                    resolve(await this.getConnection(connectionNode,changeActive))
+                    if(connectCount>=2){
+                        reject(err)
+                    }else{
+                        try {
+                            resolve(await this.getConnection(connectionNode,changeActive,connectCount+1))
+                        } catch (error) {
+                            reject(error)
+                        }
+                    }
                 } else {
                     if (changeActive) {
                         this.lastConnectionNode = NodeUtil.of(connectionNode);

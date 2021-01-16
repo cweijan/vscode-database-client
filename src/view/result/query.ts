@@ -154,17 +154,14 @@ export class QueryPage {
         const indexName = queryParam.res.sql.split(' ')[1].split('/')[1];
         queryParam.res.table = indexName
         // count, continue
-        if(queryParam.res.fields){
+        if(queryParam.res.fields.length==1){
             queryParam.res.columnList = queryParam.res.fields as any[]
             return;
         }
         queryParam.res.primaryKey = '_id'
         queryParam.res.tableCount = 1
 
-        const indexNode = Node.nodeCache[`${queryParam.connection.getConnectId()}_${indexName}`] as Node;
-        let fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' }; }) as any;
-        queryParam.res.columnList = fields
-        queryParam.res.fields = [{ name: "_index" }, { name: "_type" }, { name: "_id" }, { name: "_score" }, ...fields] as any[]
+        queryParam.res.columnList = queryParam.res.fields.slice(4) as any[]
     }
 
     private static async loadColumnList(queryParam: QueryParam<DataResponse>) {

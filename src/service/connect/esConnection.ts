@@ -45,7 +45,17 @@ export class EsConnection implements IConnection {
         })
     }
     private async handleSearch(path: any, data: any, callback: any) {
+        const indexName = path.split('/')[1];
+        const indexNode = Node.nodeCache[`${this.opt.getConnectId()}_${indexName}`] as Node;
+        let fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' }; }) as any;
+
         let rows = data.hits.hits.map((hit: any) => {
+            if (!fields) {
+                fields = [];
+                for (const key in hit._source) {
+                    fields.push({ name: key, type: 'text', nullable: 'YES' });
+                }
+            }
             let row = { _index: hit._index, _type: hit._type, _id: hit._id, _score: hit._score };
             for (const key in hit._source) {
                 row[key] = hit._source[key];
@@ -55,7 +65,8 @@ export class EsConnection implements IConnection {
             }
             return row;
         });
-        callback(null, rows, null, data.hits.total.value || data.hits.total);
+        fields.unshift( { name: "_index" }, { name: "_type" }, { name: "_id" }, { name: "_score" } );
+        callback(null, rows, fields, data.hits.total.value || data.hits.total);
     }
 
     connect(callback: (err: Error) => void): void {

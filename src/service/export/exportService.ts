@@ -42,13 +42,6 @@ export class ExportService {
 
     private async exportData(context: ExportContext) {
 
-        if (context.dbOption.dbType == DatabaseType.ES) {
-            (context.dbOption as ESIndexNode).loadData(context.request, false).then(({ rows, fields }) => {
-                this.delegateExport(context, rows, fields)
-            })
-            return;
-        }
-
         const sql = context.sql
         const connection = await ConnectionManager.getConnection(context.dbOption)
         connection.query(sql, (err, rows, fields?: FieldInfo[]) => {
