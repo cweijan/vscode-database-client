@@ -22,9 +22,9 @@ export class ESIndexNode extends EsBaseNode {
     constructor(readonly info: string, readonly parent: Node) {
         super(null)
         this.init(parent)
-        this.cacheSelf()
         const [health, status, index, uuid, pri, rep, docsCount, docsDeleted, storeSize, priStoreSize] = info.split(/\s+/)
         this.label = index
+        this.cacheSelf()
         this.description = storeSize
         this.command = {
             command: "mysql.show.esIndex",

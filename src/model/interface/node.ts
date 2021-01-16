@@ -68,7 +68,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.collapsibleState = DatabaseCache.getElementState(this)
     }
 
-    private static nodeCache = {};
+    public static nodeCache = {};
     public cacheSelf() {
         if (this.contextValue == ModelType.CONNECTION || this.contextValue == ModelType.ES_CONNECTION) {
             Node.nodeCache[`${this.getConnectId()}`] = this;

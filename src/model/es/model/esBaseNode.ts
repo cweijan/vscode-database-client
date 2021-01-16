@@ -8,6 +8,7 @@ import { EsDataResponse, RunResponse } from "@/view/result/queryResponse";
 import axios, { Method } from "axios";
 import { pathToFileURL } from "url";
 import { ViewColumn, window, workspace } from "vscode";
+import { ESIndexNode } from "./esIndexNode";
 
 export interface RestRequest {
     content: any;
@@ -16,6 +17,7 @@ export interface RestRequest {
 }
 export class EsBaseNode extends Node {
 
+    private static indexCache = {};
 
 
     async loadData(request?: RestRequest, sendResult: boolean = true) {
@@ -48,10 +50,14 @@ export class EsBaseNode extends Node {
                 )
                 return;
             }
-            let fields = [];
+
+            const indexName = path.split('/')[1]
+            const indexNode = Node.nodeCache[`${this.getConnectId()}_${indexName}`] as Node;
+            let fields = (await indexNode?.getChildren())?.map(node => { return { name: node.label } })
+
             let rows = data.hits.hits.map((hit: any) => {
-                if (fields.length == 0) {
-                    fields.push({ name: "_index" }, { name: "_type" }, { name: "_id" }, { name: "_score" })
+                if (!fields) {
+                    fields = [];
                     for (const key in hit._source) {
                         fields.push({ name: key })
                     }
@@ -65,6 +71,7 @@ export class EsBaseNode extends Node {
                 }
                 return row
             })
+            fields.unshift({ name: "_index" }, { name: "_type" }, { name: "_id" }, { name: "_score" })
             return { rows, fields, total: data.hits.total }
         }).catch(err => {
             const reason = err.response.data.error.reason;
@@ -86,6 +93,21 @@ export class EsBaseNode extends Node {
             } as EsDataResponse
         });
 
+    }
+
+    public cacheSelf() {
+        if (this.contextValue == ModelType.CONNECTION || this.contextValue == ModelType.ES_CONNECTION) {
+            Node.nodeCache[`${this.getConnectId()}`] = this;
+        } else {
+            Node.nodeCache[`${this.getConnectId()}_${this.label}`] = this;
+        }
+    }
+    public getCache() {
+        if (this.contextValue == ModelType.CONNECTION) {
+            return Node.nodeCache[`${this.getConnectId()}`]
+
+        }
+        return Node.nodeCache[`${this.getConnectId()}_${this.label}`]
     }
 
 }
