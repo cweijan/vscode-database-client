@@ -1,11 +1,5 @@
 export class EsTemplate {
-    public static query = `// All query
-GET /myIndex/_search
-{
-  "query": { "match_all": {} }
-}
-
-// Match query
+    public static query = `// Match query
 GET /myIndex/_search
 {
   "query": {
@@ -29,23 +23,5 @@ GET /myIndex/_search
       "user.id": "kimchy"
     }
   }
-}
-
-// Create document
-PUT /myIndex/_doc/1
-{
-  "name": "John Doe"
-}
-
-// Update document
-POST /myIndex/_doc/1
-{
-  "name": "John Doe"
-}
-
-// Get document 
-GET /myIndex/_doc/1
-
-// Delete Document
-DELETE /myIndex/_doc/1`;
+}`;
 }
