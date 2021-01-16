@@ -151,10 +151,15 @@ export class QueryPage {
     }
 
     private static async loadEsColumnList(queryParam: QueryParam<DataResponse>) {
-        queryParam.res.primaryKey = '_id'
-        queryParam.res.tableCount = 1
         const indexName = queryParam.res.sql.split(' ')[1].split('/')[1];
         queryParam.res.table = indexName
+        // count, continue
+        if(queryParam.res.fields){
+            queryParam.res.columnList = queryParam.res.fields as any[]
+            return;
+        }
+        queryParam.res.primaryKey = '_id'
+        queryParam.res.tableCount = 1
 
         const indexNode = Node.nodeCache[`${queryParam.connection.getConnectId()}_${indexName}`] as Node;
         let fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' }; }) as any;

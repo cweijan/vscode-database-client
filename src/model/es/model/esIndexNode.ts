@@ -67,10 +67,7 @@ export class ESIndexNode extends EsBaseNode {
     }
     public async countSql() {
 
-        const start = new Date().getTime();
-        return axios.get(`${this.scheme}://${this.host}:${this.port}/${this.label}/_count`).then(({ data }) => {
-            QueryPage.send({ connection: this, type: MessageType.DATA, res: { sql: "", costTime: new Date().getTime() - start, data: [{ count: data.count }], fields: [{ name: 'count' }], pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
-        })
+        QueryUnit.runQuery(`get /${this.label}/_count`,this)
 
     }
 

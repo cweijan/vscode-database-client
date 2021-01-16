@@ -18,10 +18,10 @@ export class EsConnection implements IConnection {
         }
         const splitIndex = sql.indexOf('\n')
         let [type, path] = (splitIndex == -1 ? sql : sql.substring(0, splitIndex)).split(' ')
-        if (path?.charAt(0)!="/") {
+        if (path?.charAt(0) != "/") {
             path = "/" + path
         }
-        const body = splitIndex == -1 ? null : sql.substring(splitIndex + 1)+"\n"
+        const body = splitIndex == -1 ? null : sql.substring(splitIndex + 1) + "\n"
 
         axios({
             method: type,
@@ -32,8 +32,11 @@ export class EsConnection implements IConnection {
             responseType: 'json',
             data: body
         }).then(async ({ data }) => {
-            if (data.items || data?.result == 'created' || data?.result == 'updated' || data?.result == 'deleted') {
-                callback(null, { affectedRows: data.items?data.items.length:1 })
+
+            if (data.count) {
+                callback(null, [{ count: data.count }], [{ name: 'count',nullable: 'YES' }])
+            } else if (data.items || data?.result == 'created' || data?.result == 'updated' || data?.result == 'deleted') {
+                callback(null, { affectedRows: data.items ? data.items.length : 1 })
             } else if (data?.hits?.hits) {
                 this.handleSearch(path, data, callback);
             }
