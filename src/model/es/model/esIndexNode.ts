@@ -38,7 +38,8 @@ export class ESIndexNode extends EsBaseNode {
         return axios.get(`${this.scheme}://${this.host}:${this.port}/${this.label}/_mapping`).then(res => {
             const mappings = res.data[this.label]?.mappings
             if (mappings) {
-                const properties = mappings[Object.keys(mappings)[0]]?.properties
+                // since es7, mappings don't have type.
+                const properties = mappings.properties ||mappings[Object.keys(mappings)[0]]?.properties
                 this.properties = properties;
                 return Object.keys(properties).map(name => {
                     const property = properties[name];
