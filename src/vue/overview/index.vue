@@ -19,7 +19,7 @@
           <span>{{prettyBytes(Number(scope.row.index_length))}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="table_collation" label="table_collation"></el-table-column>
+      <el-table-column align="center" prop="table_collation" label="table_collation"  width="200"></el-table-column>
       <el-table-column align="center" prop="row_format" label="row_format"></el-table-column>
     </el-table>
   </div>
