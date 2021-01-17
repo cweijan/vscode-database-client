@@ -65,7 +65,7 @@ export class EsConnection implements IConnection {
             }
             return row;
         });
-        fields.unshift( { name: "_index" }, { name: "_type" }, { name: "_id" }, { name: "_score" } );
+        fields.unshift( { name: "_id" }, { name: "_score" } );
         callback(null, rows, fields, data.hits.total.value || data.hits.total);
     }
 
