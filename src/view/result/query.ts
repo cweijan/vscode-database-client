@@ -65,13 +65,11 @@ export class QueryPage {
                     dbOption.execute(sql).then((rows) => {
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
                     })
-                }).on('esLoad', ({ column, value }) => {
-                    queryParam.res.request.query = {
-                        term: {
-                            [column]: value
-                        }
-                    };
-                    (dbOption as ESIndexNode).loadData(queryParam.res.request)
+                }).on('esFilter', (query) => {
+                    const req = EsRequest.parse(queryParam.res.sql)
+                    const obj = req.bodyObject()
+                    obj.query = query;
+                    QueryUnit.runQuery(req.toQuery(obj), dbOption);
                 }).on('count', async (params) => {
                     dbOption.execute(params.sql).then((rows) => {
                         handler.emit('COUNT', { data: rows[0].count })

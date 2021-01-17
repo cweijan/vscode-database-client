@@ -8,8 +8,7 @@ export class EsPageService extends AbstractPageSerivce {
         const body = req.bodyObject();
         body.from = start;
         body.size = limit;
-        req.setBody(body);
-        return req.toQuery()
+        return req.toQuery(body)
     }
 
 }

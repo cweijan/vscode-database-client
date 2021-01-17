@@ -3,16 +3,12 @@ export class EsRequest {
 
     constructor(public type: string, public path: string, public body: string) { }
 
-    public toQuery():string{
-        return `${this.type} ${this.path}\n${this.body}`
+    public toQuery(bodyObj: EsQuery): string {
+        return `${this.type} ${this.path}\n${JSON.stringify(bodyObj)}`
     }
 
-    public bodyObject(): any {
+    public bodyObject(): EsQuery {
         return JSON.parse(this.body)
-    }
-
-    public setBody(bodyObj: any) {
-        this.body = JSON.stringify(bodyObj)
     }
 
     public static parse(request: string): EsRequest {
@@ -27,4 +23,12 @@ export class EsRequest {
         return new EsRequest(type, path, body)
     }
 
+}
+
+export interface EsQuery {
+    from?: number;
+    size?: number;
+    query?:any;
+    stored_fields?:any;
+    highlight?:any;
 }

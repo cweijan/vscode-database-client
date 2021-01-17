@@ -230,7 +230,7 @@ export default {
     filter(event, column) {
       let inputvalue = "" + (event ? event.target.value : "")
       if (this.result.dbType == "ElasticSearch") {
-        vscodeEvent.emit("esLoad", { column, value: inputvalue })
+        vscodeEvent.emit("esFilter", { term: { [column]: inputvalue } })
         return
       }
 
@@ -309,7 +309,9 @@ export default {
           if (this.result.dbType == "ElasticSearch") {
             deleteSql =
               checkboxRecords.length > 1
-                ? `POST /_bulk\n${checkboxRecords.map(c=>`{ "delete" : { "_index" : "${this.result.table}", "_id" : "${c}" } }`).join("\n")}`
+                ? `POST /_bulk\n${checkboxRecords
+                    .map((c) => `{ "delete" : { "_index" : "${this.result.table}", "_id" : "${c}" } }`)
+                    .join("\n")}`
                 : `DELETE /${this.result.table}/_doc/${checkboxRecords[0]}`
           } else {
             deleteSql =
