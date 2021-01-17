@@ -7,8 +7,8 @@ Vue.use(ElementUI, { locale });
 import UmyUi from 'umy-ui'
 import 'umy-ui/lib/theme-chalk/index.css';
 import '@/../public/theme/auto.css'
+import '@/../public/theme/umyui.css'
 import './view.css'
-import './umyui.css'
 Vue.use(UmyUi);
 
 Vue.config.productionTip = false

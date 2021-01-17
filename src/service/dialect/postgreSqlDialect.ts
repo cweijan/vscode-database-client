@@ -1,6 +1,15 @@
 import { SqlDialect } from "./sqlDialect";
 
 export class PostgreSqlDialect extends SqlDialect{
+    variableList(): string {
+        return 'SHOW ALL'
+    }
+    statusList(): string {
+        throw new Error("Method not implemented.");
+    }
+    processList(): string {
+        return 'SELECT * from pg_stat_activity'
+    }
     addColumn(table: string): string {
         return `ALTER TABLE
         ${table} 

@@ -48,7 +48,7 @@ export class PostgreSqlConnection implements IConnection {
         })
     }
     adaptResult(res: QueryArrayResult<any>) {
-        if (res.command != 'SELECT') {
+        if (res.command != 'SELECT' && res.command != 'SHOW') {
             return { affectedRows: res.rowCount }
         }
         return res.rows;

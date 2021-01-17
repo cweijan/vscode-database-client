@@ -1,8 +1,5 @@
-import { FieldInfo } from "mysql2";
-import { Console } from "../../common/Console";
 import { ConnectionNode } from "../../model/database/connectionNode";
-import { ConnectionManager } from "../../service/connectionManager";
-import { AbstractStatusService, DashBoardItem, DashBoardResponse, ProcessListResponse } from "./abstractStatusService";
+import { AbstractStatusService, DashBoardItem, DashBoardResponse } from "./abstractStatusService";
 import format = require('date-format');
 
 interface QueryResponse {
@@ -22,23 +19,6 @@ export class MysqlStatusService extends AbstractStatusService {
             response[res.Variable_name] = value
         }
         return response;
-    }
-
-    protected async onProcessList(connectionNode: ConnectionNode): Promise<ProcessListResponse> {
-        const connection = await ConnectionManager.getConnection(connectionNode)
-        return new Promise((resovle, rej) => {
-            connection.query('show processlist', (err, rows, fields: FieldInfo[]) => {
-                if (err) {
-                    Console.log(err);
-                    rej(err)
-                } else {
-                    resovle({
-                        fields: fields.map((field) => field.name),
-                        list: rows
-                    })
-                }
-            })
-        })
     }
 
     protected async onDashBoard(connectionNode: ConnectionNode): Promise<DashBoardResponse> {

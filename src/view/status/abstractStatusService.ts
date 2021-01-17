@@ -2,10 +2,14 @@ import { StatusService } from "./statusService";
 import { ConnectionNode } from "../../model/database/connectionNode";
 import { ViewManager } from "../viewManager";
 import { Global } from "../../common/global";
+import { ConnectionManager } from "@/service/connectionManager";
+import { Console } from "@/common/Console";
+import { FieldInfo } from "mysql2";
+import Query = require("mysql2/typings/mysql/lib/protocol/sequences/Query");
+import { QueryUnit } from "@/service/queryUnit";
 
 export abstract class AbstractStatusService implements StatusService {
 
-    protected abstract onProcessList(connectionNode: ConnectionNode): ProcessListResponse | Promise<ProcessListResponse>;
     protected abstract onDashBoard(connectionNode: ConnectionNode): DashBoardResponse | Promise<DashBoardResponse>;
 
     public show(connectionNode: ConnectionNode): void | Promise<void> {
@@ -14,12 +18,20 @@ export abstract class AbstractStatusService implements StatusService {
             splitView: false, title: "Server Status",
             iconPath: Global.getExtPath("resources", "icon", "state.svg"),
             eventHandler: (handler) => {
-                handler.on("init",()=>{
+                handler.on("init", () => {
                     handler.emit('route', 'status')
-                })
-                .on("processList", async () => {
-                    const processList = await this.onProcessList(connectionNode)
-                    handler.emit("processList", { ...processList })
+                }).on("processList", async () => {
+                    QueryUnit.queryPromise<any>(await ConnectionManager.getConnection(connectionNode), connectionNode.dialect.processList()).then(({ rows, fields }) => {
+                        handler.emit("processList", { fields, rows })
+                    })
+                }).on("variableList", async () => {
+                    QueryUnit.queryPromise<any>(await ConnectionManager.getConnection(connectionNode), connectionNode.dialect.variableList()).then(({ rows, fields }) => {
+                        handler.emit("variableList", { fields, rows })
+                    })
+                }).on("statusList", async () => {
+                    QueryUnit.queryPromise<any>(await ConnectionManager.getConnection(connectionNode), connectionNode.dialect.statusList()).then(({ rows, fields }) => {
+                        handler.emit("statusList", { fields, rows })
+                    })
                 }).on("dashBoard", async () => {
                     const dashBoard = await this.onDashBoard(connectionNode)
                     handler.emit("dashBoard", { ...dashBoard })
@@ -28,11 +40,6 @@ export abstract class AbstractStatusService implements StatusService {
         })
     }
 
-}
-
-export interface ProcessListResponse {
-    fields: string[]
-    list: any[]
 }
 
 export interface DashBoardItem {

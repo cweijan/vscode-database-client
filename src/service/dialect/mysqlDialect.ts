@@ -1,6 +1,15 @@
 import { SqlDialect } from "./sqlDialect";
 
 export class MysqlDialect extends SqlDialect{
+    variableList(): string {
+        return 'show global VARIABLES'
+    }
+    statusList(): string {
+        return 'show global status'
+    }
+    processList(): string {
+        return 'show processlist'
+    }
     addColumn( table: string): string {
         return `ALTER TABLE
         ${table} 

@@ -2,6 +2,15 @@ import { window } from "vscode";
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect extends SqlDialect {
+    variableList(): string {
+        throw new Error("Method not implemented.");
+    }
+    statusList(): string {
+        throw new Error("Method not implemented.");
+    }
+    processList(): string {
+        return 'SELECT * from pg_stat_activity'
+    }
     addColumn(table: string): string {
         return `ALTER TABLE
         ${table} 

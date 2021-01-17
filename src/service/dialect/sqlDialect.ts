@@ -32,6 +32,9 @@ export abstract class SqlDialect {
     abstract procedureTemplate(): string;
     abstract triggerTemplate(): string;
     abstract functionTemplate(): string;
+    abstract processList():string;
+    abstract variableList():string;
+    abstract statusList():string;
     pingDataBase(database: string): string{
         return null;
     }

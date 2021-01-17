@@ -13,12 +13,13 @@ import { ServiceManager } from "./serviceManager";
 import { NodeUtil } from "~/model/nodeUtil";
 import { Trans } from "~/common/trans";
 import { IConnection } from "./connect/connection";
+import { FieldInfo } from "mysql2";
 
 export class QueryUnit {
 
-    public static queryPromise<T>(connection: IConnection, sql: string, showError = true): Promise<T> {
+    public static queryPromise<T>(connection: IConnection, sql: string, showError = true): Promise<QueryResult<T>> {
         return new Promise((resolve, reject) => {
-            connection.query(sql, (err: Error, rows) => {
+            connection.query(sql, (err: Error, rows, fields, total) => {
                 if (err) {
                     if (showError) {
                         Console.log(`Execute sql fail : ${sql}`);
@@ -26,7 +27,7 @@ export class QueryUnit {
                     }
                     reject(err);
                 } else {
-                    resolve(rows);
+                    resolve(({  rows, fields, total }));
                 }
             });
         });
@@ -73,7 +74,7 @@ export class QueryUnit {
 
         const executeTime = new Date().getTime();
         try {
-            (await ConnectionManager.getConnection(connectionNode, true)).query(sql, (err: Error, data, fields,total) => {
+            (await ConnectionManager.getConnection(connectionNode, true)).query(sql, (err: Error, data, fields, total) => {
                 if (err) {
                     QueryPage.send({ connection: connectionNode, type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
                     return;
@@ -97,7 +98,7 @@ export class QueryUnit {
                         QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
                         return;
                     }
-                    QueryPage.send({ connection: connectionNode, type: MessageType.DATA, res: { sql, costTime, data, fields,total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+                    QueryPage.send({ connection: connectionNode, type: MessageType.DATA, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
                 } else {
                     // unknow result, send sql success
                     QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
@@ -192,3 +193,10 @@ export class QueryUnit {
 
 }
 
+
+
+export class QueryResult<T>{
+    public rows: T;
+    public fields: FieldInfo[];
+    public total?: number;
+}

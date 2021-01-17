@@ -1,6 +1,15 @@
 import { SqlDialect } from "./sqlDialect";
 
 export class EsDialect extends SqlDialect{
+    variableList(): string {
+        throw new Error("Method not implemented.");
+    }
+    statusList(): string {
+        throw new Error("Method not implemented.");
+    }
+    processList(): string {
+        throw new Error("Method not implemented.");
+    }
     updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
         return "";
     }
