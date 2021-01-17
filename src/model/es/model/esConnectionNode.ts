@@ -6,6 +6,7 @@ import { Constants, ModelType } from "../../../common/constants";
 import { ConnectionManager } from "../../../service/connectionManager";
 import { Node } from "../../interface/node";
 import { EsBaseNode } from "./esBaseNode";
+import { EsDiscoverGroup } from "./esDiscoverGroup";
 import { EsIndexGroup } from "./esIndexGroupNode";
 import { EsTemplate } from "./esTemplate";
 
@@ -54,7 +55,7 @@ export class EsConnectionNode extends EsBaseNode {
 
     async getChildren(): Promise<Node[]> {
 
-        return [new EsIndexGroup(this)]
+        return [new EsIndexGroup(this),new EsDiscoverGroup(this)]
 
     }
 

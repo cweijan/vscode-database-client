@@ -1,5 +1,6 @@
 import { Node } from "@/model/interface/node";
 import { TableGroup } from "@/model/main/tableGroup";
+import { QueryUnit } from "@/service/queryUnit";
 import { ESIndexNode } from "./esIndexNode";
 
 export class EsIndexGroup extends TableGroup {
@@ -17,6 +18,12 @@ export class EsIndexGroup extends TableGroup {
             }
             return indexes;
         })
+    }
+
+    public async createTemplate() {
+
+        QueryUnit.showSQLTextDocument(this, this.dialect.tableTemplate(), 'create-index-template.es')
+
     }
 
 }
