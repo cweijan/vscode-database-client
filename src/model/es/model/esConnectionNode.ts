@@ -1,15 +1,13 @@
+import { FileManager } from "@/common/filesManager";
+import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import * as path from "path";
+import { Range } from "vscode";
 import { Constants, ModelType } from "../../../common/constants";
 import { ConnectionManager } from "../../../service/connectionManager";
 import { Node } from "../../interface/node";
-import { ESIndexNode } from "./esIndexNode";
-import { InfoNode } from "../../other/infoNode";
-import axios from "axios";
-import { FileManager } from "@/common/filesManager";
 import { EsBaseNode } from "./esBaseNode";
-import { Range } from "vscode";
+import { EsIndexGroup } from "./esIndexGroupNode";
 import { EsTemplate } from "./esTemplate";
-import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 
 /**
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
@@ -32,8 +30,8 @@ export class EsConnectionNode extends EsBaseNode {
         if (EsConnectionNode.versionMap[this.uid]) {
             this.description = EsConnectionNode.versionMap[this.uid]
         } else {
-            axios.get(`${this.scheme}://${this.host}:${this.port}`).then(res => {
-                this.description=`version: ${res.data.version.number}`
+            this.execute<any>('get /').then(res => {
+                this.description=`version: ${res.version.number}`
                 EsConnectionNode.versionMap[this.uid]=this.description
                 DbTreeDataProvider.refresh(this)
             }).catch(err=>{
@@ -56,16 +54,7 @@ export class EsConnectionNode extends EsBaseNode {
 
     async getChildren(): Promise<Node[]> {
 
-        return axios.get(`${this.scheme}://${this.host}:${this.port}/_cat/indices`).then(res => {
-            let indexes = [];
-            const results = res.data.match(/[^\r\n]+/g);
-            for (const result of results) {
-                indexes.push(new ESIndexNode(result, this))
-            }
-            return indexes;
-        }).catch(err => {
-            return [new InfoNode(err)]
-        })
+        return [new EsIndexGroup(this)]
 
     }
 

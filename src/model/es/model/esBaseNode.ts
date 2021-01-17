@@ -2,15 +2,10 @@ import { ConfigKey, MessageType, ModelType } from "@/common/constants";
 import { FileManager, FileModel } from "@/common/filesManager";
 import { Global } from "@/common/global";
 import { Node } from "@/model/interface/node";
-import { resolveType } from "@/service/dump/mysql/resolveType";
 import { QueryPage } from "@/view/result/query";
 import { EsDataResponse, RunResponse } from "@/view/result/queryResponse";
 import axios, { Method } from "axios";
-import { FieldInfo } from "mysql2";
-import { pathToFileURL } from "url";
 import { ViewColumn, window, workspace } from "vscode";
-import { indexOf } from "xe-utils/methods";
-import { ESIndexNode } from "./esIndexNode";
 
 export interface RestRequest {
     content: any;

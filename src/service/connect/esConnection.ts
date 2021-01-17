@@ -39,6 +39,8 @@ export class EsConnection implements IConnection {
                 callback(null, { affectedRows: data.items ? data.items.length : 1 })
             } else if (data?.hits?.hits) {
                 this.handleSearch(path, data, callback);
+            }else{
+                callback(null,data)
             }
         }).catch(err => {
             console.log(err)

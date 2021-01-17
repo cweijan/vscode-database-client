@@ -1,15 +1,10 @@
-import { ConfigKey, Constants, MessageType, ModelType } from "@/common/constants";
+import { ConfigKey, Constants, ModelType } from "@/common/constants";
 import { FileManager } from "@/common/filesManager";
 import { Global } from "@/common/global";
 import { QueryUnit } from "@/service/queryUnit";
-import { QueryPage } from "@/view/result/query";
-import { DataResponse } from "@/view/result/queryResponse";
-import axios from "axios";
-import { writeFileSync } from "fs";
 import * as path from "path";
 import { Range } from "vscode";
 import { Node } from "../../interface/node";
-import { InfoNode } from "../../other/infoNode";
 import { EsBaseNode } from "./esBaseNode";
 import { EsColumnNode } from "./esColumnNode";
 import { EsTemplate } from "./esTemplate";
@@ -36,8 +31,8 @@ export class ESIndexNode extends EsBaseNode {
 
     async getChildren(): Promise<Node[]> {
 
-        return axios.get(`${this.scheme}://${this.host}:${this.port}/${this.label}/_mapping`).then(res => {
-            const mappings = res.data[this.label]?.mappings
+        return this.execute(`get /${this.label}/_mapping`).then(data => {
+            const mappings = data[this.label]?.mappings
             if (mappings) {
                 // since es7, mappings don't have type.
                 const properties = mappings.properties ||mappings[Object.keys(mappings)[0]]?.properties
@@ -50,8 +45,6 @@ export class ESIndexNode extends EsBaseNode {
             }
 
             return []
-        }).catch(err => {
-            return [new InfoNode(err)]
         })
 
     }
