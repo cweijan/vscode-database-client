@@ -360,9 +360,6 @@ export default {
       this.table.loading = true
     },
     changePage(pageNum, jump) {
-      if (this.result.sql && !this.result.sql.match(/^\s*select/i)) {
-        return
-      }
       vscodeEvent.emit("next", {
         sql: this.result.sql,
         pageNum: jump ? pageNum : this.page.pageNum + pageNum,

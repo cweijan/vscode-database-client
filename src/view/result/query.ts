@@ -1,3 +1,4 @@
+import { EsRequest } from "@/model/es/esRequest";
 import { ESIndexNode } from "@/model/es/model/esIndexNode";
 import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
@@ -60,15 +61,17 @@ export class QueryPage {
                     }
                     QueryUnit.runQuery(params.sql, dbOption);
                 }).on(OperateType.next, async (params) => {
-                    if (dbOption.dbType == DatabaseType.ES) {
-                        queryParam.res.request.content.from = (params.pageNum - 1) * params.pageSize;
-                        (dbOption as ESIndexNode).loadData(queryParam.res.request)
-                        return;
-                    }
                     const sql = ServiceManager.getPageService(dbOption.dbType).build(params.sql, params.pageNum, params.pageSize)
                     dbOption.execute(sql).then((rows) => {
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
                     })
+                }).on('esLoad', ({ column, value }) => {
+                    queryParam.res.request.query = {
+                        term: {
+                            [column]: value
+                        }
+                    };
+                    (dbOption as ESIndexNode).loadData(queryParam.res.request)
                 }).on('count', async (params) => {
                     dbOption.execute(params.sql).then((rows) => {
                         handler.emit('COUNT', { data: rows[0].count })
@@ -81,13 +84,6 @@ export class QueryPage {
                     Global.updateConfig(ConfigKey.DEFAULT_LIMIT, pageSize)
                 }).on('openCoffee', () => {
                     env.openExternal(Uri.parse('https://www.buymeacoffee.com/cweijan'));
-                }).on('esLoad', ({ column, value }) => {
-                    queryParam.res.request.query = {
-                        term: {
-                            [column]: value
-                        }
-                    };
-                    (dbOption as ESIndexNode).loadData(queryParam.res.request)
                 })
             }
         });
@@ -154,7 +150,7 @@ export class QueryPage {
         const indexName = queryParam.res.sql.split(' ')[1].split('/')[1];
         queryParam.res.table = indexName
         // count, continue
-        if(queryParam.res.fields.length==1){
+        if (queryParam.res.fields.length == 1) {
             queryParam.res.columnList = queryParam.res.fields as any[]
             return;
         }

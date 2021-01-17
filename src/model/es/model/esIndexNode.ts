@@ -67,11 +67,7 @@ export class ESIndexNode extends EsBaseNode {
 
     viewData() {
         QueryUnit.runQuery(`GET /${this.label}/_search
-{
-    "from": 0,
-    "size": ${Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT)},
-    "query": { "match_all": {} }   
-}`,this)
+{ "from": 0, "size": ${Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT)}, "query": { "match_all": {} } }`,this)
     }
 
 }

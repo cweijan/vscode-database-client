@@ -33,6 +33,7 @@ import { SqlDialect } from "./dialect/sqlDialect";
 import { PostgresqlImortService } from "./import/postgresqlImortService";
 import { SqlServerImportService } from "./import/sqlServerImportService";
 import { EsDialect } from "./dialect/esDialect";
+import { EsPageService } from "./page/esPageService";
 
 export class ServiceManager {
 
@@ -123,6 +124,8 @@ export class ServiceManager {
                 return new MssqlPageService();
             case DatabaseType.PG:
                 return new PostgreSqlPageService();
+            case DatabaseType.ES:
+                return new EsPageService();
         }
 
         return new MysqlPageSerivce();
