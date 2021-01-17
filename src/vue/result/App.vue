@@ -178,6 +178,7 @@ export default {
         case "NEXT_PAGE":
           this.result.data = response.data
           this.toolbar.sql = response.sql
+          this.result.data.unshift({ isFilter: true, content: "" })
           break
         case "COUNT":
           this.page.total = parseInt(response.data)
