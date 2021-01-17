@@ -66,15 +66,15 @@ export class QueryPage {
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
                     })
                 }).on('esFilter', (query) => {
-                    const req = EsRequest.parse(queryParam.res.sql)
-                    const obj = req.bodyObject()
-                    obj.query = query;
-                    QueryUnit.runQuery(req.toQuery(obj), dbOption);
+                    const esQuery=EsRequest.build(queryParam.res.sql,obj=>{
+                        obj.query = query;
+                    })
+                    QueryUnit.runQuery(esQuery, dbOption);
                 }).on('esSort', (sort) => {
-                    const req = EsRequest.parse(queryParam.res.sql)
-                    const obj = req.bodyObject()
-                    obj.sort = sort;
-                    QueryUnit.runQuery(req.toQuery(obj), dbOption);
+                    const esQuery=EsRequest.build(queryParam.res.sql,obj=>{
+                        obj.sort=sort;
+                    })
+                    QueryUnit.runQuery(esQuery, dbOption);
                 }).on('count', async (params) => {
                     dbOption.execute(params.sql).then((rows) => {
                         handler.emit('COUNT', { data: rows[0].count })

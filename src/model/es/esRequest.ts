@@ -3,12 +3,11 @@ export class EsRequest {
 
     constructor(public type: string, public path: string, public body: string) { }
 
-    public toQuery(bodyObj: EsQuery): string {
-        return `${this.type} ${this.path}\n${JSON.stringify(bodyObj)}`
-    }
-
-    public bodyObject(): EsQuery {
-        return JSON.parse(this.body)
+    public static build(request: string, callback: (body: EsQuery) => void): string {
+        const esReq = this.parse(request)
+        const obj = JSON.parse(esReq.body)
+        callback(obj)
+        return `${esReq.type} ${esReq.path}\n${JSON.stringify(obj)}`
     }
 
     public static parse(request: string): EsRequest {
@@ -28,8 +27,8 @@ export class EsRequest {
 export interface EsQuery {
     from?: number;
     size?: number;
-    query?:any;
-    sort?:any[];
-    stored_fields?:any;
-    highlight?:any;
+    query?: any;
+    sort?: any[];
+    stored_fields?: any;
+    highlight?: any;
 }
