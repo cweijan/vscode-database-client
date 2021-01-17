@@ -34,22 +34,20 @@ export class EsConnection implements IConnection {
         }).then(async ({ data }) => {
 
             if (data.count) {
-                callback(null, [{ count: data.count }], [{ name: 'count',nullable: 'YES' }])
+                callback(null, [{ count: data.count }], [{ name: 'count', nullable: 'YES' }])
             } else if (data.items || data?.result == 'created' || data?.result == 'updated' || data?.result == 'deleted') {
                 callback(null, { affectedRows: data.items ? data.items.length : 1 })
             } else if (data?.hits?.hits) {
                 this.handleSearch(path, data, callback);
-            }else{
-                callback(null,data)
+            } else {
+                callback(null, data)
             }
         }).catch(err => {
             console.log(err)
         })
     }
     private async handleSearch(path: any, data: any, callback: any) {
-        const indexName = path.split('/')[1];
-        const indexNode = Node.nodeCache[`${this.opt.getConnectId()}_${indexName}`] as Node;
-        let fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' }; }) as any;
+        let fields = null;
 
         let rows = data.hits.hits.map((hit: any) => {
             if (!fields) {
@@ -65,9 +63,19 @@ export class EsConnection implements IConnection {
                     row[key] = JSON.stringify(row[key]);
                 }
             }
+            if (hit.highlight) {
+                for (const key in hit.highlight) {
+                    row[key] = hit.highlight[key].map((hv:any) => (hv instanceof Object) ? JSON.stringify(hv) : hv).join(",")
+                }
+            }
             return row;
         });
-        fields.unshift( { name: "_id" }, { name: "_score" } );
+        if (!fields) {
+            const indexName = path.split('/')[1];
+            const indexNode = Node.nodeCache[`${this.opt.getConnectId()}_${indexName}`] as Node;
+            fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' }; }) as any;
+        }
+        fields.unshift({ name: "_id" }, { name: "_score" });
         callback(null, rows, fields, data.hits.total.value || data.hits.total);
     }
 

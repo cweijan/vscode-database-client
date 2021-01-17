@@ -230,7 +230,7 @@ export default {
     filter(event, column) {
       let inputvalue = "" + (event ? event.target.value : "")
       if (this.result.dbType == "ElasticSearch") {
-        vscodeEvent.emit("esFilter", { term: { [column]: inputvalue } })
+        vscodeEvent.emit("esFilter", { match: { [column]: inputvalue } })
         return
       }
 

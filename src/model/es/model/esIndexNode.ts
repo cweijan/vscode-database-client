@@ -35,7 +35,7 @@ export class ESIndexNode extends EsBaseNode {
             const mappings = data[this.label]?.mappings
             if (mappings) {
                 // since es7, mappings don't have type.
-                const properties = mappings.properties ||mappings[Object.keys(mappings)[0]]?.properties
+                const properties = mappings.properties || mappings[Object.keys(mappings)[0]]?.properties
                 this.properties = properties;
                 return Object.keys(properties).map(name => {
                     const property = properties[name];
@@ -50,24 +50,25 @@ export class ESIndexNode extends EsBaseNode {
     }
 
     public newQuery() {
-        FileManager.show(`${this.getConnectId()}#${this.label}.es`).then(editor => {
+        FileManager.show(`${this.getConnectId()}#${this.label}.es`).then(async editor => {
             if (editor.document.getText().length == 0) {
+                const columns = (await this.getChildren()).map(n => `"${n.label}"`).join(",")
                 editor.edit(editBuilder => {
-                    editBuilder.replace(new Range(0, 0, 0, 0), EsTemplate.query.replace(/myIndex/g,this.label))
+                    editBuilder.replace(new Range(0, 0, 0, 0), EsTemplate.query.replace(/myIndex/g, this.label).replace("$fields", columns))
                 });
             }
         })
     }
     public async countSql() {
 
-        QueryUnit.runQuery(`get /${this.label}/_count`,this)
+        QueryUnit.runQuery(`get /${this.label}/_count`, this)
 
     }
 
 
     viewData() {
         QueryUnit.runQuery(`GET /${this.label}/_search
-{ "from": 0, "size": ${Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT)}, "query": { "match_all": {} } }`,this)
+{ "from": 0, "size": ${Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT)}, "query": { "match_all": {} } }`, this)
     }
 
 }

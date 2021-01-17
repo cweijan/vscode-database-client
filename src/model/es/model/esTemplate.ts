@@ -1,27 +1,39 @@
 export class EsTemplate {
-    public static query = `// Match query
-GET /myIndex/_search
+    public static query = `GET /myIndex/_search
 {
   "query": {
     "bool": {
       "must": [
-        { "match": { "title":   "Search"        }},
+        {
+          "match_all": {}
+        }
       ],
-      "filter": [ 
-        { "term":  { "status": "published" }},
-        { "range": { "publish_date": { "gte": "2015-01-01" }}}
-      ]
+      "filter": [],
+      "should": [],
+      "must_not": []
     }
-  }
-}
-
-// Term query
-GET /myIndex/_search
-{
-  "query": {
-    "match": {
-      "user.id": "kimchy"
+  },
+  "_source": {
+    "includes":[$fields]
+  },
+  "sort": [
+    {
+      "_score": {
+        "order": "desc"
+      }
     }
+  ],
+  "highlight": {
+    "pre_tags": [
+      "<span style='color:red;'>"
+    ],
+    "post_tags": [
+      "</span>"
+    ],
+    "fields": {
+      "*": {}
+    },
+    "fragment_size": 2147483647
   }
 }`;
 }

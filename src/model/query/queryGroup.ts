@@ -24,7 +24,7 @@ export class QueryGroup extends Node {
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
         const queries = this.readdir(this.storePath)?.map(fileName => new QueryNode(fileName.replace(/\.[^/.]+$/, ""), this));
         if (!queries || queries.length == 0) {
-            return [new InfoNode("This database has no saved query.")]
+            return [new InfoNode("There is no saved query.")]
         }
         return queries
     }

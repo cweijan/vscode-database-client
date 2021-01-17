@@ -1,4 +1,5 @@
 import { FileManager } from "@/common/filesManager";
+import { QueryGroup } from "@/model/query/queryGroup";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import * as path from "path";
 import { Range } from "vscode";
@@ -6,7 +7,6 @@ import { Constants, ModelType } from "../../../common/constants";
 import { ConnectionManager } from "../../../service/connectionManager";
 import { Node } from "../../interface/node";
 import { EsBaseNode } from "./esBaseNode";
-import { EsDiscoverGroup } from "./esDiscoverGroup";
 import { EsIndexGroup } from "./esIndexGroupNode";
 import { EsTemplate } from "./esTemplate";
 
@@ -55,7 +55,7 @@ export class EsConnectionNode extends EsBaseNode {
 
     async getChildren(): Promise<Node[]> {
 
-        return [new EsIndexGroup(this),new EsDiscoverGroup(this)]
+        return [new EsIndexGroup(this),new QueryGroup(this)]
 
     }
 
