@@ -1,6 +1,9 @@
 export class EsTemplate {
     public static query = `GET /myIndex/_search
 {
+  "_source": {
+    "includes":[$fields]
+  },
   "query": {
     "bool": {
       "must": [
@@ -12,9 +15,6 @@ export class EsTemplate {
       "should": [],
       "must_not": []
     }
-  },
-  "_source": {
-    "includes":[$fields]
   },
   "sort": [
     {
