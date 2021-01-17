@@ -29,6 +29,7 @@ export interface EsQuery {
     from?: number;
     size?: number;
     query?:any;
+    sort?:any[];
     stored_fields?:any;
     highlight?:any;
 }

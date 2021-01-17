@@ -271,6 +271,10 @@ export default {
       this.changePage(0)
     },
     sort(row) {
+      if (this.result.dbType == "ElasticSearch") {
+        vscodeEvent.emit("esSort", [{ [row.prop]: { order: row.order } }])
+        return
+      }
       let sortSql = this.result.sql
         .replace(/\n/, " ")
         .replace(";", "")

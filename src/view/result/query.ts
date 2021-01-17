@@ -70,6 +70,11 @@ export class QueryPage {
                     const obj = req.bodyObject()
                     obj.query = query;
                     QueryUnit.runQuery(req.toQuery(obj), dbOption);
+                }).on('esSort', (sort) => {
+                    const req = EsRequest.parse(queryParam.res.sql)
+                    const obj = req.bodyObject()
+                    obj.sort = sort;
+                    QueryUnit.runQuery(req.toQuery(obj), dbOption);
                 }).on('count', async (params) => {
                     dbOption.execute(params.sql).then((rows) => {
                         handler.emit('COUNT', { data: rows[0].count })
