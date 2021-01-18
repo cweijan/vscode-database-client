@@ -5,10 +5,9 @@ import { Node } from "../../model/interface/node";
 import { NodeUtil } from "../../model/nodeUtil";
 import { Util } from "../../common/util";
 import { Global } from "../../common/global";
+import { ConnectionManager } from "@/service/connectionManager";
 
-export abstract class AbstractConnectService {
-
-    protected abstract connect(connectionNode: Node): Promise<any> | any;
+export class ConnectService {
 
     public async openConnect(provider: DbTreeDataProvider, connectionNode?: ConnectionNode) {
         let node: any;
@@ -19,8 +18,8 @@ export abstract class AbstractConnectService {
             node = { ...connectionNode, isGlobal: connectionNode.global !== false }
             if (node.ssh) {
                 node.ssh.tunnelPort = null
-                if(!node.ssh.algorithms){
-                    node.ssh.algorithms={ cipher:[] }
+                if (!node.ssh.algorithms) {
+                    node.ssh.algorithms = { cipher: [] }
                 }
             }
         }
@@ -45,6 +44,15 @@ export abstract class AbstractConnectService {
                 })
             }
         });
+    }
+
+    public async connect(connectionNode: Node): Promise<void> {
+        const connectId = connectionNode.getConnectId();
+        const connection = ConnectionManager.getActiveConnectByKey(connectId)
+        if (connection) {
+            ConnectionManager.removeConnection(connectId)
+        }
+        await ConnectionManager.getConnection(connectionNode)
     }
 
 }

@@ -1,47 +1,45 @@
+import { DatabaseType } from "@/common/constants";
 import * as vscode from "vscode";
 import { ExtensionContext } from "vscode";
 import { FileManager } from "../common/filesManager";
+import { Global } from "../common/global";
 import { CompletionProvider } from "../provider/complete/completionProvider";
 import { SqlFormattingProvider } from "../provider/sqlFormattingProvider";
 import { TableInfoHoverProvider } from "../provider/tableInfoHoverProvider";
 import { DbTreeDataProvider as DbTreeDataProvider } from "../provider/treeDataProvider";
-import { ViewManager } from "../view/viewManager";
-import { AbstractConnectService } from "../view/connect/abstractConnectService";
-import { MysqlConnectService } from "../view/connect/mysqlConnectService";
-import { DatabaseCache } from "./common/databaseCache";
-import { AbstractDumpService } from "./dump/abstractDumpService";
-import { MysqlDumpService } from "./dump/mysqlDumpService";
-import { MockRunner } from "./mock/mockRunner";
-import { MysqlSettingService } from "./setting/MysqlSettingService";
-import { SettingService } from "./setting/settingService";
-import { HistoryRecorder } from "./common/historyRecorder";
-import { StatusService } from "../view/status/statusService";
-import { MysqlStatusService } from "../view/status/mysqlStatusService";
-import { Global } from "../common/global";
-import { ImportService } from "./import/importService";
-import { MysqlImportService } from "./import/mysqlImportService";
+import { ConnectService } from "../view/connect/connectService";
 import { OverviewService } from "../view/overview/overviewService";
-import { MssqlPageService } from "./page/mssqlPageService";
-import { MysqlPageSerivce } from "./page/mysqlPageSerivce";
-import { PageService } from "./page/pageService";
-import { DatabaseType } from "@/common/constants";
-import { PostgreSqlPageService } from "./page/postgreSqlPageService";
+import { MysqlStatusService } from "../view/status/mysqlStatusService";
+import { StatusService } from "../view/status/statusService";
+import { ViewManager } from "../view/viewManager";
+import { DatabaseCache } from "./common/databaseCache";
+import { HistoryRecorder } from "./common/historyRecorder";
+import { EsDialect } from "./dialect/esDialect";
 import { MssqlDIalect } from "./dialect/mssqlDIalect";
 import { MysqlDialect } from "./dialect/mysqlDialect";
 import { PostgreSqlDialect } from "./dialect/postgreSqlDialect";
 import { SqlDialect } from "./dialect/sqlDialect";
+import { AbstractDumpService } from "./dump/abstractDumpService";
+import { MysqlDumpService } from "./dump/mysqlDumpService";
+import { MysqlImportService } from "./import/mysqlImportService";
 import { PostgresqlImortService } from "./import/postgresqlImortService";
 import { SqlServerImportService } from "./import/sqlServerImportService";
-import { EsDialect } from "./dialect/esDialect";
+import { MockRunner } from "./mock/mockRunner";
 import { EsPageService } from "./page/esPageService";
+import { MssqlPageService } from "./page/mssqlPageService";
+import { MysqlPageSerivce } from "./page/mysqlPageSerivce";
+import { PageService } from "./page/pageService";
+import { PostgreSqlPageService } from "./page/postgreSqlPageService";
+import { MysqlSettingService } from "./setting/MysqlSettingService";
+import { SettingService } from "./setting/settingService";
 
 export class ServiceManager {
 
     public static instance: ServiceManager;
+    public connectService = new ConnectService();
     public mockRunner: MockRunner;
     public provider: DbTreeDataProvider;
     public historyService: HistoryRecorder;
-    public connectService: AbstractConnectService;
     public settingService: SettingService;
     public overviewService: OverviewService;
     public statusService: StatusService;
@@ -91,7 +89,6 @@ export class ServiceManager {
         this.settingService = new MysqlSettingService();
         this.overviewService = new OverviewService();
         this.dumpService = new MysqlDumpService();
-        this.connectService = new MysqlConnectService();
         this.statusService = new MysqlStatusService()
     }
 
