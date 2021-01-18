@@ -37,9 +37,9 @@ export class ServiceManager {
 
     public static instance: ServiceManager;
     public connectService = new ConnectService();
+    public historyService = new HistoryRecorder();
     public mockRunner: MockRunner;
     public provider: DbTreeDataProvider;
-    public historyService: HistoryRecorder;
     public settingService: SettingService;
     public overviewService: OverviewService;
     public statusService: StatusService;
@@ -49,7 +49,6 @@ export class ServiceManager {
     constructor(private readonly context: ExtensionContext) {
         Global.context = context;
         this.mockRunner = new MockRunner();
-        this.historyService = new HistoryRecorder()
         DatabaseCache.initCache(context);
         ViewManager.initExtesnsionPath(context.extensionPath);
         FileManager.init(context)
