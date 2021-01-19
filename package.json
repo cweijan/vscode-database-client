@@ -892,6 +892,7 @@
 	"scripts": {
 		"dev": "webpack --progress",
 		"build": "webpack -p --progress",
+		"lib": "webpack --config webpack.config.lib.js --progress -p",
 		"publich": "vsce publish",
 		"vscode:prepublish": "npm run build"
 	},

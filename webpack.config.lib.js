@@ -1,8 +1,8 @@
 const path = require('path');
 var webpack = require('webpack');
 
-// 1. npm i tedious pg mysql2
-// 2. npx webpack --config webpack.config.lib.js --progress -p
+// 1. npm i tedious mysql2 node-xlsx tunnelSsh
+// 2. npm run lib
 
 module.exports = [
     {
@@ -15,9 +15,8 @@ module.exports = [
         entry: {
             tedious: './node_modules/tedious/lib/tedious.js',
             mysql2: './node_modules/mysql2/index.js',
-            pg: './node_modules/pg/lib/index.js',
-            routington: './node_modules/routington/lib/index.js',
-            redis: './node_modules/redis/index.js',
+            nodeXlsx: './node_modules/node-xlsx/lib/index.js',
+            tunnelSsh: './node_modules/tunnel-ssh/index.js',
         } ,
         output: {
             path: path.resolve(__dirname, 'out'),
