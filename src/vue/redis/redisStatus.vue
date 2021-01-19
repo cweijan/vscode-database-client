@@ -173,26 +173,23 @@ export default {
   },
   mounted() {
     vscodeEvent = getVscodeEvent()
+    this.refreshInit()
     vscodeEvent.on("info", (info) => {
       this.initStatus(info)
-      this.refreshInit()
     })
     vscodeEvent.emit("route-" + this.$route.name)
   },
   destroyed() {
+    clearInterval(this.refreshTimer)
     vscodeEvent.destroy()
   },
   methods: {
     refreshInit() {
-      this.refreshTimer && clearInterval(this.refreshTimer)
-
-      if (this.autoRefresh) {
-        this.initShow()
-
-        this.refreshTimer = setInterval(() => {
-          this.initShow()
-        }, this.refreshInterval)
-      }
+      this.refreshTimer=setInterval(() => {
+        if (this.autoRefresh) {
+          vscodeEvent.emit("route-" + this.$route.name)
+        }
+      },2000);
     },
     sortByKeys(a, b) {
       return a.keys - b.keys

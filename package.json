@@ -63,12 +63,12 @@
 			"activitybar": [
 				{
 					"id": "github-cweijan-mysql",
-					"title": "Mysql",
+					"title": "Explorer",
 					"icon": "resources/icon/database-container.svg"
 				},
 				{
 					"id": "github-cweijan-nosql",
-					"title": "NoSql Explorer",
+					"title": "Explorer",
 					"icon": "resources/image/icon.png"
 				}
 			]
@@ -77,7 +77,7 @@
 			"github-cweijan-mysql": [
 				{
 					"id": "github.cweijan.mysql",
-					"name": "Connections"
+					"name": "Databases"
 				}
 			],
 			"github-cweijan-nosql": [
@@ -510,12 +510,12 @@
 			"view/title": [
 				{
 					"command": "mysql.connection.add",
-					"when": "view == github.cweijan.mysql",
+					"when": "view =~ /cweijan/",
 					"group": "navigation@3"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql",
+					"when": "view =~ /cweijan/",
 					"group": "navigation@2"
 				},
 				{
