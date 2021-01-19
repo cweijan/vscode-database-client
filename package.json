@@ -65,6 +65,11 @@
 					"id": "github-cweijan-mysql",
 					"title": "Mysql",
 					"icon": "resources/icon/database-container.svg"
+				},
+				{
+					"id": "github-cweijan-nosql",
+					"title": "NoSql Explorer",
+					"icon": "resources/image/icon.png"
 				}
 			]
 		},
@@ -73,6 +78,12 @@
 				{
 					"id": "github.cweijan.mysql",
 					"name": "Connections"
+				}
+			],
+			"github-cweijan-nosql": [
+				{
+					"id": "github.cweijan.nosql",
+					"name": "NoSql"
 				}
 			]
 		},
@@ -438,6 +449,25 @@
 				"command": "mysql.delete.trigger",
 				"title": "%command.delete.trigger%",
 				"category": "MySQL"
+			},
+			{
+				"command": "mysql.redis.connection.terminal",
+				"title": "Open Terminal",
+				"category": "Redis",
+				"icon": "resources/image/terminal.svg"
+			},
+			{
+				"command": "mysql.redis.connection.status",
+				"title": "Server status"
+			},
+			{
+				"command": "mysql.redis.key.del",
+				"title": "Delete Key",
+				"icon": "resources/image/delete.png"
+			},
+			{
+				"command": "mysql.redis.key.detail",
+				"title": "View Key Detail"
 			}
 		],
 		"keybindings": [
@@ -814,6 +844,21 @@
 					"command": "mysql.delete.trigger",
 					"when": "view == github.cweijan.mysql && viewItem == trigger",
 					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.redis.connection.terminal",
+					"when": "view == github.cweijan.nosql && viewItem == redisConnection",
+					"group": "inline@1"
+				},
+				{
+					"command": "mysql.redis.connection.status",
+					"when": "view == github.cweijan.nosql && viewItem == redisConnection",
+					"group": "connection"
+				},
+				{
+					"command": "mysql.redis.key.del",
+					"when": "view == github.cweijan.nosql && viewItem == redisKey",
+					"group": "inline"
 				}
 			]
 		},
@@ -860,6 +905,7 @@
 		"css-loader": "^3.5.3",
 		"file-loader": "^6.0.0",
 		"html-webpack-plugin": "^4.3.0",
+		"@types/redis": "^2.8.18",
 		"postcss": "^8.2.1",
 		"postcss-loader": "^4.1.0",
 		"style-loader": "^1.2.1",
@@ -883,6 +929,7 @@
 		"date-format": "^3.0.0",
 		"deepmerge": "^3.2.0",
 		"element-ui": "^2.13.2",
+		"json-format-highlight": "^1.0.4",
 		"lodash": "^4.17.20",
 		"mockjs": "^1.1.0",
 		"mysql2": "^2.2.5",
@@ -890,6 +937,7 @@
 		"pg": "^8.5.1",
 		"portfinder": "^1.0.26",
 		"pretty-bytes": "^5.3.0",
+		"redis": "^3.0.2",
 		"routington": "^1.0.3",
 		"sqlstring": "^2.3.2",
 		"tedious": "^9.2.3",

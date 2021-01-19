@@ -33,6 +33,8 @@ import { UserNode } from "./model/database/userNode";
 import { EsConnectionNode } from "./model/es/model/esConnectionNode";
 import { ESIndexNode } from "./model/es/model/esIndexNode";
 import { activeEs } from "./model/es/provider/main";
+import { RedisConnectionNode } from "./node/connectionNode";
+import KeyNode from "./node/keyNode";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -50,6 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
                 ConnectionManager.getConnection(fileNode, this)
             }
         }),
+        
         ...initCommand({
             // util
             ...{
@@ -182,6 +185,13 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.count.sql": (tableNode: TableNode) => {
                     tableNode.countSql()
                 },
+            },
+            // redis
+            ...{
+                "mysql.redis.connection.status":(connectionNode: RedisConnectionNode) => connectionNode.showStatus(),
+                "mysql.redis.connection.terminal":(connectionNode: RedisConnectionNode) => connectionNode.openTerminal(),
+                "mysql.redis.key.detail":(keyNode: KeyNode) => keyNode.detail(),
+                "mysql.redis.key.del":(keyNode: KeyNode) => keyNode.delete(),
             },
             // table node
             ...{

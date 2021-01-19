@@ -20,6 +20,7 @@
       <el-radio v-model="connectionOption.dbType" label="PostgreSQL">PostgreSQL</el-radio>
       <el-radio v-model="connectionOption.dbType" label="SqlServer">SQL Server</el-radio>
       <el-radio v-model="connectionOption.dbType" label="ElasticSearch">ElasticSearch</el-radio>
+      <el-radio v-model="connectionOption.dbType" label="Redis">Redis</el-radio>
       </el-select>
     </section>
 

@@ -60,7 +60,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.scheme=source.scheme
         this.global = source.global
         this.dbType = source.dbType
-        if (!this.dialect) {
+        if (!this.dialect && this.dbType!=DatabaseType.REDIS) {
             this.dialect = ServiceManager.getDialect(this.dbType)
         }
         this.includeDatabases = source.includeDatabases
