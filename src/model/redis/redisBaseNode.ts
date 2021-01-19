@@ -3,7 +3,7 @@ import { RedisConnection } from "@/service/connect/redisConnection";
 import { ConnectionManager } from "@/service/connectionManager";
 import { RedisClient } from "redis";
 
-export default abstract class AbstractNode extends Node {
+export default abstract class RedisBaseNode extends Node {
     abstract getChildren(): Promise<Node[]>;
 
     public async getClient(): Promise<RedisClient> {

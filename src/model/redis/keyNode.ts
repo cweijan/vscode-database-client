@@ -6,9 +6,9 @@ import * as path from "path";
 import { promisify } from "util";
 import * as vscode from "vscode";
 import { TreeItemCollapsibleState } from "vscode";
-import AbstractNode from "./abstracNode";
+import RedisBaseNode from "./redisBaseNode";
 
-export default class KeyNode extends AbstractNode {
+export default class KeyNode extends RedisBaseNode {
 
     readonly contextValue = ModelType.REDIS_KEY;
     readonly iconPath = path.join(Constants.RES_PATH, `image/redis_key.png`);
@@ -27,7 +27,7 @@ export default class KeyNode extends AbstractNode {
     /**
      * @todo Split the key by ':' and group them
      */
-    async getChildren(): Promise<AbstractNode[]> {
+    async getChildren(): Promise<RedisBaseNode[]> {
         return [];
     }
 

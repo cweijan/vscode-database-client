@@ -10,7 +10,7 @@ import { Global } from "../common/global";
 import { NodeUtil } from "@/model/nodeUtil";
 import { InfoNode } from "@/model/other/infoNode";
 import { EsConnectionNode } from "@/model/es/model/esConnectionNode";
-import { RedisConnectionNode } from "@/node/connectionNode";
+import { RedisConnectionNode } from "@/model/redis/connectionNode";
 
 export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 

@@ -5,11 +5,11 @@ import { ViewManager } from "@/view/viewManager";
 import * as path from "path";
 import { promisify } from "util";
 import * as vscode from "vscode";
-import AbstractNode from "./abstracNode";
+import RedisBaseNode from "./redisBaseNode";
 import { FolderNode } from "./folderNode";
 import KeyNode from "./keyNode";
 
-export class RedisConnectionNode extends AbstractNode {
+export class RedisConnectionNode extends RedisBaseNode {
 
 
     contextValue = ModelType.REDIS_CONNECTION;
@@ -23,11 +23,11 @@ export class RedisConnectionNode extends AbstractNode {
         //     this.collapsibleState = NodeState.get(this)
     }
 
-    async getChildren(): Promise<AbstractNode[]> {
+    async getChildren(): Promise<RedisBaseNode[]> {
         const client = await this.getClient()
         let keys: string[] = await promisify(client.keys).bind(client)(this.pattern);
         keys = keys.slice(0, 5000)
-        const prefixMap: { [key: string]: AbstractNode[] } = {}
+        const prefixMap: { [key: string]: RedisBaseNode[] } = {}
         for (const key of keys.sort()) {
             let prefix = key.replace(this.pattern.replace("*", ""), "").split(":")[0];
             if (!prefixMap[prefix]) prefixMap[prefix] = []
