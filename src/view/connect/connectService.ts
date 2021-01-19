@@ -30,7 +30,11 @@ export class ConnectService {
                 handler.on("init", () => {
                     handler.emit('route', 'connect')
                 }).on("route-connect", async () => {
-                    if (node) handler.emit("edit", node)
+                    if (node) {
+                        handler.emit("edit", node)
+                    }else{
+                        handler.emit("connect")
+                    }
                 }).on("connecting", async (data) => {
                     const connectionOption = data.connectionOption
                     const connectNode = Util.trim(NodeUtil.of(connectionOption))
@@ -39,7 +43,11 @@ export class ConnectService {
                         provider.addConnection(connectNode)
                         handler.panel.dispose();
                     } catch (err) {
-                        handler.emit("error", err)
+                        if (err?.message) {
+                            handler.emit("error", err.message)
+                        } else {
+                            handler.emit("error", err)
+                        }
                     }
                 })
             }

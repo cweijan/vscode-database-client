@@ -165,6 +165,7 @@ export default {
       },
       type: "password",
       databaseType: "mysql",
+      editModel: false,
       error: false,
       errorMessage: "",
     }
@@ -173,7 +174,11 @@ export default {
     vscodeEvent = getVscodeEvent()
     vscodeEvent
       .on("edit", (node) => {
+        this.editModel = true
         this.connectionOption = node
+      })
+      .on("connect", (node) => {
+        this.editModel = false
       })
       .on("error", (err) => {
         this.error = true
@@ -199,6 +204,9 @@ export default {
   },
   watch: {
     "connectionOption.dbType"(value) {
+      if (this.editModel) {
+        return
+      }
       switch (value) {
         case "MySQL":
           this.connectionOption.user = "root"
