@@ -4,12 +4,12 @@ import ElementUI from 'element-ui';
 import locale from 'element-ui/lib/locale/lang/en'
 Vue.use(ElementUI, { locale });
 
-import UmyUi from 'umy-ui'
-import 'umy-ui/lib/theme-chalk/index.css';
+import UmyTable from 'umy-table'
+import 'umy-table/lib/theme-chalk/index.css';
 import '@/../public/theme/auto.css'
 import '@/../public/theme/umyui.css'
 import './view.css'
-Vue.use(UmyUi);
+Vue.use(UmyTable);
 
 Vue.config.productionTip = false
 

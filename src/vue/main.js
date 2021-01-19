@@ -3,16 +3,16 @@ import App from './App'
 import ElementUI from 'element-ui';
 import locale from 'element-ui/lib/locale/lang/en'
 import VueRouter from 'vue-router'
-import UmyUi from 'umy-ui'
+import UmyTable from 'umy-table'
 
-import 'umy-ui/lib/theme-chalk/index.css';
+import 'umy-table/lib/theme-chalk/index.css';
 import '@/../public/theme/auto.css'
 import '@/../public/theme/umyui.css'
 import "tailwindcss/tailwind.css"
 
 Vue.use(VueRouter)
 Vue.use(ElementUI, { locale });
-Vue.use(UmyUi);
+Vue.use(UmyTable);
 
 Vue.config.productionTip = false
 

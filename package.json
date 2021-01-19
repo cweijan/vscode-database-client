@@ -855,7 +855,9 @@
 		"@types/node": "^12.12.6",
 		"@types/ssh2": "^0.5.43",
 		"@types/vscode": "1.38.0",
-		"cardinal": "^2.1.1",
+		"@antv/g2": "^4.0.9",
+		"@types/pg": "^7.14.7",
+		"@types/tedious": "^4.0.3",
 		"copy-webpack-plugin": "^6.3.0",
 		"css-loader": "^3.5.3",
 		"file-loader": "^6.0.0",
@@ -874,9 +876,6 @@
 		"webpack-cli": "^3.3.11"
 	},
 	"dependencies": {
-		"@antv/g2": "^4.0.9",
-		"@types/pg": "^7.14.7",
-		"@types/tedious": "^4.0.3",
 		"axios": "^0.21.1",
 		"command-exists": "^1.2.9",
 		"comment-json": "^4.1.0",
@@ -884,7 +883,6 @@
 		"deepmerge": "^3.2.0",
 		"element-ui": "^2.13.2",
 		"lodash": "^4.17.20",
-		"mockjs": "^1.1.0",
 		"mysql2": "^2.2.5",
 		"node-xlsx": "^0.15.0",
 		"pg": "^8.5.1",
@@ -895,10 +893,8 @@
 		"tedious": "^9.2.3",
 		"tunnel-ssh": "^4.1.4",
 		"umy-table": "1.0.8",
-		"umy-ui": "1.0.8",
 		"vue": "^2.6.11",
-		"vue-router": "^3.4.1",
-		"xe-utils": "2.7.14"
+		"vue-router": "^3.4.1"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",

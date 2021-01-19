@@ -22,7 +22,8 @@ module.exports = [
             devtoolModuleFilenameTemplate: '[absoluteResourcePath]',
         },
         externals: {
-            vscode: 'commonjs vscode'
+            vscode: 'commonjs vscode',
+            mockjs: 'mockjs vscode',
         },
         resolve: {
             extensions: ['.ts', '.js'],
@@ -32,9 +33,12 @@ module.exports = [
             }
         },
         plugins: [
-            new webpack.IgnorePlugin(/^(pg-native|supports-color)$/)
+            new webpack.IgnorePlugin(/^(pg-native|supports-color|cardinal)$/),
+            new CopyWebpackPlugin({
+                patterns: [{ from: 'src/bin', to: './bin' }]
+            }),
         ],
-        module: { rules: [{ test: /\.ts$/, exclude: /node_modules/, use: ['ts-loader'] }] },
+        module: { rules: [{ test: /\.ts$/, exclude: /(node_modules|bin)/, use: ['ts-loader'] }] },
         optimization: { minimize: false },
         watch: !isProd,
         mode: isProd ? 'production' : 'development',
