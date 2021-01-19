@@ -109,7 +109,7 @@ export class ExportService {
     }
 
     private exportByNodeXlsx(filePath: string, fields: FieldInfo[], rows: any) {
-        const nodeXlsx = require('node-xlsx');
+        const nodeXlsx = require('@/bin/node-xlsx');
         fs.writeFileSync(filePath, nodeXlsx.build([{
             name: "sheet1",
             data: [
