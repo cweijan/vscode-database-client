@@ -255,7 +255,7 @@ export default {
 }
 </script>
 
-<style type="text/css">
+<style scoped>
 body {
   background-color: #f7f7f7;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;

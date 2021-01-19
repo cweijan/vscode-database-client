@@ -242,7 +242,7 @@ export default {
   },
 }
 </script>
-<style type="text/css">
+<style scoped>
     .json-panel {
         line-height: 1.3;
         background: #292a2b;
