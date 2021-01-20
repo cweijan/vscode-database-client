@@ -44,7 +44,7 @@
 
     <template v-if="connectionOption.dbType!='ElasticSearch'">
 
-      <section class="mb-2">
+      <section class="mb-2" v-if="connectionOption.dbType!='Redis'">
         <label class="block font-bold" for="connection-user">Username</label>
         <input class="w-full field__input" id="connection-user" placeholder="Username" required v-model="connectionOption.user" />
       </section>
@@ -226,10 +226,13 @@ export default {
           this.connectionOption.port = 1433
           break
         case "ElasticSearch":
+          this.connectionOption.user = null
           this.connectionOption.port = 9200
+          this.connectionOption.database = null
           break
         case "Redis":
           this.connectionOption.port = 6379
+          this.connectionOption.user = null
           this.connectionOption.database = "0"
           break
       }
