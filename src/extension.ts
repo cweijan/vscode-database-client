@@ -33,7 +33,7 @@ import { UserNode } from "./model/database/userNode";
 import { EsConnectionNode } from "./model/es/model/esConnectionNode";
 import { ESIndexNode } from "./model/es/model/esIndexNode";
 import { activeEs } from "./model/es/provider/main";
-import { RedisConnectionNode } from "./model/redis/connectionNode";
+import { RedisConnectionNode } from "./model/redis/redisConnectionNode";
 import KeyNode from "./model/redis/keyNode";
 
 export function activate(context: vscode.ExtensionContext) {
