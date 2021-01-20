@@ -17,7 +17,7 @@ export class EsUtil {
             QueryUnit.runQuery(`${em.Method.Text} ${em.Path.Text}\n${em.Body.Text}`,node)
             return;
         }
-        (await node.getConnection()).query(`${em.Method.Text} ${em.Path.Text}\n${em.Body.Text}`, 'dontParse', async (data, result) => {
+        (await node.getConnection()).query(`${em.Method.Text} ${em.Path.Text}\n${em.Body.Text}`, 'dontParse', async (err, data) => {
             vscode.window.showTextDocument(
                 await vscode.workspace.openTextDocument(await FileManager.record(`${node.getConnectId()}#result.json`, JSON.stringify(data, null, 2), FileModel.WRITE)),
                 vscode.ViewColumn.Two, true
