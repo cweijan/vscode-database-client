@@ -32,7 +32,10 @@ export class EsConnection implements IConnection {
             responseType: 'json',
             data: body
         }).then(async ({ data }) => {
-
+            if(values=="dontParse"){
+                callback(null,data)
+                return;
+            }
             if (data.count) {
                 callback(null, [{ count: data.count }], [{ name: 'count', nullable: 'YES' }])
             } else if (data.items || data?.result == 'created' || data?.result == 'updated' || data?.result == 'deleted') {

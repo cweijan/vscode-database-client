@@ -17,7 +17,12 @@ export class ElasticCodeLensProvider implements vscode.CodeLensProvider {
                 ret.push(new vscode.CodeLens(em.Method.Range, {
                     title: "▶ Run Query",
                     command: "mysql.elastic.execute",
-                    arguments: [em]
+                    arguments: [em,false]
+                }))
+                ret.push(new vscode.CodeLens(em.Method.Range, {
+                    title: "▶ Run Query And Parse",
+                    command: "mysql.elastic.execute",
+                    arguments: [em,true]
                 }))
                 if(DocumentFinder.find(em.Path.Text)){
                     ret.push(new vscode.CodeLens(em.Method.Range, {

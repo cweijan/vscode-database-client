@@ -114,6 +114,10 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         return (await QueryUnit.queryPromise<T>(await ConnectionManager.getConnection(this), sql)).rows
     }
 
+    public async getConnection(){
+        return ConnectionManager.getConnection(this)
+    }
+
     public wrap(origin: string) {
         return Util.wrap(origin, this.dbType)
     }
