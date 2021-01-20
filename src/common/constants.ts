@@ -20,7 +20,7 @@ export enum OperateType {
 export enum CacheKey {
     ConectionsKey = "mysql.connections",
     CollapseSate = "mysql.database.cache.collapseState",
-    CONECTIONS_CONFIG = "redis.connections",
+    NOSQL_CONNECTION = "redis.connections",
     COLLAPSE_SATE = "redis.cache.collapseState",
 }
 

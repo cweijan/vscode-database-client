@@ -1,9 +1,12 @@
 import { FileManager } from "@/common/filesManager";
+import { Util } from "@/common/util";
+import { NodeUtil } from "@/model/nodeUtil";
 import { QueryGroup } from "@/model/query/queryGroup";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
+import { DatabaseCache } from "@/service/common/databaseCache";
 import * as path from "path";
-import { Range } from "vscode";
-import { Constants, ModelType } from "../../../common/constants";
+import { ExtensionContext, Range } from "vscode";
+import { CacheKey, Constants, ModelType } from "../../../common/constants";
 import { ConnectionManager } from "../../../service/connectionManager";
 import { Node } from "../../interface/node";
 import { EsBaseNode } from "./esBaseNode";
@@ -56,6 +59,24 @@ export class EsConnectionNode extends EsBaseNode {
     async getChildren(): Promise<Node[]> {
 
         return [new EsIndexGroup(this),new QueryGroup(this)]
+
+    }
+
+    public copyName() {
+        Util.copyToBoard(this.host)
+    }
+
+    public async deleteConnection(context: ExtensionContext) {
+
+        Util.confirm(`Are you want to Delete Connection ${this.uid} ? `, async () => {
+            const targetContext = this.global === false ? context.workspaceState : context.globalState;
+            const connections = targetContext.get<{ [key: string]: Node }>(CacheKey.NOSQL_CONNECTION);
+            ConnectionManager.removeConnection(this.uid)
+            DatabaseCache.clearDatabaseCache(this.uid)
+            delete connections[this.uid];
+            await targetContext.update(CacheKey.NOSQL_CONNECTION, NodeUtil.removeParent(connections));
+            DbTreeDataProvider.refresh();
+        })
 
     }
 

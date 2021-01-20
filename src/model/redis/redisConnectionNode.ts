@@ -1,4 +1,4 @@
-import { Constants, ModelType } from "@/common/constants";
+import { CacheKey, Constants, ModelType } from "@/common/constants";
 import { Node } from "@/model/interface/node";
 import { NodeUtil } from "@/model/nodeUtil";
 import { ViewManager } from "@/view/viewManager";
@@ -8,6 +8,10 @@ import * as vscode from "vscode";
 import RedisBaseNode from "./redisBaseNode";
 import { FolderNode } from "./folderNode";
 import KeyNode from "./keyNode";
+import { Util } from "@/common/util";
+import { DbTreeDataProvider } from "@/provider/treeDataProvider";
+import { DatabaseCache } from "@/service/common/databaseCache";
+import { ConnectionManager } from "@/service/connectionManager";
 
 export class RedisConnectionNode extends RedisBaseNode {
 
@@ -84,6 +88,24 @@ export class RedisConnectionNode extends RedisBaseNode {
                 }
             })
         })
+    }
+
+    public copyName() {
+        Util.copyToBoard(this.host)
+    }
+
+    public async deleteConnection(context: vscode.ExtensionContext) {
+
+        Util.confirm(`Are you want to Delete Connection ${this.uid} ? `, async () => {
+            const targetContext = this.global === false ? context.workspaceState : context.globalState;
+            const connections = targetContext.get<{ [key: string]: Node }>(CacheKey.NOSQL_CONNECTION);
+            ConnectionManager.removeConnection(this.uid)
+            DatabaseCache.clearDatabaseCache(this.uid)
+            delete connections[this.uid];
+            await targetContext.update(CacheKey.NOSQL_CONNECTION, NodeUtil.removeParent(connections));
+            DbTreeDataProvider.refresh();
+        })
+
     }
 
 }

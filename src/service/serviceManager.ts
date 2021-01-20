@@ -87,7 +87,7 @@ export class ServiceManager {
     }
 
     private initTreeProvider() {
-        this.nosqlProvider = new DbTreeDataProvider(this.context,CacheKey.CONECTIONS_CONFIG);
+        this.nosqlProvider = new DbTreeDataProvider(this.context,CacheKey.NOSQL_CONNECTION);
         const treeview = vscode.window.createTreeView("github.cweijan.nosql", {
             treeDataProvider: this.nosqlProvider,
         });
