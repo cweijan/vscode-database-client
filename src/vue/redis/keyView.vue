@@ -145,6 +145,8 @@ export default {
       this.editTemp = this.jsonContent()
       const temp = this.edit.content + "".trim()
       this.selectedView = temp.startsWith("[") || temp.startsWith("{") ? "ViewerJson" : "ViewerText"
+    }).on("msg",(content)=>{
+      this.$message.success(content)
     })
     vscodeEvent.emit("route-" + this.$route.name)
   },
@@ -178,7 +180,7 @@ export default {
       return ""
     },
     dynamicHeight() {
-      return window.innerHeight - 180 + "px"
+      return window.innerHeight - 100 + "px"
     },
   },
   methods: {
