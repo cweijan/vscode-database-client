@@ -19,7 +19,7 @@ export class RedisConnectionNode extends RedisBaseNode {
     contextValue = ModelType.REDIS_CONNECTION;
     iconPath: string = path.join(Constants.RES_PATH, `image/redis_connection.png`);
     iconDetailPath: string = path.join(Constants.RES_PATH, `image/code-terminal.svg`);
-    pattern = "*";
+    
     constructor(readonly uid: string, readonly parent: Node) {
         super(uid)
         this.init(parent)
@@ -28,26 +28,12 @@ export class RedisConnectionNode extends RedisBaseNode {
     async getChildren(): Promise<RedisBaseNode[]> {
         const client = await this.getClient()
         let keys: string[] = await promisify(client.keys).bind(client)(this.pattern);
-        keys = keys.slice(0, 5000)
-        const prefixMap: { [key: string]: RedisBaseNode[] } = {}
-        for (const key of keys.sort()) {
-            let prefix = key.replace(this.pattern.replace("*", ""), "").split(":")[0];
-            if (!prefixMap[prefix]) prefixMap[prefix] = []
-            prefixMap[prefix].push(new KeyNode(key, prefix, this))
-        }
-
-        return Object.keys(prefixMap).map((prefix: string) => {
-            if (prefixMap[prefix].length > 1) {
-                return new FolderNode(prefix,prefixMap[prefix],this)
-            } else {
-                return prefixMap[prefix][0]
-            }
-        })
+        return FolderNode.buildChilds(this,"", keys)
     }
     async openTerminal(): Promise<any> {
         const client = await this.getClient()
         ViewManager.createWebviewPanel({
-            splitView: true, title: `${this.host}@${this.port}`,preserveFocus:false,
+            splitView: true, title: `${this.host}@${this.port}`, preserveFocus: false,
             iconPath: this.iconDetailPath, path: "app",
             eventHandler: (handler) => {
                 handler.on("init", () => {

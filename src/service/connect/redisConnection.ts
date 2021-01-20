@@ -10,7 +10,7 @@ export class RedisConnection implements IConnection {
             host: opt.host,
             port: opt.port,
             db: opt.database,
-            // auth_pass: opt.auth,
+            auth_pass: opt.password,
             connect_timeout: 5000
         })
 

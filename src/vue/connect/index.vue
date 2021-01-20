@@ -153,7 +153,7 @@ export default {
         usingSSH: false,
         dbType: "MySQL",
         global: true,
-        scheme:'http',
+        scheme: "http",
         timezone: "+00:00",
         ssh: {
           host: "",
@@ -227,6 +227,10 @@ export default {
           break
         case "ElasticSearch":
           this.connectionOption.port = 9200
+          break
+        case "Redis":
+          this.connectionOption.port = 6379
+          this.connectionOption.database = "0"
           break
       }
     },
