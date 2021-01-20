@@ -14,12 +14,9 @@
 	],
 	"keywords": [
 		"SQL",
-		"MariaDB",
-		"PostgreSQL",
 		"MySQL",
 		"Database",
 		"DB",
-		"SqlServer",
 		"RDBMS"
 	],
 	"bugs": {
