@@ -17,10 +17,6 @@ export class ViewOption {
      */
     public singlePage?: boolean;
     /**
-     * kill exists panel
-     */
-    public killHidden?: boolean;
-    /**
      * receive webview send message 
      */
     public handleHtml?: (html: string, viewPanel: WebviewPanel) => string;
@@ -61,7 +57,6 @@ export class ViewManager {
         return new Promise((resolve, reject) => {
 
             if (typeof (viewOption.singlePage) == 'undefined') { viewOption.singlePage = true }
-            if (typeof (viewOption.killHidden) == 'undefined') { viewOption.killHidden = true }
 
             if(viewOption.preserveFocus==null){
                 viewOption.preserveFocus=true;
@@ -73,11 +68,15 @@ export class ViewManager {
                 viewOption.type = viewOption.type + new Date().getTime()
             }
 
+            const viewColumn = viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One;
             const currentStatus = this.viewStatu[viewOption.type]
             if (viewOption.singlePage && currentStatus) {
-                if (viewOption.killHidden && currentStatus.instance?.visible == false) {
+                if (viewColumn==vscode.ViewColumn.Two && currentStatus.instance?.visible == false) {
                     currentStatus.instance.dispose()
                 } else {
+                    if(currentStatus.instance?.visible == false){
+                        currentStatus.instance.reveal()
+                    }
                     currentStatus.eventEmitter.removeAllListeners()
                     if (viewOption.eventHandler) {
                         viewOption.eventHandler(new Hanlder(currentStatus.instance, currentStatus.eventEmitter))
@@ -89,10 +88,7 @@ export class ViewManager {
             const webviewPanel = vscode.window.createWebviewPanel(
                 viewOption.type,
                 viewOption.title,
-                {
-                    viewColumn: viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One,
-                    preserveFocus: viewOption.preserveFocus
-                },
+                { viewColumn, preserveFocus: viewOption.preserveFocus },
                 { enableScripts: true, retainContextWhenHidden: true },
             );
             const newStatus = { creating: true, instance: webviewPanel, eventEmitter: new EventEmitter() }
