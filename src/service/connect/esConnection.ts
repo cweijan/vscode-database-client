@@ -44,6 +44,7 @@ export class EsConnection implements IConnection {
             }
         }).catch(err => {
             console.log(err)
+            callback(err)
         })
     }
     private async handleSearch(path: any, data: any, callback: any) {

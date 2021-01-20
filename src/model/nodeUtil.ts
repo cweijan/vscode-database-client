@@ -18,6 +18,11 @@ export abstract class NodeUtil {
 
     public static removeParent(nodes: any): any {
         if (!nodes) return null;
+        // if is node instance
+        if(nodes instanceof Node){
+            return  { ...nodes, parent: null };
+        }
+        // if is node object map
         let result = {};
         for (const nodeKey of Object.keys(nodes)) {
             if (!nodes[nodeKey]) continue;

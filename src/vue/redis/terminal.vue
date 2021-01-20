@@ -30,8 +30,8 @@ export default {
   mounted() {
     vscodeEvent = getVscodeEvent()
     vscodeEvent
-      .on("config", (node) => {
-        this.initCliContent(no)
+      .on("config", (config) => {
+        this.initCliContent(config)
       })
       .on("result", (reply) => {
         this.content += this.resolveResult(reply)
@@ -44,6 +44,7 @@ export default {
   methods: {
     initCliContent(redisConfig) {
       this.$refs.cliParams.focus()
+      console.log(redisConfig)
       this.content += `> ${redisConfig.host}@${redisConfig.port} connected!\n`
       this.scrollToBottom()
     },

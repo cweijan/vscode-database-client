@@ -39,7 +39,7 @@ export class RedisConnectionNode extends RedisBaseNode {
                 handler.on("init", () => {
                     handler.emit("route", 'terminal')
                 }).on("route-terminal", async () => {
-                    handler.emit("config", ...NodeUtil.removeParent(this))
+                    handler.emit("config", NodeUtil.removeParent(this))
                 }).on("exec", (content) => {
                     if (!content) {
                         return;
