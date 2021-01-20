@@ -11,8 +11,7 @@ export class FolderNode extends RedisBaseNode {
     constructor(readonly label: string, readonly childens: Node[], readonly parent: Node) {
         super(label)
         this.init(parent)
-        this.collapsibleState = TreeItemCollapsibleState.Collapsed
-        // this.collapsibleState = NodeState.get(this)
+        this.uid=`${parent.uid}/${label}`
     }
 
     public async getChildren() {

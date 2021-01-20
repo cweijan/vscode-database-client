@@ -23,8 +23,6 @@ export class RedisConnectionNode extends RedisBaseNode {
     constructor(readonly uid: string, readonly parent: Node) {
         super(uid)
         this.init(parent)
-        this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
-        //     this.collapsibleState = NodeState.get(this)
     }
 
     async getChildren(): Promise<RedisBaseNode[]> {

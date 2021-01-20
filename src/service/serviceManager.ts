@@ -92,10 +92,10 @@ export class ServiceManager {
             treeDataProvider: this.nosqlProvider,
         });
         treeview.onDidCollapseElement((event) => {
-            // NodeState.store(event.element, vscode.TreeItemCollapsibleState.Collapsed);
+            DatabaseCache.storeElementState(event.element, vscode.TreeItemCollapsibleState.Collapsed);
         });
         treeview.onDidExpandElement((event) => {
-            // NodeState.store(event.element, vscode.TreeItemCollapsibleState.Expanded);
+            DatabaseCache.storeElementState(event.element, vscode.TreeItemCollapsibleState.Expanded);
         });
         return treeview;
     }
