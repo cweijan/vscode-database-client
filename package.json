@@ -63,12 +63,12 @@
 			"activitybar": [
 				{
 					"id": "github-cweijan-mysql",
-					"title": "Explorer",
+					"title": "Database Explorer",
 					"icon": "resources/icon/database-container.svg"
 				},
 				{
 					"id": "github-cweijan-nosql",
-					"title": "Explorer",
+					"title": "Nosql Explorer",
 					"icon": "resources/image/icon.png"
 				}
 			]
@@ -77,13 +77,13 @@
 			"github-cweijan-mysql": [
 				{
 					"id": "github.cweijan.mysql",
-					"name": "Databases"
+					"name": "Connections"
 				}
 			],
 			"github-cweijan-nosql": [
 				{
 					"id": "github.cweijan.nosql",
-					"name": "NoSql"
+					"name": "Connections"
 				}
 			]
 		},
@@ -938,8 +938,6 @@
 		"redis": "^3.0.2",
 		"routington": "^1.0.3",
 		"sqlstring": "^2.3.2",
-		"tedious": "^9.2.3",
-		"tunnel-ssh": "^4.1.4",
 		"umy-table": "1.0.8",
 		"vue": "^2.6.11",
 		"vue-router": "^3.4.1"

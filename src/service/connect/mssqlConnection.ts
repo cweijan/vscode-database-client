@@ -1,5 +1,5 @@
 import { Node } from "@/model/interface/node";
-import { Connection, ConnectionConfig, Request } from "tedious";
+import { Connection, ConnectionConfig, Request } from "@/bin/tedious";
 import { IConnection, queryCallback } from "./connection";
 import { ConnectionPool } from "./pool/connectionPool";
 import format = require('date-format');

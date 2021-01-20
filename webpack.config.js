@@ -33,7 +33,7 @@ module.exports = [
             }
         },
         plugins: [
-            new webpack.IgnorePlugin(/^(pg-native|supports-color|cardinal)$/),
+            new webpack.IgnorePlugin(/^(pg-native|supports-color|cardinal|encoding)$/),
             new CopyWebpackPlugin({
                 patterns: [{ from: 'src/bin', to: './bin' }]
             }),
@@ -52,7 +52,7 @@ module.exports = [
         plugins: [
             new VueLoaderPlugin(),
             new HtmlWebpackPlugin({ inject: true, template: './public/index.html', chunks: ['app'], filename: 'webview/app.html' }),
-            new HtmlWebpackPlugin({ inject: true, template: './public/index.html', chunks: ['query'], filename: 'webview/result.html' }),
+            new HtmlWebpackPlugin({ inject: true, templateContent: `<body> <div id="app"></div> </body>`, chunks: ['query'], filename: 'webview/result.html' }),
             new CopyWebpackPlugin({
                 patterns: [{ from: 'public', to: './webview' }]
             }),

@@ -15,11 +15,11 @@ module.exports = [
         entry: {
             tedious: './node_modules/tedious/lib/tedious.js',
             mysql2: './node_modules/mysql2/index.js',
-            nodeXlsx: './node_modules/node-xlsx/lib/index.js',
-            tunnelSsh: './node_modules/tunnel-ssh/index.js',
+            'node-xlsx': './node_modules/node-xlsx/lib/index.js',
+            'tunnel-ssh': './node_modules/tunnel-ssh/index.js',
         } ,
         output: {
-            path: path.resolve(__dirname, 'out'),
+            path: path.resolve(__dirname, 'src/bin'),
             filename: '[name].js',
             libraryTarget: 'commonjs2'
         },

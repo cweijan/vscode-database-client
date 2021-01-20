@@ -16,10 +16,10 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public _onDidChangeTreeData: vscode.EventEmitter<Node> = new vscode.EventEmitter<Node>();
     public readonly onDidChangeTreeData: vscode.Event<Node> = this._onDidChangeTreeData.event;
-    private static instance: DbTreeDataProvider
+    private static instances: DbTreeDataProvider[]=[]
 
     constructor(protected context: vscode.ExtensionContext,readonly connectionKey:string) {
-        DbTreeDataProvider.instance = this
+        DbTreeDataProvider.instances.push(this)
     }
 
     /**
@@ -99,11 +99,13 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
      * refresh treeview context
      */
     public static refresh(element?: Node): void {
-        this.instance._onDidChangeTreeData.fire(element);
+        for (const instance of this.instances) {
+            instance._onDidChangeTreeData.fire(element);
+        }
     }
 
     public static getInstnace() {
-        return this.instance;
+        return this.instances;
     }
 
     public async getConnectionNodes(): Promise<Node[]> {

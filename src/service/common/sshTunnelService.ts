@@ -1,4 +1,4 @@
-import tunnel = require('tunnel-ssh')
+import tunnel = require('@/bin/tunnel-ssh')
 import { Node } from '../../model/interface/node';
 import { Console } from '../../common/Console';
 import { existsSync } from 'fs';

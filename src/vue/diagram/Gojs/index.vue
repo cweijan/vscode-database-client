@@ -7,7 +7,6 @@
 </template>
 
 <script>
-import './go.js';
 import { getVscodeEvent } from "../../util/vscode";
 let vscodeEvent;
 
