@@ -510,12 +510,12 @@
 			"view/title": [
 				{
 					"command": "mysql.connection.add",
-					"when": "view =~ /cweijan/",
+					"when": "view =~ /cweijan.+?ql/",
 					"group": "navigation@3"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan/",
+					"when": "view =~ /cweijan.+?ql/",
 					"group": "navigation@2"
 				},
 				{
@@ -532,317 +532,317 @@
 			"view/item/context": [
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(esConnection|redisConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(esConnection|redisConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
 					"group": "inline@-2"
 				},
 				{
 					"command": "mysql.connection.edit",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.host.copy",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
 					"group": "1_mysql@3"
 				},
 				{
 					"command": "mysql.database.add",
-					"when": "view =~ /cweijan/ && viewItem == connection",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == connection",
 					"group": "2_mysql@0"
 				},
 				{
 					"command": "mysql.diagram.add",
-					"when": "view =~ /cweijan/ && viewItem == diagramGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == diagramGroup",
 					"group": "2_mysql@0"
 				},
 				{
 					"command": "mysql.query.add",
-					"when": "view =~ /cweijan/ && viewItem == queryGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == queryGroup",
 					"group": "2_mysql@0"
 				},
 				{
 					"command": "mysql.query.rename",
-					"when": "view =~ /cweijan/ && viewItem == query",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == query",
 					"group": "2_mysql@0"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
 					"group": "2_mysql@1"
 				},
 				{
 					"command": "mysql.server.info",
-					"when": "view =~ /cweijan/ && viewItem == connection",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == connection",
 					"group": "4_mysql@1"
 				},
 				{
 					"command": "mysql.data.import",
-					"when": "view =~ /cweijan/ && viewItem == connection",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == connection",
 					"group": "8_mysql@1"
 				},
 				{
 					"command": "mysql.connection.delete",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
 					"group": "10mysql@2"
 				},
 				{
 					"command": "mysql.query.switch",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(connection|database|esConnection|esIndex)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|database|esConnection|esIndex)$/",
 					"group": "inline@1"
 				},
 				{
 					"command": "mysql.database.add",
-					"when": "view =~ /cweijan/ && viewItem == connection",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == connection",
 					"group": "inline@0"
 				},
 				{
 					"command": "mysql.diagram.add",
-					"when": "view =~ /cweijan/ && viewItem == diagramGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == diagramGroup",
 					"group": "inline@0"
 				},
 				{
 					"command": "mysql.query.add",
-					"when": "view =~ /cweijan/ && viewItem == queryGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == queryGroup",
 					"group": "inline@0"
 				},
 				{
 					"command": "mysql.template.user",
-					"when": "view =~ /cweijan/ && viewItem == userGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == userGroup",
 					"group": "1_mysql@1"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan/ && viewItem == userGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == userGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.user",
-					"when": "view =~ /cweijan/ && viewItem == userGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == userGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.change.user",
-					"when": "view =~ /cweijan/ && viewItem == user",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == user",
 					"group": "1_mysql@-1"
 				},
 				{
 					"command": "mysql.user.grant",
-					"when": "view =~ /cweijan/ && viewItem == user",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == user",
 					"group": "1_mysql@0"
 				},
 				{
 					"command": "mysql.delete.user",
-					"when": "view =~ /cweijan/ && viewItem == user",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == user",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.name.copy",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(user|database|esColumn|column|table|view|esIndex|procedure|function|trigger)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(user|database|esColumn|column|table|view|esIndex|procedure|function|trigger)$/",
 					"group": "-1_mysql@-5"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan/ && viewItem == database",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
 					"group": "3_mysql@0"
 				},
 				{
 					"command": "mysql.db.overview",
-					"when": "view =~ /cweijan/ && viewItem == database",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
 					"group": "3_mysql@2"
 				},
 				{
 					"command": "mysql.db.truncate",
-					"when": "view =~ /cweijan/ && viewItem == database",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
 					"group": "4_mysql@4"
 				},
 				{
 					"command": "mysql.db.drop",
-					"when": "view =~ /cweijan/ && viewItem == database",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
 					"group": "4_mysql@5"
 				},
 				{
 					"command": "mysql.data.export",
-					"when": "view =~ /cweijan/ && viewItem == database",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
 					"group": "mysql@5"
 				},
 				{
 					"command": "mysql.struct.export",
-					"when": "view =~ /cweijan/ && viewItem == database",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
 					"group": "mysql@6"
 				},
 				{
 					"command": "mysql.data.import",
-					"when": "view =~ /cweijan/ && viewItem == database",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
 					"group": "mysql@6"
 				},
 				{
 					"command": "mysql.table.show",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(table|view)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|view)$/",
 					"group": "inline@3"
 				},
 				{
 					"command": "mysql.table.drop",
-					"when": "view =~ /cweijan/ && viewItem == table && false",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table && false",
 					"group": "inline@1"
 				},
 				{
 					"command": "mysql.table.source",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(table|view)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|view)$/",
 					"group": "1_inline@0"
 				},
 				{
 					"command": "mysql.count.sql",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(table|view|esIndex)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|view|esIndex)$/",
 					"group": "1_inline@3"
 				},
 				{
 					"command": "mysql.column.add",
-					"when": "view =~ /cweijan/ && viewItem == table",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "1_inline@4"
 				},
 				{
 					"command": "mysql.mock.table",
-					"when": "view =~ /cweijan/ && viewItem == table",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "1_inline1@1"
 				},
 				{
 					"command": "mysql.data.export",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(table|view)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|view)$/",
 					"group": "1_inline1@2"
 				},
 				{
 					"command": "mysql.struct.export",
-					"when": "view =~ /cweijan/ && viewItem =~ /^(table|view)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|view)$/",
 					"group": "1_inline1@3"
 				},
 				{
 					"command": "mysql.template.sql",
-					"when": "view =~ /cweijan/ && viewItem == table",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "1_mysql@0"
 				},
 				{
 					"command": "mysql.copy.insert",
-					"when": "view =~ /cweijan/ && viewItem == table",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "1_mysql@1"
 				},
 				{
 					"command": "mysql.template.delete",
-					"when": "view =~ /cweijan/ && viewItem == table",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "1_mysql@3"
 				},
 				{
 					"command": "mysql.copy.update",
-					"when": "view =~ /cweijan/ && viewItem == table",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.table.truncate",
-					"when": "view =~ /cweijan/ && viewItem == table",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "2_mysql@1"
 				},
 				{
 					"command": "mysql.table.drop",
-					"when": "view =~ /cweijan/ && viewItem == table",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "2_mysql@2"
 				},
 				{
 					"command": "mysql.index.template",
-					"when": "view =~ /cweijan/ && viewItem == table",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "1_inline@7"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan/ && viewItem == tableGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == tableGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.table",
-					"when": "view =~ /cweijan/ && viewItem == tableGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == tableGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.column.up",
-					"when": "view =~ /cweijan/ && viewItem == column",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == column",
 					"group": "inline@0"
 				},
 				{
 					"command": "mysql.column.down",
-					"when": "view =~ /cweijan/ && viewItem == column",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == column",
 					"group": "inline@2"
 				},
 				{
 					"command": "mysql.column.changeName",
-					"when": "view =~ /cweijan/ && viewItem == column",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == column",
 					"group": "inline@4"
 				},
 				{
 					"command": "mysql.column.drop",
-					"when": "view =~ /cweijan/ && viewItem == column",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == column",
 					"group": "3_mysql@1"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan/ && viewItem == viewGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == viewGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.view",
-					"when": "view =~ /cweijan/ && viewItem == viewGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == viewGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.delete.view",
-					"when": "view =~ /cweijan/ && viewItem == view",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == view",
 					"group": "1_mysql@1"
 				},
 				{
 					"command": "mysql.diagram.drop",
-					"when": "view =~ /cweijan/ && viewItem == diagram",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == diagram",
 					"group": "inline@0"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan/ && viewItem == procedureGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == procedureGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.procedure",
-					"when": "view =~ /cweijan/ && viewItem == procedureGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == procedureGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.delete.procedure",
-					"when": "view =~ /cweijan/ && viewItem == procedure",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == procedure",
 					"group": "2_mysql@1"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan/ && viewItem == functionGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == functionGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.function",
-					"when": "view =~ /cweijan/ && viewItem == functionGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == functionGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.delete.function",
-					"when": "view =~ /cweijan/ && viewItem == function",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == function",
 					"group": "1_mysql@1"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan/ && viewItem == triggerGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == triggerGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.trigger",
-					"when": "view =~ /cweijan/ && viewItem == triggerGroup",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == triggerGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.delete.trigger",
-					"when": "view =~ /cweijan/ && viewItem == trigger",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == trigger",
 					"group": "1_mysql@1"
 				},
 				{
