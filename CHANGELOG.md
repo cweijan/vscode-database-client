@@ -1,6 +1,6 @@
 # CHANGELOG
 
-# 3.2.0 Unpublish.
+# 3.2.0 2020/1/20.
 
 - Migrate elasticsearch node to nosql explorer.
 - Support connect to redis server.
