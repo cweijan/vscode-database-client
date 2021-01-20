@@ -5,6 +5,7 @@ import { EsConnection } from "./esConnection";
 import { MSSqlConnnection } from "./mssqlConnection";
 import { MysqlConnection } from "./mysqlConnection";
 import { PostgreSqlConnection } from "./postgreSqlConnection";
+import { RedisConnection } from "./redisConnection";
 
 export interface IConnection {
     query(sql: string, callback?: queryCallback): void;
@@ -21,7 +22,7 @@ export interface IConnection {
 /**
  * fieldInfo, need name/orgTable
  */
-export type queryCallback = (err: Error | null, results?: any, fields?: FieldInfo[],total?:number) => void;
+export type queryCallback = (err: Error | null, results?: any, fields?: FieldInfo[], total?: number) => void;
 
 export interface QueryFunction {
 
@@ -39,6 +40,8 @@ export function create(opt: Node) {
             return new PostgreSqlConnection(opt)
         case DatabaseType.ES:
             return new EsConnection(opt);
+        case DatabaseType.REDIS:
+            return new RedisConnection(opt);
     }
     return new MysqlConnection(opt)
 }

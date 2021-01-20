@@ -19,7 +19,9 @@ export enum OperateType {
 
 export enum CacheKey {
     ConectionsKey = "mysql.connections",
-    CollapseSate = "mysql.database.cache.collapseState"
+    CollapseSate = "mysql.database.cache.collapseState",
+    CONECTIONS_CONFIG = "redis.connections",
+    COLLAPSE_SATE = "redis.cache.collapseState",
 }
 
 export enum ConfigKey {
@@ -48,14 +50,18 @@ export enum Confirm {
 export enum DatabaseType {
     MYSQL = "MySQL", PG = "PostgreSQL",
     MSSQL = "SqlServer", ORACLE = "Oracle",
-    ES = "ElasticSearch"
+    ES = "ElasticSearch", REDIS = "Redis"
 }
 
 export enum ModelType {
     /**
+     * redis
+     */
+    REDIS_CONNECTION = "redisConnection", REDIS_FOLDER = "redisFolder", REDIS_KEY = "redisKey",
+    /**
      * ElasticSearch
      */
-    ES_CONNECTION = "esConnection",ES_INDEX="esIndex",ES_COLUMN="esColumn",
+    ES_CONNECTION = "esConnection", ES_INDEX = "esIndex", ES_COLUMN = "esColumn",
     /**
      * database
      */
@@ -81,4 +87,9 @@ export enum MessageType {
 export enum Template {
     table = "sql-template.sql",
     alter = "alter-template.sql"
+}
+
+
+export enum RedisType {
+    hash = 'hash', list = 'list', string = 'string', zset = 'zset', set = 'set'
 }

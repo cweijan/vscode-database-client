@@ -1,4 +1,4 @@
-import { DatabaseType } from "@/common/constants";
+import { CacheKey, DatabaseType } from "@/common/constants";
 import * as vscode from "vscode";
 import { ExtensionContext } from "vscode";
 import { FileManager } from "../common/filesManager";
@@ -40,6 +40,7 @@ export class ServiceManager {
     public historyService = new HistoryRecorder();
     public mockRunner: MockRunner;
     public provider: DbTreeDataProvider;
+    public nosqlProvider: DbTreeDataProvider;
     public settingService: SettingService;
     public overviewService: OverviewService;
     public statusService: StatusService;
@@ -64,6 +65,7 @@ export class ServiceManager {
 
         this.initMysqlService();
         res.push(this.initTreeView())
+        res.push(this.initTreeProvider())
         ServiceManager.instance = this;
         this.isInit = true
         return res
@@ -71,7 +73,7 @@ export class ServiceManager {
 
 
     private initTreeView() {
-        this.provider = new DbTreeDataProvider(this.context);
+        this.provider = new DbTreeDataProvider(this.context,CacheKey.ConectionsKey);
         const treeview = vscode.window.createTreeView("github.cweijan.mysql", {
             treeDataProvider: this.provider,
         });
@@ -83,6 +85,21 @@ export class ServiceManager {
         });
         return treeview;
     }
+
+    private initTreeProvider() {
+        this.nosqlProvider = new DbTreeDataProvider(this.context,CacheKey.CONECTIONS_CONFIG);
+        const treeview = vscode.window.createTreeView("github.cweijan.nosql", {
+            treeDataProvider: this.nosqlProvider,
+        });
+        treeview.onDidCollapseElement((event) => {
+            // NodeState.store(event.element, vscode.TreeItemCollapsibleState.Collapsed);
+        });
+        treeview.onDidExpandElement((event) => {
+            // NodeState.store(event.element, vscode.TreeItemCollapsibleState.Expanded);
+        });
+        return treeview;
+    }
+
 
     private initMysqlService() {
         this.settingService = new MysqlSettingService();

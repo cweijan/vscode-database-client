@@ -63,8 +63,13 @@
 			"activitybar": [
 				{
 					"id": "github-cweijan-mysql",
-					"title": "Mysql",
+					"title": "Explorer",
 					"icon": "resources/icon/database-container.svg"
+				},
+				{
+					"id": "github-cweijan-nosql",
+					"title": "Explorer",
+					"icon": "resources/image/icon.png"
 				}
 			]
 		},
@@ -72,7 +77,13 @@
 			"github-cweijan-mysql": [
 				{
 					"id": "github.cweijan.mysql",
-					"name": "Connections"
+					"name": "Databases"
+				}
+			],
+			"github-cweijan-nosql": [
+				{
+					"id": "github.cweijan.nosql",
+					"name": "NoSql"
 				}
 			]
 		},
@@ -438,6 +449,25 @@
 				"command": "mysql.delete.trigger",
 				"title": "%command.delete.trigger%",
 				"category": "MySQL"
+			},
+			{
+				"command": "mysql.redis.connection.terminal",
+				"title": "Open Terminal",
+				"category": "Redis",
+				"icon": "resources/image/terminal.svg"
+			},
+			{
+				"command": "mysql.redis.connection.status",
+				"title": "Server status"
+			},
+			{
+				"command": "mysql.redis.key.del",
+				"title": "Delete Key",
+				"icon": "resources/image/delete.png"
+			},
+			{
+				"command": "mysql.redis.key.detail",
+				"title": "View Key Detail"
 			}
 		],
 		"keybindings": [
@@ -480,12 +510,12 @@
 			"view/title": [
 				{
 					"command": "mysql.connection.add",
-					"when": "view == github.cweijan.mysql",
+					"when": "view =~ /cweijan/",
 					"group": "navigation@3"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql",
+					"when": "view =~ /cweijan/",
 					"group": "navigation@2"
 				},
 				{
@@ -502,318 +532,333 @@
 			"view/item/context": [
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(esConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(esConnection|redisConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
 					"group": "inline@-2"
 				},
 				{
 					"command": "mysql.connection.edit",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|esConnection)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.host.copy",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|esConnection)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
 					"group": "1_mysql@3"
 				},
 				{
 					"command": "mysql.database.add",
-					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"when": "view =~ /cweijan/ && viewItem == connection",
 					"group": "2_mysql@0"
 				},
 				{
 					"command": "mysql.diagram.add",
-					"when": "view == github.cweijan.mysql && viewItem == diagramGroup",
+					"when": "view =~ /cweijan/ && viewItem == diagramGroup",
 					"group": "2_mysql@0"
 				},
 				{
 					"command": "mysql.query.add",
-					"when": "view == github.cweijan.mysql && viewItem == queryGroup",
+					"when": "view =~ /cweijan/ && viewItem == queryGroup",
 					"group": "2_mysql@0"
 				},
 				{
 					"command": "mysql.query.rename",
-					"when": "view == github.cweijan.mysql && viewItem == query",
+					"when": "view =~ /cweijan/ && viewItem == query",
 					"group": "2_mysql@0"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|esConnection)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
 					"group": "2_mysql@1"
 				},
 				{
 					"command": "mysql.server.info",
-					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"when": "view =~ /cweijan/ && viewItem == connection",
 					"group": "4_mysql@1"
 				},
 				{
 					"command": "mysql.data.import",
-					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"when": "view =~ /cweijan/ && viewItem == connection",
 					"group": "8_mysql@1"
 				},
 				{
 					"command": "mysql.connection.delete",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|esConnection)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
 					"group": "10mysql@2"
 				},
 				{
 					"command": "mysql.query.switch",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(connection|database|esConnection|esIndex)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(connection|database|esConnection|esIndex)$/",
 					"group": "inline@1"
 				},
 				{
 					"command": "mysql.database.add",
-					"when": "view == github.cweijan.mysql && viewItem == connection",
+					"when": "view =~ /cweijan/ && viewItem == connection",
 					"group": "inline@0"
 				},
 				{
 					"command": "mysql.diagram.add",
-					"when": "view == github.cweijan.mysql && viewItem == diagramGroup",
+					"when": "view =~ /cweijan/ && viewItem == diagramGroup",
 					"group": "inline@0"
 				},
 				{
 					"command": "mysql.query.add",
-					"when": "view == github.cweijan.mysql && viewItem == queryGroup",
+					"when": "view =~ /cweijan/ && viewItem == queryGroup",
 					"group": "inline@0"
 				},
 				{
 					"command": "mysql.template.user",
-					"when": "view == github.cweijan.mysql && viewItem == userGroup",
+					"when": "view =~ /cweijan/ && viewItem == userGroup",
 					"group": "1_mysql@1"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem == userGroup",
+					"when": "view =~ /cweijan/ && viewItem == userGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.user",
-					"when": "view == github.cweijan.mysql && viewItem == userGroup",
+					"when": "view =~ /cweijan/ && viewItem == userGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.change.user",
-					"when": "view == github.cweijan.mysql && viewItem == user",
+					"when": "view =~ /cweijan/ && viewItem == user",
 					"group": "1_mysql@-1"
 				},
 				{
 					"command": "mysql.user.grant",
-					"when": "view == github.cweijan.mysql && viewItem == user",
+					"when": "view =~ /cweijan/ && viewItem == user",
 					"group": "1_mysql@0"
 				},
 				{
 					"command": "mysql.delete.user",
-					"when": "view == github.cweijan.mysql && viewItem == user",
+					"when": "view =~ /cweijan/ && viewItem == user",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.name.copy",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(user|database|esColumn|column|table|view|esIndex|procedure|function|trigger)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(user|database|esColumn|column|table|view|esIndex|procedure|function|trigger)$/",
 					"group": "-1_mysql@-5"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem == database",
+					"when": "view =~ /cweijan/ && viewItem == database",
 					"group": "3_mysql@0"
 				},
 				{
 					"command": "mysql.db.overview",
-					"when": "view == github.cweijan.mysql && viewItem == database",
+					"when": "view =~ /cweijan/ && viewItem == database",
 					"group": "3_mysql@2"
 				},
 				{
 					"command": "mysql.db.truncate",
-					"when": "view == github.cweijan.mysql && viewItem == database",
+					"when": "view =~ /cweijan/ && viewItem == database",
 					"group": "4_mysql@4"
 				},
 				{
 					"command": "mysql.db.drop",
-					"when": "view == github.cweijan.mysql && viewItem == database",
+					"when": "view =~ /cweijan/ && viewItem == database",
 					"group": "4_mysql@5"
 				},
 				{
 					"command": "mysql.data.export",
-					"when": "view == github.cweijan.mysql && viewItem == database",
+					"when": "view =~ /cweijan/ && viewItem == database",
 					"group": "mysql@5"
 				},
 				{
 					"command": "mysql.struct.export",
-					"when": "view == github.cweijan.mysql && viewItem == database",
+					"when": "view =~ /cweijan/ && viewItem == database",
 					"group": "mysql@6"
 				},
 				{
 					"command": "mysql.data.import",
-					"when": "view == github.cweijan.mysql && viewItem == database",
+					"when": "view =~ /cweijan/ && viewItem == database",
 					"group": "mysql@6"
 				},
 				{
 					"command": "mysql.table.show",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(table|view)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(table|view)$/",
 					"group": "inline@3"
 				},
 				{
 					"command": "mysql.table.drop",
-					"when": "view == github.cweijan.mysql && viewItem == table && false",
+					"when": "view =~ /cweijan/ && viewItem == table && false",
 					"group": "inline@1"
 				},
 				{
 					"command": "mysql.table.source",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(table|view)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(table|view)$/",
 					"group": "1_inline@0"
 				},
 				{
 					"command": "mysql.count.sql",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(table|view|esIndex)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(table|view|esIndex)$/",
 					"group": "1_inline@3"
 				},
 				{
 					"command": "mysql.column.add",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view =~ /cweijan/ && viewItem == table",
 					"group": "1_inline@4"
 				},
 				{
 					"command": "mysql.mock.table",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view =~ /cweijan/ && viewItem == table",
 					"group": "1_inline1@1"
 				},
 				{
 					"command": "mysql.data.export",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(table|view)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(table|view)$/",
 					"group": "1_inline1@2"
 				},
 				{
 					"command": "mysql.struct.export",
-					"when": "view == github.cweijan.mysql && viewItem =~ /^(table|view)$/",
+					"when": "view =~ /cweijan/ && viewItem =~ /^(table|view)$/",
 					"group": "1_inline1@3"
 				},
 				{
 					"command": "mysql.template.sql",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view =~ /cweijan/ && viewItem == table",
 					"group": "1_mysql@0"
 				},
 				{
 					"command": "mysql.copy.insert",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view =~ /cweijan/ && viewItem == table",
 					"group": "1_mysql@1"
 				},
 				{
 					"command": "mysql.template.delete",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view =~ /cweijan/ && viewItem == table",
 					"group": "1_mysql@3"
 				},
 				{
 					"command": "mysql.copy.update",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view =~ /cweijan/ && viewItem == table",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.table.truncate",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view =~ /cweijan/ && viewItem == table",
 					"group": "2_mysql@1"
 				},
 				{
 					"command": "mysql.table.drop",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view =~ /cweijan/ && viewItem == table",
 					"group": "2_mysql@2"
 				},
 				{
 					"command": "mysql.index.template",
-					"when": "view == github.cweijan.mysql && viewItem == table",
+					"when": "view =~ /cweijan/ && viewItem == table",
 					"group": "1_inline@7"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem == tableGroup",
+					"when": "view =~ /cweijan/ && viewItem == tableGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.table",
-					"when": "view == github.cweijan.mysql && viewItem == tableGroup",
+					"when": "view =~ /cweijan/ && viewItem == tableGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.column.up",
-					"when": "view == github.cweijan.mysql && viewItem == column",
+					"when": "view =~ /cweijan/ && viewItem == column",
 					"group": "inline@0"
 				},
 				{
 					"command": "mysql.column.down",
-					"when": "view == github.cweijan.mysql && viewItem == column",
+					"when": "view =~ /cweijan/ && viewItem == column",
 					"group": "inline@2"
 				},
 				{
 					"command": "mysql.column.changeName",
-					"when": "view == github.cweijan.mysql && viewItem == column",
+					"when": "view =~ /cweijan/ && viewItem == column",
 					"group": "inline@4"
 				},
 				{
 					"command": "mysql.column.drop",
-					"when": "view == github.cweijan.mysql && viewItem == column",
+					"when": "view =~ /cweijan/ && viewItem == column",
 					"group": "3_mysql@1"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem == viewGroup",
+					"when": "view =~ /cweijan/ && viewItem == viewGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.view",
-					"when": "view == github.cweijan.mysql && viewItem == viewGroup",
+					"when": "view =~ /cweijan/ && viewItem == viewGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.delete.view",
-					"when": "view == github.cweijan.mysql && viewItem == view",
+					"when": "view =~ /cweijan/ && viewItem == view",
 					"group": "1_mysql@1"
 				},
 				{
 					"command": "mysql.diagram.drop",
-					"when": "view == github.cweijan.mysql && viewItem == diagram",
+					"when": "view =~ /cweijan/ && viewItem == diagram",
 					"group": "inline@0"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem == procedureGroup",
+					"when": "view =~ /cweijan/ && viewItem == procedureGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.procedure",
-					"when": "view == github.cweijan.mysql && viewItem == procedureGroup",
+					"when": "view =~ /cweijan/ && viewItem == procedureGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.delete.procedure",
-					"when": "view == github.cweijan.mysql && viewItem == procedure",
+					"when": "view =~ /cweijan/ && viewItem == procedure",
 					"group": "2_mysql@1"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem == functionGroup",
+					"when": "view =~ /cweijan/ && viewItem == functionGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.function",
-					"when": "view == github.cweijan.mysql && viewItem == functionGroup",
+					"when": "view =~ /cweijan/ && viewItem == functionGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.delete.function",
-					"when": "view == github.cweijan.mysql && viewItem == function",
+					"when": "view =~ /cweijan/ && viewItem == function",
 					"group": "1_mysql@1"
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view == github.cweijan.mysql && viewItem == triggerGroup",
+					"when": "view =~ /cweijan/ && viewItem == triggerGroup",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.template.trigger",
-					"when": "view == github.cweijan.mysql && viewItem == triggerGroup",
+					"when": "view =~ /cweijan/ && viewItem == triggerGroup",
 					"group": "inline"
 				},
 				{
 					"command": "mysql.delete.trigger",
-					"when": "view == github.cweijan.mysql && viewItem == trigger",
+					"when": "view =~ /cweijan/ && viewItem == trigger",
 					"group": "1_mysql@1"
+				},
+				{
+					"command": "mysql.redis.connection.terminal",
+					"when": "view == github.cweijan.nosql && viewItem == redisConnection",
+					"group": "inline@1"
+				},
+				{
+					"command": "mysql.redis.connection.status",
+					"when": "view == github.cweijan.nosql && viewItem == redisConnection",
+					"group": "connection"
+				},
+				{
+					"command": "mysql.redis.key.del",
+					"when": "view == github.cweijan.nosql && viewItem == redisKey",
+					"group": "inline"
 				}
 			]
 		},
@@ -847,6 +892,7 @@
 	"scripts": {
 		"dev": "webpack --progress",
 		"build": "webpack -p --progress",
+		"lib": "webpack --config webpack.config.lib.js --progress -p",
 		"publich": "vsce publish",
 		"vscode:prepublish": "npm run build"
 	},
@@ -862,6 +908,7 @@
 		"css-loader": "^3.5.3",
 		"file-loader": "^6.0.0",
 		"html-webpack-plugin": "^4.3.0",
+		"@types/redis": "^2.8.18",
 		"postcss": "^8.2.1",
 		"postcss-loader": "^4.1.0",
 		"style-loader": "^1.2.1",
@@ -882,11 +929,13 @@
 		"date-format": "^3.0.0",
 		"deepmerge": "^3.2.0",
 		"element-ui": "^2.13.2",
+		"json-format-highlight": "^1.0.4",
 		"lodash": "^4.17.20",
 		"mysql2": "^2.2.5",
 		"pg": "^8.5.1",
 		"portfinder": "^1.0.26",
 		"pretty-bytes": "^5.3.0",
+		"redis": "^3.0.2",
 		"routington": "^1.0.3",
 		"sqlstring": "^2.3.2",
 		"tedious": "^9.2.3",
