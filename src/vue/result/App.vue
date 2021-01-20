@@ -145,7 +145,7 @@ export default {
         this.reset()
       }
       // only es have.
-      if (data.total) {
+      if (data.total!=null) {
         this.page.total = parseInt(data.total)
       } else if (this.result.tableCount == 1) {
         this.count()
