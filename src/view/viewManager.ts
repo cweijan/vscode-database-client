@@ -10,6 +10,7 @@ export class ViewOption {
     public path: string;
     public title: string;
     public type?: string;
+    public preserveFocus?:boolean;
     public splitView: boolean = false;
     /**
      * keep single page by viewType
@@ -62,6 +63,9 @@ export class ViewManager {
             if (typeof (viewOption.singlePage) == 'undefined') { viewOption.singlePage = true }
             if (typeof (viewOption.killHidden) == 'undefined') { viewOption.killHidden = true }
 
+            if(viewOption.preserveFocus==null){
+                viewOption.preserveFocus=true;
+            }
             if(!viewOption.type){
                 viewOption.type=viewOption.title
             }
@@ -87,7 +91,7 @@ export class ViewManager {
                 viewOption.title,
                 {
                     viewColumn: viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One,
-                    preserveFocus: true
+                    preserveFocus: viewOption.preserveFocus
                 },
                 { enableScripts: true, retainContextWhenHidden: true },
             );

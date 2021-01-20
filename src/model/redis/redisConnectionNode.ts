@@ -47,7 +47,7 @@ export class RedisConnectionNode extends RedisBaseNode {
     async openTerminal(): Promise<any> {
         const client = await this.getClient()
         ViewManager.createWebviewPanel({
-            splitView: true, title: `${this.host}@${this.port}`,
+            splitView: true, title: `${this.host}@${this.port}`,preserveFocus:false,
             iconPath: this.iconDetailPath, path: "app",
             eventHandler: (handler) => {
                 handler.on("init", () => {
