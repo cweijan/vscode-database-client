@@ -91,8 +91,8 @@ export class MysqlDialect extends SqlDialect{
     tableTemplate(): string {
         return `CREATE TABLE [name](  
     id int NOT NULL primary key AUTO_INCREMENT comment 'primary key',
-    created_time DATETIME COMMENT 'created tiem',
-    updated_time DATETIME COMMENT 'updated tiem',
+    created_time DATETIME COMMENT 'created time',
+    updated_time DATETIME COMMENT 'updated time',
     [column] varchar(255) comment ''
 ) default charset utf8 comment '';`
     }
