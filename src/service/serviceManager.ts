@@ -1,4 +1,5 @@
 import { CacheKey, DatabaseType } from "@/common/constants";
+import { SqlCodeLensProvider } from "@/provider/sqlCodeLensProvider";
 import * as vscode from "vscode";
 import { ExtensionContext } from "vscode";
 import { FileManager } from "../common/filesManager";
@@ -59,6 +60,7 @@ export class ServiceManager {
         if (this.isInit) { return [] }
         const res: vscode.Disposable[] = [
             vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormattingProvider()),
+            vscode.languages.registerCodeLensProvider('sql', new SqlCodeLensProvider()),
             vscode.languages.registerHoverProvider('sql', new TableInfoHoverProvider()),
             vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.', ">", "<", "=", "(")
         ]
