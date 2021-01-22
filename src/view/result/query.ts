@@ -76,7 +76,7 @@ export class QueryPage {
                     })
                     QueryUnit.runQuery(esQuery, dbOption);
                 }).on('count', async (params) => {
-                    dbOption.execute(params.sql).then((rows) => {
+                    dbOption.execute(params.sql.replace(/\bSELECT\b.+?\bFROM\b/i,'select count(*) count from')).then((rows) => {
                         handler.emit('COUNT', { data: rows[0].count })
                     })
                 }).on(OperateType.export, (params) => {
@@ -201,6 +201,7 @@ export class QueryPage {
         }
         queryParam.res.tableCount = sqlList.length;
         queryParam.res.table = tableName;
+        queryParam.res.database = database;
     }
 
 }

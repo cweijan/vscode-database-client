@@ -357,7 +357,7 @@ export default {
     count() {
       if (!this.result.table) return
       this.info.visible = false
-      vscodeEvent.emit("count", { sql: `SELECT count(*) count FROM ${this.result.table}` })
+      vscodeEvent.emit("count", { sql: this.result.sql })
     },
     execute(sql) {
       if (!sql) return
