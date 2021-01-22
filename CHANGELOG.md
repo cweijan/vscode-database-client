@@ -1,6 +1,11 @@
 # CHANGELOG
 
-# 3.2.0 2020/1/20.
+# 3.2.1 2020/1/23
+
+- Resign connect page.
+- Add sql code lens.
+
+# 3.2.0 2020/1/20
 
 - Migrate elasticsearch node to nosql explorer.
 - Support connect to redis server.
