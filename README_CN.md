@@ -1,0 +1,75 @@
+# Database Client
+
+[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2)
+
+Database Client For Visual Studio Code
+
+[English](README.md)|中文文档
+
+> 支持的数据库: Mysql/MariaDB、SqlServer、Postgresql、Redis、ElasticSearch
+
+**Features**
+
+- [Database Client](#database-client)
+  - [连接](#连接)
+  - [数据表](#数据表)
+  - [执行SQL](#执行SQL)
+  - [生成测试数据](#生成测试数据)
+  - [历史记录](#历史记录)
+  - [备份/导出](#备份/导出)
+  - [表过滤](#表过滤)
+
+## 安装
+
+在 Visual Studio Code 扩展中心安装 [vscode-mysql](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2).
+
+## 连接
+
+1. 打开左侧数据库面板, 点击添加按钮
+2. 在连接页面配置相应的数据库信息
+
+![connection](images/connection.jpg)
+
+## 数据表
+
+1. 点击数据库表打开数据视图
+2. 之后便可在页面进行CRUD、数据导出等操作.
+   ![query](images/QueryTable.jpg)
+
+## 执行SQL
+
+* 点击数据库节点的 `New Query` 按钮.
+  ![newquery](images/newquery.jpg)
+* 之后可在编辑器中编辑和执行SQL.
+* ![run](images/run.jpg)
+
+## 生成测试数据
+
+- 该扩展提供一键生成虚拟数据的功能, 再也不用为没有测试数据而烦恼.
+  ![mockData](images/mockData.png)
+
+## 历史记录
+
+- 点击历史记录按钮后可查看以往执行的Sql记录.
+  ![history](images/history.jpg)
+
+## 备份/导出
+
+* 在表或者数据库节点右击, 之后便可以进行数据的导入导出.
+  ![bakcup](images/Backup.jpg)
+
+## 表过滤
+
+![filter](images/filter.gif)
+
+# 致谢
+
+- [vscode-mysql](https://github.com/formulahendry/vscode-mysql): 本插件的灵感来源
+- [mysqldump](https://github.com/bradzacher/mysqldum): 数据备份库.
+- [sql-formatter](https://github.com/zeroturnaround/sql-formatter) Sql格式化库.
+- [umy-ui](https://github.com/u-leo/umy-ui): 表数据渲染库.
+- 核心连接库:
+
+  - [node-mysql2](https://github.com/sidorares/node-mysql2) : Mysql client.
+  - [node-postgres](https://github.com/brianc/node-postgres): PostgreSql client.
+  - [tedious](https://github.com/tediousjs/tedious): SqlServer client.

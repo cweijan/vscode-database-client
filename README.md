@@ -4,29 +4,26 @@
 
 Database Client For Visual Studio Code
 
-> Supported databases: Mysql/MariaDB、SqlServer、Postgresql
-> 
+English|[中文文档](README_CN.md)
+
+> Supported databases: Mysql/MariaDB、SqlServer、Postgresql、Redis、ElasticSearch
+>
 > Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client)
 
 **Features**
 
 - [Database Client](#database-client)
   - [Connect](#connect)
-  - [View Tables](#view-tables)
-  - [Execute Sql](#execute-sql)
+  - [Table](#table)
+  - [Execute SQL](#execute-SQL)
   - [Generate Mock Data](#generate-mock-data)
   - [History](#history)
   - [Backup/Import](#backupimport)
-  - [Setting](#setting)
   - [Filter](#filter)
 
 ## Installation
 
 Install from vscode marketplace [vscode-mysql](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2).
-
-## Coffee
-
-If you like this this extension, consider [buying me a coffee](https://www.buymeacoffee.com/cweijan). Thank you!
 
 ## Connect
 
@@ -35,20 +32,18 @@ If you like this this extension, consider [buying me a coffee](https://www.buyme
 
 ![connection](images/connection.jpg)
 
-## View Tables
+## Table
 
-1. Click Table To Open Query page and Load data.
-2. You can do data modification on query page.
+1. Click table to open table view.
+2. Then you can do data modification on view page.
    ![query](images/QueryTable.jpg)
 
-## Execute Sql
+## Execute SQL
 
 * In the MySQL Panel, click the `New Query` button.
   ![newquery](images/newquery.jpg)
-* This changes the active database.
-* Now you can enjoy Intellisense for SQL code within the editor.
-* Click Run Button or Press `F9` to Execute.
-  ![run](images/run.jpg)
+* Now you can edit and run SQL within the editor.
+* ![run](images/run.jpg)
 
 ## Generate Mock Data
 
@@ -64,18 +59,6 @@ If you like this this extension, consider [buying me a coffee](https://www.buyme
 
 * Move to ant DatabaseNode or TableNode, backup/import options are listed in the context menu (right click to open).
   ![bakcup](images/Backup.jpg)
-
-## Setting
-
-OpenSetting -> extensions -> Mysql
-
-![Setting](images/setting.png)
-
-## Other
-
-* Find a suprise when you right click on a node.
-
-![suprise](images/surprise.jpg)
 
 ## Filter
 
