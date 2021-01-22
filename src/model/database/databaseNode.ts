@@ -16,6 +16,7 @@ import { ProcedureGroup } from "../main/procedureGroup";
 import { TableGroup } from "../main/tableGroup";
 import { TriggerGroup } from "../main/triggerGroup";
 import { ViewGroup } from "../main/viewGroup";
+import { MongoTableGroup } from "../mongo/mongoTableGroup";
 import { NodeUtil } from '../nodeUtil';
 import { QueryGroup } from "../query/queryGroup";
 
@@ -41,7 +42,7 @@ export class DatabaseNode extends Node implements CopyAble {
 
         if(this.dbType==DatabaseType.MONGO_DB){
             return [
-                new TableGroup(this)
+                new MongoTableGroup(this)
             ]
         }
 

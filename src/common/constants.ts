@@ -53,7 +53,7 @@ export enum DatabaseType {
 }
 
 export enum ModelType {
-    MONGO_CONNECTION="mongoConnection",
+    MONGO_CONNECTION="mongoConnection",MONGO_TABLE="mongoTable",
     /**
      * redis
      */

@@ -18,6 +18,13 @@ export class MongoConnection implements IConnection {
             callback(err)
         })
     }
+
+    run(callback: (client: MongoClient) => void) {
+        
+        callback(this.client)
+    }
+
+
     beginTransaction(callback: (err: Error) => void): void {
     }
     rollback(): void {
