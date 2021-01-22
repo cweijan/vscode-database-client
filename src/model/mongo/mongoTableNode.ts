@@ -1,6 +1,7 @@
 import { ModelType } from "@/common/constants";
 import { MongoConnection } from "@/service/connect/mongoConnection";
 import { ConnectionManager } from "@/service/connectionManager";
+import { QueryUnit } from "@/service/queryUnit";
 import { MongoClient } from "mongodb";
 import { TableNode } from "../main/tableNode";
 
@@ -14,12 +15,6 @@ export class MongoTableNode extends TableNode {
         return [];
     }
 
-
-    public async selectSqlTemplate() {
-        const client = await this.getClient()
-        const result=await client.db(this.database).collection(this.label).find({}).toArray()
-        console.log(result)
-    }
 
     public async getClient(): Promise<MongoClient> {
         const redis = (await ConnectionManager.getConnection(this)) as MongoConnection

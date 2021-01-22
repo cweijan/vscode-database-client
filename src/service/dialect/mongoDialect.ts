@@ -38,7 +38,7 @@ export class MongoDialect implements SqlDialect{
         throw new Error("Method not implemented.");
     }
     buildPageSql(database: string, table: string, pageSize: number): string {
-        throw new Error("Method not implemented.");
+        return `this.client.db('${database}').collection('${table}').find({}).toArray()`;
     }
     countSql(database: string, table: string): string {
         throw new Error("Method not implemented.");
@@ -92,7 +92,7 @@ export class MongoDialect implements SqlDialect{
         throw new Error("Method not implemented.");
     }
     pingDataBase(database: string): string {
-        return `use ${database}`
+        return null;
     }
     dropTriggerTemplate(name: string): string {
         throw new Error("Method not implemented.");

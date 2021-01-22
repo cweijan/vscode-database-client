@@ -20,7 +20,7 @@ export class MongoConnection implements IConnection {
     }
 
     run(callback: (client: MongoClient) => void) {
-        
+
         callback(this.client)
     }
 
@@ -39,7 +39,7 @@ export class MongoConnection implements IConnection {
 
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
-    query(sql: any, values?: any, callback?: any) {
+    async query(sql: any, values?: any, callback?: any) {
         if (!callback && values instanceof Function) {
             callback = values;
         }
@@ -49,9 +49,36 @@ export class MongoConnection implements IConnection {
                 console.log(res)
             })
         } else {
-            console.log(sql)
-            callback(null, null)
+            const result = await eval(sql)
+            this.handleSearch(sql, result, callback)
         }
+    }
+
+    private async handleSearch(sql: any, data: any, callback: any) {
+        let fields = null;
+
+        let rows = data.map((document: any) => {
+            if (!fields) {
+                fields = [];
+                for (const key in document) {
+                    fields.push({ name: key, type: 'text', nullable: 'YES' });
+                }
+            }
+            let row = {};
+            for (const key in document) {
+                row[key] = document[key];
+                if (row[key] instanceof Object) {
+                    row[key] = JSON.stringify(row[key]);
+                }
+            }
+            return row;
+        });
+        // if (!fields) {
+        //     const indexName = path.split('/')[1];
+        //     const indexNode = Node.nodeCache[`${this.opt.getConnectId()}_${indexName}`] as Node;
+        //     fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' }; }) as any;
+        // }
+        callback(null, rows, fields);
     }
 
 }
