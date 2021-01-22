@@ -2,10 +2,17 @@
   <div class="container flex flex-col mx-auto">
     <h1 class="py-4 text-2xl">Connect to Database Server</h1>
 
-    <blockquote class="p-3 mb-2 panel" id="error" v-if="error">
+    <blockquote class="p-3 mb-2 panel error" v-if="connect.error">
       <section class="panel__text">
-        <div class="font-bold mr-5 inline-block w-14">Connection error!</div>
-        <span id="errorMessage" v-text="errorMessage"></span>
+        <div class="font-bold mr-5 inline-block w-32">Connection error!</div>
+        <span v-text="connect.errorMessage"></span>
+      </section>
+    </blockquote>
+
+    <blockquote class="p-3 mb-2 panel success" v-if="connect.success">
+      <section class="panel__text">
+        <div class="font-bold mr-5 inline-block w-32">Connection success!</div>
+        <span v-text="connect.successMessage"></span>
       </section>
     </blockquote>
 
@@ -142,8 +149,8 @@
       </div>
     </div>
 
-    <div >
-      <button class="button button--primary w-28 inline mr-4" @click="tryConnect">Connect</button>
+    <div>
+      <button class="button button--primary w-28 inline mr-4" @click="tryConnect" v-loading="connect.loading">Connect</button>
       <button class="button button--primary w-28 inline" @click="close">Close</button>
     </div>
   </div>
@@ -184,9 +191,14 @@ export default {
         "ElasticSearch",
         "Redis",
       ],
+      connect: {
+        loading: false,
+        success: false,
+        successMessage: "",
+        error: false,
+        errorMessage: "",
+      },
       editModel: false,
-      error: false,
-      errorMessage: "",
     };
   },
   mounted() {
@@ -200,8 +212,16 @@ export default {
         this.editModel = false;
       })
       .on("error", (err) => {
-        this.error = true;
-        this.errorMessage = err;
+        this.connect.loading = false;
+        this.connect.success = false;
+        this.connect.error = true;
+        this.connect.errorMessage = err;
+      })
+      .on("success", (message) => {
+        this.connect.loading = false;
+        this.connect.error = false;
+        this.connect.success = true;
+        this.connect.successMessage = message;
       });
     vscodeEvent.emit("route-" + this.$route.name);
     window.onkeydown = (e) => {
@@ -215,13 +235,14 @@ export default {
   },
   methods: {
     tryConnect() {
+      this.connect.loading=true;
       vscodeEvent.emit("connecting", {
         connectionOption: this.connectionOption,
       });
     },
-    close(){
-      vscodeEvent.emit("close")
-    }
+    close() {
+      vscodeEvent.emit("close");
+    },
   },
   watch: {
     "connectionOption.dbType"(value) {
@@ -330,7 +351,14 @@ input::-webkit-inner-spin-button {
   border-left-width: 5px;
   border-left-style: solid;
   background: var(--vscode-textBlockQuote-background);
+}
+
+.error {
   border-color: var(--vscode-inputValidation-errorBorder);
+}
+
+.success {
+  border-color: green;
 }
 
 .panel__text {

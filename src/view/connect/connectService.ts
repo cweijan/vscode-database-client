@@ -41,7 +41,8 @@ export class ConnectService {
                     try {
                         await this.connect(connectNode)
                         provider.addConnection(connectNode)
-                        handler.panel.dispose();
+                        // handler.panel.dispose();
+                        handler.emit("success", 'connect success!')
                     } catch (err) {
                         if (err?.message) {
                             handler.emit("error", err.message)
