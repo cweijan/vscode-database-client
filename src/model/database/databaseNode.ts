@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/constants";
+import { Constants, DatabaseType, ModelType } from "../../common/constants";
 import { FileManager } from '../../common/filesManager';
 import { Util } from '../../common/util';
 import { DbTreeDataProvider } from '../../provider/treeDataProvider';
@@ -38,6 +38,13 @@ export class DatabaseNode extends Node implements CopyAble {
     }
 
     public getChildren(): Promise<Node[]>|Node[] {
+
+        if(this.dbType==DatabaseType.MONGO_DB){
+            return [
+                new TableGroup(this)
+            ]
+        }
+
         return [
             new TableGroup(this), new ViewGroup(this),
             new QueryGroup(this), new DiagramGroup(this),

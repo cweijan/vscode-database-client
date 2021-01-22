@@ -21,6 +21,7 @@
       <el-radio v-model="connectionOption.dbType" label="SqlServer">SQL Server</el-radio>
       <el-radio v-model="connectionOption.dbType" label="ElasticSearch">ElasticSearch</el-radio>
       <el-radio v-model="connectionOption.dbType" label="Redis">Redis</el-radio>
+      <el-radio v-model="connectionOption.dbType" label="MongoDB">MongoDB</el-radio>
       </el-select>
     </section>
 
@@ -138,8 +139,8 @@
 </template>
 
 <script>
-import { getVscodeEvent } from "../util/vscode"
-let vscodeEvent
+import { getVscodeEvent } from "../util/vscode";
+let vscodeEvent;
 export default {
   name: "Connect",
   data() {
@@ -169,76 +170,81 @@ export default {
       editModel: false,
       error: false,
       errorMessage: "",
-    }
+    };
   },
   mounted() {
-    vscodeEvent = getVscodeEvent()
+    vscodeEvent = getVscodeEvent();
     vscodeEvent
       .on("edit", (node) => {
-        this.editModel = true
-        this.connectionOption = node
+        this.editModel = true;
+        this.connectionOption = node;
       })
       .on("connect", (node) => {
-        this.editModel = false
+        this.editModel = false;
       })
       .on("error", (err) => {
-        this.error = true
-        this.errorMessage = err
-      })
-    vscodeEvent.emit("route-" + this.$route.name)
+        this.error = true;
+        this.errorMessage = err;
+      });
+    vscodeEvent.emit("route-" + this.$route.name);
     window.onkeydown = (e) => {
       if (e.key == "Enter" && e.target.tagName == "INPUT") {
-        this.tryConnect()
+        this.tryConnect();
       }
-    }
+    };
   },
   destroyed() {
-    vscodeEvent.destroy()
+    vscodeEvent.destroy();
   },
   methods: {
     tryConnect() {
       vscodeEvent.emit("connecting", {
         databaseType: this.databaseType,
         connectionOption: this.connectionOption,
-      })
+      });
     },
   },
   watch: {
     "connectionOption.dbType"(value) {
       if (this.editModel) {
-        return
+        return;
       }
       switch (value) {
         case "MySQL":
-          this.connectionOption.user = "root"
-          this.connectionOption.port = 3306
-          break
+          this.connectionOption.user = "root";
+          this.connectionOption.port = 3306;
+          break;
         case "PostgreSQL":
-          this.connectionOption.user = "postgres"
-          this.connectionOption.port = 5432
-          break
+          this.connectionOption.user = "postgres";
+          this.connectionOption.port = 5432;
+          break;
         case "Oracle":
-          this.connectionOption.user = "system"
-          this.connectionOption.port = 1521
-          break
+          this.connectionOption.user = "system";
+          this.connectionOption.port = 1521;
+          break;
         case "SqlServer":
-          this.connectionOption.user = "sa"
-          this.connectionOption.port = 1433
-          break
+          this.connectionOption.user = "sa";
+          this.connectionOption.port = 1433;
+          break;
         case "ElasticSearch":
-          this.connectionOption.user = null
-          this.connectionOption.port = 9200
-          this.connectionOption.database = null
-          break
+          this.connectionOption.user = null;
+          this.connectionOption.port = 9200;
+          this.connectionOption.database = null;
+          break;
         case "Redis":
-          this.connectionOption.port = 6379
-          this.connectionOption.user = null
-          this.connectionOption.database = "0"
-          break
+          this.connectionOption.port = 6379;
+          this.connectionOption.user = "redis";
+          this.connectionOption.database = "0";
+          break;
+        case "MongoDB":
+          this.connectionOption.port = 27017;
+          this.connectionOption.user = "mongo";
+          this.connectionOption.database = null;
+          break;
       }
     },
   },
-}
+};
 </script>
 
 <style scoped>

@@ -48,12 +48,12 @@ export enum Confirm {
 }
 
 export enum DatabaseType {
-    MYSQL = "MySQL", PG = "PostgreSQL",
-    MSSQL = "SqlServer", ORACLE = "Oracle",
-    ES = "ElasticSearch", REDIS = "Redis"
+    MYSQL = "MySQL", PG = "PostgreSQL", MSSQL = "SqlServer",
+    ES = "ElasticSearch", REDIS = "Redis", MONGO_DB="MongoDB"
 }
 
 export enum ModelType {
+    MONGO_CONNECTION="mongoConnection",
     /**
      * redis
      */

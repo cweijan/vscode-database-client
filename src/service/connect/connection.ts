@@ -2,6 +2,7 @@ import { DatabaseType } from "@/common/constants";
 import { Node } from "@/model/interface/node";
 import { FieldInfo } from "mysql2";
 import { EsConnection } from "./esConnection";
+import { MongoConnection } from "./mongoConnection";
 import { MSSqlConnnection } from "./mssqlConnection";
 import { MysqlConnection } from "./mysqlConnection";
 import { PostgreSqlConnection } from "./postgreSqlConnection";
@@ -42,6 +43,8 @@ export function create(opt: Node) {
             return new EsConnection(opt);
         case DatabaseType.REDIS:
             return new RedisConnection(opt);
+        case DatabaseType.MONGO_DB:
+            return new MongoConnection(opt);
     }
     return new MysqlConnection(opt)
 }
