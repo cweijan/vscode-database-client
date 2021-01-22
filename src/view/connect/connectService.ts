@@ -49,6 +49,8 @@ export class ConnectService {
                             handler.emit("error", err)
                         }
                     }
+                }).on("close",()=>{
+                    handler.panel.dispose()
                 })
             }
         });

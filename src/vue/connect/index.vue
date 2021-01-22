@@ -74,7 +74,7 @@
     </template>
 
     <section class="flex items-center mb-2">
-       <div class="inline-block mr-10">
+      <div class="inline-block mr-10">
         <label class="mr-2 font-bold" for="ssh-connection">Using SSH</label>
         <el-switch id="ssh-connection" v-model="connectionOption.usingSSH"></el-switch>
       </div>
@@ -142,9 +142,10 @@
       </div>
     </div>
 
-    <div id="fields" data-type="none"></div>
-
-    <button class="button button--primary" @click="tryConnect">Connect</button>
+    <div >
+      <button class="button button--primary w-28 inline mr-4" @click="tryConnect">Connect</button>
+      <button class="button button--primary w-28 inline" @click="close">Close</button>
+    </div>
   </div>
 </template>
 
@@ -218,6 +219,9 @@ export default {
         connectionOption: this.connectionOption,
       });
     },
+    close(){
+      vscodeEvent.emit("close")
+    }
   },
   watch: {
     "connectionOption.dbType"(value) {
@@ -305,7 +309,6 @@ input::-webkit-inner-spin-button {
 }
 
 .button {
-  width: auto;
   padding: 4px 14px;
   border: 0;
   display: inline-block;
