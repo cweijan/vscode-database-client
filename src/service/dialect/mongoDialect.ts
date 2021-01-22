@@ -38,7 +38,7 @@ export class MongoDialect implements SqlDialect{
         throw new Error("Method not implemented.");
     }
     buildPageSql(database: string, table: string, pageSize: number): string {
-        return `this.client.db('${database}').collection('${table}').find({}).toArray()`;
+        return `db('${database}').collection('${table}').find({}).toArray()`;
     }
     countSql(database: string, table: string): string {
         throw new Error("Method not implemented.");

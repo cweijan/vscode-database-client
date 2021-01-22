@@ -49,7 +49,7 @@ export class MongoConnection implements IConnection {
                 console.log(res)
             })
         } else {
-            const result = await eval(sql)
+            const result = await eval('this.client.'+sql)
             this.handleSearch(sql, result, callback)
         }
     }
