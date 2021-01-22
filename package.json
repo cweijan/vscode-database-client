@@ -220,11 +220,6 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.template.delete",
-				"title": "%command.template.delete%",
-				"category": "MySQL"
-			},
-			{
 				"command": "mysql.data.import",
 				"title": "%command.data.import%",
 				"category": "MySQL"
@@ -237,16 +232,6 @@
 			{
 				"command": "mysql.struct.export",
 				"title": "%command.struct.export%",
-				"category": "MySQL"
-			},
-			{
-				"command": "mysql.copy.insert",
-				"title": "%command.copy.insert%",
-				"category": "MySQL"
-			},
-			{
-				"command": "mysql.copy.update",
-				"title": "%command.copy.update%",
 				"category": "MySQL"
 			},
 			{
@@ -719,21 +704,6 @@
 					"command": "mysql.template.sql",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "1_mysql@0"
-				},
-				{
-					"command": "mysql.copy.insert",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
-					"group": "1_mysql@1"
-				},
-				{
-					"command": "mysql.template.delete",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
-					"group": "1_mysql@3"
-				},
-				{
-					"command": "mysql.copy.update",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
-					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.table.truncate",

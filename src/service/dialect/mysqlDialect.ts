@@ -77,10 +77,10 @@ export class MysqlDialect extends SqlDialect{
         return `SELECT TABLE_NAME name FROM information_schema.VIEWS  WHERE TABLE_SCHEMA = '${database}'`;
     }
     buildPageSql(database: string, table: string, pageSize: number):string {
-        return  `SELECT * FROM ${database}.${table} LIMIT ${pageSize};`;
+        return  `SELECT * FROM ${table} LIMIT ${pageSize};`;
     }
     countSql(database: string, table: string): string {
-        return `SELECT count(*) FROM ${database}.${table};`;
+        return `SELECT count(*) FROM ${table};`;
     }
     showTables(database: string): string {
         return `SELECT table_comment comment,TABLE_NAME as name FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' order by table_name;`
