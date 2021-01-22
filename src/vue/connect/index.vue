@@ -16,11 +16,11 @@
 
     <section class="mb-2">
       <label class="block font-bold" for="connection-type">Connection Type</label>
-      <el-radio v-model="connectionOption.dbType" label="MySQL">MySQL</el-radio>
-      <el-radio v-model="connectionOption.dbType" label="PostgreSQL">PostgreSQL</el-radio>
-      <el-radio v-model="connectionOption.dbType" label="SqlServer">SQL Server</el-radio>
-      <el-radio v-model="connectionOption.dbType" label="ElasticSearch">ElasticSearch</el-radio>
-      <el-radio v-model="connectionOption.dbType" label="Redis">Redis</el-radio>
+      <ul class="tab" id="tabs">
+        <li class="tab__item " :class="{'tab__item--active':supportDatabase==connectionOption.dbType}" v-for="supportDatabase in supportDatabases" @click="connectionOption.dbType=supportDatabase">
+          {{supportDatabase}}
+        </li>
+      </ul>
       </el-select>
     </section>
 
@@ -59,7 +59,7 @@
         <input class="w-full field__input" id="databases" placeholder="Default is all databases" v-model="connectionOption.database" />
       </section>
 
-      <section class="mb-2">
+      <section class="mb-2"  v-if="connectionOption.dbType=='MySQL'">
         <label class="block font-bold" for="timezone">Timezone</label>
         <input class="w-full field__input" id="timezone" placeholder="+HH:MM" v-model="connectionOption.timezone" />
       </section>
@@ -138,8 +138,8 @@
 </template>
 
 <script>
-import { getVscodeEvent } from "../util/vscode"
-let vscodeEvent
+import { getVscodeEvent } from "../util/vscode";
+let vscodeEvent;
 export default {
   name: "Connect",
   data() {
@@ -165,84 +165,92 @@ export default {
         },
       },
       type: "password",
-      databaseType: "mysql",
+      supportDatabases: [
+        "MySQL",
+        "PostgreSQL",
+        "SqlServer",
+        "ElasticSearch",
+        "Redis",
+      ],
       editModel: false,
       error: false,
       errorMessage: "",
-    }
+    };
   },
   mounted() {
-    vscodeEvent = getVscodeEvent()
+    vscodeEvent = getVscodeEvent();
     vscodeEvent
       .on("edit", (node) => {
-        this.editModel = true
-        this.connectionOption = node
+        this.editModel = true;
+        this.connectionOption = node;
       })
       .on("connect", (node) => {
-        this.editModel = false
+        this.editModel = false;
       })
       .on("error", (err) => {
-        this.error = true
-        this.errorMessage = err
-      })
-    vscodeEvent.emit("route-" + this.$route.name)
+        this.error = true;
+        this.errorMessage = err;
+      });
+    vscodeEvent.emit("route-" + this.$route.name);
     window.onkeydown = (e) => {
       if (e.key == "Enter" && e.target.tagName == "INPUT") {
-        this.tryConnect()
+        this.tryConnect();
       }
-    }
+    };
   },
   destroyed() {
-    vscodeEvent.destroy()
+    vscodeEvent.destroy();
   },
   methods: {
     tryConnect() {
       vscodeEvent.emit("connecting", {
-        databaseType: this.databaseType,
         connectionOption: this.connectionOption,
-      })
+      });
     },
   },
   watch: {
     "connectionOption.dbType"(value) {
       if (this.editModel) {
-        return
+        return;
       }
       switch (value) {
         case "MySQL":
-          this.connectionOption.user = "root"
-          this.connectionOption.port = 3306
-          break
+          this.connectionOption.user = "root";
+          this.connectionOption.port = 3306;
+          this.connectionOption.database = null;
+          break;
         case "PostgreSQL":
-          this.connectionOption.user = "postgres"
-          this.connectionOption.port = 5432
-          break
+          this.connectionOption.user = "postgres";
+          this.connectionOption.port = 5432;
+          this.connectionOption.database = "postgres";
+          break;
         case "Oracle":
-          this.connectionOption.user = "system"
-          this.connectionOption.port = 1521
-          break
+          this.connectionOption.user = "system";
+          this.connectionOption.port = 1521;
+          break;
         case "SqlServer":
-          this.connectionOption.user = "sa"
-          this.connectionOption.port = 1433
-          break
+          this.connectionOption.user = "sa";
+          this.connectionOption.port = 1433;
+          this.connectionOption.database = 'master';
+          break;
         case "ElasticSearch":
-          this.connectionOption.user = null
-          this.connectionOption.port = 9200
-          this.connectionOption.database = null
-          break
+          this.connectionOption.user = null;
+          this.connectionOption.port = 9200;
+          this.connectionOption.database = null;
+          break;
         case "Redis":
-          this.connectionOption.port = 6379
-          this.connectionOption.user = null
-          this.connectionOption.database = "0"
-          break
+          this.connectionOption.port = 6379;
+          this.connectionOption.user = null;
+          this.connectionOption.database = "0";
+          break;
       }
     },
   },
-}
+};
 </script>
 
 <style scoped>
-/* .tab {
+.tab {
   border-bottom: 1px solid var(--vscode-dropdown-border);
   display: flex;
   padding: 0;
@@ -252,10 +260,9 @@ export default {
   list-style: none;
   cursor: pointer;
   font-size: 13px;
-  padding: 7px 8px;
+  padding: 7px 10px;
   color: var(--vscode-foreground);
   border-bottom: 1px solid transparent;
-  margin: 0 0 -1px 0;
 }
 
 .tab__item:hover {
@@ -265,7 +272,7 @@ export default {
 .tab__item--active {
   color: var(--vscode-panelTitle-activeForeground);
   border-bottom-color: var(--vscode-panelTitle-activeForeground);
-} */
+}
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
