@@ -4,14 +4,14 @@
 
     <blockquote class="p-3 mb-2 panel" id="error" v-if="error">
       <section class="panel__text">
-        <div class="block font-bold">Connection error!</div>
+        <div class="font-bold mr-5 inline-block w-14">Connection error!</div>
         <span id="errorMessage" v-text="errorMessage"></span>
       </section>
     </blockquote>
 
     <section class="mb-2">
-      <label class="block font-bold" for="connection-name">Name</label>
-      <input class="w-full field__input" id="connection-name" placeholder="The name of connection, it can be empty" v-model="connectionOption.name" />
+      <label class="font-bold mr-5 inline-block " for="connection-name">Connection Name</label>
+      <input class="w-1/3 field__input" id="connection-name" placeholder="The name of connection, it can be empty" v-model="connectionOption.name" />
     </section>
 
     <section class="mb-2">
@@ -26,107 +26,118 @@
 
     <template v-if="connectionOption.dbType=='ElasticSearch'">
       <section class="mb-2">
-        <label class="block font-bold" for="connection-scheme">Scheme</label>
+        <label class="font-bold mr-5 inline-block w-14" for="connection-scheme">Scheme</label>
         <el-radio v-model="connectionOption.scheme" label="http">Http</el-radio>
         <el-radio v-model="connectionOption.scheme" label="https">Https</el-radio>
       </section>
     </template>
 
     <section class="mb-2">
-      <label class="block font-bold" for="connection-host">Host</label>
-      <input class="w-full field__input" id="connection-host" placeholder="The host of connection" required v-model="connectionOption.host" />
-    </section>
-
-    <section class="mb-2">
-      <label class="block font-bold" for="connection-port">Port</label>
-      <input class="w-full field__input" id="connection-port" placeholder="The port of connection" required type="number" v-model="connectionOption.port" />
+      <div class="inline-block mr-10">
+        <label class="font-bold mr-5 inline-block w-14" for="connection-host">Host</label>
+        <input class="w-64 field__input" id="connection-host" placeholder="The host of connection" required v-model="connectionOption.host" />
+      </div>
+      <div class="inline-block mr-10">
+        <label class="font-bold mr-5 inline-block w-14" for="connection-port">Port</label>
+        <input class="w-64 field__input" id="connection-port" placeholder="The port of connection" required type="number" v-model="connectionOption.port" />
+      </div>
     </section>
 
     <template v-if="connectionOption.dbType!='ElasticSearch'">
 
       <section class="mb-2" v-if="connectionOption.dbType!='Redis'">
-        <label class="block font-bold" for="connection-user">Username</label>
-        <input class="w-full field__input" id="connection-user" placeholder="Username" required v-model="connectionOption.user" />
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-14" for="connection-user">Username</label>
+          <input class="w-64 field__input" id="connection-user" placeholder="Username" required v-model="connectionOption.user" />
+        </div>
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-14" for="databases">Databases</label>
+          <input class="w-64 field__input" id="databases" placeholder="Default is all databases" v-model="connectionOption.database" />
+        </div>
+
       </section>
 
       <section class="mb-2">
-        <label class="block font-bold" for="connection-password">Password</label>
-        <input class="w-full field__input" id="connection-password" placeholder="Password" type="password" v-model="connectionOption.password" />
-      </section>
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-14" for="connection-password">Password</label>
+          <input class="w-64 field__input" id="connection-password" placeholder="Password" type="password" v-model="connectionOption.password" />
+        </div>
 
-      <section class="mb-2">
-        <label class="block font-bold" for="databases">Databases</label>
-        <input class="w-full field__input" id="databases" placeholder="Default is all databases" v-model="connectionOption.database" />
-      </section>
-
-      <section class="mb-2"  v-if="connectionOption.dbType=='MySQL'">
-        <label class="block font-bold" for="timezone">Timezone</label>
-        <input class="w-full field__input" id="timezone" placeholder="+HH:MM" v-model="connectionOption.timezone" />
+        <template v-if="connectionOption.dbType=='MySQL'">
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-14" for="timezone">Timezone</label>
+            <input class="w-64 field__input" id="timezone" placeholder="+HH:MM" v-model="connectionOption.timezone" />
+          </div>
+        </template>
       </section>
 
     </template>
 
     <section class="flex items-center mb-2">
-      <label class="mr-2 font-bold" for="global">Global</label>
-      <el-switch id="global" v-model="connectionOption.global"></el-switch>
-    </section>
-
-    <section class="flex items-center mb-2">
-      <label class="mr-2 font-bold" for="ssh-connection">Using SSH</label>
-      <el-switch id="ssh-connection" v-model="connectionOption.usingSSH"></el-switch>
+       <div class="inline-block mr-10">
+        <label class="mr-2 font-bold" for="ssh-connection">Using SSH</label>
+        <el-switch id="ssh-connection" v-model="connectionOption.usingSSH"></el-switch>
+      </div>
+      <div class="inline-block mr-10">
+        <label class="mr-2 font-bold" for="global">Global</label>
+        <el-switch id="global" v-model="connectionOption.global"></el-switch>
+      </div>
     </section>
 
     <div v-if="connectionOption.usingSSH">
       <section class="mb-2">
-        <label class="block font-bold" for="connection-ssh-host">SSH Host</label>
-        <input class="w-full field__input" id="connection-ssh-host" placeholder="SSH Host" required v-model="connectionOption.ssh.host" />
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-28" for="connection-ssh-host">SSH Host</label>
+          <input class="w-64 field__input" id="connection-ssh-host" placeholder="SSH Host" required v-model="connectionOption.ssh.host" />
+        </div>
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-28" for="connection-ssh-port">SSH Port</label>
+          <input class="w-64 field__input" id="connection-ssh-port" placeholder="SSH Port" required type="number" v-model="connectionOption.ssh.port" />
+        </div>
       </section>
 
       <section class="mb-2">
-        <label class="block font-bold" for="connection-ssh-port">SSH Port</label>
-        <input class="w-full field__input" id="connection-ssh-port" placeholder="SSH Port" required type="number" v-model="connectionOption.ssh.port" />
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-28" for="connection-ssh-username">SSH Username</label>
+          <input class="w-64 field__input" id="connection-ssh-username" placeholder="SSH Username" required v-model="connectionOption.ssh.username" />
+        </div>
+
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-28" for="connection-ssh-username">SSH Cipher</label>
+          <el-select v-model="connectionOption.ssh.algorithms.cipher[0]" placeholder="Default">
+            <el-option value="aes128-cbc">aes128-cbc</el-option>
+            <el-option value="aes192-cbc">aes192-cbc</el-option>
+            <el-option value="aes256-cbc">aes256-cbc</el-option>
+            <el-option value="3des-cbc">3des-cbc</el-option>
+            <el-option value="aes128-ctr">aes128-ctr</el-option>
+            <el-option value="aes192-ctr">aes192-ctr</el-option>
+            <el-option value="aes256-ctr">aes256-ctr</el-option>
+          </el-select>
+        </div>
       </section>
 
       <section class="mb-2">
-        <label class="block font-bold" for="connection-ssh-username">SSH Username</label>
-        <input class="w-full field__input" id="connection-ssh-username" placeholder="SSH Username" required v-model="connectionOption.ssh.username" />
-      </section>
-
-      <section class="mb-2">
-        <label class="block font-bold" for="connection-ssh-username">SSH Cipher</label>
-        <el-select v-model="connectionOption.ssh.algorithms.cipher[0]" placeholder="Default">
-          <el-option value="aes128-cbc">aes128-cbc</el-option>
-          <el-option value="aes192-cbc">aes192-cbc</el-option>
-          <el-option value="aes256-cbc">aes256-cbc</el-option>
-          <el-option value="3des-cbc">3des-cbc</el-option>
-          <el-option value="aes128-ctr">aes128-ctr</el-option>
-          <el-option value="aes192-ctr">aes192-ctr</el-option>
-          <el-option value="aes256-ctr">aes256-ctr</el-option>
-        </el-select>
-      </section>
-
-      <section class="mb-2">
-        <label class="block font-bold" for="connection-ssh-type">Type</label>
-        <select class="w-full field__input" v-model="type">
-          <option class="p-1" value="password">Password</option>
-          <option class="p-1" value="privateKey">Private Key</option>
-        </select>
+        <label class="font-bold mr-5 inline-block w-28" for="connection-ssh-type">Type</label>
+        <el-radio v-model="type" label="password">Password</el-radio>
+        <el-radio v-model="type" label="privateKey">Private Key</el-radio>
       </section>
 
       <div v-if="type == 'password'">
         <section class="mb-2">
-          <label class="block font-bold" for="connection-ssh-password">Password</label>
-          <input class="w-full field__input" id="connection-ssh-password" placeholder="Password" required type="password" v-model="connectionOption.ssh.password" />
+          <label class="font-bold mr-5 inline-block w-28" for="connection-ssh-password">Password</label>
+          <input class="w-64 field__input" id="connection-ssh-password" placeholder="Password" required type="password" v-model="connectionOption.ssh.password" />
         </section>
       </div>
       <div v-else>
         <section class="mb-2">
-          <label class="block font-bold" for="connection-ssh-private-key-path">Private Key Path</label>
-          <input class="w-full field__input" id="connection-ssh-private-key-path" placeholder="Private Key Path" v-model="connectionOption.ssh.privateKeyPath" />
-        </section>
-        <section class="mb-2">
-          <label class="block font-bold" for="connection-ssh-passphrase">Passphrase</label>
-          <input class="w-full field__input" id="connection-ssh-passphrase" placeholder="Passphrase" type="passphrase" v-model="connectionOption.ssh.passphrase" />
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-28" for="connection-ssh-private-key-path">Private Key Path</label>
+            <input class="w-64 field__input" id="connection-ssh-private-key-path" placeholder="Private Key Path" v-model="connectionOption.ssh.privateKeyPath" />
+          </div>
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-28" for="connection-ssh-passphrase">Passphrase</label>
+            <input class="w-64 field__input" id="connection-ssh-passphrase" placeholder="Passphrase" type="passphrase" v-model="connectionOption.ssh.passphrase" />
+          </div>
         </section>
       </div>
     </div>
@@ -231,7 +242,7 @@ export default {
         case "SqlServer":
           this.connectionOption.user = "sa";
           this.connectionOption.port = 1433;
-          this.connectionOption.database = 'master';
+          this.connectionOption.database = "master";
           break;
         case "ElasticSearch":
           this.connectionOption.user = null;
