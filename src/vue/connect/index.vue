@@ -1,6 +1,6 @@
 <template>
   <div class="container flex flex-col mx-auto">
-    <h1 class="py-4 text-2xl">Connect to Database server</h1>
+    <h1 class="py-4 text-2xl">Connect to Database Server</h1>
 
     <blockquote class="p-3 mb-2 panel" id="error" v-if="error">
       <section class="panel__text">
@@ -10,12 +10,12 @@
     </blockquote>
 
     <section class="mb-2">
-      <label class="block font-bold" for="connection-name">Connection Name</label>
+      <label class="block font-bold" for="connection-name">Name</label>
       <input class="w-full field__input" id="connection-name" placeholder="The name of connection, it can be empty" v-model="connectionOption.name" />
     </section>
 
     <section class="mb-2">
-      <label class="block font-bold" for="connection-type">Connection Type</label>
+      <label class="block font-bold" for="connection-type">Database Type</label>
       <ul class="tab" id="tabs">
         <li class="tab__item " :class="{'tab__item--active':supportDatabase==connectionOption.dbType}" v-for="supportDatabase in supportDatabases" @click="connectionOption.dbType=supportDatabase">
           {{supportDatabase}}
