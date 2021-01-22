@@ -871,7 +871,6 @@
 		"@types/node": "^12.12.6",
 		"@types/ssh2": "^0.5.43",
 		"@types/vscode": "1.38.0",
-		"@antv/g2": "^4.0.9",
 		"@types/pg": "^7.14.7",
 		"@types/tedious": "^4.0.3",
 		"copy-webpack-plugin": "^6.3.0",

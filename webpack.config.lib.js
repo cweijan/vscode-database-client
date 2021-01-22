@@ -1,7 +1,7 @@
 const path = require('path');
 var webpack = require('webpack');
 
-// 1. npm i tedious mysql2 node-xlsx tunnelSsh
+// 1. npm i tedious mysql2 node-xlsx tunnelSsh g2
 // 2. npm run lib
 
 module.exports = [
@@ -17,6 +17,7 @@ module.exports = [
             mysql2: './node_modules/mysql2/index.js',
             'node-xlsx': './node_modules/node-xlsx/lib/index.js',
             'tunnel-ssh': './node_modules/tunnel-ssh/index.js',
+            'g2': './node_modules/@antv/g2/lib/index.js',
         } ,
         output: {
             path: path.resolve(__dirname, 'src/bin'),

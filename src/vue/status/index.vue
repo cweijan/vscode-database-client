@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { Chart } from "@antv/g2"
+import { Chart } from "@/bin/g2"
 
 import { getVscodeEvent } from "../util/vscode"
 let vscodeEvent
@@ -127,10 +127,10 @@ export default {
     vscodeEvent.emit("processList")
     vscodeEvent.emit("variableList")
     vscodeEvent.emit("statusList")
-    // this.sendLoadDashBoard();
+    this.sendLoadDashBoard();
     setInterval(() => {
-      // this.sendLoadDashBoard();
-    }, 5000)
+      this.sendLoadDashBoard();
+    }, 1000)
   },
   methods: {
     sendLoadDashBoard() {
