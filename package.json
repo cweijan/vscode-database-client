@@ -452,22 +452,22 @@
 			},
 			{
 				"command": "mysql.redis.connection.terminal",
-				"title": "Open Terminal",
+				"title": "%command.redis.connection.terminal%",
 				"category": "Redis",
 				"icon": "resources/image/terminal.svg"
 			},
 			{
 				"command": "mysql.redis.connection.status",
-				"title": "Server status"
+				"title": "%command.redis.connection.status%"
 			},
 			{
 				"command": "mysql.redis.key.del",
-				"title": "Delete Key",
+				"title": "%command.redis.key.del%",
 				"icon": "resources/image/delete.png"
 			},
 			{
 				"command": "mysql.redis.key.detail",
-				"title": "View Key Detail"
+				"title": "%command.redis.key.detail%"
 			}
 		],
 		"keybindings": [
