@@ -16,19 +16,20 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
         let start: vscode.Position;
         let end: vscode.Position;
         let sql: string = "";
-        const lineCount = Math.min(document.lineCount,500);
+        const lineCount = Math.min(document.lineCount, 500);
         for (var i = 0; i < lineCount; i++) {
             var line = document.lineAt(i)
             var text = line.text;
             sql = sql + text;
 
-            if (!text?.trim()) continue;
-
-            if (!start) {
+            if (text?.trim() && !start) {
                 start = new vscode.Position(i, 0)
             }
 
-            const sep = text.indexOf(";")
+            let sep = text.indexOf(";")
+            if (start && (lineCount - 1 == i)) {
+                sep=text.length;
+            }
             if (sep != -1) {
                 end = new vscode.Position(i, sep)
                 codeLens.push(new vscode.CodeLens(new vscode.Range(start, end), {
