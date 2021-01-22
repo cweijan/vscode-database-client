@@ -6,9 +6,7 @@ Database Client For Visual Studio Code
 
 > Supported databases: Mysql/MariaDB、SqlServer、Postgresql、Redis、ElasticSearch
 >
-> Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client)
->
-> [中文文档](README_CN.md)
+> Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
 
 **Features**
 

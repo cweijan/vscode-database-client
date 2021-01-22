@@ -54,6 +54,8 @@
 
 ## 表过滤
 
+用于快速筛选数据表.
+
 ![filter](images/filter.gif)
 
 # 致谢
