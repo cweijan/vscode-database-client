@@ -1,16 +1,10 @@
 # Database Client
 
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2)
+[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client2.svg)
 
-Database Client For Visual Studio Code
+该项目为数据库通用管理软件, 支持**Mysql、SqlServer、Postgresql、Redis、ElasticSearch**主流数据库的管理.
 
-[English](README.md)|中文文档
-
-> 支持的数据库: Mysql/MariaDB、SqlServer、Postgresql、Redis、ElasticSearch
-
-**Features**
-
-- [Database Client](#database-client)
+- 功能
   - [连接](#连接)
   - [数据表](#数据表)
   - [执行SQL](#执行SQL)
