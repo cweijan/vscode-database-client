@@ -52,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
                 ConnectionManager.getConnection(fileNode, this)
             }
         }),
-        
+
         ...initCommand({
             // util
             ...{
@@ -166,7 +166,7 @@ export function activate(context: vscode.ExtensionContext) {
                     if (typeof sql != 'string') { sql = null; }
                     QueryUnit.runQuery(sql);
                 },
-                "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode | EsConnectionNode|ESIndexNode) => {
+                "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode | EsConnectionNode | ESIndexNode) => {
                     if (databaseOrConnectionNode) {
                         await databaseOrConnectionNode.newQuery();
                     } else {
@@ -188,10 +188,10 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // redis
             ...{
-                "mysql.redis.connection.status":(connectionNode: RedisConnectionNode) => connectionNode.showStatus(),
-                "mysql.redis.connection.terminal":(connectionNode: RedisConnectionNode) => connectionNode.openTerminal(),
-                "mysql.redis.key.detail":(keyNode: KeyNode) => keyNode.detail(),
-                "mysql.redis.key.del":(keyNode: KeyNode) => keyNode.delete(),
+                "mysql.redis.connection.status": (connectionNode: RedisConnectionNode) => connectionNode.showStatus(),
+                "mysql.redis.connection.terminal": (connectionNode: RedisConnectionNode) => connectionNode.openTerminal(),
+                "mysql.redis.key.detail": (keyNode: KeyNode) => keyNode.detail(),
+                "mysql.redis.key.del": (keyNode: KeyNode) => keyNode.delete(),
             },
             // table node
             ...{
@@ -239,6 +239,9 @@ export function activate(context: vscode.ExtensionContext) {
             ...{
                 "mysql.template.sql": (tableNode: TableNode, run: boolean) => {
                     tableNode.selectSqlTemplate(run);
+                },
+                "mysql.codeLens.run": (sql:string) => {
+                    QueryUnit.runQuery(sql)
                 },
                 "mysql.index.template": (tableNode: TableNode) => {
                     tableNode.indexTemplate();

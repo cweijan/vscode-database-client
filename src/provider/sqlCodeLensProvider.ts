@@ -16,38 +16,31 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
         let start: vscode.Position;
         let end: vscode.Position;
         let sql: string = "";
-        for (var i = 0; i < document.lineCount; i++) {
+        const lineCount = Math.min(document.lineCount,500);
+        for (var i = 0; i < lineCount; i++) {
             var line = document.lineAt(i)
             var text = line.text;
             sql = sql + text;
 
+            if (!text?.trim()) continue;
+
             if (!start) {
-                // 0 need change to string start
                 start = new vscode.Position(i, 0)
             }
-
-            if (text.length == 0)
-                continue
 
             const sep = text.indexOf(";")
             if (sep != -1) {
                 end = new vscode.Position(i, sep)
                 codeLens.push(new vscode.CodeLens(new vscode.Range(start, end), {
                     command: "mysql.codeLens.run",
-                    title: "Run Query",
+                    title: "Run SQL",
                     arguments: [sql],
                 }));
-                sql = ""
-                let hasRemain=false;
-                if (hasRemain) {
-                    // start = new vscode.Position(i, sep + 1)
-                } else {
-                    start = null;
-                }
+                start = null;
+                sql = text.substr(sep)
                 continue;
             }
         }
-
 
         return codeLens
 
