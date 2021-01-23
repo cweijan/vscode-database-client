@@ -36,29 +36,35 @@ ext install cweijan.vscode-mysql-client2
 
 1. Click table to open table view.
 2. Then you can do data modification on the view page.
-   ![query](images/QueryTable.jpg)
+
+![query](images/QueryTable.jpg)
 
 ## Execute SQL Query
 
 In the Database Explorer panel, click the `Open Query` button.
+
 ![newquery](images/newquery.jpg)
 
 Now you can edit and run SQL query within the editor.
+
 ![run](images/run.jpg)
 
 ## Generate Mock Data
 
 Now you do not need to spend time writing test data.
+
 ![mockData](images/mockData.png)
 
 ## History
 
 Click the history button to open the list of recently executed query history records.
+
 ![history](images/history.jpg)
 
 ## Backup/Import
 
 Move to ant DatabaseNode or TableNode. The export/import options are listed in the context menu (right click to open).
+
 ![bakcup](images/Backup.jpg)
 
 ## Filter
