@@ -8,7 +8,7 @@ import RedisBaseNode from "./redisBaseNode";
 export class FolderNode extends RedisBaseNode {
     contextValue = ModelType.REDIS_FOLDER;
     readonly iconPath = path.join(Constants.RES_PATH, `image/folder.svg`);
-    constructor(readonly label: string, readonly childens: string[], readonly parent: Node) {
+    constructor(readonly label: string, readonly childens: string[], readonly parent: RedisBaseNode) {
         super(label)
         this.init(parent)
         this.pattern = label
