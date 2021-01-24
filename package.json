@@ -89,6 +89,12 @@
 		},
 		"commands": [
 			{
+				"command": "mysql.struct.diff",
+				"title": "%command.history.open%",
+				"category": "MySQL",
+				"icon": "resources/icon/history.svg"
+			},
+			{
 				"command": "mysql.history.open",
 				"title": "%command.history.open%",
 				"category": "MySQL",
@@ -512,6 +518,11 @@
 					"command": "mysql.history.open",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@0"
+				},
+				{
+					"command": "mysql.struct.diff",
+					"when": "view == github.cweijan.mysql",
+					"group": "navigation@-2"
 				}
 			],
 			"view/item/context": [

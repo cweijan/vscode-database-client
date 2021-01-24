@@ -35,6 +35,7 @@ import { ESIndexNode } from "./model/es/model/esIndexNode";
 import { activeEs } from "./model/es/provider/main";
 import { RedisConnectionNode } from "./model/redis/redisConnectionNode";
 import KeyNode from "./model/redis/keyNode";
+import { DiffService } from "./service/diff/diffService";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -95,6 +96,9 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // externel data
             ...{
+                "mysql.struct.diff":()=>{
+                    new DiffService().startDiff(serviceManager.provider);
+                },
                 "mysql.data.export": (node: DatabaseNode | TableNode) => {
                     serviceManager.dumpService.dump(node, true)
                 },

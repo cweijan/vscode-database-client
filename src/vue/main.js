@@ -22,6 +22,7 @@ import connect from "./connect";
 import status from "./status";
 import overview from "./overview";
 import design from "./design";
+import structDiff from "./structDiff";
 import keyView from "./redis/keyView";
 import terminal from "./redis/terminal";
 import redisStatus from "./redis/redisStatus";
@@ -35,6 +36,7 @@ const router = new VueRouter({
     { path: '/selector', component: Selector, name: 'selector' },
     { path: '/overview', component: overview, name: 'overview' },
     { path: '/design', component: design, name: 'design' },
+    { path: '/structDiff', component: structDiff, name: 'structDiff' },
     // redis
     { path: '/keyView', component: keyView, name: 'keyView' },
     { path: '/terminal', component: terminal, name: 'terminal' },
