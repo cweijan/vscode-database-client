@@ -1,9 +1,6 @@
 import * as vscode from "vscode";
 import { ModelType } from "../../../common/constants";
-import { Node } from "../../../model/interface/node";
-import { TableGroup } from "../../../model/main/tableGroup";
 import { TableNode } from "../../../model/main/tableNode";
-import { DatabaseCache } from "../../../service/common/databaseCache";
 import { ConnectionManager } from "../../../service/connectionManager";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
@@ -11,7 +8,7 @@ export class TableChain implements ComplectionChain {
 
     public async getComplection(complectionContext: ComplectionContext): Promise<vscode.CompletionItem[]> {
 
-        if (complectionContext.preWord && complectionContext.preWord.match(/\b(into|from|update|table|join)\b/ig)) {
+        if (complectionContext.preWord?.match(/\b(into|from|update|table|join)\b/ig)) {
             return await this.generateTableComplectionItem();
         }
         return null;
@@ -24,16 +21,20 @@ export class TableChain implements ComplectionChain {
     private async generateTableComplectionItem(): Promise<vscode.CompletionItem[]> {
 
         const lcp = ConnectionManager.getLastConnectionOption();
-        if (!lcp?.database) { return []; }
 
-        const databaseid = `${lcp.getConnectId()}_${lcp.database}`;
-        const tableList = DatabaseCache.getChildListOfDatabase(databaseid);
-        if (tableList == null) { return []; }
+        const nodes = await lcp?.getByRegion()?.getChildren()
+        if (!nodes) {
+            return []
+        }
 
-        return tableList.map<vscode.CompletionItem>((tableNode: TableNode) => {
+        let nodeList = []
+        for (const node of nodes) {
+            nodeList.push(...await node.getChildren())
+        }
+        return nodeList.map<vscode.CompletionItem>((tableNode: TableNode) => {
             const completionItem = new vscode.CompletionItem(tableNode.table);
-            if(tableNode.comment){
-                completionItem.detail=tableNode.comment
+            if (tableNode.comment) {
+                completionItem.detail = tableNode.comment
             }
             completionItem.insertText = tableNode.wrap(tableNode.table);
             switch (tableNode.contextValue) {

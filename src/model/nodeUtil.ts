@@ -12,7 +12,7 @@ export abstract class NodeUtil {
             node.__proto__ = Node.prototype
         }
         if (node.dialect && !(node.dialect instanceof SqlDialect)) {
-            node.dialect=ServiceManager.getDialect(node.dbType)
+            node.dialect = ServiceManager.getDialect(node.dbType)
         }
         return node;
     }
@@ -20,8 +20,8 @@ export abstract class NodeUtil {
     public static removeParent(nodes: any): any {
         if (!nodes) return null;
         // if is node instance
-        if(nodes instanceof Node){
-            return  { ...nodes, parent: null };
+        if (nodes instanceof Node) {
+            return { ...nodes, parent: null };
         }
         // if is node object map
         let result = {};

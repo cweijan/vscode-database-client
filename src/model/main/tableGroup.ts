@@ -12,7 +12,6 @@ export class TableGroup extends Node {
     public contextValue: string = ModelType.TABLE_GROUP;
     constructor(readonly parent: Node) {
         super("TABLE")
-        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.TABLE_GROUP}`;
         this.init(parent)
     }
 
@@ -22,7 +21,7 @@ export class TableGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return this.execute<any[]>( this.dialect.showTables(this.database))
+        return this.execute<any[]>(this.dialect.showTables(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new TableNode(table.name, table.comment, this);
@@ -30,7 +29,7 @@ export class TableGroup extends Node {
                 if (tableNodes.length == 0) {
                     tableNodes = [new InfoNode("This database has no table")];
                 }
-                DatabaseCache.setTableListOfDatabase(this.uid, tableNodes);
+                DatabaseCache.setChildListOfDatabase(this.uid, tableNodes);
                 return tableNodes;
             })
             .catch((err) => {

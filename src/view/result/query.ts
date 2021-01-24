@@ -171,7 +171,6 @@ export class QueryPage {
             return;
         }
 
-        let conn = queryParam.connection;
         let tableName = sqlList[0]
         let database: string;
 
@@ -182,12 +181,7 @@ export class QueryPage {
             database = fields[0].schema || fields[0].db;
         }
 
-        let tableNode = DatabaseCache.getTable(`${conn.getConnectId()}_${database ? database : conn.database}`, tableName);
-        if (!tableNode) {
-            const tables = tableName.split('.')
-            tableNode = DatabaseCache.getTable(`${conn.getConnectId()}_${tables.unshift()}`, tables.join("."));
-        }
-
+        const tableNode = queryParam.connection.getByRegion(tableName)
         if (tableNode) {
             let primaryKey: string;
             const columnList = (await tableNode.getChildren()).map((columnNode: ColumnNode) => {

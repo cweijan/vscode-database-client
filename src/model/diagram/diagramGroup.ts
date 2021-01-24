@@ -1,16 +1,16 @@
-import { existsSync, readdirSync } from "fs";
+import { readdirSync } from "fs";
 import * as path from "path";
 import { Constants, ModelType } from "../../common/constants";
 import { FileManager, FileModel } from "../../common/filesManager";
+import { Global } from "../../common/global";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { DatabaseCache } from "../../service/common/databaseCache";
 import { ViewManager } from "../../view/viewManager";
 import { Node } from "../interface/node";
+import { TableGroup } from "../main/tableGroup";
 import { TableNode } from "../main/tableNode";
 import { ColumnNode } from "../other/columnNode";
-import { DiagramNode } from "./diagramNode";
-import { Global } from "../../common/global";
 import { InfoNode } from "../other/infoNode";
+import { DiagramNode } from "./diagramNode";
 
 export class DiagramGroup extends Node {
 
@@ -18,12 +18,11 @@ export class DiagramGroup extends Node {
     public iconPath = path.join(Constants.RES_PATH, "icon/diagram.svg")
     constructor(readonly parent: Node) {
         super("DIAGRAM")
-        this.uid = `${this.getConnectId()}_${parent.database}_${ModelType.DIAGRAM_GROUP}`;
         this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        const path = `${FileManager.storagePath}/diagram/${this.getConnectId()}_${this.database}`;
+        const path = `${FileManager.storagePath}/diagram/${this.getConnectId({ withDbForce: true })}`;
         const diagrams = this.readdir(path)?.map(fileName => new DiagramNode(fileName.replace(/\.[^/.]+$/, ""), this));
         if (!diagrams || diagrams.length == 0) {
             return [new InfoNode("This database has no created diagram.")]
@@ -31,7 +30,7 @@ export class DiagramGroup extends Node {
         return diagrams
     }
 
-    readdir(path:string):string[]{
+    readdir(path: string): string[] {
         try {
             return readdirSync(path)
         } catch (error) {
@@ -49,7 +48,7 @@ export class DiagramGroup extends Node {
                 }).on("route-selector", async () => {
                     handler.emit("selector-load", await this.getTableInfos())
                 }).on("save", ({ name, data }) => {
-                    const diagramPath = `diagram/${this.getConnectId()}_${this.database}/${name}.json`;
+                    const diagramPath = `diagram/${this.getConnectId({ withDbForce: true })}/${name}.json`;
                     FileManager.record(diagramPath, data, FileModel.WRITE)
                     DbTreeDataProvider.refresh(this)
                 })
@@ -81,7 +80,8 @@ export class DiagramGroup extends Node {
             purple: "#d689ff",
             orange: "#fdb400"
         };
-        return await Promise.all(DatabaseCache.getTableListOfDatabase(`${this.getConnectId()}_${this.database}`).map(async (node: TableNode) => {
+
+        return await Promise.all((await new TableGroup(this.parent).getChildren() as TableNode[]).map(async (node: TableNode) => {
             return {
                 key: node.table,
                 items: (await node.getChildren()).map((columnNode: ColumnNode) => {

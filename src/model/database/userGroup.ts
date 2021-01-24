@@ -13,8 +13,7 @@ export class UserGroup extends DatabaseNode {
     public iconPath = path.join(Constants.RES_PATH, "icon/userGroup.svg")
     constructor(readonly name: string, readonly parent: Node) {
         super(name, parent)
-        this.uid = `${this.getConnectId()}_${ModelType.USER_GROUP}`;
-        this.database = parent.database
+        this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -27,7 +26,7 @@ export class UserGroup extends DatabaseNode {
                 userNodes = tables.map<UserNode>((table) => {
                     return new UserNode(table.user, table.host, this);
                 });
-                DatabaseCache.setTableListOfDatabase(this.uid, userNodes);
+                DatabaseCache.setChildListOfDatabase(this.uid, userNodes);
                 return userNodes;
             })
             .catch((err) => {

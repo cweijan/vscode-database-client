@@ -30,14 +30,14 @@ export class QueryNode extends Node {
     public async rename() {
         vscode.window.showInputBox({ placeHolder: "Input new name" }).then(newName => {
             if (newName) {
-                renameSync(this.getFilePath(),this.getFilePath(newName))
+                renameSync(this.getFilePath(), this.getFilePath(newName))
                 DbTreeDataProvider.refresh(this.parent)
             }
         })
     }
 
     private getFilePath(newName?: string): string {
-        return `${FileManager.storagePath}/query/${this.getConnectId()}_${this.database}/${newName || this.name}.sql`;
+        return `${FileManager.storagePath}/query/${this.getConnectId({ withDbForce: true })}/${newName || this.name}.sql`;
     }
 
 

@@ -24,8 +24,8 @@ export class TableNode extends Node implements CopyAble {
     constructor(public readonly table: string, readonly comment: string, readonly parent: Node) {
         super(`${table}`)
         this.description = comment
-        this.uid = `${parent.getConnectId()}_${parent.database}_${table}`
         this.init(parent)
+        this.cacheSelf()
         this.command = {
             command: "mysql.template.sql",
             title: "Run Select Statement",

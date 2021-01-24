@@ -15,7 +15,6 @@ export class ProcedureNode extends Node {
     constructor(readonly name: string, readonly parent: Node) {
         super(name)
         this.init(parent)
-        // this.uid = `${info.getConnectKey()}_${info.database}_${name}`
         this.command = {
             command: "mysql.show.procedure",
             title: "Show Procedure Create Source",
@@ -24,10 +23,10 @@ export class ProcedureNode extends Node {
     }
 
     public async showSource() {
-        this.execute<any[]>( this.dialect.showProcedureSource(this.database,this.name))
+        this.execute<any[]>(this.dialect.showProcedureSource(this.database, this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0]
-                QueryUnit.showSQLTextDocument(this,`DROP PROCEDURE IF EXISTS ${this.name};\n${procedDtail['Create Procedure']}`);
+                QueryUnit.showSQLTextDocument(this, `DROP PROCEDURE IF EXISTS ${this.name};\n${procedDtail['Create Procedure']}`);
             });
     }
 
@@ -39,8 +38,8 @@ export class ProcedureNode extends Node {
     public drop() {
 
         Util.confirm(`Are you want to drop procedure ${this.name} ? `, async () => {
-            this.execute( `DROP procedure ${this.wrap(this.name)}`).then(() => {
-                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}_${ModelType.PROCEDURE_GROUP}`)
+            this.execute(`DROP procedure ${this.wrap(this.name)}`).then(() => {
+                DatabaseCache.clearTableCache(`${this.parent.uid}`)
                 DbTreeDataProvider.refresh(this.parent)
                 vscode.window.showInformationMessage(`Drop procedure ${this.name} success!`)
             })

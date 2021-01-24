@@ -77,7 +77,7 @@ export class ColumnNode extends Node implements CopyAble {
         const dropSql = `ALTER TABLE \n\t${this.wrap(this.table)} DROP COLUMN ${this.wrap(this.column.name)};`;
         await QueryUnit.showSQLTextDocument(this, dropSql, Template.alter);
         Util.confirm(`Are you want to drop column ${this.column.name} ? `, async () => {
-            this.execute(dropSql).then(()=>{
+            this.execute(dropSql).then(() => {
                 DatabaseCache.clearColumnCache(`${this.parent.uid}`);
                 DbTreeDataProvider.refresh(this.parent);
             })

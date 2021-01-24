@@ -10,14 +10,13 @@ import { ViewNode } from "./viewNode";
 
 export class ViewGroup extends Node {
 
-    public iconPath: { light: string ; dark: string } = {
-        dark:  path.join(Constants.RES_PATH, "icon/table.svg"),
+    public iconPath: { light: string; dark: string } = {
+        dark: path.join(Constants.RES_PATH, "icon/table.svg"),
         light: path.join(Constants.RES_PATH, "light/view_group.png")
     };
     public contextValue = ModelType.VIEW_GROUP
     constructor(readonly parent: Node) {
         super("VIEW")
-        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.VIEW_GROUP}`;
         this.init(parent)
     }
 
@@ -38,7 +37,7 @@ export class ViewGroup extends Node {
                 } else if (tableNodes.length == 0) {
                     tableNodes = [new InfoNode("This database has no view")];
                 }
-                DatabaseCache.setTableListOfDatabase(this.uid, tableNodes);
+                DatabaseCache.setChildListOfDatabase(this.uid, tableNodes);
                 return tableNodes;
             })
             .catch((err) => {

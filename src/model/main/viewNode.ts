@@ -14,18 +14,18 @@ export class ViewNode extends TableNode {
     public contextValue: string = ModelType.VIEW;
 
     public async showSource() {
-        this.execute<any[]>( this.dialect.showViewSource(this.database,this.table))
+        this.execute<any[]>(this.dialect.showViewSource(this.database, this.table))
             .then((sourceResule) => {
-                const sql   =`DROP VIEW ${this.table};${sourceResule[0]['Create View']}`
-                QueryUnit.showSQLTextDocument(this,sqlFormatter.format(sql));
+                const sql = `DROP VIEW ${this.table};${sourceResule[0]['Create View']}`
+                QueryUnit.showSQLTextDocument(this, sqlFormatter.format(sql));
             });
     }
 
     public drop() {
 
         Util.confirm(`Are you want to drop view ${this.table} ? `, async () => {
-            this.execute( `DROP view ${this.wrap(this.table)}`).then(() => {
-                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}`);
+            this.execute(`DROP view ${this.wrap(this.table)}`).then(() => {
+                DatabaseCache.clearTableCache(this.parent.uid);
                 DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop view ${this.table} success!`);
             });

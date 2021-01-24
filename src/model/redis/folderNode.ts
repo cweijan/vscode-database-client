@@ -10,7 +10,6 @@ export class FolderNode extends RedisBaseNode {
     readonly iconPath = path.join(Constants.RES_PATH, `image/folder.svg`);
     constructor(readonly label: string, readonly prefix: string, readonly childens: string[], readonly parent: Node) {
         super(label)
-        this.uid = `${parent.uid}/${label}`
         this.init(parent)
         this.pattern = label
     }

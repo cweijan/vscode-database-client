@@ -12,7 +12,6 @@ export class ProcedureGroup extends Node {
     public iconPath = path.join(Constants.RES_PATH, "icon/procedure.png")
     constructor(readonly parent: Node) {
         super("PROCEDURE")
-        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.PROCEDURE_GROUP}`;
         this.init(parent)
     }
 
@@ -22,7 +21,7 @@ export class ProcedureGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return this.execute<any[]>( this.dialect.showProcedures(this.database))
+        return this.execute<any[]>(this.dialect.showProcedures(this.database))
             .then((tables) => {
                 tableNodes = tables.map<Node>((table) => {
                     return new ProcedureNode(table.ROUTINE_NAME, this);
@@ -30,7 +29,7 @@ export class ProcedureGroup extends Node {
                 if (tableNodes.length == 0) {
                     tableNodes = [new InfoNode("This database has no procedure")];
                 }
-                DatabaseCache.setTableListOfDatabase(this.uid, tableNodes);
+                DatabaseCache.setChildListOfDatabase(this.uid, tableNodes);
                 return tableNodes;
             })
             .catch((err) => {

@@ -85,6 +85,4 @@ Move to ant DatabaseNode or TableNode. The export/import options are listed in t
 ## RoadMap
 
 - Sync database struct from diffrent connection.
-- Support export database of postgresql、sqlserver.
 - Support manager index.
-- Better Intetllisense sql.

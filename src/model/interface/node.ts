@@ -12,10 +12,14 @@ import { SSHConfig } from "./sshConfig";
 export interface SwitchOpt {
     isGlobal?: boolean;
     withDb?: boolean;
+    withDbForce?: boolean;
 }
 
 export abstract class Node extends vscode.TreeItem implements CopyAble {
 
+    /**
+     * using as cache key
+     */
     public uid: string;
 
     public host: string;
@@ -38,7 +42,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     /**
      * es only
      */
-    public scheme:string;
+    public scheme: string;
 
     constructor(uid: string) {
         super(uid)
@@ -52,35 +56,52 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.port = source.port
         this.user = source.user
         this.password = source.password
-        this.database = source.database
+        if (!this.database) this.database = source.database
         this.timezone = source.timezone
         this.certPath = source.certPath
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
-        this.scheme=source.scheme
+        this.scheme = source.scheme
         this.global = source.global
         this.dbType = source.dbType
-        if (!this.dialect && this.dbType!=DatabaseType.REDIS) {
-            this.dialect = ServiceManager.getDialect(this.dbType)
-        }
         this.includeDatabases = source.includeDatabases
         this.excludeDatabases = source.excludeDatabases
         this.collapsibleState = DatabaseCache.getElementState(this)
+        if (!this.dialect && this.dbType != DatabaseType.REDIS) {
+            this.dialect = ServiceManager.getDialect(this.dbType)
+        }
+        if (this.uid) return;
+        if (this.contextValue == ModelType.CONNECTION) {
+            this.uid = this.getConnectId()
+        } else if (this.contextValue == ModelType.DATABASE) {
+            this.uid = `${this.getConnectId({ withDbForce: true })}`
+        } else {
+            this.uid = `${this.getConnectId({ withDbForce: true })}#${this.label}`
+        }
     }
 
     public static nodeCache = {};
     public cacheSelf() {
         if (this.contextValue == ModelType.CONNECTION || this.contextValue == ModelType.ES_CONNECTION) {
             Node.nodeCache[`${this.getConnectId()}`] = this;
+        } else if (this.contextValue == ModelType.DATABASE) {
+            Node.nodeCache[`${this.getConnectId({ withDbForce: true })}`] = this;
         } else {
-            Node.nodeCache[`${this.getConnectId()}_${this.database}`] = this;
+            Node.nodeCache[`${this.uid}`] = this;
         }
     }
     public getCache() {
         if (this.database) {
-            return Node.nodeCache[`${this.getConnectId()}_${this.database}`]
+            return Node.nodeCache[`${this.getConnectId({ withDbForce: true })}`]
         }
         return Node.nodeCache[`${this.getConnectId()}`]
+    }
+
+    public getByRegion(region?: string): Node {
+        if (!region) {
+            return Node.nodeCache[`${this.getConnectId({ withDbForce: true })}`]
+        }
+        return Node.nodeCache[`${this.getConnectId({ withDbForce: true })}#${region}`]
     }
 
     public getChildren(isRresh?: boolean): Node[] | Promise<Node[]> {
@@ -94,6 +115,11 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
         let uid = (this.usingSSH && this.ssh) ? `${prefix}_${this.ssh.host}_${this.ssh.port}_${this.ssh.username}`
             : `${prefix}_${this.host}_${this.port}_${this.user}`;
+
+
+        if (opt?.withDbForce && this.database) {
+            return `${uid}_${this.database}`
+        }
 
         /**
          * mssql and postgres must special database when connect.
@@ -114,7 +140,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         return (await QueryUnit.queryPromise<T>(await ConnectionManager.getConnection(this), sql)).rows
     }
 
-    public async getConnection(){
+    public async getConnection() {
         return ConnectionManager.getConnection(this)
     }
 

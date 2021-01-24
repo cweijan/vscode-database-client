@@ -1,20 +1,20 @@
-import { Node } from "../../model/interface/node";
+import { DatabaseType, ModelType } from "@/common/constants";
+import { ViewNode } from "@/model/main/viewNode";
 import * as vscode from "vscode";
+import { Node } from "../../model/interface/node";
+import { TableNode } from "../../model/main/tableNode";
 import { DatabaseCache } from "../common/databaseCache";
-import { Console } from "../../common/Console";
-import { DatabaseNode } from "../../model/database/databaseNode";
 import format = require('date-format');
 import path = require('path');
-import { TableNode } from "../../model/main/tableNode";
-import { ViewNode } from "@/model/main/viewNode";
-import { DatabaseType } from "@/common/constants";
+import { TableGroup } from "@/model/main/tableGroup";
+import { ViewGroup } from "@/model/main/viewGroup";
 
 export abstract class AbstractDumpService {
 
     public async dump(node: Node, withData: boolean) {
 
-        const dbType=node.dbType
-        if(dbType==DatabaseType.MSSQL||dbType==DatabaseType.PG){
+        const dbType = node.dbType
+        if (dbType == DatabaseType.MSSQL || dbType == DatabaseType.PG) {
             vscode.window.showErrorMessage("Dump only support mysql.")
             return;
         }
@@ -23,9 +23,9 @@ export abstract class AbstractDumpService {
         if (node instanceof TableNode || node instanceof ViewNode) {
             tables = [node.table]
         } else {
-            const tableList = DatabaseCache.getTableListOfDatabase(node.uid);
-            const viewList = DatabaseCache.getViewListOfDatabase(node.uid) || [];
-            const tableAndViewList=tableList.concat(viewList)
+            const tableList = await new TableGroup(node).getChildren();
+            const viewList = await new ViewGroup(node).getChildren();
+            const tableAndViewList = tableList.concat(viewList)
             tables = await vscode.window.showQuickPick(tableAndViewList.map(table => table.label), { canPickMany: true, placeHolder: "Select databases to export, default is all" })
             if (!tables) {
                 return;

@@ -13,6 +13,7 @@ import { FileManager, FileModel } from '../../common/filesManager';
 import { MockModel } from './mockModel';
 import { Node } from '../../model/interface/node';
 import { ColumnMeta } from '../../model/other/columnMeta';
+import { TableGroup } from '@/model/main/tableGroup';
 
 export class MockRunner {
 
@@ -40,13 +41,10 @@ export class MockRunner {
     public async runMock() {
 
         const content = vscode.window.activeTextEditor.document.getText()
-
         const mockModel = JSON.parse(content) as MockModel;
-        if (!mockModel.mode) {
-            mockModel.mode = 'global'
-        }
-        const databaseid = `${mockModel.mode}_${mockModel.host}_${mockModel.port}_${mockModel.user}_${mockModel.database}`;
-        const tableList = DatabaseCache.getChildListOfDatabase(databaseid) as TableNode[]
+
+
+        const tableList = await new TableGroup(ConnectionManager.getByActiveFile()).getChildren() as TableNode[]
         if (!tableList) {
             vscode.window.showErrorMessage(`Database ${mockModel.database} not found!`)
             return;

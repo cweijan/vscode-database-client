@@ -1,25 +1,21 @@
+import { TableNode } from "@/model/main/tableNode";
+import { ConnectionManager } from "@/service/connectionManager";
 import * as vscode from "vscode";
-import {HoverProvider} from "vscode";
-import {DatabaseCache} from "../service/common/databaseCache";
-import {ColumnNode} from "../model/other/columnNode";
+import { HoverProvider } from "vscode";
 
 export class TableInfoHoverProvider implements HoverProvider {
 
     public async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover> {
 
+
         const tableName = document.getText(document.getWordRangeAtPosition(position));
-        for (const tableNode of DatabaseCache.getTableNodeList()) {
-            if (tableNode.table === tableName) {
-                const columnNodes = (await tableNode.getChildren()) as ColumnNode[];
-                let hoverContent = `${tableNode.database}.${tableName}:`;
-                for (const columnNode of columnNodes) {
-                    hoverContent += `
-${columnNode.column.name} ${columnNode.column.type} ${columnNode.column.comment ? "comment " + columnNode.column.comment : ""} `;
-                }
-                const markdownStr = new vscode.MarkdownString();
-                markdownStr.appendCodeblock(hoverContent, "sql");
-                return new vscode.Hover(markdownStr);
-            }
+        const tableNode = ConnectionManager.getLastConnectionOption()?.getByRegion(tableName) as TableNode
+
+        const sourceCode = await tableNode?.execute<any[]>(tableNode.dialect.showTableSource(tableNode.database, tableNode.table))
+        if (sourceCode) {
+            const markdownStr = new vscode.MarkdownString();
+            markdownStr.appendCodeblock(sourceCode[0]['Create Table'], "sql");
+            return new vscode.Hover(markdownStr);
         }
 
         return null;

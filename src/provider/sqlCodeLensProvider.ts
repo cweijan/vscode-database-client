@@ -20,7 +20,7 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
         for (var i = 0; i < lineCount; i++) {
             var line = document.lineAt(i)
             var text = line.text;
-            sql = sql + text;
+            sql = sql +"\n"+ text;
 
             if (text?.trim() && !start) {
                 start = new vscode.Position(i, 0)

@@ -19,7 +19,7 @@ export class RedisConnectionNode extends RedisBaseNode {
     contextValue = ModelType.REDIS_CONNECTION;
     iconPath: string = path.join(Constants.RES_PATH, `image/redis_connection.png`);
     iconDetailPath: string = path.join(Constants.RES_PATH, `image/code-terminal.svg`);
-    
+
     constructor(readonly uid: string, readonly parent: Node) {
         super(uid)
         this.init(parent)
@@ -28,7 +28,7 @@ export class RedisConnectionNode extends RedisBaseNode {
     async getChildren(): Promise<RedisBaseNode[]> {
         const client = await this.getClient()
         let keys: string[] = await promisify(client.keys).bind(client)(this.pattern);
-        return FolderNode.buildChilds(this,"", keys)
+        return FolderNode.buildChilds(this, "", keys)
     }
     async openTerminal(): Promise<any> {
         const client = await this.getClient()

@@ -81,6 +81,7 @@ export class ViewManager {
                     if (viewOption.eventHandler) {
                         viewOption.eventHandler(new Hanlder(currentStatus.instance, currentStatus.eventEmitter))
                     }
+                    currentStatus.creating=false;
                     currentStatus.eventEmitter.emit('init')
                     return Promise.resolve(currentStatus.instance);
                 }
@@ -116,9 +117,13 @@ export class ViewManager {
                     viewOption.eventHandler(new Hanlder(webviewPanel, newStatus.eventEmitter))
                 }
                 webviewPanel.webview.onDidReceiveMessage((message) => {
-                    newStatus.eventEmitter.emit(message.type, message.content)
                     if (message.type == 'init') {
-                        newStatus.creating = false
+                        if (newStatus.creating) {
+                            newStatus.eventEmitter.emit(message.type, message.content)
+                            newStatus.creating = false
+                        }
+                    } else {
+                        newStatus.eventEmitter.emit(message.type, message.content)
                     }
                 })
                 resolve(webviewPanel);

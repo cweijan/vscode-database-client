@@ -13,7 +13,6 @@ export class TriggerGroup extends Node {
 
     constructor(readonly parent: Node) {
         super("TRIGGER")
-        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.TRIGGER_GROUP}`;
         this.init(parent)
     }
 
@@ -23,7 +22,7 @@ export class TriggerGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return this.execute<any[]>( this.dialect.showTriggers(this.database))
+        return this.execute<any[]>(this.dialect.showTriggers(this.database))
             .then((tables) => {
                 tableNodes = tables.map<TriggerNode>((table) => {
                     return new TriggerNode(table.TRIGGER_NAME, this);
@@ -31,7 +30,7 @@ export class TriggerGroup extends Node {
                 if (tableNodes.length == 0) {
                     tableNodes = [new InfoNode("This database has no trigger")];
                 }
-                DatabaseCache.setTableListOfDatabase(this.uid, tableNodes);
+                DatabaseCache.setChildListOfDatabase(this.uid, tableNodes);
                 return tableNodes;
             })
             .catch((err) => {

@@ -1,13 +1,12 @@
-import { readFileSync, unlink, unlinkSync } from "fs";
+import { readFileSync, unlinkSync } from "fs";
 import * as path from "path";
-import { TreeItemCollapsibleState } from "vscode";
 import { Constants, ModelType } from "../../common/constants";
 import { FileManager, FileModel } from "../../common/filesManager";
+import { Global } from "../../common/global";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ViewManager } from "../../view/viewManager";
 import { Node } from "../interface/node";
-import { Global } from "../../common/global";
 
 export class DiagramNode extends Node {
 
@@ -15,9 +14,7 @@ export class DiagramNode extends Node {
     public iconPath = path.join(Constants.RES_PATH, "icon/diagram-node.svg")
     constructor(public name: string, readonly parent: Node) {
         super(name)
-        this.uid = `${parent.getConnectId()}_${parent.database}_diragram_${name}`
         this.init(parent)
-        this.collapsibleState = TreeItemCollapsibleState.None
         this.command = {
             command: "mysql.diagram.open",
             title: "Open Diagram",
@@ -39,7 +36,7 @@ export class DiagramNode extends Node {
                 }).on("save", ({ name, data }) => {
                     unlinkSync(this.getFilePath())
                     this.name = name
-                    const diagramPath = `diagram/${this.getConnectId()}_${this.database}/${name}.json`;
+                    const diagramPath = `diagram/${this.getConnectId({withDbForce:true})}/${name}.json`;
                     FileManager.record(diagramPath, data, FileModel.WRITE)
                     DbTreeDataProvider.refresh(this.parent)
                 })
@@ -49,7 +46,7 @@ export class DiagramNode extends Node {
 
 
     private getFilePath(): string {
-        return `${FileManager.storagePath}/diagram/${this.getConnectId()}_${this.database}/${this.name}.json`;
+        return `${FileManager.storagePath}/diagram/${this.getConnectId({withDbForce:true})}/${this.name}.json`;
     }
 
     public async getChildren(): Promise<Node[]> {

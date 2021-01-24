@@ -21,13 +21,12 @@ import { QueryGroup } from "../query/queryGroup";
 
 export class DatabaseNode extends Node implements CopyAble {
 
-    
+
     public contextValue: string = ModelType.DATABASE;
     public iconPath: string = path.join(Constants.RES_PATH, "icon/database.svg");
     constructor(name: string, readonly parent: Node) {
         super(name)
-        this.uid = `${parent.getConnectId()}_${name}`
-        this.parent = NodeUtil.of({ ...parent, database: name } as Node)
+        this.database = name
         this.init(this.parent)
         this.cacheSelf()
         const lcp = ConnectionManager.getLastConnectionOption(false);
@@ -37,7 +36,7 @@ export class DatabaseNode extends Node implements CopyAble {
         }
     }
 
-    public getChildren(): Promise<Node[]>|Node[] {
+    public getChildren(): Promise<Node[]> | Node[] {
         return [
             new TableGroup(this), new ViewGroup(this),
             new QueryGroup(this), new DiagramGroup(this),

@@ -12,7 +12,6 @@ export class FunctionGroup extends Node {
     public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
     constructor(readonly parent: Node) {
         super("FUNCTION")
-        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.FUNCTION_GROUP}`;
         this.init(parent)
     }
 
@@ -22,7 +21,7 @@ export class FunctionGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return this.execute<any[]>( this.dialect.showFunctions(this.database))
+        return this.execute<any[]>(this.dialect.showFunctions(this.database))
             .then((tables) => {
                 tableNodes = tables.map<FunctionNode>((table) => {
                     return new FunctionNode(table.ROUTINE_NAME, this);
@@ -30,7 +29,7 @@ export class FunctionGroup extends Node {
                 if (tableNodes.length == 0) {
                     tableNodes = [new InfoNode("This database has no function")];
                 }
-                DatabaseCache.setTableListOfDatabase(this.uid, tableNodes);
+                DatabaseCache.setChildListOfDatabase(this.uid, tableNodes);
                 return tableNodes;
             })
             .catch((err) => {

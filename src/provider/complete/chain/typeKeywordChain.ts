@@ -3,7 +3,7 @@ import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class TypeKeywordChain implements ComplectionChain {
 
-    private typeList: string[] = ["INTEGER", "CHAR", "VARCHAR", "DECIMAL", "SMALLINT", "TINYINT", "MEDIUMINT", "BIGINT",
+    private typeList: string[] = ["INTEGER", "CHAR", "VARCHAR", "DECIMAL", "SMALLINT", "TINYINT", "MEDIUMINT", "BIGINT","CHARACTER",
         "NUMERIC", "BIT", "INT", "FLOAT", "DOUBLE", "TEXT", "SET", "BLOB", "TIMESTAMP", "DATE", "TIME", "YEAR", "DATETIME"];
     private typeComplectionItems: vscode.CompletionItem[] = [];
     private needStop = false;

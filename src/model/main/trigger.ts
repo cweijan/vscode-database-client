@@ -22,10 +22,10 @@ export class TriggerNode extends Node {
     }
 
     public async showSource() {
-        this.execute( this.dialect.showTriggerSource(this.database, this.name))
+        this.execute(this.dialect.showTriggerSource(this.database, this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0]
-                QueryUnit.showSQLTextDocument(this,`${this.dialect.dropTriggerTemplate(this.wrap(this.name))};\n${procedDtail['SQL Original Statement']}`);
+                QueryUnit.showSQLTextDocument(this, `${this.dialect.dropTriggerTemplate(this.wrap(this.name))};\n${procedDtail['SQL Original Statement']}`);
             });
     }
 
@@ -41,7 +41,7 @@ export class TriggerNode extends Node {
         }
         Util.confirm(`Are you want to drop trigger ${this.name} ?`, async () => {
             this.execute(this.dialect.dropTriggerTemplate(this.wrap(this.name))).then(() => {
-                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.database}_${ModelType.TRIGGER_GROUP}`)
+                DatabaseCache.clearTableCache(this.parent.uid)
                 DbTreeDataProvider.refresh(this.parent)
                 vscode.window.showInformationMessage(`Drop trigger ${this.name} success!`)
             })

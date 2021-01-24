@@ -26,7 +26,6 @@ export class ConnectionNode extends Node implements CopyAble {
         super(uid)
         this.init(parent)
         this.cacheSelf()
-        this.uid = this.getConnectId()
         if (parent.name) {
             this.label = `${parent.name}_${this.uid}`
             this.name = parent.name
@@ -61,7 +60,7 @@ export class ConnectionNode extends Node implements CopyAble {
                 const includeDatabaseArray = this.includeDatabases?.toLowerCase()?.split(",")
                 const usingInclude = includeDatabaseArray && includeDatabaseArray.length > 1;
                 const databaseNodes = databases.filter((db) => {
-                    if(usingInclude && includeDatabaseArray.indexOf(db?.Database?.toLocaleLowerCase())==-1){
+                    if (usingInclude && includeDatabaseArray.indexOf(db?.Database?.toLocaleLowerCase()) == -1) {
                         return false;
                     }
                     return true;

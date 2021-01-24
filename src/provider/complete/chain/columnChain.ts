@@ -1,10 +1,9 @@
 import * as vscode from "vscode";
-import { DatabaseCache } from "../../../service/common/databaseCache";
-import { ColumnNode } from "../../../model/other/columnNode";
-import { ComplectionChain, ComplectionContext } from "../complectionContext";
-import { Util } from "../../../common/util";
 import { Pattern } from "../../../common/constants";
+import { Util } from "../../../common/util";
+import { ColumnNode } from "../../../model/other/columnNode";
 import { ConnectionManager } from "../../../service/connectionManager";
+import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class ColumnChain implements ComplectionChain {
 
@@ -56,23 +55,16 @@ export class ColumnChain implements ComplectionChain {
         if (!tableName) {
             return [];
         }
-        let columnNodes: ColumnNode[] = [];
-
 
         const lcp = ConnectionManager.getLastConnectionOption()
-        if (!lcp) { return []; }
-        const uid = `${lcp.getConnectId()}_${lcp.database}_${tableName}`;
-
-        for (const tableNode of DatabaseCache.getTableNodeList()) {
-            if ((tableNode.table == tableName) ||
-                (tableNode.uid === uid)) {
-                columnNodes = (await tableNode.getChildren()) as ColumnNode[];
-                break;
-            }
+        let columnNodes = (await lcp?.getByRegion(tableName)?.getChildren()) as ColumnNode[];
+        if (!columnNodes) {
+            return []
         }
 
         return columnNodes.map<vscode.CompletionItem>((columnNode) => {
-            const completionItem = new vscode.CompletionItem(columnNode.description ? `${columnNode.label}  ${columnNode.description}` : columnNode.label);
+            const completionItem = new vscode.CompletionItem(columnNode.label);
+            completionItem.documentation=columnNode.description as string
             completionItem.insertText = columnNode.column.name
             completionItem.kind = vscode.CompletionItemKind.Field;
             return completionItem;
