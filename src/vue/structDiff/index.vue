@@ -28,37 +28,34 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-button @click="startCompare" title="Start Compare" type="danger" size="mini">Start Compare
-    </el-button>
-    <el-button @click="sync" title="Confrim Sync" type="danger" size="mini">Confirm Sync
-    </el-button>
+    <div>
+      <el-button class="m-2" @click="startCompare" title="Start Compare" type="danger" size="mini" v-loading="loading.compare">Compare
+      </el-button>
+      <template v-if="compareResult.sqlList">
+        <el-card>
+          <el-button @click="confrimSync" v-loading="loading.sync" title="Confrim Sync" type="success" size="mini">Sync
+          </el-button>
+          <ux-grid :data="compareResult.sqlList" :height="remainHeight" ref="dataTable" stripe style="width: 100%" @selection-change="selectionChange">
+            <ux-table-column type="checkbox" width="40" fixed="left"> </ux-table-column>
+            <ux-table-column align="center" width="60" field="type" title="type" show-overflow-tooltip="true"></ux-table-column>
+            <ux-table-column align="center" field="sql" title="sql" show-overflow-tooltip="true"></ux-table-column>
+          </ux-grid>
+        </el-card>
+      </template>
+    </div>
   </div>
 </template>
 
 <script>
 import { getVscodeEvent } from "../util/vscode";
-import { wrapByDb } from "@/common/wrapper";
 const vscodeEvent = getVscodeEvent();
 export default {
   data() {
     return {
-      init: {
-        nodes: [],
-        databaseList: {},
-      },
-      option: {
-        from: { connection: null, database: null },
-        to: {},
-      },
-      compareResult: { sqlList: [] },
-      designData: { indexs: [], table: null, dbType: null },
-      index: {
-        visible: false,
-        loading: false,
-        column: null,
-        type: null,
-      },
-      activePanel: "index",
+      init: { nodes: [], databaseList: {} },
+      option: { from: { connection: null, database: null }, to: {} },
+      loading: { compare: false, sync: false },
+      compareResult: { sqlList: null },
     };
   },
   destroyed() {
@@ -71,38 +68,40 @@ export default {
       })
       .on("compareResult", (compareResult) => {
         this.compareResult = compareResult;
+        this.loading.compare = false;
       })
       .on("syncSuccess", () => {
         this.$message.success("syncSuccess");
+        this.loading.sync = false;
       })
       .on("success", () => {
-        this.index.loading = false;
-        this.index.visible = false;
         this.refresh();
       })
       .on("error", (msg) => {
         this.$message.error(msg);
+        this.loading.sync = false;
       });
     vscodeEvent.emit("route-" + this.$route.name);
   },
   methods: {
-    createIndex() {
-      this.index.loading = true;
-      this.execute(
-        `ALTER TABLE ${wrapByDb(
-          this.designData.table,
-          this.designData.dbType
-        )} ADD ${this.index.type} (${wrapByDb(
-          this.index.column,
-          this.designData.dbType
-        )})`
-      );
-    },
     startCompare() {
+      this.loading.compare = true;
       vscodeEvent.emit("start", this.option);
     },
-    sync(){
-      vscodeEvent.emit("sync",{sqlList:this.compareResult.sqlList,option:this.option})
+    confrimSync() {
+      const sqlList = this.$refs.dataTable.getCheckboxRecords();
+      if (!sqlList || sqlList.length == 0) {
+        this.$message.error("Need to select at least one sql!");
+        return;
+      }
+      this.loading.sync = true;
+      vscodeEvent.emit("sync", {
+        sqlList: sqlList,
+        option: this.option,
+      });
+    },
+    selectionChange(selection) {
+      // this.toolbar.show = selection.length > 0
     },
     execute(sql) {
       if (!sql) return;
@@ -114,7 +113,7 @@ export default {
   },
   computed: {
     remainHeight() {
-      return window.outerHeight - 130;
+      return window.outerHeight - 340;
     },
   },
 };
