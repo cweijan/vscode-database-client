@@ -5,6 +5,8 @@ import { RedisClient } from "redis";
 
 export default abstract class RedisBaseNode extends Node {
     pattern = "*";
+    level = 0;
+
     abstract getChildren(): Promise<Node[]>;
 
     public async getClient(): Promise<RedisClient> {
