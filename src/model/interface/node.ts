@@ -66,11 +66,9 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.dbType = source.dbType
         this.includeDatabases = source.includeDatabases
         this.excludeDatabases = source.excludeDatabases
-        this.collapsibleState = DatabaseCache.getElementState(this)
         if (!this.dialect && this.dbType != DatabaseType.REDIS) {
             this.dialect = ServiceManager.getDialect(this.dbType)
         }
-        if (this.uid) return;
         if (this.contextValue == ModelType.CONNECTION) {
             this.uid = this.getConnectId()
         } else if (this.contextValue == ModelType.DATABASE) {
@@ -78,6 +76,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         } else {
             this.uid = `${this.getConnectId({ withDbForce: true })}#${this.label}`
         }
+        this.collapsibleState = DatabaseCache.getElementState(this)
     }
 
     public static nodeCache = {};
