@@ -28,7 +28,7 @@ export class RedisConnectionNode extends RedisBaseNode {
     async getChildren(): Promise<RedisBaseNode[]> {
         const client = await this.getClient()
         let keys: string[] = await promisify(client.keys).bind(client)(this.pattern);
-        return FolderNode.buildChilds(this,"", keys)
+        return FolderNode.buildChilds(this, keys)
     }
     async openTerminal(): Promise<any> {
         const client = await this.getClient()
