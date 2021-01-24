@@ -30,7 +30,8 @@
     </div>
     <el-button @click="startCompare" title="Start Compare" type="danger" size="mini">Start Compare
     </el-button>
-
+    <el-button @click="sync" title="Confrim Sync" type="danger" size="mini">Confirm Sync
+    </el-button>
   </div>
 </template>
 
@@ -49,6 +50,7 @@ export default {
         from: { connection: null, database: null },
         to: {},
       },
+      compareResult: { sqlList: [] },
       designData: { indexs: [], table: null, dbType: null },
       index: {
         visible: false,
@@ -66,6 +68,12 @@ export default {
     vscodeEvent
       .on("structDiff-data", (data) => {
         this.init = data;
+      })
+      .on("compareResult", (compareResult) => {
+        this.compareResult = compareResult;
+      })
+      .on("syncSuccess", () => {
+        this.$message.success("syncSuccess");
       })
       .on("success", () => {
         this.index.loading = false;
@@ -91,21 +99,10 @@ export default {
       );
     },
     startCompare() {
-      vscodeEvent.emit("start",this.option);
+      vscodeEvent.emit("start", this.option);
     },
-    deleteConfirm(row) {
-      this.$confirm("Are you sure you want to delete this data?", "Warning", {
-        confirmButtonText: "OK",
-        cancelButtonText: "Cancel",
-        type: "warning",
-      }).then(() => {
-        this.execute(
-          `ALTER TABLE ${wrapByDb(
-            this.designData.table,
-            this.designData.dbType
-          )} DROP INDEX ${row.index_name}`
-        );
-      });
+    sync(){
+      vscodeEvent.emit("sync",{sqlList:this.compareResult.sqlList,option:this.option})
     },
     execute(sql) {
       if (!sql) return;

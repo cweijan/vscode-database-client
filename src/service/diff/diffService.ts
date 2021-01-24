@@ -6,6 +6,8 @@ import { ColumnNode } from "@/model/other/columnNode";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { ViewManager } from "@/view/viewManager";
 import { DatabaseCache } from "../common/databaseCache";
+import { ConnectionManager } from "../connectionManager";
+import { QueryUnit } from "../queryUnit";
 
 export class DiffService {
     startDiff(provider: DbTreeDataProvider) {
@@ -35,8 +37,17 @@ export class DiffService {
                     const toTables = DatabaseCache.getChildListOfId(`${opt.to.connection}_${opt.to.database}#TABLE`)
 
                     let sqlList = await this.compareTables(fromTables, toTables);
-                    console.log(sqlList)
+                    handler.emit("compareResult", { sqlList })
+                }).on("sync", async ({ option, sqlList }) => {
 
+                    const databaseId = `${option.from.connection}_${option.from.database}`
+                    const dbNode = Node.nodeCache[databaseId]
+                    try {
+                        await QueryUnit.runBatch(await ConnectionManager.getConnection(dbNode), sqlList.map(sql => sql.sql))
+                        handler.emit("syncSuccess")
+                    } catch (error) {
+                        handler.emit("error", error.message)
+                    }
                 })
             })
         })
@@ -79,9 +90,13 @@ export class DiffService {
 
         fromColumns.forEach((fromColumn: ColumnNode) => {
             if (toColumnsMap[fromColumn.label]) {
-                const toColumnNode=toColumnsMap[fromColumn.label] as ColumnNode
-                if(toColumnNode.type!=fromColumn.type){
-                    sqlList.push({ type: 'change', sql: `ALTER TABLE ${toColumnNode.table} ALTER COLUMN ${toColumnNode.label} ${toColumnNode.type}` });
+                const toColumnNode = toColumnsMap[fromColumn.label] as ColumnNode
+                if (toColumnNode.type != fromColumn.type) {
+                    if(toColumnNode.dbType==DatabaseType.MSSQL || toColumnNode.dbType==DatabaseType.PG){
+                        sqlList.push({ type: 'change', sql: `ALTER TABLE ${toColumnNode.table} ALTER COLUMN ${toColumnNode.label} ${toColumnNode.type}` });
+                    }else{
+                        sqlList.push({ type: 'change', sql: `ALTER TABLE ${toColumnNode.table} CHANGE ${toColumnNode.label} ${toColumnNode.label} ${toColumnNode.type} ;` });
+                    }
                 }
                 delete toColumnsMap[fromColumn.label];
             } else {
@@ -91,11 +106,11 @@ export class DiffService {
 
         for (const toColumn in toColumnsMap) {
             const newColumnNode = toColumnsMap[toColumn] as ColumnNode;
-            if(newColumnNode.dbType==DatabaseType.MSSQL){
+            if (newColumnNode.dbType == DatabaseType.MSSQL) {
                 sqlList.push({ type: 'add', sql: `ALTER TABLE ${newColumnNode.table} ADD ${newColumnNode.label} ${newColumnNode.column.type};` });
-            }else{
+            } else {
                 sqlList.push({ type: 'add', sql: `ALTER TABLE ${newColumnNode.table} ADD COLUMN ${newColumnNode.label} ${newColumnNode.column.type};` });
-                
+
             }
         }
         return sqlList;

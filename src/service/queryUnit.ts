@@ -14,6 +14,7 @@ import { NodeUtil } from "~/model/nodeUtil";
 import { Trans } from "~/common/trans";
 import { IConnection } from "./connect/connection";
 import { FieldInfo } from "mysql2";
+import { rejects } from "assert";
 
 export class QueryUnit {
 
@@ -110,7 +111,7 @@ export class QueryUnit {
         }
     }
     public static runBatch(connection: IConnection, sqlList: string[]) {
-        return new Promise((resolve) => {
+        return new Promise((resolve,reject) => {
             connection.beginTransaction(async () => {
                 try {
                     for (let sql of sqlList) {
@@ -122,7 +123,7 @@ export class QueryUnit {
                     resolve(true)
                 } catch (err) {
                     connection.rollback()
-                    resolve(false)
+                    reject(err)
                 }
             })
         })

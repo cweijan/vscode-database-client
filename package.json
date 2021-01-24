@@ -90,9 +90,12 @@
 		"commands": [
 			{
 				"command": "mysql.struct.diff",
-				"title": "%command.history.open%",
+				"title": "%command.struct.diff%",
 				"category": "MySQL",
-				"icon": "resources/icon/history.svg"
+				"icon": {
+					"light": "resources/light/sync.svg",
+					"dark": "resources/dark/sync.svg"
+				}
 			},
 			{
 				"command": "mysql.history.open",

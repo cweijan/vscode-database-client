@@ -11,6 +11,7 @@
 	"command.diagram.drop": "Drop Diagram",
 	"command.connection.add": "Add Connection",
 	"command.connection.edit": "Edit Connection",
+	"command.struct.diff": "Database Struct Sync",
 	"command.server.info": "Server Status",
 	"command.connection.delete": "Delete Connection",
 	"command.database.add": "New Database",
