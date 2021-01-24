@@ -1,4 +1,3 @@
-import { DatabaseChain } from "@/provider/complete/chain/databaseChain";
 import { DatabaseCache } from "@/service/common/databaseCache";
 import * as path from "path";
 import * as vscode from "vscode";

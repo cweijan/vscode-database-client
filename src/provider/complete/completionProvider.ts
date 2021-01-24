@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import { ColumnChain } from "./chain/columnChain";
-import { DatabaseChain } from "./chain/databaseChain";
 import { KeywordChain } from "./chain/keywordChain";
 import { TableChain } from "./chain/tableChain";
 import { TableCreateChain } from "./chain/tableCreatingChain";
@@ -22,7 +21,6 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         this.fullChain = [
             new TableCreateChain(),
             new TypeKeywordChain(),
-            new DatabaseChain(),
             new TableChain(),
             new ColumnChain(),
             new FunctionChain(),
