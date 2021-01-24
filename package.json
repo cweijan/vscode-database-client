@@ -488,7 +488,7 @@
 				},
 				{
 					"command": "mysql.mock.run",
-					"when": "resourceFilename == mock.json ",
+					"when": "resourceFilename =~ /mock.json$/ ",
 					"group": "navigation"
 				}
 			],

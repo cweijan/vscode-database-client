@@ -24,8 +24,8 @@ export class MockRunner {
         const mockModel: MockModel = {
             mode: tableNode.global === false ? 'workspace' : 'global',
             host: tableNode.getHost(), port: tableNode.getPort(), user: tableNode.getUser(), database: tableNode.database, table: tableNode.table,
-            mockStartIndex: MockRunner.primaryKeyMap[tableNode.getConnectId()] ? 'auto' : 1
-            , mockCount: 50, examples: "http://mockjs.com/examples.html#DPD", mock: {}
+            mockStartIndex: MockRunner.primaryKeyMap[tableNode.uid] ? 'auto' : 1
+            , mockCount: 10, examples: "http://mockjs.com/examples.html#DPD", mock: {}
         }
         for (const columnNode of columnList) {
             mockModel.mock[columnNode.column.name] = {
@@ -34,24 +34,7 @@ export class MockRunner {
             }
         }
 
-        const mockPath = `mock/${tableNode.database}/${tableNode.table}/mock.json`;
-        const mockFullPath = `${FileManager.storagePath}/${mockPath}`;
-        let targetModel = mockModel;
-
-        try {
-            if (existsSync(mockFullPath)) {
-                const existsMockModel = JSON.parse(readFileSync(mockFullPath, 'utf8')) as MockModel;
-                if (Object.keys(existsMockModel.mock).length != columnList.length) {
-                    existsMockModel.mock = mockModel.mock
-                }
-                targetModel = existsMockModel
-            }
-        } catch (err) { }
-
-        await FileManager.record(mockPath, JSON.stringify(targetModel, null, 4), FileModel.WRITE);
-        await vscode.window.showTextDocument(
-            await vscode.workspace.openTextDocument(mockFullPath)
-        );
+        QueryUnit.showSQLTextDocument(tableNode, JSON.stringify(mockModel, null, 4), 'mock.json')
     }
 
     public async runMock() {
@@ -59,8 +42,8 @@ export class MockRunner {
         const content = vscode.window.activeTextEditor.document.getText()
 
         const mockModel = JSON.parse(content) as MockModel;
-        if(!mockModel.mode){
-            mockModel.mode='global'
+        if (!mockModel.mode) {
+            mockModel.mode = 'global'
         }
         const databaseid = `${mockModel.mode}_${mockModel.host}_${mockModel.port}_${mockModel.user}_${mockModel.database}`;
         const tableList = DatabaseCache.getChildListOfDatabase(databaseid) as TableNode[]
@@ -106,7 +89,7 @@ export class MockRunner {
 
             const success = await QueryUnit.runBatch(connection, sqlList)
             vscode.commands.executeCommand("mysql.template.sql", tableNode, true)
-            QueryPage.send({ connection:tableNode,type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
+            QueryPage.send({ connection: tableNode, type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
 
         }
     }

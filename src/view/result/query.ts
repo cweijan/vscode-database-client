@@ -66,17 +66,17 @@ export class QueryPage {
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
                     })
                 }).on('esFilter', (query) => {
-                    const esQuery=EsRequest.build(queryParam.res.sql,obj=>{
+                    const esQuery = EsRequest.build(queryParam.res.sql, obj => {
                         obj.query = query;
                     })
                     QueryUnit.runQuery(esQuery, dbOption);
                 }).on('esSort', (sort) => {
-                    const esQuery=EsRequest.build(queryParam.res.sql,obj=>{
-                        obj.sort=sort;
+                    const esQuery = EsRequest.build(queryParam.res.sql, obj => {
+                        obj.sort = sort;
                     })
                     QueryUnit.runQuery(esQuery, dbOption);
                 }).on('count', async (params) => {
-                    dbOption.execute(params.sql.replace(/\bSELECT\b.+?\bFROM\b/i,'select count(*) count from')).then((rows) => {
+                    dbOption.execute(params.sql.replace(/\bSELECT\b.+?\bFROM\b/i, 'select count(*) count from')).then((rows) => {
                         handler.emit('COUNT', { data: rows[0].count })
                     })
                 }).on(OperateType.export, (params) => {
@@ -146,7 +146,7 @@ export class QueryPage {
         const extName = extname(window.activeTextEditor.document.fileName)?.toLowerCase()
         const fileName = basename(window.activeTextEditor.document.fileName)?.toLowerCase()
 
-        return extName == '.sql' || fileName == 'mock.json' || extName == '.es';
+        return extName == '.sql' || fileName.match(/mock.json$/) != null || extName == '.es';
     }
 
     private static async loadEsColumnList(queryParam: QueryParam<DataResponse>) {
