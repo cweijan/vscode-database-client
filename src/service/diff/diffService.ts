@@ -1,6 +1,8 @@
 import { Global } from "@/common/global";
+import { TableGroup } from "@/model/main/tableGroup";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { ViewManager } from "@/view/viewManager";
+import { DatabaseCache } from "../common/databaseCache";
 
 export class DiffService {
     startDiff(provider: DbTreeDataProvider) {
@@ -18,6 +20,10 @@ export class DiffService {
                         databaseList[node.label] = await node.getChildren()
                     }
                     handler.emit('structDiff-data', { nodes, databaseList })
+                }).on("start", (opt) => {
+                    const from=DatabaseCache.getChildListOfId(`${opt.from.connection}_${opt.from.database}#TABLE`)
+                    const to=DatabaseCache.getChildListOfId(`${opt.to.connection}_${opt.to.database}#TABLE`)
+                    console.log(from)
                 }).on("execute", async sql => {
                     try {
                         // await this.execute(sql)

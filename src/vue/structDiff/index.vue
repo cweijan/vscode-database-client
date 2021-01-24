@@ -28,8 +28,8 @@
         </el-form-item>
       </el-form>
     </div>
-          <el-button @click="deleteConfirm" title="Start Compare" type="danger" size="mini" >Start Compare
-        </el-button>
+    <el-button @click="startCompare" title="Start Compare" type="danger" size="mini">Start Compare
+    </el-button>
 
   </div>
 </template>
@@ -89,6 +89,9 @@ export default {
           this.designData.dbType
         )})`
       );
+    },
+    startCompare() {
+      vscodeEvent.emit("start",this.option);
     },
     deleteConfirm(row) {
       this.$confirm("Are you sure you want to delete this data?", "Warning", {
