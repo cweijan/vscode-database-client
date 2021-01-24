@@ -14,7 +14,7 @@ export class ColumnNode extends Node implements CopyAble {
     public type: string;
     public contextValue: string = ModelType.COLUMN;
     public isPrimaryKey = false;
-    constructor(private readonly table: string, readonly column: ColumnMeta, readonly parent: Node, readonly index: number) {
+    constructor(public readonly table: string, readonly column: ColumnMeta, readonly parent: Node, readonly index: number) {
         super(column.name)
         this.init(parent)
         this.type = `${this.column.type}`

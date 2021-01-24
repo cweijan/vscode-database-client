@@ -57,12 +57,11 @@ export class TableNode extends Node implements CopyAble {
     }
 
 
-    public async showSource() {
+    public async showSource(open = true) {
+        let sql: string;
         if (this.dbType == DatabaseType.MYSQL || !this.dbType) {
-            this.execute<any[]>(this.dialect.showTableSource(this.database, this.table))
-                .then((sourceResule) => {
-                    QueryUnit.showSQLTextDocument(this, sourceResule[0]['Create Table']);
-                });
+            const sourceResule =await this.execute<any[]>(this.dialect.showTableSource(this.database, this.table))
+            sql = sourceResule[0]['Create Table'];
         } else {
             const childs = await this.getChildren()
             let table = this.table;
@@ -71,7 +70,7 @@ export class TableNode extends Node implements CopyAble {
                 tables.shift()
                 table = tables.join(".")
             }
-            let sql = `create table ${table}(\n`
+            sql = `create table ${table}(\n`
             for (let i = 0; i < childs.length; i++) {
                 const child: ColumnNode = childs[i] as ColumnNode;
                 if (i == childs.length - 1) {
@@ -81,8 +80,11 @@ export class TableNode extends Node implements CopyAble {
                 }
             }
             sql += ");"
+        }
+        if(open){
             QueryUnit.showSQLTextDocument(this, sql);
         }
+        return sql;
     }
 
     public changeTableName() {

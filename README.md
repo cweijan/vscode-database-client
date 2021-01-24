@@ -81,7 +81,3 @@ Move to ant DatabaseNode or TableNode. The export/import options are listed in t
   - [node-mysql2](https://github.com/sidorares/node-mysql2) : Mysql client.
   - [node-postgres](https://github.com/brianc/node-postgres): PostgreSql client.
   - [tedious](https://github.com/tediousjs/tedious): SqlServer client.
-
-## RoadMap
-
-- Sync database struct from diffrent connection.

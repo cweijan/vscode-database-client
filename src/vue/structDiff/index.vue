@@ -2,7 +2,7 @@
   <div>
     <div class="opt-panel">
       <el-form>
-        <el-form-item label="from">
+        <el-form-item label="Target">
           <el-select v-model="option.from.connection">
             <el-option :label="node.label" :value="node.label" :key="node.label" v-for="node in init.nodes"></el-option>
           </el-select>
@@ -16,7 +16,7 @@
     </div>
     <div class="opt-panel">
       <el-form>
-        <el-form-item label="to">
+        <el-form-item label="Sync From">
           <el-select v-model="option.to.connection">
             <el-option :label="node.label" :value="node.label" :key="node.label" v-for="node in init.nodes"></el-option>
           </el-select>

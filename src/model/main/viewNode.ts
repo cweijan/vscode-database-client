@@ -13,12 +13,13 @@ export class ViewNode extends TableNode {
     public iconPath: string = path.join(Constants.RES_PATH, "icon/view.png");
     public contextValue: string = ModelType.VIEW;
 
-    public async showSource() {
-        this.execute<any[]>(this.dialect.showViewSource(this.database, this.table))
-            .then((sourceResule) => {
-                const sql = `DROP VIEW ${this.table};${sourceResule[0]['Create View']}`
-                QueryUnit.showSQLTextDocument(this, sqlFormatter.format(sql));
-            });
+    public async showSource(open = true) {
+        const sourceResule = await this.execute<any[]>(this.dialect.showViewSource(this.database, this.table))
+        const sql = `DROP VIEW ${this.table};${sourceResule[0]['Create View']}`
+        if(open){
+            QueryUnit.showSQLTextDocument(this, sqlFormatter.format(sql));
+        }
+        return null;
     }
 
     public drop() {
