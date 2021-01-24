@@ -1,3 +1,4 @@
+import { ViewManager } from "@/view/viewManager";
 import * as path from "path";
 import * as vscode from "vscode";
 import { ConfigKey, Constants, DatabaseType, MessageType, ModelType, Template } from "../../common/constants";
@@ -122,11 +123,32 @@ export class TableNode extends Node implements CopyAble {
     }
 
     public indexTemplate() {
-        QueryUnit.showSQLTextDocument(this, `-- ALTER TABLE ${this.wrap(this.table)} DROP INDEX [indexName];
--- ALTER TABLE ${this.wrap(this.table)} ADD [UNIQUE|INDEX|PRIMARY KEY] ([columns]);`, Template.alter);
-        setTimeout(() => {
-            QueryUnit.runQuery(`SELECT COLUMN_NAME name,table_schema,index_name,non_unique FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${this.database}' and table_name='${this.table}';`, this);
-        }, 10);
+        ViewManager.createWebviewPanel({
+            path: "app", title: "Design Table",
+            splitView: false, iconPath: Global.getExtPath("resources", "icon", "add.svg"),
+            eventHandler: (handler => {
+                handler.on("init", () => {
+                    handler.emit('route', 'design')
+                }).on("route-design", async () => {
+                    const result = await this.execute(this.dialect.showIndex(this.wrap(this.database), this.wrap(this.table)))
+                    let primaryKey: string;
+                    const columnList = (await this.getChildren()).map((columnNode: ColumnNode) => {
+                        if (columnNode.isPrimaryKey) {
+                            primaryKey = columnNode.column.name;
+                        }
+                        return columnNode.column;
+                    });
+                    handler.emit('design-data', { indexs: result, table: this.table, columnList, primaryKey, dbType: this.dbType })
+                }).on("execute", async sql => {
+                    try {
+                        await this.execute(sql)
+                        handler.emit("success")
+                    } catch (error) {
+                        handler.emit("error", error.message)
+                    }
+                })
+            })
+        })
 
     }
 

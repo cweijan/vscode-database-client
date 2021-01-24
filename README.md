@@ -85,4 +85,3 @@ Move to ant DatabaseNode or TableNode. The export/import options are listed in t
 ## RoadMap
 
 - Sync database struct from diffrent connection.
-- Support manager index.

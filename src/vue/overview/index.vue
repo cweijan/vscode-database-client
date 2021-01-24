@@ -28,7 +28,7 @@
 <script>
 import { getVscodeEvent } from "../util/vscode";
 const prettyBytes = require("pretty-bytes");
-let vscodeEvent;
+const vscodeEvent = getVscodeEvent();
 
 export default {
   data() {
@@ -40,7 +40,6 @@ export default {
     vscodeEvent.destroy();
   },
   mounted() {
-    vscodeEvent = getVscodeEvent();
     vscodeEvent.on("overview-data", data => {
       console.log(data.infos);
       this.tableData = data.infos;

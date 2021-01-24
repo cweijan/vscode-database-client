@@ -5,6 +5,9 @@
  * 2. 增加system view节点
  */
 export abstract class SqlDialect {
+    showIndex(database: string, table: string): string {
+        return null;
+    }
     abstract updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string;
     abstract showDatabases(): string;
     abstract showTables(database: string): string;
@@ -32,13 +35,13 @@ export abstract class SqlDialect {
     abstract procedureTemplate(): string;
     abstract triggerTemplate(): string;
     abstract functionTemplate(): string;
-    abstract processList():string;
-    abstract variableList():string;
-    abstract statusList():string;
-    pingDataBase(database: string): string{
+    abstract processList(): string;
+    abstract variableList(): string;
+    abstract statusList(): string;
+    pingDataBase(database: string): string {
         return null;
     }
-    dropTriggerTemplate(name:string): string{
+    dropTriggerTemplate(name: string): string {
         return `DROP IF EXISTS TRIGGER ${name}`
     }
 }

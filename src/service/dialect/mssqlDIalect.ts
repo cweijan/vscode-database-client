@@ -2,6 +2,9 @@ import { window } from "vscode";
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect extends SqlDialect {
+    showIndex(database: string, table: string): string {
+        throw new Error("Method not implemented.");
+    }
     variableList(): string {
         throw new Error("Method not implemented.");
     }

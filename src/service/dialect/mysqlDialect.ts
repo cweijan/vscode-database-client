@@ -1,6 +1,9 @@
 import { SqlDialect } from "./sqlDialect";
 
 export class MysqlDialect extends SqlDialect{
+    showIndex(database: string, table: string): string {
+        return `SELECT column_name,index_name,non_unique,index_type FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${database}' and table_name='${table}';`
+    }
     variableList(): string {
         return 'show global VARIABLES'
     }

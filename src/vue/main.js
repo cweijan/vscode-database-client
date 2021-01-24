@@ -21,6 +21,7 @@ import Selector from "./diagram/Selector";
 import connect from "./connect";
 import status from "./status";
 import overview from "./overview";
+import design from "./design";
 import keyView from "./redis/keyView";
 import terminal from "./redis/terminal";
 import redisStatus from "./redis/redisStatus";
@@ -33,6 +34,7 @@ const router = new VueRouter({
     { path: '/diagram', component: Gojs, name: 'diagram' },
     { path: '/selector', component: Selector, name: 'selector' },
     { path: '/overview', component: overview, name: 'overview' },
+    { path: '/design', component: design, name: 'design' },
     // redis
     { path: '/keyView', component: keyView, name: 'keyView' },
     { path: '/terminal', component: terminal, name: 'terminal' },

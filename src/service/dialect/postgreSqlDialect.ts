@@ -1,6 +1,9 @@
 import { SqlDialect } from "./sqlDialect";
 
 export class PostgreSqlDialect extends SqlDialect{
+    showIndex(database: string, table: string): string {
+        throw new Error("Method not implemented.");
+    }
     variableList(): string {
         return 'SHOW ALL'
     }

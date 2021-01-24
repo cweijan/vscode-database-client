@@ -32,7 +32,7 @@
 	"command.mock.run": "Start Generate",
 	"command.mock.table": "Generate Mock Data",
 	"command.changeTableName": "Change Name",
-	"command.index.template": "Index Manage",
+	"command.index.template": "Design Table",
 	"command.column.changeName": "Change Column Name",
 	"command.column.add": "Add Column",
 	"command.column.up": "Move Column Up",

@@ -32,7 +32,7 @@
 	"command.mock.run": "开始生成",
 	"command.mock.table": "生成Mock数据",
 	"command.changeTableName": "修改表名称",
-	"command.index.template": "索引管理",
+	"command.index.template": "设计表",
 	"command.column.changeName": "修改列名",
 	"command.column.add": "新建列",
 	"command.column.up": "上移列",
