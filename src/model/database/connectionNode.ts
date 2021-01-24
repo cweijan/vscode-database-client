@@ -58,15 +58,12 @@ export class ConnectionNode extends Node implements CopyAble {
 
         return this.execute<any[]>(this.dialect.showDatabases())
             .then((databases) => {
+                const includeDatabaseArray = this.includeDatabases?.toLowerCase()?.split(",")
+                const usingInclude = includeDatabaseArray && includeDatabaseArray.length > 1;
                 const databaseNodes = databases.filter((db) => {
-
-                    if (this.includeDatabases) {
-                        for (const includeDatabase of this.includeDatabases.split(",")) {
-                            if (db.Database == includeDatabase.trim()) { return true; }
-                        }
+                    if(usingInclude && includeDatabaseArray.indexOf(db?.Database?.toLocaleLowerCase())==-1){
                         return false;
                     }
-
                     return true;
                 }).map<DatabaseNode>((database) => {
                     return new DatabaseNode(database.Database, this);
