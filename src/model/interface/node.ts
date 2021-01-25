@@ -1,11 +1,14 @@
 import { DatabaseType, ModelType } from "@/common/constants";
 import { Util } from "@/common/util";
+import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { ConnectionManager } from "@/service/connectionManager";
 import { SqlDialect } from "@/service/dialect/sqlDialect";
 import { QueryUnit } from "@/service/queryUnit";
 import { ServiceManager } from "@/service/serviceManager";
 import * as vscode from "vscode";
+import { Memento } from "vscode";
 import { DatabaseCache } from "../../service/common/databaseCache";
+import { NodeUtil } from "../nodeUtil";
 import { CopyAble } from "./copyAble";
 import { SSHConfig } from "./sshConfig";
 
@@ -31,13 +34,19 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public timezone?: string;
     public certPath?: string;
     public includeDatabases?: string;
-    public excludeDatabases?: string;
 
     public global?: boolean;
+    public disable?: boolean;
     public usingSSH?: boolean;
     public ssh?: SSHConfig;
     public dbType?: DatabaseType;
     public dialect?: SqlDialect;
+
+    /**
+     * contenxt
+     */
+    public provider?: DbTreeDataProvider;
+    public context?: Memento;
 
     /**
      * es only
@@ -64,19 +73,66 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.scheme = source.scheme
         this.global = source.global
         this.dbType = source.dbType
+        this.disable = source.disable
         this.includeDatabases = source.includeDatabases
-        this.excludeDatabases = source.excludeDatabases
+        if (!this.provider) this.provider = source.provider
+        if (!this.context) this.context = source.context
+        // init dialect
         if (!this.dialect && this.dbType != DatabaseType.REDIS) {
             this.dialect = ServiceManager.getDialect(this.dbType)
         }
-        if (this.contextValue == ModelType.CONNECTION) {
-            this.uid = this.getConnectId()
-        } else if (this.contextValue == ModelType.DATABASE) {
-            this.uid = `${this.getConnectId({ withDbForce: true })}`
-        } else {
-            this.uid = `${this.getConnectId({ withDbForce: true })}#${this.label}`
+        if(this.disable){
+            this.command={command:"mysql.connection.open",title:"Open Connection",arguments:[this]}
         }
+        this.initUid();
+        // init tree state
         this.collapsibleState = DatabaseCache.getElementState(this)
+    }
+
+
+
+    public initUid() {
+        if (this.uid) return;
+        if (this.contextValue == ModelType.CONNECTION) {
+            this.uid = this.getConnectId();
+        } else if (this.contextValue == ModelType.DATABASE) {
+            this.uid = `${this.getConnectId({ withDbForce: true })}`;
+        } else {
+            this.uid = `${this.getConnectId({ withDbForce: true })}#${this.label}`;
+        }
+    }
+
+    public async indent(command: IndentCommand) {
+
+        const cacheKey = command.cacheKey || this.provider.connectionKey;
+        const connections = this.context.get<{ [key: string]: Node }>(cacheKey);
+        if (!this.uid) {
+            this.uid = this.getConnectId();
+        }
+
+        switch (command.command) {
+            case CommandKey.add:
+                connections[this.uid] = NodeUtil.removeParent(this);
+                break;
+            case CommandKey.update:
+                connections[this.uid] = NodeUtil.removeParent(this);
+                ConnectionManager.removeConnection(this.uid)
+                DatabaseCache.clearDatabaseCache(this.uid)
+                break;
+            case CommandKey.delete:
+                ConnectionManager.removeConnection(this.uid)
+                delete connections[this.uid]
+            default:
+                break;
+        }
+
+
+        await this.context.update(cacheKey, connections);
+
+        if (command.refresh !== false) {
+            DbTreeDataProvider.refresh();
+        }
+
     }
 
     public static nodeCache = {};
@@ -147,4 +203,12 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         return Util.wrap(origin, this.dbType)
     }
 
+}
+export class IndentCommand {
+    command: CommandKey;
+    refresh?: boolean;
+    cacheKey?: string;
+}
+export enum CommandKey {
+    update, add, delete
 }

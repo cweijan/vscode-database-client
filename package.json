@@ -181,6 +181,10 @@
 				"command": "mysql.connection.edit",
 				"title": "%command.connection.edit%",
 				"category": "MySQL"
+			},{
+				"command": "mysql.connection.disable",
+				"title": "%command.connection.disable%",
+				"category": "MySQL"
 			},
 			{
 				"command": "mysql.server.info",
@@ -546,9 +550,14 @@
 					"group": "1_mysql@2"
 				},
 				{
+					"command": "mysql.connection.disable",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
+					"group": "1_mysql@4"
+				},
+				{
 					"command": "mysql.host.copy",
 					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
-					"group": "1_mysql@3"
+					"group": "1_mysql@6"
 				},
 				{
 					"command": "mysql.database.add",

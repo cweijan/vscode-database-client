@@ -8,7 +8,7 @@ import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { CopyAble } from "../interface/copyAble";
-import { Node } from "../interface/node";
+import { CommandKey, Node } from "../interface/node";
 import { NodeUtil } from "../nodeUtil";
 import { InfoNode } from "../other/infoNode";
 import { DatabaseNode } from "./databaseNode";
@@ -30,15 +30,21 @@ export class ConnectionNode extends Node implements CopyAble {
             this.label = `${parent.name}_${this.uid}`
             this.name = parent.name
         }
-        if (this.dbType == DatabaseType.PG) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/pg_server.svg");
-        } else if (this.dbType == DatabaseType.MSSQL) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/mssql_server.png");
+        if (this.disable) {
+            this.collapsibleState = vscode.TreeItemCollapsibleState.None;
+            this.iconPath = path.join(Constants.RES_PATH, "icon/close.svg");
+            return;
         }
         const lcp = ConnectionManager.getLastConnectionOption(false);
         if (lcp && lcp.getConnectId() == this.getConnectId()) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/connection-active.svg");
             this.description = `Active`
+            return;
+        }
+        if (this.dbType == DatabaseType.PG) {
+            this.iconPath = path.join(Constants.RES_PATH, "icon/pg_server.svg");
+        } else if (this.dbType == DatabaseType.MSSQL) {
+            this.iconPath = path.join(Constants.RES_PATH, "icon/mssql_server.png");
         }
     }
 
@@ -124,13 +130,7 @@ export class ConnectionNode extends Node implements CopyAble {
     public async deleteConnection(context: vscode.ExtensionContext) {
 
         Util.confirm(`Are you want to Delete Connection ${this.uid} ? `, async () => {
-            const targetContext = this.global === false ? context.workspaceState : context.globalState;
-            const connections = targetContext.get<{ [key: string]: Node }>(CacheKey.ConectionsKey);
-            ConnectionManager.removeConnection(this.uid)
-            DatabaseCache.clearDatabaseCache(this.uid)
-            delete connections[this.uid];
-            await targetContext.update(CacheKey.ConectionsKey, NodeUtil.removeParent(connections));
-            DbTreeDataProvider.refresh();
+            this.indent({command:CommandKey.delete})
         })
 
     }

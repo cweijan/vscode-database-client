@@ -21,13 +21,13 @@ export abstract class NodeUtil {
         if (!nodes) return null;
         // if is node instance
         if (nodes instanceof Node) {
-            return { ...nodes, parent: null };
+            return { ...nodes, parent: null, provider: null, context: null,command:null };
         }
         // if is node object map
         let result = {};
         for (const nodeKey of Object.keys(nodes)) {
             if (!nodes[nodeKey]) continue;
-            result[nodeKey] = { ...nodes[nodeKey], parent: null }
+            result[nodeKey] = { ...nodes[nodeKey], parent: null, provider: null, context: null,command:null }
         }
         return result;
     }

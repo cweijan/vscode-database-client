@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 3.3.0 Preview
+
+- Support close connection.
+- Add `sel` snippet.
+- compatible with old vscode version.
+
 # 3.2.2 2020/1/25
 
 - Fix redis folder Infinite recursion load bug.

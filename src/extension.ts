@@ -85,7 +85,13 @@ export function activate(context: vscode.ExtensionContext) {
                     serviceManager.connectService.openConnect(serviceManager.provider)
                 },
                 "mysql.connection.edit": (connectionNode: ConnectionNode) => {
-                    serviceManager.connectService.openConnect(serviceManager.provider, connectionNode)
+                    serviceManager.connectService.openConnect(connectionNode.provider, connectionNode)
+                },
+                "mysql.connection.open":(connectionNode: ConnectionNode)=>{
+                    connectionNode.provider.openConnection(connectionNode)
+                },
+                "mysql.connection.disable": (connectionNode: ConnectionNode) => {
+                    connectionNode.provider.disableConnection(connectionNode)
                 },
                 "mysql.connection.delete": (connectionNode: ConnectionNode) => {
                     connectionNode.deleteConnection(context);

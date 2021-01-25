@@ -4,7 +4,7 @@ import { ConnectionManager } from "../service/connectionManager";
 import { DatabaseCache } from "../service/common/databaseCache";
 import { ConnectionNode } from "../model/database/connectionNode";
 import { DatabaseNode } from "../model/database/databaseNode";
-import { Node } from "../model/interface/node";
+import { CommandKey, Node } from "../model/interface/node";
 import { UserGroup } from "../model/database/userGroup";
 import { Global } from "../common/global";
 import { NodeUtil } from "@/model/nodeUtil";
@@ -16,9 +16,9 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public _onDidChangeTreeData: vscode.EventEmitter<Node> = new vscode.EventEmitter<Node>();
     public readonly onDidChangeTreeData: vscode.Event<Node> = this._onDidChangeTreeData.event;
-    private static instances: DbTreeDataProvider[]=[]
+    private static instances: DbTreeDataProvider[] = []
 
-    constructor(protected context: vscode.ExtensionContext,readonly connectionKey:string) {
+    constructor(protected context: vscode.ExtensionContext, public readonly connectionKey: string) {
         DbTreeDataProvider.instances.push(this)
     }
 
@@ -57,33 +57,25 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         }
     }
 
-    public async addConnection(connectionNode: Node) {
-
-        await this.removeOldConnection(connectionNode);
-
-        const targetContext = connectionNode.global === false ? this.context.workspaceState : this.context.globalState;
-        let connections = targetContext.get<{ [key: string]: Node }>(this.getKeyByNode(connectionNode), {});
-        const connectId = connectionNode.getConnectId();
-        connections[connectId] = connectionNode;
-        ConnectionManager.removeConnection(connectId)
-        await targetContext.update(this.getKeyByNode(connectionNode), NodeUtil.removeParent(connections));
-        DbTreeDataProvider.refresh();
-
+    public async openConnection(connectionNode: ConnectionNode) {
+        connectionNode.disable = false;
+        connectionNode.indent({ command: CommandKey.update })
     }
 
-    /**
-     * if is add from edit, clear previous connection info.
-     * isGlobal is a temp properties.
-     */
-    private async removeOldConnection(connectionNode: Node) {
-        const editGlobal = (connectionNode as any).isGlobal;
-        if (editGlobal != null) {
-            const isGlobal = editGlobal !== false;
-            const oldContext = isGlobal ? this.context.globalState : this.context.workspaceState;
-            const oldConnections = oldContext.get<{ [key: string]: Node; }>(this.getKeyByNode(connectionNode));
-            delete oldConnections[connectionNode.getConnectId({ isGlobal })];
-            await oldContext.update(this.getKeyByNode(connectionNode), NodeUtil.removeParent(oldConnections));
+    public async disableConnection(connectionNode: ConnectionNode) {
+        connectionNode.disable = true;
+        connectionNode.indent({ command: CommandKey.update })
+    }
+
+    public async addConnection(node: Node) {
+
+        if ((node as any).isGlobal != null) {
+            await node.indent({ command: CommandKey.delete })
         }
+
+        node.context = node.global === false ? this.context.workspaceState : this.context.globalState
+        node.indent({ command: CommandKey.add, cacheKey: this.getKeyByNode(node) })
+
     }
 
     private getKeyByNode(connectionNode: Node): string {
@@ -117,24 +109,28 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
         return Object.keys(connections).map(key => {
             const connectInfo = connections[key];
-            const connection = this.getNode(connectInfo, key);
-            if (typeof connectInfo.global == "undefined") {
-                // Compatible with older versions, will remove in the feature
-                connectInfo.global = true;
-            }
-            return connection;
+            return this.getNode(connectInfo, key);
         })
 
     }
 
     private getNode(connectInfo: Node, key: string) {
+        let node: Node;
         if (connectInfo.dbType == DatabaseType.ES) {
-            return new EsConnectionNode(key, connectInfo);
+            node = new EsConnectionNode(key, connectInfo);
         }
         if (connectInfo.dbType == DatabaseType.REDIS) {
-            return new RedisConnectionNode(key, connectInfo)
+            node = new RedisConnectionNode(key, connectInfo)
+        } else {
+            node = new ConnectionNode(key, connectInfo)
         }
-        return new ConnectionNode(key, connectInfo);
+        node.provider = this
+        // Compatible with older versions
+        if (node.global !== false) {
+            node.global = true;
+        }
+        node.context = node.global === false ? this.context.workspaceState : this.context.globalState;
+        return node;
     }
 
     public async activeDb() {
