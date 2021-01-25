@@ -126,7 +126,7 @@ export class TableNode extends Node implements CopyAble {
 
     public indexTemplate() {
         ViewManager.createWebviewPanel({
-            path: "app", title: "Design Table",
+            path: "app", title: `${this.table}@${this.database}`,
             splitView: false, iconPath: Global.getExtPath("resources", "icon", "add.svg"),
             eventHandler: (handler => {
                 handler.on("init", () => {

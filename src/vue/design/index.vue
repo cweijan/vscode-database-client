@@ -35,7 +35,7 @@ export default {
     vscodeEvent.destroy();
   },
   mounted() {
-    vscodeEvent.emit("route-" + this.$route.name);
+    
   },
   methods: {
     refresh() {

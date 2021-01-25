@@ -38,7 +38,7 @@
 <script>
 import { getVscodeEvent } from "../util/vscode";
 import { wrapByDb } from "@/common/wrapper";
-const vscodeEvent = getVscodeEvent();
+let vscodeEvent;
 export default {
   data() {
     return {
@@ -52,6 +52,7 @@ export default {
     };
   },
   mounted() {
+    vscodeEvent = getVscodeEvent();
     vscodeEvent
       .on("design-data", (data) => {
         this.designData = data;
@@ -65,6 +66,7 @@ export default {
       .on("error", (msg) => {
         this.$message.error(msg);
       });
+    vscodeEvent.emit("route-" + this.$route.name);
   },
   methods: {
     createIndex() {

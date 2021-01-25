@@ -16,7 +16,7 @@
     </ux-grid>
     <el-dialog :title="'Add Index'" :visible.sync="index.visible" width="30%" top="3vh" size="mini">
       <el-form>
-        <el-form-item label="Export File Type">
+        <el-form-item label="Index Type">
           <el-select v-model="index.type">
             <el-option :label="'UNIQUE'" value="UNIQUE"></el-option>
             <el-option :label="'INDEX'" value="INDEX"></el-option>
@@ -38,7 +38,7 @@
 <script>
 import { getVscodeEvent } from "../util/vscode";
 import { wrapByDb } from "@/common/wrapper";
-const vscodeEvent = getVscodeEvent();
+let vscodeEvent;
 export default {
   data() {
     return {
@@ -52,6 +52,7 @@ export default {
     };
   },
   mounted() {
+    vscodeEvent = getVscodeEvent();
     vscodeEvent
       .on("design-data", (data) => {
         this.designData = data;
@@ -65,6 +66,7 @@ export default {
       .on("error", (msg) => {
         this.$message.error(msg);
       });
+      vscodeEvent.emit("route-" + this.$route.name);
   },
   methods: {
     createIndex() {
@@ -80,7 +82,7 @@ export default {
       );
     },
     deleteConfirm(row) {
-      this.$confirm("Are you sure you want to delete this data?", "Warning", {
+      this.$confirm("Are you sure you want to delete this index?", "Warning", {
         confirmButtonText: "OK",
         cancelButtonText: "Cancel",
         type: "warning",
