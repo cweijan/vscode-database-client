@@ -47,6 +47,12 @@
 				"configuration": "./syntaxes/es.configuration.json"
 			}
 		],
+		"snippets": [
+			{
+				"language": "sql",
+				"path": "./syntaxes/snippets.json"
+			}
+		],
 		"grammars": [
 			{
 				"language": "sql",
