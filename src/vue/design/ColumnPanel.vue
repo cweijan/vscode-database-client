@@ -33,10 +33,10 @@
 </template>
 
 <script>
-import { getVscodeEvent } from "../util/vscode";
+import { inject } from "../mixin/vscodeInject";
 import { wrapByDb } from "@/common/wrapper";
-let vscodeEvent;
 export default {
+  mixins: [inject],
   data() {
     return {
       designData: {
@@ -54,12 +54,10 @@ export default {
     };
   },
   mounted() {
-    vscodeEvent = getVscodeEvent();
-    vscodeEvent
-      .on("design-data", (data) => {
-        this.designData = data;
-        this.designData.editColumnList = [...this.designData.columnList];
-      })
+    this.on("design-data", (data) => {
+      this.designData = data;
+      this.designData.editColumnList = [...this.designData.columnList];
+    })
       .on("success", () => {
         this.column.loading = false;
         this.column.visible = false;
@@ -67,8 +65,8 @@ export default {
       })
       .on("error", (msg) => {
         this.$message.error(msg);
-      });
-    vscodeEvent.emit("route-" + this.$route.name);
+      })
+      .init();
   },
   methods: {
     createcolumn() {
@@ -77,10 +75,9 @@ export default {
         `ALTER TABLE ${wrapByDb(
           this.designData.table,
           this.designData.dbType
-        )} ADD ${wrapByDb(
-          this.column.name,
-          this.designData.dbType
-        )} ${this.column.type}`
+        )} ADD ${wrapByDb(this.column.name, this.designData.dbType)} ${
+          this.column.type
+        }`
       );
     },
     deleteConfirm(row) {
@@ -99,11 +96,11 @@ export default {
     },
     execute(sql) {
       if (!sql) return;
-      vscodeEvent.emit("execute", sql);
+      this.emit("execute", sql);
     },
   },
   destroyed() {
-    vscodeEvent.destroy();
+    this.destroy();
   },
 };
 </script>

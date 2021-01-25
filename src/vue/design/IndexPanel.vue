@@ -36,10 +36,10 @@
 </template>
 
 <script>
-import { getVscodeEvent } from "../util/vscode";
 import { wrapByDb } from "@/common/wrapper";
-let vscodeEvent;
+import { inject } from "../mixin/vscodeInject";
 export default {
+  mixins: [inject],
   data() {
     return {
       designData: { indexs: [], table: null, dbType: null },
@@ -52,8 +52,7 @@ export default {
     };
   },
   mounted() {
-    vscodeEvent = getVscodeEvent();
-    vscodeEvent
+    this
       .on("design-data", (data) => {
         this.designData = data;
         this.designData.editIndex = [...this.designData.indexs];
@@ -65,8 +64,7 @@ export default {
       })
       .on("error", (msg) => {
         this.$message.error(msg);
-      });
-      vscodeEvent.emit("route-" + this.$route.name);
+      }).init()
   },
   methods: {
     createIndex() {
@@ -97,12 +95,9 @@ export default {
     },
     execute(sql) {
       if (!sql) return;
-      vscodeEvent.emit("execute", sql);
+      this.emit("execute", sql);
     },
-  },
-  destroyed() {
-    vscodeEvent.destroy();
-  },
+  }
 };
 </script>
 

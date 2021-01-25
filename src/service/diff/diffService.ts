@@ -2,6 +2,7 @@ import { DatabaseType } from "@/common/constants";
 import { Global } from "@/common/global";
 import { Node } from "@/model/interface/node";
 import { TableNode } from "@/model/main/tableNode";
+import { NodeUtil } from "@/model/nodeUtil";
 import { ColumnNode } from "@/model/other/columnNode";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { ViewManager } from "@/view/viewManager";
@@ -24,7 +25,8 @@ export class DiffService {
                     for (const node of nodes) {
                         databaseList[node.label] = await node.getChildren()
                     }
-                    handler.emit('structDiff-data', { nodes, databaseList })
+                    const data = { nodes: NodeUtil.removeParent(nodes), databaseList: NodeUtil.removeParent(databaseList) };
+                    handler.emit('structDiffData', data)
                 }).on("execute", async sql => {
                     try {
                         // await this.execute(sql)

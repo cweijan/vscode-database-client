@@ -21,13 +21,20 @@ export abstract class NodeUtil {
         if (!nodes) return null;
         // if is node instance
         if (nodes instanceof Node) {
-            return { ...nodes, parent: null, provider: null, context: null,command:null };
+            return { ...nodes, parent: null, provider: null, context: null, command: null };
+        }
+        if (nodes instanceof Array) {
+            let tempNodes = []
+            for (const node of nodes) {
+                tempNodes.push(this.removeParent(node))
+            }
+            return tempNodes;
         }
         // if is node object map
         let result = {};
         for (const nodeKey of Object.keys(nodes)) {
             if (!nodes[nodeKey]) continue;
-            result[nodeKey] = { ...nodes[nodeKey], parent: null, provider: null, context: null,command:null }
+            result[nodeKey] = this.removeParent(nodes[nodeKey])
         }
         return result;
     }

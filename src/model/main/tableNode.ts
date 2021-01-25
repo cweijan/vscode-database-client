@@ -145,6 +145,7 @@ export class TableNode extends Node implements CopyAble {
                     const sql = this.dialect.renameTable(this.database, this.table, newTableName);
                     try {
                         await this.execute(sql)
+                        await this.refresh()
                         await this.parent.refresh()
                         handler.emit("success")
                     } catch (error) {
@@ -153,6 +154,7 @@ export class TableNode extends Node implements CopyAble {
                 }).on("execute", async sql => {
                     try {
                         await this.execute(sql)
+                        await this.refresh()
                         await this.parent.refresh()
                         handler.emit("success")
                     } catch (error) {

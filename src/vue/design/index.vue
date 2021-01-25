@@ -20,12 +20,12 @@
 </template>
 
 <script>
-import { getVscodeEvent } from "../util/vscode";
+import { inject } from "../mixin/vscodeInject";
 import IndexPanel from "./IndexPanel";
 import ColumnPanel from "./ColumnPanel";
 import InfoPanel from "./InfoPanel";
-let vscodeEvent;
 export default {
+  mixins: [inject],
   components: { IndexPanel, ColumnPanel, InfoPanel },
   data() {
     return {
@@ -33,25 +33,11 @@ export default {
       activePanel: "info",
     };
   },
-  destroyed() {
-    vscodeEvent.destroy();
-  },
   mounted() {
-    vscodeEvent = getVscodeEvent();
-    vscodeEvent.on("design-data", (data) => {
+    this.on("design-data", (data) => {
       this.table=data.table
     });
-  },
-  methods: {
-    refresh() {
-      vscodeEvent.emit("route-" + this.$route.name);
-    },
-  },
-  computed: {
-    remainHeight() {
-      return window.outerHeight - 130;
-    },
-  },
+  }
 };
 </script>
 

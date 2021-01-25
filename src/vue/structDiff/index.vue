@@ -4,12 +4,12 @@
       <el-form>
         <el-form-item label="Target">
           <el-select v-model="option.from.connection">
-            <el-option :label="node.label" :value="node.label" :key="node.label" v-for="node in init.nodes"></el-option>
+            <el-option :label="node.label" :value="node.label" :key="node.label" v-for="node in initData.nodes"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="database">
           <el-select v-model="option.from.database">
-            <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in init.databaseList[option.from.connection]"></el-option>
+            <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in initData.databaseList[option.from.connection]"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -18,12 +18,12 @@
       <el-form>
         <el-form-item label="Sync From">
           <el-select v-model="option.to.connection">
-            <el-option :label="node.label" :value="node.label" :key="node.label" v-for="node in init.nodes"></el-option>
+            <el-option :label="node.label" :value="node.label" :key="node.label" v-for="node in initData.nodes"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="database">
           <el-select v-model="option.to.database">
-            <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in init.databaseList[option.to.connection]"></el-option>
+            <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in initData.databaseList[option.to.connection]"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -47,25 +47,22 @@
 </template>
 
 <script>
-import { getVscodeEvent } from "../util/vscode";
-const vscodeEvent = getVscodeEvent();
+import { inject } from "../mixin/vscodeInject";
 export default {
+  mixins: [inject],
   data() {
     return {
-      init: { nodes: [], databaseList: {} },
+      initData: { nodes: [], databaseList: {} },
       option: { from: { connection: null, database: null }, to: {} },
       loading: { compare: false, sync: false },
       compareResult: { sqlList: null },
     };
   },
-  destroyed() {
-    vscodeEvent.destroy();
-  },
   mounted() {
-    vscodeEvent
-      .on("structDiff-data", (data) => {
-        this.init = data;
-      })
+    this.on("structDiffData", (data) => {
+       console.log(123123)
+      this.initData = data;
+    })
       .on("compareResult", (compareResult) => {
         this.compareResult = compareResult;
         this.loading.compare = false;
@@ -80,13 +77,13 @@ export default {
       .on("error", (msg) => {
         this.$message.error(msg);
         this.loading.sync = false;
-      });
-    vscodeEvent.emit("route-" + this.$route.name);
+      })
+      .init();
   },
   methods: {
     startCompare() {
       this.loading.compare = true;
-      vscodeEvent.emit("start", this.option);
+      this.emit("start", this.option);
     },
     confrimSync() {
       const sqlList = this.$refs.dataTable.getCheckboxRecords();
@@ -95,7 +92,7 @@ export default {
         return;
       }
       this.loading.sync = true;
-      vscodeEvent.emit("sync", {
+      this.emit("sync", {
         sqlList: sqlList,
         option: this.option,
       });
@@ -105,10 +102,10 @@ export default {
     },
     execute(sql) {
       if (!sql) return;
-      vscodeEvent.emit("execute", sql);
+      this.emit("execute", sql);
     },
     refresh() {
-      vscodeEvent.emit("route-" + this.$route.name);
+      this.emit("route-" + this.$route.name);
     },
   },
   computed: {

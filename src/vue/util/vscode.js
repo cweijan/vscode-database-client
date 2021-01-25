@@ -12,9 +12,9 @@ export const getVscodeEvent = () => {
         }
     }
     return {
-        on(event, data) {
+        on(event, callback) {
             this.tryInit();
-            events[event] = data
+            events[event] = callback
             return this;
         },
         emit(event, data) {

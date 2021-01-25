@@ -13,10 +13,10 @@
 </template>
 
 <script>
-import { getVscodeEvent } from "../util/vscode";
 import { wrapByDb } from "@/common/wrapper";
-let vscodeEvent;
+import { inject } from "../mixin/vscodeInject";
 export default {
+  mixins: [inject],
   data() {
     return {
       designData: { table: null, dbType: null },
@@ -30,26 +30,24 @@ export default {
     };
   },
   mounted() {
-    vscodeEvent = getVscodeEvent();
-    vscodeEvent
-      .on("design-data", (data) => {
-        this.designData = data;
-        this.table.name = data.table;
-        this.table.comment = data.comment;
-        this.designData.editIndex = [...this.designData.indexs];
-      })
+    this.on("design-data", (data) => {
+      this.designData = data;
+      this.table.name = data.table;
+      this.table.comment = data.comment;
+      this.designData.editIndex = [...this.designData.indexs];
+    })
       .on("success", () => {
-        this.$message.success("Rename success!")
+        this.$message.success("Rename success!");
         this.refresh();
       })
       .on("error", (msg) => {
         this.$message.error(msg);
-      });
-    vscodeEvent.emit("route-" + this.$route.name);
+      })
+      .init();
   },
   methods: {
-    rename(){
-      vscodeEvent.emit('rename',this.table.name)
+    rename() {
+      this.emit("rename", this.table.name);
     },
     createIndex() {
       this.index.loading = true;
@@ -65,11 +63,8 @@ export default {
     },
     execute(sql) {
       if (!sql) return;
-      vscodeEvent.emit("execute", sql);
+      this.emit("execute", sql);
     },
-  },
-  destroyed() {
-    vscodeEvent.destroy();
   },
 };
 </script>
