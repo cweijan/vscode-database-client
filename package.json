@@ -864,27 +864,27 @@
 		},
 		"configuration": {
 			"type": "object",
-			"title": "MySQL",
+			"title": "%config.title%",
 			"properties": {
 				"vscode-mysql.enableDelimiter": {
 					"type": "boolean",
 					"default": false,
-					"description": "Support delimiter when import sql."
+					"description": "%config.enableDelimiter%"
 				},
 				"vscode-mysql.loadMetaOnConnect": {
 					"type": "boolean",
 					"default": true,
-					"description": "Load database meta info when connected, If your machine's performance is low, turn it off."
+					"description": "%config.loadMetaOnConnect%"
 				},
 				"vscode-mysql.defaultSelectLimit": {
 					"type": "integer",
 					"default": 100,
-					"description": "Default limit of query sql."
+					"description": "%config.defaultSelectLimit%"
 				},
 				"vscode-mysql.showTotal": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show total on result view."
+					"description": "%config.showTotal%"
 				}
 			}
 		}

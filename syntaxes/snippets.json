@@ -2,7 +2,7 @@
     "SelectTemplate": {
         "prefix": "sel",
         "body": [
-            "SELECT * FROM $1;"
+            "SELECT * FROM $1"
         ]
     }
 }

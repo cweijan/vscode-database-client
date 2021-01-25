@@ -27,7 +27,7 @@
 ## 数据表
 
 1. 点击数据库表打开数据视图
-2. 之后便可在页面进行CRUD、数据导出等操作.
+2. 之后便可在页面进行CRUD、数据导出(**Excel、JSON**)等操作.
    ![query](images/QueryTable.jpg)
 
 ## 执行SQL

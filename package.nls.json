@@ -61,5 +61,10 @@
 	"command.redis.connection.terminal": "Open Terminal",
     "command.redis.connection.status": "Server status",
     "command.redis.key.del": "Delete Key",
-    "command.redis.key.detail": "View Key Detail"
+	"command.redis.key.detail": "View Key Detail",
+	"config.title":"Database Client",
+	"config.enableDelimiter":"Support delimiter when import sql.",
+	"config.loadMetaOnConnect":"Load database meta info when connected, If your machine's performance is low, turn it off.",
+	"config.defaultSelectLimit":"Default limit of query sql.",
+	"config.showTotal": "Show total on result view."
 }
