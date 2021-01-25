@@ -63,12 +63,19 @@
         </div>
       </section>
 
+      <section class="mb-2" v-if="connectionOption.dbType=='Redis'">
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-14"><span class="text-red-600 mr-1">*</span>Password</label>
+          <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
+        </div>
+      </section>
+
       <section class="mb-2">
         <div class="inline-block mr-10">
           <label class="font-bold mr-5 inline-block w-14">Databases</label>
           <input class="w-64 field__input" placeholder="Special connection database" v-model="connectionOption.database" />
         </div>
-        <div class="inline-block mr-10"  v-if="connectionOption.dbType!='Redis'">
+        <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
           <label class="font-bold mr-5 inline-block w-32">Include Databases</label>
           <input class="w-64 field__input" placeholder="Which databases need to be displayed" v-model="connectionOption.includeDatabases" />
         </div>
