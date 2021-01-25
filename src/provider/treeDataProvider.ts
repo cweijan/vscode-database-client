@@ -118,8 +118,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         let node: Node;
         if (connectInfo.dbType == DatabaseType.ES) {
             node = new EsConnectionNode(key, connectInfo);
-        }
-        if (connectInfo.dbType == DatabaseType.REDIS) {
+        }else if (connectInfo.dbType == DatabaseType.REDIS) {
             node = new RedisConnectionNode(key, connectInfo)
         } else {
             node = new ConnectionNode(key, connectInfo)
