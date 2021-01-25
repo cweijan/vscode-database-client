@@ -3,7 +3,7 @@
     <div class="design-toolbar">
       <el-button @click="index.visible=true" type="primary" title="Insert" icon="el-icon-circle-plus-outline" size="mini" circle> </el-button>
     </div>
-    <ux-grid :data="designData.editIndex" stripe style="width: 100%">
+    <ux-grid :data="designData.editIndex" stripe style="width: 100%" :cell-style="{height: '35px'}">
       <ux-table-column align="center" field="index_name" title="index_name" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column align="center" field="column_name" title="column_name" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column align="center" field="non_unique" title="non_unique" show-overflow-tooltip="true"></ux-table-column>

@@ -3,7 +3,7 @@
     <div class="design-toolbar">
       <el-button @click="column.visible=true" type="primary" title="Insert" icon="el-icon-circle-plus-outline" size="mini" circle> </el-button>
     </div>
-    <ux-grid :data="designData.editColumnList" stripe style="width: 100%">
+    <ux-grid :data="designData.editColumnList" stripe style="width: 100%" :cell-style="{height: '35px'}">
       <ux-table-column align="center" field="name" title="name" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column align="center" field="key" title="key" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column align="center" field="nullable" title="nullable" show-overflow-tooltip="true"></ux-table-column>
