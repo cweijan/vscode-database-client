@@ -144,6 +144,7 @@ export class TableNode extends Node implements CopyAble {
                 }).on("execute", async sql => {
                     try {
                         await this.execute(sql)
+                        await this.getChildren(true)
                         handler.emit("success")
                     } catch (error) {
                         handler.emit("error", error.message)
