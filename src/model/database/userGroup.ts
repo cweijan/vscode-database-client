@@ -14,6 +14,8 @@ export class UserGroup extends DatabaseNode {
     constructor(readonly name: string, readonly parent: Node) {
         super(name, parent)
         this.init(parent)
+        // fix switch database fail.
+        this.database = null
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
