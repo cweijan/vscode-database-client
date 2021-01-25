@@ -52,7 +52,7 @@ module.exports = [
         plugins: [
             new VueLoaderPlugin(),
             new HtmlWebpackPlugin({ inject: true, template: './public/index.html', chunks: ['app'], filename: 'webview/app.html' }),
-            new HtmlWebpackPlugin({ inject: true, templateContent: `<body> <div id="app"></div> </body>`, chunks: ['query'], filename: 'webview/result.html' }),
+            new HtmlWebpackPlugin({ inject: true, templateContent: `<head><script src="js/oldCompatible.js"></script></head><body> <div id="app"></div> </body>`, chunks: ['query'], filename: 'webview/result.html' }),
             new CopyWebpackPlugin({
                 patterns: [{ from: 'public', to: './webview' }]
             }),
