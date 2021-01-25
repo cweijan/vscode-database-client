@@ -23,7 +23,7 @@
 
     <section class="mb-2">
       <label class="block font-bold">Database Type</label>
-      <ul class="tab" id="tabs">
+      <ul class="tab">
         <li class="tab__item " :class="{'tab__item--active':supportDatabase==connectionOption.dbType}" v-for="supportDatabase in supportDatabases" @click="connectionOption.dbType=supportDatabase">
           {{supportDatabase}}
         </li>
