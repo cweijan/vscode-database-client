@@ -701,19 +701,24 @@
 					"group": "inline@1"
 				},
 				{
+					"command": "mysql.index.template",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
+					"group": "1_inline@0"
+				},
+				{
 					"command": "mysql.table.source",
 					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|view)$/",
-					"group": "1_inline@0"
+					"group": "1_inline@2"
 				},
 				{
 					"command": "mysql.count.sql",
 					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|view|esIndex)$/",
-					"group": "1_inline@3"
+					"group": "1_inline@4"
 				},
 				{
 					"command": "mysql.column.add",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
-					"group": "1_inline@4"
+					"group": "1_inline@6"
 				},
 				{
 					"command": "mysql.mock.table",
@@ -744,11 +749,6 @@
 					"command": "mysql.table.drop",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "2_mysql@2"
-				},
-				{
-					"command": "mysql.index.template",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
-					"group": "1_inline@7"
 				},
 				{
 					"command": "mysql.refresh",
