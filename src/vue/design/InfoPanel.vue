@@ -4,10 +4,10 @@
       <el-form-item label="Table">
         <el-input v-model="table.name"></el-input>
       </el-form-item>
-      <el-form-item label="Comment">
+      <!-- <el-form-item label="Comment">
         <el-input v-model="table.comment"></el-input>
-      </el-form-item>
-      <el-button>Update</el-button>
+      </el-form-item> -->
+      <el-button @click="rename">Update</el-button>
     </el-form>
   </div>
 </template>
@@ -39,8 +39,7 @@ export default {
         this.designData.editIndex = [...this.designData.indexs];
       })
       .on("success", () => {
-        this.index.loading = false;
-        this.index.visible = false;
+        this.$message.success("Rename success!")
         this.refresh();
       })
       .on("error", (msg) => {
@@ -49,6 +48,9 @@ export default {
     vscodeEvent.emit("route-" + this.$route.name);
   },
   methods: {
+    rename(){
+      vscodeEvent.emit('rename',this.table.name)
+    },
     createIndex() {
       this.index.loading = true;
       this.execute(

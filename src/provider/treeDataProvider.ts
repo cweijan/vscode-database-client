@@ -87,6 +87,10 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     }
 
 
+    public reload(element?:Node){
+        this._onDidChangeTreeData.fire(element);
+    }
+
     /**
      * refresh treeview context
      */

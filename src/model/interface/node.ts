@@ -90,6 +90,10 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     }
 
 
+    public async refresh(){
+        await this.getChildren(true)
+        this.provider.reload(this)
+    }
 
     public initUid() {
         if (this.uid) return;

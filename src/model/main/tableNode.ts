@@ -141,10 +141,19 @@ export class TableNode extends Node implements CopyAble {
                         return columnNode.column;
                     });
                     handler.emit('design-data', { indexs: result, table: this.table, comment: this.comment, columnList, primaryKey, dbType: this.dbType })
+                }).on("rename", async newTableName => {
+                    const sql = this.dialect.renameTable(this.database, this.table, newTableName);
+                    try {
+                        await this.execute(sql)
+                        await this.parent.refresh()
+                        handler.emit("success")
+                    } catch (error) {
+                        handler.emit("error", error.message)
+                    }
                 }).on("execute", async sql => {
                     try {
                         await this.execute(sql)
-                        await this.getChildren(true)
+                        await this.parent.refresh()
                         handler.emit("success")
                     } catch (error) {
                         handler.emit("error", error.message)
