@@ -1,3 +1,4 @@
+import { Util } from "@/common/util";
 import { EsRequest } from "@/model/es/esRequest";
 import { ESIndexNode } from "@/model/es/model/esIndexNode";
 import { ServiceManager } from "@/service/serviceManager";
@@ -75,6 +76,8 @@ export class QueryPage {
                         obj.sort = sort;
                     })
                     QueryUnit.runQuery(esQuery, dbOption);
+                }).on('copy',value=>{
+                    Util.copyToBoard(value)
                 }).on('count', async (params) => {
                     dbOption.execute(params.sql.replace(/\bSELECT\b.+?\bFROM\b/i, 'select count(*) count from')).then((rows) => {
                         handler.emit('COUNT', { data: rows[0].count })

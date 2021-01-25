@@ -181,7 +181,8 @@
 				"command": "mysql.connection.edit",
 				"title": "%command.connection.edit%",
 				"category": "MySQL"
-			},{
+			},
+			{
 				"command": "mysql.connection.disable",
 				"title": "%command.connection.disable%",
 				"category": "MySQL"
@@ -938,6 +939,7 @@
 		"sqlstring": "^2.3.2",
 		"umy-table": "1.0.8",
 		"vue": "^2.6.11",
+		"vue-contextmenujs": "^1.3.13",
 		"vue-router": "^3.4.1"
 	},
 	"__metadata": {

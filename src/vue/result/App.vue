@@ -57,7 +57,7 @@
         <template slot-scope="scope">
           <el-input class='edit-filter' v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" :clearable='true' placeholder="Filter" @clear="filter(null,scope.column.title)" @keyup.enter.native="filter($event,scope.column.title)">
           </el-input>
-          <span v-if="!scope.row.isFilter" v-html='dataformat(scope.row[scope.column.title])'></span>
+          <div v-if="!scope.row.isFilter" @contextmenu.prevent="onContextmenu($event,scope.column)" v-html='dataformat(scope.row[scope.column.title])'></div>
         </template>
         <template slot="edit" slot-scope="scope">
           <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter" v-on:keyup.enter.native="filter($event,scope.column.title)">
@@ -73,13 +73,13 @@
 </template>
 
 <script>
-import { getVscodeEvent } from "../util/vscode"
-import CellEditor from "./component/CellEditor.vue"
-import ExportDialog from "./component/ExportDialog.vue"
-import EditDialog from "./component/EditDialog.vue"
-import { util } from "./mixin/util"
-import { wrapByDb } from "@/common/wrapper"
-let vscodeEvent
+import { getVscodeEvent } from "../util/vscode";
+import CellEditor from "./component/CellEditor.vue";
+import ExportDialog from "./component/ExportDialog.vue";
+import EditDialog from "./component/EditDialog.vue";
+import { util } from "./mixin/util";
+import { wrapByDb } from "@/common/wrapper";
+let vscodeEvent;
 
 export default {
   mixins: [util],
@@ -132,92 +132,92 @@ export default {
         current: null,
         primary: null,
       },
-    }
+    };
   },
   mounted() {
     const handlerData = (data, sameTable) => {
-      this.result = data
-      this.toolbar.sql = data.sql
+      this.result = data;
+      this.toolbar.sql = data.sql;
 
       if (sameTable) {
-        this.clear()
+        this.clear();
       } else {
-        this.reset()
+        this.reset();
       }
       // only es have.
-      if (data.total!=null) {
-        this.page.total = parseInt(data.total)
+      if (data.total != null) {
+        this.page.total = parseInt(data.total);
       } else if (this.result.tableCount == 1) {
-        this.count()
+        this.count();
       }
-    }
+    };
     const handlerCommon = (res) => {
       if (this.$refs.editor) {
-        this.$refs.editor.close()
+        this.$refs.editor.close();
       }
-      this.info.visible = true
-      this.info.message = res.message
-    }
-    vscodeEvent = getVscodeEvent()
+      this.info.visible = true;
+      this.info.message = res.message;
+    };
+    vscodeEvent = getVscodeEvent();
     window.addEventListener("message", ({ data }) => {
-      if (!data) return
-      const response = data.content
-      console.log(response)
-      this.table.loading = false
+      if (!data) return;
+      const response = data.content;
+      console.log(response);
+      this.table.loading = false;
       switch (data.type) {
         case "EXPORT_DONE":
-          this.exportOption.visible = false
-          break
+          this.exportOption.visible = false;
+          break;
         case "RUN":
-          this.toolbar.sql = response.sql
-          this.table.loading = response.transId != this.result.transId
-          break
+          this.toolbar.sql = response.sql;
+          this.table.loading = response.transId != this.result.transId;
+          break;
         case "DATA":
-          handlerData(response)
-          break
+          handlerData(response);
+          break;
         case "NEXT_PAGE":
-          this.result.data = response.data
-          this.toolbar.sql = response.sql
-          this.result.data.unshift({ isFilter: true, content: "" })
-          break
+          this.result.data = response.data;
+          this.toolbar.sql = response.sql;
+          this.result.data.unshift({ isFilter: true, content: "" });
+          break;
         case "COUNT":
-          this.page.total = parseInt(response.data)
-          break
+          this.page.total = parseInt(response.data);
+          break;
         case "DML":
         case "DDL":
-          handlerCommon(response)
-          this.info.error = false
-          this.info.needRefresh = false
-          this.refresh()
-          break
+          handlerCommon(response);
+          this.info.error = false;
+          this.info.needRefresh = false;
+          this.refresh();
+          break;
         case "ERROR":
-          handlerCommon(response)
-          this.info.error = true
-          break
+          handlerCommon(response);
+          this.info.error = true;
+          break;
         case "MESSAGE":
           if (response.message) {
             if (response.success) {
-              this.$message.success(response.message)
+              this.$message.success(response.message);
             } else {
-              this.$message.error(response.message)
+              this.$message.error(response.message);
             }
           }
-          this.refresh()
-          break
+          this.refresh();
+          break;
         default:
-          this.$message(JSON.stringify(data))
+          this.$message(JSON.stringify(data));
       }
-    })
-    vscodeEvent.emit("init")
+    });
+    vscodeEvent.emit("init");
     window.addEventListener("keyup", (event) => {
       if (event.key == "c" && event.ctrlKey) {
-        document.execCommand("copy")
+        document.execCommand("copy");
       }
-    })
+    });
   },
   methods: {
     openCoffee() {
-      vscodeEvent.emit("openCoffee")
+      vscodeEvent.emit("openCoffee");
     },
     confirmExport(exportOption) {
       vscodeEvent.emit("export", {
@@ -226,76 +226,163 @@ export default {
           sql: this.result.sql,
           table: this.result.table,
         },
-      })
+      });
     },
-    filter(event, column) {
-      let inputvalue = "" + (event ? event.target.value : "")
+    onContextmenu(event, column) {
+      const name = column.title;
+      const value = event.target.textContent;
+      event.target.value=value;
+      this.$contextmenu({
+        items: [
+           {
+            label: `Copy`,
+            onClick: () => {
+              vscodeEvent.emit("copy",value)
+            },
+          },
+          {
+            label: `Filter by ${name} = '${value}'`,
+            onClick: () => {
+              this.filter(event, name, "=");
+            },
+          },
+          {
+            label: "Filter by",
+            divided: true,
+            children: [
+              {
+                label: `Filter by ${name} > '${value}'`,
+                onClick: () => {
+                  this.filter(event, name, ">");
+                },
+              },
+              {
+                label: `Filter by ${name} >= '${value}'`,
+                onClick: () => {
+                  this.filter(event, name, ">=");
+                },
+              },
+              {
+                label: `Filter by ${name} < '${value}'`,
+                onClick: () => {
+                  this.filter(event, name, "<");
+                },
+              },
+              {
+                label: `Filter by ${name} <= '${value}'`,
+                onClick: () => {
+                  this.filter(event, name, "<=");
+                },
+              },
+              {
+                label: `Filter by ${name} LIKE '%${value}%'`,
+                onClick: () => {
+                  event.target.value=`%${value}%`;
+                  this.filter(event, name, "LIKE");
+                },
+              },
+              {
+                label: `Filter by ${name} NOT LIKE '%${value}%'`,
+                onClick: () => {
+                  event.target.value=`%${value}%`;
+                  this.filter(event, name, "NOT LIKE");
+                },
+              },
+            ],
+          },
+        ],
+        event,
+        customClass: "class-a",
+        zIndex: 3,
+        minWidth: 230,
+      });
+      return false;
+    },
+    filter(event, column, operation) {
+      if (!operation) operation = "=";
+      let inputvalue = "" + (event ? event.target.value : "");
       if (this.result.dbType == "ElasticSearch") {
-        vscodeEvent.emit("esFilter", { match: { [column]: inputvalue } })
-        return
+        vscodeEvent.emit("esFilter", { match: { [column]: inputvalue } });
+        return;
       }
 
-      let filterSql = this.result.sql.replace(/\n/, " ").replace(";", " ") + " "
+      let filterSql =
+        this.result.sql.replace(/\n/, " ").replace(";", " ") + " ";
 
-      let existsCheck = new RegExp(`(WHERE|AND)?\\s*\`?${column}\`?\\s*(=|is)\\s*.+?\\s`, "igm")
+      let existsCheck = new RegExp(
+        `(WHERE|AND)?\\s*\`?${column}\`?\\s*(=|is|>=|<=|<>)\\s*.+?\\s`,
+        "igm"
+      );
 
       if (inputvalue) {
         const condition =
           inputvalue.toLowerCase() === "null"
             ? `${column} is null`
-            : `${wrapByDb(column, this.result.dbType)}='${inputvalue}'`
+            : `${wrapByDb(
+                column,
+                this.result.dbType
+              )} ${operation} '${inputvalue}'`;
         if (existsCheck.exec(filterSql)) {
           // condition present
-          filterSql = filterSql.replace(existsCheck, `$1 ${condition} `)
+          filterSql = filterSql.replace(existsCheck, `$1 ${condition} `);
         } else if (filterSql.match(/\bwhere\b/gi)) {
           //have where
-          filterSql = filterSql.replace(/\b(where)\b/gi, `\$1 ${condition} AND `)
+          filterSql = filterSql.replace(
+            /\b(where)\b/gi,
+            `\$1 ${condition} AND `
+          );
         } else {
           //have not where
-          filterSql = filterSql.replace(new RegExp(`(from\\s*.+?)\\s`, "ig"), `\$1 WHERE ${condition} `)
+          filterSql = filterSql.replace(
+            new RegExp(`(from\\s*.+?)\\s`, "ig"),
+            `\$1 WHERE ${condition} `
+          );
         }
       } else {
         // empty value, clear filter
-        let beforeAndCheck = new RegExp(`\\b${column}\\b\\s*(=|is)\\s*.+?\\s*AND`, "igm")
+        let beforeAndCheck = new RegExp(
+          `\\b${column}\\b\\s*(=|is)\\s*.+?\\s*AND`,
+          "igm"
+        );
         if (beforeAndCheck.exec(filterSql)) {
-          filterSql = filterSql.replace(beforeAndCheck, "")
+          filterSql = filterSql.replace(beforeAndCheck, "");
         } else {
-          filterSql = filterSql.replace(existsCheck, " ")
+          filterSql = filterSql.replace(existsCheck, " ");
         }
       }
 
-      this.execute(filterSql + ";")
+      this.execute(filterSql + ";");
     },
     changePageSize(size) {
-      this.page.pageSize = size
-      vscodeEvent.emit("changePageSize", size)
-      this.changePage(0)
+      this.page.pageSize = size;
+      vscodeEvent.emit("changePageSize", size);
+      this.changePage(0);
     },
     sort(row) {
       if (this.result.dbType == "ElasticSearch") {
-        vscodeEvent.emit("esSort", [{ [row.prop]: { order: row.order } }])
-        return
+        vscodeEvent.emit("esSort", [{ [row.prop]: { order: row.order } }]);
+        return;
       }
       let sortSql = this.result.sql
         .replace(/\n/, " ")
         .replace(";", "")
         .replace(/order by .+? (desc|asc)?/gi, "")
-        .replace(/\s?(limit.+)?$/i, ` ORDER BY ${row.prop} ${row.order} \$1 `)
-      this.execute(sortSql + ";")
+        .replace(/\s?(limit.+)?$/i, ` ORDER BY ${row.prop} ${row.order} \$1 `);
+      this.execute(sortSql + ";");
     },
     getTypeByColumn(key) {
-      if (!this.result.columnList) return
+      if (!this.result.columnList) return;
       for (const column of this.result.columnList) {
         if (column.name === key) {
-          return column.simpleType || column.type
+          return column.simpleType || column.type;
         }
       }
     },
     updateEdit(row, column, event) {
       if (row.isFilter) {
-        return
+        return;
       }
-      this.update.current = { ...row }
+      this.update.current = { ...row };
     },
     deleteConfirm() {
       this.$confirm("Are you sure you want to delete this data?", "Warning", {
@@ -306,137 +393,151 @@ export default {
         .then(() => {
           let checkboxRecords = this.$refs.dataTable
             .getCheckboxRecords()
-            .filter((checkboxRecord) => checkboxRecord[this.result.primaryKey] != null)
-            .map((checkboxRecord) =>
-              this.wrapQuote(this.getTypeByColumn(this.result.primaryKey), checkboxRecord[this.result.primaryKey])
+            .filter(
+              (checkboxRecord) => checkboxRecord[this.result.primaryKey] != null
             )
-          let deleteSql = null
+            .map((checkboxRecord) =>
+              this.wrapQuote(
+                this.getTypeByColumn(this.result.primaryKey),
+                checkboxRecord[this.result.primaryKey]
+              )
+            );
+          let deleteSql = null;
           if (this.result.dbType == "ElasticSearch") {
             deleteSql =
               checkboxRecords.length > 1
                 ? `POST /_bulk\n${checkboxRecords
-                    .map((c) => `{ "delete" : { "_index" : "${this.result.table}", "_id" : "${c}" } }`)
+                    .map(
+                      (c) =>
+                        `{ "delete" : { "_index" : "${this.result.table}", "_id" : "${c}" } }`
+                    )
                     .join("\n")}`
-                : `DELETE /${this.result.table}/_doc/${checkboxRecords[0]}`
+                : `DELETE /${this.result.table}/_doc/${checkboxRecords[0]}`;
           } else {
             deleteSql =
               checkboxRecords.length > 1
-                ? `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey} in (${checkboxRecords.join(",")})`
-                : `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}=${checkboxRecords[0]}`
+                ? `DELETE FROM ${this.result.table} WHERE ${
+                    this.result.primaryKey
+                  } in (${checkboxRecords.join(",")})`
+                : `DELETE FROM ${this.result.table} WHERE ${this.result.primaryKey}=${checkboxRecords[0]}`;
           }
-          this.execute(deleteSql)
+          this.execute(deleteSql);
         })
         .catch((e) => {
           if (e) {
-            this.$message.error(e)
+            this.$message.error(e);
           } else {
-            this.$message({ type: "warning", message: "Delete canceled" })
+            this.$message({ type: "warning", message: "Delete canceled" });
           }
-        })
+        });
     },
     computeWidth(key, index, keyIndex, value) {
-      if (this.table.widthItem[keyIndex]) return this.table.widthItem[keyIndex]
-      if (!index) index = 0
-      if (!this.result.data[index] || index > 10) return 70
+      if (this.table.widthItem[keyIndex]) return this.table.widthItem[keyIndex];
+      if (!index) index = 0;
+      if (!this.result.data[index] || index > 10) return 70;
       if (!value) {
-        value = this.result.data[index][key]
+        value = this.result.data[index][key];
       }
-      var dynamic = value ? (value + "").length * 10 : (key + "").length * 10
-      if (dynamic > 600) dynamic = 600
-      if (dynamic < 70) dynamic = 70
-      var nextDynamic = this.computeWidth(key, index + 1, keyIndex)
-      if (dynamic < nextDynamic) dynamic = nextDynamic
-      this.table.widthItem[keyIndex] = dynamic
-      return dynamic
+      var dynamic = value ? (value + "").length * 10 : (key + "").length * 10;
+      if (dynamic > 600) dynamic = 600;
+      if (dynamic < 70) dynamic = 70;
+      var nextDynamic = this.computeWidth(key, index + 1, keyIndex);
+      if (dynamic < nextDynamic) dynamic = nextDynamic;
+      this.table.widthItem[keyIndex] = dynamic;
+      return dynamic;
     },
     refresh() {
       if (this.result.sql) {
-        this.execute(this.result.sql)
+        this.execute(this.result.sql);
       }
     },
     count() {
-      if (!this.result.table) return
-      this.info.visible = false
-      vscodeEvent.emit("count", { sql: this.result.sql })
+      if (!this.result.table) return;
+      this.info.visible = false;
+      vscodeEvent.emit("count", { sql: this.result.sql });
     },
     execute(sql) {
-      if (!sql) return
+      if (!sql) return;
       vscodeEvent.emit("execute", {
         sql: sql.replace(/ +/gi, " "),
-      })
-      this.table.loading = true
+      });
+      this.table.loading = true;
     },
     changePage(pageNum, jump) {
       vscodeEvent.emit("next", {
         sql: this.result.sql,
         pageNum: jump ? pageNum : this.page.pageNum + pageNum,
         pageSize: this.page.pageSize,
-      })
-      this.table.loading = true
+      });
+      this.table.loading = true;
     },
     dataformat(origin) {
       if (origin == undefined || origin == null) {
-        return "<span class='null-column'>(NULL)</span>"
+        return "<span class='null-column'>(NULL)</span>";
       }
       if (origin.hasOwnProperty("type")) {
-        return String.fromCharCode.apply(null, new Uint16Array(origin.data))
+        return String.fromCharCode.apply(null, new Uint16Array(origin.data));
       }
-      return origin
+      return origin;
     },
     initShowColumn() {
-      const fields = this.result.fields
-      if (!fields) return
-      this.toolbar.showColumns = []
+      const fields = this.result.fields;
+      if (!fields) return;
+      this.toolbar.showColumns = [];
       for (let i = 0; i < fields.length; i++) {
-        if (!fields[i].name) continue
-        this.toolbar.showColumns.push(fields[i].name.toLowerCase())
+        if (!fields[i].name) continue;
+        this.toolbar.showColumns.push(fields[i].name.toLowerCase());
       }
     },
     // show call when load same table data
     clear() {
       // reset page
-      this.page.pageNum = 1
-      this.page.pageSize = this.result.pageSize
-      this.page.total = null
+      this.page.pageNum = 1;
+      this.page.pageSize = this.result.pageSize;
+      this.page.total = null;
       // info
       if (this.info.needRefresh) {
-        this.info.visible = false
+        this.info.visible = false;
       } else {
-        this.info.needRefresh = true
+        this.info.needRefresh = true;
       }
       // loading
-      this.table.loading = false
+      this.table.loading = false;
       // toolbar
-      this.toolbar.show = false
+      this.toolbar.show = false;
     },
     selectionChange(selection) {
-      this.toolbar.show = this.result.primaryKey && selection.length > 0 && this.result.tableCount == 1
+      this.toolbar.show =
+        this.result.primaryKey &&
+        selection.length > 0 &&
+        this.result.tableCount == 1;
     },
     // show call when change table
     reset() {
-      this.clear()
+      this.clear();
       // table
-      this.table.widthItem = {}
-      this.initShowColumn()
+      this.table.widthItem = {};
+      this.initShowColumn();
       // add filter row
       if (this.result.columnList) {
-        this.result.data.unshift({ isFilter: true, content: "" })
+        this.result.data.unshift({ isFilter: true, content: "" });
       }
       // toolbar
       if (!this.result.sql.match(/\bwhere\b/gi)) {
-        this.toolbar.filter = {}
-        this.$refs.dataTable.clearSort()
+        this.toolbar.filter = {};
+        this.$refs.dataTable.clearSort();
       }
     },
   },
   computed: {
     columnCount() {
-      if (this.result.data == undefined || this.result.data[0] == undefined) return 0
-      return Object.keys(this.result.data[0]).length
+      if (this.result.data == undefined || this.result.data[0] == undefined)
+        return 0;
+      return Object.keys(this.result.data[0]).length;
     },
     remainHeight() {
-      return window.outerHeight - 230
+      return window.outerHeight - 230;
     },
   },
-}
+};
 </script>

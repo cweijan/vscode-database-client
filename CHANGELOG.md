@@ -6,6 +6,7 @@
 - Add `sel` snippet.
 - compatible with old vscode version.
 - Fix code len detect comment as sql.
+- Add context menu to result view.
 
 # 3.2.2 2020/1/25
 
