@@ -5,7 +5,7 @@
 - Fix redis folder Infinite recursion load bug.
 - Add GUI of index manager view.
 - Implement database struct sync feature.
-- Fix intetllisense sql fail when cache not exists.
+- Enhance intetllisense sql.
 
 # 3.2.1 2020/1/23
 

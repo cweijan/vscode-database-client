@@ -25,7 +25,7 @@ export class ComplectionContext {
         const prePostion = position.character === 0 ? position : new vscode.Position(position.line, position.character - 1);
         const preChart = position.character === 0 ? null : document.getText(new vscode.Range(prePostion, position));
 
-        const wordMatch = currentSql.match(/(\w|-|\_|\*)+/g);
+        const wordMatch = currentSql.match(/(\w|-|\_|\*|\.)+/g);
         if (wordMatch) {
             if ((preChart == null || preChart.match(/[\. \(\)\[\]\'\"]/)) && wordMatch.length >= 1) {
                 context.preWord = wordMatch[wordMatch.length - 1];
@@ -33,6 +33,7 @@ export class ComplectionContext {
                 context.preWord = wordMatch[wordMatch.length - 2];
             }
         }
+        context.preWord=context.preWord?.replace(/\.$/,'')
         const codeMatch = currentSql.match(/(\w|=|<|>|\()+$/);
         if (codeMatch) {
             context.currentWord = codeMatch[0];
