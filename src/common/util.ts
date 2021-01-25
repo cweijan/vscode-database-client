@@ -11,7 +11,8 @@ export class Util {
         const tableMatch = new RegExp(tablePattern, 'img').exec(sql)
         if (tableMatch) {
             return tableMatch[0].replace(/\bfrom|join|update|into\b/i, "") // remove keyword
-                .replace(/`/g, "")// trim tableName
+                .replace(/`|"|'/g, "")// trim tableName
+                .replace(/^\s*\[(.+)\]$/, "$1") // trim tableName again
                 .trim()
         }
 
