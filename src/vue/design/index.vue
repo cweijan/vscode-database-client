@@ -1,5 +1,6 @@
 <template>
   <div>
+    table:{{table}}
     <div v-if="activePanel=='info'"></div>
     <ul class="tab">
       <li class="tab__item " :class="{'tab__item--active':activePanel=='info'}" @click="activePanel='info'">Info </li>
@@ -23,19 +24,23 @@ import { getVscodeEvent } from "../util/vscode";
 import IndexPanel from "./IndexPanel";
 import ColumnPanel from "./ColumnPanel";
 import InfoPanel from "./InfoPanel";
-const vscodeEvent = getVscodeEvent();
+let vscodeEvent;
 export default {
-  components: { IndexPanel, ColumnPanel,InfoPanel },
+  components: { IndexPanel, ColumnPanel, InfoPanel },
   data() {
     return {
-      activePanel: "index",
+      table: null,
+      activePanel: "info",
     };
   },
   destroyed() {
     vscodeEvent.destroy();
   },
   mounted() {
-    
+    vscodeEvent = getVscodeEvent();
+    vscodeEvent.on("design-data", (data) => {
+      this.table=data.table
+    });
   },
   methods: {
     refresh() {

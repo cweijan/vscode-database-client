@@ -60,7 +60,7 @@ export class TableNode extends Node implements CopyAble {
     public async showSource(open = true) {
         let sql: string;
         if (this.dbType == DatabaseType.MYSQL || !this.dbType) {
-            const sourceResule =await this.execute<any[]>(this.dialect.showTableSource(this.database, this.table))
+            const sourceResule = await this.execute<any[]>(this.dialect.showTableSource(this.database, this.table))
             sql = sourceResule[0]['Create Table'];
         } else {
             const childs = await this.getChildren()
@@ -81,7 +81,7 @@ export class TableNode extends Node implements CopyAble {
             }
             sql += ");"
         }
-        if(open){
+        if (open) {
             QueryUnit.showSQLTextDocument(this, sql);
         }
         return sql;
@@ -126,7 +126,7 @@ export class TableNode extends Node implements CopyAble {
 
     public indexTemplate() {
         ViewManager.createWebviewPanel({
-            path: "app", title: `${this.table}@${this.database}`,
+            path: "app", title: "Design Table(Preview)",
             splitView: false, iconPath: Global.getExtPath("resources", "icon", "add.svg"),
             eventHandler: (handler => {
                 handler.on("init", () => {
@@ -140,7 +140,7 @@ export class TableNode extends Node implements CopyAble {
                         }
                         return columnNode.column;
                     });
-                    handler.emit('design-data', { indexs: result, table: this.table, columnList, primaryKey, dbType: this.dbType })
+                    handler.emit('design-data', { indexs: result, table: this.table, comment: this.comment, columnList, primaryKey, dbType: this.dbType })
                 }).on("execute", async sql => {
                     try {
                         await this.execute(sql)
