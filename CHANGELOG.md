@@ -1,6 +1,6 @@
 # CHANGELOG
 
-# 3.2.2
+# 3.2.2 2020/1/25
 
 - Fix redis folder Infinite recursion load bug.
 - Add GUI of index manager view.
