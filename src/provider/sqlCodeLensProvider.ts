@@ -19,7 +19,7 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
         const lineCount = Math.min(document.lineCount, 500);
         for (var i = 0; i < lineCount; i++) {
             var line = document.lineAt(i)
-            var text = line.text;
+            var text = line.text?.replace(/(--|#).+/,'');
             sql = sql +"\n"+ text;
 
             if (text?.trim() && !start) {

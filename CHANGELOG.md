@@ -5,6 +5,7 @@
 - Support close connection.
 - Add `sel` snippet.
 - compatible with old vscode version.
+- Fix code len detect comment as sql.
 
 # 3.2.2 2020/1/25
 
