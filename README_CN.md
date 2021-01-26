@@ -15,7 +15,7 @@
 
 ## 安装
 
-在 Visual Studio Code 扩展中心安装 [vscode-mysql](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2).
+在 Visual Studio Code 扩展中心安装 [Database Client](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2).
 
 ## 连接
 
