@@ -98,10 +98,7 @@ export default {
       if (!sql) return;
       this.emit("execute", sql);
     },
-  },
-  destroyed() {
-    this.destroy();
-  },
+  }
 };
 </script>
 
