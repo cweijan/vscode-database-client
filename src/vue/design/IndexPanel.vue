@@ -83,12 +83,7 @@ export default {
         cancelButtonText: "Cancel",
         type: "warning",
       }).then(() => {
-        this.execute(
-          `ALTER TABLE ${wrapByDb(
-            this.designData.table,
-            this.designData.dbType
-          )} DROP INDEX ${row.index_name}`
-        );
+        this.emit("dropIndex",row.index_name)
       });
     },
     execute(sql) {

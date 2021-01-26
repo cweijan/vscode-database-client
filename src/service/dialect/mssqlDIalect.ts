@@ -7,6 +7,9 @@ export class MssqlDIalect extends SqlDialect {
     createIndex(createIndexParam:CreateIndexParam): string{
         return `ALTER TABLE ${createIndexParam.table} ADD ${createIndexParam.type} (${createIndexParam.column})`;
     }
+    dropIndex(table: string, indexName: string): string {
+        return `DROP INDEX ${table}.${indexName}`
+    }
     showIndex(database: string, table: string): string {
         return `SELECT
         index_name = ind.name,

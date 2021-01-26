@@ -7,7 +7,9 @@ import { UpdateTableParam } from "./param/updateTableParam";
  * 2. 增加system view节点
  */
 export abstract class SqlDialect {
-
+    dropIndex( table: string, indexName: string) :string{
+        throw new Error("Method not implemented.");
+    }
     showIndex(database: string, table: string): string { return null; }
     createIndex(createIndexParam:CreateIndexParam): string { return null };
     abstract updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string;

@@ -40,7 +40,7 @@ export default {
     })
       .on("success", () => {
         this.$message.success("Update success!");
-        this.refresh();
+        this.init();
       })
       .on("error", (msg) => {
         this.$message.error(msg);

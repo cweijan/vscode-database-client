@@ -5,7 +5,10 @@ import { SqlDialect } from "./sqlDialect";
 export class PostgreSqlDialect extends SqlDialect {
     createIndex(createIndexParam:CreateIndexParam): string{
         const indexType=createIndexParam.indexType||"btree"
-        return `CREATE INDEX ${createIndexParam.column}_index ON ${createIndexParam.table} USING ${indexType} (${createIndexParam.column});`;
+        return `CREATE INDEX ${createIndexParam.column}_${new Date().getTime()}_index ON ${createIndexParam.table} USING ${indexType} (${createIndexParam.column});`;
+    }
+    dropIndex(table: string, indexName: string): string {
+        return `DROP INDEX ${indexName}`
     }
     showIndex(database: string, table: string): string {
         return `SELECT indexname index_name, indexdef FROM pg_indexes WHERE schemaname = 'public' and tablename='${table}'`

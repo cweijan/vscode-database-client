@@ -115,7 +115,7 @@ export class TableNode extends Node implements CopyAble {
 
     public designTable() {
 
-        const executeAndRefresh=async(sql: string, handler: Hanlder)=>{
+        const executeAndRefresh = async (sql: string, handler: Hanlder) => {
             try {
                 await this.execute(sql)
                 await this.refresh()
@@ -144,12 +144,15 @@ export class TableNode extends Node implements CopyAble {
                     handler.emit('design-data', { indexs: result, table: this.table, comment: this.comment, columnList, primaryKey, dbType: this.dbType })
                 }).on("updateTable", async ({ newTableName, newComment }) => {
                     const sql = this.dialect.updateTable({ table: this.table, newTableName, comment: this.comment, newComment });
-                    await executeAndRefresh(sql,handler)
+                    await executeAndRefresh(sql, handler)
+                }).on("dropIndex", async indexName => {
+                    const sql = this.dialect.dropIndex(this.table, indexName);
+                    await executeAndRefresh(sql, handler)
                 }).on("execute", async sql => {
-                    await executeAndRefresh(sql,handler)
-                }).on("createIndex",async ({column,type,indexType})=>{
-                    const sql = this.dialect.createIndex({column,type,indexType,table:this.wrap(this.table)});
-                    await executeAndRefresh(sql,handler)
+                    await executeAndRefresh(sql, handler)
+                }).on("createIndex", async ({ column, type, indexType }) => {
+                    const sql = this.dialect.createIndex({ column, type, indexType, table: this.wrap(this.table) });
+                    await executeAndRefresh(sql, handler)
                 })
             })
         })
