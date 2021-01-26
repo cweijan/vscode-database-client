@@ -7,3 +7,11 @@
 5. `export interface ImportService`(mysql only now)
 6. `export class OverviewService` (mysql only now)
 7. `export interface StatusService` (mysql only now)
+
+
+# Next Share
+
+- Support sqlite、mongodb
+- Struct sync
+- Table design
+- sql server old version.
