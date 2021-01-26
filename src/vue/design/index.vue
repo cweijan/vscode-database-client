@@ -1,8 +1,8 @@
 <template>
   <div class="mt-2">
+    <el-button @click="init" type="success" title="Refresh"  size="mini" >Refresh </el-button>
     <el-tag>Table:</el-tag>
     {{table}}
-    <div v-if="activePanel=='info'"></div>
     <ul class="tab">
       <li class="tab__item " :class="{'tab__item--active':activePanel=='info'}" @click="activePanel='info'">Info </li>
       <li class="tab__item " :class="{'tab__item--active':activePanel=='column'}" @click="activePanel='column'">Column </li>

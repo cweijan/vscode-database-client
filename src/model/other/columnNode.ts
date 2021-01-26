@@ -36,9 +36,10 @@ export class ColumnNode extends Node implements CopyAble {
     }
 
     private buildInfo() {
-        if(this.column.extra=='auto_increment'){
-            this.column.isAutoIncrement=true;
+        if (this.column.extra == 'auto_increment') {
+            this.column.isAutoIncrement = true;
         }
+        this.column.isNotNull = this.column.nullable != 'YES'
         const columnKey: string = this.column.key;
         switch (columnKey) {
             case 'UNI':
@@ -58,20 +59,6 @@ export class ColumnNode extends Node implements CopyAble {
 
     public async getChildren(): Promise<Node[]> {
         return [];
-    }
-
-    public async changeColumnName() {
-
-        const columnName = this.column.name;
-        vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(async (newColumnName) => {
-            if (!newColumnName) { return; }
-            const sql = `alter table ${this.wrap(this.table)} change column ${this.wrap(columnName)} ${this.wrap(newColumnName)} ${this.column.type} comment '${this.column.comment}'`;
-            this.execute(sql).then((rows) => {
-                DatabaseCache.clearColumnCache(`${this.parent.uid}`);
-                DbTreeDataProvider.refresh(this.parent);
-            });
-
-        });
     }
 
     public updateColumnTemplate() {

@@ -31,7 +31,6 @@
 	"command.mock.table": "Generate Mock Data",
 	"command.changeTableName": "Change Name",
 	"comman.table.design": "Design Table",
-	"command.column.changeName": "Change Column Name",
 	"command.column.add": "Add Column",
 	"command.column.up": "Move Column Up",
 	"command.column.down": "Move Column Down",

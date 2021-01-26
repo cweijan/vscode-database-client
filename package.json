@@ -299,15 +299,6 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.column.changeName",
-				"title": "%command.column.changeName%",
-				"category": "MySQL",
-				"icon": {
-					"light": "resources/light/edit.svg",
-					"dark": "resources/dark/edit.svg"
-				}
-			},
-			{
 				"command": "mysql.column.add",
 				"title": "%command.column.add%",
 				"category": "MySQL"
@@ -759,11 +750,6 @@
 					"command": "mysql.column.down",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == column",
 					"group": "inline@2"
-				},
-				{
-					"command": "mysql.column.changeName",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == column",
-					"group": "inline@4"
 				},
 				{
 					"command": "mysql.column.drop",

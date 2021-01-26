@@ -23,7 +23,7 @@ export class TableNode extends Node implements CopyAble {
     public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.TABLE;
 
-    constructor(public readonly table: string, readonly comment: string, readonly parent: Node) {
+    constructor(public table: string, readonly comment: string, readonly parent: Node) {
         super(`${table}`)
         this.description = comment
         this.init(parent)
@@ -141,9 +141,14 @@ export class TableNode extends Node implements CopyAble {
                         }
                         return columnNode.column;
                     });
-                    handler.emit('design-data', { indexs: result, table: this.table, comment: this.comment, columnList, primaryKey, dbType: this.dbType })
+                    const node = this.getByRegion(this.table) as TableNode || this
+                    handler.emit('design-data', { indexs: result, table: node.table, comment: node.comment, columnList, primaryKey, dbType: node.dbType })
                 }).on("updateTable", async ({ newTableName, newComment }) => {
                     const sql = this.dialect.updateTable({ table: this.table, newTableName, comment: this.comment, newComment });
+                    await executeAndRefresh(sql, handler)
+                    this.table=newTableName
+                }).on("updateColumn",async (updateColumnParam)=>{
+                    const sql = this.dialect.updateColumnSql(updateColumnParam);
                     await executeAndRefresh(sql, handler)
                 }).on("dropIndex", async indexName => {
                     const sql = this.dialect.dropIndex(this.table, indexName);

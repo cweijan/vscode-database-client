@@ -1,4 +1,5 @@
 import { CreateIndexParam } from "./param/createIndexParam";
+import { UpdateColumnParam } from "./param/updateColumnParam";
 import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
@@ -37,6 +38,12 @@ export class MysqlDialect extends SqlDialect {
         const defaultDefinition = nullable == "YES" ? "" : " NOT NULL";
         comment = comment ? ` comment '${comment}'` : "";
         return `ALTER TABLE\n\t${table} CHANGE ${column} ${column} ${type}${defaultDefinition}${comment};`;
+    }
+    updateColumnSql(updateColumnParam: UpdateColumnParam): string {
+        let {columnName,columnType,newColumnName,comment,nullable,table}=updateColumnParam
+        const defaultDefinition = nullable ? "" : " NOT NULL";
+        comment = comment ? ` comment '${comment}'` : "";
+        return `ALTER TABLE\n\t${table} CHANGE ${columnName} ${newColumnName} ${columnType}${defaultDefinition}${comment};`;
     }
     showUsers(): string {
         return `SELECT concat(user,'@',host) user FROM mysql.user;`;

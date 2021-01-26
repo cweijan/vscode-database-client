@@ -223,9 +223,6 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // column node
             ...{
-                "mysql.column.changeName": (columnNode: ColumnNode) => {
-                    columnNode.changeColumnName();
-                },
                 "mysql.column.up": (columnNode: ColumnNode) => {
                     columnNode.moveUp();
                 },

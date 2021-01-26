@@ -6,11 +6,12 @@
     <ux-grid :data="designData.editColumnList" stripe style="width: 100%" :cell-style="{height: '25px'}">
       <ux-table-column title="Operation" width="120">
         <template v-slot="{ row }">
+          <el-button @click="openEdit(row)" title="edit" size="mini" icon="el-icon-edit" circle> </el-button>
           <el-button @click="deleteConfirm(row)" title="delete" type="danger" size="mini" icon="el-icon-delete" circle> </el-button>
         </template>
       </ux-table-column>
       <ux-table-column align="center" field="name" title="Name" show-overflow-tooltip="true"></ux-table-column>
-      <ux-table-column align="center" field="type" title="Type"  show-overflow-tooltip="true"></ux-table-column>
+      <ux-table-column align="center" field="type" title="Type" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column align="center" field="comment" title="Comment" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column align="center" field="maxLength" width="80" title="Length" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column align="center" field="defaultValue" width="120" title="Default" show-overflow-tooltip="true"></ux-table-column>
@@ -35,12 +36,32 @@
         </template>
       </ux-table-column>
     </ux-grid>
+    <el-dialog :title="'Update Column'" :visible.sync="column.editVisible" top="3vh" size="mini">
+      <el-form :inline='true'>
+        <el-form-item label="Name">
+          <el-input v-model="editColumn.name"></el-input>
+        </el-form-item>
+        <el-form-item label="Type">
+          <el-input v-model="editColumn.type"></el-input>
+        </el-form-item>
+        <el-form-item label="Comment">
+          <el-input v-model="editColumn.comment"></el-input>
+        </el-form-item>
+        <el-form-item label="Not Null">
+          <el-checkbox v-model="editColumn.isNotNull"></el-checkbox>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" :loading="column.editloading" @click="updateColumn">Update</el-button>
+        <el-button @click="column.editVisible=false">Cancel</el-button>
+      </span>
+    </el-dialog>
     <el-dialog :title="'Add Column'" :visible.sync="column.visible" top="3vh" size="mini">
       <el-form :inline='true'>
         <el-form-item label="Name">
           <el-input v-model="column.name"></el-input>
         </el-form-item>
-        <el-form-item label="type">
+        <el-form-item label="Type">
           <el-input v-model="column.type"></el-input>
         </el-form-item>
       </el-form>
@@ -65,11 +86,16 @@ export default {
         columnList: [],
         editColumnList: [],
       },
+      editColumn: {},
       column: {
         visible: false,
+        editVisible: false,
         loading: false,
+        editLoading: false,
+
         column: null,
         type: null,
+        nullable: false,
       },
     };
   },
@@ -80,7 +106,9 @@ export default {
     })
       .on("success", () => {
         this.column.loading = false;
+        this.column.editLoading = false;
         this.column.visible = false;
+        this.column.editVisible = false;
         this.init();
       })
       .on("error", (msg) => {
@@ -89,6 +117,16 @@ export default {
       .init();
   },
   methods: {
+    updateColumn() {
+      this.emit("updateColumn", {
+        newColumnName: this.editColumn.name,
+        columnType: this.editColumn.type,
+        comment: this.editColumn.comment,
+        nullable: !this.editColumn.isNotNull,
+        table: this.designData.table,
+        columnName: this.column.name,
+      });
+    },
     createcolumn() {
       this.column.loading = true;
       this.execute(
@@ -99,6 +137,12 @@ export default {
           this.column.type
         }`
       );
+    },
+    openEdit(row) {
+      this.column.name = row.name;
+      this.editColumn = {...row};
+      this.column.editVisible = true;
+      this.column.editLoading = false;
     },
     deleteConfirm(row) {
       this.$confirm("Are you sure you want to delete this column?", "Warning", {

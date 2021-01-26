@@ -1,10 +1,11 @@
 import { CreateIndexParam } from "./param/createIndexParam";
+import { UpdateColumnParam } from "./param/updateColumnParam";
 import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
 export class PostgreSqlDialect extends SqlDialect {
-    createIndex(createIndexParam:CreateIndexParam): string{
-        const indexType=createIndexParam.indexType||"btree"
+    createIndex(createIndexParam: CreateIndexParam): string {
+        const indexType = createIndexParam.indexType || "btree"
         return `CREATE INDEX ${createIndexParam.column}_${new Date().getTime()}_index ON ${createIndexParam.table} USING ${indexType} (${createIndexParam.column});`;
     }
     dropIndex(table: string, indexName: string): string {
@@ -32,11 +33,22 @@ export class PostgreSqlDialect extends SqlDialect {
         return `CREATE USER [name] WITH PASSWORD 'password'`
     }
     updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
-        const defaultDefinition = nullable == "YES" ? "DROP NOT NULL" : "SET NOT NULL";
         comment = comment ? ` comment '${comment}'` : "";
-        return `ALTER TABLE ${table} RENAME ${column} TO [newName]; -- update column name
-ALTER TABLE ${table} ALTER COLUMN ${column} TYPE ${type}; -- update column type
-ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update column nullable`;
+        return `ALTER TABLE ${table} ALTER COLUMN ${column} TYPE ${type};
+ALTER TABLE ${table} ALTER RENAME COLUMN ${column} TO [newColumnName];`;
+    }
+    updateColumnSql(updateColumnParam: UpdateColumnParam): string {
+        let { columnName, columnType, newColumnName, comment, nullable, table } = updateColumnParam
+        const defaultDefinition = nullable ? "DROP NOT NULL" : "SET NOT NULL";
+        let sql = `ALTER TABLE ${table} ALTER COLUMN ${columnName} TYPE ${columnType};
+ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
+        if (comment) {
+            sql = sql + `COMMENT ON COLUMN ${table}.${columnName} is '${comment}';`
+        }
+        if (columnName != newColumnName) {
+            sql = sql + `ALTER TABLE ${table} RENAME COLUMN ${columnName} TO ${newColumnName};`
+        }
+        return sql;
     }
     showUsers(): string {
         return `SELECT usename "user" from pg_user `;

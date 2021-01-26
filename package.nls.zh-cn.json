@@ -31,7 +31,6 @@
 	"command.mock.table": "生成随机数据",
 	"command.changeTableName": "修改表名称",
 	"comman.table.design": "设计表",
-	"command.column.changeName": "修改列名",
 	"command.column.add": "新建列",
 	"command.column.up": "上移列",
 	"command.column.down": "下移列",

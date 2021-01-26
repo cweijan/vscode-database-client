@@ -1,5 +1,6 @@
 import { window } from "vscode";
 import { CreateIndexParam } from "./param/createIndexParam";
+import { UpdateColumnParam } from "./param/updateColumnParam";
 import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
@@ -51,6 +52,12 @@ export class MssqlDIalect extends SqlDialect {
         return `EXEC sp_rename '${table}.${column}', '${column}', 'COLUMN'
 ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
 `;
+    }
+    updateColumnSql(updateColumnParam: UpdateColumnParam): string {
+        let {columnName,columnType,newColumnName,comment,nullable,table}=updateColumnParam
+        const defaultDefinition = nullable ? "" : " NOT NULL";
+        comment = comment ? ` comment '${comment}'` : "";
+        return `ALTER TABLE\n\t${table} CHANGE ${columnName} ${newColumnName} ${columnType}${defaultDefinition}${comment};`;
     }
     showUsers(): string {
         return `SELECT name [user] from sys.database_principals where type='S'`
