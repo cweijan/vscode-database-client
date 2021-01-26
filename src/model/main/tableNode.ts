@@ -87,20 +87,6 @@ export class TableNode extends Node implements CopyAble {
         return sql;
     }
 
-    public changeTableName() {
-
-        vscode.window.showInputBox({ value: this.table, placeHolder: 'newTableName', prompt: `You will changed ${this.database}.${this.table} to new table name!` }).then(async (newTableName) => {
-            if (!newTableName) { return; }
-            const sql = this.dialect.renameTable(this.database, this.table, newTableName);
-            this.execute(sql).then((rows) => {
-                DatabaseCache.clearTableCache(this.parent.uid);
-                DbTreeDataProvider.refresh(this.parent);
-            });
-
-        });
-
-    }
-
     public dropTable() {
 
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
@@ -124,7 +110,7 @@ export class TableNode extends Node implements CopyAble {
 
     }
 
-    public indexTemplate() {
+    public designTable() {
         ViewManager.createWebviewPanel({
             path: "app", title: "Design Table(Preview)",
             splitView: false, iconPath: Global.getExtPath("resources", "icon", "add.svg"),

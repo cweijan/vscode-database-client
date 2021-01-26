@@ -299,8 +299,8 @@
 				}
 			},
 			{
-				"command": "mysql.index.template",
-				"title": "%command.index.template%",
+				"command": "mysql.table.design",
+				"title": "%comman.table.design%",
 				"category": "MySQL"
 			},
 			{
@@ -701,7 +701,7 @@
 					"group": "inline@1"
 				},
 				{
-					"command": "mysql.index.template",
+					"command": "mysql.table.design",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "1_inline@0"
 				},

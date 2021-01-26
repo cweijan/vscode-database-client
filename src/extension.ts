@@ -217,9 +217,6 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.table.source": (tableNode: TableNode) => {
                     if (tableNode) { tableNode.showSource(); }
                 },
-                "mysql.changeTableName": (tableNode: TableNode) => {
-                    tableNode.changeTableName();
-                },
                 "mysql.table.show": (tableNode: TableNode) => {
                     if (tableNode) { tableNode.openInNew(); }
                 },
@@ -253,8 +250,8 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.codeLens.run": (sql:string) => {
                     QueryUnit.runQuery(sql)
                 },
-                "mysql.index.template": (tableNode: TableNode) => {
-                    tableNode.indexTemplate();
+                "mysql.table.design": (tableNode: TableNode) => {
+                    tableNode.designTable();
                 },
                 "mysql.template.delete": (tableNode: TableNode) => {
                     tableNode.deleteSqlTemplate();
