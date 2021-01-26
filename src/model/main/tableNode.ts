@@ -118,7 +118,7 @@ export class TableNode extends Node implements CopyAble {
                 handler.on("init", () => {
                     handler.emit('route', 'design')
                 }).on("route-design", async () => {
-                    const result = await this.execute(this.dialect.showIndex(this.wrap(this.database), this.wrap(this.table)))
+                    const result = await this.execute(this.dialect.showIndex(this.database, this.table))
                     let primaryKey: string;
                     const columnList = (await this.getChildren()).map((columnNode: ColumnNode) => {
                         if (columnNode.isPrimaryKey) {

@@ -1,14 +1,16 @@
 <template>
-  <div>
-    <el-form>
-      <el-form-item label="Table">
-        <el-input v-model="table.name"></el-input>
-      </el-form-item>
-      <el-form-item label="Comment">
-        <el-input v-model="table.comment"></el-input>
-      </el-form-item>
-      <el-button @click="rename">Update</el-button>
-    </el-form>
+  <div class="ml-4 ">
+    <div class="mb-3">
+      <div class="inline-block mr-10">
+        <label class="font-bold mr-5 inline-block w-14"><span class="text-red-600 mr-1">*</span>Table</label>
+        <input class="w-64 field__input" required v-model="table.name" />
+      </div>
+      <div class="inline-block mr-10">
+        <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Comment</label>
+        <input class="w-64 field__input" v-model="table.comment" />
+      </div>
+    </div>
+    <el-button @click="rename">Update</el-button>
   </div>
 </template>
 
@@ -73,4 +75,16 @@ export default {
 </script>
 
 <style>
+.field__input {
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-dropdown-border);
+  color: var(--vscode-input-foreground);
+  padding: 4px;
+  margin: 2px 0;
+}
+
+.field__input:focus {
+  border-color: inherit;
+  outline: 0;
+}
 </style>

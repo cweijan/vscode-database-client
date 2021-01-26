@@ -327,18 +327,6 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-.field__input {
-  background: var(--vscode-input-background);
-  border: 1px solid var(--vscode-dropdown-border);
-  color: var(--vscode-input-foreground);
-  padding: 4px;
-  margin: 2px 0;
-}
-
-.field__input:focus {
-  border-color: inherit;
-  outline: 0;
-}
 
 .button {
   padding: 4px 14px;

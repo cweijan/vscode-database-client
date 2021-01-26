@@ -1,20 +1,17 @@
 <template>
-  <div>
-    table:{{table}}
+  <div class="mt-2">
+    <el-tag>Table:</el-tag>
+    {{table}}
     <div v-if="activePanel=='info'"></div>
     <ul class="tab">
       <li class="tab__item " :class="{'tab__item--active':activePanel=='info'}" @click="activePanel='info'">Info </li>
       <li class="tab__item " :class="{'tab__item--active':activePanel=='column'}" @click="activePanel='column'">Column </li>
       <li class="tab__item " :class="{'tab__item--active':activePanel=='index'}" @click="activePanel='index'">Index </li>
     </ul>
-    <div v-if="activePanel=='info'">
-      <InfoPanel />
-    </div>
-    <div v-if="activePanel=='column'">
-      <ColumnPanel />
-    </div>
-    <div v-if="activePanel=='index'">
-      <IndexPanel />
+    <div class="mt-2">
+      <InfoPanel v-if="activePanel=='info'" />
+      <ColumnPanel v-if="activePanel=='column'" />
+      <IndexPanel v-if="activePanel=='index'" />
     </div>
   </div>
 </template>
@@ -35,9 +32,9 @@ export default {
   },
   mounted() {
     this.on("design-data", (data) => {
-      this.table=data.table
+      this.table = data.table;
     });
-  }
+  },
 };
 </script>
 

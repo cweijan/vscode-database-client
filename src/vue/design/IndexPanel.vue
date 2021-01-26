@@ -14,17 +14,19 @@
         </template>
       </ux-table-column>
     </ux-grid>
-    <el-dialog :title="'Add Index'" :visible.sync="index.visible" width="30%" top="3vh" size="mini">
-      <el-form>
+    <el-dialog :title="'Add Index'" :visible.sync="index.visible" top="3vh" size="mini">
+      <el-form :inline='true'>
+        <el-form-item label="Column">
+          <el-select v-model="index.column" >
+            <el-option :label="column.name" :value="column.name" v-for="column in designData.columnList"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="Index Type">
-          <el-select v-model="index.type">
+          <el-select v-model="index.type" >
             <el-option :label="'UNIQUE'" value="UNIQUE"></el-option>
             <el-option :label="'INDEX'" value="INDEX"></el-option>
             <el-option :label="'PRIMARY KEY'" value="PRIMARY KEY"></el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item label="Column">
-          <el-input v-model="index.column"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -42,7 +44,7 @@ export default {
   mixins: [inject],
   data() {
     return {
-      designData: { indexs: [], table: null, dbType: null },
+      designData: { indexs: [], table: null, dbType: null ,columnList:[]},
       index: {
         visible: false,
         loading: false,
@@ -60,7 +62,7 @@ export default {
       .on("success", () => {
         this.index.loading = false;
         this.index.visible = false;
-        this.refresh();
+        this.init();
       })
       .on("error", (msg) => {
         this.$message.error(msg);

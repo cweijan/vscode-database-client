@@ -8,19 +8,18 @@
       <ux-table-column align="center" field="key" title="key" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column align="center" field="nullable" title="nullable" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column align="center" field="type" title="type" show-overflow-tooltip="true"></ux-table-column>
-      <ux-table-column align="center" field="simpleType" title="simpleType" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column title="Operation" width="120">
         <template v-slot="{ row }">
           <el-button @click="deleteConfirm(row)" title="delete" type="danger" size="mini" icon="el-icon-delete" circle> </el-button>
         </template>
       </ux-table-column>
     </ux-grid>
-    <el-dialog :title="'Add Column'" :visible.sync="column.visible" width="30%" top="3vh" size="mini">
-      <el-form>
-        <el-form-item label="Column Name">
-          <el-input v-model="column.name"></el-input>
+    <el-dialog :title="'Add Column'" :visible.sync="column.visible" top="3vh" size="mini">
+      <el-form :inline='true'>
+        <el-form-item label="Name">
+          <el-input v-model="column.name" ></el-input>
         </el-form-item>
-        <el-form-item label="Column type">
+        <el-form-item label="type">
           <el-input v-model="column.type"></el-input>
         </el-form-item>
       </el-form>
@@ -61,7 +60,7 @@ export default {
       .on("success", () => {
         this.column.loading = false;
         this.column.visible = false;
-        this.refresh();
+        this.init();
       })
       .on("error", (msg) => {
         this.$message.error(msg);
