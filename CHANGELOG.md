@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# 3.3.1 2020-1-26
+
+- More implement or table design.
+
 # 3.3.0 2020-1-26
 
 - Support close connection.
