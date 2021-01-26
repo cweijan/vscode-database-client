@@ -9,10 +9,10 @@ import { ConfigKey, DatabaseType, MessageType, OperateType } from "../../common/
 import { Global } from "../../common/global";
 import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
-import { DatabaseCache } from "../../service/common/databaseCache";
-import { ExportService } from "../../service/export/exportService";
-import { QueryUnit } from "../../service/queryUnit";
-import { ViewManager } from "../viewManager";
+import { DatabaseCache } from "../common/databaseCache";
+import { ExportService } from "../export/exportService";
+import { QueryUnit } from "../queryUnit";
+import { ViewManager } from "../../common/viewManager";
 import { DataResponse } from "./queryResponse";
 
 export class QueryParam<T> {

@@ -1,4 +1,4 @@
-import { ViewManager } from "@/view/viewManager";
+import { ViewManager } from "@/common/viewManager";
 import * as path from "path";
 import * as vscode from "vscode";
 import { ConfigKey, Constants, DatabaseType, MessageType, ModelType, Template } from "../../common/constants";
@@ -9,8 +9,8 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { MockRunner } from "../../service/mock/mockRunner";
 import { QueryUnit } from "../../service/queryUnit";
-import { QueryPage } from "../../view/result/query";
-import { DataResponse } from "../../view/result/queryResponse";
+import { QueryPage } from "../../service/result/query";
+import { DataResponse } from "../../service/result/queryResponse";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { ColumnMeta } from "../other/columnMeta";

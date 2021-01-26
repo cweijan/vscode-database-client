@@ -5,7 +5,7 @@ import { TableNode } from "@/model/main/tableNode";
 import { NodeUtil } from "@/model/nodeUtil";
 import { ColumnNode } from "@/model/other/columnNode";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
-import { ViewManager } from "@/view/viewManager";
+import { ViewManager } from "@/common/viewManager";
 import { DatabaseCache } from "../common/databaseCache";
 import { ConnectionManager } from "../connectionManager";
 import { QueryUnit } from "../queryUnit";

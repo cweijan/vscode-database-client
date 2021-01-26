@@ -5,7 +5,7 @@ import { FileManager, FileModel } from "../../common/filesManager";
 import { Global } from "../../common/global";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { ViewManager } from "../../view/viewManager";
+import { ViewManager } from "../../common/viewManager";
 import { Node } from "../interface/node";
 
 export class DiagramNode extends Node {

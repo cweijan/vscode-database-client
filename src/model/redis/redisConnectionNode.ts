@@ -2,7 +2,7 @@ import { Constants, ModelType } from "@/common/constants";
 import { Util } from "@/common/util";
 import { CommandKey, Node } from "@/model/interface/node";
 import { NodeUtil } from "@/model/nodeUtil";
-import { ViewManager } from "@/view/viewManager";
+import { ViewManager } from "@/common/viewManager";
 import * as path from "path";
 import { promisify } from "util";
 import * as vscode from "vscode";

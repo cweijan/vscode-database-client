@@ -1,7 +1,7 @@
 import { NodeUtil } from "@/model/nodeUtil";
 import { Global } from "../../common/global";
 import { Node } from "../../model/interface/node";
-import { ViewManager } from "../viewManager";
+import { ViewManager } from "../../common/viewManager";
 
 export class OverviewService {
 

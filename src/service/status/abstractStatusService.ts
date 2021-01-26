@@ -1,6 +1,6 @@
 import { StatusService } from "./statusService";
 import { ConnectionNode } from "../../model/database/connectionNode";
-import { ViewManager } from "../viewManager";
+import { ViewManager } from "../../common/viewManager";
 import { Global } from "../../common/global";
 import { ConnectionManager } from "@/service/connectionManager";
 import { Console } from "@/common/Console";

@@ -1,6 +1,6 @@
 import { ConnectionNode } from "../../model/database/connectionNode";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { ViewManager } from "../viewManager";
+import { ViewManager } from "../../common/viewManager";
 import { Node } from "../../model/interface/node";
 import { NodeUtil } from "../../model/nodeUtil";
 import { Util } from "../../common/util";

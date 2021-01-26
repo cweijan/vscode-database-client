@@ -1,7 +1,7 @@
 import { CommandKey, Constants, ModelType, RedisType } from "@/common/constants";
 import { Global } from "@/common/global";
 import { Node } from "@/model/interface/node";
-import { ViewManager } from "@/view/viewManager";
+import { ViewManager } from "@/common/viewManager";
 import * as path from "path";
 import { promisify } from "util";
 import * as vscode from "vscode";
