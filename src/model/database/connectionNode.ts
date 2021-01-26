@@ -109,9 +109,7 @@ export class ConnectionNode extends Node implements CopyAble {
             dbName = await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" })
         }
         if (dbName) {
-            await ConnectionManager.getConnection({
-                ...this, database: dbName
-            } as Node, true);
+            ConnectionManager.changeActive(this)
         }
 
     }

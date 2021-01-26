@@ -16,7 +16,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public _onDidChangeTreeData: vscode.EventEmitter<Node> = new vscode.EventEmitter<Node>();
     public readonly onDidChangeTreeData: vscode.Event<Node> = this._onDidChangeTreeData.event;
-    private static instances: DbTreeDataProvider[] = []
+    public static instances: DbTreeDataProvider[] = []
 
     constructor(protected context: vscode.ExtensionContext, public readonly connectionKey: string) {
         DbTreeDataProvider.instances.push(this)
@@ -87,7 +87,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     }
 
 
-    public reload(element?:Node){
+    public reload(element?: Node) {
         this._onDidChangeTreeData.fire(element);
     }
 
@@ -122,7 +122,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         let node: Node;
         if (connectInfo.dbType == DatabaseType.ES) {
             node = new EsConnectionNode(key, connectInfo);
-        }else if (connectInfo.dbType == DatabaseType.REDIS) {
+        } else if (connectInfo.dbType == DatabaseType.REDIS) {
             node = new RedisConnectionNode(key, connectInfo)
         } else {
             node = new ConnectionNode(key, connectInfo)
@@ -151,7 +151,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
             vscode.window.showQuickPick(dbIdList).then(async (dbId) => {
                 if (dbId) {
                     const dbNode = dbIdMap.get(dbId);
-                    await ConnectionManager.getConnection(dbNode, true)
+                    ConnectionManager.changeActive(dbNode)
                     vscode.window.showInformationMessage(`Change active database to ${dbNode.database} success!`)
                 }
 

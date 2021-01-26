@@ -13,6 +13,7 @@ types.setTypeParser(114, (val) => val)
  */
 export class PostgreSqlConnection implements IConnection {
     private client: Client;
+    private dead: boolean;
     constructor(opt: Node) {
         const config = {
             host: opt.host, port: opt.port,
@@ -26,7 +27,7 @@ export class PostgreSqlConnection implements IConnection {
     }
     isAlive(): boolean {
         const temp = this.client as any;
-        return temp._connected && !temp._ending && temp._queryable;
+        return !this.dead && temp._connected && !temp._ending && temp._queryable;
     }
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
@@ -73,6 +74,7 @@ export class PostgreSqlConnection implements IConnection {
         await this.client.query("COMMIT")
     }
     end(): void {
+        this.dead = true;
         this.client.end()
     }
 

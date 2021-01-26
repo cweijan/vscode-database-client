@@ -34,7 +34,7 @@ export default class KeyNode extends RedisBaseNode {
     public async delete() {
         const client = await this.getClient();
         await promisify(client.del).bind(client)(this.label)
-        vscode.commands.executeCommand(CommandKey.Refresh)
+        this.provider.reload()
     }
 
 

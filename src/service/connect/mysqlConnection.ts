@@ -5,6 +5,7 @@ import { IConnection, queryCallback } from "./connection";
 
 export class MysqlConnection implements IConnection {
     private con: mysql.Connection;
+    private dead:boolean;
     constructor(node: Node) {
         const newConnectionOptions = {
             host: node.host, port: node.port, user: node.user, password: node.password, database: node.database,
@@ -28,7 +29,7 @@ export class MysqlConnection implements IConnection {
         this.con = mysql.createConnection(newConnectionOptions);
     }
     isAlive(): boolean {
-        return this.con.state == 'authenticated' || this.con.authorized
+        return !this.dead && (this.con.state == 'authenticated' || this.con.authorized)
     }
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
@@ -48,6 +49,7 @@ export class MysqlConnection implements IConnection {
         this.con.commit()
     }
     end(): void {
+        this.dead=true;
         this.con.end()
     }
 

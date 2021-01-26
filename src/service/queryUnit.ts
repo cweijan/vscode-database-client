@@ -75,7 +75,7 @@ export class QueryUnit {
 
         const executeTime = new Date().getTime();
         try {
-            (await ConnectionManager.getConnection(connectionNode, true)).query(sql, (err: Error, data, fields, total) => {
+            (await ConnectionManager.getConnection(connectionNode)).query(sql, (err: Error, data, fields, total) => {
                 if (err) {
                     QueryPage.send({ connection: connectionNode, type: MessageType.ERROR, res: { sql, message: err.message } as ErrorResponse });
                     return;
@@ -86,7 +86,7 @@ export class QueryUnit {
                 }
                 if (data.affectedRows) {
                     QueryPage.send({ connection: connectionNode, type: MessageType.DML, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
-                    vscode.commands.executeCommand(CommandKey.Refresh);
+                    // vscode.commands.executeCommand(CommandKey.Refresh);
                     return;
                 }
 

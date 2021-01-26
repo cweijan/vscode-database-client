@@ -13,13 +13,13 @@ import { create, IConnection } from "./connect/connection";
 interface ConnectionWrapper {
     connection: IConnection;
     ssh: SSHConfig;
-    createTime: Date
+    database?: string
 }
 
 export class ConnectionManager {
 
-    private static lastConnectionNode: Node;
-    private static activeConnection: { [key: string]: ConnectionWrapper } = {};
+    private static activeNode: Node;
+    private static alivedConnection: { [key: string]: ConnectionWrapper } = {};
     private static tunnelService = new SSHTunnelService();
 
     public static getLastConnectionOption(checkActiveFile = true): Node {
@@ -29,7 +29,7 @@ export class ConnectionManager {
             if (fileNode) { return fileNode }
         }
 
-        const node = this.lastConnectionNode;
+        const node = this.activeNode;
         if (node == null) {
             // ConnectionManager.checkConnection();
         }
@@ -38,24 +38,30 @@ export class ConnectionManager {
     }
 
     public static getActiveConnectByKey(key: string): ConnectionWrapper {
-        return this.activeConnection[key]
+        return this.alivedConnection[key]
     }
 
     public static removeConnection(uid: string) {
 
-        const lcp = this.lastConnectionNode;
+        const lcp = this.activeNode;
         if (lcp?.getConnectId() == uid) {
-            delete this.lastConnectionNode
+            delete this.activeNode
         }
-        const activeConnect = this.activeConnection[uid];
+        const activeConnect = this.alivedConnection[uid];
         if (activeConnect) {
-            this.end(uid,activeConnect)
+            this.end(uid, activeConnect)
         }
         DatabaseCache.clearDatabaseCache(uid)
 
     }
 
-    public static getConnection(connectionNode: Node, changeActive: boolean = false,connectCount:number=1): Promise<IConnection> {
+    public static changeActive(connectionNode: Node) {
+        this.activeNode = connectionNode;
+        Global.updateStatusBarItems(connectionNode);
+        DbTreeDataProvider.refresh()
+    }
+
+    public static getConnection(connectionNode: Node, connectCount: number = 1): Promise<IConnection> {
         if (!connectionNode) {
             this.checkConnection()
             throw new Error("No MySQL Server or Database selected!")
@@ -63,23 +69,16 @@ export class ConnectionManager {
         return new Promise(async (resolve, reject) => {
 
             NodeUtil.of(connectionNode)
-            if (changeActive) {
-                this.lastConnectionNode = connectionNode;
-                Global.updateStatusBarItems(connectionNode);
-                setTimeout(() => {
-                    // TODO, 这里导致缓存失效
-                    DbTreeDataProvider.refresh()
-                }, 100);
-            }
             const key = connectionNode.getConnectId({ withDb: true });
-            const connection = this.activeConnection[key];
-            if (connection ) {
-                if(connection.connection.isAlive()){
+            const connection = this.alivedConnection[key];
+            if (connection) {
+                if (connection.connection.isAlive() && connection.database != connectionNode.database) {
                     const sql = connectionNode?.dialect?.pingDataBase(connectionNode.database);
                     try {
-                        if(sql){
+                        if (sql) {
                             await QueryUnit.queryPromise(connection.connection, sql, false)
                         }
+                        connection.database = connectionNode.database
                         resolve(connection.connection);
                         return;
                     } catch (err) {
@@ -93,7 +92,7 @@ export class ConnectionManager {
             if (connectOption.usingSSH) {
                 connectOption = await this.tunnelService.createTunnel(connectOption, (err) => {
                     if (err.errno == 'EADDRINUSE') { return; }
-                    this.activeConnection[key] = null
+                    this.alivedConnection[key] = null
                 })
                 if (!connectOption) {
                     reject("create ssh tunnel fail!");
@@ -101,23 +100,20 @@ export class ConnectionManager {
                 }
             }
             const newConnection = create(connectOption);
-            this.activeConnection[key] = { connection: newConnection, ssh, createTime: new Date() };
+            this.alivedConnection[key] = { connection: newConnection, ssh, database: connectionNode.database };
             newConnection.connect(async (err: Error) => {
                 if (err) {
-                    this.end(key,this.activeConnection[key])
-                    if(connectCount>=2){
+                    this.end(key, this.alivedConnection[key])
+                    if (connectCount >= 2) {
                         reject(err)
-                    }else{
+                    } else {
                         try {
-                            resolve(await this.getConnection(connectionNode,changeActive,connectCount+1))
+                            resolve(await this.getConnection(connectionNode, connectCount + 1))
                         } catch (error) {
                             reject(error)
                         }
                     }
                 } else {
-                    if (changeActive) {
-                        this.lastConnectionNode = NodeUtil.of(connectionNode);
-                    }
                     resolve(newConnection);
                 }
             });
@@ -127,7 +123,7 @@ export class ConnectionManager {
     }
 
     private static end(key: string, connection: ConnectionWrapper) {
-        this.activeConnection[key] = null
+        this.alivedConnection[key] = null
         try {
             this.tunnelService.closeTunnel(key)
             connection.connection.end();

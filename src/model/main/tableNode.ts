@@ -118,8 +118,6 @@ export class TableNode extends Node implements CopyAble {
         const executeAndRefresh = async (sql: string, handler: Hanlder) => {
             try {
                 await this.execute(sql)
-                await this.refresh()
-                await this.parent.refresh()
                 handler.emit("success")
             } catch (error) {
                 handler.emit("error", error.message)
@@ -146,15 +144,21 @@ export class TableNode extends Node implements CopyAble {
                 }).on("updateTable", async ({ newTableName, newComment }) => {
                     const sql = this.dialect.updateTable({ table: this.table, newTableName, comment: this.comment, newComment });
                     await executeAndRefresh(sql, handler)
-                    this.table=newTableName
-                }).on("updateColumn",async (updateColumnParam)=>{
+                    DatabaseCache.setChildListOfDatabase(this.parent.uid, null);
+                    this.provider.reload(this.parent)
+                }).on("updateColumn", async (updateColumnParam) => {
                     const sql = this.dialect.updateColumnSql(updateColumnParam);
                     await executeAndRefresh(sql, handler)
+                    DatabaseCache.setColumnListOfTable(this.uid, null);
+                    this.provider.reload(this.parent)
                 }).on("dropIndex", async indexName => {
                     const sql = this.dialect.dropIndex(this.table, indexName);
                     await executeAndRefresh(sql, handler)
                 }).on("execute", async sql => {
                     await executeAndRefresh(sql, handler)
+                    DatabaseCache.setColumnListOfTable(this.uid, null);
+                    DatabaseCache.setChildListOfDatabase(this.parent.uid, null);
+                    this.provider.reload(this.parent)
                 }).on("createIndex", async ({ column, type, indexType }) => {
                     const sql = this.dialect.createIndex({ column, type, indexType, table: this.wrap(this.table) });
                     await executeAndRefresh(sql, handler)
@@ -169,6 +173,7 @@ export class TableNode extends Node implements CopyAble {
         const sql = this.dialect.buildPageSql(this.wrap(this.database), this.wrap(this.table), pageSize);
 
         const connection = await ConnectionManager.getConnection(this);
+        ConnectionManager.changeActive(this)
         const executeTime = new Date().getTime();
         connection.query(sql, (err: Error, data, fields) => {
             const costTime = new Date().getTime() - executeTime;
@@ -185,6 +190,7 @@ export class TableNode extends Node implements CopyAble {
         const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
         const sql = this.dialect.buildPageSql(this.wrap(this.database), this.wrap(this.table), pageSize);
         QueryUnit.runQuery(sql, this);
+        ConnectionManager.changeActive(this)
     }
 
     public insertSqlTemplate(show: boolean = true): Promise<string> {

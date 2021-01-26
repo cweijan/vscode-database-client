@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.onDidChangeActiveTextEditor((e) => {
             const fileNode = ConnectionManager.getByActiveFile()
             if (fileNode) {
-                ConnectionManager.getConnection(fileNode, this)
+                ConnectionManager.changeActive(fileNode)
             }
         }),
 
@@ -63,7 +63,9 @@ export function activate(context: vscode.ExtensionContext) {
                         await node.getChildren(true)
                         DbTreeDataProvider.refresh(node)
                     } else {
-                        serviceManager.provider.init();
+                        for (const instance of DbTreeDataProvider.instances) {
+                            instance.init()
+                        }
                     }
                 },
                 [CommandKey.RecordHistory]: (sql: string, costTime: number) => {
