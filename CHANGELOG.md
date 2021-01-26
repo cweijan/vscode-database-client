@@ -1,6 +1,6 @@
 # CHANGELOG
 
-# 3.3.0 Preview
+# 3.3.0 2020-1-26
 
 - Support close connection.
 - Add snippet to sql editor.
