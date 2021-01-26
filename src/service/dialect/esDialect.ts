@@ -1,3 +1,4 @@
+import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
 export class EsDialect extends SqlDialect{
@@ -58,7 +59,7 @@ export class EsDialect extends SqlDialect{
     truncateDatabase(database: string): string {
         return "";
     }
-    renameTable(database: string, tableName: string, newName: string): string {
+    updateTable(update: UpdateTableParam): string {
         return "";
     }
     showTableSource(database: string, table: string): string {

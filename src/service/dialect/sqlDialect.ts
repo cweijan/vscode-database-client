@@ -1,3 +1,4 @@
+import { UpdateTableParam } from "./param/updateTableParam";
 
 /**
  * TODO
@@ -24,7 +25,7 @@ export abstract class SqlDialect {
     abstract countSql(database: string, table: string): string;
     abstract createDatabase(database: string): string;
     abstract truncateDatabase(database: string): string;
-    abstract renameTable(database: string, tableName: string, newName: string): string;
+    abstract updateTable(update: UpdateTableParam): string;
     abstract showTableSource(database: string, table: string): string;
     abstract showViewSource(database: string, table: string): string;
     abstract showProcedureSource(database: string, name: string): string;

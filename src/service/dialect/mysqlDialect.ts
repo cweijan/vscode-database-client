@@ -1,6 +1,7 @@
+import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
-export class MysqlDialect extends SqlDialect{
+export class MysqlDialect extends SqlDialect {
     showIndex(database: string, table: string): string {
         return `SELECT column_name,index_name,non_unique,index_type FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${database}' and table_name='${table}';`
     }
@@ -13,7 +14,7 @@ export class MysqlDialect extends SqlDialect{
     processList(): string {
         return 'show processlist'
     }
-    addColumn( table: string): string {
+    addColumn(table: string): string {
         return `ALTER TABLE
         ${table} 
     ADD 
@@ -25,7 +26,7 @@ export class MysqlDialect extends SqlDialect{
     showSystemViews(database: string): string {
         throw new Error("Method not implemented.");
     }
-    updateColumn( table: string, column: string, type: string, comment: string, nullable: string): string {
+    updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
         const defaultDefinition = nullable == "YES" ? "" : " NOT NULL";
         comment = comment ? ` comment '${comment}'` : "";
         return `ALTER TABLE\n\t${table} CHANGE ${column} ${column} ${type}${defaultDefinition}${comment};`;
@@ -34,14 +35,22 @@ export class MysqlDialect extends SqlDialect{
         return `SELECT concat(user,'@',host) user FROM mysql.user;`;
     }
     pingDataBase(database: string): string {
-        if(!database){
+        if (!database) {
             // mysql not using connection poll, so need ping connnection active.
             return "select 1";
         }
         return `use \`${database}\``;
     }
-    renameTable(database: string, tableName: string, newName: string): string {
-        return `RENAME TABLE \`${database}\`.\`${tableName}\` to \`${database}\`.\`${newName}\``;
+    updateTable(update: UpdateTableParam): string {
+        const { table, newTableName, comment, newComment } = update
+        let sql = "";
+        if (newComment && newComment != comment) {
+            sql = `ALTER TABLE ${table} COMMENT = '${newComment}';`;
+        }
+        if (newTableName && table != newTableName) {
+            sql += `ALTER TABLE ${table} RENAME TO ${newTableName};`
+        }
+        return sql;
     }
     truncateDatabase(database: string): string {
         return `SELECT Concat('TRUNCATE TABLE \`',table_schema,'\`.\`',TABLE_NAME, '\`;') trun FROM INFORMATION_SCHEMA.TABLES where  table_schema ='${database}' and TABLE_TYPE<>'VIEW';`
@@ -64,7 +73,7 @@ export class MysqlDialect extends SqlDialect{
     showTriggerSource(database: string, name: string): string {
         return `SHOW CREATE TRIGGER \`${database}\`.\`${name}\``;
     }
-    showColumns(database: string,table:string): string {
+    showColumns(database: string, table: string): string {
         return `SELECT COLUMN_NAME name,DATA_TYPE simpleType,COLUMN_TYPE type,COLUMN_COMMENT comment,COLUMN_KEY \`key\`,IS_NULLABLE nullable,CHARACTER_MAXIMUM_LENGTH maxLength,COLUMN_DEFAULT defaultValue,EXTRA extra FROM information_schema.columns WHERE table_schema = '${database}' AND table_name = '${table}' ORDER BY ORDINAL_POSITION;`;
     }
     showTriggers(database: string): string {
@@ -79,8 +88,8 @@ export class MysqlDialect extends SqlDialect{
     showViews(database: string): string {
         return `SELECT TABLE_NAME name FROM information_schema.VIEWS  WHERE TABLE_SCHEMA = '${database}'`;
     }
-    buildPageSql(database: string, table: string, pageSize: number):string {
-        return  `SELECT * FROM ${table} LIMIT ${pageSize};`;
+    buildPageSql(database: string, table: string, pageSize: number): string {
+        return `SELECT * FROM ${table} LIMIT ${pageSize};`;
     }
     countSql(database: string, table: string): string {
         return `SELECT count(*) FROM ${table};`;

@@ -1,4 +1,5 @@
 import { window } from "vscode";
+import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect extends SqlDialect {
@@ -33,8 +34,9 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
     showUsers(): string {
         return `SELECT name [user] from sys.database_principals where type='S'`
     }
-    renameTable(database: string, tableName: string, newName: string): string {
-        return `sp_rename '${tableName}', '${newName}'`;
+    updateTable(update: UpdateTableParam):string{
+        const {database,table,newTableName}=update
+        return `sp_rename '${table}', '${newTableName}'`;
     }
     truncateDatabase(database: string): string {
         return `SELECT Concat('TRUNCATE TABLE [',table_schema,'].[',TABLE_NAME, '];') trun FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_CATALOG='${database}'`

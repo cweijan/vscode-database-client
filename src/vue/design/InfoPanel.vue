@@ -4,9 +4,9 @@
       <el-form-item label="Table">
         <el-input v-model="table.name"></el-input>
       </el-form-item>
-      <!-- <el-form-item label="Comment">
+      <el-form-item label="Comment">
         <el-input v-model="table.comment"></el-input>
-      </el-form-item> -->
+      </el-form-item>
       <el-button @click="rename">Update</el-button>
     </el-form>
   </div>
@@ -47,7 +47,10 @@ export default {
   },
   methods: {
     rename() {
-      this.emit("rename", this.table.name);
+      this.emit("updateTable", {
+        newTableName: this.table.name,
+        newComment: this.table.comment,
+      });
     },
     createIndex() {
       this.index.loading = true;

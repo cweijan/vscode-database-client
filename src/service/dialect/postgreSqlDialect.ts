@@ -1,6 +1,7 @@
+import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
-export class PostgreSqlDialect extends SqlDialect{
+export class PostgreSqlDialect extends SqlDialect {
     showIndex(database: string, table: string): string {
         throw new Error("Method not implemented.");
     }
@@ -23,7 +24,7 @@ export class PostgreSqlDialect extends SqlDialect{
         return `CREATE USER [name] WITH PASSWORD 'password'`
     }
     updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
-        const defaultDefinition = nullable == "YES" ? "DROP NOT NULL":"SET NOT NULL" ;
+        const defaultDefinition = nullable == "YES" ? "DROP NOT NULL" : "SET NOT NULL";
         comment = comment ? ` comment '${comment}'` : "";
         return `ALTER TABLE ${table} RENAME ${column} TO [newName]; -- update column name
 ALTER TABLE ${table} ALTER COLUMN ${column} TYPE ${type}; -- update column type
@@ -32,8 +33,9 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
     showUsers(): string {
         return `SELECT usename "user" from pg_user `;
     }
-    renameTable(database: string, tableName: string, newName: string): string {
-        return `RENAME TABLE "${database}"."${tableName}" to "${database}"."${newName}"`;
+    updateTable(update: UpdateTableParam): string {
+        const {database,table,newTableName}=update
+        return `RENAME TABLE "${database}"."${table}" to "${database}"."${newTableName}"`;
     }
     truncateDatabase(database: string): string {
         return `SELECT Concat('TRUNCATE TABLE "',TABLE_NAME, '";') trun FROM INFORMATION_SCHEMA.TABLES WHERE  table_schema ='public' AND table_type='BASE TABLE';`
@@ -45,7 +47,7 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
         return `SHOW CREATE TABLE "${database}"."${table}"`
     }
     showViewSource(database: string, table: string): string {
-        return `SELECT CONCAT('CREATE VIEW ',table_name,'\nAS\n(',view_definition,');') "Create View",table_name,view_definition from information_schema.views where table_name='${table}';` 
+        return `SELECT CONCAT('CREATE VIEW ',table_name,'\nAS\n(',view_definition,');') "Create View",table_name,view_definition from information_schema.views where table_name='${table}';`
     }
     showProcedureSource(database: string, name: string): string {
         return `select pg_get_functiondef('${name}' :: regproc) "Create Procedure"`;
@@ -56,7 +58,7 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
     showTriggerSource(database: string, name: string): string {
         return `select pg_get_triggerdef(oid) "SQL Original Statement" from pg_trigger where tgname = '${name}';`;
     }
-    showColumns(database: string,table:string): string {
+    showColumns(database: string, table: string): string {
         const view = table.split('.')[1];
         return `SELECT c.COLUMN_NAME "name", DATA_TYPE "simpleType", DATA_TYPE "type", IS_NULLABLE nullable, CHARACTER_MAXIMUM_LENGTH "maxLength", COLUMN_DEFAULT "defaultValue", '' "comment", tc.constraint_type "key" FROM
         information_schema.columns c
@@ -64,7 +66,7 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
         on c.COLUMN_NAME=ccu.column_name and c.table_name=ccu.table_name and ccu.table_catalog=c.TABLE_CATALOG
         left join  information_schema.table_constraints tc
         on tc.constraint_name=ccu.constraint_name
-        and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name WHERE c.TABLE_CATALOG = '${database}' AND c.table_name = '${view?view:table}' ORDER BY ORDINAL_POSITION;`;
+        and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name WHERE c.TABLE_CATALOG = '${database}' AND c.table_name = '${view ? view : table}' ORDER BY ORDINAL_POSITION;`;
     }
     showTriggers(database: string): string {
         return `SELECT TRIGGER_NAME "TRIGGER_NAME" FROM information_schema.TRIGGERS WHERE trigger_catalog = '${database}'`;
@@ -81,8 +83,8 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
     showSystemViews(database: string): string {
         return `select CONCAT(table_schema,'.',table_name) "name" from information_schema.tables where table_schema!='public' and table_type='VIEW';`
     }
-    buildPageSql(database: string, table: string, pageSize: number):string {
-        return  `SELECT * FROM ${table} LIMIT ${pageSize};`;
+    buildPageSql(database: string, table: string, pageSize: number): string {
+        return `SELECT * FROM ${table} LIMIT ${pageSize};`;
     }
     countSql(database: string, table: string): string {
         return `SELECT count(*) FROM ${table};`;
@@ -130,7 +132,7 @@ ON [table]
 FOR EACH ROW
 EXECUTE PROCEDURE [tri_fun]();`
     }
-    dropTriggerTemplate(name:string){
+    dropTriggerTemplate(name: string) {
         return `DROP TRIGGER ${name} on [table_name]`;
     }
     functionTemplate(): string {
