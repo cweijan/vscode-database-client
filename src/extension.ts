@@ -244,23 +244,14 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // template
             ...{
-                "mysql.template.sql": (tableNode: TableNode, run: boolean) => {
-                    tableNode.selectSqlTemplate(run);
+                "mysql.table.find": (tableNode: TableNode) => {
+                    tableNode.openTable();
                 },
                 "mysql.codeLens.run": (sql:string) => {
                     QueryUnit.runQuery(sql)
                 },
                 "mysql.table.design": (tableNode: TableNode) => {
                     tableNode.designTable();
-                },
-                "mysql.template.delete": (tableNode: TableNode) => {
-                    tableNode.deleteSqlTemplate();
-                },
-                "mysql.copy.insert": (tableNode: TableNode) => {
-                    tableNode.insertSqlTemplate();
-                },
-                "mysql.copy.update": (tableNode: TableNode) => {
-                    tableNode.updateSqlTemplate();
                 },
             },
             // show source

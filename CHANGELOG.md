@@ -3,11 +3,12 @@
 # 3.3.0 Preview
 
 - Support close connection.
-- Add `sel` snippet.
+- Add snippet to sql editor.
 - compatible with old vscode version.
 - Fix code len detect comment as sql.
 - Add context menu to result view.
 - Add more chinese content.
+- Init design table.
 
 # 3.2.2 2020/1/25
 

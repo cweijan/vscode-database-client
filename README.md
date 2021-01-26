@@ -45,7 +45,11 @@ In the Database Explorer panel, click the `Open Query` button.
 
 ![newquery](images/newquery.jpg)
 
-Now you can edit and run SQL query within the editor.
+That will open a sql editor bind of database, it provider:
+
+1. IntelliSense sql edit.
+2. snippets: `sel、del、ins、upd、joi`...
+3. run sql.
 
 ![run](images/run.jpg)
 

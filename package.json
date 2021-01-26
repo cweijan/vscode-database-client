@@ -235,11 +235,6 @@
 				}
 			},
 			{
-				"command": "mysql.template.sql",
-				"title": "%command.template.sql%",
-				"category": "MySQL"
-			},
-			{
 				"command": "mysql.data.import",
 				"title": "%command.data.import%",
 				"category": "MySQL"
@@ -734,11 +729,6 @@
 					"command": "mysql.struct.export",
 					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|view)$/",
 					"group": "1_inline1@3"
-				},
-				{
-					"command": "mysql.template.sql",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
-					"group": "1_mysql@0"
 				},
 				{
 					"command": "mysql.table.truncate",

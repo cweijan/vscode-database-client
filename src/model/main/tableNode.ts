@@ -28,7 +28,7 @@ export class TableNode extends Node implements CopyAble {
         this.init(parent)
         this.cacheSelf()
         this.command = {
-            command: "mysql.template.sql",
+            command: "mysql.table.find",
             title: "Run Select Statement",
             arguments: [this, true],
         }
@@ -169,16 +169,10 @@ export class TableNode extends Node implements CopyAble {
         QueryUnit.runQuery(this.dialect.countSql(this.wrap(this.database), this.wrap(this.table)), this);
     }
 
-    public async selectSqlTemplate(run: boolean) {
+    public async openTable() {
         const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
         const sql = this.dialect.buildPageSql(this.wrap(this.database), this.wrap(this.table), pageSize);
-
-        if (run) {
-            QueryUnit.runQuery(sql, this);
-        } else {
-            QueryUnit.showSQLTextDocument(this, sql, Template.table);
-        }
-
+        QueryUnit.runQuery(sql, this);
     }
 
     public insertSqlTemplate(show: boolean = true): Promise<string> {
