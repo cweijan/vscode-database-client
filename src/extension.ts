@@ -89,7 +89,7 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.connection.edit": (connectionNode: ConnectionNode) => {
                     serviceManager.connectService.openConnect(connectionNode.provider, connectionNode)
                 },
-                "mysql.connection.open":(connectionNode: ConnectionNode)=>{
+                "mysql.connection.open": (connectionNode: ConnectionNode) => {
                     connectionNode.provider.openConnection(connectionNode)
                 },
                 "mysql.connection.disable": (connectionNode: ConnectionNode) => {
@@ -104,7 +104,7 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // externel data
             ...{
-                "mysql.struct.diff":()=>{
+                "mysql.struct.diff": () => {
                     new DiffService().startDiff(serviceManager.provider);
                 },
                 "mysql.data.export": (node: DatabaseNode | TableNode) => {
@@ -182,7 +182,9 @@ export function activate(context: vscode.ExtensionContext) {
                     if (databaseOrConnectionNode) {
                         await databaseOrConnectionNode.newQuery();
                     } else {
-                        FileManager.show(`sql/${new Date().getTime()}.sql`)
+                        vscode.workspace.openTextDocument({ language: 'sql' }).then(async (doc) => {
+                            vscode.window.showTextDocument(doc)
+                        });
                     }
                 },
                 "mysql.query.open": (queryNode: QueryNode) => {
@@ -246,7 +248,7 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.table.find": (tableNode: TableNode) => {
                     tableNode.openTable();
                 },
-                "mysql.codeLens.run": (sql:string) => {
+                "mysql.codeLens.run": (sql: string) => {
                     QueryUnit.runQuery(sql)
                 },
                 "mysql.table.design": (tableNode: TableNode) => {

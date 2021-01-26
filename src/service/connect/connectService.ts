@@ -58,11 +58,7 @@ export class ConnectService {
     }
 
     public async connect(connectionNode: Node): Promise<void> {
-        const connectId = connectionNode.getConnectId();
-        const connection = ConnectionManager.getActiveConnectByKey(connectId)
-        if (connection) {
-            ConnectionManager.removeConnection(connectId)
-        }
+        ConnectionManager.removeConnection(connectionNode.getConnectId())
         await ConnectionManager.getConnection(connectionNode)
     }
 

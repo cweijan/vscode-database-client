@@ -134,7 +134,7 @@ export class ConnectionManager {
     public static getByActiveFile(): Node {
         if (vscode.window.activeTextEditor) {
             const fileName = vscode.window.activeTextEditor.document.fileName;
-            if (fileName.includes('cweijan.vscode-mysql-client2')) {
+            if (fileName.includes('cweijan')) {
                 const queryName = path.basename(fileName, path.extname(fileName))
                 const filePattern = queryName.replace(/#.+$/, '').split('_');
                 const [mode, host, port, user] = filePattern

@@ -98,10 +98,13 @@ export class ConnectionNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        const key = `${this.getConnectId()}`;
-        await FileManager.show(`${key}.sql`);
-        const dbNameList = DatabaseCache.getDatabaseListOfConnection(key).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => databaseNode.database);
-        let dbName;
+        await FileManager.show(`${new Date().getTime()}.sql`);
+        let childMap={};
+        const dbNameList = (await this.getChildren()).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => {
+            childMap[databaseNode.uid]=databaseNode
+            return databaseNode.database
+        });
+        let dbName:string;
         if (dbNameList.length == 1) {
             dbName = dbNameList[0]
         }
@@ -109,7 +112,7 @@ export class ConnectionNode extends Node implements CopyAble {
             dbName = await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" })
         }
         if (dbName) {
-            ConnectionManager.changeActive(this)
+            ConnectionManager.changeActive(childMap[`${this.getConnectId()}_${dbName}`])
         }
 
     }
