@@ -1,8 +1,12 @@
 import { window } from "vscode";
+import { CreateIndexParam } from "./param/createIndexParam";
 import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
 export class MssqlDIalect extends SqlDialect {
+    createIndex(createIndexParam:CreateIndexParam): string{
+        return `ALTER TABLE ${createIndexParam.table} ADD ${createIndexParam.type} (${createIndexParam.column})`;
+    }
     showIndex(database: string, table: string): string {
         throw new Error("Method not implemented.");
     }

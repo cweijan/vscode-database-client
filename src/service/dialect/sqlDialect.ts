@@ -1,3 +1,4 @@
+import { CreateIndexParam } from "./param/createIndexParam";
 import { UpdateTableParam } from "./param/updateTableParam";
 
 /**
@@ -6,9 +7,9 @@ import { UpdateTableParam } from "./param/updateTableParam";
  * 2. 增加system view节点
  */
 export abstract class SqlDialect {
-    showIndex(database: string, table: string): string {
-        return null;
-    }
+
+    showIndex(database: string, table: string): string { return null; }
+    createIndex(createIndexParam:CreateIndexParam): string { return null };
     abstract updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string;
     abstract showDatabases(): string;
     abstract showTables(database: string): string;

@@ -1,7 +1,11 @@
+import { CreateIndexParam } from "./param/createIndexParam";
 import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
 export class MysqlDialect extends SqlDialect {
+    createIndex(createIndexParam:CreateIndexParam): string{
+        return `ALTER TABLE ${createIndexParam.table} ADD ${createIndexParam.type} (${createIndexParam.column})`;
+    }
     showIndex(database: string, table: string): string {
         return `SELECT column_name,index_name,non_unique,index_type FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${database}' and table_name='${table}';`
     }

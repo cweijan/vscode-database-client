@@ -1,4 +1,5 @@
-import { ViewManager } from "@/common/viewManager";
+import { Hanlder, ViewManager } from "@/common/viewManager";
+import { HistoryRecorder } from "@/service/common/historyRecorder";
 import * as path from "path";
 import * as vscode from "vscode";
 import { ConfigKey, Constants, DatabaseType, MessageType, ModelType, Template } from "../../common/constants";
@@ -110,7 +111,21 @@ export class TableNode extends Node implements CopyAble {
 
     }
 
+
+
     public designTable() {
+
+        const executeAndRefresh=async(sql: string, handler: Hanlder)=>{
+            try {
+                await this.execute(sql)
+                await this.refresh()
+                await this.parent.refresh()
+                handler.emit("success")
+            } catch (error) {
+                handler.emit("error", error.message)
+            }
+        }
+
         ViewManager.createWebviewPanel({
             path: "app", title: "Design Table(Preview)",
             splitView: false, iconPath: Global.getExtPath("resources", "icon", "add.svg"),
@@ -127,25 +142,14 @@ export class TableNode extends Node implements CopyAble {
                         return columnNode.column;
                     });
                     handler.emit('design-data', { indexs: result, table: this.table, comment: this.comment, columnList, primaryKey, dbType: this.dbType })
-                }).on("updateTable", async ({newTableName,newComment}) => {
-                    const sql = this.dialect.updateTable({table:this.table,newTableName,comment:this.comment,newComment});
-                    try {
-                        await this.execute(sql)
-                        await this.refresh()
-                        await this.parent.refresh()
-                        handler.emit("success")
-                    } catch (error) {
-                        handler.emit("error", error.message)
-                    }
+                }).on("updateTable", async ({ newTableName, newComment }) => {
+                    const sql = this.dialect.updateTable({ table: this.table, newTableName, comment: this.comment, newComment });
+                    await executeAndRefresh(sql,handler)
                 }).on("execute", async sql => {
-                    try {
-                        await this.execute(sql)
-                        await this.refresh()
-                        await this.parent.refresh()
-                        handler.emit("success")
-                    } catch (error) {
-                        handler.emit("error", error.message)
-                    }
+                    await executeAndRefresh(sql,handler)
+                }).on("createIndex",async ({column,type,indexType})=>{
+                    const sql = this.dialect.createIndex({column,type,indexType,table:this.wrap(this.table)});
+                    await executeAndRefresh(sql,handler)
                 })
             })
         })

@@ -1,7 +1,12 @@
+import { CreateIndexParam } from "./param/createIndexParam";
 import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
 export class PostgreSqlDialect extends SqlDialect {
+    createIndex(createIndexParam:CreateIndexParam): string{
+        const indexType=createIndexParam.indexType||"btree"
+        return `CREATE INDEX ${createIndexParam.column}_index ON ${createIndexParam.table} USING ${indexType} (${createIndexParam.column});`;
+    }
     showIndex(database: string, table: string): string {
         throw new Error("Method not implemented.");
     }

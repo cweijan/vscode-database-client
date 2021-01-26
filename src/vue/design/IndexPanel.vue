@@ -17,12 +17,12 @@
     <el-dialog :title="'Add Index'" :visible.sync="index.visible" top="3vh" size="mini">
       <el-form :inline='true'>
         <el-form-item label="Column">
-          <el-select v-model="index.column" >
+          <el-select v-model="index.column">
             <el-option :label="column.name" :value="column.name" v-for="column in designData.columnList"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="Index Type">
-          <el-select v-model="index.type" >
+          <el-select v-model="index.type">
             <el-option :label="'UNIQUE'" value="UNIQUE"></el-option>
             <el-option :label="'INDEX'" value="INDEX"></el-option>
             <el-option :label="'PRIMARY KEY'" value="PRIMARY KEY"></el-option>
@@ -44,7 +44,7 @@ export default {
   mixins: [inject],
   data() {
     return {
-      designData: { indexs: [], table: null, dbType: null ,columnList:[]},
+      designData: { indexs: [], table: null, dbType: null, columnList: [] },
       index: {
         visible: false,
         loading: false,
@@ -54,11 +54,10 @@ export default {
     };
   },
   mounted() {
-    this
-      .on("design-data", (data) => {
-        this.designData = data;
-        this.designData.editIndex = [...this.designData.indexs];
-      })
+    this.on("design-data", (data) => {
+      this.designData = data;
+      this.designData.editIndex = [...this.designData.indexs];
+    })
       .on("success", () => {
         this.index.loading = false;
         this.index.visible = false;
@@ -66,20 +65,17 @@ export default {
       })
       .on("error", (msg) => {
         this.$message.error(msg);
-      }).init()
+      })
+      .init();
   },
   methods: {
     createIndex() {
       this.index.loading = true;
-      this.execute(
-        `ALTER TABLE ${wrapByDb(
-          this.designData.table,
-          this.designData.dbType
-        )} ADD ${this.index.type} (${wrapByDb(
-          this.index.column,
-          this.designData.dbType
-        )})`
-      );
+      this.emit("createIndex", {
+        column: this.index.column,
+        type: this.index.type,
+        indexType: this.index.indexType,
+      });
     },
     deleteConfirm(row) {
       this.$confirm("Are you sure you want to delete this index?", "Warning", {
@@ -99,7 +95,7 @@ export default {
       if (!sql) return;
       this.emit("execute", sql);
     },
-  }
+  },
 };
 </script>
 
