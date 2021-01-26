@@ -8,7 +8,21 @@ export class MssqlDIalect extends SqlDialect {
         return `ALTER TABLE ${createIndexParam.table} ADD ${createIndexParam.type} (${createIndexParam.column})`;
     }
     showIndex(database: string, table: string): string {
-        throw new Error("Method not implemented.");
+        return `SELECT
+        index_name = ind.name,
+        column_name = col.name,
+        ind.is_primary_key,
+        ind.is_unique,
+        ind.is_unique_constraint
+      FROM
+        sys.indexes ind
+        INNER JOIN sys.index_columns ic ON ind.object_id = ic.object_id
+        and ind.index_id = ic.index_id
+        INNER JOIN sys.columns col ON ic.object_id = col.object_id
+        and ic.column_id = col.column_id
+        INNER JOIN sys.tables t ON ind.object_id = t.object_id
+      WHERE
+        t.name = '${table.split('.')[1]}';`
     }
     variableList(): string {
         throw new Error("Method not implemented.");

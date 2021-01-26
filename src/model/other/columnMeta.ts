@@ -38,5 +38,7 @@ export interface ColumnMeta {
      * extra info, auto_increment
      */
     extra:any;
+    isAutoIncrement:boolean;
+    isUnique:boolean;
     isPrimary:boolean;
 }

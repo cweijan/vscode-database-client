@@ -18,7 +18,7 @@ export class ColumnNode extends Node implements CopyAble {
         super(column.name)
         this.init(parent)
         this.type = `${this.column.type}`
-        this.description = `${this.column.type} ${this.getIndex(this.column.key)} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"} ${this.column.comment}`
+        this.description = `${this.column.type} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"} ${this.column.comment}`
         if (column && this.isPrimaryKey) {
             MockRunner.primaryKeyMap[this.parent.uid] = column.name
         }
@@ -29,15 +29,21 @@ export class ColumnNode extends Node implements CopyAble {
             title: "Update Column Statement",
             arguments: [this, true],
         }
+        this.buildInfo()
     }
     public copyName(): void {
         Util.copyToBoard(this.column.name)
     }
 
-    private getIndex(columnKey: string) {
+    private buildInfo() {
+        if(this.column.extra=='auto_increment'){
+            this.column.isAutoIncrement=true;
+        }
+        const columnKey: string = this.column.key;
         switch (columnKey) {
             case 'UNI':
             case 'UNIQUE':
+                this.column.isUnique = true;
                 return "UniqueKey";
             case 'MUL': return "IndexKey";
             case 'PRI':

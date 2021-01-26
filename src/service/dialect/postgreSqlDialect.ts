@@ -8,7 +8,7 @@ export class PostgreSqlDialect extends SqlDialect {
         return `CREATE INDEX ${createIndexParam.column}_index ON ${createIndexParam.table} USING ${indexType} (${createIndexParam.column});`;
     }
     showIndex(database: string, table: string): string {
-        throw new Error("Method not implemented.");
+        return `SELECT indexname index_name, indexdef FROM pg_indexes WHERE schemaname = 'public' and tablename='${table}'`
     }
     variableList(): string {
         return 'SHOW ALL'
@@ -39,8 +39,15 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
         return `SELECT usename "user" from pg_user `;
     }
     updateTable(update: UpdateTableParam): string {
-        const {database,table,newTableName}=update
-        return `RENAME TABLE "${database}"."${table}" to "${database}"."${newTableName}"`;
+        const { table, newTableName, comment, newComment } = update
+        let sql = "";
+        if (newComment && newComment != comment) {
+            sql = `COMMENT ON TABLE ${table} IS '${newComment}';`;
+        }
+        if (newTableName && table != newTableName) {
+            sql += `ALTER TABLE ${table} RENAME TO ${newTableName};`
+        }
+        return sql;
     }
     truncateDatabase(database: string): string {
         return `SELECT Concat('TRUNCATE TABLE "',TABLE_NAME, '";') trun FROM INFORMATION_SCHEMA.TABLES WHERE  table_schema ='public' AND table_type='BASE TABLE';`
@@ -95,7 +102,12 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
         return `SELECT count(*) FROM ${table};`;
     }
     showTables(database: string): string {
-        return `select table_name "name" from information_schema.tables where table_schema='public' and table_type='BASE TABLE' ;`
+        return `  SELECT t.table_name "name", pg_catalog.obj_description(pgc.oid, 'pg_class') "comment"
+        FROM information_schema.tables t
+        INNER JOIN pg_catalog.pg_class pgc
+        ON t.table_name = pgc.relname 
+        WHERE t.table_type='BASE TABLE'
+        AND t.table_schema='public';`
     }
     showDatabases(): string {
         return `SELECT datname "Database" FROM pg_database WHERE datistemplate = false;`
@@ -103,8 +115,8 @@ ALTER TABLE ${table} ALTER COLUMN ${column} [SET|Drop] NOT NULL; -- update colum
     tableTemplate(): string {
         return `CREATE TABLE [name](  
     id SERIAL NOT NULL primary key,
-    created_time DATETIME,
-    updated_time DATETIME,
+    created_time DATE,
+    updated_time DATE,
     [column] varchar(255)
 );
 COMMENT ON TABLE [table] IS '[comment'];

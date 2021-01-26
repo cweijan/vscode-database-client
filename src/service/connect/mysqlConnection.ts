@@ -13,11 +13,11 @@ export class MysqlConnection implements IConnection {
             connectTimeout: 5000,
             typeCast: function (field, next) {
                 // if (field.type === 'TINY' && field.length === 1) 
-                if (field.type === 'JSON') {
+                // if (field.type === 'JSON') {
                     return field?.buffer()?.toString();
-                } else {
-                    return next();
-                }
+                // } else {
+                //     return next();
+                // }
             }
         } as mysql.ConnectionConfig;
         if (node.certPath && fs.existsSync(node.certPath)) {

@@ -39,7 +39,7 @@ export default {
       this.designData.editIndex = [...this.designData.indexs];
     })
       .on("success", () => {
-        this.$message.success("Rename success!");
+        this.$message.success("Update success!");
         this.refresh();
       })
       .on("error", (msg) => {
