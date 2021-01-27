@@ -11,6 +11,9 @@ import { NodeUtil } from "@/model/nodeUtil";
 import { InfoNode } from "@/model/other/infoNode";
 import { EsConnectionNode } from "@/model/es/model/esConnectionNode";
 import { RedisConnectionNode } from "@/model/redis/redisConnectionNode";
+import { DiagramGroup } from "@/model/diagram/diagramGroup";
+import { QueryGroup } from "@/model/query/queryGroup";
+import { TriggerGroup } from "@/model/main/triggerGroup";
 
 export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
@@ -20,23 +23,6 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     constructor(protected context: vscode.ExtensionContext, public readonly connectionKey: string) {
         DbTreeDataProvider.instances.push(this)
-    }
-
-    /**
-     * reload treeview context
-     */
-    public async init() {
-        DatabaseCache.clearDatabaseCache()
-        DatabaseCache.clearChildCache()
-        if (Global.getConfig<boolean>(ConfigKey.LOAD_META_ON_CONNECT)) {
-            (await this.getConnectionNodes()).forEach(async (connectionNode) => {
-                (await connectionNode.getChildren(true)).forEach(async (databaseNode) => {
-                    (await databaseNode.getChildren(true)).forEach(async (groupNode) => {
-                    });
-                });
-            })
-        }
-        DbTreeDataProvider.refresh()
     }
 
     public getTreeItem(element: Node): Promise<vscode.TreeItem> | vscode.TreeItem {
@@ -68,10 +54,10 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
         if ((node as any).isGlobal != null) {
             node.context = (node as any).isGlobal === false ? this.context.workspaceState : this.context.globalState
-            await node.indent({ command: CommandKey.delete,cacheKey:this.connectionKey })
+            await node.indent({ command: CommandKey.delete, cacheKey: this.connectionKey })
         }
 
-                node.context = node.global === false ? this.context.workspaceState : this.context.globalState
+        node.context = node.global === false ? this.context.workspaceState : this.context.globalState
         node.indent({ command: CommandKey.add, cacheKey: this.getKeyByNode(node) })
 
     }

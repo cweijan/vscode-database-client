@@ -847,11 +847,6 @@
 					"default": false,
 					"description": "%config.enableDelimiter%"
 				},
-				"vscode-mysql.loadMetaOnConnect": {
-					"type": "boolean",
-					"default": true,
-					"description": "%config.loadMetaOnConnect%"
-				},
 				"vscode-mysql.defaultSelectLimit": {
 					"type": "integer",
 					"default": 100,

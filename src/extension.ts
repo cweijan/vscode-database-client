@@ -36,6 +36,7 @@ import { activeEs } from "./model/es/provider/main";
 import { RedisConnectionNode } from "./model/redis/redisConnectionNode";
 import KeyNode from "./model/redis/keyNode";
 import { DiffService } from "./service/diff/diffService";
+import { DatabaseCache } from "./service/common/databaseCache";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -57,20 +58,18 @@ export function activate(context: vscode.ExtensionContext) {
         ...initCommand({
             // util
             ...{
-                "mysql.history.open": () => serviceManager.historyService.showHistory(),
                 [CommandKey.Refresh]: async (node: Node) => {
                     if (node) {
                         await node.getChildren(true)
-                        DbTreeDataProvider.refresh(node)
                     } else {
-                        for (const instance of DbTreeDataProvider.instances) {
-                            instance.init()
-                        }
+                        DatabaseCache.clearCache()
                     }
+                    DbTreeDataProvider.refresh(node)
                 },
                 [CommandKey.RecordHistory]: (sql: string, costTime: number) => {
                     serviceManager.historyService.recordHistory(sql, costTime);
                 },
+                "mysql.history.open": () => serviceManager.historyService.showHistory(),
                 "mysql.setting.open": () => {
                     serviceManager.settingService.open();
                 },

@@ -1,6 +1,5 @@
-import { Global } from "@/common/global";
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
-import { CacheKey, ConfigKey, ModelType } from "../../common/constants";
+import { CacheKey, ModelType } from "../../common/constants";
 import { DatabaseNode } from "../../model/database/databaseNode";
 import { Node } from "../../model/interface/node";
 
@@ -20,13 +19,9 @@ export class DatabaseCache {
         const contextValue = element.contextValue;
         if (!contextValue || contextValue == ModelType.COLUMN || contextValue == ModelType.INFO || contextValue == ModelType.FUNCTION
             || contextValue == ModelType.TRIGGER || contextValue == ModelType.PROCEDURE || contextValue == ModelType.USER
-            || contextValue==ModelType.DIAGRAM || contextValue==ModelType.ES_COLUMN
+            || contextValue == ModelType.DIAGRAM || contextValue == ModelType.ES_COLUMN
         ) {
             return TreeItemCollapsibleState.None;
-        }
-
-        if (!Global.getConfig<boolean>(ConfigKey.LOAD_META_ON_CONNECT)) {
-            return TreeItemCollapsibleState.Collapsed;
         }
 
         if (!this.collpaseState || Object.keys(this.collpaseState).length == 0) {
@@ -79,16 +74,19 @@ export class DatabaseCache {
         this.context = context;
     }
 
+    public static clearCache() {
+        this.childCache = {}
+        this.cache.database = {}
+    }
+
 
     /**
      * clear table data for database
      * @param dbChildid 
      */
-    public static clearChildCache(dbChildid?: string) {
+    public static clearChildCache(dbChildid: string) {
         if (dbChildid) {
             delete this.childCache[dbChildid];
-        } else {
-            this.childCache = {};
         }
     }
 
@@ -104,12 +102,10 @@ export class DatabaseCache {
      * clear database data for connection
      * @param connectionid 
      */
-    public static clearDatabaseCache(connectionid?: string) {
+    public static clearDatabaseCache(connectionid: string) {
         if (connectionid) {
             delete this.cache.database[connectionid];
-        } else {
-            this.cache.database = {};
-        }
+        } 
     }
 
     /**

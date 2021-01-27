@@ -59,7 +59,6 @@
 	"command.redis.key.detail": "查看键详情",
 	"config.title":"_数据库配置",
 	"config.enableDelimiter":"导入Sql文件时是否支持delimiter语句.",
-	"config.loadMetaOnConnect":"启动vscode时是否提前加载数据库, 如果你的机器性能较低, 请关闭它",
 	"config.defaultSelectLimit":"默认的分页大小.",
 	"config.showTotal": "是否在数据视图自动加载表总数."
 }

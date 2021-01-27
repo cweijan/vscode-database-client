@@ -26,7 +26,6 @@ export enum CacheKey {
 
 export enum ConfigKey {
     ENABLE_DELIMITER = "enableDelimiter",
-    LOAD_META_ON_CONNECT = "loadMetaOnConnect",
     DEFAULT_LIMIT = "defaultSelectLimit",
     SHOW_TOTAL = "showTotal",
 }

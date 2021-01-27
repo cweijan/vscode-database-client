@@ -1,7 +1,6 @@
-import { Global } from "@/common/global";
 import * as path from "path";
 import * as vscode from "vscode";
-import { CacheKey, ConfigKey, Constants, DatabaseType, ModelType } from "../../common/constants";
+import { Constants, DatabaseType, ModelType } from "../../common/constants";
 import { FileManager } from "../../common/filesManager";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
@@ -9,7 +8,6 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { CopyAble } from "../interface/copyAble";
 import { CommandKey, Node } from "../interface/node";
-import { NodeUtil } from "../nodeUtil";
 import { InfoNode } from "../other/infoNode";
 import { DatabaseNode } from "./databaseNode";
 import { UserGroup } from "./userGroup";
@@ -19,7 +17,6 @@ import { UserGroup } from "./userGroup";
  */
 export class ConnectionNode extends Node implements CopyAble {
 
-    private static initMark = {}
     public iconPath: string = path.join(Constants.RES_PATH, "icon/server.png");
     public contextValue: string = ModelType.CONNECTION;
     constructor(readonly uid: string, readonly parent: Node) {
@@ -46,6 +43,7 @@ export class ConnectionNode extends Node implements CopyAble {
         } else if (this.dbType == DatabaseType.MSSQL) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/mssql_server.png");
         }
+        this.getChildren()
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -73,14 +71,6 @@ export class ConnectionNode extends Node implements CopyAble {
                 }).map<DatabaseNode>((database) => {
                     return new DatabaseNode(database.Database, this);
                 });
-
-                if (!ConnectionNode.initMark[this.uid] && Global.getConfig<boolean>(ConfigKey.LOAD_META_ON_CONNECT)) {
-                    for (const databaseNode of databaseNodes) {
-                        for (const groupNode of databaseNode.getChildren() as Node[]) {
-                            groupNode.getChildren(true);
-                        }
-                    }
-                }
 
                 databaseNodes.unshift(new UserGroup("USER", this));
                 DatabaseCache.setDataBaseListOfConnection(this.uid, databaseNodes);
