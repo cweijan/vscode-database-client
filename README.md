@@ -65,7 +65,7 @@ Click the history button to open the list of recently executed query history rec
 
 ![history](images/history.jpg)
 
-## Backup/Import
+## Backup/Export
 
 Move to ant DatabaseNode or TableNode. The export/import options are listed in the context menu (right click to open).
 
