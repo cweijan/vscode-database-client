@@ -1,9 +1,11 @@
 import * as vscode from "vscode";
 import * as path from "path";
 
+const extName=require("@/../package.json")
+
 export class Constants {
     public static CONFIG_PREFIX = "vscode-mysql"
-    public static RES_PATH = path.join(vscode.extensions.getExtension('cweijan.vscode-mysql-client2').extensionPath, "resources");
+    public static RES_PATH = path.join(vscode.extensions.getExtension(`${extName.publisher}.${extName.name}`).extensionPath, "resources");
 }
 
 export class Pattern {

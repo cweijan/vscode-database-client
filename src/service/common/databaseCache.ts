@@ -19,20 +19,15 @@ export class DatabaseCache {
         const contextValue = element.contextValue;
         if (!contextValue || contextValue == ModelType.COLUMN || contextValue == ModelType.INFO || contextValue == ModelType.FUNCTION
             || contextValue == ModelType.TRIGGER || contextValue == ModelType.PROCEDURE || contextValue == ModelType.USER
-            || contextValue == ModelType.DIAGRAM || contextValue == ModelType.ES_COLUMN|| contextValue == ModelType.COLUMN
+            || contextValue == ModelType.DIAGRAM || contextValue == ModelType.ES_COLUMN || contextValue == ModelType.COLUMN
         ) {
             return TreeItemCollapsibleState.None;
         }
 
         if (!this.collpaseState || Object.keys(this.collpaseState).length == 0) {
-            this.collpaseState =
-                (element.global === false) ?
-                    this.context.workspaceState.get(CacheKey.CollapseSate) : this.context.globalState.get(CacheKey.CollapseSate)
-                ;
-        }
-
-        if (!this.collpaseState) {
-            this.collpaseState = {};
+            // TODO load from config
+            this.collpaseState = (true ?
+                this.context.globalState.get(CacheKey.CollapseSate,{}) : this.context.workspaceState.get(CacheKey.CollapseSate,{}));
         }
 
         if (element.uid && this.collpaseState[element.uid]) {
@@ -58,10 +53,11 @@ export class DatabaseCache {
         }
 
         this.collpaseState[element.uid] = collapseState;
-        if (element.global === false) {
-            this.context.workspaceState.update(CacheKey.CollapseSate, this.collpaseState);
-        } else {
+        // TODO load from config
+        if (true) {
             this.context.globalState.update(CacheKey.CollapseSate, this.collpaseState);
+        } else {
+            this.context.workspaceState.update(CacheKey.CollapseSate, this.collpaseState);
         }
 
     }
@@ -105,7 +101,7 @@ export class DatabaseCache {
     public static clearDatabaseCache(connectionid: string) {
         if (connectionid) {
             delete this.cache.database[connectionid];
-        } 
+        }
     }
 
     /**

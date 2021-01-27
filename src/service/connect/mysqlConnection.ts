@@ -5,7 +5,7 @@ import { IConnection, queryCallback } from "./connection";
 
 export class MysqlConnection implements IConnection {
     private con: mysql.Connection;
-    private dead:boolean;
+    private dead: boolean;
     constructor(node: Node) {
         const newConnectionOptions = {
             host: node.host, port: node.port, user: node.user, password: node.password, database: node.database,
@@ -13,12 +13,7 @@ export class MysqlConnection implements IConnection {
             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
             connectTimeout: 5000,
             typeCast: function (field, next) {
-                // if (field.type === 'TINY' && field.length === 1) 
-                // if (field.type === 'JSON') {
-                    return field?.buffer()?.toString();
-                // } else {
-                //     return next();
-                // }
+                return field?.buffer()?.toString();
             }
         } as mysql.ConnectionConfig;
         if (node.certPath && fs.existsSync(node.certPath)) {
@@ -38,11 +33,11 @@ export class MysqlConnection implements IConnection {
     }
     connect(callback: (err: Error) => void): void {
         this.con.connect(callback)
-        this.con.on("error",()=>{
-            this.dead=true;
+        this.con.on("error", () => {
+            this.dead = true;
         })
-        this.con.on("end",()=>{
-            this.dead=true;
+        this.con.on("end", () => {
+            this.dead = true;
         })
     }
     beginTransaction(callback: (err: Error) => void): void {
@@ -55,7 +50,7 @@ export class MysqlConnection implements IConnection {
         this.con.commit()
     }
     end(): void {
-        this.dead=true;
+        this.dead = true;
         this.con.end()
     }
 
