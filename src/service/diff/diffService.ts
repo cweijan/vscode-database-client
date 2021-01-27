@@ -35,8 +35,8 @@ export class DiffService {
                         handler.emit("error", error.message)
                     }
                 }).on("start", async (opt) => {
-                    const fromTables = DatabaseCache.getChildListOfId(`${opt.from.connection}_${opt.from.database}#TABLE`)
-                    const toTables = DatabaseCache.getChildListOfId(`${opt.to.connection}_${opt.to.database}#TABLE`)
+                    const fromTables = DatabaseCache.getChildCache(`${opt.from.connection}_${opt.from.database}#TABLE`)
+                    const toTables = DatabaseCache.getChildCache(`${opt.to.connection}_${opt.to.database}#TABLE`)
 
                     let sqlList = await this.compareTables(fromTables, toTables);
                     handler.emit("compareResult", { sqlList })

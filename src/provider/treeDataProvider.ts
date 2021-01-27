@@ -26,19 +26,16 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
      * reload treeview context
      */
     public async init() {
+        DatabaseCache.clearDatabaseCache()
+        DatabaseCache.clearChildCache()
         if (Global.getConfig<boolean>(ConfigKey.LOAD_META_ON_CONNECT)) {
             (await this.getConnectionNodes()).forEach(async (connectionNode) => {
                 (await connectionNode.getChildren(true)).forEach(async (databaseNode) => {
                     (await databaseNode.getChildren(true)).forEach(async (groupNode) => {
-                        groupNode.getChildren(true);
                     });
                 });
             })
-        } else {
-            DatabaseCache.clearDatabaseCache()
-            DatabaseCache.clearTableCache()
         }
-        DatabaseCache.clearColumnCache()
         DbTreeDataProvider.refresh()
     }
 

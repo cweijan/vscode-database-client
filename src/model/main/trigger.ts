@@ -41,7 +41,7 @@ export class TriggerNode extends Node {
         }
         Util.confirm(`Are you want to drop trigger ${this.name} ?`, async () => {
             this.execute(this.dialect.dropTriggerTemplate(this.wrap(this.name))).then(() => {
-                DatabaseCache.clearTableCache(this.parent.uid)
+                DatabaseCache.clearChildCache(this.parent.uid)
                 DbTreeDataProvider.refresh(this.parent)
                 vscode.window.showInformationMessage(`Drop trigger ${this.name} success!`)
             })

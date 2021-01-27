@@ -17,7 +17,7 @@ export class TableGroup extends Node {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let tableNodes = DatabaseCache.getChildListOfId(this.uid);
+        let tableNodes = DatabaseCache.getChildCache(this.uid);
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
@@ -29,7 +29,7 @@ export class TableGroup extends Node {
                 if (tableNodes.length == 0) {
                     tableNodes = [new InfoNode("This database has no table")];
                 }
-                DatabaseCache.setChildListOfDatabase(this.uid, tableNodes);
+                DatabaseCache.setChildCache(this.uid, tableNodes);
                 return tableNodes;
             })
             .catch((err) => {

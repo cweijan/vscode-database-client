@@ -19,7 +19,7 @@ export class UserGroup extends DatabaseNode {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        let userNodes = DatabaseCache.getChildListOfId(this.uid);
+        let userNodes = DatabaseCache.getChildCache(this.uid);
         if (userNodes && !isRresh) {
             return userNodes;
         }
@@ -28,7 +28,7 @@ export class UserGroup extends DatabaseNode {
                 userNodes = tables.map<UserNode>((table) => {
                     return new UserNode(table.user, table.host, this);
                 });
-                DatabaseCache.setChildListOfDatabase(this.uid, userNodes);
+                DatabaseCache.setChildCache(this.uid, userNodes);
                 return userNodes;
             })
             .catch((err) => {

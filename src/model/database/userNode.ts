@@ -40,7 +40,7 @@ export class UserNode extends Node implements CopyAble {
         Util.confirm(`Are you want to drop user ${this.username} ?`, async () => {
             this.execute(`DROP user ${this.username}`).then(() => {
                 vscode.window.showInformationMessage(`Drop user ${this.username} success!`);
-                DatabaseCache.clearTableCache(this.parent.uid)
+                DatabaseCache.clearChildCache(this.parent.uid)
                 DbTreeDataProvider.refresh(this.parent);
             });
         })

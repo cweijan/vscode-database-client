@@ -3,20 +3,13 @@ import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
 import { CacheKey, ConfigKey, ModelType } from "../../common/constants";
 import { DatabaseNode } from "../../model/database/databaseNode";
 import { Node } from "../../model/interface/node";
-import { ColumnNode } from "../../model/other/columnNode";
 
 export class DatabaseCache {
 
     private static context: ExtensionContext;
-    private static cache = { database: {}, table: {}, column: {} };
+    private static cache = { database: {} };
+    private static childCache = {};
     private static collpaseState: { key?: TreeItemCollapsibleState };
-
-    public static evictAllCache(): any {
-        if (this.context == null) { throw new Error("DatabaseCache is not init!"); }
-        this.cache.database = {};
-        this.cache.table = {};
-        this.cache.column = {};
-    }
 
     /**
      * get element current collapseState or default collapseState
@@ -91,20 +84,20 @@ export class DatabaseCache {
      * clear table data for database
      * @param dbChildid 
      */
-    public static clearTableCache(dbChildid?: string) {
+    public static clearChildCache(dbChildid?: string) {
         if (dbChildid) {
-            delete this.cache.table[dbChildid];
+            delete this.childCache[dbChildid];
         } else {
-            this.cache.table = {};
+            this.childCache = {};
         }
     }
 
-    public static setChildListOfDatabase(uid: string, tableNodeList: Node[]) {
-        this.cache.table[uid] = tableNodeList;
+    public static setChildCache(uid: string, tableNodeList: Node[]) {
+        this.childCache[uid] = tableNodeList;
     }
 
-    public static getChildListOfId(uid: string): Node[] {
-        return this.cache.table[uid];
+    public static getChildCache(uid: string): Node[] {
+        return this.childCache[uid];
     }
 
     /**
@@ -147,23 +140,6 @@ export class DatabaseCache {
         }
     }
 
-    /**
-      * claer column data for table
-      * @param tableid 
-      */
-    public static clearColumnCache(tableid?: string) {
-        if (tableid) {
-            delete this.cache.column[tableid];
-        } else {
-            this.cache.column = {};
-        }
-    }
 
-    public static setColumnListOfTable(tableid: string, columnList: ColumnNode[]) {
-        this.cache.column[tableid] = columnList;
-    }
-    public static getColumnListOfTable(tableid: string): ColumnNode[] {
-        return this.cache.column[tableid];
-    }
 
 }

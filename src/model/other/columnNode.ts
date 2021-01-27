@@ -71,7 +71,7 @@ export class ColumnNode extends Node implements CopyAble {
         await QueryUnit.showSQLTextDocument(this, dropSql, Template.alter);
         Util.confirm(`Are you want to drop column ${this.column.name} ? `, async () => {
             this.execute(dropSql).then(() => {
-                DatabaseCache.clearColumnCache(`${this.parent.uid}`);
+                DatabaseCache.setChildCache(`${this.parent.uid}`,null);
                 DbTreeDataProvider.refresh(this.parent);
             })
         })
@@ -89,7 +89,7 @@ export class ColumnNode extends Node implements CopyAble {
         }
         const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(this.column.name)} ${this.column.type} AFTER ${this.wrap(afterColumnNode.column.name)};`
         await this.execute(sql)
-        DatabaseCache.clearColumnCache(this.parent.uid)
+        DatabaseCache.setChildCache(this.parent.uid,null)
         DbTreeDataProvider.refresh(this.parent)
     }
     public async moveUp() {
@@ -102,7 +102,7 @@ export class ColumnNode extends Node implements CopyAble {
         }
         const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(beforeColumnNode.column.name)} ${beforeColumnNode.column.type} AFTER ${this.wrap(this.column.name)};`
         await this.execute(sql)
-        DatabaseCache.clearColumnCache(this.parent.uid)
+        DatabaseCache.setChildCache(this.parent.uid,null)
         DbTreeDataProvider.refresh(this.parent)
     }
 
