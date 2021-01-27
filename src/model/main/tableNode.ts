@@ -171,15 +171,8 @@ export class TableNode extends Node implements CopyAble {
     public async openInNew() {
         const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
         const sql = this.dialect.buildPageSql(this.wrap(this.database), this.wrap(this.table), pageSize);
-
-        const connection = await ConnectionManager.getConnection(this);
+        QueryUnit.runQuery(sql, this, { viewId: new Date().getTime() });
         ConnectionManager.changeActive(this)
-        const executeTime = new Date().getTime();
-        connection.query(sql, (err: Error, data, fields) => {
-            const costTime = new Date().getTime() - executeTime;
-            QueryPage.send({ singlePage: false, type: MessageType.DATA, connection: this, res: { sql, costTime, data, fields, pageSize: pageSize } as DataResponse });
-        })
-
     }
 
     public async countSql() {

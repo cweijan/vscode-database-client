@@ -1,18 +1,16 @@
 import { Util } from "@/common/util";
 import { EsRequest } from "@/model/es/esRequest";
-import { ESIndexNode } from "@/model/es/model/esIndexNode";
 import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
 import { env, StatusBarAlignment, StatusBarItem, Uri, ViewColumn, window } from "vscode";
 import { Trans } from "~/common/trans";
 import { ConfigKey, DatabaseType, MessageType, OperateType } from "../../common/constants";
 import { Global } from "../../common/global";
+import { ViewManager } from "../../common/viewManager";
 import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
-import { DatabaseCache } from "../common/databaseCache";
 import { ExportService } from "../export/exportService";
-import { QueryUnit } from "../queryUnit";
-import { ViewManager } from "../../common/viewManager";
+import { QueryOption, QueryUnit } from "../queryUnit";
 import { DataResponse } from "./queryResponse";
 
 export class QueryParam<T> {
@@ -20,12 +18,12 @@ export class QueryParam<T> {
     public singlePage?: boolean;
     public type: MessageType;
     public res: T;
+    public queryOption?: QueryOption;
 }
 
 export class QueryPage {
 
     private static exportService: ExportService = new ExportService()
-    private static hodlder: Map<string, string> = new Map()
     private static statusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -200);
     private static costStatusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -250);
 
@@ -55,30 +53,28 @@ export class QueryPage {
                         handler.panel.title = `${queryParam.res.table}@${dbOption.database}`
                     }
                     queryParam.res.transId = Trans.transId;
+                    queryParam.res.viewId = queryParam.queryOption?.viewId;
                     handler.emit(queryParam.type, { ...queryParam.res, dbType: dbOption.dbType })
                 }).on(OperateType.execute, (params) => {
-                    if (!queryParam.singlePage) {
-                        this.hodlder.set(params.sql.trim(), type)
-                    }
-                    QueryUnit.runQuery(params.sql, dbOption);
+                    QueryUnit.runQuery(params.sql, dbOption, queryParam.queryOption);
                 }).on(OperateType.next, async (params) => {
                     const sql = ServiceManager.getPageService(dbOption.dbType).build(params.sql, params.pageNum, params.pageSize)
                     dbOption.execute(sql).then((rows) => {
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
                     })
-                }).on("full",()=>{
+                }).on("full", () => {
                     handler.panel.reveal(ViewColumn.One)
                 }).on('esFilter', (query) => {
                     const esQuery = EsRequest.build(queryParam.res.sql, obj => {
                         obj.query = query;
                     })
-                    QueryUnit.runQuery(esQuery, dbOption);
+                    QueryUnit.runQuery(esQuery, dbOption, queryParam.queryOption);
                 }).on('esSort', (sort) => {
                     const esQuery = EsRequest.build(queryParam.res.sql, obj => {
                         obj.sort = sort;
                     })
-                    QueryUnit.runQuery(esQuery, dbOption);
-                }).on('copy',value=>{
+                    QueryUnit.runQuery(esQuery, dbOption, queryParam.queryOption);
+                }).on('copy', value => {
                     Util.copyToBoard(value)
                 }).on('count', async (params) => {
                     dbOption.execute(params.sql.replace(/\bSELECT\b.+?\bFROM\b/i, 'select count(*) count from')).then((rows) => {
@@ -121,16 +117,12 @@ export class QueryPage {
         if (typeof queryParam.singlePage == 'undefined') {
             queryParam.singlePage = true;
         }
-        let type = queryParam.singlePage ? "Query" : "Query" + new Date().getTime();
-        const olderTitle = this.hodlder.get(queryParam.res.sql);
-        if (olderTitle) {
-            type = olderTitle;
-            queryParam.singlePage = false;
-            if (queryParam.type == MessageType.DATA) {
-                this.hodlder.delete(queryParam.res.sql);
+        if (!queryParam.queryOption) {
+            queryParam.queryOption = {
+                viewId: "Query"
             }
         }
-        return type;
+        return queryParam.queryOption.viewId;
     }
 
     private static updateStatusBar(queryParam: QueryParam<any>) {
