@@ -17,19 +17,13 @@ export class ColumnNode extends Node implements CopyAble {
     constructor(public readonly table: string, readonly column: ColumnMeta, readonly parent: Node, readonly index: number) {
         super(column.name)
         this.init(parent)
-        this.type = `${this.column.type}`
-        this.description = `${this.column.type} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"} ${this.column.comment}`
-        if (column && this.isPrimaryKey) {
-            MockRunner.primaryKeyMap[this.parent.uid] = column.name
-        }
-        this.collapsibleState = vscode.TreeItemCollapsibleState.None
+        this.buildInfo()
         this.iconPath = path.join(Constants.RES_PATH, this.isPrimaryKey ? "icon/b_primary.png" : "icon/b_props.png");
         this.command = {
             command: "mysql.column.update",
             title: "Update Column Statement",
             arguments: [this, true],
         }
-        this.buildInfo()
     }
     public copyName(): void {
         Util.copyToBoard(this.column.name)
@@ -40,6 +34,8 @@ export class ColumnNode extends Node implements CopyAble {
             this.column.isAutoIncrement = true;
         }
         this.column.isNotNull = this.column.nullable != 'YES'
+        this.type = `${this.column.type}`
+        this.description = `${this.column.type} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"} ${this.column.comment}`
         const columnKey: string = this.column.key;
         switch (columnKey) {
             case 'UNI':
@@ -50,6 +46,7 @@ export class ColumnNode extends Node implements CopyAble {
             case 'PRI':
             case 'PRIMARY KEY':
                 this.isPrimaryKey = true
+                MockRunner.primaryKeyMap[this.parent.uid] = this.column.name
                 this.column.isPrimary = true
                 return "PrimaryKey";
         }
@@ -71,7 +68,7 @@ export class ColumnNode extends Node implements CopyAble {
         await QueryUnit.showSQLTextDocument(this, dropSql, Template.alter);
         Util.confirm(`Are you want to drop column ${this.column.name} ? `, async () => {
             this.execute(dropSql).then(() => {
-                DatabaseCache.setChildCache(`${this.parent.uid}`,null);
+                DatabaseCache.setChildCache(`${this.parent.uid}`, null);
                 DbTreeDataProvider.refresh(this.parent);
             })
         })
@@ -89,7 +86,7 @@ export class ColumnNode extends Node implements CopyAble {
         }
         const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(this.column.name)} ${this.column.type} AFTER ${this.wrap(afterColumnNode.column.name)};`
         await this.execute(sql)
-        DatabaseCache.setChildCache(this.parent.uid,null)
+        DatabaseCache.setChildCache(this.parent.uid, null)
         DbTreeDataProvider.refresh(this.parent)
     }
     public async moveUp() {
@@ -102,7 +99,7 @@ export class ColumnNode extends Node implements CopyAble {
         }
         const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(beforeColumnNode.column.name)} ${beforeColumnNode.column.type} AFTER ${this.wrap(this.column.name)};`
         await this.execute(sql)
-        DatabaseCache.setChildCache(this.parent.uid,null)
+        DatabaseCache.setChildCache(this.parent.uid, null)
         DbTreeDataProvider.refresh(this.parent)
     }
 

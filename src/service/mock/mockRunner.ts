@@ -72,7 +72,8 @@ export class MockRunner {
                 startIndex = (await tableNode.getMaxPrimary()) + 1;
             }
 
-            for (let i = startIndex; i < (startIndex + mockCount); i++) {
+            const count = parseInt(startIndex+"") + mockCount;
+            for (let i = startIndex; i < count; i++) {
                 let tempInsertSql = insertSqlTemplate;
                 for (const column in mockData) {
                     let value = mockData[column].value;

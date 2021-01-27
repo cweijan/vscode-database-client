@@ -72,17 +72,22 @@ export class ConnectionManager {
             const key = connectionNode.getConnectId({ withDb: true });
             const connection = this.alivedConnection[key];
             if (connection) {
-                if (connection.connection.isAlive() && connection.database != connectionNode.database) {
-                    const sql = connectionNode?.dialect?.pingDataBase(connectionNode.database);
-                    try {
-                        if (sql) {
-                            await QueryUnit.queryPromise(connection.connection, sql, false)
+                if (connection.connection.isAlive()) {
+                    if (connection.database != connectionNode.database) {
+                        const sql = connectionNode?.dialect?.pingDataBase(connectionNode.database);
+                        try {
+                            if (sql) {
+                                await QueryUnit.queryPromise(connection.connection, sql, false)
+                            }
+                            connection.database = connectionNode.database
+                            resolve(connection.connection);
+                            return;
+                        } catch (err) {
+                            ConnectionManager.end(key, connection);
                         }
-                        connection.database = connectionNode.database
+                    } else {
                         resolve(connection.connection);
                         return;
-                    } catch (err) {
-                        ConnectionManager.end(key, connection);
                     }
                 }
             }

@@ -247,7 +247,7 @@ export class TableNode extends Node implements CopyAble {
         const primaryKey = MockRunner.primaryKeyMap[this.uid];
         if (primaryKey != null) {
             const count = await this.execute(`select max(${primaryKey}) max from ${this.table}`);
-            if (count && count[0]) { return count[0].max }
+            if (count && count[0]?.max) { return count[0].max }
         }
 
 

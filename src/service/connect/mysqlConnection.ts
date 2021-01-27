@@ -38,6 +38,12 @@ export class MysqlConnection implements IConnection {
     }
     connect(callback: (err: Error) => void): void {
         this.con.connect(callback)
+        this.con.on("error",()=>{
+            this.dead=true;
+        })
+        this.con.on("end",()=>{
+            this.dead=true;
+        })
     }
     beginTransaction(callback: (err: Error) => void): void {
         this.con.beginTransaction(callback)

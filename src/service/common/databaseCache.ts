@@ -19,7 +19,7 @@ export class DatabaseCache {
         const contextValue = element.contextValue;
         if (!contextValue || contextValue == ModelType.COLUMN || contextValue == ModelType.INFO || contextValue == ModelType.FUNCTION
             || contextValue == ModelType.TRIGGER || contextValue == ModelType.PROCEDURE || contextValue == ModelType.USER
-            || contextValue == ModelType.DIAGRAM || contextValue == ModelType.ES_COLUMN
+            || contextValue == ModelType.DIAGRAM || contextValue == ModelType.ES_COLUMN|| contextValue == ModelType.COLUMN
         ) {
             return TreeItemCollapsibleState.None;
         }

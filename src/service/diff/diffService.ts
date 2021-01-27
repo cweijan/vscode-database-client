@@ -14,7 +14,7 @@ export class DiffService {
     startDiff(provider: DbTreeDataProvider) {
 
         ViewManager.createWebviewPanel({
-            path: "app", title: "Struct Sync",
+            path: "app", title: "Struct Sync(Preview)",
             splitView: false, iconPath: Global.getExtPath("resources", "icon", "add.svg"),
             eventHandler: (handler => {
                 handler.on("init", () => {
