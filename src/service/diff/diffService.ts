@@ -9,6 +9,9 @@ import { ViewManager } from "@/common/viewManager";
 import { DatabaseCache } from "../common/databaseCache";
 import { ConnectionManager } from "../connectionManager";
 import { QueryUnit } from "../queryUnit";
+import { DatabaseNode } from "@/model/database/databaseNode";
+import { UserGroup } from "@/model/database/userGroup";
+import { TableGroup } from "@/model/main/tableGroup";
 
 export class DiffService {
     startDiff(provider: DbTreeDataProvider) {
@@ -23,7 +26,7 @@ export class DiffService {
                     const nodes = (await provider.getConnectionNodes())
                     let databaseList = {}
                     for (const node of nodes) {
-                        databaseList[node.label] = await node.getChildren()
+                        databaseList[node.uid] = (await node.getChildren()).filter(dbNode => !(dbNode instanceof UserGroup))
                     }
                     const data = { nodes: NodeUtil.removeParent(nodes), databaseList: NodeUtil.removeParent(databaseList) };
                     handler.emit('structDiffData', data)
@@ -35,9 +38,10 @@ export class DiffService {
                         handler.emit("error", error.message)
                     }
                 }).on("start", async (opt) => {
-                    const fromTables = DatabaseCache.getChildCache(`${opt.from.connection}_${opt.from.database}#TABLE`)
-                    const toTables = DatabaseCache.getChildCache(`${opt.to.connection}_${opt.to.database}#TABLE`)
 
+                    const fromTables =await new TableGroup(Node.nodeCache[`${opt.from.connection}_${opt.from.database}`]).getChildren()
+                    const toTables =await new TableGroup(Node.nodeCache[`${opt.to.connection}_${opt.to.database}`]).getChildren()
+                    
                     let sqlList = await this.compareTables(fromTables, toTables);
                     handler.emit("compareResult", { sqlList })
                 }).on("sync", async ({ option, sqlList }) => {
@@ -94,9 +98,9 @@ export class DiffService {
             if (toColumnsMap[fromColumn.label]) {
                 const toColumnNode = toColumnsMap[fromColumn.label] as ColumnNode
                 if (toColumnNode.type != fromColumn.type) {
-                    if(toColumnNode.dbType==DatabaseType.MSSQL || toColumnNode.dbType==DatabaseType.PG){
+                    if (toColumnNode.dbType == DatabaseType.MSSQL || toColumnNode.dbType == DatabaseType.PG) {
                         sqlList.push({ type: 'change', sql: `ALTER TABLE ${toColumnNode.table} ALTER COLUMN ${toColumnNode.label} ${toColumnNode.type}` });
-                    }else{
+                    } else {
                         sqlList.push({ type: 'change', sql: `ALTER TABLE ${toColumnNode.table} CHANGE ${toColumnNode.label} ${toColumnNode.label} ${toColumnNode.type} ;` });
                     }
                 }

@@ -4,7 +4,7 @@
       <el-form>
         <el-form-item label="Target">
           <el-select v-model="option.from.connection">
-            <el-option :label="node.label" :value="node.label" :key="node.label" v-for="node in initData.nodes"></el-option>
+            <el-option :label="node.label" :value="node.uid" :key="node.uid" v-for="node in initData.nodes"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="database">
