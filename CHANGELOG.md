@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.3.2 2020-1-27
+
+- Fix 3.3.1 add connection fail.
+- Trim legacy code, now enjoy better peformance.
+
 # 3.3.1 2020-1-26
 
 - More implement or table design.
