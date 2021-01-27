@@ -19,11 +19,7 @@ Database Client for Visual Studio Code. It supports databases MySQL/MariaDB, Mic
 
 ## Installation
 
-Launch VS Code Quick Open (Ctrl+P), paste the following command, and press enter.
-
-```
-ext install cweijan.vscode-mysql-client2
-```
+Install from vscode marketplace [vscode-mysql](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2).
 
 ## Connect
 
