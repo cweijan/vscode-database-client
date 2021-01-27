@@ -47,7 +47,7 @@
 - 点击历史记录按钮后可查看以往执行的Sql记录.
   ![history](images/history.jpg)
 
-## 备份/导出
+## 备份/导入
 
 * 在表或者数据库节点右击, 之后便可以进行数据的导入导出.
   ![bakcup](images/Backup.jpg)
