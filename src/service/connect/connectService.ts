@@ -15,7 +15,7 @@ export class ConnectService {
             if (connectionNode.global == null) {
                 connectionNode.global = true
             }
-            node = { ...connectionNode, isGlobal: connectionNode.global !== false }
+            node = { ...NodeUtil.removeParent(connectionNode), isGlobal: connectionNode.global !== false }
             if (node.ssh) {
                 node.ssh.tunnelPort = null
                 if (!node.ssh.algorithms) {

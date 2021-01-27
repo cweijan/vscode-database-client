@@ -67,10 +67,11 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     public async addConnection(node: Node) {
 
         if ((node as any).isGlobal != null) {
-            await node.indent({ command: CommandKey.delete })
+            node.context = (node as any).isGlobal === false ? this.context.workspaceState : this.context.globalState
+            await node.indent({ command: CommandKey.delete,cacheKey:this.connectionKey })
         }
 
-        node.context = node.global === false ? this.context.workspaceState : this.context.globalState
+                node.context = node.global === false ? this.context.workspaceState : this.context.globalState
         node.indent({ command: CommandKey.add, cacheKey: this.getKeyByNode(node) })
 
     }

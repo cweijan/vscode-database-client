@@ -108,7 +108,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public async indent(command: IndentCommand) {
 
-        const cacheKey = command.cacheKey || this.provider.connectionKey;
+        const cacheKey = command.cacheKey || this.provider?.connectionKey;
         const connections = this.context.get<{ [key: string]: Node }>(cacheKey);
         if (!this.uid) {
             this.uid = this.getConnectId();
