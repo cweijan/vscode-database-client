@@ -20,8 +20,8 @@ export abstract class NodeUtil {
     public static removeParent(nodes: any): any {
         if (!nodes) return null;
         // if is node instance
-        if (nodes instanceof Node) {
-            return { ...nodes, parent: null, provider: null, context: null, command: null };
+        if (nodes instanceof Node || nodes.uid) {
+            return NodeUtil.of( { ...nodes, parent: null, provider: null, context: null, command: null })
         }
         if (nodes instanceof Array) {
             let tempNodes = []

@@ -40,7 +40,7 @@ export class ConnectService {
                     const connectNode = Util.trim(NodeUtil.of(connectionOption))
                     try {
                         await this.connect(connectNode)
-                        provider.addConnection(connectNode)
+                        await provider.addConnection(connectNode)
                         // handler.panel.dispose();
                         handler.emit("success", 'connect success!')
                     } catch (err) {
