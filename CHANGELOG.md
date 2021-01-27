@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.4.0
+
+- Better peformance.
+- Add full result view icon.
+
 # 3.3.2 2020-1-27
 
 - Fix 3.3.1 add connection fail.

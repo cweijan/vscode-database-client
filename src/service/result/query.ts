@@ -3,7 +3,7 @@ import { EsRequest } from "@/model/es/esRequest";
 import { ESIndexNode } from "@/model/es/model/esIndexNode";
 import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
-import { env, StatusBarAlignment, StatusBarItem, Uri, window } from "vscode";
+import { env, StatusBarAlignment, StatusBarItem, Uri, ViewColumn, window } from "vscode";
 import { Trans } from "~/common/trans";
 import { ConfigKey, DatabaseType, MessageType, OperateType } from "../../common/constants";
 import { Global } from "../../common/global";
@@ -66,6 +66,8 @@ export class QueryPage {
                     dbOption.execute(sql).then((rows) => {
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
                     })
+                }).on("full",()=>{
+                    handler.panel.reveal(ViewColumn.One)
                 }).on('esFilter', (query) => {
                     const esQuery = EsRequest.build(queryParam.res.sql, obj => {
                         obj.query = query;

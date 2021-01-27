@@ -7,6 +7,8 @@
       <div class="toolbar">
         <el-button type="primary" size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
         <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
+        <el-button @click="full" type="primary" title="Full Result View" icon="el-icon-rank" size="mini" circle>
+        </el-button>
         <el-button @click="$refs.editor.openInsert()" :disabled="result.tableCount!=1" type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle>
         </el-button>
         <el-button @click="$refs.editor.openEdit(update.current)" type="primary" size="mini" icon="el-icon-edit" title="edit" circle :disabled="!toolbar.show">
@@ -216,6 +218,9 @@ export default {
     });
   },
   methods: {
+    full(){
+      vscodeEvent.emit("full")
+    },
     openCoffee() {
       vscodeEvent.emit("openCoffee");
     },
