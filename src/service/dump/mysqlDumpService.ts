@@ -4,15 +4,13 @@ import { Console } from "../../common/Console";
 import { Node } from "../../model/interface/node";
 import { NodeUtil } from "../../model/nodeUtil";
 import { AbstractDumpService } from "./abstractDumpService";
+import { Util } from '@/common/util';
 
 export class MysqlDumpService extends AbstractDumpService {
-    protected dumpData(node: Node, dumpFilePath: string, withData: boolean,tables:string[]): void {
+    protected dumpData(node: Node, dumpFilePath: string, withData: boolean, tables: string[]): void {
 
         const host = node.usingSSH ? "127.0.0.1" : node.host
         const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
-
-        Console.log(`Doing backup ${host}_${node.database}...
-Origin command : \`mysqldump -h ${host} -P ${port} -u ${node.user} -p --database ${node.database} > ${dumpFilePath}\`.`);
 
         const option: Options = {
             connection: {
@@ -44,17 +42,16 @@ Origin command : \`mysqldump -h ${host} -P ${port} -u ${node.user} -p --database
                 maxRowsPerInsertStatement: 5000
             }
         }
-        mysqldump(option).then(() => {
-            vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.database} success!`,'open').then(action=>{
-                if(action=='open'){
-                    vscode.commands.executeCommand('vscode.open', vscode.Uri.file(dumpFilePath));
-                }
-            })
-        }).catch((err) => {
-            vscode.window.showErrorMessage(`Backup ${node.getHost()}_${node.database} fail!\n${err}`);
-        }).then(() => {
-            Console.log(`backup end.`);
+        Util.process(`Doing backup ${host}_${node.database}...`, (done) => {
+            mysqldump(option).then(() => {
+                vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.database} success!`, 'open').then(action => {
+                    if (action == 'open') {
+                        vscode.commands.executeCommand('vscode.open', vscode.Uri.file(dumpFilePath));
+                    }
+                })
+            }).finally(done)
         })
+
     }
 
 }

@@ -2,7 +2,7 @@
 import * as vscode from "vscode";
 import { Position, TextDocument } from "vscode";
 import { Confirm, DatabaseType } from "./constants";
-import {wrapByDb } from "./wrapper.js";
+import { wrapByDb } from "./wrapper.js";
 
 export class Util {
 
@@ -23,8 +23,8 @@ export class Util {
      * wrap origin with ` if is unusual identifier
      * @param origin any string
      */
-    public static wrap(origin: string,databaseType?:DatabaseType) {
-        return wrapByDb(origin,databaseType)
+    public static wrap(origin: string, databaseType?: DatabaseType) {
+        return wrapByDb(origin, databaseType)
     }
 
     public static trim(origin: any): any {
@@ -76,6 +76,18 @@ export class Util {
 
     public static async(callback: (res, rej) => void): Promise<any> {
         return new Promise((resolve, reject) => callback(resolve, reject))
+    }
+
+    public static process(title: string, task: (done) => void) {
+        vscode.window.withProgress({ title, location: vscode.ProgressLocation.Notification }, () => {
+            return new Promise(async (resolve) => {
+                try {
+                    task(resolve)
+                } catch (error) {
+                    vscode.window.showErrorMessage(error.message)
+                } 
+            })
+        })
     }
 
 }

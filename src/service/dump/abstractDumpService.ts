@@ -15,7 +15,7 @@ export abstract class AbstractDumpService {
 
         const dbType = node.dbType
         if (dbType == DatabaseType.MSSQL || dbType == DatabaseType.PG) {
-            vscode.window.showErrorMessage("Dump only support mysql.")
+            vscode.window.showErrorMessage("Dump only support mysql right now!")
             return;
         }
 
