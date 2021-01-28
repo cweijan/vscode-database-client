@@ -67,40 +67,17 @@ async function getTriggerDump(
     result
         .map(r => r[0])
         .forEach(res => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const table = tables[triggers.get(res.Trigger)!];
-
             // clean up the generated SQL
             let sql = `${res['SQL Original Statement']}`;
-
             if (!options.definer) {
                 sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
             }
-
-            // add the delimiter in case it's a multi statement trigger
-            if (options.delimiter) {
-                sql = `DELIMITER ${options.delimiter}\n${sql}${
-                    options.delimiter
-                }\nDELIMITER ;`;
-            } else {
-                // else just add a semicolon
-                sql = `${sql};`;
-            }
-
             // drop trigger statement should go outside the delimiter mods
             if (options.dropIfExist) {
                 sql = `DROP TRIGGER IF EXISTS ${res.Trigger};\n${sql}`;
             }
-
-            // add a header to the trigger
-            sql = [
-                '',
-                sql,
-                '',
-            ].join('\n');
-
-            table.triggers.push(sql);
-
+            table.triggers.push(`\n${sql};\n`);
             return table;
         });
 

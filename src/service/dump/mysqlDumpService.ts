@@ -1,16 +1,19 @@
-import mysqldump, { Options } from './mysql/main';
+import { ModelType } from '@/common/constants';
+import { Util } from '@/common/util';
 import * as vscode from "vscode";
-import { Console } from "../../common/Console";
+import { QuickPickItem } from 'vscode';
 import { Node } from "../../model/interface/node";
 import { NodeUtil } from "../../model/nodeUtil";
 import { AbstractDumpService } from "./abstractDumpService";
-import { Util } from '@/common/util';
+import mysqldump, { Options } from './mysql/main';
 
 export class MysqlDumpService extends AbstractDumpService {
-    protected dumpData(node: Node, dumpFilePath: string, withData: boolean, tables: string[]): void {
+    protected dumpData(node: Node, dumpFilePath: string, withData: boolean, items: QuickPickItem[]): void {
 
         const host = node.usingSSH ? "127.0.0.1" : node.host
         const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
+
+        const tables = items.filter(item => item.description == ModelType.TABLE).map(item => item.label)
 
         const option: Options = {
             connection: {
@@ -21,29 +24,16 @@ export class MysqlDumpService extends AbstractDumpService {
                 port: port,
             },
             dump: {
-                withDatabase: true,
-                tables,
-                schema: {
-                    format: false,
-                    table: {
-                        ifNotExist: false,
-                        dropIfExist: true,
-                        charset: true,
-                    }
-                },
+                withDatabase: items.length != 1,
+                tables
             },
             dumpToFile: dumpFilePath,
         };
         if (!withData) {
             option.dump.data = false;
-        } else {
-            option.dump.data = {
-                format: false,
-                maxRowsPerInsertStatement: 5000
-            }
-        }
+        } 
         Util.process(`Doing backup ${host}_${node.database}...`, (done) => {
-            mysqldump(option).then(() => {
+            mysqldump(option,node).then(() => {
                 vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.database} success!`, 'open').then(action => {
                     if (action == 'open') {
                         vscode.commands.executeCommand('vscode.open', vscode.Uri.file(dumpFilePath));

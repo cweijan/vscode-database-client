@@ -1,3 +1,5 @@
+import { Node } from "@/model/interface/node";
+
 interface ConnectionOptions {
     /**
      * The database host to connect to.
@@ -79,20 +81,10 @@ interface ConnectionOptions {
 
 interface SchemaDumpOptions {
     /**
-     * True to include autoincrement values in schema, false otherwise.
-     * Defaults to true.
-     */
-    autoIncrement?: boolean;
-    /**
      * True to include engine values in schema, false otherwise.
      * Defaults to true.
      */
     engine?: boolean;
-    /**
-     * True to run a sql formatter over the output, false otherwise.
-     * Defaults to true.
-     */
-    format?: boolean;
     /**
      * Options for table dumps
      */
@@ -107,14 +99,6 @@ interface SchemaDumpOptions {
          * Defaults to false.
          */
         dropIfExist?: boolean;
-        /**
-         * Include the `DEFAULT CHARSET = x` at the end of the table definition
-         * Set to true to include the value form the DB.
-         * Set to false to exclude it altogether.
-         * Set to a string to explicitly set the charset.
-         * Defaults to true.
-         */
-        charset?: boolean | string;
     };
     view?: {
         /**
@@ -142,12 +126,6 @@ interface SchemaDumpOptions {
 
 interface TriggerDumpOptions {
     /**
-     * The temporary delimiter to use between statements.
-     * Set to false to not use delmiters
-     * Defaults to ';;'.
-     */
-    delimiter?: string | false;
-    /**
      * Drop triggers before creation.
      * Defaults to false.
      */
@@ -160,12 +138,6 @@ interface TriggerDumpOptions {
 }
 
 interface FunctionDumpOptions {
-    /**
-     * The temporary delimiter to use between statements.
-     * Set to false to not use delmiters
-     * Defaults to ';;'.
-     */
-    delimiter?: string;
     /**
      * Drop function before creation.
      * Defaults to false.
@@ -180,12 +152,6 @@ interface FunctionDumpOptions {
 
 interface ProcedureDumpOptions {
     /**
-     * The temporary delimiter to use between statements.
-     * Set to false to not use delmiters
-     * Defaults to ';;'.
-     */
-    delimiter?: string;
-    /**
      * Drop procedure before creation.
      * Defaults to false.
      */
@@ -198,11 +164,6 @@ interface ProcedureDumpOptions {
 }
 
 interface DataDumpOptions {
-    /**
-     * True to run a sql formatter over the output, false otherwise.
-     * Defaults to true.
-     */
-    format?: boolean;
     /**
      * Include file headers in output
      * Defaults to true.
@@ -223,17 +184,6 @@ interface DataDumpOptions {
      * Defaults to 1 (i.e. new statement per row).
      */
     maxRowsPerInsertStatement?: number;
-    /**
-     * True to return the data in a function, false to not.
-     * This is useful in databases with a lot of data.
-     *
-     * We stream data from the DB to reduce the memory footprint.
-     * However note that if you want the result returned from the function,
-     * this will result in a larger memory footprint as the string has to be stored in memory.
-     *
-     * Defaults to false if dumpToFile is truthy, or true if not dumpToFile is falsey.
-     */
-    returnFromFunction?: boolean;
     /**
      * A map of tables to additional where strings to add.
      * Use this to limit the number of data that is dumped.
@@ -325,7 +275,6 @@ interface CompletedOptions {
     connection: Required<ConnectionOptions>;
     dump: RequiredRecursive<DumpOptions>;
     dumpToFile: string | null;
-    compressFile: boolean | null;
 }
 
 export {

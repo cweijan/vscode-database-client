@@ -16,6 +16,11 @@ interface ConnectionWrapper {
     database?: string
 }
 
+export interface GetRequest {
+    retryCount?: number;
+    sessionId?: string;
+}
+
 export class ConnectionManager {
 
     private static activeNode: Node;
@@ -30,8 +35,9 @@ export class ConnectionManager {
         }
 
         const node = this.activeNode;
-        if (node == null) {
-            // ConnectionManager.checkConnection();
+        if (!node && checkActiveFile) {
+            vscode.window.showErrorMessage("Not active database connection found!")
+            throw new Error("Not active database connection found!")
         }
 
         return node;
@@ -61,15 +67,15 @@ export class ConnectionManager {
         DbTreeDataProvider.refresh()
     }
 
-    public static getConnection(connectionNode: Node, connectCount: number = 1): Promise<IConnection> {
+    public static getConnection(connectionNode: Node, getRequest: GetRequest = { retryCount: 1 }): Promise<IConnection> {
         if (!connectionNode) {
-            this.checkConnection()
-            throw new Error("No MySQL Server or Database selected!")
+            throw new Error("Connection is dead!")
         }
         return new Promise(async (resolve, reject) => {
 
             NodeUtil.of(connectionNode)
-            const key = connectionNode.getConnectId({ withDb: true });
+            if (!getRequest.retryCount) getRequest.retryCount = 1;
+            const key = getRequest.sessionId || connectionNode.getConnectId({ withDb: true });
             const connection = this.alivedConnection[key];
             if (connection) {
                 if (connection.connection.isAlive()) {
@@ -109,11 +115,12 @@ export class ConnectionManager {
             newConnection.connect(async (err: Error) => {
                 if (err) {
                     this.end(key, this.alivedConnection[key])
-                    if (connectCount >= 2) {
+                    if (getRequest.retryCount >= 2) {
                         reject(err)
                     } else {
                         try {
-                            resolve(await this.getConnection(connectionNode, connectCount + 1))
+                            getRequest.retryCount++;
+                            resolve(await this.getConnection(connectionNode, getRequest))
                         } catch (error) {
                             reject(error)
                         }
@@ -163,14 +170,5 @@ export class ConnectionManager {
         }
         return null;
     }
-
-    private static checkConnection() {
-        vscode.window.showErrorMessage("Please create database connection.", "Config").then(action => {
-            if (action == "Config") {
-                vscode.commands.executeCommand('mysql.connection.add');
-            }
-        });
-    }
-
 
 }

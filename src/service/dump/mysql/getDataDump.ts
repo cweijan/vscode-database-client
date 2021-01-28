@@ -18,9 +18,7 @@ function buildInsert(table: Table, values: Array<string>): string {
         `VALUES ${values.join(',')};`,
     ].join(' ')
 
-    // sql-formatter lib doesn't support the X'aaff' or b'01010' literals, and it adds a space in and breaks them
-    // this undoes the wrapping we did to get around the formatting
-    return sql.replace(/NOFORMAT_WRAP\("##(.+?)##"\)/g, '$1');
+    return sql;
 }
 function buildInsertValue(row: QueryRes, table: Table): string {
     return `(${table.columnsOrdered.map(c => row[c]).join(',')})`;
@@ -33,8 +31,6 @@ function executeSql(connection: mysql.Connection, sql: string): Promise<void> {
         ),
     );
 }
-
-// eslint-disable-next-line complexity
 async function getDataDump(
     connectionOptions: ConnectionOptions,
     options: Required<DataDumpOptions>,
@@ -56,7 +52,7 @@ async function getDataDump(
             connectionOptions,
             {
                 multipleStatements: true,
-                typeCast: typeCast(tables),
+                typeCast: typeCast,
             },
         ]),
     );
@@ -98,7 +94,6 @@ async function getDataDump(
         // to avoid having to load an entire DB's worth of data at once, we select from each table individually
         // note that we use async/await within this loop to only process one table at a time (to reduce memory footprint)
         while (tables.length > 0) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const table = tables.shift()!;
 
             if (table.isView && !options.includeViewData) {
@@ -111,12 +106,11 @@ async function getDataDump(
                         },
                     ]),
                 );
-
-                // eslint-disable-next-line no-continue
                 continue;
             }
 
-            currentTableLines = options.returnFromFunction ? [] : null;
+            // currentTableLines = options.returnFromFunction ? [] : null;
+            currentTableLines =  null;
 
             if (retTables.length > 0) {
                 // add a newline before the next header to pad the dumps
@@ -135,8 +129,6 @@ async function getDataDump(
             //     ];
             //     saveChunk(header);
             // }
-
-            // eslint-disable-next-line no-await-in-loop
             await new Promise((resolve, reject) => {
                 // send the query
                 const where = options.where[table.name]

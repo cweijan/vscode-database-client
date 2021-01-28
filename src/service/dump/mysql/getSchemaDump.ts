@@ -14,10 +14,6 @@ interface ShowCreateTable {
 }
 type ShowCreateTableStatementRes = ShowCreateView | ShowCreateTable;
 
-function isCreateView(v: ShowCreateTableStatementRes): v is ShowCreateView {
-    return 'View' in v;
-}
-
 async function getSchemaDump( connection: DB, options: Required<SchemaDumpOptions>, tables: Array<Table> ): Promise<Array<Table>> {
     // we create a multi query here so we can query all at once rather than in individual connections
     const getSchemaMultiQuery = tables
@@ -30,7 +26,7 @@ async function getSchemaDump( connection: DB, options: Required<SchemaDumpOption
         .map(r => r[0])
         .map((res, i) => {
             const table = tables[i];
-            if (isCreateView(res)) {
+            if ('View' in res) {
                 return {
                     ...table,
                     name: res.View,
@@ -39,7 +35,6 @@ async function getSchemaDump( connection: DB, options: Required<SchemaDumpOption
                     isView: true,
                 };
             }
-
             return {
                 ...table,
                 name: res.Table,
@@ -50,10 +45,6 @@ async function getSchemaDump( connection: DB, options: Required<SchemaDumpOption
         })
         .map(s => {
             // clean up the generated SQL as per the options
-
-            if (!options.autoIncrement) {
-                s.schema = s.schema.replace(/AUTO_INCREMENT\s*=\s*\d+ /g, '');
-            }
             if (!options.engine) {
                 s.schema = s.schema.replace(/ENGINE\s*=\s*\w+ /, '');
             }
@@ -75,7 +66,6 @@ async function getSchemaDump( connection: DB, options: Required<SchemaDumpOption
                 }
                 if (!options.view.sqlSecurity) {
                     s.schema = s.schema.replace(
-                        // eslint-disable-next-line max-len
                         /^CREATE( OR REPLACE)?( ALGORITHM[ ]?=[ ]?\w+)?( DEFINER[ ]?=[ ]?.+?@.+)? SQL SECURITY (?:DEFINER|INVOKER)/,
                         'CREATE$1$2$3',
                     );
@@ -92,35 +82,9 @@ async function getSchemaDump( connection: DB, options: Required<SchemaDumpOption
                         'CREATE TABLE IF NOT EXISTS',
                     );
                 }
-                if (options.table.charset === false) {
-                    s.schema = s.schema.replace(
-                        /( )?(DEFAULT )?(CHARSET|CHARACTER SET) = \w+/,
-                        '',
-                    );
-                }
             }
 
-            // fix up binary/hex default values if formatted
-            if (options.format) {
-                s.schema = s.schema
-                    // fix up binary and hex strings
-                    .replace(/DEFAULT b '(\d+)'/g, "DEFAULT b'$1'")
-                    .replace(/DEFAULT X '(\d+)'/g, "DEFAULT X'$1'")
-                    // fix up set defs which get split over two lines and then cause next lines to be extra indented
-                    .replace(/\n {2}set/g, ' set')
-                    .replace(/ {4}/g, '  ');
-            }
-
-            // add a semicolon to separate schemas
-            s.schema += ';';
-
-            // pad the sql with a header
-            s.schema = [
-                '',
-                s.schema,
-                '',
-            ].join('\n');
-
+            s.schema = `${s.schema};\n`;
             return s;
         })
         .sort((a, b) => {

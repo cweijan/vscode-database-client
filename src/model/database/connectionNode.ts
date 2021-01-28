@@ -62,7 +62,7 @@ export class ConnectionNode extends Node implements CopyAble {
         return this.execute<any[]>(this.dialect.showDatabases())
             .then((databases) => {
                 const includeDatabaseArray = this.includeDatabases?.toLowerCase()?.split(",")
-                const usingInclude = includeDatabaseArray && includeDatabaseArray.length >= 1;
+                const usingInclude = this.includeDatabases && includeDatabaseArray && includeDatabaseArray.length >= 1;
                 const databaseNodes = databases.filter((db) => {
                     if (usingInclude) {
                         return includeDatabaseArray.indexOf(db?.Database?.toLocaleLowerCase()) != -1;
@@ -89,12 +89,12 @@ export class ConnectionNode extends Node implements CopyAble {
     public async newQuery() {
 
         await FileManager.show(`${new Date().getTime()}.sql`);
-        let childMap={};
+        let childMap = {};
         const dbNameList = (await this.getChildren()).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => {
-            childMap[databaseNode.uid]=databaseNode
+            childMap[databaseNode.uid] = databaseNode
             return databaseNode.database
         });
-        let dbName:string;
+        let dbName: string;
         if (dbNameList.length == 1) {
             dbName = dbNameList[0]
         }
@@ -121,7 +121,7 @@ export class ConnectionNode extends Node implements CopyAble {
     public async deleteConnection(context: vscode.ExtensionContext) {
 
         Util.confirm(`Are you want to Delete Connection ${this.uid} ? `, async () => {
-            this.indent({command:CommandKey.delete})
+            this.indent({ command: CommandKey.delete })
         })
 
     }

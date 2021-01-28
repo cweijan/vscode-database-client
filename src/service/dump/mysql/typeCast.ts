@@ -1,8 +1,7 @@
 import { TypecastField } from 'mysql2/promise';
 import * as sqlstring from 'sqlstring';
+import { bitTypes, geometryTypes, hexTypes, numberTypes } from './resolveType';
 
-import { Table } from './interfaces/Table';
-import { resolveType } from './resolveType';
 
 // adapted from https://github.com/mysqljs/mysql/blob/master/lib/protocol/Parser.js
 // changes:
@@ -41,7 +40,6 @@ function parseGeometryValue(buffer: Buffer): string {
         return val;
     }
 
-    // eslint-disable-next-line complexity
     function parseGeometry(): string {
         let result: Array<string> = [];
 
@@ -98,7 +96,6 @@ function parseGeometryValue(buffer: Buffer): string {
                 for (let i = num; i > 0; i -= 1) {
                     let geom = parseGeometry();
                     // remove the function name from the sub geometry declaration from the multi declaration
-                    // eslint-disable-next-line default-case
                     switch (wkbType) {
                         case 4: // WKBMultiPoint
                             // multipoint = MULTIPOINT(\d+ \d+, \d+ \d+....)
@@ -128,104 +125,19 @@ function parseGeometryValue(buffer: Buffer): string {
     return `GeomFromText('${parseGeometry()}')`;
 }
 
-function intToBit(int: number): string {
-    let bits = int.toString(2);
-    while (bits.length < 8) {
-        bits = `0${bits}`;
+export function typeCast(field: TypecastField): string {
+    if (geometryTypes.has(field.type)) {
+        const buf = field.buffer();
+        return buf ? parseGeometryValue(buf) : null;
+    } else if (numberTypes.has(field.type)) {
+        const result = field.string();
+        return result == null ? 'NULL' : result;
+    } else if (bitTypes.has(field.type)) {
+        const buf = field.buffer();
+        return buf ? `${buf[0]}` : null;
+    } else if (hexTypes.has(field.type)) {
+        return sqlstring.escape(field.buffer());
+    } else {
+        return sqlstring.escape(field.string());
     }
-
-    return bits;
 }
-
-/**
- * sql-formatter doesn't support hex/binary literals
- * so we wrap them in this fake function call which gets removed later
- */
-function noformatWrap(str: string): string {
-    return `NOFORMAT_WRAP("##${str}##")`;
-}
-
-const DBNULL = 'NULL';
-
-function typeCast(tables: Array<Table>): (field: TypecastField) => string {
-    const tablesByName = tables.reduce((acc, t) => {
-        acc.set(t.name, t);
-
-        return acc;
-    }, new Map<string, Table>());
-
-    // eslint-disable-next-line complexity
-    return (field: TypecastField) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const table = tablesByName.get(field.table)!;
-        const columnType = resolveType(table.columns[field.name].type);
-
-        let value: string | null = ''; // the else case shouldn't happen ever
-        /* istanbul ignore else */ if (columnType === 'GEOMETRY') {
-            // parse and convert the binary representation to a nice string
-            const buf = field.buffer();
-            if (buf == null) {
-                value = null;
-            } else {
-                value = parseGeometryValue(buf);
-            }
-        } else if (columnType === 'STRING') {
-            // sanitize the string types
-            value = sqlstring.escape(field.string());
-        } else if (columnType === 'BIT') {
-            // bit fields have a binary representation we have to deal with
-            const buf = field.buffer();
-
-            if (buf == null) {
-                value = null;
-            } else {
-                // represent a binary literal (b'010101')
-                const numBytes = buf.length;
-                let bitString = '';
-                for (let i = 0; i < numBytes; i += 1) {
-                    const int8 = buf.readUInt8(i);
-                    bitString += intToBit(int8);
-                }
-
-                // truncate the bit string to the field length
-                bitString = bitString.substr(-field.length);
-
-                value = noformatWrap(`b'${bitString}'`);
-            }
-        } else if (columnType === 'HEX') {
-            // binary blobs
-            const buf = field.buffer();
-
-            if (buf == null) {
-                value = null;
-            } else {
-                // represent a hex literal (X'AF12')
-                const numBytes = buf.length;
-                let hexString = '';
-                for (let i = 0; i < numBytes; i += 1) {
-                    const int8 = buf.readUInt8(i);
-                    const hex = int8.toString(16);
-                    if (hex.length < 2) {
-                        hexString += '0';
-                    }
-                    hexString += hex;
-                }
-
-                value = noformatWrap(`X'${hexString}'`);
-            }
-        } else if (columnType === 'NUMBER') {
-            value = field.string();
-        } else {
-            throw new Error(`Unknown column type detected: ${columnType}`);
-        }
-
-        // handle nulls
-        if (value == null) {
-            value = DBNULL;
-        }
-
-        return value;
-    };
-}
-
-export { typeCast };

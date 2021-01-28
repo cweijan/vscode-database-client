@@ -9,7 +9,7 @@ export class TableInfoHoverProvider implements HoverProvider {
 
 
         const tableName = document.getText(document.getWordRangeAtPosition(position));
-        const tableNode = ConnectionManager.getLastConnectionOption()?.getByRegion(tableName) as TableNode
+        const tableNode = ConnectionManager.getLastConnectionOption(false)?.getByRegion(tableName) as TableNode
 
         const sourceCode = await tableNode?.execute<any[]>(tableNode.dialect.showTableSource(tableNode.database, tableNode.table))
         if (sourceCode) {

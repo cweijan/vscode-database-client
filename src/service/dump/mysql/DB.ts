@@ -32,7 +32,6 @@ class DB {
         if (!isMulti) {
             // mysql will return a non-array payload if there's only one statement in the query
             // so standardise the res..
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             res = [res] as any;
         }
 

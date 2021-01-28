@@ -12,8 +12,12 @@ export class MysqlConnection implements IConnection {
             timezone: node.timezone,
             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
             connectTimeout: 5000,
-            typeCast: function (field, next) {
-                return field?.buffer()?.toString();
+            typeCast: (field, next) => {
+                const buf = field.buffer();
+                if (field.type == 'BIT') {
+                    return this.bitToBoolean(buf)
+                }
+                return buf?.toString();
             }
         } as mysql.ConnectionConfig;
         if (node.certPath && fs.existsSync(node.certPath)) {
@@ -52,6 +56,10 @@ export class MysqlConnection implements IConnection {
     end(): void {
         this.dead = true;
         this.con.end()
+    }
+
+    bitToBoolean(buf: Buffer): any {
+        return buf ? buf[0] == 1 : null;
     }
 
 }

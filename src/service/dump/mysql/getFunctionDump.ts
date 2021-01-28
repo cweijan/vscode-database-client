@@ -52,28 +52,12 @@ async function getFunctionDump(
                 sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
             }
 
-            // add the delimiter
-            if (options && options.delimiter) {
-                sql = `DELIMITER ${options.delimiter}\n${sql}${
-                    options.delimiter
-                }\nDELIMITER ;`;
-            } else {
-                sql = `DELIMITER ;;\n${sql};;\nDELIMITER ;`;
-            }
-
             // drop stored Function should go outside the delimiter mods
             if (!options || options.dropIfExist) {
                 sql = `DROP Function IF EXISTS ${res.Function};\n${sql}`;
             }
 
-            // add a header to the stored Function
-            sql = [
-                '',
-                sql,
-                '',
-            ].join('\n');
-
-            return output.push(sql);
+            return output.push(`\n${sql};\n`);
         });
 
     return output;

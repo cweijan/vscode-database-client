@@ -1,13 +1,14 @@
-import { DatabaseType, ModelType } from "@/common/constants";
+import { DatabaseType } from "@/common/constants";
+import { TableGroup } from "@/model/main/tableGroup";
+import { ViewGroup } from "@/model/main/viewGroup";
 import { ViewNode } from "@/model/main/viewNode";
 import * as vscode from "vscode";
 import { Node } from "../../model/interface/node";
 import { TableNode } from "../../model/main/tableNode";
-import { DatabaseCache } from "../common/databaseCache";
 import format = require('date-format');
-import path = require('path');
-import { TableGroup } from "@/model/main/tableGroup";
-import { ViewGroup } from "@/model/main/viewGroup";
+import { FunctionGroup } from "@/model/main/functionGroup";
+import { ProcedureGroup } from "@/model/main/procedureGroup";
+import { TriggerGroup } from "@/model/main/triggerGroup";
 
 export abstract class AbstractDumpService {
 
@@ -19,15 +20,19 @@ export abstract class AbstractDumpService {
             return;
         }
 
-        let tables = []
+        let nodes = []
         if (node instanceof TableNode || node instanceof ViewNode) {
-            tables = [node.table]
+            nodes = [{ label: node.table, description: node.contextValue }]
         } else {
             const tableList = await new TableGroup(node).getChildren();
             const viewList = await new ViewGroup(node).getChildren();
-            const tableAndViewList = tableList.concat(viewList)
-            tables = await vscode.window.showQuickPick(tableAndViewList.map(table => table.label), { canPickMany: true, placeHolder: "Select databases to export, default is all" })
-            if (!tables) {
+            const procedureList = await new ProcedureGroup(node).getChildren();
+            const functionList = await new FunctionGroup(node).getChildren();
+            const triggerList = await new TriggerGroup(node).getChildren();
+            const childrenList = [...tableList, ...viewList, ...procedureList, ...functionList, ...triggerList]
+            const pickItems = childrenList.map(node => { return { label: node.label, description: node.contextValue, picked: true }; });
+            nodes = await vscode.window.showQuickPick(pickItems, { canPickMany: true, matchOnDescription: true, ignoreFocusOut: true })
+            if (!nodes) {
                 return;
             }
         }
@@ -37,12 +42,12 @@ export abstract class AbstractDumpService {
 
         vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(exportSqlName), filters: { 'sql': ['sql'] } }).then((folderPath) => {
             if (folderPath) {
-                this.dumpData(node, folderPath.fsPath, withData, tables)
+                this.dumpData(node, folderPath.fsPath, withData, nodes)
             }
         })
 
     }
 
-    protected abstract dumpData(node: Node, exportPath: string, withData: boolean, tables: string[]): void;
+    protected abstract dumpData(node: Node, exportPath: string, withData: boolean, tables: vscode.QuickPickItem[]): void;
 
 }
