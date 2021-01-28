@@ -1,8 +1,7 @@
 import { Hanlder, ViewManager } from "@/common/viewManager";
-import { HistoryRecorder } from "@/service/common/historyRecorder";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ConfigKey, Constants, DatabaseType, MessageType, ModelType, Template } from "../../common/constants";
+import { ConfigKey, Constants, DatabaseType, ModelType, Template } from "../../common/constants";
 import { Global } from "../../common/global";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
@@ -10,8 +9,6 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { MockRunner } from "../../service/mock/mockRunner";
 import { QueryUnit } from "../../service/queryUnit";
-import { QueryPage } from "../../service/result/query";
-import { DataResponse } from "../../service/result/queryResponse";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { ColumnMeta } from "../other/columnMeta";

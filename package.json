@@ -837,20 +837,25 @@
 			"type": "object",
 			"title": "%config.title%",
 			"properties": {
-				"vscode-mysql.enableDelimiter": {
+				"database-client.enableDelimiter": {
 					"type": "boolean",
 					"default": false,
 					"description": "%config.enableDelimiter%"
 				},
-				"vscode-mysql.defaultSelectLimit": {
+				"database-client.defaultSelectLimit": {
 					"type": "integer",
 					"default": 100,
 					"description": "%config.defaultSelectLimit%"
 				},
-				"vscode-mysql.showTotal": {
+				"database-client.showTotal": {
 					"type": "boolean",
 					"default": true,
 					"description": "%config.showTotal%"
+				},
+				"database-client.disableSqlCodeLen": {
+					"type": "boolean",
+					"default": false,
+					"description": "Disable Sql Code lens."
 				}
 			}
 		}

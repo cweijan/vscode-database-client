@@ -1,3 +1,5 @@
+import { ConfigKey } from '@/common/constants';
+import { Global } from '@/common/global';
 import * as vscode from 'vscode';
 
 export class SqlCodeLensProvider implements vscode.CodeLensProvider {
@@ -10,6 +12,10 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
     }
 
     public parseCodeLens(document: vscode.TextDocument): vscode.ProviderResult<vscode.CodeLens[]> {
+
+        if(Global.getConfig<number>(ConfigKey.DISABLE_SQL_CODELEN)){
+            return []
+        }
 
         const codeLens = []
 

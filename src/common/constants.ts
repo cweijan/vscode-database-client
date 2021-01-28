@@ -29,6 +29,7 @@ export enum CacheKey {
 export enum ConfigKey {
     ENABLE_DELIMITER = "enableDelimiter",
     DEFAULT_LIMIT = "defaultSelectLimit",
+    DISABLE_SQL_CODELEN = "disableSqlCodeLen",
     SHOW_TOTAL = "showTotal",
 }
 
