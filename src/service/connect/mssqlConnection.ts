@@ -47,17 +47,17 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
             let columnCount = 0;
             const connection = poolConnection.actual;
 
-            const isSelect = sql.match(/^\s*\bselect\b/i)
+            const isDML = sql.match(/^\s*\b(insert|update|delete)\b/i)
             connection.execSql(new Request(sql, err => {
                 const multi = columnCount > 1;
                 event.emit("end")
                 if(callback){
                     if (err) {
                         callback(err, null)
-                    } else if (isSelect) {
-                        callback(null, multi ? datas : datas[0] || [], multi ? fields : fields[0] || [])
-                    } else {
+                    } else if (isDML) {
                         callback(null, { affectedRows: datas.length })
+                    } else {
+                        callback(null, multi ? datas : datas[0] || [], multi ? fields : fields[0] || [])
                     }
                 }
                 this.release(poolConnection)
