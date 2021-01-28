@@ -25,10 +25,6 @@ interface SchemaDumpOptions {
          * Defaults to true.
          */
         createOrReplace?: boolean;
-        /**
-         * Include the `DEFINER = {\`user\`@\`host\` | CURRENT_USER}` in the view definition or not
-         * Defaults to false.
-         */
         definer?: boolean;
         /**
          * Include the `ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}` in the view definition or not
@@ -49,10 +45,6 @@ interface TriggerDumpOptions {
      * Defaults to false.
      */
     dropIfExist?: boolean;
-    /**
-     * Include the `DEFINER = {\`user\`@\`host\` | CURRENT_USER}` in the view definition or not
-     * Defaults to false.
-     */
     definer?: boolean;
 }
 
@@ -62,10 +54,6 @@ interface FunctionDumpOptions {
      * Defaults to false.
      */
     dropIfExist?: boolean;
-    /**
-     * Include the `DEFINER = {\`user\`@\`host\` | CURRENT_USER}` in the sp definition or not
-     * Defaults to false.
-     */
     definer?: boolean;
 }
 
@@ -75,10 +63,6 @@ interface ProcedureDumpOptions {
      * Defaults to false.
      */
     dropIfExist?: boolean;
-    /**
-     * Include the `DEFINER = {\`user\`@\`host\` | CURRENT_USER}` in the sp definition or not
-     * Defaults to false.
-     */
     definer?: boolean;
 }
 

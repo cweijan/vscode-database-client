@@ -3,6 +3,7 @@ import { Connection, ConnectionConfig, Request } from "@/bin/tedious";
 import { IConnection, queryCallback } from "./connection";
 import { ConnectionPool } from "./pool/connectionPool";
 import format = require('date-format');
+import { EventEmitter } from "events";
 
 /**
  * tedious not support connection queue, so need using pool.
@@ -18,7 +19,7 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
                 database: node.database || undefined,
                 connectTimeout: 5000,
                 requestTimeout: 10000,
-                encrypt:node.encrypt
+                encrypt: node.encrypt
             },
             authentication: {
                 type: "default",
@@ -31,34 +32,47 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
     }
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
-    async query(sql: any, values?: any, callback?: any) {
+    query(sql: any, values?: any, callback?: any) {
         if (!callback && values instanceof Function) {
             callback = values;
         }
         let fields = [];
         let datas = [];
 
+        const event = new EventEmitter()
+
         this.getConnection(poolConnection => {
 
+            let tempDatas = [];
+            let columnCount = 0;
             const connection = poolConnection.actual;
 
             const isSelect = sql.match(/^\s*\bselect\b/i)
             connection.execSql(new Request(sql, err => {
-                if (err) {
-                    callback(err, null)
-                } else if (isSelect) {
-                    callback(null, datas, fields)
-                } else {
-                    callback(null, { affectedRows: datas.length })
+                const multi = columnCount > 1;
+                event.emit("end")
+                if(callback){
+                    if (err) {
+                        callback(err, null)
+                    } else if (isSelect) {
+                        callback(null, multi ? datas : datas[0] || [], multi ? fields : fields[0] || [])
+                    } else {
+                        callback(null, { affectedRows: datas.length })
+                    }
                 }
                 this.release(poolConnection)
             }).on('columnMetadata', (columns) => {
+                columnCount++;
+                let tempFields = []
                 columns.forEach((column) => {
-                    fields.push({
+                    tempFields.push({
                         name: column.colName,
                         orgTable: ((column) as any).tableName
                     })
                 });
+                fields.push(tempFields)
+                if (columnCount > 0)
+                    datas.push(tempDatas)
             }).on('row', columns => {
                 let temp = {};
                 columns.forEach((column) => {
@@ -66,11 +80,19 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
                     if (column.value instanceof Date) {
                         temp[column.metadata.colName] = format("yyyy-MM-dd hh:mm:ss", column.value)
                     }
+                    if (this.dumpMode) {
+                        temp[column.metadata.colName] = `'${temp[column.metadata.colName]}'`
+                    }
                 });
-                datas.push(temp)
+                if (!callback) {
+                    event.emit("result", temp)
+                    return;
+                }
+                tempDatas.push(temp)
             }))
 
         })
+        return event;
     }
     connect(callback: (err: Error) => void): void {
         const con = new Connection(this.config)

@@ -11,9 +11,9 @@ interface QueryRes {
 
 function buildInsert(row: QueryRes, table: string, values: Array<string>): string {
     const sql = [
-        `INSERT INTO \`${table}\` (\`${Object.keys(row).join(
+        `INSERT INTO ${table} (${Object.keys(row).join(
             '`,`',
-        )}\`)`,
+        )})`,
         `VALUES ${values.join(',')};`,
     ].join(' ')
 
@@ -96,7 +96,7 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
                     ? ` WHERE ${options.where[table]}`
                     : '';
                 const query = connection.query(
-                    `SELECT * FROM \`${table}\`${where}`,
+                    `SELECT * FROM ${table}${where}`,
                 ) as Query;
 
                 let rowQueue: Array<string> = [];
@@ -142,9 +142,6 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
             await executeSql(connection, 'UNLOCK TABLES');
         }
     }
-
-    // clean up our connections
-    await ((connection.end() as unknown) as Promise<void>);
 
     if (outFileStream) {
         // tidy up the file stream, making sure writes are 100% flushed before continuing

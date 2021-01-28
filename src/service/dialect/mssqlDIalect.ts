@@ -73,7 +73,7 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         return `create database ${database}`;
     }
     showTableSource(database: string, table: string): string {
-        return `SHOW CREATE TABLE "${database}"."${table}";`
+        return ``
     }
     showViewSource(database: string, table: string): string {
         return `SELECT definition 'Create View' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${table}');`

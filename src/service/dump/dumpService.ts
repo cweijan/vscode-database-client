@@ -26,6 +26,7 @@ export class DumpService {
             const functionList = await new FunctionGroup(node).getChildren();
             const triggerList = await new TriggerGroup(node).getChildren();
             const childrenList = [...tableList, ...viewList, ...procedureList, ...functionList, ...triggerList]
+                .filter(item => item.contextValue != ModelType.INFO && item.contextValue != ModelType.SYSTEM_VIEW_GROUP)
             const pickItems = childrenList.map(node => { return { label: node.label, description: node.contextValue, picked: true }; });
             nodes = await vscode.window.showQuickPick(pickItems, { canPickMany: true, matchOnDescription: true, ignoreFocusOut: true })
             if (!nodes) {

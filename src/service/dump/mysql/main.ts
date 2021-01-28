@@ -54,8 +54,8 @@ export default async function main(inputOptions: Options, node: Node): Promise<v
     }
 
     if (options.dumpToFile && node.database && options.dump.withDatabase) {
-        fs.appendFileSync(options.dumpToFile, `CREATE DATABASE /*!32312 IF NOT EXISTS*/ \`${node.database}\` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
-USE \`${node.database}\`;\n\n`);
+        fs.appendFileSync(options.dumpToFile, `CREATE DATABASE /*!32312 IF NOT EXISTS*/ ${node.database} /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+USE ${node.database};\n\n`);
     }
 
     const sessionId = new Date().getTime() + ""

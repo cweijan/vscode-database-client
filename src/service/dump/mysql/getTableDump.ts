@@ -11,6 +11,7 @@ export async function getTableDump(node: Node, sessionId: string, options: Requi
     const getSchemaMultiQuery = tables
         .map(t => node.dialect.showTableSource(node.database, t))
         .join('');
+    if (!getSchemaMultiQuery) return;
     const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateTable[][];
     const createStatements = result
         .map((r) => {
@@ -22,7 +23,7 @@ export async function getTableDump(node: Node, sessionId: string, options: Requi
             if (options.table.dropIfExist) {
                 schema = schema.replace(
                     /^CREATE TABLE/,
-                    `DROP TABLE IF EXISTS \`${res.Table}\`;\nCREATE TABLE`,
+                    `DROP TABLE IF EXISTS ${res.Table};\nCREATE TABLE`,
                 );
             } else if (options.table.ifNotExist) {
                 schema = schema.replace(
