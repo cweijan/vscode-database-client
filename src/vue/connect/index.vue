@@ -63,6 +63,14 @@
         </div>
       </section>
 
+      <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-14">Encrypt</label>
+          <el-switch v-model="connectionOption.encrypt"></el-switch>
+           ( If connect SqlServer fail, try change this option. )
+        </div>
+      </section>
+
       <section class="mb-2" v-if="connectionOption.dbType=='Redis'">
         <div class="inline-block mr-10">
           <label class="font-bold mr-5 inline-block w-14"><span class="text-red-600 mr-1">*</span>Password</label>
@@ -182,6 +190,7 @@ export default {
         usingSSH: false,
         includeDatabases: null,
         dbType: "MySQL",
+        encrypt:true,
         global: true,
         scheme: "http",
         timezone: "+00:00",

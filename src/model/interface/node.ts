@@ -42,6 +42,10 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public ssh?: SSHConfig;
     public dbType?: DatabaseType;
     public dialect?: SqlDialect;
+    /**
+     * mssql
+     */
+    public encrypt?: boolean;
 
     /**
      * contenxt
@@ -74,6 +78,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.scheme = source.scheme
         this.global = source.global
         this.dbType = source.dbType
+        this.encrypt=source.encrypt
         this.disable = source.disable
         this.includeDatabases = source.includeDatabases
         if (!this.provider) this.provider = source.provider
