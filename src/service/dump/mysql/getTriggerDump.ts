@@ -23,7 +23,6 @@ interface ShowCreateTrigger {
 }
 
 async function getTriggerDump(node: Node, sessionId: string, options: Required<TriggerDumpOptions>, triggers: Array<string>): Promise<string> {
-    const output: Array<string> = [];
     if (triggers.length === 0) {
         return "";
     }
@@ -34,7 +33,7 @@ async function getTriggerDump(node: Node, sessionId: string, options: Required<T
     }).join("")
 
     const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateTrigger[][];
-    result.forEach(r => {
+    const output=result.map(r => {
         const res = r[0]
         // clean up the generated SQL
         let sql = `${res['SQL Original Statement']}`;
@@ -45,10 +44,10 @@ async function getTriggerDump(node: Node, sessionId: string, options: Required<T
         if (options.dropIfExist) {
             sql = `DROP TRIGGER IF EXISTS ${res.Trigger};\n${sql}`;
         }
-        output.push(`\n${sql};\n`);
+        return `${sql};`;
     });
 
-    return output.join("\n");
+    return output.join("\n\n");
 }
 
 export { ShowTriggers, ShowCreateTrigger, getTriggerDump };

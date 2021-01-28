@@ -125,7 +125,7 @@ function parseGeometryValue(buffer: Buffer): string {
     return `GeomFromText('${parseGeometry()}')`;
 }
 
-export function typeCast(field: TypecastField): string {
+export function dumpTypeCast(field: TypecastField): string {
     if (geometryTypes.has(field.type)) {
         const buf = field.buffer();
         return buf ? parseGeometryValue(buf) : null;

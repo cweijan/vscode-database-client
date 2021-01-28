@@ -1,18 +1,22 @@
 import { Node } from "@/model/interface/node";
 import * as fs from "fs";
 import * as mysql from "mysql2";
+import { TypecastField } from "mysql2";
 import { IConnection, queryCallback } from "./connection";
+import { dumpTypeCast } from './convert/mysqlTypeCast';
 
-export class MysqlConnection implements IConnection {
+export class MysqlConnection extends IConnection {
     private con: mysql.Connection;
     private dead: boolean;
     constructor(node: Node) {
+        super()
         const newConnectionOptions = {
             host: node.host, port: node.port, user: node.user, password: node.password, database: node.database,
             timezone: node.timezone,
             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
             connectTimeout: 5000,
             typeCast: (field, next) => {
+                if (this.dumpMode) return dumpTypeCast(field as TypecastField)
                 const buf = field.buffer();
                 if (field.type == 'BIT') {
                     return this.bitToBoolean(buf)
@@ -33,7 +37,7 @@ export class MysqlConnection implements IConnection {
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
     query(sql: any, values?: any, callback?: any) {
-        this.con.query(sql, values, callback)
+        return this.con.query(sql, values, callback)
     }
     connect(callback: (err: Error) => void): void {
         this.con.connect(callback)

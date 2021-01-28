@@ -11,10 +11,11 @@ types.setTypeParser(114, (val) => val)
 /**
  * https://www.npmjs.com/package/pg
  */
-export class PostgreSqlConnection implements IConnection {
+export class PostgreSqlConnection extends IConnection {
     private client: Client;
     private dead: boolean;
     constructor(opt: Node) {
+        super()
         const config = {
             host: opt.host, port: opt.port,
             user: opt.user, password: opt.password,

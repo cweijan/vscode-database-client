@@ -8,7 +8,13 @@ import { DatabaseCache } from "./common/databaseCache";
 import { NodeUtil } from "../model/nodeUtil";
 import { SSHTunnelService } from "./common/sshTunnelService";
 import { DbTreeDataProvider } from "../provider/treeDataProvider";
-import { create, IConnection } from "./connect/connection";
+import { IConnection } from "./connect/connection";
+import { DatabaseType } from "@/common/constants";
+import { EsConnection } from "./connect/esConnection";
+import { MSSqlConnnection } from "./connect/mssqlConnection";
+import { MysqlConnection } from "./connect/mysqlConnection";
+import { PostgreSqlConnection } from "./connect/postgreSqlConnection";
+import { RedisConnection } from "./connect/redisConnection";
 
 interface ConnectionWrapper {
     connection: IConnection;
@@ -110,7 +116,7 @@ export class ConnectionManager {
                     return;
                 }
             }
-            const newConnection = create(connectOption);
+            const newConnection = this.create(connectOption);
             this.alivedConnection[key] = { connection: newConnection, ssh, database: connectionNode.database };
             newConnection.connect(async (err: Error) => {
                 if (err) {
@@ -132,6 +138,20 @@ export class ConnectionManager {
 
         });
 
+    }
+
+    private static create(opt: Node) {
+        switch (opt.dbType) {
+            case DatabaseType.MSSQL:
+                return new MSSqlConnnection(opt)
+            case DatabaseType.PG:
+                return new PostgreSqlConnection(opt)
+            case DatabaseType.ES:
+                return new EsConnection(opt);
+            case DatabaseType.REDIS:
+                return new RedisConnection(opt);
+        }
+        return new MysqlConnection(opt)
     }
 
     private static end(key: string, connection: ConnectionWrapper) {

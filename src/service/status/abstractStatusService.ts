@@ -1,12 +1,9 @@
-import { StatusService } from "./statusService";
-import { ConnectionNode } from "../../model/database/connectionNode";
-import { ViewManager } from "../../common/viewManager";
-import { Global } from "../../common/global";
 import { ConnectionManager } from "@/service/connectionManager";
-import { Console } from "@/common/Console";
-import { FieldInfo } from "mysql2";
-import Query = require("mysql2/typings/mysql/lib/protocol/sequences/Query");
 import { QueryUnit } from "@/service/queryUnit";
+import { Global } from "../../common/global";
+import { ViewManager } from "../../common/viewManager";
+import { ConnectionNode } from "../../model/database/connectionNode";
+import { StatusService } from "./statusService";
 
 export abstract class AbstractStatusService implements StatusService {
 

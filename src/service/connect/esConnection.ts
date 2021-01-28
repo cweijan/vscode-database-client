@@ -2,11 +2,12 @@ import axios from "axios";
 import { Node } from "@/model/interface/node";
 import { IConnection, queryCallback } from "./connection";
 
-export class EsConnection implements IConnection {
+export class EsConnection extends IConnection {
 
     private url: string;
     private conneted: boolean;
     constructor(private opt: Node) {
+        super()
         this.url = `${opt.scheme}://${opt.host}:${opt.port}`
     }
 

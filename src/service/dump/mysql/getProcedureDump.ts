@@ -19,7 +19,6 @@ interface ShowCreateProcedure {
 }
 
 async function getProcedureDump(node: Node, sessionId: string, options: Required<ProcedureDumpOptions>, procedures: Array<string>): Promise<string> {
-    const output: Array<string> = [];
     if (procedures.length == 0) {
         return "";
     }
@@ -27,25 +26,19 @@ async function getProcedureDump(node: Node, sessionId: string, options: Required
         return node.dialect.showProcedureSource(node.database, proc)
     }).join("")
     const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateProcedure[][];
-    // mysql2 returns an array of arrays which will all have our one row
-    result.forEach(r => {
+    const output = result.map(r => {
         const res = r[0]
-        // clean up the generated SQL
         let sql = `${res['Create Procedure']}`;
-
         if (!options || !options.definer) {
             sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
         }
-
-        // drop stored procedure should go outside the delimiter mods
         if (!options || options.dropIfExist) {
             sql = `DROP PROCEDURE IF EXISTS ${res.Procedure};\n${sql}`;
         }
-
-        return output.push(`\n${sql};\n`);
+        return `${sql};`;
     });
 
-    return output.join("\n");
+    return output.join("\n\n");
 }
 
 export { ShowProcedures, ShowCreateProcedure, getProcedureDump };

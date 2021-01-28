@@ -2,10 +2,11 @@ import { Node } from "@/model/interface/node";
 import { RedisClient, createClient } from "redis";
 import { IConnection, queryCallback } from "./connection";
 
-export class RedisConnection implements IConnection {
+export class RedisConnection extends IConnection {
     private conneted: boolean;
     private client: RedisClient;
     constructor(opt: Node) {
+        super()
         this.client = createClient({
             host: opt.host,
             port: opt.port,

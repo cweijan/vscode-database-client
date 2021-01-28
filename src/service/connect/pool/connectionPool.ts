@@ -1,12 +1,14 @@
 import { EventEmitter } from "events";
+import { IConnection } from "../connection";
 import { IpoolConnection, pcStatus } from "./poolConnection";
 
-export abstract class ConnectionPool<T> {
+export abstract class ConnectionPool<T> extends IConnection {
     private connections: IpoolConnection<T>[] = [];
     private conneted: boolean;
     private waitQueue: Function[] = [];
 
     constructor() {
+        super()
     }
 
     public async getConnection(callback?: (connection: IpoolConnection<T>) => void): Promise<IpoolConnection<T>> {

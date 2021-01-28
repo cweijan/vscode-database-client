@@ -8,7 +8,7 @@ import format = require('date-format');
  * tedious not support connection queue, so need using pool.
  * http://tediousjs.github.io/tedious/getting-started.html
  */
-export class MSSqlConnnection extends ConnectionPool<Connection> implements IConnection {
+export class MSSqlConnnection extends ConnectionPool<Connection>{
     private config: ConnectionConfig;
     constructor(node: Node) {
         super()

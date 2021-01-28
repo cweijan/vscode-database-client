@@ -1,21 +1,18 @@
-import { DatabaseType } from "@/common/constants";
-import { Node } from "@/model/interface/node";
-import { FieldInfo } from "mysql2";
-import { EsConnection } from "./esConnection";
-import { MSSqlConnnection } from "./mssqlConnection";
-import { MysqlConnection } from "./mysqlConnection";
-import { PostgreSqlConnection } from "./postgreSqlConnection";
-import { RedisConnection } from "./redisConnection";
+import { FieldInfo, Query } from "mysql2";
 
-export interface IConnection {
-    query(sql: string, callback?: queryCallback): void;
-    query(sql: string, values: any, callback?: queryCallback): void;
-    connect(callback: (err: Error) => void): void;
-    beginTransaction(callback: (err: Error) => void): void;
-    rollback(): void;
-    commit(): void;
-    end(): void;
-    isAlive(): boolean;
+export abstract class IConnection {
+    protected dumpMode: boolean = false;
+    public enableDumpMode(){
+        this.dumpMode=true;
+    };
+    abstract query(sql: string, callback?: queryCallback): void | Query;
+    abstract query(sql: string, values: any, callback?: queryCallback): void | Query;
+    abstract connect(callback: (err: Error) => void): void;
+    abstract beginTransaction(callback: (err: Error) => void): void;
+    abstract rollback(): void;
+    abstract commit(): void;
+    abstract end(): void;
+    abstract isAlive(): boolean;
 }
 
 
@@ -32,16 +29,3 @@ export interface QueryFunction {
 }
 
 
-export function create(opt: Node) {
-    switch (opt.dbType) {
-        case DatabaseType.MSSQL:
-            return new MSSqlConnnection(opt)
-        case DatabaseType.PG:
-            return new PostgreSqlConnection(opt)
-        case DatabaseType.ES:
-            return new EsConnection(opt);
-        case DatabaseType.REDIS:
-            return new RedisConnection(opt);
-    }
-    return new MysqlConnection(opt)
-}

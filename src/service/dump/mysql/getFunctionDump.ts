@@ -1,5 +1,4 @@
 import { FunctionDumpOptions } from './interfaces/Options';
-import { DB } from './DB';
 import { Node } from '@/model/interface/node';
 
 interface ShowFunctions {
@@ -20,7 +19,6 @@ interface ShowCreateFunction {
 }
 
 async function getFunctionDump(node: Node, sessionId: string, options: Required<FunctionDumpOptions>, functions: Array<string>): Promise<string> {
-    const output: Array<string> = [];
     if (functions.length == 0) {
         return "";
     }
@@ -28,24 +26,19 @@ async function getFunctionDump(node: Node, sessionId: string, options: Required<
         return node.dialect.showFunctionSource(node.database, fun)
     }).join("")
     const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateFunction[][];
-    result.forEach(r => {
+    const output = result.map(r => {
         const res = r[0]
-        // clean up the generated SQL
         let sql = `${res['Create Function']}`;
-
         if (!options || !options.definer) {
             sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
         }
-
-        // drop stored Function should go outside the delimiter mods
         if (!options || options.dropIfExist) {
             sql = `DROP Function IF EXISTS ${res.Function};\n${sql}`;
         }
-
-        output.push(`\n${sql};\n`);
+        return `${sql};`;
     });
 
-    return output.join("\n");
+    return output.join("\n\n");
 }
 
 export { ShowFunctions, ShowCreateFunction, getFunctionDump };

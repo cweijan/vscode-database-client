@@ -1,18 +1,17 @@
+import { Node } from '@/model/interface/node';
+import { IConnection } from '@/service/connect/connection';
+import { ConnectionManager } from '@/service/connectionManager';
 import * as fs from 'fs';
-import * as mysql from 'mysql2';
-import { all as merge } from 'deepmerge';
-
-import { ConnectionOptions, DataDumpOptions } from './interfaces/Options';
-import { Table } from './interfaces/Table';
-import { typeCast } from './typeCast';
+import { Query } from 'mysql2';
+import { DataDumpOptions } from './interfaces/Options';
 
 interface QueryRes {
     [k: string]: unknown;
 }
 
-function buildInsert(row: QueryRes, table: Table, values: Array<string>): string {
+function buildInsert(row: QueryRes, table: string, values: Array<string>): string {
     const sql = [
-        `INSERT INTO \`${table.name}\` (\`${Object.keys(row).join(
+        `INSERT INTO \`${table}\` (\`${Object.keys(row).join(
             '`,`',
         )}\`)`,
         `VALUES ${values.join(',')};`,
@@ -20,23 +19,18 @@ function buildInsert(row: QueryRes, table: Table, values: Array<string>): string
 
     return sql;
 }
-function buildInsertValue(row: QueryRes, table: Table): string {
+function buildInsertValue(row: QueryRes): string {
     return `(${Object.keys(row).map(c => row[c]).join(',')})`;
 }
 
-function executeSql(connection: mysql.Connection, sql: string): Promise<void> {
+function executeSql(connection: IConnection, sql: string): Promise<void> {
     return new Promise((resolve, reject) =>
         connection.query(sql, err =>
             err ? /* istanbul ignore next */ reject(err) : resolve(),
         ),
     );
 }
-async function getDataDump(
-    connectionOptions: ConnectionOptions,
-    options: Required<DataDumpOptions>,
-    tables: Array<Table>,
-    dumpToFile: string | null,
-): Promise<Array<Table>> {
+async function getDataDump(node: Node, sessionId: string, options: Required<DataDumpOptions>, tables: Array<string>, dumpToFile: string | null,): Promise<void> {
     // ensure we have a non-zero max row option
     options.maxRowsPerInsertStatement = Math.max(
         options.maxRowsPerInsertStatement,
@@ -46,18 +40,8 @@ async function getDataDump(
     // clone the array
     tables = [...tables];
 
-    // we open a new connection with a special typecast function for dumping data
-    const connection = mysql.createConnection(
-        merge([
-            connectionOptions,
-            {
-                multipleStatements: true,
-                typeCast: typeCast,
-            },
-        ]),
-    );
+    const connection = await ConnectionManager.getConnection(node, { sessionId })
 
-    const retTables: Array<Table> = [];
     let currentTableLines: Array<string> | null = null;
 
     // open the write stream (if configured to)
@@ -91,52 +75,29 @@ async function getDataDump(
             await executeSql(connection, 'SET GLOBAL read_only = ON');
         }
 
+        connection.enableDumpMode()
+
         // to avoid having to load an entire DB's worth of data at once, we select from each table individually
         // note that we use async/await within this loop to only process one table at a time (to reduce memory footprint)
         while (tables.length > 0) {
             const table = tables.shift()!;
 
-            if (table.isView && !options.includeViewData) {
-                // don't dump data for views
-                retTables.push(
-                    merge<Table>([
-                        table,
-                        {
-                            data: null,
-                        },
-                    ]),
-                );
-                continue;
-            }
-
             // currentTableLines = options.returnFromFunction ? [] : null;
             currentTableLines = null;
 
-            if (retTables.length > 0) {
+            if (tables.length > 0) {
                 // add a newline before the next header to pad the dumps
                 saveChunk('');
             }
 
-            // if (options.verbose) {
-            //     // write the table header to the file
-            //     const header = [
-            //         '# ------------------------------------------------------------',
-            //         `# DATA DUMP FOR TABLE: ${table.name}${
-            //             options.lockTables ? ' (locked)' : ''
-            //         }`,
-            //         '# ------------------------------------------------------------',
-            //         '',
-            //     ];
-            //     saveChunk(header);
-            // }
             await new Promise((resolve, reject) => {
                 // send the query
-                const where = options.where[table.name]
-                    ? ` WHERE ${options.where[table.name]}`
+                const where = options.where[table]
+                    ? ` WHERE ${options.where[table]}`
                     : '';
                 const query = connection.query(
-                    `SELECT * FROM \`${table.name}\`${where}`,
-                );
+                    `SELECT * FROM \`${table}\`${where}`,
+                ) as Query;
 
                 let rowQueue: Array<string> = [];
 
@@ -144,7 +105,7 @@ async function getDataDump(
                 // stream the data to the file
                 query.on('result', (row: QueryRes) => {
                     // build the values list
-                    rowQueue.push(buildInsertValue(row, table));
+                    rowQueue.push(buildInsertValue(row));
 
                     if (!tempRow) tempRow = row;
                     // if we've got a full queue
@@ -171,17 +132,6 @@ async function getDataDump(
                 );
             });
 
-            // update the table definition
-            retTables.push(
-                merge<Table>([
-                    table,
-                    {
-                        data: currentTableLines
-                            ? currentTableLines.join('\n')
-                            : null,
-                    },
-                ]),
-            );
         }
 
         saveChunk('');
@@ -206,7 +156,7 @@ async function getDataDump(
         });
     }
 
-    return retTables;
 }
 
 export { getDataDump };
+
