@@ -1,25 +1,22 @@
-import * as fs from 'fs';
+import { Node } from '@/model/interface/node';
 import { all as merge } from 'deepmerge';
-
-import {
-    Options,
-    CompletedOptions,
-    DataDumpOptions,
-} from './interfaces/Options';
-import { DumpReturn } from './interfaces/DumpReturn';
-import { getTables } from './getTables';
-import { getSchemaDump } from './getSchemaDump';
-import { getTriggerDump } from './getTriggerDump';
-import { getProcedureDump } from './getProcedureDump';
-import { getFunctionDump } from './getFunctionDump';
-import { getDataDump } from './getDataDump';
+import * as fs from 'fs';
 import { DB } from './DB';
 import { ERRORS } from './Errors';
-import { Node } from '@/model/interface/node';
+import { getDataDump } from './getDataDump';
+import { getFunctionDump } from './getFunctionDump';
+import { getProcedureDump } from './getProcedureDump';
+import { getSchemaDump } from './getSchemaDump';
+import { getTriggerDump } from './getTriggerDump';
+import { DumpReturn } from './interfaces/DumpReturn';
+import {
+    CompletedOptions, Options
+} from './interfaces/Options';
+
 
 export {
     Options
-}
+};
 
 const defaultOptions: Options = {
     connection: {
@@ -68,7 +65,6 @@ function assert(condition: unknown, message: string): void {
     }
 }
 export default async function main(inputOptions: Options, node: Node): Promise<DumpReturn> {
-    let connection;
     try {
         // assert the given options have all the required properties
         assert(inputOptions.connection, ERRORS.MISSING_CONNECTION_CONFIG);
@@ -78,139 +74,65 @@ export default async function main(inputOptions: Options, node: Node): Promise<D
         // note that you can have empty string passwords, hence the type assertion
         assert(typeof inputOptions.connection.password === 'string', ERRORS.MISSING_CONNECTION_PASSWORD,);
 
-        const options = merge([
-            defaultOptions,
-            inputOptions,
-        ]) as CompletedOptions;
+        const options = merge([defaultOptions, inputOptions]) as CompletedOptions;
 
         // make sure the port is a number
         options.connection.port = parseInt(`${options.connection.port}`, 10);
 
-        // write to the destination file (i.e. clear it)
+        // write to the destination file (clear it)
         if (options.dumpToFile) {
             fs.writeFileSync(options.dumpToFile, '');
         }
-
-        connection = await DB.connect(
-            merge([options.connection, { multipleStatements: true }]),
-        );
 
         // list the tables
         const res: DumpReturn = {
             dump: {
                 schema: null,
-                data: null,
-                trigger: null,
-                procedure: null,
-                function: null
+                data: null
             },
-            tables: await getTables(
-                connection,
-                options.connection.database,
-                options.dump.tables,
-                options.dump.excludeTables,
-            ),
+            tables: null,
         };
 
         if (options.dumpToFile && options.connection.database && options.dump.withDatabase) {
             fs.appendFileSync(options.dumpToFile, `CREATE DATABASE /*!32312 IF NOT EXISTS*/ \`${options.connection.database}\` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
-USE \`${options.connection.database}\`;\n`);
+USE \`${options.connection.database}\`;\n\n`);
         }
+
+        const sessionId = new Date().getTime() + ""
 
         // dump the schema if requested
         if (options.dump.schema !== false) {
-            const tables = res.tables;
             res.tables = await getSchemaDump(
-                connection,
+                node, sessionId,
                 options.dump.schema,
-                tables,
+                options.dump.tables
             );
-            res.dump.schema = res.tables
+            const tableResult = res.tables
                 .map(t => t.schema)
-                .filter(t => t)
-                .join('\n')
-                .trim();
+                .join('\n');
+            fs.appendFileSync(options.dumpToFile, `${tableResult}\n\n`);
+
         }
 
-        // write the schema to the file
-        if (options.dumpToFile && res.dump.schema) {
-            fs.appendFileSync(options.dumpToFile, `${res.dump.schema}\n\n`);
-        }
-
-        // dump the procedures if requested
-        if (options.dump.procedure !== false) {
-            const procedures = await getProcedureDump(
-                connection,
-                options.connection.database,
-                options.dump.procedure,
-            );
-            res.dump.procedure = procedures
-                .map(proc => proc)
-                .join('\n')
-                .trim();
-        }
-
-        // dump the functions if requested
-        if (options.dump.procedure !== false) {
-            const functions = await getFunctionDump(
-                connection,
-                options.connection.database,
-                options.dump.function,
-            );
-            res.dump.function = functions
-                .join('\n')
-                .trim();
-        }
-
-        // dump the triggers if requested
-        if (options.dump.trigger !== false) {
-            const tables = res.tables;
-            res.tables = await getTriggerDump(
-                connection,
-                options.connection.database,
-                options.dump.trigger,
-                tables,
-            );
-            res.dump.trigger = res.tables
-                .map(t => t.triggers.join('\n'))
-                .filter(t => t)
-                .join('\n')
-                .trim();
-        }
-
-        // data dump uses its own connection so kill ours
-        await connection.end();
-
-        // dump data if requested
         if (options.dump.data !== false) {
-            // don't even try to run the data dump
             const tables = res.tables;
-            res.tables = await getDataDump(
-                options.connection,
-                options.dump.data,
-                tables,
-                options.dumpToFile,
-            );
-            res.dump.data = res.tables
-                .map(t => t.data)
-                .filter(t => t)
-                .join('\n')
-                .trim();
+            res.tables = await getDataDump(options.connection, options.dump.data, tables, options.dumpToFile,);
+            res.dump.data = res.tables.map(t => t.data).join('\n');
         }
 
-        // write the procedures to the file
-        if (options.dumpToFile && res.dump.procedure) {
-            fs.appendFileSync(options.dumpToFile, `${res.dump.procedure}\n\n`);
+        if (options.dump.procedure !== false) {
+            const predecureDatas = await getProcedureDump(node, sessionId, options.dump.procedure, options.dump.procedureList);
+            fs.appendFileSync(options.dumpToFile, `${predecureDatas}\n`);
         }
 
-        // write the functions to the file
-        if (options.dumpToFile && res.dump.function) {
-            fs.appendFileSync(options.dumpToFile, `${res.dump.function}\n\n`);
+        if (options.dump.procedure !== false) {
+            const functionDatas = await getFunctionDump(node, sessionId, options.dump.function, options.dump.functionList);
+            fs.appendFileSync(options.dumpToFile, `${functionDatas}\n`);
         }
 
-        // write the triggers to the file
-        if (options.dumpToFile && res.dump.trigger) {
-            fs.appendFileSync(options.dumpToFile, `${res.dump.trigger}\n\n`);
+        if (options.dump.trigger !== false) {
+            const triggerDatas = await getTriggerDump(node, sessionId, options.dump.trigger, options.dump.triggerList);
+            fs.appendFileSync(options.dumpToFile, `${triggerDatas}\n`);
         }
 
         return res;

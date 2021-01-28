@@ -1,5 +1,5 @@
+import { Node } from '@/model/interface/node';
 import { ProcedureDumpOptions } from './interfaces/Options';
-import { DB } from './DB';
 
 interface ShowProcedures {
     Name: string;
@@ -18,49 +18,34 @@ interface ShowCreateProcedure {
     'Database Collation': string;
 }
 
-async function getProcedureDump(
-    connection: DB,
-    dbName: string,
-    options: Required<ProcedureDumpOptions>,
-): Promise<Array<string>> {
+async function getProcedureDump(node: Node, sessionId: string, options: Required<ProcedureDumpOptions>, procedures: Array<string>): Promise<string> {
     const output: Array<string> = [];
-    const procedures = await connection.query<ShowProcedures>(
-        `SHOW PROCEDURE STATUS WHERE Db = '${dbName}'`,
-    );
+    if (procedures.length == 0) {
+        return "";
+    }
+    const getSchemaMultiQuery = procedures.map(proc => {
+        return node.dialect.showProcedureSource(node.database, proc)
+    }).join("")
+    const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateProcedure[][];
+    // mysql2 returns an array of arrays which will all have our one row
+    result.forEach(r => {
+        const res = r[0]
+        // clean up the generated SQL
+        let sql = `${res['Create Procedure']}`;
 
-    // we create a multi query here so we can query all at once rather than in individual connections
-    const getSchemaMultiQuery: Array<string> = [];
-    procedures.forEach(proc => {
-        getSchemaMultiQuery.push(`SHOW CREATE PROCEDURE \`${proc.Name}\`;`);
+        if (!options || !options.definer) {
+            sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
+        }
+
+        // drop stored procedure should go outside the delimiter mods
+        if (!options || options.dropIfExist) {
+            sql = `DROP PROCEDURE IF EXISTS ${res.Procedure};\n${sql}`;
+        }
+
+        return output.push(`\n${sql};\n`);
     });
 
-    if(getSchemaMultiQuery.length==0){
-        return [];
-    }
-
-    const result = await connection.multiQuery<ShowCreateProcedure>(
-        getSchemaMultiQuery.join('\n'),
-    );
-    // mysql2 returns an array of arrays which will all have our one row
-    result
-        .map(r => r[0])
-        .forEach(res => {
-            // clean up the generated SQL
-            let sql = `${res['Create Procedure']}`;
-
-            if (!options || !options.definer) {
-                sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
-            }
-
-            // drop stored procedure should go outside the delimiter mods
-            if (!options || options.dropIfExist) {
-                sql = `DROP PROCEDURE IF EXISTS ${res.Procedure};\n${sql}`;
-            }
-
-            return output.push(`\n${sql};\n`);
-        });
-
-    return output;
+    return output.join("\n");
 }
 
 export { ShowProcedures, ShowCreateProcedure, getProcedureDump };

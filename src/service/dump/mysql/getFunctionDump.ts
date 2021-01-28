@@ -1,5 +1,6 @@
 import { FunctionDumpOptions } from './interfaces/Options';
 import { DB } from './DB';
+import { Node } from '@/model/interface/node';
 
 interface ShowFunctions {
     Name: string;
@@ -18,49 +19,33 @@ interface ShowCreateFunction {
     'Database Collation': string;
 }
 
-async function getFunctionDump(
-    connection: DB,
-    dbName: string,
-    options: Required<FunctionDumpOptions>,
-): Promise<Array<string>> {
+async function getFunctionDump(node: Node, sessionId: string, options: Required<FunctionDumpOptions>, functions: Array<string>): Promise<string> {
     const output: Array<string> = [];
-    const Functions = await connection.query<ShowFunctions>(
-        `SHOW Function STATUS WHERE Db = '${dbName}'`,
-    );
+    if (functions.length == 0) {
+        return "";
+    }
+    const getSchemaMultiQuery = functions.map(fun => {
+        return node.dialect.showFunctionSource(node.database, fun)
+    }).join("")
+    const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateFunction[][];
+    result.forEach(r => {
+        const res = r[0]
+        // clean up the generated SQL
+        let sql = `${res['Create Function']}`;
 
-    // we create a multi query here so we can query all at once rather than in individual connections
-    const getSchemaMultiQuery: Array<string> = [];
-    Functions.forEach(proc => {
-        getSchemaMultiQuery.push(`SHOW CREATE Function \`${proc.Name}\`;`);
+        if (!options || !options.definer) {
+            sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
+        }
+
+        // drop stored Function should go outside the delimiter mods
+        if (!options || options.dropIfExist) {
+            sql = `DROP Function IF EXISTS ${res.Function};\n${sql}`;
+        }
+
+        output.push(`\n${sql};\n`);
     });
 
-    if(getSchemaMultiQuery.length==0){
-        return [];
-    }
-
-    const result = await connection.multiQuery<ShowCreateFunction>(
-        getSchemaMultiQuery.join('\n'),
-    );
-    // mysql2 returns an array of arrays which will all have our one row
-    result
-        .map(r => r[0])
-        .forEach(res => {
-            // clean up the generated SQL
-            let sql = `${res['Create Function']}`;
-
-            if (!options || !options.definer) {
-                sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
-            }
-
-            // drop stored Function should go outside the delimiter mods
-            if (!options || options.dropIfExist) {
-                sql = `DROP Function IF EXISTS ${res.Function};\n${sql}`;
-            }
-
-            return output.push(`\n${sql};\n`);
-        });
-
-    return output;
+    return output.join("\n");
 }
 
 export { ShowFunctions, ShowCreateFunction, getFunctionDump };

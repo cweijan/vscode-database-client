@@ -10,9 +10,9 @@ interface QueryRes {
     [k: string]: unknown;
 }
 
-function buildInsert(table: Table, values: Array<string>): string {
+function buildInsert(row: QueryRes, table: Table, values: Array<string>): string {
     const sql = [
-        `INSERT INTO \`${table.name}\` (\`${table.columnsOrdered.join(
+        `INSERT INTO \`${table.name}\` (\`${Object.keys(row).join(
             '`,`',
         )}\`)`,
         `VALUES ${values.join(',')};`,
@@ -21,7 +21,7 @@ function buildInsert(table: Table, values: Array<string>): string {
     return sql;
 }
 function buildInsertValue(row: QueryRes, table: Table): string {
-    return `(${table.columnsOrdered.map(c => row[c]).join(',')})`;
+    return `(${Object.keys(row).map(c => row[c]).join(',')})`;
 }
 
 function executeSql(connection: mysql.Connection, sql: string): Promise<void> {
@@ -110,7 +110,7 @@ async function getDataDump(
             }
 
             // currentTableLines = options.returnFromFunction ? [] : null;
-            currentTableLines =  null;
+            currentTableLines = null;
 
             if (retTables.length > 0) {
                 // add a newline before the next header to pad the dumps
@@ -140,15 +140,17 @@ async function getDataDump(
 
                 let rowQueue: Array<string> = [];
 
+                let tempRow: QueryRes;
                 // stream the data to the file
                 query.on('result', (row: QueryRes) => {
                     // build the values list
                     rowQueue.push(buildInsertValue(row, table));
 
+                    if (!tempRow) tempRow = row;
                     // if we've got a full queue
                     if (rowQueue.length === options.maxRowsPerInsertStatement) {
                         // create and write a fresh statement
-                        const insert = buildInsert(table, rowQueue);
+                        const insert = buildInsert(row, table, rowQueue);
                         saveChunk(insert);
                         rowQueue = [];
                     }
@@ -156,7 +158,7 @@ async function getDataDump(
                 query.on('end', () => {
                     // write the remaining rows to disk
                     if (rowQueue.length > 0) {
-                        const insert = buildInsert(table, rowQueue);
+                        const insert = buildInsert(tempRow, table, rowQueue);
                         saveChunk(insert);
                         rowQueue = [];
                     }

@@ -7,6 +7,7 @@ import { QueryUnit } from "@/service/queryUnit";
 import { ServiceManager } from "@/service/serviceManager";
 import * as vscode from "vscode";
 import { Memento } from "vscode";
+import { resourceLimits } from "worker_threads";
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { NodeUtil } from "../nodeUtil";
 import { CopyAble } from "./copyAble";
@@ -81,8 +82,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         if (!this.dialect && this.dbType != DatabaseType.REDIS) {
             this.dialect = ServiceManager.getDialect(this.dbType)
         }
-        if(this.disable){
-            this.command={command:"mysql.connection.open",title:"Open Connection",arguments:[this]}
+        if (this.disable) {
+            this.command = { command: "mysql.connection.open", title: "Open Connection", arguments: [this] }
         }
         this.initUid();
         // init tree state
@@ -90,7 +91,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     }
 
 
-    public async refresh(){
+    public async refresh() {
         await this.getChildren(true)
         this.provider.reload(this)
     }
@@ -109,7 +110,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public async indent(command: IndentCommand) {
 
         const cacheKey = command.cacheKey || this.provider?.connectionKey;
-        const connections = this.context.get<{ [key: string]: Node }>(cacheKey,{});
+        const connections = this.context.get<{ [key: string]: Node }>(cacheKey, {});
         if (!this.uid) {
             this.uid = this.getConnectId();
         }
@@ -197,6 +198,14 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public async execute<T>(sql: string): Promise<T> {
         return (await QueryUnit.queryPromise<T>(await ConnectionManager.getConnection(this), sql)).rows
+    }
+
+    public async multiExecute(sql: string, sessionId: string): Promise<any> {
+        const result = (await QueryUnit.queryPromise<any>(await ConnectionManager.getConnection(this, { sessionId }), sql)).rows;
+        if (result.length == 1) {
+            return [result]
+        }
+        return result
     }
 
     public async getConnection() {

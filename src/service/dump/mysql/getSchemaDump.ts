@@ -1,6 +1,6 @@
+import { Node } from '@/model/interface/node';
 import { SchemaDumpOptions } from './interfaces/Options';
 import { Table } from './interfaces/Table';
-import { DB } from './DB';
 
 interface ShowCreateView {
     View: string;
@@ -14,21 +14,18 @@ interface ShowCreateTable {
 }
 type ShowCreateTableStatementRes = ShowCreateView | ShowCreateTable;
 
-async function getSchemaDump( connection: DB, options: Required<SchemaDumpOptions>, tables: Array<Table> ): Promise<Array<Table>> {
+async function getSchemaDump(node: Node, sessionId: string, options: Required<SchemaDumpOptions>, tables: Array<string>): Promise<Array<Table>> {
     // we create a multi query here so we can query all at once rather than in individual connections
     const getSchemaMultiQuery = tables
-        .map(t => `SHOW CREATE TABLE \`${t.name}\`;`)
+        .map(t => `SHOW CREATE TABLE \`${t}\`;`)
         .join('\n');
-    const createStatements = (await connection.multiQuery<
-        ShowCreateTableStatementRes
-    >(getSchemaMultiQuery))
-        // mysql2 returns an array of arrays which will all have our one row
-        .map(r => r[0])
-        .map((res, i) => {
-            const table = tables[i];
+    const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateTableStatementRes[];
+    const createStatements = result
+        .map((r, i) => {
+            const res = r[0]
             if ('View' in res) {
                 return {
-                    ...table,
+                    triggers: [],
                     name: res.View,
                     schema: res['Create View'],
                     data: null,
@@ -36,7 +33,7 @@ async function getSchemaDump( connection: DB, options: Required<SchemaDumpOption
                 };
             }
             return {
-                ...table,
+                triggers: [],
                 name: res.Table,
                 schema: res['Create Table'],
                 data: null,
@@ -109,3 +106,4 @@ export {
     ShowCreateTableStatementRes,
     getSchemaDump,
 };
+

@@ -14,6 +14,10 @@ export class MysqlDumpService extends AbstractDumpService {
         const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
 
         const tables = items.filter(item => item.description == ModelType.TABLE).map(item => item.label)
+        const viewList = items.filter(item => item.description == ModelType.VIEW).map(item => item.label)
+        const procedureList = items.filter(item => item.description == ModelType.PROCEDURE).map(item => item.label)
+        const functionList = items.filter(item => item.description == ModelType.FUNCTION).map(item => item.label)
+        const triggerList = items.filter(item => item.description == ModelType.TRIGGER).map(item => item.label)
 
         const option: Options = {
             connection: {
@@ -25,7 +29,7 @@ export class MysqlDumpService extends AbstractDumpService {
             },
             dump: {
                 withDatabase: items.length != 1,
-                tables
+                tables,viewList,procedureList,functionList,triggerList
             },
             dumpToFile: dumpFilePath,
         };

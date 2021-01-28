@@ -30,14 +30,6 @@ interface Table {
      */
     data: string | null;
     /**
-     * The list of column definitions for the table.
-     */
-    columns: ColumnList;
-    /**
-     * An ordered list of columns (for consistently outputing as per the DB definition)
-     */
-    columnsOrdered: Array<string>;
-    /**
      * True if the table is actually a view, false otherwise.
      */
     isView: boolean;

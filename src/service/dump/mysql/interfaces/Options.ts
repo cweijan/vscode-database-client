@@ -200,6 +200,10 @@ interface DumpOptions {
      * Defaults to all tables (signalled by passing an empty array).
      */
     tables?: Array<string>;
+    viewList?: Array<string>;
+    procedureList?: Array<string>;
+    functionList?: Array<string>;
+    triggerList?: Array<string>;
     /**
      * Dump file with database
      */
