@@ -4,7 +4,7 @@ import * as path from "path";
 const extName=require("@/../package.json")
 
 export class Constants {
-    public static CONFIG_PREFIX = "vscode-mysql"
+    public static CONFIG_PREFIX = "database-client"
     public static RES_PATH = path.join(vscode.extensions.getExtension(`${extName.publisher}.${extName.name}`).extensionPath, "resources");
 }
 

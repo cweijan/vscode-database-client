@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# 3.4.3 2020-1-28
+
+- Fix new table panel cannot execute sql.
+- Speed up data dump and support sqlserver、postgresql.
+- Support disable sql code lens.
+- Support connect to mssql with encrypt disabled.
+
 # 3.3.4 2020-1-27
 
 - Fix 3.3.1 add connection fail.
