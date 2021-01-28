@@ -1,6 +1,7 @@
 import { Node } from '@/model/interface/node';
 import { IConnection } from '@/service/connect/connection';
 import { ConnectionManager } from '@/service/connectionManager';
+import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import { Query } from 'mysql2';
 import { DataDumpOptions } from './interfaces/Options';
@@ -11,10 +12,10 @@ interface QueryRes {
 
 function buildInsert(row: QueryRes, table: string, values: Array<string>): string {
     const sql = [
-        `INSERT INTO ${table} (${Object.keys(row).join(
-            '`,`',
+        `INSERT INTO ${table}(${Object.keys(row).join(
+            ',',
         )})`,
-        `VALUES ${values.join(',')};`,
+        `VALUES${values.join(',')};`,
     ].join(' ')
 
     return sql;
@@ -75,7 +76,7 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
             await executeSql(connection, 'SET GLOBAL read_only = ON');
         }
 
-        connection.enableDumpMode()
+        connection.dumpMode=true;
 
         // to avoid having to load an entire DB's worth of data at once, we select from each table individually
         // note that we use async/await within this loop to only process one table at a time (to reduce memory footprint)
@@ -97,13 +98,13 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
                     : '';
                 const query = connection.query(
                     `SELECT * FROM ${table}${where}`,
-                ) as Query;
+                ) as EventEmitter;
 
                 let rowQueue: Array<string> = [];
 
                 let tempRow: QueryRes;
                 // stream the data to the file
-                query.on('result', (row: QueryRes) => {
+                query.on('result', (row: QueryRes,end) => {
                     // build the values list
                     rowQueue.push(buildInsertValue(row));
 
@@ -114,6 +115,9 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
                         const insert = buildInsert(row, table, rowQueue);
                         saveChunk(insert);
                         rowQueue = [];
+                    }
+                    if(end){
+                        query.emit("end")
                     }
                 });
                 query.on('end', () => {
@@ -141,6 +145,7 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
             await executeSql(connection, 'SET GLOBAL read_only = OFF');
             await executeSql(connection, 'UNLOCK TABLES');
         }
+        connection.dumpMode=false;
     }
 
     if (outFileStream) {

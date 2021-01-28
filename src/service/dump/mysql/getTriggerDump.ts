@@ -1,3 +1,4 @@
+import { DatabaseType } from '@/common/constants';
 import { Node } from '@/model/interface/node';
 import { TriggerDumpOptions } from './interfaces/Options';
 
@@ -42,7 +43,11 @@ async function getTriggerDump(node: Node, sessionId: string, options: Required<T
         }
         // drop trigger statement should go outside the delimiter mods
         if (options.dropIfExist) {
-            sql = `DROP TRIGGER IF EXISTS ${res.Trigger};\n${sql}`;
+            if(node.dbType==DatabaseType.PG){
+                sql = `DROP TRIGGER IF EXISTS ${res.Trigger} ${sql.match(/ON \S+/)[0]};\n${sql}`;
+            }else{
+                sql = `DROP TRIGGER IF EXISTS ${res.Trigger};\n${sql}`;
+            }
         }
         return `${sql};`;
     });

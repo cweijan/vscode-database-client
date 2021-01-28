@@ -2,6 +2,8 @@ import { Node } from "@/model/interface/node";
 import { Client, QueryArrayResult, types } from "pg";
 import { IConnection, queryCallback } from "./connection";
 import { TypeId } from "pg-types";
+import { EventEmitter } from "events";
+import * as sqlstring from 'sqlstring';
 
 // date
 types.setTypeParser(1082, (val) => val)
@@ -13,7 +15,6 @@ types.setTypeParser(114, (val) => val)
  */
 export class PostgreSqlConnection extends IConnection {
     private client: Client;
-    private dead: boolean;
     constructor(opt: Node) {
         super()
         const config = {
@@ -37,9 +38,19 @@ export class PostgreSqlConnection extends IConnection {
         if (!callback && values instanceof Function) {
             callback = values;
         }
+        const event = new EventEmitter()
         this.client.query(sql, (err, res) => {
             if (err) {
                 callback(err)
+                event.emit("error", err.message)
+            } else if (!callback) {
+                if (res.rows.length == 0) {
+                    event.emit("end")
+                }
+                for (let i = 1; i <= res.rows.length; i++) {
+                    const row = res.rows[i-1];
+                    event.emit("result", this.convertToDump(res.fields, row),res.rows.length == i)
+                }
             } else {
                 if (res instanceof Array) {
                     callback(null, res.map(row => this.adaptResult(row)), res.map(row => row.fields))
@@ -48,6 +59,18 @@ export class PostgreSqlConnection extends IConnection {
                 }
             }
         })
+        return event;
+    }
+    convertToDump(fields: import("pg").FieldDef[], row: any): any {
+        for (const key in row) {
+            const element = row[key];
+            if (!element) {
+                row[key] = 'NULL'
+            }else{
+                row[key]=sqlstring.escape(element)
+            }
+        }
+        return row;
     }
     adaptResult(res: QueryArrayResult<any>) {
         if (res.command != 'SELECT' && res.command != 'SHOW') {
@@ -78,5 +101,7 @@ export class PostgreSqlConnection extends IConnection {
         this.dead = true;
         this.client.end()
     }
+
+
 
 }

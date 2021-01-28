@@ -1,3 +1,4 @@
+import { DatabaseType } from '@/common/constants';
 import { Node } from '@/model/interface/node';
 import { all as merge } from 'deepmerge';
 import * as fs from 'fs';
@@ -53,7 +54,7 @@ export default async function main(inputOptions: Options, node: Node): Promise<v
         fs.writeFileSync(options.dumpToFile, '');
     }
 
-    if (options.dumpToFile && node.database && options.dump.withDatabase) {
+    if (options.dumpToFile && node.database && options.dump.withDatabase && node.dbType!=DatabaseType.PG) {
         fs.appendFileSync(options.dumpToFile, `CREATE DATABASE /*!32312 IF NOT EXISTS*/ ${node.database} /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
 USE ${node.database};\n\n`);
     }

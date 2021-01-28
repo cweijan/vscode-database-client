@@ -7,7 +7,6 @@ import { dumpTypeCast } from './convert/mysqlTypeCast';
 
 export class MysqlConnection extends IConnection {
     private con: mysql.Connection;
-    private dead: boolean;
     constructor(node: Node) {
         super()
         const newConnectionOptions = {

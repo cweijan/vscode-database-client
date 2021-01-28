@@ -1,12 +1,11 @@
-import { FieldInfo, Query } from "mysql2";
+import { EventEmitter } from "events";
+import { FieldInfo } from "mysql2";
 
 export abstract class IConnection {
-    protected dumpMode: boolean = false;
-    public enableDumpMode(){
-        this.dumpMode=true;
-    };
-    abstract query(sql: string, callback?: queryCallback): void | Query;
-    abstract query(sql: string, values: any, callback?: queryCallback): void | Query;
+    public dumpMode: boolean = false;
+    public dead: boolean = false;
+    abstract query(sql: string, callback?: queryCallback): void | EventEmitter;
+    abstract query(sql: string, values: any, callback?: queryCallback): void | EventEmitter;
     abstract connect(callback: (err: Error) => void): void;
     abstract beginTransaction(callback: (err: Error) => void): void;
     abstract rollback(): void;
