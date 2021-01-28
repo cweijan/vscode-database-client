@@ -1,3 +1,4 @@
+import { DatabaseType } from '@/common/constants';
 import { Node } from '@/model/interface/node';
 import { SchemaDumpOptions } from './interfaces/Options';
 
@@ -23,7 +24,7 @@ export async function getViewDump(node: Node, sessionId: string, options: Requir
         if (!options.engine) {
             schema = schema.replace(/ENGINE\s*=\s*\w+ /, '');
         }
-        if (options.view.createOrReplace) {
+        if (options.view.createOrReplace && node.dbType!=DatabaseType.PG && node.dbType!=DatabaseType.MSSQL) {
             schema = schema.replace(/^CREATE/, 'CREATE OR REPLACE');
         }
         if (!options.view.algorithm) {

@@ -71,7 +71,7 @@ export class TableNode extends Node implements CopyAble {
                 tables.shift()
                 table = tables.join(".")
             }
-            sql = `create table ${table}(\n`
+            sql = `CREATE TABLE ${table}(\n`
             for (let i = 0; i < childs.length; i++) {
                 const child: ColumnNode = childs[i] as ColumnNode;
                 if (i == childs.length - 1) {
@@ -80,7 +80,7 @@ export class TableNode extends Node implements CopyAble {
                     sql += `    ${child.column.name} ${child.type}${child.isPrimaryKey ? ' PRIMARY KEY' : ''},\n`
                 }
             }
-            sql += ");"
+            sql += ")"
         }
         if (open) {
             QueryUnit.showSQLTextDocument(this, sql);

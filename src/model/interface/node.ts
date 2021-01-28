@@ -162,7 +162,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         return Node.nodeCache[`${this.getConnectId()}`]
     }
 
-    public getByRegion(region?: string): Node {
+    public getByRegion<T extends Node>(region?: string): T {
         if (!region) {
             return Node.nodeCache[`${this.getConnectId({ withDbForce: true })}`]
         }

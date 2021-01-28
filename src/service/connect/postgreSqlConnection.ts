@@ -42,6 +42,7 @@ export class PostgreSqlConnection extends IConnection {
         this.client.query(sql, (err, res) => {
             if (err) {
                 callback(err)
+                this.end()
                 event.emit("error", err.message)
             } else if (!callback) {
                 if (res.rows.length == 0) {
