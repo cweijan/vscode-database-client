@@ -20,8 +20,7 @@ import { MssqlDIalect } from "./dialect/mssqlDIalect";
 import { MysqlDialect } from "./dialect/mysqlDialect";
 import { PostgreSqlDialect } from "./dialect/postgreSqlDialect";
 import { SqlDialect } from "./dialect/sqlDialect";
-import { AbstractDumpService } from "./dump/abstractDumpService";
-import { MysqlDumpService } from "./dump/mysqlDumpService";
+import { DumpService } from "./dump/dumpService";
 import { MysqlImportService } from "./import/mysqlImportService";
 import { PostgresqlImortService } from "./import/postgresqlImortService";
 import { SqlServerImportService } from "./import/sqlServerImportService";
@@ -45,7 +44,7 @@ export class ServiceManager {
     public settingService: SettingService;
     public overviewService: OverviewService;
     public statusService: StatusService;
-    public dumpService: AbstractDumpService;
+    public dumpService: DumpService;
     private isInit = false;
 
     constructor(private readonly context: ExtensionContext) {
@@ -106,7 +105,7 @@ export class ServiceManager {
     private initMysqlService() {
         this.settingService = new MysqlSettingService();
         this.overviewService = new OverviewService();
-        this.dumpService = new MysqlDumpService();
+        this.dumpService = new DumpService();
         this.statusService = new MysqlStatusService()
     }
 

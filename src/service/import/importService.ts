@@ -1,4 +1,3 @@
-import { Console } from "@/common/Console";
 import { Util } from "@/common/util";
 import { readFileSync } from "fs";
 import { window } from "vscode";
@@ -12,7 +11,7 @@ export abstract class ImportService {
         Util.process(`Importing sql file ${importPath}`,async done=>{
             try {
                 await node.execute(sql)
-                window.showInformationMessage(`Importing sql file ${importPath} success!`)
+                window.showInformationMessage(`Import sql file ${importPath} success!`)
             }finally{
                 done()
             }

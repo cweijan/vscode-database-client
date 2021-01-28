@@ -73,20 +73,19 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         return `create database ${database}`;
     }
     showTableSource(database: string, table: string): string {
-        window.showErrorMessage("Show Source Not Support Sql Server.")
-        throw new Error("Show Source Not Support Sql Server.")
+        return `SHOW CREATE TABLE "${database}"."${table}";`
     }
     showViewSource(database: string, table: string): string {
-        return `SELECT definition 'Create View' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${table}')`
+        return `SELECT definition 'Create View' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${table}');`
     }
     showProcedureSource(database: string, name: string): string {
-        return `SELECT definition 'Create Procedure' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}')`
+        return `SELECT definition 'Create Procedure' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}');`
     }
     showFunctionSource(database: string, name: string): string {
-        return `SELECT definition 'Create Function' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}')`
+        return `SELECT definition 'Create Function' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}');`
     }
     showTriggerSource(database: string, name: string): string {
-        return `SELECT definition 'SQL Original Statement' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}')`
+        return `SELECT definition 'SQL Original Statement' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}');`
     }
     /**
      * remove extra、COLUMN_COMMENT(comment)、COLUMN_KEY(key)

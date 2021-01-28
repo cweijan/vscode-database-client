@@ -1,4 +1,3 @@
-import { DatabaseType } from "@/common/constants";
 import { TableGroup } from "@/model/main/tableGroup";
 import { ViewGroup } from "@/model/main/viewGroup";
 import { ViewNode } from "@/model/main/viewNode";
@@ -9,16 +8,13 @@ import format = require('date-format');
 import { FunctionGroup } from "@/model/main/functionGroup";
 import { ProcedureGroup } from "@/model/main/procedureGroup";
 import { TriggerGroup } from "@/model/main/triggerGroup";
+import { ModelType } from "@/common/constants";
+import { Util } from "@/common/util";
+import mysqldump, { Options } from './mysql/main';
 
-export abstract class AbstractDumpService {
+export class DumpService {
 
     public async dump(node: Node, withData: boolean) {
-
-        const dbType = node.dbType
-        if (dbType == DatabaseType.MSSQL || dbType == DatabaseType.PG) {
-            vscode.window.showErrorMessage("Dump only support mysql right now!")
-            return;
-        }
 
         let nodes = []
         if (node instanceof TableNode || node instanceof ViewNode) {
@@ -48,6 +44,35 @@ export abstract class AbstractDumpService {
 
     }
 
-    protected abstract dumpData(node: Node, exportPath: string, withData: boolean, tables: vscode.QuickPickItem[]): void;
+    protected dumpData(node: Node, dumpFilePath: string, withData: boolean, items: vscode.QuickPickItem[]): void {
+
+        const tables = items.filter(item => item.description == ModelType.TABLE).map(item => item.label)
+        const viewList = items.filter(item => item.description == ModelType.VIEW).map(item => item.label)
+        const procedureList = items.filter(item => item.description == ModelType.PROCEDURE).map(item => item.label)
+        const functionList = items.filter(item => item.description == ModelType.FUNCTION).map(item => item.label)
+        const triggerList = items.filter(item => item.description == ModelType.TRIGGER).map(item => item.label)
+
+        const option: Options = {
+            dump: {
+                withDatabase: items.length != 1,
+                tables, viewList, procedureList, functionList, triggerList
+            },
+            dumpToFile: dumpFilePath,
+        };
+        if (!withData) {
+            option.dump.data = false;
+        }
+        Util.process(`Doing backup ${node.host}_${node.database}...`, (done) => {
+            mysqldump(option, node).then(() => {
+                vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.database} success!`, 'open').then(action => {
+                    if (action == 'open') {
+                        vscode.commands.executeCommand('vscode.open', vscode.Uri.file(dumpFilePath));
+                    }
+                })
+            }).finally(done)
+        })
+
+    }
+
 
 }

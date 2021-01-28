@@ -71,16 +71,16 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         return `create database "${database}"`;
     }
     showTableSource(database: string, table: string): string {
-        return `SHOW CREATE TABLE "${database}"."${table}"`
+        return `SHOW CREATE TABLE "${database}"."${table}";`
     }
     showViewSource(database: string, table: string): string {
         return `SELECT CONCAT('CREATE VIEW ',table_name,'\nAS\n(',view_definition,');') "Create View",table_name,view_definition from information_schema.views where table_name='${table}';`
     }
     showProcedureSource(database: string, name: string): string {
-        return `select pg_get_functiondef('${name}' :: regproc) "Create Procedure"`;
+        return `select pg_get_functiondef('${name}' :: regproc) "Create Procedure";`;
     }
     showFunctionSource(database: string, name: string): string {
-        return `select pg_get_functiondef('${name}' :: regproc) "Create Function"`;
+        return `select pg_get_functiondef('${name}' :: regproc) "Create Function";`;
     }
     showTriggerSource(database: string, name: string): string {
         return `select pg_get_triggerdef(oid) "SQL Original Statement" from pg_trigger where tgname = '${name}';`;

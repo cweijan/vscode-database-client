@@ -44,7 +44,7 @@ export async function getViewDump(node: Node, sessionId: string, options: Requir
                 'CREATE$1$2$3',
             );
         }
-        return schema;
+        return `${schema};`;
     });
 
     return createStatements.join("\n\n");
