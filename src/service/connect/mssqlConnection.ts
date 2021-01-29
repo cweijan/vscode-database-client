@@ -57,7 +57,8 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
                     } else if (isDML) {
                         callback(null, { affectedRows: datas.length })
                     } else {
-                        callback(null, multi ? datas : datas[0] || [], multi ? fields : fields[0] || [])
+                        if(multi) datas.push(tempDatas)
+                        callback(null, multi ? datas : tempDatas, multi ? fields : fields[0] || [])
                     }
                 }
                 this.release(poolConnection)
@@ -71,8 +72,10 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
                     })
                 });
                 fields.push(tempFields)
-                if (columnCount > 0)
+                if (columnCount > 1){
                     datas.push(tempDatas)
+                    tempDatas=[]
+                }
             }).on('row', columns => {
                 let temp = {};
                 columns.forEach((column) => {
