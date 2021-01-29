@@ -36,7 +36,7 @@ export class QueryPage {
 
         ViewManager.createWebviewPanel({
             singlePage: true,
-            splitView: this.isActiveSql(),
+            splitView: this.isActiveSql(queryParam.queryOption),
             path: 'result', title: 'Query', type,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
             eventHandler: async (handler) => {
@@ -136,9 +136,9 @@ export class QueryPage {
         }
     }
 
-    private static isActiveSql(): boolean {
+    private static isActiveSql(option: QueryOption): boolean {
 
-        if (!window.activeTextEditor || !window.activeTextEditor.document) { return false; }
+        if (!window.activeTextEditor || !window.activeTextEditor.document || option.split === false) { return false; }
 
         const extName = extname(window.activeTextEditor.document.fileName)?.toLowerCase()
         const fileName = basename(window.activeTextEditor.document.fileName)?.toLowerCase()
