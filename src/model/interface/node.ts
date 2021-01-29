@@ -59,6 +59,10 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
      * es only
      */
     public scheme: string;
+    /**
+     * database only
+     */
+    public schema: string;
 
     constructor(uid: string) {
         super(uid)
@@ -78,6 +82,9 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
         this.scheme = source.scheme
+        if(!this.schema){
+            this.schema = source.schema
+        }
         this.global = source.global
         this.dbType = source.dbType
         if(source.connectTimeout){
@@ -166,7 +173,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         }
     }
     public getCache() {
-        if (this.database) {
+        if (this.schema) {
             return Node.nodeCache[`${this.getConnectId({ withDbForce: true })}`]
         }
         return Node.nodeCache[`${this.getConnectId()}`]
@@ -192,15 +199,15 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             : `${prefix}_${this.host}_${this.port}_${this.user}`;
 
 
-        if (opt?.withDbForce && this.database) {
-            return `${uid}_${this.database}`
+        if (opt?.withDbForce && this.schema) {
+            return `${uid}_${this.schema}`
         }
 
         /**
          * mssql and postgres must special database when connect.
          */
-        if (opt?.withDb && this.database && (this.dbType == DatabaseType.PG || this.dbType == DatabaseType.MSSQL)) {
-            return `${uid}_${this.database}`
+        if (opt?.withDb && this.schema && (this.dbType == DatabaseType.MSSQL)) {
+            return `${uid}_${this.schema}`
         }
 
         return uid;

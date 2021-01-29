@@ -22,7 +22,7 @@ export class TriggerGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return this.execute<any[]>(this.dialect.showTriggers(this.database))
+        return this.execute<any[]>(this.dialect.showTriggers(this.schema))
             .then((tables) => {
                 tableNodes = tables.map<TriggerNode>((table) => {
                     return new TriggerNode(table.TRIGGER_NAME, this);

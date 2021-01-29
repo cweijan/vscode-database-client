@@ -27,12 +27,12 @@ export class ViewGroup extends Node {
             return tableNodes;
         }
         return this.execute<any[]>(
-            this.dialect.showViews(this.database))
+            this.dialect.showViews(this.schema))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new ViewNode(table.name, '', this);
                 });
-                if (this.dbType == DatabaseType.MSSQL || this.dbType == DatabaseType.PG) {
+                if (this.dbType == DatabaseType.MSSQL) {
                     tableNodes.unshift(new SystemViewGroup(this))
                 } else if (tableNodes.length == 0) {
                     tableNodes = [new InfoNode("This database has no view")];

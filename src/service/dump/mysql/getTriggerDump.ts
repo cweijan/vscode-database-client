@@ -30,7 +30,7 @@ async function getTriggerDump(node: Node, sessionId: string, options: Required<T
 
     // we create a multi query here so we can query all at once rather than in individual connections
     const getSchemaMultiQuery = triggers.map(trigger => {
-        return node.dialect.showTriggerSource(node.database, trigger)
+        return node.dialect.showTriggerSource(node.schema, trigger)
     }).join("")
 
     const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateTrigger[][];

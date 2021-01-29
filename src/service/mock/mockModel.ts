@@ -4,6 +4,7 @@ export interface MockModel {
     port: number;
     user: string;
     database: string;
+    schema: string;
     examples: string;
     table: string;
     mockStartIndex: number|string;

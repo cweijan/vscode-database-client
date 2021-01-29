@@ -14,7 +14,7 @@ export class ViewNode extends TableNode {
     public contextValue: string = ModelType.VIEW;
 
     public async showSource(open = true) {
-        const sourceResule = await this.execute<any[]>(this.dialect.showViewSource(this.database, this.table))
+        const sourceResule = await this.execute<any[]>(this.dialect.showViewSource(this.schema, this.table))
         const sql = `DROP VIEW ${this.table};${sourceResule[0]['Create View']}`
         if(open){
             QueryUnit.showSQLTextDocument(this, sqlFormatter.format(sql));

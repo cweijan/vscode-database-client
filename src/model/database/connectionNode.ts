@@ -65,11 +65,11 @@ export class ConnectionNode extends Node implements CopyAble {
                 const usingInclude = this.includeDatabases && includeDatabaseArray && includeDatabaseArray.length >= 1;
                 const databaseNodes = databases.filter((db) => {
                     if (usingInclude) {
-                        return includeDatabaseArray.indexOf(db?.Database?.toLocaleLowerCase()) != -1;
+                        return includeDatabaseArray.indexOf((db.schema || db.Database).toLocaleLowerCase()) != -1;
                     }
                     return true;
                 }).map<DatabaseNode>((database) => {
-                    return new DatabaseNode(database.Database, this);
+                    return new DatabaseNode(database.schema || database.Database, this);
                 });
 
                 databaseNodes.unshift(new UserGroup("USER", this));
@@ -92,7 +92,7 @@ export class ConnectionNode extends Node implements CopyAble {
         let childMap = {};
         const dbNameList = (await this.getChildren()).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => {
             childMap[databaseNode.uid] = databaseNode
-            return databaseNode.database
+            return databaseNode.schema
         });
         let dbName: string;
         if (dbNameList.length == 1) {

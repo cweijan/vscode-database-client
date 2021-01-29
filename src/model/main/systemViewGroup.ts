@@ -25,7 +25,7 @@ export class SystemViewGroup extends Node {
             return tableNodes;
         }
         return this.execute<any[]>(
-            this.dialect.showSystemViews(this.database))
+            this.dialect.showSystemViews(this.schema))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new ViewNode(table.name, '', this);

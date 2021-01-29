@@ -21,7 +21,7 @@ export class ProcedureGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return this.execute<any[]>(this.dialect.showProcedures(this.database))
+        return this.execute<any[]>(this.dialect.showProcedures(this.schema))
             .then((tables) => {
                 tableNodes = tables.map<Node>((table) => {
                     return new ProcedureNode(table.ROUTINE_NAME, this);

@@ -22,7 +22,7 @@ export class FunctionNode extends Node {
     }
 
     public async showSource() {
-        this.execute<any[]>( this.dialect.showFunctionSource(this.database,this.name))
+        this.execute<any[]>( this.dialect.showFunctionSource(this.schema,this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0];
                 QueryUnit.showSQLTextDocument(this,`DROP FUNCTION IF EXISTS ${this.name};\n${procedDtail['Create Function']}`);

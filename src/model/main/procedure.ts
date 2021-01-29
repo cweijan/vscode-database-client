@@ -23,7 +23,7 @@ export class ProcedureNode extends Node {
     }
 
     public async showSource() {
-        this.execute<any[]>(this.dialect.showProcedureSource(this.database, this.name))
+        this.execute<any[]>(this.dialect.showProcedureSource(this.schema, this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0]
                 QueryUnit.showSQLTextDocument(this, `DROP PROCEDURE IF EXISTS ${this.name};\n${procedDtail['Create Procedure']}`);

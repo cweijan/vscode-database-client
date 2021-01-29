@@ -19,7 +19,7 @@ import { RedisConnection } from "./connect/redisConnection";
 interface ConnectionWrapper {
     connection: IConnection;
     ssh: SSHConfig;
-    database?: string
+    schema?: string
 }
 
 export interface GetRequest {
@@ -85,13 +85,13 @@ export class ConnectionManager {
             const connection = this.alivedConnection[key];
             if (connection) {
                 if (connection.connection.isAlive()) {
-                    if (connection.database != connectionNode.database) {
-                        const sql = connectionNode?.dialect?.pingDataBase(connectionNode.database);
+                    if (connection.schema != connectionNode.schema) {
+                        const sql = connectionNode?.dialect?.pingDataBase(connectionNode.schema);
                         try {
                             if (sql) {
                                 await QueryUnit.queryPromise(connection.connection, sql, false)
                             }
-                            connection.database = connectionNode.database
+                            connection.schema = connectionNode.schema
                             resolve(connection.connection);
                             return;
                         } catch (err) {
@@ -117,7 +117,7 @@ export class ConnectionManager {
                 }
             }
             const newConnection = this.create(connectOption);
-            this.alivedConnection[key] = { connection: newConnection, ssh, database: connectionNode.database };
+            this.alivedConnection[key] = { connection: newConnection, ssh, schema: connectionNode.schema };
             newConnection.connect(async (err: Error) => {
                 if (err) {
                     this.end(key, this.alivedConnection[key])
@@ -170,18 +170,18 @@ export class ConnectionManager {
                 const queryName = path.basename(fileName, path.extname(fileName))
                 const filePattern = queryName.replace(/#.+$/, '').split('_');
                 const [mode, host, port, user] = filePattern
-                let database: string;
+                let schema: string;
                 if (filePattern.length >= 5) {
-                    database = filePattern[4]
-                    // fix if database name has _, loop append
+                    schema = filePattern[4]
+                    // fix if schema name has _, loop append
                     if (filePattern.length >= 5) {
                         for (let index = 5; index < filePattern.length; index++) {
-                            database = `${database}_${filePattern[index]}`
+                            schema = `${schema}_${filePattern[index]}`
                         }
                     }
                 }
                 if (host != null && port != null && user != null) {
-                    const node = NodeUtil.of({ host, port: parseInt(port), user, database });
+                    const node = NodeUtil.of({ host, port: parseInt(port), user, schema });
                     if (node.getCache()) {
                         return node.getCache();
                     }

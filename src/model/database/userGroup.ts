@@ -12,9 +12,10 @@ export class UserGroup extends DatabaseNode {
     public contextValue: string = ModelType.USER_GROUP;
     public iconPath = path.join(Constants.RES_PATH, "icon/userGroup.svg")
     constructor(readonly name: string, readonly parent: Node) {
-        super(name, parent)
+        super(name,parent)
         this.init(parent)
         // fix switch database fail.
+        this.schema = null
         this.database = null
     }
 

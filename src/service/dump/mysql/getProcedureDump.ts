@@ -23,7 +23,7 @@ async function getProcedureDump(node: Node, sessionId: string, options: Required
         return "";
     }
     const getSchemaMultiQuery = procedures.map(proc => {
-        return node.dialect.showProcedureSource(node.database, proc)
+        return node.dialect.showProcedureSource(node.schema, proc)
     }).join("")
     const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateProcedure[][];
     const output = result.map(r => {

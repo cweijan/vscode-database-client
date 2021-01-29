@@ -37,7 +37,7 @@ export class TableNode extends Node implements CopyAble {
         if (columnNodes && !isRresh) {
             return columnNodes;
         }
-        return this.execute<ColumnMeta[]>(this.dialect.showColumns(this.database, this.table))
+        return this.execute<ColumnMeta[]>(this.dialect.showColumns(this.schema, this.table))
             .then((columns) => {
                 columnNodes = columns.map<ColumnNode>((column, index) => {
                     return new ColumnNode(this.table, column, this, index);
@@ -58,7 +58,7 @@ export class TableNode extends Node implements CopyAble {
     public async showSource(open = true) {
         let sql: string;
         if (this.dbType == DatabaseType.MYSQL || !this.dbType) {
-            const sourceResule = await this.execute<any[]>(this.dialect.showTableSource(this.database, this.table))
+            const sourceResule = await this.execute<any[]>(this.dialect.showTableSource(this.schema, this.table))
             sql = sourceResule[0]['Create Table'];
         } else {
             const childs = await this.getChildren()
@@ -128,7 +128,7 @@ export class TableNode extends Node implements CopyAble {
                 handler.on("init", () => {
                     handler.emit('route', 'design')
                 }).on("route-design", async () => {
-                    const result = await this.execute(this.dialect.showIndex(this.database, this.table))
+                    const result = await this.execute(this.dialect.showIndex(this.schema, this.table))
                     let primaryKey: string;
                     const columnList = (await this.getChildren()).map((columnNode: ColumnNode) => {
                         if (columnNode.isPrimaryKey) {
@@ -167,18 +167,18 @@ export class TableNode extends Node implements CopyAble {
 
     public async openInNew() {
         const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
-        const sql = this.dialect.buildPageSql(this.wrap(this.database), this.wrap(this.table), pageSize);
+        const sql = this.dialect.buildPageSql(this.wrap(this.schema), this.wrap(this.table), pageSize);
         QueryUnit.runQuery(sql, this, { viewId: new Date().getTime() });
         ConnectionManager.changeActive(this)
     }
 
     public async countSql() {
-        QueryUnit.runQuery(this.dialect.countSql(this.wrap(this.database), this.wrap(this.table)), this);
+        QueryUnit.runQuery(this.dialect.countSql(this.wrap(this.schema), this.wrap(this.table)), this);
     }
 
     public async openTable() {
         const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
-        const sql = this.dialect.buildPageSql(this.wrap(this.database), this.wrap(this.table), pageSize);
+        const sql = this.dialect.buildPageSql(this.wrap(this.schema), this.wrap(this.table), pageSize);
         QueryUnit.runQuery(sql, this);
         ConnectionManager.changeActive(this)
     }

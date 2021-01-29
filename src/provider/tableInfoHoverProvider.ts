@@ -11,7 +11,7 @@ export class TableInfoHoverProvider implements HoverProvider {
         const tableName = document.getText(document.getWordRangeAtPosition(position));
         const tableNode = ConnectionManager.getLastConnectionOption(false)?.getByRegion(tableName) as TableNode
 
-        const sourceCode = await tableNode?.execute<any[]>(tableNode.dialect.showTableSource(tableNode.database, tableNode.table))
+        const sourceCode = await tableNode?.execute<any[]>(tableNode.dialect.showTableSource(tableNode.schema, tableNode.table))
         if (sourceCode) {
             const markdownStr = new vscode.MarkdownString();
             markdownStr.appendCodeblock(sourceCode[0]['Create Table'], "sql");

@@ -25,6 +25,7 @@ export class MockRunner {
         const mockModel: MockModel = {
             mode: tableNode.global === false ? 'workspace' : 'global',
             host: tableNode.getHost(), port: tableNode.getPort(), user: tableNode.getUser(), database: tableNode.database, table: tableNode.table,
+            schema:tableNode.schema,
             mockStartIndex: MockRunner.primaryKeyMap[tableNode.uid] ? 'auto' : 1
             , mockCount: 10, examples: "http://mockjs.com/examples.html#DPD", mock: {}
         }

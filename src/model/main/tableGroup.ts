@@ -21,7 +21,7 @@ export class TableGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return this.execute<any[]>(this.dialect.showTables(this.database))
+        return this.execute<any[]>(this.dialect.showTables(this.schema))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new TableNode(table.name, table.comment, this);

@@ -50,7 +50,7 @@ export class QueryPage {
                 })
                 handler.on("init", () => {
                     if (queryParam.res?.table) {
-                        handler.panel.title = `${queryParam.res.table}@${dbOption.database}`
+                        handler.panel.title = `${queryParam.res.table}@${dbOption.schema}`
                     }
                     queryParam.res.transId = Trans.transId;
                     queryParam.res.viewId = queryParam.queryOption?.viewId;

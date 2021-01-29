@@ -53,6 +53,12 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
     showUsers(): string {
         return `SELECT usename "user" from pg_user `;
     }
+    pingDataBase(database: string): string {
+        if (!database) {
+            return "select 1";
+        }
+        return `set schema '${database}';`;
+    }
     updateTable(update: UpdateTableParam): string {
         const { table, newTableName, comment, newComment } = update
         let sql = "";
@@ -106,7 +112,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public' and ROUTINE_TYPE='FUNCTION'`;
     }
     showViews(database: string): string {
-        return `select table_name "name" from information_schema.tables where table_schema='public' and table_type='VIEW';`
+        return `select table_name "name" from information_schema.tables where table_schema='${database}' and table_type='VIEW';`
     }
     showSystemViews(database: string): string {
         return `select CONCAT(table_schema,'.',table_name) "name" from information_schema.tables where table_schema!='public' and table_type='VIEW';`
@@ -123,10 +129,11 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         INNER JOIN pg_catalog.pg_class pgc
         ON t.table_name = pgc.relname 
         WHERE t.table_type='BASE TABLE'
-        AND t.table_schema='public';`
+        AND t.table_schema='${database}';`
     }
     showDatabases(): string {
-        return `SELECT datname "Database" FROM pg_database WHERE datistemplate = false;`
+        // return `SELECT datname "Database" FROM pg_database WHERE datistemplate = false;`
+        return `select catalog_name "Database",schema_name "schema" from information_schema.schemata;`
     }
     tableTemplate(): string {
         return `CREATE TABLE [name](  

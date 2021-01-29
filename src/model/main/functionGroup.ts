@@ -21,7 +21,7 @@ export class FunctionGroup extends Node {
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return this.execute<any[]>(this.dialect.showFunctions(this.database))
+        return this.execute<any[]>(this.dialect.showFunctions(this.schema))
             .then((tables) => {
                 tableNodes = tables.map<FunctionNode>((table) => {
                     return new FunctionNode(table.ROUTINE_NAME, this);

@@ -15,7 +15,7 @@ export async function getViewDump(node: Node, sessionId: string, options: Requir
         return "";
     }
     const getSchemaMultiQuery = views.map(view => {
-        return node.dialect.showViewSource(node.database, view)
+        return node.dialect.showViewSource(node.schema, view)
     }).join("")
     const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateView[][];
     const createStatements = result.map((r, i) => {

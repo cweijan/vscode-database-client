@@ -127,7 +127,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         const numbers = (await this.getConnectionNodes()).length > 1
         for (const dbNode of DatabaseCache.getDatabaseNodeList()) {
             if (dbNode instanceof UserGroup) { continue }
-            const uid = numbers ? dbNode.uid : dbNode.database
+            const uid = numbers ? dbNode.uid : dbNode.schema
             dbIdList.push(uid)
             dbIdMap.set(uid, dbNode)
         }
@@ -136,7 +136,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
                 if (dbId) {
                     const dbNode = dbIdMap.get(dbId);
                     ConnectionManager.changeActive(dbNode)
-                    vscode.window.showInformationMessage(`Change active database to ${dbNode.database} success!`)
+                    vscode.window.showInformationMessage(`Change active schema to ${dbNode.schema} success!`)
                 }
 
             })

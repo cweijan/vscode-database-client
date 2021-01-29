@@ -84,7 +84,7 @@ export class ColumnNode extends Node implements CopyAble {
             vscode.window.showErrorMessage("Column is at last.")
             return;
         }
-        const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(this.column.name)} ${this.column.type} AFTER ${this.wrap(afterColumnNode.column.name)};`
+        const sql = `ALTER TABLE ${this.wrap(this.schema)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(this.column.name)} ${this.column.type} AFTER ${this.wrap(afterColumnNode.column.name)};`
         await this.execute(sql)
         DatabaseCache.setChildCache(this.parent.uid, null)
         DbTreeDataProvider.refresh(this.parent)
@@ -97,7 +97,7 @@ export class ColumnNode extends Node implements CopyAble {
             vscode.window.showErrorMessage("Column is at first.")
             return;
         }
-        const sql = `ALTER TABLE ${this.wrap(this.database)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(beforeColumnNode.column.name)} ${beforeColumnNode.column.type} AFTER ${this.wrap(this.column.name)};`
+        const sql = `ALTER TABLE ${this.wrap(this.schema)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(beforeColumnNode.column.name)} ${beforeColumnNode.column.type} AFTER ${this.wrap(this.column.name)};`
         await this.execute(sql)
         DatabaseCache.setChildCache(this.parent.uid, null)
         DbTreeDataProvider.refresh(this.parent)

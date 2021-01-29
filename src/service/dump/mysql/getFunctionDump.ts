@@ -23,7 +23,7 @@ async function getFunctionDump(node: Node, sessionId: string, options: Required<
         return "";
     }
     const getSchemaMultiQuery = functions.map(fun => {
-        return node.dialect.showFunctionSource(node.database, fun)
+        return node.dialect.showFunctionSource(node.schema, fun)
     }).join("")
     const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateFunction[][];
     const output = result.map(r => {

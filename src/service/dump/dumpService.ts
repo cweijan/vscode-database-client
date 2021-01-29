@@ -35,7 +35,7 @@ export class DumpService {
         }
 
         const tableName = node instanceof TableNode ? node.table : null;
-        const exportSqlName = `${tableName ? tableName : ''}_${format('yyyy-MM-dd_hhmmss', new Date())}_${node.database}.sql`;
+        const exportSqlName = `${tableName ? tableName : ''}_${format('yyyy-MM-dd_hhmmss', new Date())}_${node.schema}.sql`;
 
         vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(exportSqlName), filters: { 'sql': ['sql'] } }).then((folderPath) => {
             if (folderPath) {
@@ -63,9 +63,9 @@ export class DumpService {
         if (!withData) {
             option.dump.data = false;
         }
-        Util.process(`Doing backup ${node.host}_${node.database}...`, (done) => {
+        Util.process(`Doing backup ${node.host}_${node.schema}...`, (done) => {
             mysqldump(option, node).then(() => {
-                vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.database} success!`, 'open').then(action => {
+                vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.schema} success!`, 'open').then(action => {
                     if (action == 'open') {
                         vscode.commands.executeCommand('vscode.open', vscode.Uri.file(dumpFilePath));
                     }
