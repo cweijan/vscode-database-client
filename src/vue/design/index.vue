@@ -4,12 +4,10 @@
     <el-tag>Table:</el-tag>
     {{table}}
     <ul class="tab">
-      <li class="tab__item " :class="{'tab__item--active':activePanel=='info'}" @click="activePanel='info'">Info </li>
       <li class="tab__item " :class="{'tab__item--active':activePanel=='column'}" @click="activePanel='column'">Column </li>
       <li class="tab__item " :class="{'tab__item--active':activePanel=='index'}" @click="activePanel='index'">Index </li>
     </ul>
     <div class="mt-2">
-      <InfoPanel v-if="activePanel=='info'" />
       <ColumnPanel v-if="activePanel=='column'" />
       <IndexPanel v-if="activePanel=='index'" />
     </div>
@@ -20,14 +18,13 @@
 import { inject } from "../mixin/vscodeInject";
 import IndexPanel from "./IndexPanel";
 import ColumnPanel from "./ColumnPanel";
-import InfoPanel from "./InfoPanel";
 export default {
   mixins: [inject],
-  components: { IndexPanel, ColumnPanel, InfoPanel },
+  components: { IndexPanel, ColumnPanel },
   data() {
     return {
       table: null,
-      activePanel: "info",
+      activePanel: "column",
     };
   },
   mounted() {
@@ -62,4 +59,5 @@ export default {
   color: var(--vscode-panelTitle-activeForeground);
   border-bottom-color: var(--vscode-panelTitle-activeForeground);
 }
+
 </style>

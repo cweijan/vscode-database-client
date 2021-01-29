@@ -1,5 +1,6 @@
 <template>
   <div>
+    <InfoPanel/>
     <div class="design-toolbar">
       <el-button @click="column.visible=true" type="primary" title="Insert" icon="el-icon-circle-plus-outline" size="mini" circle> </el-button>
     </div>
@@ -76,8 +77,10 @@
 <script>
 import { inject } from "../mixin/vscodeInject";
 import { wrapByDb } from "@/common/wrapper";
+import InfoPanel from "./InfoPanel";
 export default {
   mixins: [inject],
+  components:{InfoPanel},
   data() {
     return {
       designData: {
