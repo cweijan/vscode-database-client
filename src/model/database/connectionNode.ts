@@ -1,3 +1,4 @@
+import { Global } from "@/common/global";
 import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, DatabaseType, ModelType } from "../../common/constants";
@@ -72,7 +73,9 @@ export class ConnectionNode extends Node implements CopyAble {
                     return new SchemaNode(database.schema || database.Database, this);
                 });
 
-                databaseNodes.unshift(new UserGroup("USER", this));
+                if(Global.getConfig("showUser")){
+                    databaseNodes.unshift(new UserGroup("USER", this));
+                }
                 DatabaseCache.setDataBaseListOfConnection(this.uid, databaseNodes);
 
                 return databaseNodes;

@@ -857,6 +857,11 @@
 					"default": false,
 					"description": "Disable Sql Code lens."
 				},
+				"database-client.showUser": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show user on tree view."
+				},
 				"database-client.showDiagram": {
 					"type": "boolean",
 					"default": false,
