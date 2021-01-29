@@ -1,3 +1,4 @@
+import { Global } from "@/common/global";
 import * as path from "path";
 import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/constants";
@@ -37,11 +38,26 @@ export class DatabaseNode extends Node implements CopyAble {
     }
 
     public getChildren(): Promise<Node[]> | Node[] {
-        return [
-            new TableGroup(this), new ViewGroup(this),
-            new QueryGroup(this), new DiagramGroup(this),
-            new ProcedureGroup(this), new FunctionGroup(this), new TriggerGroup(this)
-        ];
+
+        let childs:Node[] = [new TableGroup(this), new ViewGroup(this)];
+
+        if (Global.getConfig('showQuery')) {
+            childs.push(new QueryGroup(this))
+        }
+        if (Global.getConfig('showDiagram')) {
+            childs.push(new DiagramGroup(this))
+        }
+        if (Global.getConfig('showProcedure')) {
+            childs.push(new ProcedureGroup(this))
+        }
+        if (Global.getConfig('showFunction')) {
+            childs.push(new FunctionGroup(this))
+        }
+        if (Global.getConfig('showTrigger')) {
+            childs.push(new TriggerGroup(this))
+        }
+
+        return childs;
     }
 
     public openOverview() {

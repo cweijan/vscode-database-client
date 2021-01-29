@@ -856,7 +856,12 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Disable Sql Code lens."
-				}
+				},
+				"database-client.showDiagram": { "type": "boolean", "default": true },
+				"database-client.showQuery": { "type": "boolean", "default": true },
+				"database-client.showProcedure": { "type": "boolean", "default": true },
+				"database-client.showFunction": { "type": "boolean", "default": true },
+				"database-client.showTrigger": { "type": "boolean", "default": true }
 			}
 		}
 	},
