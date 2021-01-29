@@ -34,6 +34,7 @@ export class SSHTunnelService {
                 dstPort: connectionNode.port,
                 localHost: '127.0.0.1',
                 localPort: port,
+                algorithms:ssh.algorithms,
                 passphrase: ssh.passphrase,
                 privateKey: (() => {
                     if (ssh.privateKeyPath && existsSync(ssh.privateKeyPath)) {
