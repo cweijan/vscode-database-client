@@ -16,13 +16,13 @@ export abstract class SqlDialect {
     }
     showIndex(database: string, table: string): string { return null; }
     createIndex(createIndexParam: CreateIndexParam): string { return null };
+    showDatabases(): string { return null; }
     abstract updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string;
-    abstract showDatabases(): string;
+    abstract showSchemas(): string;
     abstract showTables(database: string): string;
     abstract addColumn(table: string): string;
     abstract showColumns(database: string, table: string): string;
     abstract showViews(database: string): string;
-    abstract showSystemViews(database: string): string;
     abstract showUsers(): string;
     abstract createUser(): string;
     abstract showTriggers(database: string): string;

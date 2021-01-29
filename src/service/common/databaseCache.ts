@@ -1,6 +1,6 @@
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
 import { CacheKey, ModelType } from "../../common/constants";
-import { DatabaseNode } from "../../model/database/databaseNode";
+import { SchemaNode } from "../../model/database/databaseNode";
 import { Node } from "../../model/interface/node";
 
 export class DatabaseCache {
@@ -107,7 +107,7 @@ export class DatabaseCache {
     /**
      * support to complection manager
      */
-    public static getDatabaseNodeList(): DatabaseNode[] {
+    public static getDatabaseNodeList(): SchemaNode[] {
         let databaseNodeList = [];
 
         Object.keys(this.cache.database).forEach((key) => {
@@ -120,11 +120,11 @@ export class DatabaseCache {
         return databaseNodeList;
     }
 
-    public static setDataBaseListOfConnection(connectionid: string, DatabaseNodeList: DatabaseNode[]) {
+    public static setDataBaseListOfConnection(connectionid: string, DatabaseNodeList: SchemaNode[]) {
         this.cache.database[connectionid] = DatabaseNodeList;
     }
 
-    public static getDatabaseListOfConnection(connectcionid: string): DatabaseNode[] {
+    public static getDatabaseListOfConnection(connectcionid: string): SchemaNode[] {
         if (this.cache.database[connectcionid]) {
             return this.cache.database[connectcionid];
         } else {

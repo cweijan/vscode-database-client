@@ -27,7 +27,7 @@ export class ProcedureGroup extends Node {
                     return new ProcedureNode(table.ROUTINE_NAME, this);
                 });
                 if (tableNodes.length == 0) {
-                    tableNodes = [new InfoNode("This database has no procedure")];
+                    tableNodes = [new InfoNode("This schema has no procedure")];
                 }
                 DatabaseCache.setChildCache(this.uid, tableNodes);
                 return tableNodes;

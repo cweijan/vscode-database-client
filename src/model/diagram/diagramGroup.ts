@@ -25,7 +25,7 @@ export class DiagramGroup extends Node {
         const path = `${FileManager.storagePath}/diagram/${this.getConnectId({ withDbForce: true })}`;
         const diagrams = this.readdir(path)?.map(fileName => new DiagramNode(fileName.replace(/\.[^/.]+$/, ""), this));
         if (!diagrams || diagrams.length == 0) {
-            return [new InfoNode("This database has no created diagram.")]
+            return [new InfoNode("This schema has no created diagram.")]
         }
         return diagrams
     }

@@ -31,9 +31,6 @@ export class MysqlDialect extends SqlDialect {
     createUser(): string {
         return `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`;
     }
-    showSystemViews(database: string): string {
-        throw new Error("Method not implemented.");
-    }
     updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
         const defaultDefinition = nullable == "YES" ? "" : " NOT NULL";
         comment = comment ? ` comment '${comment}'` : "";
@@ -111,7 +108,7 @@ export class MysqlDialect extends SqlDialect {
     showTables(database: string): string {
         return `SELECT table_comment comment,TABLE_NAME as name FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' order by table_name;`
     }
-    showDatabases(): string {
+    showSchemas(): string {
         return "show databases"
     }
     tableTemplate(): string {

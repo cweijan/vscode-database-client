@@ -4,10 +4,10 @@ import { Constants, ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
-import { DatabaseNode } from "./databaseNode";
+import { SchemaNode } from "./databaseNode";
 import { UserNode } from "./userNode";
 
-export class UserGroup extends DatabaseNode {
+export class UserGroup extends SchemaNode {
 
     public contextValue: string = ModelType.USER_GROUP;
     public iconPath = path.join(Constants.RES_PATH, "icon/userGroup.svg")

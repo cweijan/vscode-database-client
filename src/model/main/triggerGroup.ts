@@ -28,7 +28,7 @@ export class TriggerGroup extends Node {
                     return new TriggerNode(table.TRIGGER_NAME, this);
                 });
                 if (tableNodes.length == 0) {
-                    tableNodes = [new InfoNode("This database has no trigger")];
+                    tableNodes = [new InfoNode("This schema has no trigger")];
                 }
                 DatabaseCache.setChildCache(this.uid, tableNodes);
                 return tableNodes;

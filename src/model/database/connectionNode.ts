@@ -9,7 +9,7 @@ import { ConnectionManager } from "../../service/connectionManager";
 import { CopyAble } from "../interface/copyAble";
 import { CommandKey, Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
-import { DatabaseNode } from "./databaseNode";
+import { SchemaNode } from "./databaseNode";
 import { UserGroup } from "./userGroup";
 
 /**
@@ -55,11 +55,11 @@ export class ConnectionNode extends Node implements CopyAble {
                 if (dbNode.contextValue == ModelType.USER_GROUP) {
                     return new UserGroup(dbNode.label, this)
                 }
-                return new DatabaseNode(dbNode.label, this)
+                return new SchemaNode(dbNode.label, this)
             });
         }
 
-        return this.execute<any[]>(this.dialect.showDatabases())
+        return this.execute<any[]>(this.dialect.showSchemas())
             .then((databases) => {
                 const includeDatabaseArray = this.includeDatabases?.toLowerCase()?.split(",")
                 const usingInclude = this.includeDatabases && includeDatabaseArray && includeDatabaseArray.length >= 1;
@@ -68,8 +68,8 @@ export class ConnectionNode extends Node implements CopyAble {
                         return includeDatabaseArray.indexOf((db.schema || db.Database).toLocaleLowerCase()) != -1;
                     }
                     return true;
-                }).map<DatabaseNode>((database) => {
-                    return new DatabaseNode(database.schema || database.Database, this);
+                }).map<SchemaNode>((database) => {
+                    return new SchemaNode(database.schema || database.Database, this);
                 });
 
                 databaseNodes.unshift(new UserGroup("USER", this));

@@ -19,7 +19,7 @@ import { TriggerGroup } from "../main/triggerGroup";
 import { ViewGroup } from "../main/viewGroup";
 import { QueryGroup } from "../query/queryGroup";
 
-export class DatabaseNode extends Node implements CopyAble {
+export class SchemaNode extends Node implements CopyAble {
 
 
     public contextValue: string = ModelType.DATABASE;

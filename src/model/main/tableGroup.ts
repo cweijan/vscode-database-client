@@ -27,7 +27,7 @@ export class TableGroup extends Node {
                     return new TableNode(table.name, table.comment, this);
                 });
                 if (tableNodes.length == 0) {
-                    tableNodes = [new InfoNode("This database has no table")];
+                    tableNodes = [new InfoNode("This schema has no table")];
                 }
                 DatabaseCache.setChildCache(this.uid, tableNodes);
                 return tableNodes;

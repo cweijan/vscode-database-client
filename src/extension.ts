@@ -3,7 +3,7 @@
 import * as vscode from "vscode";
 import { CommandKey } from "./common/constants";
 import { ConnectionNode } from "./model/database/connectionNode";
-import { DatabaseNode } from "./model/database/databaseNode";
+import { SchemaNode } from "./model/database/databaseNode";
 import { UserGroup } from "./model/database/userGroup";
 import { CopyAble } from "./model/interface/copyAble";
 import { FunctionNode } from "./model/main/function";
@@ -106,13 +106,13 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.struct.diff": () => {
                     new DiffService().startDiff(serviceManager.provider);
                 },
-                "mysql.data.export": (node: DatabaseNode | TableNode) => {
+                "mysql.data.export": (node: SchemaNode | TableNode) => {
                     serviceManager.dumpService.dump(node, true)
                 },
-                "mysql.struct.export": (node: DatabaseNode | TableNode) => {
+                "mysql.struct.export": (node: SchemaNode | TableNode) => {
                     serviceManager.dumpService.dump(node, false)
                 },
-                "mysql.data.import": (node: DatabaseNode | ConnectionNode) => {
+                "mysql.data.import": (node: SchemaNode | ConnectionNode) => {
                     vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
                         if (filePath) {
                             ServiceManager.getImportService(node.dbType).importSql(filePath[0].fsPath, node)
@@ -125,16 +125,16 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.db.active": () => {
                     serviceManager.provider.activeDb();
                 },
-                "mysql.db.truncate": (databaseNode: DatabaseNode) => {
+                "mysql.db.truncate": (databaseNode: SchemaNode) => {
                     databaseNode.truncateDb();
                 },
                 "mysql.database.add": (connectionNode: ConnectionNode) => {
                     connectionNode.createDatabase();
                 },
-                "mysql.db.drop": (databaseNode: DatabaseNode) => {
+                "mysql.db.drop": (databaseNode: SchemaNode) => {
                     databaseNode.dropDatatabase();
                 },
-                "mysql.db.overview": (databaseNode: DatabaseNode) => {
+                "mysql.db.overview": (databaseNode: SchemaNode) => {
                     databaseNode.openOverview();
                 },
             },
@@ -177,7 +177,7 @@ export function activate(context: vscode.ExtensionContext) {
                     if (typeof sql != 'string') { sql = null; }
                     QueryUnit.runQuery(sql,ConnectionManager.getLastConnectionOption());
                 },
-                "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode | EsConnectionNode | ESIndexNode) => {
+                "mysql.query.switch": async (databaseOrConnectionNode: SchemaNode | ConnectionNode | EsConnectionNode | ESIndexNode) => {
                     if (databaseOrConnectionNode) {
                         await databaseOrConnectionNode.newQuery();
                     } else {

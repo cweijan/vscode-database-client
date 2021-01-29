@@ -3,7 +3,7 @@ import { CacheKey, ConfigKey, DatabaseType } from "../common/constants";
 import { ConnectionManager } from "../service/connectionManager";
 import { DatabaseCache } from "../service/common/databaseCache";
 import { ConnectionNode } from "../model/database/connectionNode";
-import { DatabaseNode } from "../model/database/databaseNode";
+import { SchemaNode } from "../model/database/databaseNode";
 import { CommandKey, Node } from "../model/interface/node";
 import { UserGroup } from "../model/database/userGroup";
 import { Global } from "../common/global";
@@ -123,7 +123,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     public async activeDb() {
 
         const dbIdList: string[] = [];
-        const dbIdMap = new Map<string, DatabaseNode>();
+        const dbIdMap = new Map<string, SchemaNode>();
         const numbers = (await this.getConnectionNodes()).length > 1
         for (const dbNode of DatabaseCache.getDatabaseNodeList()) {
             if (dbNode instanceof UserGroup) { continue }

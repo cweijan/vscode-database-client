@@ -26,7 +26,7 @@ export class MssqlDIalect extends SqlDialect {
         and ic.column_id = col.column_id
         INNER JOIN sys.tables t ON ind.object_id = t.object_id
       WHERE
-        t.name = '${table.split('.')[1]}';`
+        t.name = '${table}';`
     }
     variableList(): string {
         throw new Error("Method not implemented.");
@@ -67,7 +67,7 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         return `sp_rename '${table}', '${newTableName}'`;
     }
     truncateDatabase(database: string): string {
-        return `SELECT Concat('TRUNCATE TABLE [',table_schema,'].[',TABLE_NAME, '];') trun FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_CATALOG='${database}'`
+        return `SELECT Concat('TRUNCATE TABLE [',table_schema,'].[',TABLE_NAME, '];') trun FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_SCHEMA='${database}'`
     }
     createDatabase(database: string): string {
         return `create database ${database}`;
@@ -76,16 +76,16 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         return ``
     }
     showViewSource(database: string, table: string): string {
-        return `SELECT definition 'Create View' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${table}');`
+        return `SELECT definition 'Create View' FROM sys.sql_modules WHERE object_id = OBJECT_ID('${database}.${table}');`
     }
     showProcedureSource(database: string, name: string): string {
-        return `SELECT definition 'Create Procedure','${name}' "Procedure" FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}');`
+        return `SELECT definition 'Create Procedure','${database}.${name}' "Procedure" FROM sys.sql_modules WHERE object_id = OBJECT_ID('${database}.${name}');`
     }
     showFunctionSource(database: string, name: string): string {
-        return `SELECT definition 'Create Function','${name}' "Function" FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}');`
+        return `SELECT definition 'Create Function','${database}.${name}' "Function" FROM sys.sql_modules WHERE object_id = OBJECT_ID('${database}.${name}');`
     }
     showTriggerSource(database: string, name: string): string {
-        return `SELECT definition 'SQL Original Statement','${name}' "Trigger" FROM sys.sql_modules WHERE object_id = OBJECT_ID('${name}');`
+        return `SELECT definition 'SQL Original Statement','${database}.${name}' "Trigger" FROM sys.sql_modules WHERE object_id = OBJECT_ID('${database}.${name}');`
     }
     /**
      * remove extra、COLUMN_COMMENT(comment)、COLUMN_KEY(key)
@@ -95,37 +95,34 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         return `SELECT c.COLUMN_NAME "name", DATA_TYPE "simpleType", DATA_TYPE "type", IS_NULLABLE nullable, CHARACTER_MAXIMUM_LENGTH "maxLength", COLUMN_DEFAULT "defaultValue", '' "comment", tc.constraint_type "key" FROM
         information_schema.columns c
         left join  information_schema.constraint_column_usage ccu
-        on c.COLUMN_NAME=ccu.column_name and c.table_name=ccu.table_name and ccu.table_catalog=c.TABLE_CATALOG
+        on c.COLUMN_NAME=ccu.column_name and c.table_name=ccu.table_name and ccu.table_catalog=c.TABLE_CATALOG and ccu.TABLE_SCHEMA=c.TABLE_SCHEMA
         left join  information_schema.table_constraints tc
         on tc.constraint_name=ccu.constraint_name
-        and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name WHERE c.TABLE_CATALOG = '${database}' AND c.table_name = '${table.split('.')[1]}' ORDER BY ORDINAL_POSITION`;
+        and tc.table_catalog=c.TABLE_CATALOG and tc.TABLE_SCHEMA=c.TABLE_SCHEMA and tc.table_name=c.table_name WHERE c.TABLE_SCHEMA = '${database}' AND c.table_name = '${table}' ORDER BY ORDINAL_POSITION`;
     }
     showTriggers(database: string): string {
         return `SELECT OBJECT_NAME(PARENT_OBJECT_ID) AS PARENT_TABLE, concat(SCHEMA_NAME(schema_id),'.',name) TRIGGER_NAME FROM SYS.OBJECTS WHERE TYPE = 'TR'`;
     }
     showProcedures(database: string): string {
-        return `SELECT concat(ROUTINE_SCHEMA,'.',ROUTINE_NAME) ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_CATALOG = '${database}' and ROUTINE_TYPE='PROCEDURE'`;
+        return `SELECT concat(ROUTINE_SCHEMA,'.',ROUTINE_NAME) ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_SCHEMA = '${database}' and ROUTINE_TYPE='PROCEDURE'`;
     }
     showFunctions(database: string): string {
-        return `SELECT concat(ROUTINE_SCHEMA,'.',ROUTINE_NAME) ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_CATALOG = '${database}' and ROUTINE_TYPE='FUNCTION'`;
+        return `SELECT concat(ROUTINE_SCHEMA,'.',ROUTINE_NAME) ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_SCHEMA = '${database}' and ROUTINE_TYPE='FUNCTION'`;
     }
     showViews(database: string): string {
-        return `SELECT concat(TABLE_SCHEMA,'.',TABLE_NAME) name FROM INFORMATION_SCHEMA.VIEWS`;
-    }
-    showSystemViews(database: string): string {
-        return `SELECT concat(SCHEMA_NAME(schema_id),'.',name) name FROM [sys].[system_views] ORDER BY name`;
+        return `SELECT name FROM sys.all_views t where SCHEMA_NAME(t.schema_id)='${database}' order by name`;
     }
     buildPageSql(database: string, table: string, pageSize: number): string {
-        return `SELECT TOP ${pageSize} * FROM ${table};`;
+        return `SELECT TOP ${pageSize} * FROM ${database}.${table};`;
     }
     countSql(database: string, table: string): string {
-        return `SELECT count(*) count FROM ${table};`;
+        return `SELECT count(*) count FROM ${database}.${table};`;
     }
     showTables(database: string): string {
-        return `SELECT concat(TABLE_SCHEMA,'.',TABLE_NAME) 'name' FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_CATALOG='${database}'`
+        return `SELECT TABLE_NAME 'name' FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'  AND TABLE_SCHEMA='${database}'`
     }
-    showDatabases(): string {
-        return "SELECT name 'Database' FROM master.sys.databases"
+    showSchemas(): string {
+        return "SELECT SCHEMA_NAME [schema] FROM INFORMATION_SCHEMA.SCHEMATA"
     }
     tableTemplate(): string {
         return `CREATE TABLE [name](  

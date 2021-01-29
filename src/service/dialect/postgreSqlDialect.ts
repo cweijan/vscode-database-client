@@ -12,7 +12,7 @@ export class PostgreSqlDialect extends SqlDialect {
         return `DROP INDEX ${indexName}`
     }
     showIndex(database: string, table: string): string {
-        return `SELECT indexname index_name, indexdef FROM pg_indexes WHERE schemaname = 'public' and tablename='${table}'`
+        return `SELECT indexname index_name, indexdef FROM pg_indexes WHERE schemaname = '${database}' and tablename='${table}'`
     }
     variableList(): string {
         return 'SHOW ALL'
@@ -71,7 +71,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         return sql;
     }
     truncateDatabase(database: string): string {
-        return `SELECT Concat('TRUNCATE TABLE "',TABLE_NAME, '";') trun FROM INFORMATION_SCHEMA.TABLES WHERE  table_schema ='public' AND table_type='BASE TABLE';`
+        return `SELECT Concat('TRUNCATE TABLE "',TABLE_NAME, '";') trun FROM INFORMATION_SCHEMA.TABLES WHERE  table_schema ='${database}' AND table_type='BASE TABLE';`
     }
     createDatabase(database: string): string {
         return `create database "${database}"`;
@@ -81,16 +81,16 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         // return `SHOW CREATE TABLE "${database}"."${table}";`
     }
     showViewSource(database: string, table: string): string {
-        return `SELECT CONCAT('CREATE VIEW ',table_name,'\nAS\n(',regexp_replace(view_definition,';$',''),')') "Create View",table_name,view_definition from information_schema.views where table_name='${table}';`
+        return `SELECT CONCAT('CREATE VIEW ',table_name,'\nAS\n(',regexp_replace(view_definition,';$',''),')') "Create View",table_name,view_definition from information_schema.views where table_schema='${database}' and table_name='${table}';`
     }
     showProcedureSource(database: string, name: string): string {
-        return `select pg_get_functiondef('${name}' :: regproc) "Create Procedure",'${name}' "Procedure";`;
+        return `select pg_get_functiondef('${database}.${name}' :: regproc) "Create Procedure",'${name}' "Procedure";`;
     }
     showFunctionSource(database: string, name: string): string {
-        return `select pg_get_functiondef('${name}' :: regproc) "Create Function",'${name}' "Function";`;
+        return `select pg_get_functiondef('${database}.${name}' :: regproc) "Create Function",'${name}' "Function";`;
     }
     showTriggerSource(database: string, name: string): string {
-        return `select pg_get_triggerdef(oid) "SQL Original Statement",'${name}' "Trigger" from pg_trigger where tgname = '${name}';`;
+        return `select pg_get_triggerdef(oid) "SQL Original Statement",'${database}.${name}' "Trigger" from pg_trigger where tgname = '${name}';`;
     }
     showColumns(database: string, table: string): string {
         const view = table.split('.')[1];
@@ -100,22 +100,19 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         on c.COLUMN_NAME=ccu.column_name and c.table_name=ccu.table_name and ccu.table_catalog=c.TABLE_CATALOG
         left join  information_schema.table_constraints tc
         on tc.constraint_name=ccu.constraint_name
-        and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name WHERE c.TABLE_CATALOG = '${database}' AND c.table_name = '${view ? view : table}' ORDER BY ORDINAL_POSITION;`;
+        and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name WHERE c.TABLE_SCHEMA = '${database}' AND c.table_name = '${view ? view : table}' ORDER BY ORDINAL_POSITION;`;
     }
     showTriggers(database: string): string {
-        return `SELECT TRIGGER_NAME "TRIGGER_NAME" FROM information_schema.TRIGGERS WHERE trigger_catalog = '${database}'`;
+        return `SELECT TRIGGER_NAME "TRIGGER_NAME" FROM information_schema.TRIGGERS WHERE trigger_schema = '${database}'`;
     }
     showProcedures(database: string): string {
-        return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public' and ROUTINE_TYPE='PROCEDURE'`;
+        return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${database}' and ROUTINE_TYPE='PROCEDURE'`;
     }
     showFunctions(database: string): string {
-        return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = 'public' and ROUTINE_TYPE='FUNCTION'`;
+        return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${database}' and ROUTINE_TYPE='FUNCTION'`;
     }
     showViews(database: string): string {
-        return `select table_name "name" from information_schema.tables where table_schema='${database}' and table_type='VIEW';`
-    }
-    showSystemViews(database: string): string {
-        return `select CONCAT(table_schema,'.',table_name) "name" from information_schema.tables where table_schema!='public' and table_type='VIEW';`
+        return `select table_name "name" from information_schema.tables where table_schema='${database}' and table_type='VIEW' order by "name";`
     }
     buildPageSql(database: string, table: string, pageSize: number): string {
         return `SELECT * FROM ${table} LIMIT ${pageSize};`;
@@ -131,8 +128,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         WHERE t.table_type='BASE TABLE'
         AND t.table_schema='${database}';`
     }
-    showDatabases(): string {
-        // return `SELECT datname "Database" FROM pg_database WHERE datistemplate = false;`
+    showSchemas(): string {
         return `select catalog_name "Database",schema_name "schema" from information_schema.schemata;`
     }
     tableTemplate(): string {

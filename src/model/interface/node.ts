@@ -82,16 +82,16 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
         this.scheme = source.scheme
-        if(!this.schema){
+        if (!this.schema) {
             this.schema = source.schema
         }
         this.global = source.global
         this.dbType = source.dbType
-        if(source.connectTimeout){
+        if (source.connectTimeout) {
             this.connectTimeout = parseInt(source.connectTimeout as any)
-            source.connectTimeout=parseInt(source.connectTimeout as any)
+            source.connectTimeout = parseInt(source.connectTimeout as any)
         }
-        if(source.requestTimeout){
+        if (source.requestTimeout) {
             this.requestTimeout = parseInt(source.requestTimeout as any)
             source.requestTimeout = parseInt(source.requestTimeout as any)
         }
@@ -206,8 +206,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         /**
          * mssql and postgres must special database when connect.
          */
-        if (opt?.withDb && this.schema && (this.dbType == DatabaseType.MSSQL)) {
-            return `${uid}_${this.schema}`
+        if (opt?.withDb && this.database && (this.dbType == DatabaseType.MSSQL || this.dbType == DatabaseType.PG)) {
+            return `${uid}_${this.database}`
         }
 
         return uid;

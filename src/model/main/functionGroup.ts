@@ -27,7 +27,7 @@ export class FunctionGroup extends Node {
                     return new FunctionNode(table.ROUTINE_NAME, this);
                 });
                 if (tableNodes.length == 0) {
-                    tableNodes = [new InfoNode("This database has no function")];
+                    tableNodes = [new InfoNode("This schema has no function")];
                 }
                 DatabaseCache.setChildCache(this.uid, tableNodes);
                 return tableNodes;

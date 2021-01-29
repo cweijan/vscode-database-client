@@ -4,7 +4,6 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
-import { SystemViewGroup } from "./systemViewGroup";
 import { TableNode } from "./tableNode";
 import { ViewNode } from "./viewNode";
 
@@ -32,10 +31,8 @@ export class ViewGroup extends Node {
                 tableNodes = tables.map<TableNode>((table) => {
                     return new ViewNode(table.name, '', this);
                 });
-                if (this.dbType == DatabaseType.MSSQL) {
-                    tableNodes.unshift(new SystemViewGroup(this))
-                } else if (tableNodes.length == 0) {
-                    tableNodes = [new InfoNode("This database has no view")];
+                if (tableNodes.length == 0) {
+                    tableNodes = [new InfoNode("This schema has no view")];
                 }
                 DatabaseCache.setChildCache(this.uid, tableNodes);
                 return tableNodes;

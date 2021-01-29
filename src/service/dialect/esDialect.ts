@@ -14,7 +14,7 @@ export class EsDialect extends SqlDialect{
     updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
         return "";
     }
-    showDatabases(): string {
+    showSchemas(): string {
         return "";
     }
     showTables(database: string): string {
@@ -27,9 +27,6 @@ export class EsDialect extends SqlDialect{
         return "";
     }
     showViews(database: string): string {
-        return "";
-    }
-    showSystemViews(database: string): string {
         return "";
     }
     showUsers(): string {
