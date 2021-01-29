@@ -15,11 +15,12 @@ Database Client for Visual Studio Code. It supports databases MySQL/MariaDB, Mic
   - [Generate Mock Data](#generate-mock-data)
   - [History](#history)
   - [Backup/Import](#backupimport)
+  - [Setting](#setting)
   - [Filter](#filter)
 
 ## Installation
 
-Install from vscode marketplace [vscode-mysql](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2).
+Install from vscode marketplace [vscode-database-client](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2).
 
 ## Connect
 
@@ -66,6 +67,12 @@ Click the history button to open the list of recently executed query history rec
 Move to ant DatabaseNode or TableNode. The export/import options are listed in the context menu (right click to open).
 
 ![bakcup](images/Backup.jpg)
+
+## Setting
+
+This extension contain some setting, find him in the following way.
+
+![](image/README/1611910592756.png)
 
 ## Filter
 
