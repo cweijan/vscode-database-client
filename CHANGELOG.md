@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# 3.4.4 2020-1-29
+
+- Support schema with postgresql、sqlserver.
+- Design table view update.
+- Add ui config
+- Support config  connection timeout.
+
 # 3.4.3 2020-1-28
 
 - Fix new table panel cannot execute sql.
