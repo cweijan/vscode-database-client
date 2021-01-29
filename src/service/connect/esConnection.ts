@@ -30,11 +30,12 @@ export class EsConnection extends IConnection {
             headers: {
                 'Content-Type': 'application/json',
             },
+            timeout: this.opt.connectTimeout || 2000,
             responseType: 'json',
             data: body
         }).then(async ({ data }) => {
-            if(values=="dontParse"){
-                callback(null,data)
+            if (values == "dontParse") {
+                callback(null, data)
                 return;
             }
             if (data.count) {
@@ -70,7 +71,7 @@ export class EsConnection extends IConnection {
             }
             if (hit.highlight) {
                 for (const key in hit.highlight) {
-                    row[key] = hit.highlight[key].map((hv:any) => (hv instanceof Object) ? JSON.stringify(hv) : hv).join(",")
+                    row[key] = hit.highlight[key].map((hv: any) => (hv instanceof Object) ? JSON.stringify(hv) : hv).join(",")
                 }
             }
             return row;

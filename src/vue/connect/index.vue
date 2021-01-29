@@ -33,7 +33,7 @@
 
     <template v-if="connectionOption.dbType=='ElasticSearch'">
       <section class="mb-2">
-        <label class="font-bold mr-5 inline-block w-14">Scheme</label>
+        <label class="font-bold mr-5 inline-block w-32">Scheme</label>
         <el-radio v-model="connectionOption.scheme" label="http">Http</el-radio>
         <el-radio v-model="connectionOption.scheme" label="https">Https</el-radio>
       </section>
@@ -41,7 +41,7 @@
 
     <section class="mb-2">
       <div class="inline-block mr-10">
-        <label class="font-bold mr-5 inline-block w-14"><span class="text-red-600 mr-1">*</span>Host</label>
+        <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Host</label>
         <input class="w-64 field__input" placeholder="The host of connection" required v-model="connectionOption.host" />
       </div>
       <div class="inline-block mr-10">
@@ -52,9 +52,9 @@
 
     <template v-if="connectionOption.dbType!='ElasticSearch'">
 
-      <section class="mb-2" v-if="connectionOption.dbType!='Redis'">
-        <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-14"><span class="text-red-600 mr-1">*</span>Username</label>
+      <section class="mb-2">
+        <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
+          <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Username</label>
           <input class="w-64 field__input" placeholder="Username" required v-model="connectionOption.user" />
         </div>
         <div class="inline-block mr-10">
@@ -65,22 +65,15 @@
 
       <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
         <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-14">Encrypt</label>
+          <label class="font-bold mr-5 inline-block w-32">Encrypt</label>
           <el-switch v-model="connectionOption.encrypt"></el-switch>
-           ( If connect SqlServer fail, try change this option. )
-        </div>
-      </section>
-
-      <section class="mb-2" v-if="connectionOption.dbType=='Redis'">
-        <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-14"><span class="text-red-600 mr-1">*</span>Password</label>
-          <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
+          ( If connect SqlServer fail, try change this option. )
         </div>
       </section>
 
       <section class="mb-2">
         <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-14">Databases</label>
+          <label class="font-bold mr-5 inline-block w-32">Databases</label>
           <input class="w-64 field__input" placeholder="Special connection database" v-model="connectionOption.database" />
         </div>
         <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
@@ -89,11 +82,22 @@
         </div>
       </section>
 
+      <section class="mb-2">
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-32">ConnectTimeout</label>
+          <input class="w-64 field__input" placeholder="millisecond" required v-model="connectionOption.connectTimeout" />
+        </div>
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-32">RequestTimeout</label>
+          <input class="w-64 field__input" placeholder="millisecond" required type="number" v-model="connectionOption.requestTimeout" />
+        </div>
+      </section>
+
     </template>
 
     <section class="flex items-center mb-2" v-if="connectionOption.dbType=='MySQL'">
       <div class="inline-block mr-10">
-        <label class="font-bold mr-5 inline-block w-14">Timezone</label>
+        <label class="font-bold mr-5 inline-block w-32">Timezone</label>
         <input class="w-64 field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
       </div>
     </section>
@@ -190,7 +194,7 @@ export default {
         usingSSH: false,
         includeDatabases: null,
         dbType: "MySQL",
-        encrypt:true,
+        encrypt: true,
         global: true,
         scheme: "http",
         timezone: "+00:00",
@@ -335,7 +339,6 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
 
 .button {
   padding: 4px 14px;

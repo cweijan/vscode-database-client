@@ -1,9 +1,9 @@
-import { Node } from "@/model/interface/node";
 import { Connection, ConnectionConfig, Request } from "@/bin/tedious";
-import { IConnection, queryCallback } from "./connection";
+import { Node } from "@/model/interface/node";
+import { EventEmitter } from "events";
+import { queryCallback } from "./connection";
 import { ConnectionPool } from "./pool/connectionPool";
 import format = require('date-format');
-import { EventEmitter } from "events";
 
 /**
  * tedious not support connection queue, so need using pool.
@@ -17,8 +17,8 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
             server: node.host,
             options: {
                 database: node.database || undefined,
-                connectTimeout: 5000,
-                requestTimeout: 10000,
+                connectTimeout: node.connectTimeout || 5000,
+                requestTimeout: node.requestTimeout || 10000,
                 encrypt: node.encrypt
             },
             authentication: {
@@ -51,13 +51,13 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
             connection.execSql(new Request(sql, err => {
                 const multi = columnCount > 1;
                 event.emit("end")
-                if(callback){
+                if (callback) {
                     if (err) {
                         callback(err, null)
                     } else if (isDML) {
                         callback(null, { affectedRows: datas.length })
                     } else {
-                        if(multi) datas.push(tempDatas)
+                        if (multi) datas.push(tempDatas)
                         callback(null, multi ? datas : tempDatas, multi ? fields : fields[0] || [])
                     }
                 }
@@ -72,9 +72,9 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
                     })
                 });
                 fields.push(tempFields)
-                if (columnCount > 1){
+                if (columnCount > 1) {
                     datas.push(tempDatas)
-                    tempDatas=[]
+                    tempDatas = []
                 }
             }).on('row', columns => {
                 let temp = {};

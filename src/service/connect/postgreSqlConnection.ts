@@ -21,8 +21,8 @@ export class PostgreSqlConnection extends IConnection {
             host: opt.host, port: opt.port,
             user: opt.user, password: opt.password,
             database: opt.database,
-            connectionTimeoutMillis: 5000,
-            statement_timeout: 10000
+            connectionTimeoutMillis: opt.connectTimeout || 5000,
+            statement_timeout: opt.requestTimeout || 10000
         };
         this.client = new Client(config);
 
@@ -49,8 +49,8 @@ export class PostgreSqlConnection extends IConnection {
                     event.emit("end")
                 }
                 for (let i = 1; i <= res.rows.length; i++) {
-                    const row = res.rows[i-1];
-                    event.emit("result", this.convertToDump(res.fields, row),res.rows.length == i)
+                    const row = res.rows[i - 1];
+                    event.emit("result", this.convertToDump(res.fields, row), res.rows.length == i)
                 }
             } else {
                 if (res instanceof Array) {
@@ -67,8 +67,8 @@ export class PostgreSqlConnection extends IConnection {
             const element = row[key];
             if (!element) {
                 row[key] = 'NULL'
-            }else{
-                row[key]=sqlstring.escape(element)
+            } else {
+                row[key] = sqlstring.escape(element)
             }
         }
         return row;

@@ -33,6 +33,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public database?: string;
     public name?: string;
     public timezone?: string;
+    public connectTimeout?: number;
+    public requestTimeout?: number;
     public certPath?: string;
     public includeDatabases?: string;
 
@@ -78,7 +80,15 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.scheme = source.scheme
         this.global = source.global
         this.dbType = source.dbType
-        this.encrypt=source.encrypt
+        if(source.connectTimeout){
+            this.connectTimeout = parseInt(source.connectTimeout as any)
+            source.connectTimeout=parseInt(source.connectTimeout as any)
+        }
+        if(source.requestTimeout){
+            this.requestTimeout = parseInt(source.requestTimeout as any)
+            source.requestTimeout = parseInt(source.requestTimeout as any)
+        }
+        this.encrypt = source.encrypt
         this.disable = source.disable
         this.includeDatabases = source.includeDatabases
         if (!this.provider) this.provider = source.provider

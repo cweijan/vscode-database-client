@@ -12,7 +12,7 @@ export class RedisConnection extends IConnection {
             port: opt.port,
             db: opt.database,
             auth_pass: opt.password,
-            connect_timeout: 5000
+            connect_timeout: opt.connectTimeout || 5000
         })
 
     }
@@ -24,7 +24,7 @@ export class RedisConnection extends IConnection {
         this.client.send_command(command, param, callback)
     }
     run(callback: (client: RedisClient) => void) {
-        
+
         callback(this.client)
     }
 
