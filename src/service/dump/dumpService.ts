@@ -8,9 +8,10 @@ import format = require('date-format');
 import { FunctionGroup } from "@/model/main/functionGroup";
 import { ProcedureGroup } from "@/model/main/procedureGroup";
 import { TriggerGroup } from "@/model/main/triggerGroup";
-import { ModelType } from "@/common/constants";
+import { ConfigKey, ModelType } from "@/common/constants";
 import { Util } from "@/common/util";
 import mysqldump, { Options } from './mysql/main';
+import { Global } from "@/common/global";
 
 export class DumpService {
 
@@ -22,12 +23,18 @@ export class DumpService {
         } else {
             const tableList = await new TableGroup(node).getChildren();
             const viewList = await new ViewGroup(node).getChildren();
-            const procedureList = await new ProcedureGroup(node).getChildren();
-            const functionList = await new FunctionGroup(node).getChildren();
-            const triggerList = await new TriggerGroup(node).getChildren();
-            const childrenList = [...tableList, ...viewList, ...procedureList, ...functionList, ...triggerList]
-                .filter(item => item.contextValue != ModelType.INFO && item.contextValue != ModelType.SYSTEM_VIEW_GROUP)
-            const pickItems = childrenList.map(node => { return { label: node.label, description: node.contextValue, picked: true }; });
+            let childrenList = [...tableList, ...viewList]
+            if(Global.getConfig("showProcedure")){
+                childrenList.push(...(await new ProcedureGroup(node).getChildren()))
+            }
+            if(Global.getConfig("showFunction")){
+                childrenList.push(...(await new FunctionGroup(node).getChildren()))
+            }
+            if(Global.getConfig("showTrigger")){
+                childrenList.push(...(await new TriggerGroup(node).getChildren()))
+            }
+            const pickItems = childrenList.filter(item => item.contextValue != ModelType.INFO)
+                .map(node => { return { label: node.label, description: node.contextValue, picked: true }; });
             nodes = await vscode.window.showQuickPick(pickItems, { canPickMany: true, matchOnDescription: true, ignoreFocusOut: true })
             if (!nodes) {
                 return;

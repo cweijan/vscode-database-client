@@ -27,32 +27,28 @@ async function getTriggerDump(node: Node, sessionId: string, options: Required<T
     if (triggers.length === 0) {
         return "";
     }
-
-    // we create a multi query here so we can query all at once rather than in individual connections
-    const getSchemaMultiQuery = triggers.map(trigger => {
-        return node.dialect.showTriggerSource(node.schema, trigger)
-    }).join("")
-
-    const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateTrigger[][];
-    const output=result.map(r => {
-        const res = r[0]
-        // clean up the generated SQL
-        let sql = `${res['SQL Original Statement']}`;
-        if (!options.definer) {
-            sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
-        }
-        // drop trigger statement should go outside the delimiter mods
-        if (options.dropIfExist) {
-            if(node.dbType==DatabaseType.PG){
-                sql = `DROP TRIGGER IF EXISTS ${res.Trigger} ${sql.match(/ON \S+/)[0]};\n${sql}`;
-            }else{
-                sql = `DROP TRIGGER IF EXISTS ${res.Trigger};\n${sql}`;
+    const output = triggers.map(async trigger => {
+        try {
+            const r = await node.execute(node.dialect.showTriggerSource(node.schema, trigger), sessionId)
+            const res = r[0]
+            let sql = `${res['SQL Original Statement']}`;
+            if (!options.definer) {
+                sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
             }
+            if (options.dropIfExist) {
+                if (node.dbType == DatabaseType.PG) {
+                    sql = `DROP TRIGGER IF EXISTS ${res.Trigger} ${sql.match(/ON \S+/)[0]};\n${sql}`;
+                } else {
+                    sql = `DROP TRIGGER IF EXISTS ${res.Trigger};\n${sql}`;
+                }
+            }
+            return `${sql};`;
+        } catch (error) {
+            return false;
         }
-        return `${sql};`;
     });
 
-    return output.join("\n\n");
+    return (await Promise.all(output)).filter(s => s).join("\n\n");
 }
 
 export { ShowTriggers, ShowCreateTrigger, getTriggerDump };

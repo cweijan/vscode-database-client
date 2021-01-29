@@ -22,23 +22,24 @@ async function getProcedureDump(node: Node, sessionId: string, options: Required
     if (procedures.length == 0) {
         return "";
     }
-    const getSchemaMultiQuery = procedures.map(proc => {
-        return node.dialect.showProcedureSource(node.schema, proc)
-    }).join("")
-    const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateProcedure[][];
-    const output = result.map(r => {
-        const res = r[0]
-        let sql = `${res['Create Procedure']}`;
-        if (!options || !options.definer) {
-            sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
+    const output = procedures.map(async procedure => {
+        try {
+            const r = await node.execute(node.dialect.showProcedureSource(node.schema, procedure), sessionId)
+            const res = r[0]
+            let sql = `${res['Create Procedure']}`;
+            if (!options || !options.definer) {
+                sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
+            }
+            if (!options || options.dropIfExist) {
+                sql = `DROP PROCEDURE IF EXISTS ${res.Procedure};\n${sql}`;
+            }
+            return `${sql};`;
+        } catch (error) {
+            return false;
         }
-        if (!options || options.dropIfExist) {
-            sql = `DROP PROCEDURE IF EXISTS ${res.Procedure};\n${sql}`;
-        }
-        return `${sql};`;
     });
 
-    return output.join("\n\n");
+    return (await Promise.all(output)).filter(s => s).join("\n\n");
 }
 
 export { ShowProcedures, ShowCreateProcedure, getProcedureDump };

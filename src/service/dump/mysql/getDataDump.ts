@@ -76,7 +76,7 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
             await executeSql(connection, 'SET GLOBAL read_only = ON');
         }
 
-        connection.dumpMode=true;
+        connection.dumpMode = true;
 
         // to avoid having to load an entire DB's worth of data at once, we select from each table individually
         // note that we use async/await within this loop to only process one table at a time (to reduce memory footprint)
@@ -104,7 +104,7 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
 
                 let tempRow: QueryRes;
                 // stream the data to the file
-                query.on('result', (row: QueryRes,end) => {
+                query.on('result', (row: QueryRes, end) => {
                     // build the values list
                     rowQueue.push(buildInsertValue(row));
 
@@ -116,7 +116,7 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
                         saveChunk(insert);
                         rowQueue = [];
                     }
-                    if(end){
+                    if (end) {
                         query.emit("end")
                     }
                 });
@@ -130,10 +130,9 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
 
                     resolve(null);
                 });
-                query.on(
-                    'error',
-                    /* istanbul ignore next */ err => reject(err),
-                );
+                query.on('error', err => {
+                    reject(err)
+                });
             });
 
         }
@@ -145,7 +144,7 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
             await executeSql(connection, 'SET GLOBAL read_only = OFF');
             await executeSql(connection, 'UNLOCK TABLES');
         }
-        connection.dumpMode=false;
+        connection.dumpMode = false;
     }
 
     if (outFileStream) {

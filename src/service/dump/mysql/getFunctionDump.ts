@@ -22,23 +22,24 @@ async function getFunctionDump(node: Node, sessionId: string, options: Required<
     if (functions.length == 0) {
         return "";
     }
-    const getSchemaMultiQuery = functions.map(fun => {
-        return node.dialect.showFunctionSource(node.schema, fun)
-    }).join("")
-    const result = await node.multiExecute(getSchemaMultiQuery, sessionId) as ShowCreateFunction[][];
-    const output = result.map(r => {
-        const res = r[0]
-        let sql = `${res['Create Function']}`;
-        if (!options || !options.definer) {
-            sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
+    const output = functions.map(async fun => {
+        try {
+            const r = await node.execute(node.dialect.showFunctionSource(node.schema, fun), sessionId)
+            const res = r[0]
+            let sql = `${res['Create Function']}`;
+            if (!options || !options.definer) {
+                sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
+            }
+            if (!options || options.dropIfExist) {
+                sql = `DROP Function IF EXISTS ${res.Function};\n${sql}`;
+            }
+            return `${sql};`;
+        } catch (error) {
+            return false
         }
-        if (!options || options.dropIfExist) {
-            sql = `DROP Function IF EXISTS ${res.Function};\n${sql}`;
-        }
-        return `${sql};`;
     });
 
-    return output.join("\n\n");
+    return (await Promise.all(output)).filter(s => s).join("\n\n");
 }
 
 export { ShowFunctions, ShowCreateFunction, getFunctionDump };

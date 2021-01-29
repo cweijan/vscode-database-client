@@ -218,16 +218,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public getPort(): number { return this.usingSSH ? this.ssh.port : this.port }
     public getUser(): string { return this.usingSSH ? this.ssh.username : this.user }
 
-    public async execute<T>(sql: string): Promise<T> {
-        return (await QueryUnit.queryPromise<T>(await ConnectionManager.getConnection(this), sql)).rows
-    }
-
-    public async multiExecute(sql: string, sessionId: string): Promise<any> {
-        const result = (await QueryUnit.queryPromise<any>(await ConnectionManager.getConnection(this, { sessionId }), sql)).rows;
-        if (result.length == 1) {
-            return [result]
-        }
-        return result
+    public async execute<T>(sql: string,sessionId?:string): Promise<T> {
+        return (await QueryUnit.queryPromise<T>(await ConnectionManager.getConnection(this,{sessionId}), sql)).rows
     }
 
     public async getConnection() {

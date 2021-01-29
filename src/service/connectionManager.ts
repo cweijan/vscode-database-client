@@ -117,7 +117,7 @@ export class ConnectionManager {
                 }
             }
             const newConnection = this.create(connectOption);
-            this.alivedConnection[key] = { connection: newConnection, ssh, schema: connectionNode.schema };
+            this.alivedConnection[key] = { connection: newConnection, ssh };
             newConnection.connect(async (err: Error) => {
                 if (err) {
                     this.end(key, this.alivedConnection[key])
