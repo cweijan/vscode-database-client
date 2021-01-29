@@ -2,12 +2,12 @@
   <div>
     <div class="opt-panel">
       <el-form>
-        <el-form-item label="Target">
+        <el-form-item label-width="80px" label="Target">
           <el-select v-model="option.from.connection">
             <el-option :label="node.label" :value="node.uid" :key="node.uid" v-for="node in initData.nodes"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="database">
+        <el-form-item label-width="80px" label="database">
           <el-select v-model="option.from.database">
             <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in initData.databaseList[option.from.connection]"></el-option>
           </el-select>
@@ -16,21 +16,21 @@
     </div>
     <div class="opt-panel">
       <el-form>
-        <el-form-item label="Sync From">
+        <el-form-item label-width="80px" label="Sync From">
           <el-select v-model="option.to.connection">
             <el-option :label="node.label" :value="node.label" :key="node.label" v-for="node in initData.nodes"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="database">
+        <el-form-item label-width="80px" label="database">
           <el-select v-model="option.to.database">
             <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in initData.databaseList[option.to.connection]"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
     </div>
-    <div>
-      <el-button class="m-2" @click="startCompare" title="Start Compare" type="danger" size="mini" v-loading="loading.compare">Compare
+      <el-button stlye="margin-left:250px;" class="m-2" @click="startCompare" title="Start Compare" type="danger" size="mini" v-loading="loading.compare">Compare
       </el-button>
+    <div >
       <template v-if="compareResult.sqlList">
         <el-card>
           <el-button @click="confrimSync" v-loading="loading.sync" title="Confrim Sync" type="success" size="mini">Sync
@@ -60,7 +60,7 @@ export default {
   },
   mounted() {
     this.on("structDiffData", (data) => {
-       console.log(123123)
+      console.log(123123);
       this.initData = data;
     })
       .on("compareResult", (compareResult) => {
@@ -120,5 +120,6 @@ export default {
 .opt-panel {
   width: 400px;
   display: inline-block;
+  margin-top: 30px;
 }
 </style>
