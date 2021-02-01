@@ -92,6 +92,7 @@ export default {
   },
   data() {
     return {
+      remainHeight:0,
       connection: {},
       result: {
         data: [],
@@ -137,6 +138,10 @@ export default {
     };
   },
   mounted() {
+    this.remainHeight=window.innerHeight-120;
+    window.addEventListener("resize",()=>{
+      this.remainHeight=window.innerHeight-120;
+    })
     const handlerData = (data, sameTable) => {
       this.result = data;
       this.toolbar.sql = data.sql;
@@ -539,10 +544,7 @@ export default {
       if (this.result.data == undefined || this.result.data[0] == undefined)
         return 0;
       return Object.keys(this.result.data[0]).length;
-    },
-    remainHeight() {
-      return window.outerHeight - 230;
-    },
+    }
   },
 };
 </script>
