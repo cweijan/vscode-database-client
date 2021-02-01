@@ -5,10 +5,10 @@
         <el-input type="textarea" :autosize="{ minRows:2, maxRows:5}" v-model="toolbar.sql" class="sql-pannel" />
       </div>
       <div class="toolbar">
+        <el-button v-if="showFullBtn" @click="full" type="primary" title="Full Result View" icon="el-icon-rank" size="mini" circle>
+        </el-button>
         <el-button type="primary" size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
         <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
-        <el-button @click="full" type="primary" title="Full Result View" icon="el-icon-rank" size="mini" circle>
-        </el-button>
         <el-button @click="$refs.editor.openInsert()" :disabled="result.tableCount!=1" type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle>
         </el-button>
         <el-button @click="$refs.editor.openEdit(update.current)" type="primary" size="mini" icon="el-icon-edit" title="edit" circle :disabled="!toolbar.show">
@@ -92,7 +92,8 @@ export default {
   },
   data() {
     return {
-      remainHeight:0,
+      showFullBtn: false,
+      remainHeight: 0,
       connection: {},
       result: {
         data: [],
@@ -138,10 +139,12 @@ export default {
     };
   },
   mounted() {
-    this.remainHeight=window.innerHeight-120;
-    window.addEventListener("resize",()=>{
-      this.remainHeight=window.innerHeight-120;
-    })
+    this.remainHeight = window.innerHeight - 120;
+    this.showFullBtn = window.outerWidth / window.innerWidth >= 2;
+    window.addEventListener("resize", () => {
+      this.remainHeight = window.innerHeight - 120;
+      this.showFullBtn = window.outerWidth / window.innerWidth >= 2;
+    });
     const handlerData = (data, sameTable) => {
       this.result = data;
       this.toolbar.sql = data.sql;
@@ -223,8 +226,8 @@ export default {
     });
   },
   methods: {
-    full(){
-      vscodeEvent.emit("full")
+    full() {
+      vscodeEvent.emit("full");
     },
     openCoffee() {
       vscodeEvent.emit("openCoffee");
@@ -241,13 +244,13 @@ export default {
     onContextmenu(event, column) {
       const name = column.title;
       const value = event.target.textContent;
-      event.target.value=value;
+      event.target.value = value;
       this.$contextmenu({
         items: [
-           {
+          {
             label: `Copy`,
             onClick: () => {
-              vscodeEvent.emit("copy",value)
+              vscodeEvent.emit("copy", value);
             },
           },
           {
@@ -287,14 +290,14 @@ export default {
               {
                 label: `Filter by ${name} LIKE '%${value}%'`,
                 onClick: () => {
-                  event.target.value=`%${value}%`;
+                  event.target.value = `%${value}%`;
                   this.filter(event, name, "LIKE");
                 },
               },
               {
                 label: `Filter by ${name} NOT LIKE '%${value}%'`,
                 onClick: () => {
-                  event.target.value=`%${value}%`;
+                  event.target.value = `%${value}%`;
                   this.filter(event, name, "NOT LIKE");
                 },
               },
@@ -544,7 +547,7 @@ export default {
       if (this.result.data == undefined || this.result.data[0] == undefined)
         return 0;
       return Object.keys(this.result.data[0]).length;
-    }
+    },
   },
 };
 </script>
