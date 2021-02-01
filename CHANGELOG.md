@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 3.4.5
+
+- Result view update: adapt scroll bar when height change, move full button position.
+- Split result only when run from editor.
+- Support hide user node from tree ui.
+
 # 3.4.4 2020-1-29
 
 - Support schema with postgresql、sqlserver.
