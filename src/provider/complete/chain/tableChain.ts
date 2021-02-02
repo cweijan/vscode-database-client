@@ -6,7 +6,7 @@ import { TriggerGroup } from "@/model/main/triggerGroup";
 import { ViewGroup } from "@/model/main/viewGroup";
 import { QueryGroup } from "@/model/query/queryGroup";
 import * as vscode from "vscode";
-import { ModelType } from "../../../common/constants";
+import { DatabaseType, ModelType } from "../../../common/constants";
 import { TableNode } from "../../../model/main/tableNode";
 import { ConnectionManager } from "../../../service/connectionManager";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
@@ -30,10 +30,14 @@ export class TableChain implements ComplectionChain {
         const nodeList = await this.getNodeList();
         return nodeList.map<vscode.CompletionItem>((tableNode: TableNode) => {
             const completionItem = new vscode.CompletionItem(tableNode.table);
-            if (tableNode.comment) {
-                completionItem.detail = tableNode.comment
+            if (tableNode.description) {
+                completionItem.detail = tableNode.description
             }
-            completionItem.insertText = tableNode.wrap(tableNode.table);
+            if (tableNode.dbType == DatabaseType.MSSQL) {
+                completionItem.insertText = `${tableNode.wrap(tableNode.schema)}.${tableNode.wrap(tableNode.table)}`;
+            } else {
+                completionItem.insertText = tableNode.wrap(tableNode.table);
+            }
             switch (tableNode.contextValue) {
                 case ModelType.TABLE:
                     completionItem.kind = vscode.CompletionItemKind.Function;
@@ -64,7 +68,7 @@ export class TableChain implements ComplectionChain {
             return nodeList
         }
         for (const groupNode of groupNodes) {
-            if (groupNode instanceof TableGroup || groupNode instanceof ViewGroup){
+            if (groupNode instanceof TableGroup || groupNode instanceof ViewGroup) {
                 nodeList.push(...await groupNode.getChildren());
             }
         }

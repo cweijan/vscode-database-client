@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { FieldInfo } from "mysql2";
+import { FieldInfo } from "@/common/typeDef";
 import * as fs from "fs";
 import { Console } from "../../common/Console";
 import { ExportContext, ExportType } from "./exportContext";

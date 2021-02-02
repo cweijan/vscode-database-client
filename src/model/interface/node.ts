@@ -63,6 +63,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
      * database only
      */
     public schema: string;
+    public description: string;
 
     constructor(uid: string) {
         super(uid)

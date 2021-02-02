@@ -869,7 +869,7 @@
 				},
 				"database-client.showView": {
 					"type": "boolean",
-					"default": false,
+					"default": true,
 					"description": "Show view on tree view."
 				},
 				"database-client.showQuery": {

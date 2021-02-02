@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { FieldInfo } from "mysql2";
+import { FieldInfo } from "@/common/typeDef";
 
 export abstract class IConnection {
     public dumpMode: boolean = false;

@@ -1,7 +1,6 @@
 import { Node } from "@/model/interface/node";
 import * as fs from "fs";
 import * as mysql from "mysql2";
-import { TypecastField } from "mysql2";
 import { IConnection, queryCallback } from "./connection";
 import { dumpTypeCast } from './convert/mysqlTypeCast';
 
@@ -15,7 +14,7 @@ export class MysqlConnection extends IConnection {
             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
             connectTimeout: node.connectTimeout||5000,
             typeCast: (field, next) => {
-                if (this.dumpMode) return dumpTypeCast(field as TypecastField)
+                if (this.dumpMode) return dumpTypeCast(field as mysql.TypecastField)
                 const buf = field.buffer();
                 if (field.type == 'BIT') {
                     return this.bitToBoolean(buf)

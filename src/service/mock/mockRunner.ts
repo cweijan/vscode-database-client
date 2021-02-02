@@ -12,7 +12,7 @@ import { MessageResponse } from "../result/queryResponse";
 import { FileManager, FileModel } from '../../common/filesManager';
 import { MockModel } from './mockModel';
 import { Node } from '../../model/interface/node';
-import { ColumnMeta } from '../../model/other/columnMeta';
+import { ColumnMeta } from "@/common/typeDef";
 import { TableGroup } from '@/model/main/tableGroup';
 
 export class MockRunner {

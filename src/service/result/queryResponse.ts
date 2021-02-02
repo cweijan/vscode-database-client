@@ -1,5 +1,4 @@
-import * as mysql from "mysql2";
-import { ColumnMeta } from "../../model/other/columnMeta";
+import { ColumnMeta, FieldInfo } from "@/common/typeDef";
 
 export class RunResponse {
     public sql: string;
@@ -18,7 +17,7 @@ export class DataResponse {
     public database?: string;
     public table: string | null;
     public data: any[];
-    public fields: mysql.FieldInfo[];
+    public fields: FieldInfo[];
     public pageSize: number;
     public tableCount: number;
     public total?: number;

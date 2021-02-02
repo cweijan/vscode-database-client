@@ -29,7 +29,7 @@ export class ViewGroup extends Node {
             this.dialect.showViews(this.schema))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
-                    return new ViewNode(table.name, '', this);
+                    return new ViewNode(table, this);
                 });
                 if (tableNodes.length == 0) {
                     tableNodes = [new InfoNode("This schema has no view")];

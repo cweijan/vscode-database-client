@@ -24,7 +24,7 @@ export class TableGroup extends Node {
         return this.execute<any[]>(this.dialect.showTables(this.schema))
             .then((tables) => {
                 tableNodes = tables.map<TableNode>((table) => {
-                    return new TableNode(table.name, table.comment, this);
+                    return new TableNode(table, this);
                 });
                 if (tableNodes.length == 0) {
                     tableNodes = [new InfoNode("This schema has no table")];

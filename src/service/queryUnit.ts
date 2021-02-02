@@ -13,8 +13,7 @@ import { ServiceManager } from "./serviceManager";
 import { NodeUtil } from "~/model/nodeUtil";
 import { Trans } from "~/common/trans";
 import { IConnection } from "./connect/connection";
-import { FieldInfo } from "mysql2";
-import { rejects } from "assert";
+import { FieldInfo } from "@/common/typeDef";
 
 export class QueryUnit {
 

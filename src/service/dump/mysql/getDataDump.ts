@@ -3,7 +3,6 @@ import { IConnection } from '@/service/connect/connection';
 import { ConnectionManager } from '@/service/connectionManager';
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
-import { Query } from 'mysql2';
 import { DataDumpOptions } from './interfaces/Options';
 
 interface QueryRes {

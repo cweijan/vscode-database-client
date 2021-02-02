@@ -11,7 +11,7 @@ import { MockRunner } from "../../service/mock/mockRunner";
 import { QueryUnit } from "../../service/queryUnit";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
-import { ColumnMeta } from "../other/columnMeta";
+import { ColumnMeta, TableMeta } from "@/common/typeDef";
 import { ColumnNode } from "../other/columnNode";
 import { InfoNode } from "../other/infoNode";
 
@@ -19,10 +19,12 @@ export class TableNode extends Node implements CopyAble {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.TABLE;
+    public table: string; 
 
-    constructor(public table: string, readonly comment: string, readonly parent: Node) {
-        super(`${table}`)
-        this.description = comment
+    constructor(meta: TableMeta, readonly parent: Node) {
+        super(`${meta.name}`)
+        this.table = meta.name
+        this.description = `${meta.comment} ${meta.rows}`
         this.init(parent)
         this.cacheSelf()
         this.command = {
@@ -137,9 +139,9 @@ export class TableNode extends Node implements CopyAble {
                         return columnNode.column;
                     });
                     const node = this.getByRegion(this.table) as TableNode || this
-                    handler.emit('design-data', { indexs: result, table: node.table, comment: node.comment, columnList, primaryKey, dbType: node.dbType })
+                    handler.emit('design-data', { indexs: result, table: node.table, comment: node.description, columnList, primaryKey, dbType: node.dbType })
                 }).on("updateTable", async ({ newTableName, newComment }) => {
-                    const sql = this.dialect.updateTable({ table: this.table, newTableName, comment: this.comment, newComment });
+                    const sql = this.dialect.updateTable({ table: this.table, newTableName, comment: this.description, newComment });
                     await executeAndRefresh(sql, handler)
                     DatabaseCache.setChildCache(this.parent.uid, null);
                     this.provider.reload(this.parent)

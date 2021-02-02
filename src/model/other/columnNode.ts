@@ -8,7 +8,7 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
-import { ColumnMeta } from "./columnMeta";
+import { ColumnMeta } from "@/common/typeDef";
 
 export class ColumnNode extends Node implements CopyAble {
     public type: string;
