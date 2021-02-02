@@ -14,10 +14,12 @@ export class MysqlImportService extends ImportService {
             const host = node.usingSSH ? "127.0.0.1" : node.host
             const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
             const command = `mysql -h ${host} -P ${port} -u ${node.user} ${node.password ? `-p${node.password}` : ""} ${node.schema || ""} < ${importPath}`
-            Console.log(` Executing: \`${command.replace(/-p.+? /, "-p****** ")}\``);
-            exec(command, err => {
+            Console.log(`Executing: ${command.replace(/-p.+? /, "-p****** ")}`);
+            exec(command, (err,stdout,stderr) => {
                 if (err) {
                     Console.log(err);
+                }else if(stderr){
+                    Console.log(stderr);
                 } else {
                     Console.log(`Import Success!`);
                 }
