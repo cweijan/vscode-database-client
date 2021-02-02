@@ -3,7 +3,7 @@
 import * as vscode from "vscode";
 import { CommandKey } from "./common/constants";
 import { ConnectionNode } from "./model/database/connectionNode";
-import { SchemaNode } from "./model/database/databaseNode";
+import { SchemaNode } from "./model/database/schemaNode";
 import { UserGroup } from "./model/database/userGroup";
 import { CopyAble } from "./model/interface/copyAble";
 import { FunctionNode } from "./model/main/function";

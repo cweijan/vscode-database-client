@@ -129,6 +129,9 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         TABLE_TYPE = 'BASE TABLE'
         AND TABLE_SCHEMA = '${database}'`
     }
+    showDatabases(){
+        return "SELECT name 'db' FROM master.sys.databases"
+    }
     showSchemas(): string {
         return "SELECT SCHEMA_NAME [schema] FROM INFORMATION_SCHEMA.SCHEMATA"
     }

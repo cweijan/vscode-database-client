@@ -9,7 +9,7 @@ import { ViewManager } from "@/common/viewManager";
 import { DatabaseCache } from "../common/databaseCache";
 import { ConnectionManager } from "../connectionManager";
 import { QueryUnit } from "../queryUnit";
-import { SchemaNode } from "@/model/database/databaseNode";
+import { SchemaNode } from "@/model/database/schemaNode";
 import { UserGroup } from "@/model/database/userGroup";
 import { TableGroup } from "@/model/main/tableGroup";
 

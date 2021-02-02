@@ -3,7 +3,7 @@ import { CacheKey, ConfigKey, DatabaseType } from "../common/constants";
 import { ConnectionManager } from "../service/connectionManager";
 import { DatabaseCache } from "../service/common/databaseCache";
 import { ConnectionNode } from "../model/database/connectionNode";
-import { SchemaNode } from "../model/database/databaseNode";
+import { SchemaNode } from "../model/database/schemaNode";
 import { CommandKey, Node } from "../model/interface/node";
 import { UserGroup } from "../model/database/userGroup";
 import { Global } from "../common/global";

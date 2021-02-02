@@ -4,7 +4,7 @@ import { Constants, ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
-import { SchemaNode } from "./databaseNode";
+import { SchemaNode } from "./schemaNode";
 import { UserNode } from "./userNode";
 
 export class UserGroup extends SchemaNode {

@@ -10,7 +10,8 @@ import { ConnectionManager } from "../../service/connectionManager";
 import { CopyAble } from "../interface/copyAble";
 import { CommandKey, Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
-import { SchemaNode } from "./databaseNode";
+import { CatalogNode } from "./catalogNode";
+import { SchemaNode } from "./schemaNode";
 import { UserGroup } from "./userGroup";
 
 /**
@@ -55,12 +56,16 @@ export class ConnectionNode extends Node implements CopyAble {
             return dbNodes.map(dbNode => {
                 if (dbNode.contextValue == ModelType.USER_GROUP) {
                     return new UserGroup(dbNode.label, this)
+                }else if(dbNode.contextValue==ModelType.CATALOG){
+                    return new CatalogNode(dbNode.label,this)
                 }
                 return new SchemaNode(dbNode.label, this)
             });
         }
 
-        return this.execute<any[]>(this.dialect.showSchemas())
+        const hasCatalog = this.dbType != DatabaseType.MYSQL && this.contextValue == ModelType.CONNECTION;
+        const sql = hasCatalog ? this.dialect.showDatabases() : this.dialect.showSchemas();
+        return this.execute<any[]>(sql)
             .then((databases) => {
                 const includeDatabaseArray = this.includeDatabases?.toLowerCase()?.split(",")
                 const usingInclude = this.includeDatabases && includeDatabaseArray && includeDatabaseArray.length >= 1;
@@ -69,11 +74,13 @@ export class ConnectionNode extends Node implements CopyAble {
                         return includeDatabaseArray.indexOf((db.schema || db.Database).toLocaleLowerCase()) != -1;
                     }
                     return true;
-                }).map<SchemaNode>((database) => {
-                    return new SchemaNode(database.schema || database.Database, this);
+                }).map<SchemaNode | CatalogNode>((database) => {
+                    return hasCatalog ?
+                        new CatalogNode(database.db, this)
+                        : new SchemaNode(database.schema || database.Database, this);
                 });
 
-                if(Global.getConfig("showUser")){
+                if (Global.getConfig("showUser") && !hasCatalog) {
                     databaseNodes.unshift(new UserGroup("USER", this));
                 }
                 DatabaseCache.setDataBaseListOfConnection(this.uid, databaseNodes);

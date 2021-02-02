@@ -1,6 +1,7 @@
+import { CatalogNode } from "@/model/database/catalogNode";
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
 import { CacheKey, ModelType } from "../../common/constants";
-import { SchemaNode } from "../../model/database/databaseNode";
+import { SchemaNode } from "../../model/database/schemaNode";
 import { Node } from "../../model/interface/node";
 
 export class DatabaseCache {
@@ -120,7 +121,7 @@ export class DatabaseCache {
         return databaseNodeList;
     }
 
-    public static setDataBaseListOfConnection(connectionid: string, DatabaseNodeList: SchemaNode[]) {
+    public static setDataBaseListOfConnection(connectionid: string, DatabaseNodeList: Node[]) {
         this.cache.database[connectionid] = DatabaseNodeList;
     }
 
