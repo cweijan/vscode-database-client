@@ -185,7 +185,8 @@ export class TableNode extends Node implements CopyAble {
 
     public getToolTipe(meta: TableMeta): string {
         if (this.dbType == DatabaseType.MYSQL && meta.data_length) {
-            return `AUTO_INCREMENT : ${meta.auto_increment}
+            return `ROWS : ${meta.rows}
+AUTO_INCREMENT : ${meta.auto_increment}
 DATA_LENGTH : ${prettyBytes(parseInt(meta.data_length))}
 INDEX_LENGTH : ${prettyBytes(parseInt(meta.index_length))}
 ROW_FORMAT : ${meta.row_format}

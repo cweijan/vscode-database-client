@@ -8,6 +8,7 @@
 - Support hide userNode, viewNode from tree ui.
 - Fix elasticSearch query error message not showed.
 - Integrate overview as table node tooltip.
+- Update server status view.
 
 # 3.4.4 2020-1-29
 
