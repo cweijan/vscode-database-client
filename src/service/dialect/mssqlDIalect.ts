@@ -35,7 +35,7 @@ export class MssqlDIalect extends SqlDialect {
         throw new Error("Method not implemented.");
     }
     processList(): string {
-        return 'SELECT * from pg_stat_activity'
+        return 'sp_who'
     }
     addColumn(table: string): string {
         return `ALTER TABLE
