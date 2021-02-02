@@ -24,7 +24,7 @@ export class TableNode extends Node implements CopyAble {
     constructor(meta: TableMeta, readonly parent: Node) {
         super(`${meta.name}`)
         this.table = meta.name
-        this.description = `${meta.comment} ${meta.rows}`
+        this.description = `${meta.comment||''} ${(meta.rows && meta.rows!='0')?`Rows ${meta.rows}`:''}`
         this.init(parent)
         this.cacheSelf()
         this.command = {

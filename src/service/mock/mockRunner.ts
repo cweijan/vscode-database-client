@@ -25,7 +25,7 @@ export class MockRunner {
         const mockModel: MockModel = {
             mode: tableNode.global === false ? 'workspace' : 'global',
             host: tableNode.getHost(), port: tableNode.getPort(), user: tableNode.getUser(), database: tableNode.database, table: tableNode.table,
-            schema:tableNode.schema,
+            schema: tableNode.schema,
             mockStartIndex: MockRunner.primaryKeyMap[tableNode.uid] ? 'auto' : 1
             , mockCount: 10, examples: "http://mockjs.com/examples.html#DPD", mock: {}
         }
@@ -73,7 +73,7 @@ export class MockRunner {
                 startIndex = (await tableNode.getMaxPrimary()) + 1;
             }
 
-            const count = parseInt(startIndex+"") + mockCount;
+            const count = parseInt(startIndex + "") + mockCount;
             for (let i = startIndex; i < count; i++) {
                 let tempInsertSql = insertSqlTemplate;
                 for (const column in mockData) {
@@ -89,7 +89,7 @@ export class MockRunner {
 
             const success = await QueryUnit.runBatch(connection, sqlList)
             vscode.commands.executeCommand("mysql.table.find", tableNode, true)
-            QueryPage.send({ connection: tableNode, type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
+            QueryPage.send({ queryOption: { split: true }, connection: tableNode, type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
 
         }
     }

@@ -67,7 +67,7 @@ export enum ModelType {
     /**
      * database
      */
-    CONNECTION = "connection", DATABASE = "database", USER_GROUP = "userGroup", USER = "user",
+    CONNECTION = "connection", SCHEMA = "schema", USER_GROUP = "userGroup", USER = "user",
     TABLE = "table", COLUMN = "column", INFO = "info", TABLE_GROUP = "tableGroup",
     VIEW = "view", VIEW_GROUP = "viewGroup",  TRIGGER_GROUP = "triggerGroup", TRIGGER = "trigger",
     PROCEDURE_GROUP = "procedureGroup", PROCEDURE = "procedure", FUNCTION_GROUP = "functionGroup", FUNCTION = "function",

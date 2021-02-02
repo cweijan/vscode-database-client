@@ -123,7 +123,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         if (this.uid) return;
         if (this.contextValue == ModelType.CONNECTION) {
             this.uid = this.getConnectId();
-        } else if (this.contextValue == ModelType.DATABASE) {
+        } else if (this.contextValue == ModelType.SCHEMA) {
             this.uid = `${this.getConnectId({ withDbForce: true })}`;
         } else {
             this.uid = `${this.getConnectId({ withDbForce: true })}#${this.label}`;
@@ -167,7 +167,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public cacheSelf() {
         if (this.contextValue == ModelType.CONNECTION || this.contextValue == ModelType.ES_CONNECTION) {
             Node.nodeCache[`${this.getConnectId()}`] = this;
-        } else if (this.contextValue == ModelType.DATABASE) {
+        } else if (this.contextValue == ModelType.SCHEMA) {
             Node.nodeCache[`${this.getConnectId({ withDbForce: true })}`] = this;
         } else {
             Node.nodeCache[`${this.uid}`] = this;
