@@ -2,9 +2,11 @@
 
 # 3.4.5
 
-- Result view update: adapt scroll bar when height change, move full button position.
+- Adapt result view scroll bar when height change..
+- Move result view full button position.
 - Split result only when run from editor.
-- Support hide user node from tree ui.
+- Support hide userNode, viewNode from tree ui.
+- Fix elasticSearch query error not showed.
 
 # 3.4.4 2020-1-29
 

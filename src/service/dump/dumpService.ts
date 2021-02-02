@@ -22,8 +22,10 @@ export class DumpService {
             nodes = [{ label: node.table, description: node.contextValue }]
         } else {
             const tableList = await new TableGroup(node).getChildren();
-            const viewList = await new ViewGroup(node).getChildren();
-            let childrenList = [...tableList, ...viewList]
+            let childrenList = [...tableList]
+            if(Global.getConfig("showView")){
+                childrenList.push(...(await new ViewGroup(node).getChildren()))
+            }
             if(Global.getConfig("showProcedure")){
                 childrenList.push(...(await new ProcedureGroup(node).getChildren()))
             }

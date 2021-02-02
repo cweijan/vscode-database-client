@@ -867,6 +867,11 @@
 					"default": false,
 					"description": "Show diagram on tree view."
 				},
+				"database-client.showView": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show view on tree view."
+				},
 				"database-client.showQuery": {
 					"type": "boolean",
 					"default": false,

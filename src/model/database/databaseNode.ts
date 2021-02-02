@@ -37,7 +37,11 @@ export class SchemaNode extends Node implements CopyAble {
 
     public getChildren(): Promise<Node[]> | Node[] {
 
-        let childs: Node[] = [new TableGroup(this), new ViewGroup(this)];
+        let childs: Node[] = [new TableGroup(this)];
+
+        if (Global.getConfig('showView')) {
+            childs.push(new ViewGroup(this))
+        }
 
         if (Global.getConfig('showQuery')) {
             childs.push(new QueryGroup(this))
