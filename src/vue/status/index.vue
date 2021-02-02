@@ -20,17 +20,17 @@
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="processList" name="processList">
-        <ux-grid :data="process.rows" size='small' :cell-style="{height: '35px'}" style="width: 100%">
+        <ux-grid :data="process.rows" size='small' :cell-style="{height: '35px'}" style="width: 100%"  :height="remainHeight()">
           <ux-table-column :field="field.name" :title="field.name" v-for="(field,index) in process.fields" :key="index" align="center" show-overflow-tooltip="true"/>
         </ux-grid>
       </el-tab-pane>
        <el-tab-pane label="variableList" name="variableList">
-        <ux-grid :data="variableList.rows" size='small' :cell-style="{height: '35px'}" style="width: 100%">
+        <ux-grid :data="variableList.rows" size='small' :cell-style="{height: '35px'}" style="width: 100%" :height="remainHeight()">
           <ux-table-column :field="field.name" :title="field.name" v-for="(field,index) in variableList.fields" :key="index" align="center" show-overflow-tooltip="true"/>
         </ux-grid>
       </el-tab-pane>
        <el-tab-pane label="statusList" name="statusList">
-        <ux-grid :data="statusList.rows" size='small' :cell-style="{height: '35px'}" style="width: 100%">
+        <ux-grid :data="statusList.rows" size='small' :cell-style="{height: '35px'}" style="width: 100%" :height="remainHeight()">
           <ux-table-column :field="field.name" :title="field.name" v-for="(field,index) in statusList.fields" :key="index" align="center" show-overflow-tooltip="true"/>
         </ux-grid>
       </el-tab-pane>
@@ -133,6 +133,9 @@ export default {
     }, 1000)
   },
   methods: {
+    remainHeight() {
+      return window.outerHeight - 150;
+    },
     sendLoadDashBoard() {
       if (this.dashBoard.sessions.lock) return
       this.dashBoard.sessions.lock = true
@@ -160,8 +163,6 @@ export default {
 
 <style >
 .status-container {
-  /* background-color: var(--vscode-editor-background); */
-  background-color: #f7f7f7 !important;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
 }
 .el-tabs__header {
