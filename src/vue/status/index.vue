@@ -29,7 +29,7 @@
           <ux-table-column :field="field.name" :title="field.name" v-for="(field,index) in variableList.fields" :key="index" align="center" show-overflow-tooltip="true" />
         </ux-grid>
       </el-tab-pane>
-      <el-tab-pane label="statusList" name="statusList" v-if="info.dbType=='MySQL'">
+      <el-tab-pane label="statusList" name="statusList" v-if="info.dbType!='SqlServer'">
         <ux-grid :data="statusList.rows" size='small' :cell-style="{height: '35px'}" style="width: 100%" :height="remainHeight()">
           <ux-table-column :field="field.name" :title="field.name" v-for="(field,index) in statusList.fields" :key="index" align="center" show-overflow-tooltip="true" />
         </ux-grid>

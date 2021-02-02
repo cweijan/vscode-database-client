@@ -31,7 +31,7 @@ export abstract class AbstractStatusService implements StatusService {
                         handler.emit("variableList", { fields, rows })
                     })
                 }).on("statusList", async () => {
-                    if (node.dbType != DatabaseType.MYSQL) return;
+                    if (node.dbType == DatabaseType.MSSQL) return;
                     QueryUnit.queryPromise<any>(await ConnectionManager.getConnection(node), node.dialect.statusList()).then(({ rows, fields }) => {
                         handler.emit("statusList", { fields, rows })
                     })

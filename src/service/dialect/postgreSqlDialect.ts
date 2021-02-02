@@ -18,10 +18,67 @@ export class PostgreSqlDialect extends SqlDialect {
         return 'SHOW ALL'
     }
     statusList(): string {
-        throw new Error("Method not implemented.");
+        return `SELECT
+        'db_numbackends' AS db,
+        pg_stat_get_db_numbackends(datid) AS status
+      FROM
+        pg_stat_database
+      WHERE
+        datname = current_database()
+      UNION ALL
+      SELECT
+        'db_xact_commit',
+        pg_stat_get_db_xact_commit(datid)
+      FROM
+        pg_stat_database
+      WHERE
+        datname = current_database()
+      UNION ALL
+      SELECT
+        'db_xact_rollback',
+        pg_stat_get_db_xact_rollback(datid)
+      FROM
+        pg_stat_database
+      WHERE
+        datname = current_database()
+      UNION ALL
+      SELECT
+        'db_blocks_fetched',
+        pg_stat_get_db_blocks_fetched(datid)
+      FROM
+        pg_stat_database
+      WHERE
+        datname = current_database()
+      UNION ALL
+      SELECT
+        'db_blocks_hit',
+        pg_stat_get_db_blocks_hit(datid)
+      FROM
+        pg_stat_database
+      WHERE
+        datname = current_database()`
     }
     processList(): string {
-        return 'SELECT * from pg_stat_activity'
+        return `SELECT
+        a.pid AS "Id",
+        a.usename AS "User",
+        a.client_addr AS "Host",
+        a.client_port AS "Port",
+        datname AS "db",
+        query AS "Command",
+        l.mode AS "State",
+        query_start AS "Time",
+        CASE
+          WHEN c.relname IS NOT NULL THEN 'Locked Object: ' || c.relname
+          ELSE 'Locked Transaction: ' || l.virtualtransaction
+        END AS "Info"
+      FROM
+        pg_stat_activity a
+        LEFT JOIN pg_locks l ON a.pid = l.pid
+        LEFT JOIN pg_class c ON l.relation = c.oid
+      ORDER BY
+        a.pid ASC,
+        c.relname ASC`
     }
     addColumn(table: string): string {
         return `ALTER TABLE
