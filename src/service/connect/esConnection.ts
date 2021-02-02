@@ -48,6 +48,11 @@ export class EsConnection extends IConnection {
                 callback(null, data)
             }
         }).catch(err => {
+            const reason = err?.response?.data?.error?.reason;
+            if (reason) {
+                callback(new Error(reason))
+                return;
+            }
             console.log(err)
             callback(err)
         })

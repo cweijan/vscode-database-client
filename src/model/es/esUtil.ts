@@ -13,8 +13,8 @@ export class EsUtil {
             vscode.window.showErrorMessage("Not active es found!")
             return;
         }
-        if(parse){
-            QueryUnit.runQuery(`${em.Method.Text} ${em.Path.Text}\n${em.Body.Text}`,node)
+        if (parse) {
+            QueryUnit.runQuery(`${em.Method.Text} ${em.Path.Text}\n${em.Body.Text}`, node, { split: true })
             return;
         }
         (await node.getConnection()).query(`${em.Method.Text} ${em.Path.Text}\n${em.Body.Text}`, 'dontParse', async (err, data) => {

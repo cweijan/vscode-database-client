@@ -41,7 +41,7 @@ export class QueryUnit {
 
         Trans.begin()
         connectionNode = NodeUtil.of(connectionNode)
-        if (!queryOption.split) queryOption.split = sql == null;
+        if (queryOption.split==null) queryOption.split = sql == null;
 
         let fromEditor = false;
         if (!sql) {
