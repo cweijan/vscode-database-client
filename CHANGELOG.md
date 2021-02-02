@@ -6,7 +6,8 @@
 - Move result view full button position.
 - Split result only when run from editor.
 - Support hide userNode, viewNode from tree ui.
-- Fix elasticSearch query error not showed.
+- Fix elasticSearch query error message not showed.
+- Integrate overview as table node tooltip.
 
 # 3.4.4 2020-1-29
 

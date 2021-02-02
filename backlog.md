@@ -1,17 +1,8 @@
 # Dialect or differenct database
 
-1. `export interface SqlDialect` (mysql、postgresql、sqlserver)
-2. `export interface IConnection` (mysql、postgresql、sqlserver)
-3. `PageService`(mysql、postgresql)
-4. `export abstract class AbstractDumpService` (mysql only now)
-5. `export interface ImportService`(mysql only now)
-6. `export class OverviewService` (mysql only now)
-7. `export interface StatusService` (mysql only now)
-
-
-# Next Share
-
-- Support sqlite、mongodb
-- Struct sync
-- Table design
-- sql server old version.
+1. `export interface SqlDialect`
+2. `export interface IConnection`
+3. `export abstract class AbstractDumpService`
+4. `export interface ImportService`
+5. `PageService`(mysql、postgresql)
+6. `export interface StatusService` (mysql only now)

@@ -21,7 +21,7 @@ export class ESIndexNode extends EsBaseNode {
         const [health, status, index, uuid, pri, rep, docsCount, docsDeleted, storeSize, priStoreSize] = info.split(/\s+/)
         this.label = index
         this.cacheSelf()
-        this.description = storeSize
+        this.description = `${storeSize} Docs ${docsCount}`
         this.command = {
             command: "mysql.show.esIndex",
             title: "Show ES Index Data",

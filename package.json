@@ -207,11 +207,6 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.db.overview",
-				"title": "%command.db.overview%",
-				"category": "MySQL"
-			},
-			{
 				"command": "mysql.db.drop",
 				"title": "%command.db.drop%",
 				"category": "MySQL"
@@ -329,11 +324,6 @@
 			{
 				"command": "mysql.view.source",
 				"title": "%command.view.source%",
-				"category": "MySQL"
-			},
-			{
-				"command": "mysql.count.sql",
-				"title": "%command.count.sql%",
 				"category": "MySQL"
 			},
 			{
@@ -642,11 +632,6 @@
 					"group": "3_mysql@0"
 				},
 				{
-					"command": "mysql.db.overview",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
-					"group": "3_mysql@2"
-				},
-				{
 					"command": "mysql.db.truncate",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
 					"group": "4_mysql@4"
@@ -690,11 +675,6 @@
 					"command": "mysql.table.source",
 					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|view)$/",
 					"group": "1_inline@2"
-				},
-				{
-					"command": "mysql.count.sql",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|view|esIndex)$/",
-					"group": "1_inline@4"
 				},
 				{
 					"command": "mysql.column.add",

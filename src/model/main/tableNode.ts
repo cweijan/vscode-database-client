@@ -14,18 +14,20 @@ import { Node } from "../interface/node";
 import { ColumnMeta, TableMeta } from "@/common/typeDef";
 import { ColumnNode } from "../other/columnNode";
 import { InfoNode } from "../other/infoNode";
+const prettyBytes = require("pretty-bytes")
 
 export class TableNode extends Node implements CopyAble {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.TABLE;
-    public table: string; 
+    public table: string;
 
     constructor(meta: TableMeta, readonly parent: Node) {
         super(`${meta.name}`)
         this.table = meta.name
-        this.description = `${meta.comment||''} ${(meta.rows && meta.rows!='0')?`Rows ${meta.rows}`:''}`
+        this.description = `${meta.comment || ''} ${(meta.rows && meta.rows != '0') ? `Rows ${meta.rows}` : ''}`
         this.init(parent)
+        this.tooltip = this.getToolTipe(meta)
         this.cacheSelf()
         this.command = {
             command: "mysql.table.find",
@@ -125,7 +127,7 @@ export class TableNode extends Node implements CopyAble {
 
         ViewManager.createWebviewPanel({
             path: "app", title: "Design Table(Preview)",
-            splitView: false, iconPath: Global.getExtPath("resources", "icon", "add.svg"),
+            splitView: false, iconPath: Global.getExtPath("resources", "icon", "overview.svg"),
             eventHandler: (handler => {
                 handler.on("init", () => {
                     handler.emit('route', 'design')
@@ -174,15 +176,23 @@ export class TableNode extends Node implements CopyAble {
         ConnectionManager.changeActive(this)
     }
 
-    public async countSql() {
-        QueryUnit.runQuery(this.dialect.countSql(this.wrap(this.schema), this.wrap(this.table)), this);
-    }
-
     public async openTable() {
         const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
         const sql = this.dialect.buildPageSql(this.wrap(this.schema), this.wrap(this.table), pageSize);
         QueryUnit.runQuery(sql, this);
         ConnectionManager.changeActive(this)
+    }
+
+    public getToolTipe(meta: TableMeta): string {
+        if (this.dbType == DatabaseType.MYSQL && meta.data_length) {
+            return `AUTO_INCREMENT : ${meta.auto_increment}
+DATA_LENGTH : ${prettyBytes(parseInt(meta.data_length))}
+INDEX_LENGTH : ${prettyBytes(parseInt(meta.index_length))}
+ROW_FORMAT : ${meta.row_format}
+`
+        }
+
+        return ''
     }
 
     public insertSqlTemplate(show: boolean = true): Promise<string> {

@@ -62,10 +62,6 @@ export class SchemaNode extends Node implements CopyAble {
         return childs;
     }
 
-    public openOverview() {
-        ServiceManager.instance.overviewService.openOverview(this)
-    }
-
     public dropDatatabase() {
 
         vscode.window.showInputBox({ prompt: `Are you want to drop database ${this.schema} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {

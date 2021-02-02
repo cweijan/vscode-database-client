@@ -133,10 +133,7 @@ export function activate(context: vscode.ExtensionContext) {
                 },
                 "mysql.db.drop": (databaseNode: SchemaNode) => {
                     databaseNode.dropDatatabase();
-                },
-                "mysql.db.overview": (databaseNode: SchemaNode) => {
-                    databaseNode.openOverview();
-                },
+                }
             },
             // mock
             ...{
@@ -194,10 +191,7 @@ export function activate(context: vscode.ExtensionContext) {
                 },
                 "mysql.query.rename": (queryNode: QueryNode) => {
                     queryNode.rename()
-                },
-                "mysql.count.sql": (tableNode: TableNode) => {
-                    tableNode.countSql()
-                },
+                }
             },
             // redis
             ...{

@@ -20,7 +20,6 @@ import Gojs from "./diagram/Gojs";
 import Selector from "./diagram/Selector";
 import connect from "./connect";
 import status from "./status";
-import overview from "./overview";
 import design from "./design";
 import structDiff from "./structDiff";
 import keyView from "./redis/keyView";
@@ -34,7 +33,6 @@ const router = new VueRouter({
     { path: '/status', component: status, name: 'status' },
     { path: '/diagram', component: Gojs, name: 'diagram' },
     { path: '/selector', component: Selector, name: 'selector' },
-    { path: '/overview', component: overview, name: 'overview' },
     { path: '/design', component: design, name: 'design' },
     { path: '/structDiff', component: structDiff, name: 'structDiff' },
     // redis

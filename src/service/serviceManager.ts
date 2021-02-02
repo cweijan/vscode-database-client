@@ -9,7 +9,6 @@ import { SqlFormattingProvider } from "../provider/sqlFormattingProvider";
 import { TableInfoHoverProvider } from "../provider/tableInfoHoverProvider";
 import { DbTreeDataProvider as DbTreeDataProvider } from "../provider/treeDataProvider";
 import { ConnectService } from "./connect/connectService";
-import { OverviewService } from "./overview/overviewService";
 import { MysqlStatusService } from "./status/mysqlStatusService";
 import { StatusService } from "./status/statusService";
 import { ViewManager } from "../common/viewManager";
@@ -42,7 +41,6 @@ export class ServiceManager {
     public provider: DbTreeDataProvider;
     public nosqlProvider: DbTreeDataProvider;
     public settingService: SettingService;
-    public overviewService: OverviewService;
     public statusService: StatusService;
     public dumpService: DumpService;
     private isInit = false;
@@ -104,7 +102,6 @@ export class ServiceManager {
 
     private initMysqlService() {
         this.settingService = new MysqlSettingService();
-        this.overviewService = new OverviewService();
         this.dumpService = new DumpService();
         this.statusService = new MysqlStatusService()
     }

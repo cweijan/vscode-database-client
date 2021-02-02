@@ -100,4 +100,17 @@ export interface TableMeta{
     name:string;
     comment:string;
     rows:string;
+    /**
+     * below mysql only
+     */
+    auto_increment?:string;
+    row_format?:string;
+    /**
+     * clustered bytes * pagesize
+     */
+    data_length?:string;
+    /**
+     * clustered bytes * pagesize
+     */
+    index_length?:string;
 }
