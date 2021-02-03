@@ -106,7 +106,7 @@ export class MysqlDialect extends SqlDialect {
         return `SELECT count(*) FROM ${table};`;
     }
     showTables(database: string): string {
-        return `SELECT table_comment comment,TABLE_NAME as name,TABLE_ROWS rows,auto_increment,row_format,data_length,index_length FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' order by table_name;`
+        return `SELECT table_comment \`comment\`,TABLE_NAME as \`name\`,TABLE_ROWS \`rows\`,auto_increment,\`row_format\`,data_length,index_length FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' order by table_name;`
     }
     showSchemas(): string {
         return "show databases"
