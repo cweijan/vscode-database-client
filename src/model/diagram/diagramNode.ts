@@ -36,7 +36,7 @@ export class DiagramNode extends Node {
                 }).on("save", ({ name, data }) => {
                     unlinkSync(this.getFilePath())
                     this.name = name
-                    const diagramPath = `diagram/${this.getConnectId({withDbForce:true})}/${name}.json`;
+                    const diagramPath = `diagram/${this.getConnectId({withSchema:true})}/${name}.json`;
                     FileManager.record(diagramPath, data, FileModel.WRITE)
                     DbTreeDataProvider.refresh(this.parent)
                 })
@@ -46,7 +46,7 @@ export class DiagramNode extends Node {
 
 
     private getFilePath(): string {
-        return `${FileManager.storagePath}/diagram/${this.getConnectId({withDbForce:true})}/${this.name}.json`;
+        return `${FileManager.storagePath}/diagram/${this.getConnectId({withSchema:true})}/${this.name}.json`;
     }
 
     public async getChildren(): Promise<Node[]> {

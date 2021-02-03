@@ -121,11 +121,11 @@ export class DatabaseCache {
         return databaseNodeList;
     }
 
-    public static setDataBaseListOfConnection(connectionid: string, DatabaseNodeList: Node[]) {
+    public static setSchemaListOfConnection(connectionid: string, DatabaseNodeList: Node[]) {
         this.cache.database[connectionid] = DatabaseNodeList;
     }
 
-    public static getDatabaseListOfConnection(connectcionid: string): SchemaNode[] {
+    public static getSchemaListOfConnection(connectcionid: string): SchemaNode[] {
         if (this.cache.database[connectcionid]) {
             return this.cache.database[connectcionid];
         } else {

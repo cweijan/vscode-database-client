@@ -1,10 +1,6 @@
-import { UserGroup } from "@/model/database/userGroup";
-import { DiagramGroup } from "@/model/diagram/diagramGroup";
-import { ProcedureGroup } from "@/model/main/procedureGroup";
 import { TableGroup } from "@/model/main/tableGroup";
-import { TriggerGroup } from "@/model/main/triggerGroup";
 import { ViewGroup } from "@/model/main/viewGroup";
-import { QueryGroup } from "@/model/query/queryGroup";
+import { DatabaseCache } from "@/service/common/databaseCache";
 import * as vscode from "vscode";
 import { DatabaseType, ModelType } from "../../../common/constants";
 import { TableNode } from "../../../model/main/tableNode";
@@ -15,8 +11,16 @@ export class TableChain implements ComplectionChain {
 
     public async getComplection(complectionContext: ComplectionContext): Promise<vscode.CompletionItem[]> {
 
-        await this.getNodeList();
-        if (complectionContext.preWord?.match(/\b(into|from|update|table|join)\b/ig)) {
+        if (complectionContext.preChart == ".") {
+            const temp = await this.generateTableComplectionItem(complectionContext.preWord);
+            if (temp.length == 0) {
+                return null;
+            } else {
+                return await this.generateTableComplectionItem(complectionContext.preWord);
+            }
+
+        }
+        if (complectionContext.preWord && complectionContext.preWord.match(/\b(into|from|update|table|join)\b/ig)) {
             return await this.generateTableComplectionItem();
         }
         return null;
@@ -26,14 +30,14 @@ export class TableChain implements ComplectionChain {
         return true;
     }
 
-    private async generateTableComplectionItem(): Promise<vscode.CompletionItem[]> {
-        const nodeList = await this.getNodeList();
+    private async generateTableComplectionItem(inputWord?: string): Promise<vscode.CompletionItem[]> {
+        const nodeList = await this.getNodeList(inputWord);
         return nodeList.map<vscode.CompletionItem>((tableNode: TableNode) => {
             const completionItem = new vscode.CompletionItem(tableNode.table);
             if (tableNode.description) {
                 completionItem.detail = tableNode.description
             }
-            if (tableNode.dbType == DatabaseType.MSSQL) {
+            if (tableNode.dbType == DatabaseType.MSSQL && tableNode.schema != inputWord) {
                 completionItem.insertText = `${tableNode.wrap(tableNode.schema)}.${tableNode.wrap(tableNode.table)}`;
             } else {
                 completionItem.insertText = tableNode.wrap(tableNode.table);
@@ -60,9 +64,24 @@ export class TableChain implements ComplectionChain {
         });
     }
 
-    private async getNodeList() {
+    private async getNodeList(inputWord: string) {
         let nodeList = []
-        const lcp = ConnectionManager.getLastConnectionOption();
+        let lcp = ConnectionManager.getLastConnectionOption();
+        if (!lcp) return [];
+
+        if (inputWord) {
+            let match = false;
+            const connectcionid = lcp.getConnectId();
+            for (const databaseNode of DatabaseCache.getSchemaListOfConnection(connectcionid)) {
+                if (databaseNode.schema === inputWord) {
+                    lcp = databaseNode;
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) return []
+        }
+
         const groupNodes = await lcp?.getByRegion()?.getChildren();
         if (!groupNodes) {
             return nodeList
@@ -74,4 +93,5 @@ export class TableChain implements ComplectionChain {
         }
         return nodeList;
     }
+
 }

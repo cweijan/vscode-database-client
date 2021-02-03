@@ -15,7 +15,7 @@ import { SSHConfig } from "./sshConfig";
 
 export interface SwitchOpt {
     isGlobal?: boolean;
-    withDbForce?: boolean;
+    withSchema?: boolean;
 }
 
 export abstract class Node extends vscode.TreeItem implements CopyAble {
@@ -156,23 +156,23 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         if (this.contextValue == ModelType.CONNECTION || this.contextValue == ModelType.ES_CONNECTION) {
             Node.nodeCache[`${this.getConnectId()}`] = this;
         } else if (this.contextValue == ModelType.SCHEMA) {
-            Node.nodeCache[`${this.getConnectId({ withDbForce: true })}`] = this;
+            Node.nodeCache[`${this.getConnectId({ withSchema: true })}`] = this;
         } else {
             Node.nodeCache[`${this.uid}`] = this;
         }
     }
     public getCache() {
         if (this.schema) {
-            return Node.nodeCache[`${this.getConnectId({ withDbForce: true })}`]
+            return Node.nodeCache[`${this.getConnectId({ withSchema: true })}`]
         }
         return Node.nodeCache[`${this.getConnectId()}`]
     }
 
     public getByRegion<T extends Node>(region?: string): T {
         if (!region) {
-            return Node.nodeCache[`${this.getConnectId({ withDbForce: true })}`]
+            return Node.nodeCache[`${this.getConnectId({ withSchema: true })}`]
         }
-        return Node.nodeCache[`${this.getConnectId({ withDbForce: true })}#${region}`]
+        return Node.nodeCache[`${this.getConnectId({ withSchema: true })}#${region}`]
     }
 
     public getChildren(isRresh?: boolean): Node[] | Promise<Node[]> {
@@ -181,12 +181,12 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public initUid() {
         if (this.uid) return;
-        if (this.contextValue == ModelType.CONNECTION) {
+        if (this.contextValue == ModelType.CONNECTION || this.contextValue==ModelType.CATALOG) {
             this.uid = this.getConnectId();
         } else if (this.contextValue == ModelType.SCHEMA) {
-            this.uid = `${this.getConnectId({ withDbForce: true })}`;
+            this.uid = `${this.getConnectId({ withSchema: true })}`;
         } else {
-            this.uid = `${this.getConnectId({ withDbForce: true })}#${this.label}`;
+            this.uid = `${this.getConnectId({ withSchema: true })}#${this.label}`;
         }
     }
 
@@ -198,11 +198,11 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         let uid = (this.usingSSH && this.ssh) ? `${prefix}@${this.ssh.host}@${this.ssh.port}@${this.ssh.username}`
             : `${prefix}@${this.host}@${this.port}@${this.user}`;
 
-        if (this.database) {
+        if (this.database && this.contextValue!=ModelType.CONNECTION) {
             uid = `${uid}@${this.database}`;
         }
 
-        if (opt?.withDbForce && this.schema) {
+        if (opt?.withSchema && this.schema) {
             return `${uid}@${this.schema}`
         }
 

@@ -50,7 +50,7 @@ export class ConnectionNode extends Node implements CopyAble {
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let dbNodes = DatabaseCache.getDatabaseListOfConnection(this.uid);
+        let dbNodes = DatabaseCache.getSchemaListOfConnection(this.uid);
         if (dbNodes && !isRresh) {
             // update active state.
             return dbNodes.map(dbNode => {
@@ -83,7 +83,7 @@ export class ConnectionNode extends Node implements CopyAble {
                 if (Global.getConfig("showUser") && !hasCatalog) {
                     databaseNodes.unshift(new UserGroup("USER", this));
                 }
-                DatabaseCache.setDataBaseListOfConnection(this.uid, databaseNodes);
+                DatabaseCache.setSchemaListOfConnection(this.uid, databaseNodes);
 
                 return databaseNodes;
             })

@@ -22,7 +22,7 @@ export class DiagramGroup extends Node {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        const path = `${FileManager.storagePath}/diagram/${this.getConnectId({ withDbForce: true })}`;
+        const path = `${FileManager.storagePath}/diagram/${this.getConnectId({ withSchema: true })}`;
         const diagrams = this.readdir(path)?.map(fileName => new DiagramNode(fileName.replace(/\.[^/.]+$/, ""), this));
         if (!diagrams || diagrams.length == 0) {
             return [new InfoNode("This schema has no created diagram.")]
@@ -48,7 +48,7 @@ export class DiagramGroup extends Node {
                 }).on("route-selector", async () => {
                     handler.emit("selector-load", await this.getTableInfos())
                 }).on("save", ({ name, data }) => {
-                    const diagramPath = `diagram/${this.getConnectId({ withDbForce: true })}/${name}.json`;
+                    const diagramPath = `diagram/${this.getConnectId({ withSchema: true })}/${name}.json`;
                     FileManager.record(diagramPath, data, FileModel.WRITE)
                     DbTreeDataProvider.refresh(this)
                 })
