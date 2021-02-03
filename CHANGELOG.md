@@ -12,6 +12,7 @@
   - Add some node info as tooltip.
   - Reduce connection name.
   - Support remember workspace connection status.
+- Support sql intellisense cross schema.
 - Update server status view.
 - Support show postgresql, sqlserver schemas.
 

@@ -118,6 +118,12 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async activeDb() {
 
+        const node=ConnectionManager.getByActiveFile()
+        if(node){
+            vscode.window.showErrorMessage("Query file can not change active database.")
+            return;
+        }
+
         const dbIdList: string[] = [];
         const dbIdMap = new Map<string, SchemaNode>();
         const numbers = (await this.getConnectionNodes()).length > 1

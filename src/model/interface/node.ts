@@ -16,6 +16,7 @@ import { SSHConfig } from "./sshConfig";
 export interface SwitchOpt {
     isGlobal?: boolean;
     withSchema?: boolean;
+    schema?: string;
 }
 
 export abstract class Node extends vscode.TreeItem implements CopyAble {
@@ -204,15 +205,16 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public getConnectId(opt?: SwitchOpt): string {
 
-        let uid = (this.usingSSH && this.ssh) ? `${this.ssh.host}@${this.ssh.port}`
-            : `${this.host}@${this.port}`;
+        let uid = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
 
-        if (this.database && this.contextValue != ModelType.CONNECTION) {
-            uid = `${uid}@${this.database}`;
+        const database = this.database;
+        if (database && this.contextValue != ModelType.CONNECTION) {
+            uid = `${uid}@${database}`;
         }
 
-        if (opt?.withSchema && this.schema) {
-            return `${uid}@${this.schema}`
+        const schema = opt?.schema || this.schema;
+        if (opt?.withSchema && schema) {
+            return `${uid}@${schema}`
         }
 
         return uid;

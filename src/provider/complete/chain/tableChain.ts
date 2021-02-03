@@ -1,3 +1,4 @@
+import { Node } from "@/model/interface/node";
 import { TableGroup } from "@/model/main/tableGroup";
 import { ViewGroup } from "@/model/main/viewGroup";
 import { DatabaseCache } from "@/service/common/databaseCache";
@@ -65,28 +66,20 @@ export class TableChain implements ComplectionChain {
     }
 
     private async getNodeList(inputWord: string) {
-        let nodeList = []
+
         let lcp = ConnectionManager.tryGetConnection();
         if (!lcp) return [];
 
+        // If has input, try find schema of current catalog.
         if (inputWord) {
-            let match = false;
-            const connectcionid = lcp.getConnectId();
-            const nodes = DatabaseCache.getSchemaListOfConnection(connectcionid)||[];
-            for (const databaseNode of nodes) {
-                if (databaseNode.schema === inputWord) {
-                    lcp = databaseNode;
-                    match = true;
-                    break;
-                }
-            }
-            if (!match) return []
+            const connectcionid = lcp.getConnectId({ schema: inputWord,withSchema:true });
+            lcp = Node.nodeCache[connectcionid]
+            if (!lcp) return []
         }
 
-        const groupNodes = await lcp?.getByRegion()?.getChildren();
-        if (!groupNodes) {
-            return nodeList
-        }
+        // Get current schema view and table childrens.
+        const groupNodes = await lcp.getChildren();
+        let nodeList = []
         for (const groupNode of groupNodes) {
             if (groupNode instanceof TableGroup || groupNode instanceof ViewGroup) {
                 nodeList.push(...await groupNode.getChildren());

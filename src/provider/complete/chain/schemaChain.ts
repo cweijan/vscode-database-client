@@ -1,19 +1,13 @@
+import { CatalogNode } from "@/model/database/catalogNode";
+import { SchemaNode } from "@/model/database/schemaNode";
 import * as vscode from "vscode";
-import { DatabaseCache } from "../../../service/common/databaseCache";
-import { ComplectionChain, ComplectionContext } from "../complectionContext";
-import { ConnectionManager } from "../../../service/connectionManager";
 import { UserGroup } from "../../../model/database/userGroup";
-
-function wrap(origin: string): string {
-    if (origin != null && origin.match(/\b(-|\.)\b/ig)) {
-        return `\`${origin}\``;
-    }
-    return origin;
-}
+import { ConnectionManager } from "../../../service/connectionManager";
+import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class SchemaChain implements ComplectionChain {
 
-    public getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] {
+    public getComplection(complectionContext: ComplectionContext) {
         if (complectionContext.preWord && complectionContext.preWord.match(/into|from|update|table|join/ig)) {
             return this.generateDatabaseComplectionItem();
         }
@@ -24,20 +18,17 @@ export class SchemaChain implements ComplectionChain {
         return false;
     }
 
-    private generateDatabaseComplectionItem(): vscode.CompletionItem[] {
+    private async generateDatabaseComplectionItem() {
 
-        const lcp = ConnectionManager.tryGetConnection()
+        const lcp = ConnectionManager.tryGetConnection() as (SchemaNode | CatalogNode)
         if (!lcp) { return []; }
-        const connectcionid = `${lcp.getConnectId()}`;
 
-        const databaseNodes = DatabaseCache.getSchemaListOfConnection(connectcionid);
-        if (databaseNodes == null) { return []; }
-
+        const databaseNodes = await lcp.parent.getChildren()
         return databaseNodes.filter((databaseNode) => !(databaseNode instanceof UserGroup)).map<vscode.CompletionItem>((databaseNode) => {
             const label = databaseNode.label;
             const completionItem = new vscode.CompletionItem(label);
             completionItem.kind = vscode.CompletionItemKind.Folder;
-            completionItem.insertText = wrap(label);
+            completionItem.insertText = lcp.wrap(label);
             return completionItem;
         });
     }

@@ -56,7 +56,15 @@ export class ColumnChain implements ComplectionChain {
             return [];
         }
 
-        const lcp = ConnectionManager.tryGetConnection()
+        let lcp = ConnectionManager.tryGetConnection()
+
+        const tableSplit = tableName.split(".")
+        if (tableSplit.length == 2) {
+            const connectcionid = lcp.getConnectId({ schema: tableSplit[0],withSchema:true });
+            lcp = ColumnNode.nodeCache[connectcionid]
+            tableName = tableSplit[1]
+        }
+
         let columnNodes = (await lcp?.getByRegion(tableName)?.getChildren()) as ColumnNode[];
         if (!columnNodes) {
             return []
@@ -64,7 +72,7 @@ export class ColumnChain implements ComplectionChain {
 
         return columnNodes.map<vscode.CompletionItem>((columnNode) => {
             const completionItem = new vscode.CompletionItem(columnNode.label);
-            completionItem.detail=columnNode.description as string
+            completionItem.detail = columnNode.description as string
             completionItem.insertText = columnNode.column.name
             completionItem.kind = vscode.CompletionItemKind.Field;
             return completionItem;
