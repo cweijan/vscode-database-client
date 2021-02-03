@@ -7,9 +7,8 @@ export class TableInfoHoverProvider implements HoverProvider {
 
     public async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover> {
 
-
         const tableName = document.getText(document.getWordRangeAtPosition(position));
-        const tableNode = ConnectionManager.getLastConnectionOption(false)?.getByRegion(tableName) as TableNode
+        const tableNode = ConnectionManager.tryGetConnection()?.getByRegion(tableName) as TableNode
 
         const sourceCode = await tableNode?.execute<any[]>(tableNode.dialect.showTableSource(tableNode.schema, tableNode.table))
         if (sourceCode) {

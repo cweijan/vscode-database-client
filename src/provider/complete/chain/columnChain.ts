@@ -56,7 +56,7 @@ export class ColumnChain implements ComplectionChain {
             return [];
         }
 
-        const lcp = ConnectionManager.getLastConnectionOption(false)
+        const lcp = ConnectionManager.tryGetConnection()
         let columnNodes = (await lcp?.getByRegion(tableName)?.getChildren()) as ColumnNode[];
         if (!columnNodes) {
             return []

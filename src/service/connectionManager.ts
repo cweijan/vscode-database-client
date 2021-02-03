@@ -29,24 +29,13 @@ export interface GetRequest {
 
 export class ConnectionManager {
 
-    private static activeNode: Node;
+    public static activeNode: Node;
     private static alivedConnection: { [key: string]: ConnectionWrapper } = {};
     private static tunnelService = new SSHTunnelService();
 
-    public static getLastConnectionOption(checkActiveFile = true): Node {
+    public static tryGetConnection(): Node {
 
-        if (checkActiveFile) {
-            const fileNode = this.getByActiveFile()
-            if (fileNode) { return fileNode }
-        }
-
-        const node = this.activeNode;
-        if (!node && checkActiveFile) {
-            vscode.window.showErrorMessage("Not active database connection found!")
-            throw new Error("Not active database connection found!")
-        }
-
-        return node;
+        return this.getByActiveFile() || this.activeNode;
     }
 
     public static getActiveConnectByKey(key: string): ConnectionWrapper {

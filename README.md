@@ -46,7 +46,7 @@ That will open a sql editor bind of database, it provider:
 
 1. IntelliSense sql edit.
 2. snippets: `sel、del、ins、upd、joi`...
-3. run sql.
+3. run sql (Shortcut : F9).
 
 ![run](images/run.jpg)
 

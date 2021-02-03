@@ -66,13 +66,14 @@ export class TableChain implements ComplectionChain {
 
     private async getNodeList(inputWord: string) {
         let nodeList = []
-        let lcp = ConnectionManager.getLastConnectionOption();
+        let lcp = ConnectionManager.tryGetConnection();
         if (!lcp) return [];
 
         if (inputWord) {
             let match = false;
             const connectcionid = lcp.getConnectId();
-            for (const databaseNode of DatabaseCache.getSchemaListOfConnection(connectcionid)) {
+            const nodes = DatabaseCache.getSchemaListOfConnection(connectcionid)||[];
+            for (const databaseNode of nodes) {
                 if (databaseNode.schema === inputWord) {
                     lcp = databaseNode;
                     match = true;

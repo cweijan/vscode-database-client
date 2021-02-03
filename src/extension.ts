@@ -172,7 +172,7 @@ export function activate(context: vscode.ExtensionContext) {
             ...{
                 "mysql.runQuery": (sql) => {
                     if (typeof sql != 'string') { sql = null; }
-                    QueryUnit.runQuery(sql,ConnectionManager.getLastConnectionOption());
+                    QueryUnit.runQuery(sql,ConnectionManager.tryGetConnection());
                 },
                 "mysql.query.switch": async (databaseOrConnectionNode: SchemaNode | ConnectionNode | EsConnectionNode | ESIndexNode) => {
                     if (databaseOrConnectionNode) {
@@ -242,7 +242,7 @@ export function activate(context: vscode.ExtensionContext) {
                     tableNode.openTable();
                 },
                 "mysql.codeLens.run": (sql: string) => {
-                    QueryUnit.runQuery(sql,ConnectionManager.getLastConnectionOption(),{split:true})
+                    QueryUnit.runQuery(sql,ConnectionManager.tryGetConnection(),{split:true})
                 },
                 "mysql.table.design": (tableNode: TableNode) => {
                     tableNode.designTable();

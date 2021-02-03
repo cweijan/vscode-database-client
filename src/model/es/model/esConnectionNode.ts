@@ -24,7 +24,7 @@ export class EsConnectionNode extends Node {
         this.init(parent)
         this.label=this.uid;
         this.cacheSelf()
-        const lcp = ConnectionManager.getLastConnectionOption(false);
+        const lcp = ConnectionManager.activeNode;
 
         if (this.disable) {
             this.collapsibleState = TreeItemCollapsibleState.None;

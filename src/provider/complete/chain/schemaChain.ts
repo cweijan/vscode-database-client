@@ -26,7 +26,7 @@ export class SchemaChain implements ComplectionChain {
 
     private generateDatabaseComplectionItem(): vscode.CompletionItem[] {
 
-        const lcp = ConnectionManager.getLastConnectionOption()
+        const lcp = ConnectionManager.tryGetConnection()
         if (!lcp) { return []; }
         const connectcionid = `${lcp.getConnectId()}`;
 

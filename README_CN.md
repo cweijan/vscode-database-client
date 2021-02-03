@@ -35,7 +35,7 @@
 
 * 点击数据库节点的 `New Query` 按钮.
   ![newquery](images/newquery.jpg)
-* 之后可在编辑器中编辑和执行SQL.
+* 之后可在编辑器中编辑和执行SQL(快捷键 : F9).
 * ![run](images/run.jpg)
 
 ## 生成测试数据

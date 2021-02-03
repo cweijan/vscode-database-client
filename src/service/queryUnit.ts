@@ -38,9 +38,14 @@ export class QueryUnit {
     protected static delimiterHodler = new DelimiterHolder()
     public static async runQuery(sql: string, connectionNode: Node, queryOption: QueryOption = {}): Promise<null> {
 
+        if (!connectionNode) {
+            vscode.window.showErrorMessage("Not active database connection found!")
+            throw new Error("Not active database connection found!")
+        }
+
         Trans.begin()
         connectionNode = NodeUtil.of(connectionNode)
-        if (queryOption.split==null) queryOption.split = sql == null;
+        if (queryOption.split == null) queryOption.split = sql == null;
 
         let fromEditor = false;
         if (!sql) {

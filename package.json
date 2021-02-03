@@ -459,7 +459,7 @@
 			},
 			{
 				"command": "mysql.mock.run",
-				"when": "resourceFilename == mock.json ",
+				"when": "resourceFilename =~ /mock\\.json$/ ",
 				"key": "f9"
 			}
 		],
@@ -477,11 +477,6 @@
 				}
 			],
 			"editor/title": [
-				{
-					"command": "mysql.runQuery",
-					"when": "editorLangId == sql",
-					"group": "navigation"
-				},
 				{
 					"command": "mysql.mock.run",
 					"when": "resourceFilename =~ /mock.json$/ ",
@@ -513,7 +508,7 @@
 			"view/item/context": [
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(esConnection|redisConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|esConnection|redisConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
 					"group": "inline@-2"
 				},
 				{
@@ -623,7 +618,7 @@
 				},
 				{
 					"command": "mysql.name.copy",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(user|database|esColumn|column|table|view|esIndex|procedure|function|trigger)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|user|database|esColumn|column|table|view|esIndex|procedure|function|trigger)$/",
 					"group": "-1_mysql@-5"
 				},
 				{
@@ -638,7 +633,7 @@
 				},
 				{
 					"command": "mysql.db.drop",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /(database|catalog)/",
 					"group": "4_mysql@5"
 				},
 				{

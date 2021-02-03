@@ -1,19 +1,15 @@
+import { CatalogNode } from "@/model/database/catalogNode";
+import { EsConnectionNode } from "@/model/es/model/esConnectionNode";
+import { InfoNode } from "@/model/other/infoNode";
+import { RedisConnectionNode } from "@/model/redis/redisConnectionNode";
 import * as vscode from "vscode";
-import { CacheKey, ConfigKey, DatabaseType } from "../common/constants";
-import { ConnectionManager } from "../service/connectionManager";
-import { DatabaseCache } from "../service/common/databaseCache";
+import { CacheKey, DatabaseType } from "../common/constants";
 import { ConnectionNode } from "../model/database/connectionNode";
 import { SchemaNode } from "../model/database/schemaNode";
-import { CommandKey, Node } from "../model/interface/node";
 import { UserGroup } from "../model/database/userGroup";
-import { Global } from "../common/global";
-import { NodeUtil } from "@/model/nodeUtil";
-import { InfoNode } from "@/model/other/infoNode";
-import { EsConnectionNode } from "@/model/es/model/esConnectionNode";
-import { RedisConnectionNode } from "@/model/redis/redisConnectionNode";
-import { DiagramGroup } from "@/model/diagram/diagramGroup";
-import { QueryGroup } from "@/model/query/queryGroup";
-import { TriggerGroup } from "@/model/main/triggerGroup";
+import { CommandKey, Node } from "../model/interface/node";
+import { DatabaseCache } from "../service/common/databaseCache";
+import { ConnectionManager } from "../service/connectionManager";
 
 export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
@@ -126,7 +122,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         const dbIdMap = new Map<string, SchemaNode>();
         const numbers = (await this.getConnectionNodes()).length > 1
         for (const dbNode of DatabaseCache.getDatabaseNodeList()) {
-            if (dbNode instanceof UserGroup) { continue }
+            if (dbNode instanceof UserGroup || dbNode instanceof CatalogNode) { continue }
             const uid = numbers ? dbNode.uid : dbNode.schema
             dbIdList.push(uid)
             dbIdMap.set(uid, dbNode)
