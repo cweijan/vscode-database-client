@@ -20,52 +20,58 @@ export interface SwitchOpt {
 
 export abstract class Node extends vscode.TreeItem implements CopyAble {
 
-    /**
-     * using as cache key
-     */
-    public uid: string;
-
     public host: string;
     public port: number;
     public user: string;
     public password?: string;
+    public dbType?: DatabaseType;
+    public dialect?: SqlDialect;
     public database?: string;
+    public schema: string;
     public name?: string;
     public timezone?: string;
     public connectTimeout?: number;
     public requestTimeout?: number;
-    public certPath?: string;
     public includeDatabases?: string;
 
-    public global?: boolean;
-    public disable?: boolean;
+    /**
+     * ssh
+     */
     public usingSSH?: boolean;
     public ssh?: SSHConfig;
-    public dbType?: DatabaseType;
-    public dialect?: SqlDialect;
-    /**
-     * mssql
-     */
-    public encrypt?: boolean;
 
     /**
-     * contenxt
+     * status
      */
+    public description: string;
+    public global?: boolean;
+    public disable?: boolean;
+
+    /**
+     * context
+     */
+    public uid: string;
+    public key: string;
     public provider?: DbTreeDataProvider;
     public context?: Memento;
+
+    /**
+     * mysql only
+     */
+    public certPath?: string;
+
+    /**
+      * mssql only
+      */
+    public encrypt?: boolean;
 
     /**
      * es only
      */
     public scheme: string;
-    /**
-     * database only
-     */
-    public schema: string;
-    public description: string;
 
-    constructor(uid: string) {
-        super(uid)
+    constructor(public label: string) {
+        super(label)
     }
     copyName(): void {
         Util.copyToBoard(this.label)
@@ -122,22 +128,20 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
         const cacheKey = command.cacheKey || this.provider?.connectionKey;
         const connections = this.context.get<{ [key: string]: Node }>(cacheKey, {});
-        if (!this.uid) {
-            this.uid = this.getConnectId();
-        }
+        const key = this.key || this.getConnectId()
 
         switch (command.command) {
             case CommandKey.add:
-                connections[this.uid] = NodeUtil.removeParent(this);
+                connections[key] = NodeUtil.removeParent(this);
                 break;
             case CommandKey.update:
-                connections[this.uid] = NodeUtil.removeParent(this);
-                ConnectionManager.removeConnection(this.uid)
-                DatabaseCache.clearDatabaseCache(this.uid)
+                connections[key] = NodeUtil.removeParent(this);
+                ConnectionManager.removeConnection(key)
+                DatabaseCache.clearDatabaseCache(key)
                 break;
             case CommandKey.delete:
-                ConnectionManager.removeConnection(this.uid)
-                delete connections[this.uid]
+                ConnectionManager.removeConnection(key)
+                delete connections[key]
             default:
                 break;
         }
@@ -149,6 +153,14 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             DbTreeDataProvider.refresh();
         }
 
+    }
+
+    public getChildCache<T extends Node>(): T[] {
+        return DatabaseCache.getChildCache(this.uid)
+    }
+
+    public setChildCache(childs: Node[]) {
+        DatabaseCache.setChildCache(this.uid, childs)
     }
 
     public static nodeCache = {};
@@ -181,7 +193,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public initUid() {
         if (this.uid) return;
-        if (this.contextValue == ModelType.CONNECTION || this.contextValue==ModelType.CATALOG) {
+        if (this.contextValue == ModelType.CONNECTION || this.contextValue == ModelType.CATALOG) {
             this.uid = this.getConnectId();
         } else if (this.contextValue == ModelType.SCHEMA) {
             this.uid = `${this.getConnectId({ withSchema: true })}`;
@@ -192,13 +204,10 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public getConnectId(opt?: SwitchOpt): string {
 
-        const targetGlobal = opt?.isGlobal != null ? opt.isGlobal : this.global;
-        const prefix = targetGlobal === false ? "workspace" : "global";
+        let uid = (this.usingSSH && this.ssh) ? `${this.ssh.host}@${this.ssh.port}`
+            : `${this.host}@${this.port}`;
 
-        let uid = (this.usingSSH && this.ssh) ? `${prefix}@${this.ssh.host}@${this.ssh.port}@${this.ssh.username}`
-            : `${prefix}@${this.host}@${this.port}@${this.user}`;
-
-        if (this.database && this.contextValue!=ModelType.CONNECTION) {
+        if (this.database && this.contextValue != ModelType.CONNECTION) {
             uid = `${uid}@${this.database}`;
         }
 

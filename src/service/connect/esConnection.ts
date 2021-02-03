@@ -2,6 +2,7 @@ import axios from "axios";
 import { Node } from "@/model/interface/node";
 import { IConnection, queryCallback } from "./connection";
 import { ESIndexNode } from "@/model/es/model/esIndexNode";
+import { EsIndexGroup } from "@/model/es/model/esIndexGroupNode";
 
 export class EsConnection extends IConnection {
 
@@ -84,7 +85,7 @@ export class EsConnection extends IConnection {
         });
         if (!fields) {
             const indexName = path.split('/')[1];
-            const indexNode = Node.nodeCache[`${this.opt.getConnectId()}#${indexName}`] as Node;
+            const indexNode = (await new EsIndexGroup(this.opt).getChildren()).filter(node => node.label == indexName)[0]
             fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' }; }) as any;
         }
         fields.unshift({ name: "_id" }, { name: "_score" });

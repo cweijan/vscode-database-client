@@ -1,4 +1,3 @@
-import { CatalogNode } from "@/model/database/catalogNode";
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
 import { CacheKey, ModelType } from "../../common/constants";
 import { SchemaNode } from "../../model/database/schemaNode";
@@ -9,7 +8,8 @@ export class DatabaseCache {
     private static context: ExtensionContext;
     private static cache = { database: {} };
     private static childCache = {};
-    private static collpaseState: { key?: TreeItemCollapsibleState };
+    private static globalCollpaseState: { key?: TreeItemCollapsibleState };
+    private static workspaceCollpaseState: { key?: TreeItemCollapsibleState };
 
     /**
      * get element current collapseState or default collapseState
@@ -25,14 +25,10 @@ export class DatabaseCache {
             return TreeItemCollapsibleState.None;
         }
 
-        if (!this.collpaseState || Object.keys(this.collpaseState).length == 0) {
-            // TODO load from config
-            this.collpaseState = (true ?
-                this.context.globalState.get(CacheKey.CollapseSate,{}) : this.context.workspaceState.get(CacheKey.CollapseSate,{}));
-        }
+        const collpaseState = element.global === false ? this.workspaceCollpaseState : this.globalCollpaseState;
 
-        if (element.uid && this.collpaseState[element.uid]) {
-            return this.collpaseState[element.uid];
+        if (element.uid && collpaseState[element.uid]) {
+            return collpaseState[element.uid];
         } else if (contextValue == ModelType.CONNECTION || contextValue == ModelType.TABLE_GROUP) {
             return TreeItemCollapsibleState.Expanded;
         } else {
@@ -53,12 +49,12 @@ export class DatabaseCache {
             return;
         }
 
-        this.collpaseState[element.uid] = collapseState;
-        // TODO load from config
-        if (true) {
-            this.context.globalState.update(CacheKey.CollapseSate, this.collpaseState);
+        if (element.global === false) {
+            this.workspaceCollpaseState[element.uid] = collapseState;
+            this.context.workspaceState.update(CacheKey.CollapseSate, this.globalCollpaseState);
         } else {
-            this.context.workspaceState.update(CacheKey.CollapseSate, this.collpaseState);
+            this.globalCollpaseState[element.uid] = collapseState;
+            this.context.globalState.update(CacheKey.CollapseSate, this.globalCollpaseState);
         }
 
     }
@@ -69,6 +65,8 @@ export class DatabaseCache {
      */
     public static initCache(context: ExtensionContext) {
         this.context = context;
+        this.globalCollpaseState = this.context.globalState.get(CacheKey.CollapseSate, {});
+        this.workspaceCollpaseState = this.context.workspaceState.get(CacheKey.CollapseSate, {});
     }
 
     public static clearCache() {
@@ -77,21 +75,11 @@ export class DatabaseCache {
     }
 
 
-    /**
-     * clear table data for database
-     * @param dbChildid 
-     */
-    public static clearChildCache(dbChildid: string) {
-        if (dbChildid) {
-            delete this.childCache[dbChildid];
-        }
-    }
-
     public static setChildCache(uid: string, tableNodeList: Node[]) {
         this.childCache[uid] = tableNodeList;
     }
 
-    public static getChildCache(uid: string): Node[] {
+    public static getChildCache<T extends Node>(uid: string): T[] {
         return this.childCache[uid];
     }
 

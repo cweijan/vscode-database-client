@@ -1,3 +1,4 @@
+import { QueryUnit } from "@/service/queryUnit";
 import * as path from "path";
 import { Constants, ModelType } from "../../common/constants";
 import { FileManager } from '../../common/filesManager';
@@ -28,7 +29,7 @@ export class CatalogNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        FileManager.show(`${this.uid}.sql`)
+        QueryUnit.showSQLTextDocument(this,'',`${this.database}.sql`)
 
     }
 

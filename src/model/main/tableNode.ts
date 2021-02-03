@@ -37,7 +37,7 @@ export class TableNode extends Node implements CopyAble {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        let columnNodes = DatabaseCache.getChildCache(this.uid);
+        let columnNodes = this.getChildCache();
         if (columnNodes && !isRresh) {
             return columnNodes;
         }
@@ -46,7 +46,7 @@ export class TableNode extends Node implements CopyAble {
                 columnNodes = columns.map<ColumnNode>((column, index) => {
                     return new ColumnNode(this.table, column, this, index);
                 });
-                DatabaseCache.setChildCache(this.uid, columnNodes);
+                this.setChildCache(columnNodes)
                 return columnNodes;
             })
             .catch((err) => {
@@ -93,7 +93,7 @@ export class TableNode extends Node implements CopyAble {
 
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
             this.execute(`DROP TABLE ${this.schema}.${this.wrap(this.table)}`).then(() => {
-                DatabaseCache.clearChildCache(this.parent.uid);
+                this.parent.setChildCache(null)
                 DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
             });
@@ -145,20 +145,20 @@ export class TableNode extends Node implements CopyAble {
                 }).on("updateTable", async ({ newTableName, newComment }) => {
                     const sql = this.dialect.updateTable({ table: this.table, newTableName, comment: this.description, newComment });
                     await executeAndRefresh(sql, handler)
-                    DatabaseCache.setChildCache(this.parent.uid, null);
+                    this.parent.setChildCache(null)
                     this.provider.reload(this.parent)
                 }).on("updateColumn", async (updateColumnParam) => {
                     const sql = this.dialect.updateColumnSql(updateColumnParam);
                     await executeAndRefresh(sql, handler)
-                    DatabaseCache.setChildCache(this.uid, null);
+                    this.setChildCache(null)
                     this.provider.reload(this.parent)
                 }).on("dropIndex", async indexName => {
                     const sql = this.dialect.dropIndex(this.table, indexName);
                     await executeAndRefresh(sql, handler)
                 }).on("execute", async sql => {
                     await executeAndRefresh(sql, handler)
-                    DatabaseCache.setChildCache(this.uid, null);
-                    DatabaseCache.setChildCache(this.parent.uid, null);
+                    this.setChildCache(null)
+                    this.parent.setChildCache(null)
                     this.provider.reload(this.parent)
                 }).on("createIndex", async ({ column, type, indexType }) => {
                     const sql = this.dialect.createIndex({ column, type, indexType, table: this.wrap(this.table) });

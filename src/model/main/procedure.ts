@@ -39,7 +39,7 @@ export class ProcedureNode extends Node {
 
         Util.confirm(`Are you want to drop procedure ${this.name} ? `, async () => {
             this.execute(`DROP procedure ${this.wrap(this.name)}`).then(() => {
-                DatabaseCache.clearChildCache(`${this.parent.uid}`)
+                this.parent.setChildCache(null)
                 DbTreeDataProvider.refresh(this.parent)
                 vscode.window.showInformationMessage(`Drop procedure ${this.name} success!`)
             })

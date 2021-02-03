@@ -21,12 +21,13 @@ export class ConnectionNode extends Node implements CopyAble {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/server.png");
     public contextValue: string = ModelType.CONNECTION;
-    constructor(readonly uid: string, readonly parent: Node) {
-        super(uid)
+    constructor(readonly key: string, readonly parent: Node) {
+        super(key)
         this.init(parent)
+        this.label=this.uid
         this.cacheSelf()
         if (parent.name) {
-            this.label = `${parent.name}_${this.uid}`
+            this.description=parent.name
             this.name = parent.name
         }
         if (this.disable) {
@@ -130,7 +131,7 @@ export class ConnectionNode extends Node implements CopyAble {
 
     public async deleteConnection(context: vscode.ExtensionContext) {
 
-        Util.confirm(`Are you want to Delete Connection ${this.uid} ? `, async () => {
+        Util.confirm(`Are you want to Delete Connection ${this.label} ? `, async () => {
             this.indent({ command: CommandKey.delete })
         })
 

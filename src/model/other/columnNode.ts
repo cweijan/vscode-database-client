@@ -4,7 +4,6 @@ import * as vscode from "vscode";
 import { Constants, DatabaseType, ModelType, Template } from "../../common/constants";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
@@ -35,7 +34,9 @@ export class ColumnNode extends Node implements CopyAble {
         }
         this.column.isNotNull = this.column.nullable != 'YES'
         this.type = `${this.column.type}`
-        this.description = `${this.column.type} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"} ${this.column.comment}`
+        this.description = `${this.column.type} ${this.column.comment}`
+        this.tooltip=`${this.label} ${this.column.comment}
+${this.column.type} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"}`
         const columnKey: string = this.column.key;
         switch (columnKey) {
             case 'UNI':
@@ -68,7 +69,7 @@ export class ColumnNode extends Node implements CopyAble {
         await QueryUnit.showSQLTextDocument(this, dropSql, Template.alter);
         Util.confirm(`Are you want to drop column ${this.column.name} ? `, async () => {
             this.execute(dropSql).then(() => {
-                DatabaseCache.setChildCache(`${this.parent.uid}`, null);
+                this.parent.setChildCache(null)
                 DbTreeDataProvider.refresh(this.parent);
             })
         })
@@ -86,7 +87,7 @@ export class ColumnNode extends Node implements CopyAble {
         }
         const sql = `ALTER TABLE ${this.wrap(this.schema)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(this.column.name)} ${this.column.type} AFTER ${this.wrap(afterColumnNode.column.name)};`
         await this.execute(sql)
-        DatabaseCache.setChildCache(this.parent.uid, null)
+        this.parent.setChildCache(null)
         DbTreeDataProvider.refresh(this.parent)
     }
     public async moveUp() {
@@ -99,7 +100,7 @@ export class ColumnNode extends Node implements CopyAble {
         }
         const sql = `ALTER TABLE ${this.wrap(this.schema)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(beforeColumnNode.column.name)} ${beforeColumnNode.column.type} AFTER ${this.wrap(this.column.name)};`
         await this.execute(sql)
-        DatabaseCache.setChildCache(this.parent.uid, null)
+        this.parent.setChildCache(null)
         DbTreeDataProvider.refresh(this.parent)
     }
 

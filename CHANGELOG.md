@@ -2,13 +2,18 @@
 
 # 3.4.5
 
-- Adapt result view scroll bar when height change..
-- Move result view full button position.
-- Split result only when run from editor.
-- Support hide userNode, viewNode from tree ui.
-- Fix elasticSearch query error message not showed.
-- Integrate overview as table node tooltip.
+- Result View :
+  - Adapt scroll bar when height change.
+  - Move full button position.
+  - Split only when run from editor
+  - Fix elasticSearch query error message not showed
+- Tree Ui :
+  - Support hide userNode, viewNode.
+  - Add some node info as tooltip.
+  - Reduce connection name.
+  - Support remember workspace connection status.
 - Update server status view.
+- Support show postgresql, sqlserver schemas.
 
 # 3.4.4 2020-1-29
 

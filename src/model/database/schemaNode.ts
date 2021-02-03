@@ -98,7 +98,7 @@ export class SchemaNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        FileManager.show(`${this.uid}.sql`)
+        QueryUnit.showSQLTextDocument(this,'',`${this.schema}.sql`)
 
     }
 

@@ -20,7 +20,7 @@ export class UserGroup extends SchemaNode {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        let userNodes = DatabaseCache.getChildCache(this.uid);
+        let userNodes = this.getChildCache();
         if (userNodes && !isRresh) {
             return userNodes;
         }
@@ -29,7 +29,7 @@ export class UserGroup extends SchemaNode {
                 userNodes = tables.map<UserNode>((table) => {
                     return new UserNode(table.user, table.host, this);
                 });
-                DatabaseCache.setChildCache(this.uid, userNodes);
+                this.setChildCache(userNodes)
                 return userNodes;
             })
             .catch((err) => {

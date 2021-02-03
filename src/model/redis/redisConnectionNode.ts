@@ -16,9 +16,10 @@ export class RedisConnectionNode extends RedisBaseNode {
     iconPath: string = path.join(Constants.RES_PATH, `image/redis_connection.png`);
     iconDetailPath: string = path.join(Constants.RES_PATH, `image/code-terminal.svg`);
 
-    constructor(readonly uid: string, readonly parent: Node) {
-        super(uid)
+    constructor(readonly key: string, readonly parent: Node) {
+        super(key)
         this.init(parent)
+        this.label = this.uid
         if (this.disable) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None;
             this.iconPath = path.join(Constants.RES_PATH, "icon/close.svg");
@@ -81,8 +82,8 @@ export class RedisConnectionNode extends RedisBaseNode {
 
     public async deleteConnection(context: vscode.ExtensionContext) {
 
-        Util.confirm(`Are you want to Delete Connection ${this.uid} ? `, async () => {
-            this.indent({command:CommandKey.delete})
+        Util.confirm(`Are you want to Delete Connection ${this.label} ? `, async () => {
+            this.indent({ command: CommandKey.delete })
         })
 
     }

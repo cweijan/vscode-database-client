@@ -2,6 +2,7 @@ import { FileManager } from "@/common/filesManager";
 import { Util } from "@/common/util";
 import { QueryGroup } from "@/model/query/queryGroup";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
+import { QueryUnit } from "@/service/queryUnit";
 import * as path from "path";
 import { ExtensionContext, Range, TreeItemCollapsibleState } from "vscode";
 import { Constants, ModelType } from "../../../common/constants";
@@ -18,9 +19,10 @@ export class EsConnectionNode extends Node {
     private static versionMap = {}
     public iconPath: string = path.join(Constants.RES_PATH, "icon/es.png");
     public contextValue: string = ModelType.ES_CONNECTION;
-    constructor(readonly uid: string, readonly parent: Node) {
-        super(uid)
+    constructor(readonly key: string, readonly parent: Node) {
+        super(key)
         this.init(parent)
+        this.label=this.uid;
         this.cacheSelf()
         const lcp = ConnectionManager.getLastConnectionOption(false);
 
@@ -34,12 +36,12 @@ export class EsConnectionNode extends Node {
             this.iconPath = path.join(Constants.RES_PATH, "icon/connection-active.svg");
         }
 
-        if (EsConnectionNode.versionMap[this.uid]) {
-            this.description = EsConnectionNode.versionMap[this.uid]
+        if (EsConnectionNode.versionMap[this.label]) {
+            this.description = EsConnectionNode.versionMap[this.label]
         } else {
             this.execute<any>('get /').then(res => {
                 this.description=`version: ${res.version.number}`
-                EsConnectionNode.versionMap[this.uid]=this.description
+                EsConnectionNode.versionMap[this.label]=this.description
                 DbTreeDataProvider.refresh(this)
             }).catch(err=>{
                 console.log(err)
@@ -50,13 +52,7 @@ export class EsConnectionNode extends Node {
 
 
     newQuery() {
-        FileManager.show(`${this.uid}.es`).then(editor => {
-            if (editor.document.getText().length == 0) {
-                editor.edit(editBuilder => {
-                    editBuilder.replace(new Range(0, 0, 0, 0), EsTemplate.query)
-                });
-            }
-        })
+        QueryUnit.showSQLTextDocument(this,EsTemplate.query,`${this.host}.es`)
     }
 
     async getChildren(): Promise<Node[]> {
@@ -71,7 +67,7 @@ export class EsConnectionNode extends Node {
 
     public async deleteConnection(context: ExtensionContext) {
 
-        Util.confirm(`Are you want to Delete Connection ${this.uid} ? `, async () => {
+        Util.confirm(`Are you want to Delete Connection ${this.label} ? `, async () => {
             this.indent({command:CommandKey.delete})
         })
 
