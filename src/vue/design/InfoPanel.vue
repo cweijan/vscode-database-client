@@ -9,8 +9,8 @@
         <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Comment</label>
         <input class="w-64 field__input" v-model="table.comment" />
       </div>
+    <el-button @click="rename" type="success">Update</el-button>
     </div>
-    <el-button @click="rename">Update</el-button>
   </div>
 </template>
 

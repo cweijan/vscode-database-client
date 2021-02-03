@@ -4,7 +4,7 @@
     <div class="design-toolbar">
       <el-button @click="column.visible=true" type="primary" title="Insert" icon="el-icon-circle-plus-outline" size="mini" circle> </el-button>
     </div>
-    <ux-grid :data="designData.editColumnList" stripe style="width: 100%" :cell-style="{height: '25px'}">
+    <ux-grid :data="designData.editColumnList" stripe style="width: 100%" :cell-style="{height: '25px'}" :height="remainHeight()">
       <ux-table-column title="Operation" width="120">
         <template v-slot="{ row }">
           <el-button @click="openEdit(row)" title="edit" size="mini" icon="el-icon-edit" circle> </el-button>
@@ -120,6 +120,9 @@ export default {
       .init();
   },
   methods: {
+    remainHeight() {
+      return window.outerHeight - 280;
+    },
     updateColumn() {
       this.emit("updateColumn", {
         newColumnName: this.editColumn.name,
