@@ -1,6 +1,6 @@
 # CHANGELOG
 
-# 3.4.5
+# 3.5.0 2021-2-3
 
 - Result View :
   - Adapt scroll bar when height change.
@@ -16,31 +16,31 @@
 - Update server status view.
 - Support show postgresql, sqlserver schemas.
 
-# 3.4.4 2020-1-29
+# 3.4.4 2021-1-29
 
 - Support schema with postgresql、sqlserver.
 - Design table view update.
 - Add ui config
 - Support config  connection timeout.
 
-# 3.4.3 2020-1-28
+# 3.4.3 2021-1-28
 
 - Fix new table panel cannot execute sql.
 - Speed up data dump and support sqlserver、postgresql.
 - Support disable sql code lens.
 - Support connect to mssql with encrypt disabled.
 
-# 3.3.4 2020-1-27
+# 3.3.4 2021-1-27
 
 - Fix 3.3.1 add connection fail.
 - Trim legacy code, better peformance right now.
 - Add full result view icon.
 
-# 3.3.1 2020-1-26
+# 3.3.1 2021-1-26
 
 - More implement or table design.
 
-# 3.3.0 2020-1-26
+# 3.3.0 2021-1-26
 
 - Support close connection.
 - Add snippet to sql editor.
@@ -50,14 +50,14 @@
 - Add more chinese content.
 - Init design table.
 
-# 3.2.2 2020/1/25
+# 3.2.2 2021/1/25
 
 - Fix redis folder Infinite recursion load bug.
 - Add GUI of index manager view.
 - Implement database struct sync feature.
 - Enhance intetllisense sql.
 
-# 3.2.1 2020/1/23
+# 3.2.1 2021/1/23
 
 - Resign connect page.
 - Add sql code lens.
@@ -67,11 +67,11 @@
 - Migrate elasticsearch node to nosql explorer.
 - Support connect to redis server.
 
-# 3.1.0 2020/1/17
+# 3.1.0 2021/1/17
 
 - Support connect to elasticsearch.
 
-# 3.0.0 2020/1/13
+# 3.0.0 2021/1/13
 
 - Support connect to postgresql and sqlserver.
 - Reduce resource consumption.
