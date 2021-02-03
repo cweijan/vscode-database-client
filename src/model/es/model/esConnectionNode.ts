@@ -7,14 +7,13 @@ import { ExtensionContext, Range, TreeItemCollapsibleState } from "vscode";
 import { Constants, ModelType } from "../../../common/constants";
 import { ConnectionManager } from "../../../service/connectionManager";
 import { CommandKey, Node } from "../../interface/node";
-import { EsBaseNode } from "./esBaseNode";
 import { EsIndexGroup } from "./esIndexGroupNode";
 import { EsTemplate } from "./esTemplate";
 
 /**
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
  */
-export class EsConnectionNode extends EsBaseNode {
+export class EsConnectionNode extends Node {
 
     private static versionMap = {}
     public iconPath: string = path.join(Constants.RES_PATH, "icon/es.png");

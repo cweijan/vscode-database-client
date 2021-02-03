@@ -81,7 +81,7 @@ export class ConnectionManager {
 
             NodeUtil.of(connectionNode)
             if (!getRequest.retryCount) getRequest.retryCount = 1;
-            const key = getRequest.sessionId || connectionNode.getConnectId({ withDb: true });
+            const key = getRequest.sessionId || connectionNode.getConnectId();
             const connection = this.alivedConnection[key];
             if (connection) {
                 if (connection.connection.isAlive()) {
@@ -168,20 +168,9 @@ export class ConnectionManager {
             const fileName = vscode.window.activeTextEditor.document.fileName;
             if (fileName.includes('cweijan')) {
                 const queryName = path.basename(fileName, path.extname(fileName))
-                const filePattern = queryName.replace(/#.+$/, '').split('_');
-                const [mode, host, port, user] = filePattern
-                let schema: string;
-                if (filePattern.length >= 5) {
-                    schema = filePattern[4]
-                    // fix if schema name has _, loop append
-                    if (filePattern.length >= 5) {
-                        for (let index = 5; index < filePattern.length; index++) {
-                            schema = `${schema}_${filePattern[index]}`
-                        }
-                    }
-                }
+                const [_mode, host, port, user, database, schema] = queryName.replace(/#.+$/, '').split('@')
                 if (host != null && port != null && user != null) {
-                    const node = NodeUtil.of({ host, port: parseInt(port), user, schema });
+                    const node = NodeUtil.of({ host, port: parseInt(port), user, database, schema });
                     if (node.getCache()) {
                         return node.getCache();
                     }

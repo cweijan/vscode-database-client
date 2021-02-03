@@ -15,7 +15,6 @@ import { SSHConfig } from "./sshConfig";
 
 export interface SwitchOpt {
     isGlobal?: boolean;
-    withDb?: boolean;
     withDbForce?: boolean;
 }
 
@@ -119,17 +118,6 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.provider.reload(this)
     }
 
-    public initUid() {
-        if (this.uid) return;
-        if (this.contextValue == ModelType.CONNECTION) {
-            this.uid = this.getConnectId();
-        } else if (this.contextValue == ModelType.SCHEMA) {
-            this.uid = `${this.getConnectId({ withDbForce: true })}`;
-        } else {
-            this.uid = `${this.getConnectId({ withDbForce: true })}#${this.label}`;
-        }
-    }
-
     public async indent(command: IndentCommand) {
 
         const cacheKey = command.cacheKey || this.provider?.connectionKey;
@@ -191,24 +179,31 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         return []
     }
 
+    public initUid() {
+        if (this.uid) return;
+        if (this.contextValue == ModelType.CONNECTION) {
+            this.uid = this.getConnectId();
+        } else if (this.contextValue == ModelType.SCHEMA) {
+            this.uid = `${this.getConnectId({ withDbForce: true })}`;
+        } else {
+            this.uid = `${this.getConnectId({ withDbForce: true })}#${this.label}`;
+        }
+    }
+
     public getConnectId(opt?: SwitchOpt): string {
 
         const targetGlobal = opt?.isGlobal != null ? opt.isGlobal : this.global;
         const prefix = targetGlobal === false ? "workspace" : "global";
 
-        let uid = (this.usingSSH && this.ssh) ? `${prefix}_${this.ssh.host}_${this.ssh.port}_${this.ssh.username}`
-            : `${prefix}_${this.host}_${this.port}_${this.user}`;
+        let uid = (this.usingSSH && this.ssh) ? `${prefix}@${this.ssh.host}@${this.ssh.port}@${this.ssh.username}`
+            : `${prefix}@${this.host}@${this.port}@${this.user}`;
 
-
-        if (opt?.withDbForce && this.schema) {
-            return `${uid}_${this.schema}`
+        if (this.database) {
+            uid = `${uid}@${this.database}`;
         }
 
-        /**
-         * mssql and postgres must special database when connect.
-         */
-        if (opt?.withDb && this.database && (this.dbType == DatabaseType.MSSQL || this.dbType == DatabaseType.PG)) {
-            return `${uid}_${this.database}`
+        if (opt?.withDbForce && this.schema) {
+            return `${uid}@${this.schema}`
         }
 
         return uid;
@@ -219,8 +214,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public getPort(): number { return this.usingSSH ? this.ssh.port : this.port }
     public getUser(): string { return this.usingSSH ? this.ssh.username : this.user }
 
-    public async execute<T>(sql: string,sessionId?:string): Promise<T> {
-        return (await QueryUnit.queryPromise<T>(await ConnectionManager.getConnection(this,{sessionId}), sql)).rows
+    public async execute<T>(sql: string, sessionId?: string): Promise<T> {
+        return (await QueryUnit.queryPromise<T>(await ConnectionManager.getConnection(this, { sessionId }), sql)).rows
     }
 
     public async getConnection() {

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Node } from "@/model/interface/node";
 import { IConnection, queryCallback } from "./connection";
+import { ESIndexNode } from "@/model/es/model/esIndexNode";
 
 export class EsConnection extends IConnection {
 
@@ -83,7 +84,7 @@ export class EsConnection extends IConnection {
         });
         if (!fields) {
             const indexName = path.split('/')[1];
-            const indexNode = Node.nodeCache[`${this.opt.getConnectId()}_${indexName}`] as Node;
+            const indexNode = Node.nodeCache[`${this.opt.getConnectId()}#${indexName}`] as Node;
             fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' }; }) as any;
         }
         fields.unshift({ name: "_id" }, { name: "_score" });

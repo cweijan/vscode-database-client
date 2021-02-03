@@ -5,21 +5,20 @@ import { QueryUnit } from "@/service/queryUnit";
 import * as path from "path";
 import { Range } from "vscode";
 import { Node } from "../../interface/node";
-import { EsBaseNode } from "./esBaseNode";
 import { EsColumnNode } from "./esColumnNode";
 import { EsTemplate } from "./esTemplate";
 
 
-export class ESIndexNode extends EsBaseNode {
+export class ESIndexNode extends Node {
 
     public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.ES_INDEX;
     public properties: string;
     constructor(readonly info: string, readonly parent: Node) {
         super(null)
-        this.init(parent)
         const [health, status, index, uuid, pri, rep, docsCount, docsDeleted, storeSize, priStoreSize] = info.split(/\s+/)
         this.label = index
+        this.init(parent)
         this.cacheSelf()
         this.description = `${storeSize} Docs ${docsCount}`
         this.command = {

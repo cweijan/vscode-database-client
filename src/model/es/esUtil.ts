@@ -2,13 +2,13 @@ import { FileManager, FileModel } from "@/common/filesManager";
 import { ConnectionManager } from "@/service/connectionManager";
 import { QueryUnit } from "@/service/queryUnit";
 import * as vscode from 'vscode';
-import { EsBaseNode } from "./model/esBaseNode";
+import { Node } from "../interface/node";
 import { ElasticMatch } from "./provider/ElasticMatch";
 
 export class EsUtil {
 
     public static async executeEsQueryFile(em: ElasticMatch, parse: boolean) {
-        const node = ConnectionManager.getByActiveFile() as EsBaseNode;
+        const node = ConnectionManager.getByActiveFile() as Node;
         if (node == null) {
             vscode.window.showErrorMessage("Not active es found!")
             return;

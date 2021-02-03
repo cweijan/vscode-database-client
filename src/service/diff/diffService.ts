@@ -39,14 +39,14 @@ export class DiffService {
                     }
                 }).on("start", async (opt) => {
 
-                    const fromTables =await new TableGroup(Node.nodeCache[`${opt.from.connection}_${opt.from.database}`]).getChildren()
-                    const toTables =await new TableGroup(Node.nodeCache[`${opt.to.connection}_${opt.to.database}`]).getChildren()
+                    const fromTables =await new TableGroup(Node.nodeCache[`${opt.from.connection}@${opt.from.database}@${opt.from.schema}`]).getChildren()
+                    const toTables =await new TableGroup(Node.nodeCache[`${opt.to.connection}@${opt.to.database}@${opt.to.schema}`]).getChildren()
                     
                     let sqlList = await this.compareTables(fromTables, toTables);
                     handler.emit("compareResult", { sqlList })
                 }).on("sync", async ({ option, sqlList }) => {
 
-                    const databaseId = `${option.from.connection}_${option.from.database}`
+                    const databaseId = `${option.from.connection}@${option.from.database}@${option.from.schema}`
                     const dbNode = Node.nodeCache[databaseId]
                     try {
                         await QueryUnit.runBatch(await ConnectionManager.getConnection(dbNode), sqlList.map(sql => sql.sql))

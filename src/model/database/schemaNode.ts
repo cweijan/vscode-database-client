@@ -29,7 +29,7 @@ export class SchemaNode extends Node implements CopyAble {
         this.init(this.parent)
         this.cacheSelf()
         const lcp = ConnectionManager.getLastConnectionOption(false);
-        if (lcp && lcp.getConnectId() == this.getConnectId() && (lcp.schema == this.schema )) {
+        if (lcp && lcp.getConnectId() == this.getConnectId() && (lcp.database == this.database ) && (lcp.schema == this.schema )) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/database-active.svg");
             this.description = `Active`
         }
