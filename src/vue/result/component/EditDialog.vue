@@ -1,5 +1,5 @@
 <template>
-  <el-dialog ref="editDialog" :title="editorTilte" :visible.sync="visible" width="90%" top="3vh" size="mini">
+  <el-dialog ref="editDialog" :title="editorTilte" :visible.sync="visible" width="60%" top="3vh" size="mini">
     <el-form ref="infoForm" :model="editModel" :inline="true">
       <el-form-item :prop="column.name" :key="column.name" v-for="column in columnList" size="mini">
         <template>
@@ -24,9 +24,9 @@
 </template>
 
 <script>
-import CellEditor from "./CellEditor.vue"
-import { util } from "../mixin/util"
-import { wrapByDb } from "@/common/wrapper"
+import CellEditor from "./CellEditor.vue";
+import { util } from "../mixin/util";
+import { wrapByDb } from "@/common/wrapper";
 
 export default {
   mixins: [util],
@@ -39,131 +39,159 @@ export default {
       editModel: {},
       visible: false,
       loading: false,
-    }
+    };
   },
   methods: {
     openEdit(originModel) {
       if (!originModel) {
-        this.$message.error("Edit row cannot be null!")
-        return
+        this.$message.error("Edit row cannot be null!");
+        return;
       }
-      this.originModel = originModel
-      this.editModel = { ...originModel }
-      this.model = "update"
-      this.loading = false
-      this.visible = true
+      this.originModel = originModel;
+      this.editModel = { ...originModel };
+      this.model = "update";
+      this.loading = false;
+      this.visible = true;
     },
     openCopy(originModel) {
       if (!originModel) {
-        this.$message.error("Edit row cannot be null!")
-        return
+        this.$message.error("Edit row cannot be null!");
+        return;
       }
-      this.originModel = originModel
-      this.editModel = { ...originModel }
-      this.editModel[this.primaryKey] = null
-      this.model = "copy"
-      this.loading = false
-      this.visible = true
+      this.originModel = originModel;
+      this.editModel = { ...originModel };
+      this.editModel[this.primaryKey] = null;
+      this.model = "copy";
+      this.loading = false;
+      this.visible = true;
     },
     openInsert() {
-      this.model = "insert"
-      this.editModel = {}
-      this.loading = false
-      this.visible = true
+      this.model = "insert";
+      this.editModel = {};
+      this.loading = false;
+      this.visible = true;
     },
     close() {
-      this.visible = false
+      this.visible = false;
     },
     getTypeByColumn(key) {
-      if (!this.columnList) return
+      if (!this.columnList) return;
       for (const column of this.columnList) {
         if (column.name === key) {
-          return column.simpleType || column.type
+          return column.simpleType || column.type;
         }
       }
     },
     confirmInsert() {
       if (this.dbType == "ElasticSearch") {
-        this.confirmInsertEs()
-        return
+        this.confirmInsertEs();
+        return;
       }
-      let columns = ""
-      let values = ""
+      let columns = "";
+      let values = "";
       for (const key in this.editModel) {
-        if (this.getTypeByColumn(key) == null) continue
-        const newEle = this.editModel[key]
+        if (this.getTypeByColumn(key) == null) continue;
+        const newEle = this.editModel[key];
         if (newEle != null) {
-          columns += `${wrapByDb(key, this.dbType)},`
-          values += `${this.wrapQuote(this.getTypeByColumn(key), newEle)},`
+          columns += `${wrapByDb(key, this.dbType)},`;
+          values += `${this.wrapQuote(this.getTypeByColumn(key), newEle)},`;
         }
       }
       if (values) {
-        const insertSql = `INSERT INTO ${this.table}(${columns.replace(/,$/, "")}) VALUES(${values.replace(/,$/, "")})`
-        this.loading = true
-        this.$emit("execute", insertSql)
+        const insertSql = `INSERT INTO ${this.table}(${columns.replace(
+          /,$/,
+          ""
+        )}) VALUES(${values.replace(/,$/, "")})`;
+        this.loading = true;
+        this.$emit("execute", insertSql);
       } else {
-        this.$message("Not any input, insert fail!")
+        this.$message("Not any input, insert fail!");
       }
     },
-    confirmUpdate(row, oldRow) {
-      if (oldRow) {
-        this.originModel = oldRow
+    buildUpdateSql(currentNew, oldRow) {
+       if (this.dbType == "ElasticSearch") {
+        return this.confirmUpdateEs(currentNew);
       }
-      const currentNew = row ? row : this.editModel
-      if (this.dbType == "ElasticSearch") {
-        this.confirmUpdateEs(currentNew)
-        return
+       if (!this.primaryKey) {
+        this.$message.error("This table has not primary key, cannot update!");
+        throw new Error("This table has not primary key, cannot update!")
       }
-      if (!this.primaryKey) {
-        this.$message.error("This table has not primary key, update fail!")
-        return
-      }
-      const primary = this.originModel[this.primaryKey]
-      let change = ""
+      const primary = oldRow[this.primaryKey];
+      let change = "";
       for (const key in currentNew) {
-        if (this.getTypeByColumn(key) == null) continue
-        const oldEle = this.originModel[key]
-        const newEle = currentNew[key]
+        if (this.getTypeByColumn(key) == null) continue;
+        const oldEle = oldRow[key];
+        const newEle = currentNew[key];
         if (oldEle !== newEle) {
-          change += `${wrapByDb(key, this.dbType)}=${this.wrapQuote(this.getTypeByColumn(key), newEle)},`
+          change += `${wrapByDb(key, this.dbType)}=${this.wrapQuote(
+            this.getTypeByColumn(key),
+            newEle
+          )},`;
         }
       }
-      if (change) {
-        const updateSql = `UPDATE ${this.table} SET ${change.replace(/,$/, "")} WHERE ${
-          this.primaryKey
-        }=${this.wrapQuote(this.getTypeByColumn(this.primaryKey), primary)}`
-        this.$emit("execute", updateSql)
-        this.loading = true
+      if (!change) {
+        return "";
+      }
+      return `UPDATE ${this.table} SET ${change.replace(/,$/, "")} WHERE ${
+        this.primaryKey
+      }=${this.wrapQuote(this.getTypeByColumn(this.primaryKey), primary)};`;
+    },
+    confirmUpdate(row, oldRow) {
+      if (!oldRow) {
+        oldRow = this.originModel;
+      }
+      const currentNew = row ? row : this.editModel;
+      
+      const sql = this.buildUpdateSql(currentNew, oldRow);
+      if (sql) {
+        this.$emit("execute", updateSql);
+        this.loading = true;
       } else {
-        this.$message("Not any change, update fail!")
+        this.$message("Not any change, update fail!");
       }
     },
     confirmInsertEs() {
-      this.$emit("execute", `POST /${this.table}/_doc\n` + JSON.stringify(this.editModel))
+      this.$emit(
+        "execute",
+        `POST /${this.table}/_doc\n` + JSON.stringify(this.editModel)
+      );
     },
     confirmUpdateEs(row) {
-      let value = {}
+      let value = {};
       for (const key in row) {
-        if (key == "_XID" || key == "_index" || key == "_type" || key == "_score" || key == "_id") {
-          continue
+        if (
+          key == "_XID" ||
+          key == "_index" ||
+          key == "_type" ||
+          key == "_score" ||
+          key == "_id"
+        ) {
+          continue;
         }
-        value[key] = row[key]
+        value[key] = row[key];
       }
-      this.$emit("execute", `POST /${this.table}/_doc/${row._id}\n` + JSON.stringify(value))
+      return `POST /${this.table}/_doc/${row._id}\n` + JSON.stringify(value);
     },
   },
   computed: {
     editorTilte() {
       if (this.model == "insert") {
-        return "Insert To " + this.table
+        return "Insert To " + this.table;
       } else if (this.model == "update") {
-        return "Edit For " + this.table + " : " + this.primaryKey + "=" + this.originModel[this.primaryKey]
+        return (
+          "Edit For " +
+          this.table +
+          " : " +
+          this.primaryKey +
+          "=" +
+          this.originModel[this.primaryKey]
+        );
       } else {
-        return "Copy To " + this.table
+        return "Copy To " + this.table;
       }
     },
   },
-}
+};
 </script>
 
 <style>

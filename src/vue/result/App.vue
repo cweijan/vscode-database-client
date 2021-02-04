@@ -11,8 +11,6 @@
         <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
         <el-button @click="$refs.editor.openInsert()" :disabled="result.tableCount!=1" type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle>
         </el-button>
-        <el-button @click="$refs.editor.openEdit(update.current)" type="primary" size="mini" icon="el-icon-edit" title="edit" circle :disabled="!toolbar.show">
-        </el-button>
         <el-button @click.stop="$refs.editor.openCopy(update.current)" type="info" size="mini" title="copy" icon="el-icon-document-copy" circle :disabled="!toolbar.show">
         </el-button>
         <el-button @click="deleteConfirm" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!toolbar.show">
@@ -20,7 +18,7 @@
         <el-button @click="exportOption.visible = true" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
         <el-button type="success" size="mini" icon="el-icon-caret-right" :disabled="!toolbar.sql" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
         <div style="display:inline-block">
-          <el-pagination @size-change="changePageSize" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,200,300,400,500,1000]" :layout="page.total!=null?'sizes,prev,pager, next, total, jumper':'sizes,prev, next, jumper'" :total="page.total">
+          <el-pagination @size-change="changePageSize" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,30,50,300,500]" :layout="page.total!=null?'sizes,prev,pager, next, total':'sizes,prev, next'" :total="page.total">
           </el-pagination>
         </div>
       </div>
@@ -30,7 +28,7 @@
       </div>
     </div>
     <!-- trigger when click -->
-    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe @selection-change="selectionChange" :edit-config="{trigger: 'click', mode: 'row',autoClear:false}" :checkboxConfig="{ checkMethod: ({row})=>!row.isFilter,highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="updateEdit" :show-header-overflow="false" :show-overflow="false">
+    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe @selection-change="selectionChange" :checkboxConfig="{ checkMethod: ({row})=>!row.isFilter,highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="updateEdit" :show-header-overflow="false" :show-overflow="false">
       <ux-table-column type="checkbox" width="40" fixed="left"> </ux-table-column>
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined">
         <template slot="header" slot-scope="scope">
@@ -57,14 +55,13 @@
           </el-tooltip>
         </template>
         <template slot-scope="scope">
-          <el-input class='edit-filter' v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" :clearable='true' placeholder="Filter" @clear="filter(null,scope.column.title)" @keyup.enter.native="filter($event,scope.column.title)">
-          </el-input>
-          <div v-if="!scope.row.isFilter" @contextmenu.prevent="onContextmenu($event,scope.column)" v-html='dataformat(scope.row[scope.column.title])'></div>
-        </template>
-        <template slot="edit" slot-scope="scope">
-          <el-input v-if="scope.row.isFilter" v-model="toolbar.filter[scope.column.title]" placeholder="Filter" v-on:keyup.enter.native="filter($event,scope.column.title)">
-          </el-input>
-          <el-input v-if="!scope.row.isFilter" v-model="scope.row[scope.column.title]" @keypress.enter.native="$refs.editor.confirmUpdate(scope.row,update.current)" :disabled="result.tableCount!=1"></el-input>
+          <template v-if="scope.row.isFilter">
+            <el-input class='edit-filter' v-model="toolbar.filter[scope.column.title]" :clearable='true' placeholder="Filter" @clear="filter(null,scope.column.title)" @keyup.enter.native="filter($event,scope.column.title)">
+            </el-input>
+          </template>
+          <template v-if="!scope.row.isFilter">
+            <div :contenteditable="result.tableCount==1" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])'></div>
+          </template>
         </template>
       </ux-table-column>
     </ux-grid>
@@ -133,6 +130,8 @@ export default {
         needRefresh: true,
       },
       update: {
+        editList: {},
+        lock: false,
         current: null,
         primary: null,
       },
@@ -157,12 +156,16 @@ export default {
       // only es have.
       if (data.total != null) {
         this.page.total = parseInt(data.total);
-      } else if (this.result.tableCount == 1 && this.page.pageSize<this.result.data.length+1) {
+      } else if (
+        this.result.tableCount == 1 &&
+        this.page.pageSize < this.result.data.length + 1
+      ) {
         this.count();
-      }else{
-        this.page.total=this.result.data.length-1
+      } else {
+        this.page.total = this.result.data.length - 1;
       }
-      console.log(3)
+      this.update.editList = [];
+      this.update.lock = false;
     };
     const handlerCommon = (res) => {
       if (this.$refs.editor) {
@@ -172,6 +175,21 @@ export default {
       this.info.message = res.message;
     };
     vscodeEvent = getVscodeEvent();
+
+    vscodeEvent.on("updateSuccess", () => {
+      for (const index in this.update.editList) {
+        const element = this.update.editList[index];
+        this.result.data[index] = element;
+      }
+      this.update.editList = [];
+      this.update.lock = false;
+      this.$message.success("Update Success");
+    });
+    window.onkeypress = (e) => {
+      if (e.ctrlKey && e.code == "KeyS") {
+        this.save();
+      }
+    };
     window.addEventListener("message", ({ data }) => {
       if (!data) return;
       const response = data.content;
@@ -217,8 +235,6 @@ export default {
           }
           this.refresh();
           break;
-        default:
-          this.$message(JSON.stringify(data));
       }
     });
     vscodeEvent.emit("init");
@@ -229,6 +245,32 @@ export default {
     });
   },
   methods: {
+    editListen(event, scope) {
+      const { row, column, rowIndex } = scope;
+      const editList = this.update.editList;
+      if (!editList[rowIndex]) {
+        editList[rowIndex] = { ...row };
+        delete editList[rowIndex]._XID;
+        console.log(editList[rowIndex]);
+      }
+      editList[rowIndex][column.title] = event.target.textContent;
+      vscodeEvent.emit("dataModify");
+    },
+    save() {
+      if (Object.keys(this.update.editList).length == 0 && this.update.lock) {
+        return;
+      }
+      this.update.lock = true;
+      let sql = "";
+      for (const index in this.update.editList) {
+        const element = this.update.editList[index];
+        sql += this.$refs.editor.buildUpdateSql(
+          element,
+          this.result.data[index]
+        );
+      }
+      vscodeEvent.emit("saveModify", sql);
+    },
     full() {
       vscodeEvent.emit("full");
     },
@@ -244,7 +286,8 @@ export default {
         },
       });
     },
-    onContextmenu(event, column) {
+    onContextmenu(event, scope) {
+      const { row, column } = scope;
       const name = column.title;
       const value = event.target.textContent;
       event.target.value = value;
@@ -254,6 +297,12 @@ export default {
             label: `Copy`,
             onClick: () => {
               vscodeEvent.emit("copy", value);
+            },
+          },
+          {
+            label: `Open Edit Dialog`,
+            onClick: () => {
+              this.$refs.editor.openEdit(row)
             },
           },
           {
@@ -475,7 +524,7 @@ export default {
     execute(sql) {
       if (!sql) return;
       vscodeEvent.emit("execute", {
-        sql: sql.replace(/ +/gi, " "),
+        sql,
       });
       this.table.loading = true;
     },

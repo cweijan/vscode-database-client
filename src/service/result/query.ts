@@ -88,6 +88,15 @@ export class QueryPage {
                     Global.updateConfig(ConfigKey.DEFAULT_LIMIT, pageSize)
                 }).on('openCoffee', () => {
                     env.openExternal(Uri.parse('https://www.buymeacoffee.com/cweijan'));
+                }).on('dataModify', () => {
+                    if (handler.panel.title.indexOf("*") == -1) handler.panel.title = `${handler.panel.title}*`
+                }).on("saveModify", (sql) => {
+                    dbOption.execute(sql).then(() => {
+                        handler.emit('updateSuccess')
+                        handler.panel.title = handler.panel.title.replace("*", "")
+                    }).catch(err => {
+                        handler.emit("updateFail", err)
+                    })
                 })
             }
         });
