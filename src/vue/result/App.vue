@@ -7,8 +7,8 @@
       <div class="toolbar">
         <el-button v-if="showFullBtn" @click="full" type="primary" title="Full Result View" icon="el-icon-rank" size="mini" circle>
         </el-button>
-        <el-button type="primary" size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
         <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
+        <el-button type="primary" size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
         <el-button @click="$refs.editor.openInsert()" :disabled="result.tableCount!=1" type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle>
         </el-button>
         <el-button @click="deleteConfirm" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!toolbar.show">
@@ -26,7 +26,7 @@
       </div>
     </div>
     <!-- trigger when click -->
-    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe @selection-change="selectionChange" :checkboxConfig="{ checkMethod: ({row})=>!row.isFilter,highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" @row-click="updateEdit" :show-header-overflow="false" :show-overflow="false">
+    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe @selection-change="selectionChange" :checkboxConfig="{ checkMethod: ({row})=>editable&&!row.isFilter,highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" :show-header-overflow="false" :show-overflow="false">
       <ux-table-column type="checkbox" width="40" fixed="left"> </ux-table-column>
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined">
         <template slot="header" slot-scope="scope">
@@ -58,7 +58,7 @@
             </el-input>
           </template>
           <template v-if="!scope.row.isFilter">
-            <div :contenteditable="result.tableCount==1&&result.primaryKey" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])'></div>
+            <div :contenteditable="editable" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])'></div>
           </template>
         </template>
       </ux-table-column>
@@ -129,9 +129,7 @@ export default {
       },
       update: {
         editList: {},
-        lock: false,
-        current: null,
-        primary: null,
+        lock: false
       },
     };
   },
@@ -449,12 +447,6 @@ export default {
         }
       }
     },
-    updateEdit(row, column, event) {
-      if (row.isFilter) {
-        return;
-      }
-      this.update.current = { ...row };
-    },
     deleteConfirm() {
       this.$confirm("Are you sure you want to delete this data?", "Warning", {
         confirmButtonText: "OK",
@@ -601,6 +593,9 @@ export default {
     },
   },
   computed: {
+    editable(){
+        return this.result.primaryKey && this.result.tableCount == 1;
+    },
     columnCount() {
       if (this.result.data == undefined || this.result.data[0] == undefined)
         return 0;

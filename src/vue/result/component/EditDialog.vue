@@ -144,7 +144,7 @@ export default {
       
       const sql = this.buildUpdateSql(currentNew, oldRow);
       if (sql) {
-        this.$emit("execute", updateSql);
+        this.$emit("execute", sql);
         this.loading = true;
       } else {
         this.$message("Not any change, update fail!");
