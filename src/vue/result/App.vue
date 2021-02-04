@@ -157,9 +157,12 @@ export default {
       // only es have.
       if (data.total != null) {
         this.page.total = parseInt(data.total);
-      } else if (this.result.tableCount == 1) {
+      } else if (this.result.tableCount == 1 && this.page.pageSize<this.result.data.length+1) {
         this.count();
+      }else{
+        this.page.total=this.result.data.length-1
       }
+      console.log(3)
     };
     const handlerCommon = (res) => {
       if (this.$refs.editor) {
