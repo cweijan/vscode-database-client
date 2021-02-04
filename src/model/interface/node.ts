@@ -55,6 +55,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public key: string;
     public provider?: DbTreeDataProvider;
     public context?: Memento;
+    public parent?: Node;
 
     /**
      * mysql only

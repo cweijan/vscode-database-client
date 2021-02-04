@@ -25,12 +25,16 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         return element;
     }
 
-    public getChildren(element?: Node): Thenable<Node[]> | Node[] {
+    public async getChildren(element?: Node): Promise<Node[]> {
         if (!element) {
             return this.getConnectionNodes();
         }
         try {
-            return element.getChildren();
+            const children = await element.getChildren();
+            for (const child of children) {
+                child.parent = element;
+            }
+            return children;
         } catch (error) {
             return [new InfoNode(error)]
         }
@@ -118,8 +122,8 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async activeDb() {
 
-        const node=ConnectionManager.getByActiveFile()
-        if(node){
+        const node = ConnectionManager.getByActiveFile()
+        if (node) {
             vscode.window.showErrorMessage("Query file can not change active database.")
             return;
         }
