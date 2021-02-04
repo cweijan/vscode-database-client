@@ -11,8 +11,6 @@
         <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
         <el-button @click="$refs.editor.openInsert()" :disabled="result.tableCount!=1" type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle>
         </el-button>
-        <el-button @click.stop="$refs.editor.openCopy(update.current)" type="info" size="mini" title="copy" icon="el-icon-document-copy" circle :disabled="!toolbar.show">
-        </el-button>
         <el-button @click="deleteConfirm" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!toolbar.show">
         </el-button>
         <el-button @click="exportOption.visible = true" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
@@ -60,7 +58,7 @@
             </el-input>
           </template>
           <template v-if="!scope.row.isFilter">
-            <div :contenteditable="result.tableCount==1" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])'></div>
+            <div :contenteditable="result.tableCount==1&&result.primaryKey" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])'></div>
           </template>
         </template>
       </ux-table-column>
@@ -298,12 +296,20 @@ export default {
             onClick: () => {
               vscodeEvent.emit("copy", value);
             },
+            divided:true
           },
           {
             label: `Open Edit Dialog`,
             onClick: () => {
               this.$refs.editor.openEdit(row)
             },
+          },
+           {
+            label: `Open Copy Dialog`,
+            onClick: () => {
+              this.$refs.editor.openCopy(row)
+            },
+            divided:true
           },
           {
             label: `Filter by ${name} = '${value}'`,
@@ -325,7 +331,7 @@ export default {
                 label: `Filter by ${name} >= '${value}'`,
                 onClick: () => {
                   this.filter(event, name, ">=");
-                },
+                },  divided:true
               },
               {
                 label: `Filter by ${name} < '${value}'`,
@@ -337,7 +343,7 @@ export default {
                 label: `Filter by ${name} <= '${value}'`,
                 onClick: () => {
                   this.filter(event, name, "<=");
-                },
+                },  divided:true
               },
               {
                 label: `Filter by ${name} LIKE '%${value}%'`,
