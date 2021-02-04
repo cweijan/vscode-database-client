@@ -452,7 +452,7 @@ export default {
         value = this.result.data[index][key];
       }
       var dynamic = value ? (value + "").length * 10 : (key + "").length * 10;
-      if (dynamic > 600) dynamic = 600;
+      if (dynamic > 150) dynamic = 150;
       if (dynamic < 70) dynamic = 70;
       var nextDynamic = this.computeWidth(key, index + 1, keyIndex);
       if (dynamic < nextDynamic) dynamic = nextDynamic;
