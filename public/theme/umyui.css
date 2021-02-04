@@ -1,3 +1,6 @@
+/**
+https://www.umyui.com/
+*/
 .el-input.is-disabled input {
   border: none !important;
   user-select: all;
@@ -5,6 +8,10 @@
 
 .plx-header--column.col--ellipsis > .plx-cell .plx-cell--title {
   font-weight: 400;
+}
+
+.plx-cell--checkbox.is--disabled{
+  display: none;
 }
 
 .col--index{
@@ -17,6 +24,10 @@
 
 .plx-edit-icon {
   display: none;
+}
+
+.plx-cell--title{
+ width: 100%; 
 }
 
 .title-info,
