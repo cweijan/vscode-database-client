@@ -129,7 +129,7 @@ export default {
       },
       update: {
         editList: {},
-        lock: false
+        lock: false,
       },
     };
   },
@@ -182,7 +182,11 @@ export default {
       this.$message.success("Update Success");
     });
     window.onkeypress = (e) => {
-      if (e.ctrlKey && e.code == "KeyS") {
+      if (e.code == "Enter") {
+        this.save();
+        e.stopPropagation()
+        e.preventDefault();
+      } else if (e.ctrlKey && e.code == "KeyS") {
         this.save();
       }
     };
@@ -294,20 +298,20 @@ export default {
             onClick: () => {
               vscodeEvent.emit("copy", value);
             },
-            divided:true
+            divided: true,
           },
           {
             label: `Open Edit Dialog`,
             onClick: () => {
-              this.$refs.editor.openEdit(row)
+              this.$refs.editor.openEdit(row);
             },
           },
-           {
+          {
             label: `Open Copy Dialog`,
             onClick: () => {
-              this.$refs.editor.openCopy(row)
+              this.$refs.editor.openCopy(row);
             },
-            divided:true
+            divided: true,
           },
           {
             label: `Filter by ${name} = '${value}'`,
@@ -329,7 +333,8 @@ export default {
                 label: `Filter by ${name} >= '${value}'`,
                 onClick: () => {
                   this.filter(event, name, ">=");
-                },  divided:true
+                },
+                divided: true,
               },
               {
                 label: `Filter by ${name} < '${value}'`,
@@ -341,7 +346,8 @@ export default {
                 label: `Filter by ${name} <= '${value}'`,
                 onClick: () => {
                   this.filter(event, name, "<=");
-                },  divided:true
+                },
+                divided: true,
               },
               {
                 label: `Filter by ${name} LIKE '%${value}%'`,
@@ -593,8 +599,8 @@ export default {
     },
   },
   computed: {
-    editable(){
-        return this.result.primaryKey && this.result.tableCount == 1;
+    editable() {
+      return this.result.primaryKey && this.result.tableCount == 1;
     },
     columnCount() {
       if (this.result.data == undefined || this.result.data[0] == undefined)
