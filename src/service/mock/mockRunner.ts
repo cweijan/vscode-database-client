@@ -23,11 +23,9 @@ export class MockRunner {
     public async create(tableNode: TableNode) {
         const columnList = (await tableNode.getChildren()) as ColumnNode[]
         const mockModel: MockModel = {
-            mode: tableNode.global === false ? 'workspace' : 'global',
-            host: tableNode.getHost(), port: tableNode.getPort(), user: tableNode.getUser(), database: tableNode.database, table: tableNode.table,
-            schema: tableNode.schema,
+            schema: tableNode.schema,table: tableNode.table,
             mockStartIndex: MockRunner.primaryKeyMap[tableNode.uid] ? 'auto' : 1
-            , mockCount: 10, examples: "http://mockjs.com/examples.html#DPD", mock: {}
+            , mockCount: 10, mockValueReference: "http://mockjs.com/examples.html#DPD", mock: {}
         }
         for (const columnNode of columnList) {
             mockModel.mock[columnNode.column.name] = {
@@ -45,11 +43,13 @@ export class MockRunner {
         const mockModel = JSON.parse(content) as MockModel;
 
 
-        const tableList = await new TableGroup(ConnectionManager.getByActiveFile()).getChildren() as TableNode[]
-        if (!tableList) {
-            vscode.window.showErrorMessage(`Database ${mockModel.database} not found!`)
+        const node = ConnectionManager.getByActiveFile();
+        if (!node) {
+            vscode.window.showErrorMessage(`This mock target not valid!`)
             return;
         }
+
+        const tableList = await new TableGroup(node).getChildren() as TableNode[]
         let tableNode: TableNode;
         for (const table of tableList) {
             if (table.table == mockModel.table) {
