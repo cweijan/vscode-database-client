@@ -179,12 +179,17 @@ export default {
       }
       this.update.editList = [];
       this.update.lock = false;
-      this.$message.success("Update Success");
+      this.$message({
+        showClose: true,
+        duration: 500,
+        message: "Update Success",
+        type: "success",
+      });
     });
     window.onkeypress = (e) => {
       if (e.code == "Enter") {
         this.save();
-        e.stopPropagation()
+        e.stopPropagation();
         e.preventDefault();
       } else if (e.ctrlKey && e.code == "KeyS") {
         this.save();
@@ -227,11 +232,12 @@ export default {
           break;
         case "MESSAGE":
           if (response.message) {
-            if (response.success) {
-              this.$message.success(response.message);
-            } else {
-              this.$message.error(response.message);
-            }
+            this.$message({
+              showClose: true,
+              duration: 1000,
+              message: response.message,
+              type: response.success ? "success" : "error",
+            });
           }
           this.refresh();
           break;

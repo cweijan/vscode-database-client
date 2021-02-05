@@ -138,8 +138,8 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
     tableTemplate(): string {
         return `CREATE TABLE [name](  
     id int NOT NULL primary key,
-    created_time DATETIME,
-    updated_time DATETIME,
+    create_time DATETIME,
+    update_time DATETIME,
     [column] varchar(255)
 );
 EXECUTE sp_addextendedproperty N'MS_Description', '[table_comment]', N'user', N'dbo', N'table', N'[table_name]', NULL, NULL;

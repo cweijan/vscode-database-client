@@ -194,8 +194,8 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
     tableTemplate(): string {
         return `CREATE TABLE [name](  
     id SERIAL NOT NULL primary key,
-    created_time DATE,
-    updated_time DATE,
+    create_time DATE,
+    update_time DATE,
     [column] varchar(255)
 );
 COMMENT ON TABLE [table] IS '[comment'];

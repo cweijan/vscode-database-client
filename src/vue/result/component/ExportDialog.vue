@@ -4,7 +4,7 @@
       <el-form-item label="Export File Type">
         <el-select v-model="exportOption.type">
           <el-option :label="'Xlsx'" value="xlsx"></el-option>
-          <el-option :label="'Insert Sql'" value="sql"></el-option>
+          <el-option :label="'Sql'" value="sql"></el-option>
           <el-option :label="'Json'" value="json"></el-option>
           <el-option :label="'Csv'" value="csv"> </el-option>
         </el-select>
