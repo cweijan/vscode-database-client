@@ -22,7 +22,7 @@
               <div class="menu_item_icon" v-if="hasIcon">
                 <i :class="item.icon" v-if="item.icon"></i>
               </div>
-              <span class="menu_item_label">{{item.label}}</span>
+              <span class="menu_item_label" :title="item.label">{{item.label}}</span>
               <div class="menu_item_expand_icon"></div>
             </div>
             <div
@@ -39,7 +39,7 @@
               <div class="menu_item_icon" v-if="hasIcon">
                 <i :class="item.icon" v-if="item.icon"></i>
               </div>
-              <span class="menu_item_label">{{item.label}}</span>
+              <span class="menu_item_label" :title="item.label">{{item.label}}</span>
               <div class="menu_item_expand_icon">▶</div>
             </div>
             <div
@@ -56,7 +56,7 @@
               <div class="menu_item_icon" v-if="hasIcon">
                 <i :class="item.icon" v-if="item.icon"></i>
               </div>
-              <span class="menu_item_label">{{item.label}}</span>
+              <span class="menu_item_label" :title="item.label">{{item.label}}</span>
               <div class="menu_item_expand_icon"></div>
             </div>
           </template>
@@ -231,9 +231,10 @@ export default {
 .menu {
   position: fixed;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
-  background: #fff;
+  /* background: #fff; */
+  background: var(--vscode-menu-background);
   border-radius: 4px;
-  padding: 8px 0;
+  /* padding: 0 15px; */
 }
 .menu_body {
   display: block;
@@ -243,15 +244,15 @@ export default {
   line-height: 32px;
   padding: 0 16px;
   margin: 0;
-  font-size: 13px;
+  font-size: 12px;
   outline: 0;
   display: flex;
   align-items: center;
   transition: 0.2s;
-  border-bottom: 1px solid #00000000;
 }
 .menu_item__divided {
-  border-bottom-color: #ebeef5;
+  /* border-bottom: 1px solid var(--vscode-menu-separatorBackground); ; */
+  border-bottom: 1px solid #666A71;
 }
 .menu_item .menu_item_icon {
   margin-right: 8px;
@@ -259,6 +260,10 @@ export default {
 }
 .menu_item .menu_item_label {
   flex: 1;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .menu_item .menu_item_expand_icon {
   margin-left: 16px;
@@ -266,20 +271,25 @@ export default {
   width: 10px;
 }
 .menu_item__available {
-  color: #606266;
+  /* color: #606266; */
+  color: var(--vscode-menu-foreground);
   cursor: pointer;
 }
 .menu_item__available:hover {
-  background: #ecf5ff;
-  color: #409eff;
+  /* background: #ecf5ff; */
+  background: var(--vscode-menu-selectionBackground);
+  /* color: #409eff; */
+  color: var(--vscode-menu-selectionForeground);
 }
 .menu_item__disabled {
   color: #c0c4cc;
   cursor: not-allowed;
 }
 .menu_item_expand {
-  background: #ecf5ff;
-  color: #409eff;
+  /* background: #ecf5ff; */
+  background: var(--vscode-menu-selectionBackground);
+  /* color: #409eff; */
+  color: var(--vscode-menu-selectionForeground);
 }
 </style>
 
