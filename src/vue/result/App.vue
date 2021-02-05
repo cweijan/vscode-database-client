@@ -58,7 +58,7 @@
             </el-input>
           </template>
           <template v-if="!scope.row.isFilter">
-            <div :contenteditable="editable" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])'></div>
+            <div :contenteditable="editable" style="height: 100%; line-height: 33px;" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])'></div>
           </template>
         </template>
       </ux-table-column>

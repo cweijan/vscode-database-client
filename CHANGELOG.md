@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.5.2 2021-2-5
+
+- Fix treeview not refresh when drop node.
+- Result view update and get better update interactive.
+
 # 3.5.0 2021-2-3
 
 - Result View :

@@ -75,6 +75,7 @@ https://www.umyui.com/
 .plx-body--column.col--checkbox,
   /* header */
 .plx-table .plx-table--header-wrapper .plx-table--header-border-line {
+  
   border: 1px solid var(--vscode-textBlockQuote-background) !important;
 }
 
@@ -83,6 +84,7 @@ https://www.umyui.com/
   background: none !important;
   border: 1px solid var(--vscode-textBlockQuote-background) !important;
 }
+
 
 /* result outline */
 .plx-table .plx-table--border-line,
