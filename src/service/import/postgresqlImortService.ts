@@ -14,7 +14,7 @@ export class PostgresqlImortService extends ImportService {
             const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
             const command = `psql -h ${host} -p ${port} -U ${node.user} -d ${node.database} < ${importPath}`
             Console.log(`Executing: ${command}`);
-            exec(`SET "PGPASSWORD=${node.password}" && ${command}`, (err,stdout,stderr) => {
+            exec(`set "PGPASSWORD=${node.password}" && ${command}`, (err,stdout,stderr) => {
                 if (err) {
                     Console.log(err);
                 }else if(stderr){
