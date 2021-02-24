@@ -183,7 +183,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         INNER JOIN pg_catalog.pg_class pgc
         ON t.table_name = pgc.relname 
         WHERE t.table_type='BASE TABLE'
-        AND t.table_schema='${database}';`
+        AND t.table_schema='${database}' order by t.table_name;`
     }
     showDatabases(){
         return `SELECT datname "db" FROM pg_database WHERE datistemplate = false;`

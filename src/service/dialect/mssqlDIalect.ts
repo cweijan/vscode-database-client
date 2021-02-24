@@ -127,7 +127,7 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         and ds.index_id IN (0, 1)
       WHERE
         TABLE_TYPE = 'BASE TABLE'
-        AND TABLE_SCHEMA = '${database}'`
+        AND TABLE_SCHEMA = '${database}' order by TABLE_NAME`
     }
     showDatabases(){
         return "SELECT name 'db' FROM sys.databases"
