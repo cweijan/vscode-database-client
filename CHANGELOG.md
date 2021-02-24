@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 3.5.3 2021-2-24
+
+- SqlServer support change connection port.
+- Fix postgresql import sql fail.
+- Sort table by name.
+
 # 3.5.2 2021-2-5
 
 - Fix treeview not refresh when drop node.
