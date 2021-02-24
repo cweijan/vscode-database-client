@@ -121,6 +121,10 @@ export class ConnectionManager {
                         }
                     }
                 } else {
+                    const sql = connectionNode?.dialect?.pingDataBase(connectionNode.schema);
+                    if(connectionNode.schema && sql){
+                        await QueryUnit.queryPromise(connection.connection, sql, false)
+                    }
                     resolve(newConnection);
                 }
             });
