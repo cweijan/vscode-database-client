@@ -19,6 +19,10 @@ export class RedisConnectionNode extends RedisBaseNode {
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
         this.init(parent)
+        if (parent.name) {
+            this.description=parent.name
+            this.name = parent.name
+        }
         this.label = this.uid
         if (this.disable) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None;

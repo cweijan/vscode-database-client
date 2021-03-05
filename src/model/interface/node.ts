@@ -197,7 +197,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         if (this.uid) return;
         if (this.contextValue == ModelType.CONNECTION || this.contextValue == ModelType.CATALOG) {
             this.uid = this.getConnectId();
-        } else if (this.contextValue == ModelType.SCHEMA) {
+        } else if (this.contextValue == ModelType.SCHEMA || this.contextValue==ModelType.REDIS_CONNECTION) {
             this.uid = `${this.getConnectId({ withSchema: true })}`;
         } else {
             this.uid = `${this.getConnectId({ withSchema: true })}#${this.label}`;
