@@ -107,6 +107,7 @@ export class ServiceManager {
     }
 
     public static getImportService(dbType: DatabaseType) {
+        if (!dbType) dbType = DatabaseType.MYSQL
         switch (dbType) {
             case DatabaseType.MSSQL:
                 return new SqlServerImportService()
@@ -117,6 +118,7 @@ export class ServiceManager {
     }
 
     public static getDialect(dbType: DatabaseType): SqlDialect {
+        if (!dbType) dbType = DatabaseType.MYSQL
         switch (dbType) {
             case DatabaseType.MSSQL:
                 return new MssqlDIalect()
@@ -129,7 +131,7 @@ export class ServiceManager {
     }
 
     public static getPageService(databaseType: DatabaseType): PageService {
-
+        if (!databaseType) databaseType = DatabaseType.MYSQL
         switch (databaseType) {
             case DatabaseType.MSSQL:
                 return new MssqlPageService();

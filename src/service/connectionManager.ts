@@ -123,13 +123,13 @@ export class ConnectionManager {
                 } else {
                     try {
                         const sql = connectionNode?.dialect?.pingDataBase(connectionNode.schema);
-                        if(connectionNode.schema && sql){
+                        if (connectionNode.schema && sql) {
                             await QueryUnit.queryPromise(newConnection, sql, false)
-                        }    
+                        }
                     } catch (error) {
                         console.log(err)
                     }
-                    
+
                     resolve(newConnection);
                 }
             });
@@ -139,6 +139,7 @@ export class ConnectionManager {
     }
 
     private static create(opt: Node) {
+        if (!opt.dbType) opt.dbType = DatabaseType.MYSQL
         switch (opt.dbType) {
             case DatabaseType.MSSQL:
                 return new MSSqlConnnection(opt)

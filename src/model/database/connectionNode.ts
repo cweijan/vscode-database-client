@@ -88,9 +88,6 @@ export class ConnectionNode extends Node implements CopyAble {
 
                 return databaseNodes;
             })
-            .catch((err) => {
-                return [new InfoNode(err)];
-            });
     }
 
     public copyName() {
