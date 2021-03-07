@@ -1,19 +1,22 @@
 import { Node } from "@/model/interface/node";
-import { RedisClient, createClient } from "redis";
 import { IConnection, queryCallback } from "./connection";
+
+import * as IoRedis from "ioredis";
 
 export class RedisConnection extends IConnection {
     private conneted: boolean;
-    private client: RedisClient;
+    private client: IoRedis.Redis;
     constructor(opt: Node) {
         super()
-        this.client = createClient({
+        this.client = new IoRedis({
+            port: opt.port, 
             host: opt.host,
-            port: opt.port,
-            db: opt.database,
-            auth_pass: opt.password,
-            connect_timeout: opt.connectTimeout || 5000
-        })
+            password: opt.password,
+            connectTimeout: opt.connectTimeout || 5000,
+            db: opt.database as any as number,
+            family: 4, // 4 (IPv4) or 6 (IPv6)
+        });
+
 
     }
     query(sql: string, callback?: queryCallback): void;
@@ -23,7 +26,7 @@ export class RedisConnection extends IConnection {
         const command = param.shift()
         this.client.send_command(command, param, callback)
     }
-    run(callback: (client: RedisClient) => void) {
+    run(callback: (client: IoRedis.Redis) => void) {
 
         callback(this.client)
     }

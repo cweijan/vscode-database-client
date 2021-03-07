@@ -1,10 +1,7 @@
-import { CommandKey, Constants, ModelType, RedisType } from "@/common/constants";
-import { Global } from "@/common/global";
-import { Node } from "@/model/interface/node";
+import { Constants, ModelType, RedisType } from "@/common/constants";
 import { ViewManager } from "@/common/viewManager";
+import { Node } from "@/model/interface/node";
 import * as path from "path";
-import { promisify } from "util";
-import * as vscode from "vscode";
 import { TreeItemCollapsibleState } from "vscode";
 import RedisBaseNode from "./redisBaseNode";
 
@@ -33,7 +30,7 @@ export default class KeyNode extends RedisBaseNode {
 
     public async delete() {
         const client = await this.getClient();
-        await promisify(client.del).bind(client)(this.label)
+        await client.del(this.label)
         this.provider.reload()
     }
 
@@ -41,44 +38,42 @@ export default class KeyNode extends RedisBaseNode {
     public async detail() {
 
         const client = await this.getClient();
-        const type = await promisify(client.type).bind(client)(this.label)
+        const type = await client.type(this.label)
         let content: any;
         switch (type) {
             case RedisType.string:
-                content = await promisify(client.get).bind(client)(this.label)
+                content = await client.get(this.label)
                 break;
             case RedisType.hash:
-                const hall = await promisify(client.hgetall).bind(client)(this.label)
+                const hall = await client.hgetall(this.label)
                 content = Object.keys(hall).map(key => {
                     return { key, value: hall[key] }
                 })
                 break;
             case RedisType.list:
-                content = await promisify(client.lrange).bind(client)
-                    (this.label, 0, await promisify(client.llen).bind(client)(this.label))
+                content = await client.lrange(this.label, 0, await client.llen(this.label))
                 break;
             case RedisType.set:
-                content = await promisify(client.smembers).bind(client)(this.label)
+                content = await client.smembers(this.label)
                 break;
             case RedisType.zset:
-                content = await promisify(client.zrange).bind(client)
-                    (this.label, 0, await promisify(client.zcard).bind(client)(this.label))
+                content = await client.zrange(this.label, 0, await client.zcard(this.label))
                 break;
         }
         const title = `${type}:${this.label}`;
 
         ViewManager.createWebviewPanel({
-            path: "app", splitView: false, title, type:"Info",singlePage: true,
+            path: "app", splitView: false, title, type: "Info", singlePage: true,
             iconPath: this.iconDetailPath,
             eventHandler: async (handler) => {
                 handler.on("init", () => {
                     handler.emit("route", 'keyView')
                 }).on("route-keyView", async () => {
-                    handler.panel.title=title
+                    handler.panel.title = title
                     handler.emit("detail", {
                         res: {
                             content, type, name: this.label,
-                            ttl: await promisify(client.ttl).bind(client)(this.label)
+                            ttl: await client.ttl(this.label)
                         }
                     })
                 }).on("refresh", () => {
@@ -86,17 +81,17 @@ export default class KeyNode extends RedisBaseNode {
                 }).on("update", async (content) => {
                     switch (content.key.type) {
                         case 'string':
-                            await promisify(client.set).bind(client)(content.key.name, content.key.content)
+                            await client.set(content.key.name, content.key.content)
                             handler.emit("msg", `Update key ${content.key.name} to new value success!`)
                             break;
                     }
                 }).on("rename", async (content) => {
-                    await promisify(client.rename).bind(client)(content.key.name, content.key.newName)
+                    await client.rename(content.key.name, content.key.newName)
                     this.detail()
-                }).on("del",async (content)=>{
-                    await promisify(client.del).bind(client)(content.key.name)
-                }).on("ttl",async (content)=>{
-                    await promisify(client.expire).bind(client)(content.key.name, content.key.ttl)
+                }).on("del", async (content) => {
+                    await client.del(content.key.name)
+                }).on("ttl", async (content) => {
+                    await client.expire(content.key.name, content.key.ttl)
                     handler.emit("msg", `Change TTL for key:${content.key.name} success!`)
                 })
             }

@@ -1,10 +1,9 @@
 import { Constants, ModelType } from "@/common/constants";
 import { Util } from "@/common/util";
+import { ViewManager } from "@/common/viewManager";
 import { CommandKey, Node } from "@/model/interface/node";
 import { NodeUtil } from "@/model/nodeUtil";
-import { ViewManager } from "@/common/viewManager";
 import * as path from "path";
-import { promisify } from "util";
 import * as vscode from "vscode";
 import { FolderNode } from "./folderNode";
 import RedisBaseNode from "./redisBaseNode";
@@ -33,7 +32,7 @@ export class RedisConnectionNode extends RedisBaseNode {
 
     async getChildren(): Promise<RedisBaseNode[]> {
         const client = await this.getClient()
-        let keys: string[] = await promisify(client.keys).bind(client)(this.pattern);
+        let keys: string[] = await client.keys(this.pattern)
         return FolderNode.buildChilds(this, keys)
     }
     async openTerminal(): Promise<any> {
@@ -46,16 +45,14 @@ export class RedisConnectionNode extends RedisBaseNode {
                     handler.emit("route", 'terminal')
                 }).on("route-terminal", async () => {
                     handler.emit("config", NodeUtil.removeParent(this))
-                }).on("exec", (content) => {
+                }).on("exec", async (content) => {
                     if (!content) {
                         return;
                     }
                     const splitCommand: string[] = content.replace(/ +/g, " ").split(' ')
                     const command = splitCommand.shift()
-                    client.send_command(command, splitCommand, (err, response) => {
-                        const reply = err ? err.message : response
-                        handler.emit("result", reply)
-                    })
+                    const reply=await client.send_command(command, splitCommand)
+                    handler.emit("result", reply)
                 }).on("exit", () => {
                     handler.panel.dispose()
                 })
