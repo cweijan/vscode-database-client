@@ -93,6 +93,38 @@ export default class KeyNode extends RedisBaseNode {
                 }).on("ttl", async (content) => {
                     await client.expire(content.key.name, content.key.ttl)
                     handler.emit("msg", `Change TTL for key:${content.key.name} success!`)
+                }).on("add", async content => {
+                    switch (type) {
+                        case RedisType.hash:
+                            client.hset(this.label,content.key,content.value)
+                            break;
+                        case RedisType.list:
+                            client.lpush(this.label,0,content.value)
+                            break;
+                        case RedisType.set:
+                            client.sadd(this.label,content.value)
+                            break;
+                        case RedisType.zset:
+                            client.zadd(this.label,0,content.value)
+                            break;
+                    }
+                    handler.emit("refresh")
+                }).on("deleteLine",async content=>{
+                    switch (type) {
+                        case RedisType.hash:
+                            client.hdel(this.label,content.key)
+                            break;
+                        case RedisType.list:
+                            client.lrem(this.label,0,content)
+                            break;
+                        case RedisType.set:
+                            client.srem(this.label,content)
+                            break;
+                        case RedisType.zset:
+                            client.zrem(this.label,content)
+                            break;
+                    }
+                    handler.emit("refresh")
                 })
             }
         })

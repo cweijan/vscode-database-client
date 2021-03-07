@@ -63,22 +63,24 @@
           <!-- add button -->
           <el-form :inline="true" size="small">
             <el-form-item>
-              <!-- <el-button size="small" type="primary" @click='editDialogVisiable=true'>
-                                Add New
-                            </el-button> -->
+              <el-button size="small" type="primary" @click='editDialogVisiable=true'>
+                Add New
+              </el-button>
             </el-form-item>
           </el-form>
           <!-- edit & add dialog -->
           <el-dialog :title="dialogTitle" :visible.sync="editDialogVisiable">
             <el-form>
+              <el-form-item label="key" v-if="key.type=='hash'">
+                <el-input v-model="addKey"></el-input>
+              </el-form-item>
               <el-form-item label="Value">
-                <!-- <span v-if='editLineItem.binary' class='content-binary'>Hex</span> -->
-                <!-- <FormatViewer :content.sync='editLineItem.value'></FormatViewer> -->
+                <el-input v-model="addData"></el-input>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
               <el-button @click="editDialogVisiable = false">Cancel</el-button>
-              <el-button type="primary" @click="editLine">Confirm</el-button>
+              <el-button type="primary" @click="confirmAdd">Confirm</el-button>
             </div>
           </el-dialog>
         </div>
@@ -97,18 +99,14 @@
                 {{key.type=='hash'?scope.row.value:scope.row}}
               </template>
             </el-table-column>
-            <!-- <el-table-column label="Operation" width="150" align="center">
-                            <template slot="header" slot-scope="scope">
-                                <input class="el-input__inner key-detail-filter-value" v-model="filterValue"
-                                    :placeholder="'Keyword Search'" />
-                            </template>
-                            <template slot-scope="scope">
-                                <el-button type="text" @click="showEditDialog(scope.row)" icon="el-icon-edit" circle>
-                                </el-button>
-                                <el-button type="text" @click="deleteLine(scope.row)" icon="el-icon-delete" circle>
-                                </el-button>
-                            </template>
-                        </el-table-column> -->
+            <el-table-column label="Operation" width="150" align="center">
+              <template slot-scope="scope">
+                <el-button type="text" @click="showEditDialog(scope.row)" icon="el-icon-edit" circle  v-if="key.type=='hash'">
+                </el-button>
+                <el-button type="text" @click="deleteLine(scope.row)" icon="el-icon-delete" circle>
+                </el-button>
+              </template>
+            </el-table-column>
           </el-table>
           <!-- <el-pagination class="pagenation-table-page-container" v-if="dataAfterFilter.length > pageSize"
                         :total="dataAfterFilter.length" :page-size="pageSize" :current-page.sync="pageIndex"
@@ -122,36 +120,46 @@
 </template>
 
 <script>
-import formatHighlight from 'json-format-highlight'
+import formatHighlight from "json-format-highlight";
 
-import { getVscodeEvent } from "../util/vscode"
-const prettyBytes = require("pretty-bytes")
-let vscodeEvent
+import { getVscodeEvent } from "../util/vscode";
+const prettyBytes = require("pretty-bytes");
+let vscodeEvent;
 
 export default {
-  data() {
-    return {
-      tableData: [],
-    }
-  },
   destroyed() {
-    vscodeEvent.destroy()
+    vscodeEvent.destroy();
   },
   mounted() {
-    vscodeEvent = getVscodeEvent()
-    vscodeEvent.on("detail", (data) => {
-      this.key = data.res
-      this.edit = this.deepClone(data.res)
-      this.editTemp = this.jsonContent()
-      const temp = this.edit.content + "".trim()
-      this.selectedView = temp.startsWith("[") || temp.startsWith("{") ? "ViewerJson" : "ViewerText"
-    }).on("msg",(content)=>{
-      this.$message.success(content)
-    })
-    vscodeEvent.emit("route-" + this.$route.name)
+    vscodeEvent = getVscodeEvent();
+    vscodeEvent
+      .on("detail", (data) => {
+        this.key = data.res;
+        this.edit = this.deepClone(data.res);
+        this.editTemp = this.jsonContent();
+        const temp = this.edit.content + "".trim();
+        this.selectedView =
+          temp.startsWith("[") || temp.startsWith("{")
+            ? "ViewerJson"
+            : "ViewerText";
+      })
+      .on("msg", (content) => {
+        this.$message.success(content);
+      })
+      .on("refresh", () => {
+        this.editDialogVisiable = false;
+        this.editModel=false;
+        this.addData = null;
+        this.addKey = null;
+        this.refresh();
+      });
+    vscodeEvent.emit("route-" + this.$route.name);
   },
   data() {
     return {
+      addKey: "",
+      addData: "",
+      editModel: false,
       key: { name: "", ttl: -1, content: null },
       // copy from key
       edit: { name: "", ttl: -1, content: null },
@@ -165,27 +173,30 @@ export default {
         { value: "ViewerJson", text: "Json" },
       ],
       textrows: 6,
-    }
+    };
   },
   computed: {
-    dialogTitle(edit) {
+    dialogTitle() {
+      const edit = this.editModel;
       switch (this.key.type) {
+        case "hash":
+          return edit ? "Edit Hash" : "Add to hash";
         case "set":
-          return edit ? "Edit Set" : "Add to set"
+          return edit ? "Edit Set" : "Add to set";
         case "zset":
-          return edit ? "Edit ZSet" : "Add to zset"
+          return edit ? "Edit ZSet" : "Add to zset";
         case "list":
-          return edit ? "Edit List" : "Add to list"
+          return edit ? "Edit List" : "Add to list";
       }
-      return ""
+      return "";
     },
     dynamicHeight() {
-      return window.innerHeight - 100 + "px"
+      return window.innerHeight - 100 + "px";
     },
   },
   methods: {
     changeByJson(event) {
-      this.edit.content = event.target.innerText
+      this.edit.content = event.target.innerText;
     },
     jsonContent() {
       try {
@@ -196,14 +207,30 @@ export default {
           trueColor: "#569cD6",
           falseColor: "#569cD6",
           nullColor: "#569cD6",
-        })
+        });
       } catch (error) {
-        console.log(error)
-        return this.edit.content
+        console.log(error);
+        return this.edit.content;
       }
     },
     refresh() {
-      vscodeEvent.emit("refresh", { key: this.key })
+      vscodeEvent.emit("refresh", { key: this.key });
+    },
+    confirmAdd() {
+      vscodeEvent.emit("add", {
+        key: this.addKey,
+        value: this.addData,
+        editModel: this.editModel,
+      });
+    },
+    showEditDialog(row) {
+      this.addKey=row.key
+      this.addData=row.value
+      this.editModel=true;
+      this.editDialogVisiable=true
+    },
+    deleteLine(row) {
+      vscodeEvent.emit("deleteLine", row);
     },
     deleteKey() {
       this.$confirm("Are you sure you want to delete this key?", "Warning", {
@@ -211,139 +238,151 @@ export default {
         cancelButtonText: "Cancel",
         type: "warning",
       }).then(() => {
-        vscodeEvent.emit("del", { key: { name: this.key.name } })
-        this.key = {}
-        this.edit = {}
-      })
+        vscodeEvent.emit("del", { key: { name: this.key.name } });
+        this.key = {};
+        this.edit = {};
+      });
     },
     rename() {
-      console.log(this.key.name)
-      vscodeEvent.emit("rename", { key: { name: this.key.name, newName: this.edit.name } })
+      console.log(this.key.name);
+      vscodeEvent.emit("rename", {
+        key: { name: this.key.name, newName: this.edit.name },
+      });
     },
     ttlKey() {
-      vscodeEvent.emit("ttl", { key: { name: this.key.name, ttl: this.edit.ttl } })
+      vscodeEvent.emit("ttl", {
+        key: { name: this.key.name, ttl: this.edit.ttl },
+      });
     },
     update() {
-      vscodeEvent.emit("update", { key: { name: this.key.name, type: this.key.type, content: this.edit.content } })
+      vscodeEvent.emit("update", {
+        key: {
+          name: this.key.name,
+          type: this.key.type,
+          content: this.edit.content,
+        },
+      });
     },
     deepClone(obj) {
-      let objClone = Array.isArray(obj) ? [] : {}
+      let objClone = Array.isArray(obj) ? [] : {};
       if (obj && typeof obj === "object") {
         for (let key in obj) {
           if (obj.hasOwnProperty(key)) {
             if (obj[key] && typeof obj[key] === "object") {
-              objClone[key] = this.deepClone(obj[key])
+              objClone[key] = this.deepClone(obj[key]);
             } else {
-              objClone[key] = obj[key]
+              objClone[key] = obj[key];
             }
           }
         }
       }
-      return objClone
+      return objClone;
     },
   },
-}
+};
 </script>
 <style scoped>
-    .json-panel {
-        line-height: 1.3;
-        background: #292a2b;
-        font-size: 20px;
-        font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace, 'Avenir', Helvetica, Arial, sans-serif;
-    }
+.json-panel {
+  line-height: 1.3;
+  background: #292a2b;
+  font-size: 20px;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier,
+    monospace, "Avenir", Helvetica, Arial, sans-serif;
+}
 
-    body {
-        background-color: #FFFFFF;
-        font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
-    }
+body {
+  background-color: #ffffff;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", Arial, sans-serif;
+}
 
-    .value-panel {
-        overflow: scroll;
-    }
+.value-panel {
+  overflow: scroll;
+}
 
-    .key-tab-container {
-        margin-top: 30px;
-        padding-left: 5px;
-    }
+.key-tab-container {
+  margin-top: 30px;
+  padding-left: 5px;
+}
 
-    .key-header-info {
-        margin-top: 15px;
-    }
+.key-header-info {
+  margin-top: 15px;
+}
 
-    .key-content-container {
-        margin-top: 15px;
-    }
+.key-content-container {
+  margin-top: 15px;
+}
 
-    .key-detail-filter-value {
-        width: 60%;
-        height: 24px;
-        padding: 0 5px;
-    }
+.key-detail-filter-value {
+  width: 60%;
+  height: 24px;
+  padding: 0 5px;
+}
 
-    /*tooltip in table width limit*/
-    .el-tooltip__popper {
-        max-width: 50%;
-    }
+/*tooltip in table width limit*/
+.el-tooltip__popper {
+  max-width: 50%;
+}
 
-    .content-binary {
-        color: #7ab3ef;
-        font-size: 80%;
-        float: left;
-    }
+.content-binary {
+  color: #7ab3ef;
+  font-size: 80%;
+  float: left;
+}
 
-    /* header */
-    .key-detail-type {
-        text-transform: capitalize;
-        text-align: center;
-        width: 28px;
-        display: inline-block;
-    }
+/* header */
+.key-detail-type {
+  text-transform: capitalize;
+  text-align: center;
+  width: 28px;
+  display: inline-block;
+}
 
-    /* viewer */
-    .format-selector {
-        margin-left: 20px;
-        margin-right: 20px;
-        width: 122px;
-    }
+/* viewer */
+.format-selector {
+  margin-left: 20px;
+  margin-right: 20px;
+  width: 122px;
+}
 
-    .format-selector .el-input__inner {
-        height: 22px;
-    }
+.format-selector .el-input__inner {
+  height: 22px;
+}
 
-    .dark-mode .text-formated-container {
-        border-color: #7f8ea5;
-    }
+.dark-mode .text-formated-container {
+  border-color: #7f8ea5;
+}
 
-    /*key field span*/
-    .vjs__tree span {
-        color: #616069;
-    }
+/*key field span*/
+.vjs__tree span {
+  color: #616069;
+}
 
-    .dark-mode .vjs__tree span:not([class^="vjs"]) {
-        color: #ebebec;
-    }
+.dark-mode .vjs__tree span:not([class^="vjs"]) {
+  color: #ebebec;
+}
 
-    /*brackets*/
-    .dark-mode .vjs__tree .vjs__tree__node {
-        color: #9e9ea2;
-    }
+/*brackets*/
+.dark-mode .vjs__tree .vjs__tree__node {
+  color: #9e9ea2;
+}
 
-    .dark-mode .vjs__tree .vjs__tree__node:hover {
-        color: #20a0ff;
-    }
+.dark-mode .vjs__tree .vjs__tree__node:hover {
+  color: #20a0ff;
+}
 
-    .collapse-container {
-        height: 27px;
-    }
+.collapse-container {
+  height: 27px;
+}
 
-    .collapse-container .collapse-btn {
-        float: right;
-        padding: 9px 0;
-    }
+.collapse-container .collapse-btn {
+  float: right;
+  padding: 9px 0;
+}
 
-    .formater-binary {
-        padding-left: 5px;
-        color: #7ab3ef;
-        font-size: 80%;
-    }
+.formater-binary {
+  padding-left: 5px;
+  color: #7ab3ef;
+  font-size: 80%;
+}
 </style>
