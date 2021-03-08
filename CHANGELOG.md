@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 3.5.6 2021-3-7
+- Redis Support add、delete of list、set、hash
+
+# 3.5.5 2021-3-5
+- Redis terminal support show some command.
+
 # 3.5.3 2021-2-24
 
 - SqlServer support change connection port.

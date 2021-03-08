@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-client2",
 	"displayName": "MySQL",
 	"description": "Database Client for vscode",
-	"version": "3.5.5",
+	"version": "3.5.6",
 	"publisher": "cweijan",
 	"icon": "resources/logo.png",
 	"engines": {
