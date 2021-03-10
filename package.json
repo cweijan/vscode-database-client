@@ -568,7 +568,7 @@
 				},
 				{
 					"command": "mysql.query.switch",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|database|esConnection|esIndex)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|catalog|database|esConnection|esIndex)$/",
 					"group": "inline@1"
 				},
 				{

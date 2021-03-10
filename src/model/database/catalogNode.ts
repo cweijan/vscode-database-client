@@ -1,7 +1,9 @@
+import { DbTreeDataProvider } from "@/provider/treeDataProvider";
+import { DatabaseCache } from "@/service/common/databaseCache";
 import { QueryUnit } from "@/service/queryUnit";
 import * as path from "path";
+import * as vscode from "vscode";
 import { Constants, ModelType } from "../../common/constants";
-import { FileManager } from '../../common/filesManager';
 import { Util } from '../../common/util';
 import { ConnectionManager } from "../../service/connectionManager";
 import { CopyAble } from "../interface/copyAble";
@@ -24,12 +26,28 @@ export class CatalogNode extends Node implements CopyAble {
     }
 
     public getChildren(): Promise<Node[]> | Node[] {
-        return this.parent.getChildren.apply(this)
+        return this.parent.getChildren.call(this,true)
     }
 
     public async newQuery() {
 
         QueryUnit.showSQLTextDocument(this,'',`${this.database}.sql`)
+
+    }
+
+    public dropDatatabase() {
+
+        vscode.window.showInputBox({ prompt: `Are you want to drop database ${this.schema} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
+            if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
+                this.execute(`DROP DATABASE ${this.wrap(this.database)}`).then(() => {
+                    DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`)
+                    DbTreeDataProvider.refresh(this.parent);
+                    vscode.window.showInformationMessage(`Drop database ${this.schema} success!`)
+                })
+            } else {
+                vscode.window.showInformationMessage(`Cancel drop database ${this.schema}!`)
+            }
+        })
 
     }
 

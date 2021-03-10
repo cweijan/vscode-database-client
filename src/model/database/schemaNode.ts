@@ -1,14 +1,12 @@
 import { Global } from "@/common/global";
 import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/constants";
-import { FileManager } from '../../common/filesManager';
+import { Constants, DatabaseType, ModelType } from "../../common/constants";
 import { Util } from '../../common/util';
 import { DbTreeDataProvider } from '../../provider/treeDataProvider';
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { QueryUnit } from "../../service/queryUnit";
-import { ServiceManager } from "../../service/serviceManager";
 import { DiagramGroup } from "../diagram/diagramGroup";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
@@ -24,12 +22,12 @@ export class SchemaNode extends Node implements CopyAble {
 
     public contextValue: string = ModelType.SCHEMA;
     public iconPath: string = path.join(Constants.RES_PATH, "icon/database.svg");
-    constructor(public schema: string,  readonly parent: Node) {
+    constructor(public schema: string, readonly parent: Node) {
         super(schema)
         this.init(this.parent)
         this.cacheSelf()
         const lcp = ConnectionManager.activeNode;
-        if (lcp && lcp.getConnectId() == this.getConnectId() && (lcp.database == this.database ) && (lcp.schema == this.schema )) {
+        if (lcp && lcp.getConnectId() == this.getConnectId() && (lcp.database == this.database) && (lcp.schema == this.schema)) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/database-active.svg");
             this.description = `Active`
         }
@@ -64,15 +62,16 @@ export class SchemaNode extends Node implements CopyAble {
 
     public dropDatatabase() {
 
-        vscode.window.showInputBox({ prompt: `Are you want to drop database ${this.schema} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
+        const target = this.dbType == DatabaseType.MSSQL || this.dbType == DatabaseType.PG ? 'schema' : 'database';
+        vscode.window.showInputBox({ prompt: `Are you want to drop ${target} ${this.schema} ?     `, placeHolder: `Input ${target} name to confirm.` }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.schema.toLowerCase()) {
-                this.execute(`DROP DATABASE ${this.wrap(this.schema)}`).then(() => {
+                this.execute(`DROP ${target} ${this.wrap(this.schema)}`).then(() => {
                     DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`)
                     DbTreeDataProvider.refresh(this.parent);
-                    vscode.window.showInformationMessage(`Drop database ${this.schema} success!`)
+                    vscode.window.showInformationMessage(`Drop ${target} ${this.schema} success!`)
                 })
             } else {
-                vscode.window.showInformationMessage(`Cancel drop database ${this.schema}!`)
+                vscode.window.showInformationMessage(`Cancel drop ${target} ${this.schema}`)
             }
         })
 
@@ -98,7 +97,7 @@ export class SchemaNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        QueryUnit.showSQLTextDocument(this,'',`${this.schema}.sql`)
+        QueryUnit.showSQLTextDocument(this, '', `${this.schema}.sql`)
 
     }
 
