@@ -24,10 +24,10 @@ export class ConnectionNode extends Node implements CopyAble {
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
         this.init(parent)
-        this.label=this.uid
+        this.label = this.uid
         this.cacheSelf()
         if (parent.name) {
-            this.description=parent.name
+            this.description = parent.name
             this.name = parent.name
         }
         if (this.disable) {
@@ -38,7 +38,7 @@ export class ConnectionNode extends Node implements CopyAble {
         const lcp = ConnectionManager.activeNode;
         if (lcp && lcp.getConnectId() == this.getConnectId()) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/connection-active.svg");
-            this.description = `Active`
+            this.description = `${parent.name ? parent.name + " " : ""}Active`
             return;
         }
         if (this.dbType == DatabaseType.PG) {
@@ -57,8 +57,8 @@ export class ConnectionNode extends Node implements CopyAble {
             return dbNodes.map(dbNode => {
                 if (dbNode.contextValue == ModelType.USER_GROUP) {
                     return new UserGroup(dbNode.label, this)
-                }else if(dbNode.contextValue==ModelType.CATALOG){
-                    return new CatalogNode(dbNode.label,this)
+                } else if (dbNode.contextValue == ModelType.CATALOG) {
+                    return new CatalogNode(dbNode.label, this)
                 }
                 return new SchemaNode(dbNode.label, this)
             });
