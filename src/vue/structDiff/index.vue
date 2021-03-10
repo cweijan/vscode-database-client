@@ -16,12 +16,12 @@
     </div>
     <div class="opt-panel">
       <el-form>
-        <el-form-item label-width="80px" label="Sync From">
+        <el-form-item label-width="90px" label="Sync From">
           <el-select v-model="option.to.connection">
             <el-option :label="node.label" :value="node.label" :key="node.label" v-for="node in initData.nodes"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label-width="80px" label="database">
+        <el-form-item label-width="90px" label="database">
           <el-select v-model="option.to.database">
             <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in initData.databaseList[option.to.connection]"></el-option>
           </el-select>
