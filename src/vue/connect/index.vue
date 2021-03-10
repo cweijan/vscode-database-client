@@ -11,14 +11,17 @@
 
     <blockquote class="p-3 mb-2 panel success" v-if="connect.success">
       <section class="panel__text">
-        <div class="font-bold mr-5 inline-block w-32">Connection success!</div>
+        <div class="font-bold mr-5 inline-block w-36">Connection success!</div>
         <span v-text="connect.successMessage"></span>
       </section>
     </blockquote>
 
     <section class="mb-2">
       <label class="font-bold mr-5 inline-block ">Connection Name</label>
-      <input class="w-1/3 field__input" placeholder="The connection name." v-model="connectionOption.name" />
+      <input class="w-1/4 field__input" placeholder="Connection name" v-model="connectionOption.name" />
+      <label class="font-bold ml-4 mr-5 inline-block ">Connection Type</label>
+      <el-radio v-model="connectionOption.global" :label="true">Global</el-radio>
+      <el-radio v-model="connectionOption.global" :label="false">Workspace</el-radio>
     </section>
 
     <section class="mb-2">
@@ -104,12 +107,8 @@
 
     <section class="flex items-center mb-2">
       <div class="inline-block mr-10">
-        <label class="mr-2 font-bold">Using SSH</label>
+        <label class="mr-2 font-bold">SSH Tunnel</label>
         <el-switch v-model="connectionOption.usingSSH"></el-switch>
-      </div>
-      <div class="inline-block mr-10">
-        <label class="mr-2 font-bold">Global</label>
-        <el-switch v-model="connectionOption.global"></el-switch>
       </div>
     </section>
 
@@ -162,7 +161,9 @@
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-28">Private Key Path</label>
             <input class="w-64 field__input" placeholder="Private Key Path" v-model="connectionOption.ssh.privateKeyPath" />
+            (Only support private key in pem format.)
           </div>
+          <br>
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-28">Passphrase</label>
             <input class="w-64 field__input" placeholder="Passphrase" type="passphrase" v-model="connectionOption.ssh.passphrase" />
