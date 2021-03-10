@@ -161,9 +161,7 @@
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-28">Private Key Path</label>
             <input class="w-64 field__input" placeholder="Private Key Path" v-model="connectionOption.ssh.privateKeyPath" />
-            (Only support private key in pem format.)
           </div>
-          <br>
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-28">Passphrase</label>
             <input class="w-64 field__input" placeholder="Passphrase" type="passphrase" v-model="connectionOption.ssh.passphrase" />
