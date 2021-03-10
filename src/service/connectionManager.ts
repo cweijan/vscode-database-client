@@ -167,9 +167,9 @@ export class ConnectionManager {
             const fileName = vscode.window.activeTextEditor.document.fileName;
             if (fileName.includes('cweijan')) {
                 const queryName = path.basename(path.resolve(fileName, '..'))
-                const [host, port, database, schema] = queryName.replace(/#.+$/, '').split('@')
+                const [user, host, port, database, schema] = queryName.replace(/#.+$/, '').split('@')
                 if (host != null && port != null) {
-                    const node = NodeUtil.of({ host, port: parseInt(port), database, schema });
+                    const node = NodeUtil.of({ user, host, port: parseInt(port), database, schema });
                     if (node.getCache()) {
                         return node.getCache();
                     }

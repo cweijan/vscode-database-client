@@ -206,7 +206,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public getConnectId(opt?: SwitchOpt): string {
 
-        let uid = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
+        let uid = (this.usingSSH) ? `${this.ssh.username}@${this.ssh.host}@${this.ssh.port}` : `${this.user}@${this.host}@${this.port}`;
 
         const database = this.database;
         if (database && this.contextValue != ModelType.CONNECTION) {
