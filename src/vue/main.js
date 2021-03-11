@@ -25,7 +25,7 @@ import structDiff from "./structDiff";
 import keyView from "./redis/keyView";
 import terminal from "./redis/terminal";
 import redisStatus from "./redis/redisStatus";
-
+import forward from "./forward";
 
 const router = new VueRouter({
   routes: [
@@ -39,6 +39,8 @@ const router = new VueRouter({
     { path: '/keyView', component: keyView, name: 'keyView' },
     { path: '/terminal', component: terminal, name: 'terminal' },
     { path: '/redisStatus', component: redisStatus, name: 'redisStatus' },
+    // ssh
+    { path: '/forward', component: forward, name: 'forward' },
   ]
 })
 

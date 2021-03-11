@@ -93,30 +93,20 @@
       };
     },
     mounted() {
-      window.addEventListener("message", ({ data }) => {
-        console.log(data);
-        if (!data) return;
-        switch (data.type) {
-          case "forwardList":
-            this.forwardList = data.content;
-            this.panel.loading = false;
-            this.panel.visible = false;
-            break;
-          case "config":
-            this.title = data.content.host;
-            this.config = data.content;
-            break;
-          case "success":
-            this.error = false;
-            postMessage({ type: "load" });
-            break;
-          case "error":
-            this.error = true;
-            this.errorMessage = data.content;
-            break;
-        }
-      });
-      this.init()
+      this.on("forwardList", content => {
+        this.forwardList = ent;
+        this.panel.loading = false;
+        this.panel.visible = false;
+      }).on("config", content => {
+        this.title = content.host;
+        this.config = content;
+      }).on("success", (content) => {
+        this.error = false;
+        this.emit("load")
+      }).on("error", content => {
+        this.error = true;
+        this.errorMessage = content;
+      }).init()
     },
     methods: {
       createRequest() {
@@ -127,26 +117,23 @@
         this.panel.visible = true;
       },
       load() {
-        postMessage({ type: "load" });
+        this.emit("load")
       },
       confirmUpdate() {
-        postMessage({ type: "update", content: this.panel.edit });
+        this.emit("update",this.panel.edit)
         this.panel.loading = true;
       },
       info(row) {
-        postMessage({
-          type: "cmd",
-          content: `ssh  -qTnN -L ${row.localHost}:${row.localPort}:${row.remoteHost}:${row.remotePort} ${this.config.username}@${this.config.host}`
-        });
+        this.emit("cmd",`ssh  -qTnN -L ${row.localHost}:${row.localPort}:${row.remoteHost}:${row.remotePort} ${this.config.username}@${this.config.host}`)
       },
       start(id) {
-        this.emit("start",id)
+        this.emit("start", id)
       },
       stop(id) {
-        this.emit("stop",id)
+        this.emit("stop", id)
       },
       remove(id) {
-        this.emit("remove",id)
+        this.emit("remove", id)
       },
       openEdit(row) {
         this.panel.edit = row;
@@ -168,13 +155,6 @@
           .catch(() => {
             this.$message({ type: "info", message: "Delete canceled" });
           });
-      },
-      tryConnect() {
-        postMessage({
-          type: "CONNECT_TO_SQL_SERVER",
-          databaseType: this.databaseType,
-          connectionOption: this.connectionOption
-        });
       }
     }
   };

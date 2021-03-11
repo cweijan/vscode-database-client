@@ -31,6 +31,7 @@ import { PageService } from "./page/pageService";
 import { PostgreSqlPageService } from "./page/postgreSqlPageService";
 import { MysqlSettingService } from "./setting/MysqlSettingService";
 import { SettingService } from "./setting/settingService";
+import ConnectionProvider from "@/model/ssh/connectionProvider";
 
 export class ServiceManager {
 
@@ -51,6 +52,7 @@ export class ServiceManager {
         DatabaseCache.initCache(context);
         ViewManager.initExtesnsionPath(context.extensionPath);
         FileManager.init(context)
+        new ConnectionProvider();
     }
 
     public init(): vscode.Disposable[] {

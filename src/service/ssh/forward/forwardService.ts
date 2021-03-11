@@ -28,6 +28,8 @@ export class ForwardService {
             splitView: false, path: "forward", title: `forward://${sshConfig.username}@${sshConfig.host}`,
             eventHandler: (handler) => {
                 handler.on("init", () => {
+                    handler.emit("route", 'forward')
+                }).on("route-forward",()=>{
                     handler.emit("config", sshConfig)
                     handler.emit("forwardList", this.list(sshConfig))
                 }).on("update", async content => {

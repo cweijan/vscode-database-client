@@ -6,6 +6,8 @@ import { NodeUtil } from "../../model/nodeUtil";
 import { Util } from "../../common/util";
 import { Global } from "../../common/global";
 import { ConnectionManager } from "@/service/connectionManager";
+import { DatabaseType } from "@/common/constants";
+import { ClientManager } from "../ssh/clientManager";
 
 export class ConnectService {
 
@@ -32,7 +34,7 @@ export class ConnectService {
                 }).on("route-connect", async () => {
                     if (node) {
                         handler.emit("edit", node)
-                    }else{
+                    } else {
                         handler.emit("connect")
                     }
                 }).on("connecting", async (data) => {
@@ -41,7 +43,7 @@ export class ConnectService {
                     try {
                         await this.connect(connectNode)
                         await provider.addConnection(connectNode)
-                        handler.emit("success", {message:'connect success!',key:connectNode.key})
+                        handler.emit("success", { message: 'connect success!', key: connectNode.key })
                     } catch (err) {
                         if (err?.message) {
                             handler.emit("error", err.message)
@@ -49,7 +51,7 @@ export class ConnectService {
                             handler.emit("error", err)
                         }
                     }
-                }).on("close",()=>{
+                }).on("close", () => {
                     handler.panel.dispose()
                 })
             }
@@ -57,6 +59,10 @@ export class ConnectService {
     }
 
     public async connect(connectionNode: Node): Promise<void> {
+        if (connectionNode.dbType == DatabaseType.SSH) {
+            await ClientManager.getSSH(connectionNode.ssh, false)
+            return;
+        }
         ConnectionManager.removeConnection(connectionNode.getConnectId())
         await ConnectionManager.getConnection(connectionNode)
     }

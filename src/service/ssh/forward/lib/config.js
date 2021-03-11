@@ -1,6 +1,5 @@
 var util = require('util');
 var defaults = require('lodash.defaults');
-var debug = require('debug')('tunnel-ssh-config');
 
 var ConfigError = function (message, extra) {
     Error.captureStackTrace(this, this.constructor);
@@ -34,18 +33,6 @@ function createConfig(config) {
     if (!config.dstPort) {
         throw new ConfigError('dstPort not set');
     }
-    debug('ssh-config', (function () {
-        var hiddenValues = ['password', 'privateKey'];
-
-        return Object.keys(config).reduce(function (obj, key) {
-            if (hiddenValues.indexOf(key) === -1) {
-                obj[key] = config[key];
-            } else {
-                obj[key] = '***HIDDEN***';
-            }
-            return obj;
-        }, {});
-    })());
 
     return config;
 }

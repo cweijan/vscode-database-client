@@ -26,6 +26,9 @@ export class SSHConnectionNode extends Node {
         super(name);
         this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
         this.fullPath = this.parentName + this.name;
+        if(!name){
+            this.label=`${sshConfig.username}@${sshConfig.host}`
+        }
         if (!file) {
             this.contextValue = ModelType.SSH_CONNECTION;
             this.iconPath = path.join(Constants.RES_PATH, "ssh/chain.svg");

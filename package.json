@@ -450,59 +450,58 @@
 				"command": "mysql.redis.key.detail",
 				"title": "%command.redis.key.detail%"
 			},
-			  {
-				"command": "ssh.connection.terminal",
+			{
+				"command": "mysql.ssh.connection.terminal",
 				"title": "Open Terminal",
 				"icon": {
-				  "light": "resources/ssh/light/terminal.png",
-				  "dark": "resources/ssh/dark/terminal.svg"
+					"light": "resources/ssh/light/terminal.png",
+					"dark": "resources/ssh/dark/terminal.svg"
 				}
-			  },
-			  {
-				"command": "ssh.terminal.hear",
+			},
+			{
+				"command": "mysql.ssh.terminal.hear",
 				"title": "Open Terminal in hear"
-			  },
-			  {
-				"command": "ssh.path.copy",
+			},
+			{
+				"command": "mysql.ssh.path.copy",
 				"title": "Copy Path"
-			  },
-			  {
-				"command": "ssh.file.new",
+			},
+			{
+				"command": "mysql.ssh.file.new",
 				"title": "New File"
-			  },
-			  {
-				"command": "ssh.folder.new",
+			},
+			{
+				"command": "mysql.ssh.folder.new",
 				"title": "New Folder"
-			  },
-			  {
-				"command": "ssh.host.copy",
+			},
+			{
+				"command": "mysql.ssh.host.copy",
 				"title": "Copy Host"
-			  },
-			  {
-				"command": "ssh.forward.port",
+			},
+			{
+				"command": "mysql.ssh.forward.port",
 				"title": "Forward Port"
-			  },
-			  {
-				"command": "ssh.socks.port",
+			},
+			{
+				"command": "mysql.ssh.socks.port",
 				"title": "Start Socks5 Proxy"
-			  },
-			  {
-				"command": "ssh.folder.open",
+			},
+			{
+				"command": "mysql.ssh.folder.open",
 				"title": "Open In Terminal"
-			  },
-			  {
-				"command": "ssh.file.delete",
+			},
+			{
+				"command": "mysql.ssh.file.delete",
 				"title": "Delete"
-			  },
-			  {
-				"command": "ssh.file.download",
+			},
+			{
+				"command": "mysql.ssh.file.download",
 				"title": "Download File"
-			  },
-			  {
-				"command": "ssh.file.upload",
+			},
+			{
+				"command": "mysql.ssh.file.upload",
 				"title": "Upload File"
-			  }
-			
+			}
 		],
 		"keybindings": [
 			{
@@ -859,76 +858,76 @@
 					"when": "view == github.cweijan.nosql && viewItem == redisKey",
 					"group": "inline"
 				},
-				  {
-					"command": "ssh.connection.terminal",
+				{
+					"command": "mysql.ssh.connection.terminal",
 					"when": "view == github.cweijan.nosql && viewItem == connection",
 					"group": "inline@1"
-				  },
-				  {
-					"command": "ssh.host.copy",
+				},
+				{
+					"command": "mysql.ssh.host.copy",
 					"when": "view == github.cweijan.nosql && viewItem == connection",
 					"group": "0_connection@-2"
-				  },
-				  {
-					"command": "ssh.forward.port",
+				},
+				{
+					"command": "mysql.ssh.forward.port",
 					"when": "view == github.cweijan.nosql && viewItem == connection",
 					"group": "1_connection@0"
-				  },
-				  {
-					"command": "ssh.socks.port",
+				},
+				{
+					"command": "mysql.ssh.socks.port",
 					"when": "view == github.cweijan.nosql && viewItem == connection",
 					"group": "1_connection@1"
-				  },
-				  {
-					"command": "ssh.file.new",
+				},
+				{
+					"command": "mysql.ssh.file.new",
 					"when": "view == github.cweijan.nosql && viewItem == connection",
 					"group": "2_connection@2"
-				  },
-				  {
-					"command": "ssh.folder.new",
+				},
+				{
+					"command": "mysql.ssh.folder.new",
 					"when": "view == github.cweijan.nosql && viewItem == connection ",
 					"group": "2_connection@4"
-				  },
-				  {
-					"command": "ssh.path.copy",
+				},
+				{
+					"command": "mysql.ssh.path.copy",
 					"when": "view == github.cweijan.nosql && viewItem != connection",
 					"group": "a@1"
-				  },
-				  {
-					"command": "ssh.folder.open",
+				},
+				{
+					"command": "mysql.ssh.folder.open",
 					"when": "view == github.cweijan.nosql && viewItem == folder",
 					"group": "a@2"
-				  },
-				  {
-					"command": "ssh.file.new",
+				},
+				{
+					"command": "mysql.ssh.file.new",
 					"when": "view == github.cweijan.nosql && viewItem == folder",
 					"group": "folder@0"
-				  },
-				  {
-					"command": "ssh.folder.new",
+				},
+				{
+					"command": "mysql.ssh.folder.new",
 					"when": "view == github.cweijan.nosql && viewItem == folder ",
 					"group": "folder@1"
-				  },
-				  {
-					"command": "ssh.file.upload",
+				},
+				{
+					"command": "mysql.ssh.file.upload",
 					"when": "view == github.cweijan.nosql && viewItem == folder",
 					"group": "folder@2"
-				  },
-				  {
-					"command": "ssh.file.delete",
+				},
+				{
+					"command": "mysql.ssh.file.delete",
 					"when": "view == github.cweijan.nosql && viewItem == folder",
 					"group": "folder@4"
-				  },
-				  {
-					"command": "ssh.file.download",
+				},
+				{
+					"command": "mysql.ssh.file.download",
 					"when": "view == github.cweijan.nosql && viewItem == file",
 					"group": "file@1"
-				  },
-				  {
-					"command": "ssh.file.delete",
+				},
+				{
+					"command": "mysql.ssh.file.delete",
 					"when": "view == github.cweijan.nosql && viewItem == file",
 					"group": "file@2"
-				  }
+				}
 			]
 		},
 		"configuration": {
@@ -1050,7 +1049,6 @@
 		"umy-table": "1.0.8",
 		"vue": "^2.6.11",
 		"vue-router": "^3.4.1",
-		"debug": "2.6.9",
 		"lodash.defaults": "^4.1.0",
 		"progress-stream": "^2.0.0"
 	},

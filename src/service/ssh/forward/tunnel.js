@@ -1,5 +1,4 @@
 var net = require('net');
-var debug = require('debug')('tunnel-ssh');
 var Connection = require('ssh2');
 var createConfig = require('./lib/config');
 var events = require('events');
@@ -20,10 +19,8 @@ function bindSSHConnection(config, netConnection) {
         sshConnection.forwardOut(config.srcHost, config.srcPort, config.dstHost, config.dstPort, function (err, sshStream) {
             if (err) {
                 netConnection.emit('error', err);
-                debug('Destination port:', err);
                 return;
             }
-            debug('sshStream:create');
             tunelMark[id] = { connection: sshConnection }
             sshStream.on('error', function (error) {
                 console.log(err)
@@ -42,7 +39,6 @@ function bindSSHConnection(config, netConnection) {
 
     var sshConnection = new Connection();
     sshConnection.on('ready', function () {
-        debug('sshConnection:ready');
         netConnection.emit('sshConnection', sshConnection, netConnection);
         forward(sshConnection, netConnection)
     }).on('error', () => {

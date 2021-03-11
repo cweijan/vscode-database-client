@@ -9,6 +9,7 @@ import * as vscode from 'vscode';
 import { TreeItemCollapsibleState } from "vscode";
 import { Node } from '../interface/node';
 import { SSHConfig } from '../interface/sshConfig';
+import ConnectionProvider from './connectionProvider';
 var progressStream = require('progress-stream');
 
 const prettyBytes = require('pretty-bytes');
@@ -23,7 +24,7 @@ export class FileNode extends Node {
         this.iconPath = this.getIcon(this.file.filename)
         this.fullPath = this.parentName + this.file.filename;
         this.command = {
-            command: "ssh.file.open",
+            command: "mysql.ssh.file.open",
             arguments: [this],
             title: "Open File"
         }
