@@ -26,6 +26,7 @@ import keyView from "./redis/keyView";
 import terminal from "./redis/terminal";
 import redisStatus from "./redis/redisStatus";
 import forward from "./forward";
+import sshTerminal from "./xterm";
 
 const router = new VueRouter({
   routes: [
@@ -41,6 +42,7 @@ const router = new VueRouter({
     { path: '/redisStatus', component: redisStatus, name: 'redisStatus' },
     // ssh
     { path: '/forward', component: forward, name: 'forward' },
+    { path: '/sshTerminal', component: sshTerminal, name: 'sshTerminal' },
   ]
 })
 

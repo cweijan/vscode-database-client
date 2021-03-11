@@ -860,32 +860,32 @@
 				},
 				{
 					"command": "mysql.ssh.connection.terminal",
-					"when": "view == github.cweijan.nosql && viewItem == connection",
+					"when": "view == github.cweijan.nosql && viewItem == sshConnection",
 					"group": "inline@1"
 				},
 				{
 					"command": "mysql.ssh.host.copy",
-					"when": "view == github.cweijan.nosql && viewItem == connection",
+					"when": "view == github.cweijan.nosql && viewItem == sshConnection",
 					"group": "0_connection@-2"
 				},
 				{
 					"command": "mysql.ssh.forward.port",
-					"when": "view == github.cweijan.nosql && viewItem == connection",
+					"when": "view == github.cweijan.nosql && viewItem == sshConnection",
 					"group": "1_connection@0"
 				},
 				{
 					"command": "mysql.ssh.socks.port",
-					"when": "view == github.cweijan.nosql && viewItem == connection",
+					"when": "view == github.cweijan.nosql && viewItem == sshConnection",
 					"group": "1_connection@1"
 				},
 				{
 					"command": "mysql.ssh.file.new",
-					"when": "view == github.cweijan.nosql && viewItem == connection",
+					"when": "view == github.cweijan.nosql && viewItem == sshConnection",
 					"group": "2_connection@2"
 				},
 				{
 					"command": "mysql.ssh.folder.new",
-					"when": "view == github.cweijan.nosql && viewItem == connection ",
+					"when": "view == github.cweijan.nosql && viewItem == sshConnection ",
 					"group": "2_connection@4"
 				},
 				{

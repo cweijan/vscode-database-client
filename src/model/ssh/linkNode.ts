@@ -8,8 +8,8 @@ export class LinkNode extends Node {
     constructor(info: string) {
         super(info)
         this.iconPath={
-            light: path.join(Constants.RES_PATH, "ssh/image/light/link.svg"),
-            dark: path.join(Constants.RES_PATH, "ssh/image/dark/link.svg"),
+            light: path.join(Constants.RES_PATH, "ssh/light/link.svg"),
+            dark: path.join(Constants.RES_PATH, "ssh/dark/link.svg"),
         }
         this.collapsibleState = TreeItemCollapsibleState.None
     }

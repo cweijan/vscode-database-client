@@ -136,7 +136,7 @@ export class FileNode extends Node {
 
         }
 
-        return `${extPath}/resources/ssh/icon/${fileIcon}`
+        return `${extPath}/ssh/icon/${fileIcon}`
     }
 
 

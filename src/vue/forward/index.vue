@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>{{title}}</h1>
     <blockquote class="panel" id="error" v-if="error">
       <p class="panel__text">
         Connection error! <span id="errorMessage" v-text="errorMessage"></span><br />
@@ -94,7 +93,7 @@
     },
     mounted() {
       this.on("forwardList", content => {
-        this.forwardList = ent;
+        this.forwardList = content;
         this.panel.loading = false;
         this.panel.visible = false;
       }).on("config", content => {
