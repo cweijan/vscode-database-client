@@ -37,6 +37,8 @@ import { RedisConnectionNode } from "./model/redis/redisConnectionNode";
 import KeyNode from "./model/redis/keyNode";
 import { DiffService } from "./service/diff/diffService";
 import { DatabaseCache } from "./service/common/databaseCache";
+import { FileNode } from "./model/ssh/fileNode";
+import { SSHConnectionNode } from "./model/ssh/sshConnectionNode";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -119,6 +121,21 @@ export function activate(context: vscode.ExtensionContext) {
                         }
                     });
                 },
+            },
+            // ssh
+            ...{
+                'ssh.connection.terminal': (parentNode: SSHConnectionNode) => parentNode.openTerminal(),
+                'ssh.folder.new': (parentNode: SSHConnectionNode) => parentNode.newFolder(),
+                'ssh.file.new': (parentNode: SSHConnectionNode) => parentNode.newFile(),
+                'ssh.host.copy': (parentNode: SSHConnectionNode) => parentNode.copyIP(),
+                'ssh.forward.port': (parentNode: SSHConnectionNode) => parentNode.fowardPort(),
+                'ssh.file.upload': (parentNode: SSHConnectionNode) => parentNode.upload(),
+                'ssh.folder.open': (parentNode: SSHConnectionNode) => parentNode.openInTeriminal(),
+                'ssh.path.copy': (node: Node) => node.copyName(),
+                'ssh.socks.port': (parentNode: SSHConnectionNode) => parentNode.startSocksProxy(),
+                'ssh.file.delete': (fileNode: FileNode | SSHConnectionNode) => fileNode.delete(),
+                'ssh.file.open': (fileNode: FileNode) => fileNode.open(),
+                'ssh.file.download': (fileNode: FileNode) => fileNode.download(),
             },
             // database
             ...{

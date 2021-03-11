@@ -1,7 +1,10 @@
 
+import { ServiceManager } from "@/service/serviceManager";
+import { join } from "path";
 import * as vscode from "vscode";
 import { Position, TextDocument } from "vscode";
-import { Confirm, DatabaseType } from "./constants";
+import { Confirm, Constants, DatabaseType } from "./constants";
+import { Global } from "./global";
 import { wrapByDb } from "./wrapper.js";
 
 export class Util {
@@ -88,6 +91,18 @@ export class Util {
                 } 
             })
         })
+    }
+
+    public static getExtPath(...paths: string[]) {
+        
+        return vscode.Uri.file(join(Constants.RES_PATH, ...paths))
+    }
+
+    public static getStore(key: string): any {
+        return Global.context.globalState.get(key);
+    }
+    public static store(key: string, object: any) {
+        Global.context.globalState.update(key, object)
     }
 
 }

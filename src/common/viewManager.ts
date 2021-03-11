@@ -6,7 +6,7 @@ import { Console } from "./Console";
 import { EventEmitter } from 'events'
 
 export class ViewOption {
-    public iconPath?: string;
+    public iconPath?:  string|vscode.Uri | { light: vscode.Uri; dark: vscode.Uri };
     public path: string;
     public title: string;
     public type?: string;
@@ -102,7 +102,11 @@ export class ViewManager {
                     return;
                 }
                 if (viewOption.iconPath) {
-                    webviewPanel.iconPath = vscode.Uri.file(viewOption.iconPath)
+                    if(viewOption.iconPath instanceof Object){
+                        webviewPanel.iconPath = viewOption.iconPath
+                    }else{
+                        webviewPanel.iconPath =vscode.Uri.file(viewOption.iconPath) 
+                    }
                 }
                 const contextPath = path.resolve(targetPath, "..");
                 if (viewOption.handleHtml) {

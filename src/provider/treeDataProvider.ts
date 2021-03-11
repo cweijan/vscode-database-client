@@ -2,6 +2,7 @@ import { CatalogNode } from "@/model/database/catalogNode";
 import { EsConnectionNode } from "@/model/es/model/esConnectionNode";
 import { InfoNode } from "@/model/other/infoNode";
 import { RedisConnectionNode } from "@/model/redis/redisConnectionNode";
+import { SSHConnectionNode } from "@/model/ssh/sshConnectionNode";
 import * as vscode from "vscode";
 import { CacheKey, DatabaseType } from "../common/constants";
 import { ConnectionNode } from "../model/database/connectionNode";
@@ -65,7 +66,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     private getKeyByNode(connectionNode: Node): string {
         const dbType = connectionNode.dbType;
-        if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS) {
+        if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS || dbType==DatabaseType.SSH) {
             return CacheKey.NOSQL_CONNECTION;
         }
         return CacheKey.ConectionsKey;
@@ -109,6 +110,8 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
             node = new EsConnectionNode(key, connectInfo);
         } else if (connectInfo.dbType == DatabaseType.REDIS) {
             node = new RedisConnectionNode(key, connectInfo)
+        } else if (connectInfo.dbType == DatabaseType.SSH) {
+            node = new SSHConnectionNode(connectInfo.ssh,connectInfo.name)
         } else {
             node = new ConnectionNode(key, connectInfo)
         }

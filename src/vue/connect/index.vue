@@ -19,9 +19,9 @@
     <section class="mb-2">
       <label class="font-bold mr-5 inline-block ">Connection Name</label>
       <input class="w-1/4 field__input" placeholder="Connection name" v-model="connectionOption.name" />
-      <label class="font-bold ml-4 mr-5 inline-block ">Connection Type</label>
+      <label class="font-bold ml-4 mr-5 inline-block ">Connection Target</label>
       <el-radio v-model="connectionOption.global" :label="true">Global</el-radio>
-      <el-radio v-model="connectionOption.global" :label="false">Workspace</el-radio>
+      <el-radio v-model="connectionOption.global" :label="false">Current Workspace</el-radio>
     </section>
 
     <section class="mb-2">
@@ -34,85 +34,87 @@
       </el-select>
     </section>
 
-    <template v-if="connectionOption.dbType=='ElasticSearch'">
+    <template v-if="connectionOption.dbType!='SSH'">
+      <template v-if="connectionOption.dbType=='ElasticSearch'">
+        <section class="mb-2">
+          <label class="font-bold mr-5 inline-block w-32">Scheme</label>
+          <el-radio v-model="connectionOption.scheme" label="http">Http</el-radio>
+          <el-radio v-model="connectionOption.scheme" label="https">Https</el-radio>
+        </section>
+      </template>
+  
       <section class="mb-2">
-        <label class="font-bold mr-5 inline-block w-32">Scheme</label>
-        <el-radio v-model="connectionOption.scheme" label="http">Http</el-radio>
-        <el-radio v-model="connectionOption.scheme" label="https">Https</el-radio>
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Host</label>
+          <input class="w-64 field__input" placeholder="The host of connection" required v-model="connectionOption.host" />
+        </div>
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Port</label>
+          <input class="w-64 field__input" placeholder="The port of connection" required type="number" v-model="connectionOption.port" />
+        </div>
+      </section>
+  
+      <template v-if="connectionOption.dbType!='ElasticSearch'">
+  
+        <section class="mb-2">
+          <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
+            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Username</label>
+            <input class="w-64 field__input" placeholder="Username" required v-model="connectionOption.user" />
+          </div>
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Password</label>
+            <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
+          </div>
+        </section>
+  
+        <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-32">Encrypt</label>
+            <el-switch v-model="connectionOption.encrypt"></el-switch>
+            ( If connect SqlServer fail, try change this option. )
+          </div>
+        </section>
+  
+        <section class="mb-2">
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-32">Databases</label>
+            <input class="w-64 field__input" placeholder="Special connection database" v-model="connectionOption.database" />
+          </div>
+          <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
+            <label class="font-bold mr-5 inline-block w-32">Include Databases</label>
+            <input class="w-64 field__input" placeholder="Which databases need to be displayed" v-model="connectionOption.includeDatabases" />
+          </div>
+        </section>
+  
+        <section class="mb-2">
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-32">ConnectTimeout</label>
+            <input class="w-64 field__input" placeholder="millisecond" required v-model="connectionOption.connectTimeout" />
+          </div>
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-32">RequestTimeout</label>
+            <input class="w-64 field__input" placeholder="millisecond" required type="number" v-model="connectionOption.requestTimeout" />
+          </div>
+        </section>
+  
+      </template>
+  
+      <section class="flex items-center mb-2" v-if="connectionOption.dbType=='MySQL'">
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-32">Timezone</label>
+          <input class="w-64 field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
+        </div>
+      </section>
+  
+      <section class="flex items-center mb-2">
+        <div class="inline-block mr-10">
+          <label class="mr-2 font-bold">SSH Tunnel</label>
+          <el-switch v-model="connectionOption.usingSSH"></el-switch>
+        </div>
       </section>
     </template>
 
-    <section class="mb-2">
-      <div class="inline-block mr-10">
-        <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Host</label>
-        <input class="w-64 field__input" placeholder="The host of connection" required v-model="connectionOption.host" />
-      </div>
-      <div class="inline-block mr-10">
-        <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Port</label>
-        <input class="w-64 field__input" placeholder="The port of connection" required type="number" v-model="connectionOption.port" />
-      </div>
-    </section>
-
-    <template v-if="connectionOption.dbType!='ElasticSearch'">
-
-      <section class="mb-2">
-        <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
-          <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Username</label>
-          <input class="w-64 field__input" placeholder="Username" required v-model="connectionOption.user" />
-        </div>
-        <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Password</label>
-          <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
-        </div>
-      </section>
-
-      <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
-        <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32">Encrypt</label>
-          <el-switch v-model="connectionOption.encrypt"></el-switch>
-          ( If connect SqlServer fail, try change this option. )
-        </div>
-      </section>
-
-      <section class="mb-2">
-        <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32">Databases</label>
-          <input class="w-64 field__input" placeholder="Special connection database" v-model="connectionOption.database" />
-        </div>
-        <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
-          <label class="font-bold mr-5 inline-block w-32">Include Databases</label>
-          <input class="w-64 field__input" placeholder="Which databases need to be displayed" v-model="connectionOption.includeDatabases" />
-        </div>
-      </section>
-
-      <section class="mb-2">
-        <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32">ConnectTimeout</label>
-          <input class="w-64 field__input" placeholder="millisecond" required v-model="connectionOption.connectTimeout" />
-        </div>
-        <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32">RequestTimeout</label>
-          <input class="w-64 field__input" placeholder="millisecond" required type="number" v-model="connectionOption.requestTimeout" />
-        </div>
-      </section>
-
-    </template>
-
-    <section class="flex items-center mb-2" v-if="connectionOption.dbType=='MySQL'">
-      <div class="inline-block mr-10">
-        <label class="font-bold mr-5 inline-block w-32">Timezone</label>
-        <input class="w-64 field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
-      </div>
-    </section>
-
-    <section class="flex items-center mb-2">
-      <div class="inline-block mr-10">
-        <label class="mr-2 font-bold">SSH Tunnel</label>
-        <el-switch v-model="connectionOption.usingSSH"></el-switch>
-      </div>
-    </section>
-
-    <div v-if="connectionOption.usingSSH">
+    <div v-if="connectionOption.usingSSH || connectionOption.dbType=='SSH'">
       <section class="mb-2">
         <div class="inline-block mr-10">
           <label class="font-bold mr-5 inline-block w-28">SSH Host</label>
@@ -214,6 +216,7 @@ export default {
         "SqlServer",
         "ElasticSearch",
         "Redis",
+        "SSH"
       ],
       connect: {
         loading: false,
@@ -303,6 +306,8 @@ export default {
           this.connectionOption.port = 6379;
           this.connectionOption.user = null;
           this.connectionOption.database = "0";
+          break;
+        case "SSH":
           break;
       }
     },
