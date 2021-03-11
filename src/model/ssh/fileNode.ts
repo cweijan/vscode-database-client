@@ -91,7 +91,11 @@ export class FileNode extends Node {
                             str.on("progress", (progressData: any) => {
                                 if (progressData.percentage == 100) {
                                     resolve(null)
-                                    vscode.window.showInformationMessage(`Download ${this.fullPath} success, cost time: ${progressData.runtime}s`)
+                                    vscode.window.showInformationMessage(`Download ${this.fullPath} success, cost time: ${progressData.runtime}s`, 'Open').then(action => {
+                                        if (action) {
+                                            vscode.commands.executeCommand('vscode.open', uri);
+                                        }
+                                    })
                                     return;
                                 }
                                 progress.report({ increment: progressData.percentage-before,message:`remaining : ${prettyBytes(progressData.remaining)}` });
