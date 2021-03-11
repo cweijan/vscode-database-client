@@ -74,7 +74,7 @@
 				},
 				{
 					"id": "github-cweijan-nosql",
-					"title": "NoSQL Explorer",
+					"title": "Other Explorer",
 					"icon": "resources/image/icon.png"
 				}
 			]
@@ -83,13 +83,13 @@
 			"github-cweijan-mysql": [
 				{
 					"id": "github.cweijan.mysql",
-					"name": "Connections"
+					"name": ""
 				}
 			],
 			"github-cweijan-nosql": [
 				{
 					"id": "github.cweijan.nosql",
-					"name": "Connections"
+					"name": ""
 				}
 			]
 		},
