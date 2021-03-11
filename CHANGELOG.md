@@ -1,9 +1,17 @@
 # CHANGELOG
 
+# 3.6.0 2021-3-11
+
+- Support connect to database server without exists connection.
+- Support connect to ssh server.
+- Implment some ui feature of postgresql.
+
 # 3.5.6 2021-3-7
+
 - Redis Support add、delete of list、set、hash
 
 # 3.5.5 2021-3-5
+
 - Redis terminal support show some command.
 
 # 3.5.3 2021-2-24
