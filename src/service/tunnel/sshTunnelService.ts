@@ -1,4 +1,4 @@
-import tunnel = require('@/bin/tunnel-ssh')
+import tunnel = require('./tunnel-ssh')
 import { Node } from '../../model/interface/node';
 import { Console } from '../../common/Console';
 import { existsSync } from 'fs';
@@ -16,7 +16,7 @@ export class SSHTunnelService {
     }
 
     public createTunnel(connectionNode: Node, errorCallback: (error) => void): Promise<Node> {
-        return new Promise(async (resolve) => {
+        return new Promise(async (resolve,reject) => {
             const ssh = connectionNode.ssh
             const key = connectionNode.getConnectId();
             if (this.tunelMark[key]) {

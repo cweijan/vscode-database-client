@@ -6,7 +6,7 @@ import { QueryUnit } from "./queryUnit";
 import { SSHConfig } from "../model/interface/sshConfig";
 import { DatabaseCache } from "./common/databaseCache";
 import { NodeUtil } from "../model/nodeUtil";
-import { SSHTunnelService } from "./common/sshTunnelService";
+import { SSHTunnelService } from "./tunnel/sshTunnelService";
 import { DbTreeDataProvider } from "../provider/treeDataProvider";
 import { IConnection } from "./connect/connection";
 import { DatabaseType } from "@/common/constants";

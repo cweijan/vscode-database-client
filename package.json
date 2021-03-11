@@ -918,6 +918,7 @@
 		"pretty-bytes": "^5.3.0",
 		"routington": "^1.0.3",
 		"sqlstring": "^2.3.2",
+		"ssh2": "0.5.4",
 		"umy-table": "1.0.8",
 		"vue": "^2.6.11",
 		"vue-router": "^3.4.1"
