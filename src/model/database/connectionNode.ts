@@ -9,7 +9,6 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { CopyAble } from "../interface/copyAble";
 import { CommandKey, Node } from "../interface/node";
-import { InfoNode } from "../other/infoNode";
 import { CatalogNode } from "./catalogNode";
 import { SchemaNode } from "./schemaNode";
 import { UserGroup } from "./userGroup";
@@ -24,7 +23,7 @@ export class ConnectionNode extends Node implements CopyAble {
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
         this.init(parent)
-        this.label = this.uid
+        this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
         this.cacheSelf()
         if (parent.name) {
             this.description = parent.name

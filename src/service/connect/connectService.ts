@@ -41,7 +41,7 @@ export class ConnectService {
                     try {
                         await this.connect(connectNode)
                         await provider.addConnection(connectNode)
-                        handler.emit("success", 'connect success!')
+                        handler.emit("success", {message:'connect success!',key:connectNode.key})
                     } catch (err) {
                         if (err?.message) {
                             handler.emit("error", err.message)

@@ -11,7 +11,7 @@
 
     <blockquote class="p-3 mb-2 panel success" v-if="connect.success">
       <section class="panel__text">
-        <div class="font-bold mr-5 inline-block w-36">Connection success!</div>
+        <div class="font-bold mr-5 inline-block w-36">Success!</div>
         <span v-text="connect.successMessage"></span>
       </section>
     </blockquote>
@@ -195,6 +195,7 @@ export default {
         dbType: "MySQL",
         encrypt: true,
         global: true,
+        key:null,
         scheme: "http",
         timezone: "+00:00",
         ssh: {
@@ -240,11 +241,12 @@ export default {
         this.connect.error = true;
         this.connect.errorMessage = err;
       })
-      .on("success", (message) => {
+      .on("success", (res) => {
         this.connect.loading = false;
         this.connect.error = false;
         this.connect.success = true;
-        this.connect.successMessage = message;
+        this.connect.successMessage = res.message;
+        this.connectionOption.key=res.key;
       });
     vscodeEvent.emit("route-" + this.$route.name);
     window.onkeydown = (e) => {

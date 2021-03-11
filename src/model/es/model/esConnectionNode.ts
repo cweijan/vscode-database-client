@@ -22,7 +22,7 @@ export class EsConnectionNode extends Node {
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
         this.init(parent)
-        this.label=this.uid;
+        this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
         this.cacheSelf()
         const lcp = ConnectionManager.activeNode;
 

@@ -22,7 +22,7 @@ export class RedisConnectionNode extends RedisBaseNode {
             this.description=parent.name
             this.name = parent.name
         }
-        this.label = this.uid
+        this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
         if (this.disable) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None;
             this.iconPath = path.join(Constants.RES_PATH, "icon/close.svg");
