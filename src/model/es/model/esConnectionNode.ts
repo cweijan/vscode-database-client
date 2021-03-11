@@ -32,7 +32,7 @@ export class EsConnectionNode extends Node {
             return;
         }
 
-        if (lcp && lcp.getConnectId() == this.getConnectId()) {
+        if (this.isActive(lcp)) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/connection-active.svg");
         }
 

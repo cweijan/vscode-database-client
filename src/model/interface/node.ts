@@ -115,11 +115,16 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         if (this.disable) {
             this.command = { command: "mysql.connection.open", title: "Open Connection", arguments: [this] }
         }
+        this.key = source.key;
         this.initUid();
         // init tree state
         this.collapsibleState = DatabaseCache.getElementState(this)
     }
 
+    public initKey() {
+        if (this.key) return this.key;
+        this.key = new Date().getTime() + "";
+    }
 
     public async refresh() {
         await this.getChildren(true)
@@ -197,16 +202,20 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         if (this.uid) return;
         if (this.contextValue == ModelType.CONNECTION || this.contextValue == ModelType.CATALOG) {
             this.uid = this.getConnectId();
-        } else if (this.contextValue == ModelType.SCHEMA || this.contextValue==ModelType.REDIS_CONNECTION) {
+        } else if (this.contextValue == ModelType.SCHEMA || this.contextValue == ModelType.REDIS_CONNECTION) {
             this.uid = `${this.getConnectId({ withSchema: true })}`;
         } else {
             this.uid = `${this.getConnectId({ withSchema: true })}#${this.label}`;
         }
     }
 
+    public isActive(cur: Node) {
+        return cur && cur.getConnectId() == this.getConnectId();
+    }
+
     public getConnectId(opt?: SwitchOpt): string {
 
-        let uid = (this.usingSSH) ? `${this.ssh.username}@${this.ssh.host}@${this.ssh.port}` : `${this.user}@${this.host}@${this.port}`;
+        let uid = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
 
         const database = this.database;
         if (database && this.contextValue != ModelType.CONNECTION) {

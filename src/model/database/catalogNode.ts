@@ -19,7 +19,7 @@ export class CatalogNode extends Node implements CopyAble {
         this.init(this.parent)
         this.cacheSelf()
         const lcp = ConnectionManager.activeNode;
-        if (lcp && lcp.getConnectId() == this.getConnectId() && (lcp.database == this.database)) {
+        if (this.isActive(lcp) && (lcp.database == this.database)) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/database-active.svg");
             this.description = `Active`
         }

@@ -36,7 +36,7 @@ export class ConnectionNode extends Node implements CopyAble {
             return;
         }
         const lcp = ConnectionManager.activeNode;
-        if (lcp && lcp.getConnectId() == this.getConnectId()) {
+        if (this.isActive(lcp)) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/connection-active.svg");
             this.description = `${parent.name ? parent.name + " " : ""}Active`
             return;
