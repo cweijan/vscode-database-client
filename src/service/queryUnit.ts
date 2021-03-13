@@ -97,9 +97,11 @@ export class QueryUnit {
                 // query result or multi statement.
                 if (Array.isArray(data)) {
                     // not query result
-                    if (data[1] && (
-                        data[1].__proto__.constructor.name == "array" || data[1].__proto__.constructor.name == "OkPacket" || data[1].__proto__.constructor.name == "ResultSetHeader")
-                    ) {
+                    const lastEle = data[data.length - 1]
+                    if (lastEle && lastEle.__proto__.constructor.name == "ResultSetHeader") {
+                        data = data[data.length - 2]
+                        fields = fields[fields.length - 2] as any as FieldInfo[]
+                    } else if (lastEle && (lastEle.__proto__.constructor.name == "array" || lastEle.__proto__.constructor.name == "OkPacket")) {
                         QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, queryOption, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
                         return;
                     }
