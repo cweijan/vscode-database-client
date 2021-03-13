@@ -1,4 +1,4 @@
-import { CommandKey } from '@/common/constants';
+import { CodeCommand } from '@/common/constants';
 import { ClientManager } from '@/service/ssh/clientManager';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -24,7 +24,7 @@ export default class ConnectionProvider  {
             if (err) {
                 vscode.window.showErrorMessage(err.message)
             } else {
-                vscode.commands.executeCommand(CommandKey.Refresh)
+                vscode.commands.executeCommand(CodeCommand.Refresh)
                 vscode.window.showInformationMessage("Update to remote success!")
             }
         })

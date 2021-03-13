@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CommandKey } from "./common/constants";
+import { CodeCommand } from "./common/constants";
 import { ConnectionNode } from "./model/database/connectionNode";
 import { SchemaNode } from "./model/database/schemaNode";
 import { UserGroup } from "./model/database/userGroup";
@@ -60,7 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
         ...initCommand({
             // util
             ...{
-                [CommandKey.Refresh]: async (node: Node) => {
+                [CodeCommand.Refresh]: async (node: Node) => {
                     if (node) {
                         await node.getChildren(true)
                     } else {
@@ -68,7 +68,7 @@ export function activate(context: vscode.ExtensionContext) {
                     }
                     DbTreeDataProvider.refresh(node)
                 },
-                [CommandKey.RecordHistory]: (sql: string, costTime: number) => {
+                [CodeCommand.RecordHistory]: (sql: string, costTime: number) => {
                     serviceManager.historyService.recordHistory(sql, costTime);
                 },
                 "mysql.history.open": () => serviceManager.historyService.showHistory(),

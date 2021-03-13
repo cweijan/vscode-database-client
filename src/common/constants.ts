@@ -33,7 +33,7 @@ export enum ConfigKey {
     SHOW_TOTAL = "showTotal",
 }
 
-export enum CommandKey {
+export enum CodeCommand {
     RecordHistory = "mysql.history.record",
     Refresh = "mysql.refresh"
 }

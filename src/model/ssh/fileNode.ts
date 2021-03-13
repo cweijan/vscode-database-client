@@ -1,4 +1,4 @@
-import { CommandKey, Constants, ModelType } from '@/common/constants';
+import { CodeCommand, Constants, ModelType } from '@/common/constants';
 import { FileManager, FileModel } from '@/common/filesManager';
 import { ClientManager } from '@/service/ssh/clientManager';
 import { createWriteStream } from 'fs';
@@ -41,7 +41,7 @@ export class FileNode extends Node {
                     if (err) {
                         vscode.window.showErrorMessage(err.message)
                     } else {
-                        vscode.commands.executeCommand(CommandKey.Refresh)
+                        vscode.commands.executeCommand(CodeCommand.Refresh)
                     }
                 })
             }

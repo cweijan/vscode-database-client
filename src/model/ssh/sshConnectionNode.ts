@@ -1,4 +1,4 @@
-import { CommandKey, Constants, ModelType } from "@/common/constants";
+import { CodeCommand, Constants, ModelType } from "@/common/constants";
 import { FileManager, FileModel } from "@/common/filesManager";
 import { Util } from "@/common/util";
 import { ClientManager } from "@/service/ssh/clientManager";
@@ -9,7 +9,7 @@ import { createReadStream, statSync } from "fs";
 import * as path from "path";
 import { FileEntry } from "ssh2-streams";
 import * as vscode from "vscode";
-import { Node } from "../interface/node";
+import { CommandKey, Node } from "../interface/node";
 import { SSHConfig } from "../interface/sshConfig";
 import { InfoNode } from "../other/infoNode";
 import { FileNode } from "./fileNode";
@@ -22,7 +22,7 @@ export class SSHConnectionNode extends Node {
     fullPath: string;
     private terminalService: TerminalService = new XtermTerminal();
 
-    constructor(readonly sshConfig: SSHConfig, readonly name: string, readonly file?: FileEntry, readonly parentName?: string, iconPath?: string) {
+    constructor(readonly key:string,readonly sshConfig: SSHConfig, readonly name: string, readonly file?: FileEntry, readonly parentName?: string, iconPath?: string) {
         super(name);
         this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
         this.fullPath = this.parentName + this.name;
@@ -41,6 +41,14 @@ export class SSHConnectionNode extends Node {
         } else if (iconPath) {
             this.iconPath = iconPath;
         }
+    }
+
+    public async deleteConnection(context: vscode.ExtensionContext) {
+
+        Util.confirm(`Are you want to Delete Connection ${this.label} ? `, async () => {
+            this.indent({ command: CommandKey.delete })
+        })
+
     }
 
     public copyIP() {
@@ -71,7 +79,7 @@ export class SSHConnectionNode extends Node {
                     if (err) {
                         vscode.window.showErrorMessage(err.message)
                     } else {
-                        vscode.commands.executeCommand(CommandKey.Refresh)
+                        vscode.commands.executeCommand(CodeCommand.Refresh)
                     }
                 })
             } else {
@@ -88,7 +96,7 @@ export class SSHConnectionNode extends Node {
                     if (err) {
                         vscode.window.showErrorMessage(err.message)
                     } else {
-                        vscode.commands.executeCommand(CommandKey.Refresh)
+                        vscode.commands.executeCommand(CodeCommand.Refresh)
                     }
                 })
             } else {
@@ -159,7 +167,7 @@ export class SSHConnectionNode extends Node {
                     if (err) {
                         vscode.window.showErrorMessage(err.message)
                     } else {
-                        vscode.commands.executeCommand(CommandKey.Refresh)
+                        vscode.commands.executeCommand(CodeCommand.Refresh)
                     }
                 })
             }
@@ -202,7 +210,7 @@ export class SSHConnectionNode extends Node {
 
         for (const entry of entryList) {
             if (entry.longname.startsWith("d")) {
-                folderList.push(new SSHConnectionNode(this.sshConfig, entry.filename, entry, parentName))
+                folderList.push(new SSHConnectionNode(this.key,this.sshConfig, entry.filename, entry, parentName))
             } else if (entry.longname.startsWith("l")) {
                 fileList.push(new LinkNode(entry.filename))
             } else {

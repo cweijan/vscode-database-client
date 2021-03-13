@@ -1,6 +1,6 @@
 "use strict";
 import * as vscode from "vscode";
-import { CommandKey, ConfigKey, Cursor, DatabaseType, MessageType } from "../common/constants";
+import { CodeCommand, ConfigKey, Cursor, DatabaseType, MessageType } from "../common/constants";
 import { Global } from "../common/global";
 import { Console } from "../common/Console";
 import { FileManager, FileModel } from "../common/filesManager";
@@ -86,7 +86,7 @@ export class QueryUnit {
                 }
                 const costTime = new Date().getTime() - executeTime;
                 if (fromEditor) {
-                    vscode.commands.executeCommand(CommandKey.RecordHistory, sql, costTime);
+                    vscode.commands.executeCommand(CodeCommand.RecordHistory, sql, costTime);
                 }
                 if (data.affectedRows) {
                     QueryPage.send({ connection: connectionNode, type: MessageType.DML, queryOption, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
