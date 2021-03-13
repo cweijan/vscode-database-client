@@ -135,15 +135,6 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.diagram.add",
-				"title": "%command.diagram.add%",
-				"icon": {
-					"light": "resources/light/add.svg",
-					"dark": "resources/dark/add.svg"
-				},
-				"category": "MySQL"
-			},
-			{
 				"command": "mysql.query.add",
 				"title": "%command.query.add%",
 				"icon": {
@@ -156,17 +147,6 @@
 				"command": "mysql.query.rename",
 				"title": "%command.query.rename%",
 				"category": "MySQL"
-			},
-			{
-				"command": "mysql.diagram.open",
-				"title": "%command.diagram.open%",
-				"category": "MySQL"
-			},
-			{
-				"command": "mysql.diagram.drop",
-				"title": "%command.diagram.drop%",
-				"category": "MySQL",
-				"icon": "resources/icon/criss-cross.svg"
 			},
 			{
 				"command": "mysql.connection.add",
@@ -588,11 +568,6 @@
 					"group": "2_mysql@0"
 				},
 				{
-					"command": "mysql.diagram.add",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == diagramGroup",
-					"group": "2_mysql@0"
-				},
-				{
 					"command": "mysql.query.add",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == queryGroup",
 					"group": "2_mysql@0"
@@ -630,11 +605,6 @@
 				{
 					"command": "mysql.database.add",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == connection",
-					"group": "inline@0"
-				},
-				{
-					"command": "mysql.diagram.add",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == diagramGroup",
 					"group": "inline@0"
 				},
 				{
@@ -796,11 +766,6 @@
 					"command": "mysql.delete.view",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == view",
 					"group": "1_mysql@1"
-				},
-				{
-					"command": "mysql.diagram.drop",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == diagram",
-					"group": "inline@0"
 				},
 				{
 					"command": "mysql.refresh",

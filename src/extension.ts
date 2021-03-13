@@ -23,8 +23,6 @@ import { ServiceManager } from "./service/serviceManager";
 import { QueryUnit } from "./service/queryUnit";
 import { FileManager } from "./common/filesManager";
 import { ConnectionManager } from "./service/connectionManager";
-import { DiagramNode } from "./model/diagram/diagramNode";
-import { DiagramGroup } from "./model/diagram/diagramGroup";
 import { QueryNode } from "./model/query/queryNode";
 import { QueryGroup } from "./model/query/queryGroup";
 import { Node } from "./model/interface/node";
@@ -171,18 +169,6 @@ export function activate(context: vscode.ExtensionContext) {
                 },
                 "mysql.user.sql": (userNode: UserNode) => {
                     userNode.selectSqlTemplate();
-                },
-            },
-            // diagram node
-            ...{
-                "mysql.diagram.add": (diagramNode: DiagramGroup) => {
-                    diagramNode.openAdd()
-                },
-                "mysql.diagram.open": (node: DiagramNode) => {
-                    node.open()
-                },
-                "mysql.diagram.drop": (node: DiagramNode) => {
-                    node.drop()
                 },
             },
             // query node
