@@ -7,7 +7,6 @@ import { DbTreeDataProvider } from '../../provider/treeDataProvider';
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { QueryUnit } from "../../service/queryUnit";
-import { DiagramGroup } from "../diagram/diagramGroup";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { FunctionGroup } from "../main/functionGroup";
@@ -43,9 +42,6 @@ export class SchemaNode extends Node implements CopyAble {
 
         if (Global.getConfig('showQuery')) {
             childs.push(new QueryGroup(this))
-        }
-        if (Global.getConfig('showDiagram')) {
-            childs.push(new DiagramGroup(this))
         }
         if (Global.getConfig('showProcedure')) {
             childs.push(new ProcedureGroup(this))
