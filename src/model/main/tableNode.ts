@@ -92,7 +92,7 @@ export class TableNode extends Node implements CopyAble {
     public dropTable() {
 
         Util.confirm(`Are you want to drop table ${this.table} ? `, async () => {
-            this.execute(`DROP TABLE ${this.schema}.${this.wrap(this.table)}`).then(() => {
+            this.execute(`DROP TABLE ${this.wrap(this.table)}`).then(() => {
                 this.parent.setChildCache(null)
                 DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop table ${this.table} success!`);
