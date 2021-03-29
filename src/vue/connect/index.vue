@@ -75,12 +75,12 @@
           </div>
         </section>
   
-        <section class="mb-2">
+        <section class="mb-2" v-if="connectionOption.dbType!='FTP'">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">Databases</label>
             <input class="w-64 field__input" placeholder="Special connection database" v-model="connectionOption.database" />
           </div>
-          <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
+          <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis' ">
             <label class="font-bold mr-5 inline-block w-32">Include Databases</label>
             <input class="w-64 field__input" placeholder="Which databases need to be displayed" v-model="connectionOption.includeDatabases" />
           </div>
@@ -307,6 +307,10 @@ export default {
           this.connectionOption.port = 6379;
           this.connectionOption.user = null;
           this.connectionOption.database = "0";
+          break;
+        case "FTP":
+          this.connectionOption.port = 12;
+          this.connectionOption.user = null;
           break;
         case "SSH":
           break;

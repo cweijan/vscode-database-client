@@ -59,7 +59,7 @@ export enum ModelType {
     /**
      * ftp
      */
-     FTP_CONNECTION="ftpConnection", FTP_FOLDER = 'ftpFolder', FTP_FILE = "ftp_file",FTP_Link = "ftp_link",
+     FTP_CONNECTION="ftpConnection", FTP_FOLDER = 'ftpFolder', FTP_FILE = "ftpFile",FTP_Link = "ftpLink",
     /**
      * ssh
      */

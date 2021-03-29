@@ -38,16 +38,20 @@ export class FTPConnectionNode extends FtpBaseNode {
     getChildren(): Promise<Node[]> {
 
         return new Promise(async (resolve, reject) => {
-            const client = await this.getClient()
-            client.list(this.fullPath, (err, list) => {
-                if (err) {
-                    resolve([new InfoNode(err.message)]);
-                } else if (list.length == 0) {
-                    resolve([new InfoNode("There are no files in this folder.")]);
-                } else {
-                    resolve(this.build(list))
-                }
-            });
+            try {
+                const client = await this.getClient()
+                client.list(this.fullPath, (err, list) => {
+                    if (err) {
+                        resolve([new InfoNode(err.message)]);
+                    } else if (list.length == 0) {
+                        resolve([new InfoNode("There are no files in this folder.")]);
+                    } else {
+                        resolve(this.build(list))
+                    }
+                });
+            } catch (error) {
+                reject(error)
+            }
         })
 
     }

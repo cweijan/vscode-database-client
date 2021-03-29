@@ -59,13 +59,15 @@ export class FTPFileNode extends FtpBaseNode {
         }
         const client = await this.getClient()
         const tempPath = await FileManager.record(`temp/${this.file.name}`, null, FileModel.WRITE);
-        // client.get(this.fullPath, tempPath, async (err) => {
-        //     if (err) {
-        //         vscode.window.showErrorMessage(err.message)
-        //     } else {
-        //         vscode.commands.executeCommand('vscode.open', vscode.Uri.file(tempPath))
-        //     }
-        // })
+        client.get(this.fullPath, async (err, stream) => {
+            if (err) {
+                vscode.window.showErrorMessage(err.message)
+            } else {
+                stream.pipe(createWriteStream(tempPath)).on("close", () => {
+                    vscode.commands.executeCommand('vscode.open', vscode.Uri.file(tempPath))
+                })
+            }
+        })
     }
 
     download(): any {

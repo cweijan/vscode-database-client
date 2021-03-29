@@ -37,6 +37,7 @@ import { DiffService } from "./service/diff/diffService";
 import { DatabaseCache } from "./service/common/databaseCache";
 import { FileNode } from "./model/ssh/fileNode";
 import { SSHConnectionNode } from "./model/ssh/sshConnectionNode";
+import { FTPFileNode } from "./model/ftp/ftpFileNode";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -132,7 +133,7 @@ export function activate(context: vscode.ExtensionContext) {
                 'mysql.ssh.path.copy': (node: Node) => node.copyName(),
                 'mysql.ssh.socks.port': (parentNode: SSHConnectionNode) => parentNode.startSocksProxy(),
                 'mysql.ssh.file.delete': (fileNode: FileNode | SSHConnectionNode) => fileNode.delete(),
-                'mysql.ssh.file.open': (fileNode: FileNode) => fileNode.open(),
+                'mysql.ssh.file.open': (fileNode: FileNode|FTPFileNode) => fileNode.open(),
                 'mysql.ssh.file.download': (fileNode: FileNode) => fileNode.download(),
             },
             // database

@@ -67,7 +67,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     private getKeyByNode(connectionNode: Node): string {
         const dbType = connectionNode.dbType;
-        if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS || dbType==DatabaseType.SSH) {
+        if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS || dbType==DatabaseType.SSH || dbType==DatabaseType.FTP) {
             return CacheKey.NOSQL_CONNECTION;
         }
         return CacheKey.ConectionsKey;

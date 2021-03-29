@@ -549,12 +549,12 @@
 				},
 				{
 					"command": "mysql.connection.edit",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection|ftpConnection)$/",
 					"group": "1_mysql@2"
 				},
 				{
 					"command": "mysql.connection.disable",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection|ftpConnection)$/",
 					"group": "1_mysql@4"
 				},
 				{
@@ -579,7 +579,7 @@
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection|ftpConnection)$/",
 					"group": "2_mysql@1"
 				},
 				{
@@ -594,7 +594,7 @@
 				},
 				{
 					"command": "mysql.connection.delete",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection|ftpConnection)$/",
 					"group": "10mysql@2"
 				},
 				{
@@ -829,7 +829,7 @@
 				},
 				{
 					"command": "mysql.connection.delete",
-					"when": "view == github.cweijan.nosql && viewItem == sshConnection",
+					"when": "view == github.cweijan.nosql && viewItem =~ /(sshConnection|ftpConnection)/",
 					"group": "inline@0"
 				},
 				{
@@ -839,7 +839,7 @@
 				},
 				{
 					"command": "mysql.ssh.host.copy",
-					"when": "view == github.cweijan.nosql && viewItem == sshConnection",
+					"when": "view == github.cweijan.nosql && viewItem =~ /(sshConnection|ftpConnection)/",
 					"group": "0_connection@-2"
 				},
 				{
@@ -854,12 +854,12 @@
 				},
 				{
 					"command": "mysql.ssh.file.new",
-					"when": "view == github.cweijan.nosql && viewItem == sshConnection",
+					"when": "view == github.cweijan.nosql && viewItem =~ /(sshConnection|ftpConnection)/",
 					"group": "2_connection@2"
 				},
 				{
 					"command": "mysql.ssh.folder.new",
-					"when": "view == github.cweijan.nosql && viewItem == sshConnection ",
+					"when": "view == github.cweijan.nosql && viewItem =~ /(sshConnection|ftpConnection)/",
 					"group": "2_connection@4"
 				},
 				{
@@ -874,27 +874,27 @@
 				},
 				{
 					"command": "mysql.ssh.file.new",
-					"when": "view == github.cweijan.nosql && viewItem == folder",
+					"when": "view == github.cweijan.nosql && viewItem =~ /(folder|ftpFolder)/",
 					"group": "folder@0"
 				},
 				{
 					"command": "mysql.ssh.folder.new",
-					"when": "view == github.cweijan.nosql && viewItem == folder ",
+					"when": "view == github.cweijan.nosql && viewItem =~ /(folder|ftpFolder)/",
 					"group": "folder@1"
 				},
 				{
 					"command": "mysql.ssh.file.upload",
-					"when": "view == github.cweijan.nosql && viewItem == folder",
+					"when": "view == github.cweijan.nosql && viewItem =~ /(folder|ftpFolder)/",
 					"group": "folder@2"
 				},
 				{
 					"command": "mysql.ssh.file.delete",
-					"when": "view == github.cweijan.nosql && viewItem =~ /^(folder|file|redisFolder)$/",
+					"when": "view == github.cweijan.nosql && viewItem =~ /^(folder|ftpFolder|file|ftpFile|redisFolder)$/",
 					"group": "folder@4"
 				},
 				{
 					"command": "mysql.ssh.file.download",
-					"when": "view == github.cweijan.nosql && viewItem == file",
+					"when": "view == github.cweijan.nosql && viewItem =~ /(file|ftpFile)/",
 					"group": "file@1"
 				}
 			]
