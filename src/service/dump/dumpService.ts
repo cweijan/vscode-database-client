@@ -12,6 +12,7 @@ import { ConfigKey, ModelType } from "@/common/constants";
 import { Util } from "@/common/util";
 import mysqldump, { Options } from './mysql/main';
 import { Global } from "@/common/global";
+import { SchemaNode } from "@/model/database/schemaNode";
 
 export class DumpService {
 
@@ -64,7 +65,7 @@ export class DumpService {
 
         const option: Options = {
             dump: {
-                withDatabase: items.length != 1,
+                withDatabase: node instanceof SchemaNode,
                 tables, viewList, procedureList, functionList, triggerList
             },
             dumpToFile: dumpFilePath,

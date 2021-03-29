@@ -8,6 +8,7 @@ import { getProcedureDump } from './getProcedureDump';
 import { getTableDump } from './getTableDump';
 import { getTriggerDump } from './getTriggerDump';
 import { getViewDump } from './getViewDump';
+import { HEADER_VARIABLES, FOOTER_VARIABLES } from './sessionVariables';
 import {
     CompletedOptions, Options
 } from './interfaces/Options';
@@ -45,18 +46,26 @@ const defaultOptions: Options = {
     dumpToFile: null,
 };
 
+function isMysql(node: Node) {
+    return node.dbType != DatabaseType.PG && node.dbType != DatabaseType.MSSQL;
+}
+
+
 export default async function main(inputOptions: Options, node: Node): Promise<void> {
 
     const options = merge([defaultOptions, inputOptions]) as CompletedOptions;
 
     // write to the destination file (clear it)
-    if (options.dumpToFile) {
-        fs.writeFileSync(options.dumpToFile, '');
+    fs.writeFileSync(options.dumpToFile, '');
+
+    // write the initial headers
+    if (isMysql(node)) {
+        fs.appendFileSync(options.dumpToFile, `${HEADER_VARIABLES}\n`);
     }
 
-    if (options.dumpToFile && node.database && options.dump.withDatabase && node.dbType!=DatabaseType.PG && node.dbType!=DatabaseType.MSSQL) {
-        fs.appendFileSync(options.dumpToFile, `CREATE DATABASE /*!32312 IF NOT EXISTS*/ ${node.database} /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
-USE ${node.database};\n\n`);
+    if (node.schema && options.dump.withDatabase && isMysql(node)) {
+        fs.appendFileSync(options.dumpToFile, `CREATE DATABASE /*!32312 IF NOT EXISTS*/ ${node.schema} /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+USE ${node.schema};\n\n`);
     }
 
     const sessionId = new Date().getTime() + ""
@@ -89,6 +98,11 @@ USE ${node.database};\n\n`);
     if (options.dump.trigger !== false) {
         const triggerDatas = await getTriggerDump(node, sessionId, options.dump.trigger, options.dump.triggerList);
         fs.appendFileSync(options.dumpToFile, `${triggerDatas}\n\n`);
+    }
+
+      // reset all of the variables
+      if (isMysql(node)) {
+        fs.appendFileSync(options.dumpToFile, FOOTER_VARIABLES);
     }
 
 }
