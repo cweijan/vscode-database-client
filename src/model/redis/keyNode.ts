@@ -1,4 +1,5 @@
 import { Constants, ModelType, RedisType } from "@/common/constants";
+import { Util } from "@/common/util";
 import { ViewManager } from "@/common/viewManager";
 import { Node } from "@/model/interface/node";
 import * as path from "path";
@@ -29,9 +30,11 @@ export default class KeyNode extends RedisBaseNode {
     }
 
     public async delete() {
-        const client = await this.getClient();
-        await client.del(this.label)
-        this.provider.reload()
+        Util.confirm(`Are you want delete key ${this.label} ? `, async () => {
+            const client = await this.getClient();
+            await client.del(this.label)
+            this.provider.reload()
+        })
     }
 
 
@@ -96,32 +99,32 @@ export default class KeyNode extends RedisBaseNode {
                 }).on("add", async content => {
                     switch (type) {
                         case RedisType.hash:
-                            client.hset(this.label,content.key,content.value)
+                            client.hset(this.label, content.key, content.value)
                             break;
                         case RedisType.list:
-                            client.lpush(this.label,0,content.value)
+                            client.lpush(this.label, 0, content.value)
                             break;
                         case RedisType.set:
-                            client.sadd(this.label,content.value)
+                            client.sadd(this.label, content.value)
                             break;
                         case RedisType.zset:
-                            client.zadd(this.label,0,content.value)
+                            client.zadd(this.label, 0, content.value)
                             break;
                     }
                     handler.emit("refresh")
-                }).on("deleteLine",async content=>{
+                }).on("deleteLine", async content => {
                     switch (type) {
                         case RedisType.hash:
-                            client.hdel(this.label,content.key)
+                            client.hdel(this.label, content.key)
                             break;
                         case RedisType.list:
-                            client.lrem(this.label,0,content)
+                            client.lrem(this.label, 0, content)
                             break;
                         case RedisType.set:
-                            client.srem(this.label,content)
+                            client.srem(this.label, content)
                             break;
                         case RedisType.zset:
-                            client.zrem(this.label,content)
+                            client.zrem(this.label, content)
                             break;
                     }
                     handler.emit("refresh")

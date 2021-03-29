@@ -1,4 +1,5 @@
 import { Constants, ModelType } from "@/common/constants";
+import { Util } from "@/common/util";
 import { Node } from "@/model/interface/node";
 import * as path from "path";
 import KeyNode from "./keyNode";
@@ -33,6 +34,16 @@ export class FolderNode extends RedisBaseNode {
             } else {
                 return new KeyNode(prefixMap[prefix][0], prefix, parent)
             }
+        })
+    }
+
+    public async delete() {
+        Util.confirm(`Are you want delete folder ${this.label} ? `, async () => {
+            const client = await this.getClient();
+            for (const child of this.childens) {
+                await client.del(child) 
+            }
+            this.provider.reload()
         })
     }
 

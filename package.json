@@ -824,7 +824,7 @@
 				},
 				{
 					"command": "mysql.redis.key.del",
-					"when": "view == github.cweijan.nosql && viewItem == redisKey",
+					"when": "view == github.cweijan.nosql && viewItem =~ /^(redisKey|redisFolder)$/",
 					"group": "inline"
 				},
 				{
@@ -889,18 +889,14 @@
 				},
 				{
 					"command": "mysql.ssh.file.delete",
-					"when": "view == github.cweijan.nosql && viewItem == folder",
+					"when": "view == github.cweijan.nosql && viewItem =~ /^(folder|file|redisFolder)$/",
 					"group": "folder@4"
 				},
+				
 				{
 					"command": "mysql.ssh.file.download",
 					"when": "view == github.cweijan.nosql && viewItem == file",
 					"group": "file@1"
-				},
-				{
-					"command": "mysql.ssh.file.delete",
-					"when": "view == github.cweijan.nosql && viewItem == file",
-					"group": "file@2"
 				}
 			]
 		},
