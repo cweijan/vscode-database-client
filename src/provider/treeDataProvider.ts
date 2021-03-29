@@ -1,5 +1,6 @@
 import { CatalogNode } from "@/model/database/catalogNode";
 import { EsConnectionNode } from "@/model/es/model/esConnectionNode";
+import { FTPConnectionNode } from "@/model/ftp/ftpConnectionNode";
 import { InfoNode } from "@/model/other/infoNode";
 import { RedisConnectionNode } from "@/model/redis/redisConnectionNode";
 import { SSHConnectionNode } from "@/model/ssh/sshConnectionNode";
@@ -112,6 +113,8 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
             node = new RedisConnectionNode(key, connectInfo)
         } else if (connectInfo.dbType == DatabaseType.SSH) {
             node = new SSHConnectionNode(key,connectInfo.ssh,connectInfo.name)
+        } else if (connectInfo.dbType == DatabaseType.FTP) {
+            node = new FTPConnectionNode(key,connectInfo)
         } else {
             node = new ConnectionNode(key, connectInfo)
         }

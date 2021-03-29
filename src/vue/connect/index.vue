@@ -216,7 +216,8 @@ export default {
         "SqlServer",
         "ElasticSearch",
         "Redis",
-        "SSH"
+        "SSH",
+        "FTP"
       ],
       connect: {
         loading: false,

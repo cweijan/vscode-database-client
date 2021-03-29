@@ -52,15 +52,18 @@ export enum Confirm {
 export enum DatabaseType {
     MYSQL = "MySQL", PG = "PostgreSQL",
     MSSQL = "SqlServer", ORACLE = "Oracle",
-    ES = "ElasticSearch", REDIS = "Redis",SSH="SSH"
+    ES = "ElasticSearch", REDIS = "Redis",SSH="SSH",FTP="FTP"
 }
 
 export enum ModelType {
     /**
+     * ftp
+     */
+     FTP_CONNECTION="ftpConnection", FTP_FOLDER = 'ftpFolder', FTP_FILE = "ftp_file",FTP_Link = "ftp_link",
+    /**
      * ssh
      */
-    SSH_CONNECTION="sshConnection",
-     FOLDER = 'folder', FILE = "file",Link = "link",
+    SSH_CONNECTION="sshConnection", FOLDER = 'folder', FILE = "file",Link = "link",
     /**
      * redis
      */

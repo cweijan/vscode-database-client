@@ -15,6 +15,7 @@ import { MSSqlConnnection } from "./connect/mssqlConnection";
 import { MysqlConnection } from "./connect/mysqlConnection";
 import { PostgreSqlConnection } from "./connect/postgreSqlConnection";
 import { RedisConnection } from "./connect/redisConnection";
+import { FTPConnection } from "./connect/ftpConnection";
 
 interface ConnectionWrapper {
     connection: IConnection;
@@ -149,6 +150,8 @@ export class ConnectionManager {
                 return new EsConnection(opt);
             case DatabaseType.REDIS:
                 return new RedisConnection(opt);
+                case DatabaseType.FTP:
+                return new FTPConnection(opt);
         }
         return new MysqlConnection(opt)
     }

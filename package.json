@@ -892,7 +892,6 @@
 					"when": "view == github.cweijan.nosql && viewItem =~ /^(folder|file|redisFolder)$/",
 					"group": "folder@4"
 				},
-				
 				{
 					"command": "mysql.ssh.file.download",
 					"when": "view == github.cweijan.nosql && viewItem == file",
@@ -995,12 +994,14 @@
 		"xterm-addon-search-bar": "^0.2.0"
 	},
 	"dependencies": {
+		"@types/ftp": "^0.3.31",
 		"axios": "^0.21.1",
 		"command-exists": "^1.2.9",
 		"comment-json": "^4.1.0",
 		"date-format": "^3.0.0",
 		"deepmerge": "^3.2.0",
 		"element-ui": "^2.13.2",
+		"ftp": "^0.3.10",
 		"ioredis": "^4.23.0",
 		"json-format-highlight": "^1.0.4",
 		"lodash": "^4.17.20",
