@@ -86,6 +86,13 @@
           </div>
         </section>
   
+        <section class="mb-2" v-if="connectionOption.dbType=='FTP'">
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-32">Encoding</label>
+            <input class="w-64 field__input" placeholder="millisecond" required v-model="connectionOption.encoding" />
+          </div>
+        </section>
+
         <section class="mb-2">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">ConnectTimeout</label>
@@ -191,6 +198,7 @@ export default {
         port: "3306",
         user: "root",
         password: "",
+        encoding: "utf8",
         database: null,
         usingSSH: false,
         includeDatabases: null,

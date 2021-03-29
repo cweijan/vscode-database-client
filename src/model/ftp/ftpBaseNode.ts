@@ -1,6 +1,6 @@
 import { FTPConnection } from "@/service/connect/ftpConnection";
 import { ConnectionManager } from "@/service/connectionManager";
-import * as Client from "ftp";
+import * as Client from '@/model/ftp/lib/connection'
 import { Node } from "../interface/node";
 
 export class FtpBaseNode extends Node {

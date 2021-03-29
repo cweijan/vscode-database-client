@@ -579,7 +579,7 @@
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection|ftpConnection)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection|folder|ftpConnection|ftpFolder)$/",
 					"group": "2_mysql@1"
 				},
 				{
@@ -994,14 +994,12 @@
 		"xterm-addon-search-bar": "^0.2.0"
 	},
 	"dependencies": {
-		"@types/ftp": "^0.3.31",
 		"axios": "^0.21.1",
 		"command-exists": "^1.2.9",
 		"comment-json": "^4.1.0",
 		"date-format": "^3.0.0",
 		"deepmerge": "^3.2.0",
 		"element-ui": "^2.13.2",
-		"ftp": "^0.3.10",
 		"ioredis": "^4.23.0",
 		"json-format-highlight": "^1.0.4",
 		"lodash": "^4.17.20",
@@ -1016,7 +1014,9 @@
 		"ssh2": "0.5.4",
 		"umy-table": "1.0.8",
 		"vue": "^2.6.11",
-		"vue-router": "^3.4.1"
+		"vue-router": "^3.4.1",
+		"readable-stream": "1.1.x",
+		"xregexp": "2.0.0"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",

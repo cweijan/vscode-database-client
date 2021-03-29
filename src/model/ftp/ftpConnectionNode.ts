@@ -7,9 +7,7 @@ import { CommandKey, Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
 import { FtpBaseNode } from "./ftpBaseNode";
 import { FTPFileNode } from "./ftpFileNode";
-import prettyBytes = require("pretty-bytes");
-import Client = require("ftp");
-var progressStream = require('progress-stream');
+import * as Client from '@/model/ftp/lib/connection'
 
 export class FTPConnectionNode extends FtpBaseNode {
 
@@ -23,6 +21,7 @@ export class FTPConnectionNode extends FtpBaseNode {
         if (file) {
             this.fullPath = (parent as FTPConnectionNode).fullPath + key + "/"
         } else {
+            this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
             this.description = this.name
         }
     }

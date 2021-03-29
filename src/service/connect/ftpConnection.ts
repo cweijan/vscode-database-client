@@ -1,7 +1,7 @@
 import { Node } from "@/model/interface/node";
 import EventEmitter = require("events");
 import { IConnection, queryCallback } from "./connection";
-import * as Client from 'ftp'
+import * as Client from '@/model/ftp/lib/connection'
 
 export class FTPConnection extends IConnection {
 
@@ -36,6 +36,7 @@ export class FTPConnection extends IConnection {
             port: this.node.port,
             user: this.node.user,
             password: this.node.password,
+            encoding:this.node.encoding,
             secure: false,
             connTimeout: this.node.connectTimeout||3000,
             pasvTimeout: this.node.requestTimeout

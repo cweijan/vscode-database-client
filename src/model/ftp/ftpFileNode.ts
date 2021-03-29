@@ -8,7 +8,7 @@ import { TreeItemCollapsibleState } from "vscode";
 import { Node } from '../interface/node';
 import { FtpBaseNode } from './ftpBaseNode';
 import { FTPConnectionNode } from './ftpConnectionNode';
-import Client = require('ftp');
+import * as Client from '@/model/ftp/lib/connection'
 var progressStream = require('progress-stream');
 
 const prettyBytes = require('pretty-bytes');
