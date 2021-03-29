@@ -9,7 +9,13 @@ export class Console {
         }
         this.outputChannel.show(true);
         const begin = format('yyyy-MM-dd hh:mm:ss', new Date());
-        this.outputChannel.appendLine(`${begin} : ${value}`);
+        this.outputChannel.appendLine(`${begin} ${value}`);
+    }
+
+    public static ling(){
+        if (this.outputChannel == null) {
+            this.outputChannel = vscode.window.createOutputChannel("MySQL");
+        }
         this.outputChannel.appendLine("-----------------------------------------------------------------------------------------");
     }
 

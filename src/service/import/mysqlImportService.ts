@@ -15,14 +15,11 @@ export class MysqlImportService extends ImportService {
             const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
             const command = `mysql -h ${host} -P ${port} -u ${node.user} ${node.password ? `-p${node.password}` : ""} ${node.schema || ""} < ${importPath}`
             Console.log(`Executing: ${command.replace(/-p.+? /, "-p****** ")}`);
-            exec(command, (err,stdout,stderr) => {
-                if (err) {
-                    Console.log(err);
-                }else if(stderr){
-                    Console.log(stderr);
-                } else {
-                    Console.log(`Import Success!`);
-                }
+            const cp=exec(command, (err,stdout,stderr) => {
+                Console.log(err||stdout||stderr);
+            })
+            cp.on("close",(code,singal)=>{
+                Console.log(code===0?'Import Done.':"Import Occur Error!");
             })
         } else {
             super.importSql(importPath,node)
