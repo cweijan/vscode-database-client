@@ -59,7 +59,7 @@ export default async function main(inputOptions: Options, node: Node): Promise<v
     fs.writeFileSync(options.dumpToFile, '');
 
     // write the initial headers
-    if (isMysql(node)) {
+    if (node.schema && options.dump.withDatabase && isMysql(node)) {
         fs.appendFileSync(options.dumpToFile, `${HEADER_VARIABLES}\n`);
     }
 
@@ -101,7 +101,7 @@ USE ${node.schema};\n\n`);
     }
 
       // reset all of the variables
-      if (isMysql(node)) {
+      if (node.schema && options.dump.withDatabase && isMysql(node)) {
         fs.appendFileSync(options.dumpToFile, FOOTER_VARIABLES);
     }
 
