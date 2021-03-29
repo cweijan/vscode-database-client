@@ -253,7 +253,8 @@ export default {
   methods: {
     getTip(column,scopeColumn){
       if(!column)return scopeColumn.title
-      return column.type;
+      
+      return `${column.type}${column.comment?`#${column.comment}`:""}`
     },
     editListen(event, scope) {
       const { row, column, rowIndex } = scope;
