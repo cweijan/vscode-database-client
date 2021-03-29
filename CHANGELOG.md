@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# 3.6.5 2021-3-29
+
+- Support connectio to ftp server.
+- Support delete ssh connection.
+- Support show procedrue one result.
+- Fix bugs.
+
 # 3.6.0 2021-3-11
 
 - Support connect to database server without exists connection.
