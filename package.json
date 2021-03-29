@@ -544,7 +544,7 @@
 			"view/item/context": [
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|esConnection|redisConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|esConnection|sshConnection|redisConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
 					"group": "inline@-2"
 				},
 				{
