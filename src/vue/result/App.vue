@@ -43,7 +43,7 @@
       </ux-table-column>
       <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field.name,0,index,toolbar.filter[field.name])" edit-render>
         <template slot="header" slot-scope="scope">
-          <el-tooltip class="item" effect="dark" :content="(result.columnList[index]&&result.columnList[index].comment)?result.columnList[index].comment:scope.column.title" placement="left-start">
+          <el-tooltip class="item" effect="dark" :content="getTip(result.columnList[index],scope.column)" placement="left-start">
             <span>
               <span v-if="result.columnList[index]&& (result.columnList[index].nullable != 'YES')" style="color: #f94e4e; position: relative; top: .2em;">
                 *
@@ -251,6 +251,10 @@ export default {
     });
   },
   methods: {
+    getTip(column,scopeColumn){
+      if(!column)return scopeColumn.title
+      return column.type;
+    },
     editListen(event, scope) {
       const { row, column, rowIndex } = scope;
       const editList = this.update.editList;
