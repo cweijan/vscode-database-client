@@ -89,18 +89,22 @@
         <section class="mb-2" v-if="connectionOption.dbType=='FTP'">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">Encoding</label>
-            <input class="w-64 field__input" placeholder="millisecond" required v-model="connectionOption.encoding" />
+            <input class="w-64 field__input" placeholder="UTF8" required v-model="connectionOption.encoding" />
+          </div>
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-32">Show Hidden File</label>
+            <el-switch v-model="connectionOption.showHidden"></el-switch>
           </div>
         </section>
 
         <section class="mb-2">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">ConnectTimeout</label>
-            <input class="w-64 field__input" placeholder="millisecond" required v-model="connectionOption.connectTimeout" />
+            <input class="w-64 field__input" placeholder="5000" required v-model="connectionOption.connectTimeout" />
           </div>
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">RequestTimeout</label>
-            <input class="w-64 field__input" placeholder="millisecond" required type="number" v-model="connectionOption.requestTimeout" />
+            <input class="w-64 field__input" placeholder="10000" required type="number" v-model="connectionOption.requestTimeout" />
           </div>
         </section>
   
@@ -201,6 +205,7 @@ export default {
         encoding: "utf8",
         database: null,
         usingSSH: false,
+        showHidden: false,
         includeDatabases: null,
         dbType: "MySQL",
         encrypt: true,
@@ -317,7 +322,7 @@ export default {
           this.connectionOption.database = "0";
           break;
         case "FTP":
-          this.connectionOption.port = 12;
+          this.connectionOption.port = 21;
           this.connectionOption.user = null;
           break;
         case "SSH":

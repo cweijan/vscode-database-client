@@ -135,6 +135,9 @@ export class FTPConnectionNode extends FtpBaseNode {
 
         const folderList: Node[] = []
         const fileList: Node[] = []
+        if (!this.showHidden) {
+            list = list.filter(item => !item.name.startsWith("."))
+        }
 
         for (const item of list) {
             if (item.type == "d") {

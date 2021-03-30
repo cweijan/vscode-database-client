@@ -76,6 +76,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
      * encoding, ftp only
      */
      public encoding: string;
+     public showHidden: boolean;
 
     constructor(public label: string) {
         super(label)
@@ -96,6 +97,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.usingSSH = source.usingSSH
         this.scheme = source.scheme
         this.encoding=source.encoding
+        this.showHidden=source.showHidden
         if (!this.schema) {
             this.schema = source.schema
         }
