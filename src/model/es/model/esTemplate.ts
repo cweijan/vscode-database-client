@@ -35,5 +35,11 @@ export class EsTemplate {
     },
     "fragment_size": 2147483647
   }
+}
+
+POST /myIndex/_doc
+{
+    "id": 1,
+    "name": "test"
 }`;
 }

@@ -49,7 +49,7 @@ export class ESIndexNode extends Node {
     }
 
     public newQuery() {
-        FileManager.show(`${this.getConnectId()}#${this.label}.es`).then(async editor => {
+        FileManager.show(`${this.getConnectId()}/${this.label}.es`).then(async editor => {
             if (editor.document.getText().length == 0) {
                 const columns = (await this.getChildren()).map(n => `"${n.label}"`).join(",")
                 editor.edit(editBuilder => {

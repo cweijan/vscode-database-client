@@ -173,7 +173,7 @@ export class ConnectionManager {
                 const [host, port, database, schema] = queryName
                 .replace(/^.*@@/, '') // new connection id
                 .replace(/#.+$/, '').split('@')
-                if (host != null && port != null) {
+                if (host != null) {
                     const node = NodeUtil.of({ key: queryName.split('@@')[0], host, port: parseInt(port), database, schema });
                     if (node.getCache()) {
                         return node.getCache();
