@@ -29,6 +29,7 @@ export class FileManager {
     public static record(fileName: string, content: string, model?: FileModel): Promise<string> {
         if (!this.storagePath) { vscode.window.showErrorMessage("FileManager is not init!") }
         if (!fileName) { return; }
+        fileName=fileName.replace(/[\:\*\?"\<\>]*/g,"")
         return new Promise((resolve) => {
             const recordPath = `${this.storagePath}/${fileName}`;
             this.check(path.resolve(recordPath, '..'))
@@ -47,7 +48,6 @@ export class FileManager {
 
 
     private static check(checkPath: string) {
-
         if (!fs.existsSync(checkPath)) { this.recursiseCreate(checkPath) }
 
     }
