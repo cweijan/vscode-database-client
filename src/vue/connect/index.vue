@@ -45,10 +45,13 @@
   
       <section class="mb-2">
         <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Host</label>
+          <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>
+            <span v-if="connectionOption.dbType=='ElasticSearch'">URL</span>
+            <span v-if="connectionOption.dbType!='ElasticSearch'">Host</span>
+          </label>
           <input class="w-64 field__input" placeholder="The host of connection" required v-model="connectionOption.host" />
         </div>
-        <div class="inline-block mr-10">
+        <div class="inline-block mr-10" v-if="connectionOption.dbType!='ElasticSearch'">
           <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Port</label>
           <input class="w-64 field__input" placeholder="The port of connection" required type="number" v-model="connectionOption.port" />
         </div>
@@ -312,8 +315,9 @@ export default {
           this.connectionOption.database = "master";
           break;
         case "ElasticSearch":
+          this.connectionOption.host="127.0.0.1:9200"
           this.connectionOption.user = null;
-          this.connectionOption.port = 9200;
+          this.connectionOption.port = null;
           this.connectionOption.database = null;
           break;
         case "Redis":

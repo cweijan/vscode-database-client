@@ -1,8 +1,9 @@
 import axios from "axios";
 import { Node } from "@/model/interface/node";
 import { IConnection, queryCallback } from "./connection";
-import { ESIndexNode } from "@/model/es/model/esIndexNode";
 import { EsIndexGroup } from "@/model/es/model/esIndexGroupNode";
+import * as compareVersions from 'compare-versions';
+const extPackage=require("@/../package.json")
 
 export class EsConnection extends IConnection {
 
@@ -10,7 +11,11 @@ export class EsConnection extends IConnection {
     private conneted: boolean;
     constructor(private opt: Node) {
         super()
-        this.url = `${opt.scheme}://${opt.host}:${opt.port}`
+        if(compareVersions(extPackage.version,'3.6.6')===1){
+            this.url = `${opt.scheme}://${opt.host}`
+        }else{
+            this.url = `${opt.scheme}://${opt.host}:${opt.port}`
+        }
     }
 
     query(sql: string, callback?: queryCallback): void;
