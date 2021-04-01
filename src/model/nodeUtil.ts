@@ -8,6 +8,9 @@ export abstract class NodeUtil {
         if (!node) {
             return null;
         }
+        if(isNaN(node.port)){
+            node.port=null;
+        }
         if (node && !(node instanceof Node)) {
             node.__proto__ = Node.prototype
         }

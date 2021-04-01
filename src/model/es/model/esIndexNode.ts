@@ -32,7 +32,7 @@ export class ESIndexNode extends Node {
 
         return this.execute(`get /${this.label}/_mapping`).then(data => {
             const mappings = data[this.label]?.mappings
-            if (mappings) {
+            if (mappings!=null && Object.keys(mappings).length>0) {
                 // since es7, mappings don't have type.
                 const properties = mappings.properties || mappings[Object.keys(mappings)[0]]?.properties
                 this.properties = properties;

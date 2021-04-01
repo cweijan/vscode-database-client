@@ -235,10 +235,10 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
         const schema = opt?.schema || this.schema;
         if (opt?.withSchema && schema) {
-            return `${uid}@${schema}`
+            return `${uid}@${schema}`.replace(/[\:\*\?"\<\>]*/g,"")
         }
 
-        return uid;
+        return uid.replace(/[\:\*\?"\<\>]*/g,"");
     }
 
 
