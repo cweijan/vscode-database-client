@@ -35,7 +35,6 @@ export class QueryUnit {
 
 
     private static importPattern = /^\s*\bsource\b\s+(.+)/i;
-    protected static delimiterHodler = new DelimiterHolder()
     public static async runQuery(sql: string, connectionNode: Node, queryOption: QueryOption = {}): Promise<null> {
 
         if (!connectionNode) {
@@ -61,7 +60,7 @@ export class QueryUnit {
                 sql = sqlList[0]
             }
 
-            const parseResult = this.delimiterHodler.parseBatch(sql, connectionNode.getConnectId())
+            const parseResult = DelimiterHolder.parseBatch(sql, connectionNode.getConnectId())
             sql = parseResult.sql
             if (!sql && parseResult.replace) {
                 QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, queryOption, res: { message: `change delimiter success`, success: true } as MessageResponse });
@@ -147,7 +146,7 @@ export class QueryUnit {
         const activeTextEditor = vscode.window.activeTextEditor;
         const selection = activeTextEditor.selection;
         const newLocal = !selection.isEmpty ? activeTextEditor.document.getText(selection) :
-            this.obtainSql(activeTextEditor, this.delimiterHodler.get(connectionNode.getConnectId()));
+            this.obtainSql(activeTextEditor, DelimiterHolder.get(connectionNode.getConnectId()));
         return newLocal;
     }
 

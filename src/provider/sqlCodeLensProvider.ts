@@ -1,5 +1,7 @@
 import { ConfigKey } from '@/common/constants';
 import { Global } from '@/common/global';
+import { DelimiterHolder } from '@/service/common/delimiterHolder';
+import { ConnectionManager } from '@/service/connectionManager';
 import * as vscode from 'vscode';
 
 export class SqlCodeLensProvider implements vscode.CodeLensProvider {
@@ -17,6 +19,8 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
             return []
         }
 
+        const delimter=this.getDelimter();
+
         const codeLens = []
 
         let start: vscode.Position;
@@ -32,7 +36,7 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
                 start = new vscode.Position(i, 0)
             }
 
-            let sep = text.indexOf(";")
+            let sep = text.indexOf(delimter)
             if (start && (lineCount - 1 == i)) {
                 sep=text.length;
             }
@@ -44,13 +48,21 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
                     arguments: [sql],
                 }));
                 start = null;
-                sql = text.substr(sep)
+                sql = text.substr(sep+delimter.length)
                 continue;
             }
         }
 
         return codeLens
 
+    }
+    private getDelimter() {
+
+        const node=ConnectionManager.tryGetConnection()
+        if(node){
+            return DelimiterHolder.get(node.getConnectId()).replace(/\\/g,'')
+        }
+        return ";";
     }
 
 }
