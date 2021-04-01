@@ -70,11 +70,11 @@
           </div>
         </section>
   
-        <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
+        <section class="mb-2" v-if="connectionOption.dbType=='SqlServer' || connectionOption.dbType=='PostgreSQL'">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">Encrypt</label>
             <el-switch v-model="connectionOption.encrypt"></el-switch>
-            ( If connect SqlServer fail, try change this option. )
+            ( If connect DatabaseServer fail, try change this option. )
           </div>
         </section>
   
@@ -302,6 +302,7 @@ export default {
           break;
         case "PostgreSQL":
           this.connectionOption.user = "postgres";
+          this.connectionOption.encrypt=false;
           this.connectionOption.port = 5432;
           this.connectionOption.database = "postgres";
           break;
@@ -311,6 +312,7 @@ export default {
           break;
         case "SqlServer":
           this.connectionOption.user = "sa";
+          this.connectionOption.encrypt=true;
           this.connectionOption.port = 1433;
           this.connectionOption.database = "master";
           break;
