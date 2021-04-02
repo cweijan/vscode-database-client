@@ -1,10 +1,16 @@
 # CHANGELOG
 
+# 3.6.7 2021-4-2
+
+- Postgresql support config ssl enable option.
+- Support delimiter on codelen.
+- Change ElasticSearch connect host:port to url.
+
 # 3.6.5 2021-3-29
 
-- Support connectio to ftp server.
+- Support connect to ftp server.
 - Support delete ssh connection.
-- Support show procedrue one result.
+- Support show procedure one result.
 - Fix bugs.
 
 # 3.6.0 2021-3-11
