@@ -46,10 +46,10 @@ export class QueryUnit {
         connectionNode = NodeUtil.of(connectionNode)
         if (queryOption.split == null) queryOption.split = sql == null;
 
-        let fromEditor = false;
+        let recordHistory = queryOption.recordHistory;
         if (!sql) {
             sql = this.getSqlFromEditor(connectionNode);
-            fromEditor = true;
+            recordHistory = true;
         }
         sql = sql.replace(/^\s*--.+/igm, '').trim();
 
@@ -84,7 +84,7 @@ export class QueryUnit {
                     return;
                 }
                 const costTime = new Date().getTime() - executeTime;
-                if (fromEditor) {
+                if (recordHistory) {
                     vscode.commands.executeCommand(CodeCommand.RecordHistory, sql, costTime);
                 }
                 if (data.affectedRows) {
@@ -210,4 +210,5 @@ export interface QueryResult<T> {
 export interface QueryOption {
     viewId?: any;
     split?: boolean;
+    recordHistory?:boolean;
 }

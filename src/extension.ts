@@ -246,7 +246,7 @@ export function activate(context: vscode.ExtensionContext) {
                     tableNode.openTable();
                 },
                 "mysql.codeLens.run": (sql: string) => {
-                    QueryUnit.runQuery(sql,ConnectionManager.tryGetConnection(),{split:true})
+                    QueryUnit.runQuery(sql,ConnectionManager.tryGetConnection(),{split:true,recordHistory:true})
                 },
                 "mysql.table.design": (tableNode: TableNode) => {
                     tableNode.designTable();
