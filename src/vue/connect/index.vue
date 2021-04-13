@@ -294,6 +294,7 @@ export default {
       if (this.editModel) {
         return;
       }
+      this.connectionOption.host="127.0.0.1"
       switch (value) {
         case "MySQL":
           this.connectionOption.user = "root";
