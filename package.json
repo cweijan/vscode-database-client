@@ -1,5 +1,5 @@
 {
-	"name": "vscode-database-client2",
+	"name": "vscode-mysql-client2",
 	"displayName": "Database Client",
 	"description": "Database Client for vscode",
 	"version": "3.6.7",

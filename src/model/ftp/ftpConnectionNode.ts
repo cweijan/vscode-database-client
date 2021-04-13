@@ -8,6 +8,7 @@ import { InfoNode } from "../other/infoNode";
 import { FtpBaseNode } from "./ftpBaseNode";
 import { FTPFileNode } from "./ftpFileNode";
 import * as Client from '@/model/ftp/lib/connection'
+import { TreeItemCollapsibleState } from "vscode";
 
 export class FTPConnectionNode extends FtpBaseNode {
 
@@ -18,6 +19,10 @@ export class FTPConnectionNode extends FtpBaseNode {
         this.contextValue = this.file ? ModelType.FTP_FOLDER : ModelType.FTP_CONNECTION;
         this.init(parent)
         this.iconPath = path.join(Constants.RES_PATH, this.file ? "ssh/folder.svg" : "ssh/chain.svg");
+        if (this.disable) {
+            this.collapsibleState = TreeItemCollapsibleState.None;
+            this.iconPath = path.join(Constants.RES_PATH, "icon/close.svg");
+        }
         if (file) {
             this.fullPath = (parent as FTPConnectionNode).fullPath + key + "/"
         } else {
