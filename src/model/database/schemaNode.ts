@@ -61,7 +61,10 @@ export class SchemaNode extends Node implements CopyAble {
         const target = this.dbType == DatabaseType.MSSQL || this.dbType == DatabaseType.PG ? 'schema' : 'database';
         vscode.window.showInputBox({ prompt: `Are you want to drop ${target} ${this.schema} ?     `, placeHolder: `Input ${target} name to confirm.` }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.schema.toLowerCase()) {
-                this.execute(`DROP ${target} ${this.wrap(this.schema)}`).then(() => {
+                this.execute(`DROP ${target} ${this.wrap(this.schema)}`).then(async () => {
+                    for (const child of await this.getChildren()) {
+                        child.setChildCache(null)
+                    }
                     DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`)
                     DbTreeDataProvider.refresh(this.parent);
                     vscode.window.showInformationMessage(`Drop ${target} ${this.schema} success!`)
