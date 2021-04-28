@@ -517,6 +517,11 @@
 					"command": "mysql.mock.run",
 					"when": "resourceFilename =~ /mock.json$/ ",
 					"group": "navigation"
+				},
+				{
+					"command": "mysql.runQuery",
+					"when": "editorLangId == sql || resourceFilename =~ /.sql$/ ",
+					"group": "navigation"
 				}
 			],
 			"view/title": [
