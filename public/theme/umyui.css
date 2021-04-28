@@ -31,12 +31,12 @@ https://www.umyui.com/
 }
 
 .title-info,
-.plx-cell--title {
+.plx-cell--title .column-name{
   user-select: all;
 }
 
 .plx-cell,
-.plx-cell--title {
+.plx-cell--title{
   text-overflow: unset !important;
 }
 

@@ -48,7 +48,9 @@
               <span v-if="result.columnList[index]&& (result.columnList[index].nullable != 'YES')" style="color: #f94e4e; position: relative; top: .2em;">
                 *
               </span>
-              {{ scope.column.title }}
+              <span class="column-name">
+                {{ scope.column.title }}
+              </span>
             </span>
           </el-tooltip>
         </template>
