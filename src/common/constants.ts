@@ -87,6 +87,7 @@ export enum MessageType {
     DATA = 'DATA',
     DML = 'DML',
     DDL = 'DDL',
+    MESSAGE_BLOCK = 'MESSAGE_BLOCK',
     ERROR = "ERROR",
     RUN = "RUN",
     MESSAGE = "MESSAGE",

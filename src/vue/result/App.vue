@@ -221,6 +221,7 @@ export default {
           break;
         case "DML":
         case "DDL":
+        case "MESSAGE_BLOCK":
           handlerCommon(response);
           this.info.error = false;
           this.info.needRefresh = false;

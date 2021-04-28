@@ -14,6 +14,8 @@ import { NodeUtil } from "~/model/nodeUtil";
 import { Trans } from "~/common/trans";
 import { IConnection } from "./connect/connection";
 import { FieldInfo } from "@/common/typeDef";
+import { Util } from "@/common/util";
+import { utils } from "ssh2-streams";
 
 export class QueryUnit {
 
@@ -93,22 +95,28 @@ export class QueryUnit {
                     return;
                 }
 
-                // query result or multi statement.
-                if (Array.isArray(data)) {
-                    // not query result
-                    const lastEle = data[data.length - 1]
-                    if (lastEle && lastEle.__proto__.constructor.name == "ResultSetHeader") {
-                        data = data[data.length - 2]
-                        fields = fields[fields.length - 2] as any as FieldInfo[]
-                    } else if (lastEle && (lastEle.__proto__.constructor.name == "array" || lastEle.__proto__.constructor.name == "OkPacket")) {
-                        QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, queryOption, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
-                        return;
-                    }
-                    QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
-                } else {
-                    // unknow result, send sql success
-                    QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, queryOption, res: { message: `Execute sql success : ${sql}`, costTime, success: true } as MessageResponse });
+                // unknow result
+                if (!Array.isArray(data)) {
+                    QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE_BLOCK, queryOption, res: { sql, costTime } as DMLResponse });
+                    return;
                 }
+
+                // query result
+                if(fields && Array.isArray(fields) && Util.is(fields[0],'ColumnDefinition')){
+                    QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+                    return;
+                }
+
+                //procedrue call result
+                const lastEle = data[data.length - 1]
+                if (data.length>2 &&  Util.is(lastEle,'ResultSetHeader') && Util.is(data[0],'TextRow')) {
+                    data = data[data.length - 2]
+                    fields = fields[fields.length - 2] as any as FieldInfo[]
+                    QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+                    return;
+                }
+
+                QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE_BLOCK, queryOption, res: { sql, costTime } as DMLResponse });
 
             });
         } catch (error) {
@@ -210,5 +218,5 @@ export interface QueryResult<T> {
 export interface QueryOption {
     viewId?: any;
     split?: boolean;
-    recordHistory?:boolean;
+    recordHistory?: boolean;
 }

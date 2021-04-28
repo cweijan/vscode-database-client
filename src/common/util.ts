@@ -88,13 +88,13 @@ export class Util {
                     task(resolve)
                 } catch (error) {
                     vscode.window.showErrorMessage(error.message)
-                } 
+                }
             })
         })
     }
 
     public static getExtPath(...paths: string[]) {
-        
+
         return vscode.Uri.file(join(Constants.RES_PATH, ...paths))
     }
 
@@ -103,6 +103,11 @@ export class Util {
     }
     public static store(key: string, object: any) {
         Global.context.globalState.update(key, object)
+    }
+
+    public static is(object: any, type: string) :boolean{
+        if(!object) return false;
+        return object.__proto__.constructor.name == type;
     }
 
 }
