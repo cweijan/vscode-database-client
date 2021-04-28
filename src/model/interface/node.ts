@@ -229,7 +229,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         uid = `${this.key}@@${uid}`
 
         const database = this.database;
-        if (database && this.contextValue != ModelType.CONNECTION) {
+        if (database && this?.contextValue != ModelType.CONNECTION) {
             uid = `${uid}@${database}`;
         }
 

@@ -1,5 +1,13 @@
 # CHANGELOG
 
+# 3.6.9 2021-4-28
+
+- Support show multi DML execute result.
+- Result view select column without '*'.
+- Disable retry.
+- Fix filter trigger save on result view.
+- Update donate button style.
+
 # 3.6.7 2021-4-2
 
 - Postgresql support config ssl enable option.
