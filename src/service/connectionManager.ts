@@ -111,16 +111,7 @@ export class ConnectionManager {
             newConnection.connect(async (err: Error) => {
                 if (err) {
                     this.end(key, this.alivedConnection[key])
-                    if (getRequest.retryCount >= 2) {
-                        reject(err)
-                    } else {
-                        try {
-                            getRequest.retryCount++;
-                            resolve(await this.getConnection(connectionNode, getRequest))
-                        } catch (error) {
-                            reject(error)
-                        }
-                    }
+                    reject(err)
                 } else {
                     try {
                         const sql = connectionNode?.dialect?.pingDataBase(connectionNode.schema);
