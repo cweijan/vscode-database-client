@@ -8,7 +8,7 @@
         <el-button v-if="showFullBtn" @click="full" type="primary" title="Full Result View" icon="el-icon-rank" size="mini" circle>
         </el-button>
         <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
-        <el-button type="primary" size="mini" icon="el-icon-loading" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
+        <el-button type="primary" size="mini" icon="el-icon-milk-tea" title="Buy the author a cup of coffee" circle @click='openCoffee'></el-button>
         <el-button @click="$refs.editor.openInsert()" :disabled="result.tableCount!=1" type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle>
         </el-button>
         <el-button @click="deleteConfirm" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!toolbar.show">
@@ -58,7 +58,7 @@
             </el-input>
           </template>
           <template v-if="!scope.row.isFilter">
-            <div :contenteditable="editable" style="height: 100%; line-height: 33px;" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])'></div>
+            <div class="edit-column" :contenteditable="editable" style="height: 100%; line-height: 33px;" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])'></div>
           </template>
         </template>
       </ux-table-column>
@@ -187,12 +187,10 @@ export default {
       });
     });
     window.onkeypress = (e) => {
-      if (e.code == "Enter") {
+      if ((e.code == "Enter" && e.target.classList.contains('edit-column') ) || (e.ctrlKey && e.code == "KeyS")) {
         this.save();
         e.stopPropagation();
         e.preventDefault();
-      } else if (e.ctrlKey && e.code == "KeyS") {
-        this.save();
       }
     };
     window.addEventListener("message", ({ data }) => {
@@ -280,7 +278,9 @@ export default {
           this.result.data[index]
         );
       }
-      vscodeEvent.emit("saveModify", sql);
+      if(sql){
+        vscodeEvent.emit("saveModify", sql);
+      }
     },
     full() {
       vscodeEvent.emit("full");
