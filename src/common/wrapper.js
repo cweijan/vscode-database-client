@@ -5,7 +5,7 @@
 export function wrapByDb(origin, databaseType) {
     if (origin == null) { return origin; }
 
-    if (origin.match(/\b[-]\b/ig) || origin.match(/^(if|key|desc|length)$/i)) {
+    if (origin.match(/\b[-\s]+\b/ig) || origin.match(/^( |if|key|desc|length)$/i)) {
         if (databaseType == 'SqlServer') {
             return origin.split(".").map(text => `[${text}]`).join(".")
         }

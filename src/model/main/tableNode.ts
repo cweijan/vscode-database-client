@@ -249,7 +249,7 @@ ROW_FORMAT : ${meta.row_format}
 
         const primaryKey = MockRunner.primaryKeyMap[this.uid];
         if (primaryKey != null) {
-            const count = await this.execute(`select max(${primaryKey}) max from ${this.table}`);
+            const count = await this.execute(`select max(${primaryKey}) max from ${this.wrap(this.table)}`);
             if (count && count[0]?.max) { return count[0].max }
         }
 
