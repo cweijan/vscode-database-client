@@ -1,3 +1,4 @@
+import { Console } from "@/common/Console";
 import { DatabaseType, ModelType } from "@/common/constants";
 import { Util } from "@/common/util";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
@@ -75,8 +76,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     /**
      * encoding, ftp only
      */
-     public encoding: string;
-     public showHidden: boolean;
+    public encoding: string;
+    public showHidden: boolean;
 
     constructor(public label: string) {
         super(label)
@@ -96,8 +97,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
         this.scheme = source.scheme
-        this.encoding=source.encoding
-        this.showHidden=source.showHidden
+        this.encoding = source.encoding
+        this.showHidden = source.showHidden
         if (!this.schema) {
             this.schema = source.schema
         }
@@ -141,31 +142,35 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public async indent(command: IndentCommand) {
 
-        const cacheKey = command.cacheKey || this.provider?.connectionKey;
-        const connections = this.context.get<{ [key: string]: Node }>(cacheKey, {});
-        const key = this.key || this.getConnectId()
+        try {
+            const cacheKey = command.cacheKey || this.provider?.connectionKey;
+            const connections = this.context.get<{ [key: string]: Node }>(cacheKey, {});
+            const key = this.key || this.getConnectId()
 
-        switch (command.command) {
-            case CommandKey.add:
-                connections[key] = NodeUtil.removeParent(this);
-                break;
-            case CommandKey.update:
-                connections[key] = NodeUtil.removeParent(this);
-                ConnectionManager.removeConnection(key)
-                DatabaseCache.clearDatabaseCache(key)
-                break;
-            case CommandKey.delete:
-                ConnectionManager.removeConnection(key)
-                delete connections[key]
-            default:
-                break;
-        }
+            switch (command.command) {
+                case CommandKey.add:
+                    connections[key] = NodeUtil.removeParent(this);
+                    break;
+                case CommandKey.update:
+                    connections[key] = NodeUtil.removeParent(this);
+                    ConnectionManager.removeConnection(key)
+                    DatabaseCache.clearDatabaseCache(key)
+                    break;
+                case CommandKey.delete:
+                    ConnectionManager.removeConnection(key)
+                    delete connections[key]
+                default:
+                    break;
+            }
 
 
-        await this.context.update(cacheKey, connections);
+            await this.context.update(cacheKey, connections);
 
-        if (command.refresh !== false) {
-            DbTreeDataProvider.refresh();
+            if (command.refresh !== false) {
+                DbTreeDataProvider.refresh();
+            }
+        } catch (error) {
+            Console.log(error)
         }
 
     }
@@ -235,10 +240,10 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
         const schema = opt?.schema || this.schema;
         if (opt?.withSchema && schema) {
-            return `${uid}@${schema}`.replace(/[\:\*\?"\<\>]*/g,"")
+            return `${uid}@${schema}`.replace(/[\:\*\?"\<\>]*/g, "")
         }
 
-        return uid.replace(/[\:\*\?"\<\>]*/g,"");
+        return uid.replace(/[\:\*\?"\<\>]*/g, "");
     }
 
 
