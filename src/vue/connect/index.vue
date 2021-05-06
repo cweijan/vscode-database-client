@@ -77,6 +77,13 @@
             ( If connect DatabaseServer fail, try change this option. )
           </div>
         </section>
+
+        <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-32">Instance Name</label>
+            <input class="w-64 field__input" placeholder="Connection named instance" v-model="connectionOption.instanceName" />
+          </div>
+        </section>
   
         <section class="mb-2" v-if="connectionOption.dbType!='FTP'">
           <div class="inline-block mr-10">

@@ -67,6 +67,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
       * mssql only
       */
     public encrypt?: boolean;
+    public instanceName?: string;
 
     /**
      * es only
@@ -113,6 +114,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             source.requestTimeout = parseInt(source.requestTimeout as any)
         }
         this.encrypt = source.encrypt
+        this.instanceName=source.instanceName
         this.disable = source.disable
         this.includeDatabases = source.includeDatabases
         if (!this.provider) this.provider = source.provider
