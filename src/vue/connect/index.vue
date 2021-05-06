@@ -71,17 +71,30 @@
         </section>
   
         <section class="mb-2" v-if="connectionOption.dbType=='SqlServer' || connectionOption.dbType=='PostgreSQL'">
+          <div class="inline-block mr-10" v-if="connectionOption.dbType=='SqlServer'">
+            <label class="font-bold mr-5 inline-block w-32">Auth Type</label>
+            <el-select v-model="connectionOption.authType">
+              <el-option :label="'default'" value="default"></el-option>
+              <el-option :label="'ntlm(Windows Auth)'" value="ntlm"></el-option>
+              <!-- <el-option :label="'azure-active-directory-password'" value="azure-active-directory-password"></el-option>
+              <el-option :label="'azure-active-directory-msi-vm'" value="azure-active-directory-msi-vm"></el-option>
+              <el-option :label="'azure-active-directory-msi-app-service'" value="azure-active-directory-msi-app-service"></el-option> -->
+            </el-select>
+          </div>
           <div class="inline-block mr-10">
-            <label class="font-bold mr-5 inline-block w-32">Encrypt</label>
+            <label class="font-bold mr-5 inline-block w-18">Encrypt</label>
             <el-switch v-model="connectionOption.encrypt"></el-switch>
-            ( If connect DatabaseServer fail, try change this option. )
+          </div>
+          <div class="inline-block mr-10" v-if="connectionOption.dbType=='SqlServer'">
+            <label class="font-bold mr-5 inline-block w-32">TrustServerCertificate</label>
+            <el-switch v-model="connectionOption.trustServerCertificate"></el-switch>
           </div>
         </section>
 
         <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">Instance Name</label>
-            <input class="w-64 field__input" placeholder="Connection named instance" v-model="connectionOption.instanceName" />
+            <input class="w-64 field__input" placeholder="Connection named instance" title="The instance name to connect to. The SQL Server Browser service must be running on the database server, and UDP port 1434 on the database server must be reachable.(no default)" v-model="connectionOption.instanceName" />
           </div>
         </section>
   
@@ -211,6 +224,7 @@ export default {
         host: "127.0.0.1",
         port: "3306",
         user: "root",
+        authType:"default",
         password: "",
         encoding: "utf8",
         database: null,

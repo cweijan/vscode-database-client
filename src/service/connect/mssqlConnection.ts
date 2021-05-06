@@ -18,6 +18,7 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
             options: {
                 port:node.port,
                 instanceName: node.instanceName,
+                trustServerCertificate: node.trustServerCertificate,
                 database: node.database || undefined,
                 connectTimeout: node.connectTimeout? parseInt(node.connectTimeout as any): 5000,
                 requestTimeout: node.requestTimeout? parseInt(node.requestTimeout as any): 10000,
