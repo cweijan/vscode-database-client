@@ -3,12 +3,12 @@
     <div class="opt-panel">
       <el-form>
         <el-form-item label-width="80px" label="Target">
-          <el-select v-model="option.from.connection">
+          <el-select v-model="option.from.connection" @change="clearFrom">
             <el-option :label="node.label" :value="node.uid" :key="node.uid" v-for="node in initData.nodes"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label-width="80px" label="database">
-          <el-select v-model="option.from.database">
+          <el-select v-model="option.from.database"  @change="(db)=>changeActive(db,true)">
             <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in initData.databaseList[option.from.connection]"></el-option>
           </el-select>
         </el-form-item>
@@ -17,13 +17,13 @@
     <div class="opt-panel">
       <el-form>
         <el-form-item label-width="90px" label="Sync From">
-          <el-select v-model="option.to.connection">
-            <el-option :label="node.label" :value="node.label" :key="node.label" v-for="node in initData.nodes"></el-option>
+          <el-select v-model="option.to.connection" @change="clearTo">
+            <el-option :label="node.label" :value="node.uid" :key="node.uid" v-for="node in initData.nodes" ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label-width="90px" label="database">
-          <el-select v-model="option.to.database">
-            <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in initData.databaseList[option.to.connection]"></el-option>
+          <el-select v-model="option.to.database" @change="(db)=>changeActive(db,false)">
+            <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in initData.databaseList[option.to.connection]" ></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -53,7 +53,7 @@ export default {
   data() {
     return {
       initData: { nodes: [], databaseList: {} },
-      option: { from: { connection: null, database: null }, to: {} },
+      option: { from: { connection: null, database: null,db:null }, to: {db:null} },
       loading: { compare: false, sync: false },
       compareResult: { sqlList: null },
     };
@@ -81,6 +81,26 @@ export default {
       .init();
   },
   methods: {
+    clearFrom(){
+      this.option.from.db=null;
+      this.option.from.database=null;
+    },
+    clearTo(){
+      this.option.to.db=null;
+      this.option.to.database=null;
+    },
+    changeActive(dbName,isFrom){
+      const key=isFrom?this.option.from.connection:this.option.to.connection;
+      for (const db of this.initData.databaseList[key]) {
+        if(db.label==dbName){
+          if(isFrom){
+            this.option.from.db=db;
+          }else{
+            this.option.to.db=db;
+          }
+        }
+      }
+    },
     startCompare() {
       this.loading.compare = true;
       this.emit("start", this.option);

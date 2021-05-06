@@ -38,10 +38,8 @@ export class DiffService {
                         handler.emit("error", error.message)
                     }
                 }).on("start", async (opt) => {
-
-                    const fromTables =await new TableGroup(Node.nodeCache[`${opt.from.connection}@${opt.from.database}@${opt.from.schema}`]).getChildren()
-                    const toTables =await new TableGroup(Node.nodeCache[`${opt.to.connection}@${opt.to.database}@${opt.to.schema}`]).getChildren()
-                    
+                    const fromTables =await new TableGroup(Node.nodeCache[opt.from.db.uid]).getChildren()
+                    const toTables =await new TableGroup(Node.nodeCache[opt.to.db.uid]).getChildren()
                     let sqlList = await this.compareTables(fromTables, toTables);
                     handler.emit("compareResult", { sqlList })
                 }).on("sync", async ({ option, sqlList }) => {

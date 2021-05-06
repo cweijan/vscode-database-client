@@ -116,9 +116,9 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             source.requestTimeout = parseInt(source.requestTimeout as any)
         }
         this.encrypt = source.encrypt
-        this.trustServerCertificate=source.trustServerCertificate
-        this.instanceName=source.instanceName
-        this.authType=source.authType
+        this.trustServerCertificate = source.trustServerCertificate
+        this.instanceName = source.instanceName
+        this.authType = source.authType
         this.disable = source.disable
         this.includeDatabases = source.includeDatabases
         if (!this.provider) this.provider = source.provider
@@ -246,7 +246,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
         const schema = opt?.schema || this.schema;
         if (opt?.withSchema && schema) {
-            return `${uid}@${schema}`.replace(/[\:\*\?"\<\>]*/g, "")
+            uid = `${uid}@${schema}`
         }
 
         return uid.replace(/[\:\*\?"\<\>]*/g, "");
