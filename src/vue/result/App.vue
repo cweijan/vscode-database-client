@@ -225,7 +225,6 @@ export default {
           handlerCommon(response);
           this.info.error = false;
           this.info.needRefresh = false;
-          this.refresh();
           break;
         case "ERROR":
           handlerCommon(response);
