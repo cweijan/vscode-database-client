@@ -6,7 +6,7 @@
     <template v-else-if="type=='time'">
       <el-time-picker value-format="HH:mm:ss" :value="value" @input="sync"></el-time-picker>
     </template>
-    <template v-else-if="type=='datetime'">
+    <template v-else-if="isDateTime(type)">
       <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" type="datetime" :value="value" @input="sync"></el-date-picker>
     </template>
     <el-input v-else="type" :value="value" @input="sync"></el-input>
@@ -18,6 +18,11 @@ import { METHODS } from "http"
 export default {
   props: ["type", "value"],
   methods: {
+    isDateTime(type){
+      if(!type)return false;
+      type=type.toUpperCase()
+      return type=='DATETIME' || type=='TIMESTAMP' || type=='TIMESTAMP WITHOUT TIME ZONE'
+    },
     sync(value) {
       // console.log(value)
       this.$emit("input", value)

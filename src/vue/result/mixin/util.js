@@ -41,7 +41,7 @@ export const util = {
                 case "json":
                     return `'${value}'`
                 default:
-                    if (type.indexOf("text") !== -1 || type.indexOf("blob") !== -1 || type.indexOf("binary") !== -1) {
+                    if (type.indexOf("timestamp") !== -1 || type.indexOf("text") !== -1 || type.indexOf("blob") !== -1 || type.indexOf("binary") !== -1) {
                         return `'${value}'`
                     }
             }
