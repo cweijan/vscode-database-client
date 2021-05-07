@@ -49,7 +49,7 @@ export class QueryUnit {
 
         let recordHistory = queryOption.recordHistory;
         if (!sql) {
-            sql = this.getSqlFromEditor(connectionNode);
+            sql = this.getSqlFromEditor(connectionNode,queryOption.runAll);
             recordHistory = true;
         }
         sql = sql.replace(/^\s*--.+/igm, '').trim();
@@ -145,12 +145,16 @@ export class QueryUnit {
 
     private static batchPattern = /\s+(TRIGGER|PROCEDURE|FUNCTION)\s+/ig;
 
-    private static getSqlFromEditor(connectionNode: Node): string {
+    private static getSqlFromEditor(connectionNode: Node,runAll:boolean): string {
         if (!vscode.window.activeTextEditor) {
             throw new Error("No SQL file selected!");
 
         }
         const activeTextEditor = vscode.window.activeTextEditor;
+        if(runAll){
+            return activeTextEditor.document.getText()
+        }
+
         const selection = activeTextEditor.selection;
         const newLocal = !selection.isEmpty ? activeTextEditor.document.getText(selection) :
             this.obtainSql(activeTextEditor, DelimiterHolder.get(connectionNode.getConnectId()));
@@ -218,4 +222,8 @@ export interface QueryOption {
     viewId?: any;
     split?: boolean;
     recordHistory?: boolean;
+    /**
+     * runAll if get sql from editor.
+     */
+    runAll?: boolean;
 }

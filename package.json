@@ -205,6 +205,15 @@
 				}
 			},
 			{
+				"command": "mysql.runAllQuery",
+				"title": "%command.runAllQuery%",
+				"category": "MySQL",
+				"icon": {
+					"light": "resources/light/run.png",
+					"dark": "resources/dark/run.png"
+				}
+			},
+			{
 				"command": "mysql.query.switch",
 				"title": "%command.query.switch%",
 				"category": "MySQL",
@@ -494,6 +503,11 @@
 				"when": "editorLangId == sql"
 			},
 			{
+				"command": "mysql.runAllQuery",
+				"key": "ctrl+f9",
+				"when": "editorLangId == sql"
+			},
+			{
 				"command": "mysql.mock.run",
 				"when": "resourceFilename =~ /mock\\.json$/ ",
 				"key": "f9"
@@ -504,12 +518,17 @@
 				{
 					"command": "mysql.runQuery",
 					"when": "editorLangId == sql",
-					"group": "navigation@0"
+					"group": "navigation@-2"
+				},
+				{
+					"command": "mysql.runAllQuery",
+					"when": "editorLangId == sql",
+					"group": "navigation@1"
 				},
 				{
 					"command": "mysql.db.active",
 					"when": "editorLangId == sql",
-					"group": "navigation@1"
+					"group": "navigation@2"
 				}
 			],
 			"editor/title": [
