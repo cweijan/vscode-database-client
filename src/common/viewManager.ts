@@ -81,7 +81,9 @@ export class ViewManager {
                     if (viewOption.eventHandler) {
                         viewOption.eventHandler(new Hanlder(currentStatus.instance, currentStatus.eventEmitter))
                     }
-                    currentStatus.creating=false;
+                    if(currentStatus.creating){
+                        return;
+                    }
                     currentStatus.eventEmitter.emit('init')
                     return Promise.resolve(currentStatus.instance);
                 }
