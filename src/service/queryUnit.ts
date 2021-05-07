@@ -102,12 +102,12 @@ export class QueryUnit {
                 }
 
                 // query result
-                if(fields && Array.isArray(fields) && Util.is(fields[0],'ColumnDefinition')){
+                if(fields && Array.isArray(fields) && fields[0]!=null && fields[0].name!=undefined){
                     QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
                     return;
                 }
 
-                //procedrue call result
+                // mysql procedrue call result
                 const lastEle = data[data.length - 1]
                 if (data.length>2 &&  Util.is(lastEle,'ResultSetHeader') && Util.is(data[0],'TextRow')) {
                     data = data[data.length - 2]
