@@ -1,11 +1,13 @@
 # CHANGELOG
 
-# 1.6.10 2021-5-7
+# 3.7.0 2021-5-7
 
 - Fix struct sync open fail.
 - Mssql add  windows auth option.
 - Fix first data load fail.
 - Trigger refresh when create object.
+- Add run all sql comand.
+- Format postgresql timestamp show like pgadmin4.
 
 # 3.6.9 2021-4-28
 
