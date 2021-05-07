@@ -15,7 +15,6 @@ import { Trans } from "~/common/trans";
 import { IConnection } from "./connect/connection";
 import { FieldInfo } from "@/common/typeDef";
 import { Util } from "@/common/util";
-import { utils } from "ssh2-streams";
 
 export class QueryUnit {
 
@@ -89,31 +88,31 @@ export class QueryUnit {
                 if (recordHistory) {
                     vscode.commands.executeCommand(CodeCommand.RecordHistory, sql, costTime);
                 }
-                if (data.affectedRows) {
-                    QueryPage.send({ connection: connectionNode, type: MessageType.DML, queryOption, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
-                    // vscode.commands.executeCommand(CommandKey.Refresh);
-                    return;
+
+                if (sql.match(/create (table|prcedure|FUNCTION|VIEW)/i)) {
+                    vscode.commands.executeCommand(CodeCommand.Refresh);
                 }
 
-                // unknow result
-                if (!Array.isArray(data)) {
-                    QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE_BLOCK, queryOption, res: { sql, costTime } as DMLResponse });
+                if (data.affectedRows) {
+                    QueryPage.send({ connection: connectionNode, type: MessageType.DML, queryOption, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
                     return;
                 }
 
                 // query result
-                if(fields && Array.isArray(fields) && fields[0]!=null && fields[0].name!=undefined){
+                if (Array.isArray(fields) && fields[0] != null && fields[0].name != undefined) {
                     QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
                     return;
                 }
 
-                // mysql procedrue call result
-                const lastEle = data[data.length - 1]
-                if (data.length>2 &&  Util.is(lastEle,'ResultSetHeader') && Util.is(data[0],'TextRow')) {
-                    data = data[data.length - 2]
-                    fields = fields[fields.length - 2] as any as FieldInfo[]
-                    QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
-                    return;
+                if (Array.isArray(data)) {
+                    // mysql procedrue call result
+                    const lastEle = data[data.length - 1]
+                    if (data.length > 2 && Util.is(lastEle, 'ResultSetHeader') && Util.is(data[0], 'TextRow')) {
+                        data = data[data.length - 2]
+                        fields = fields[fields.length - 2] as any as FieldInfo[]
+                        QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+                        return;
+                    }
                 }
 
                 QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE_BLOCK, queryOption, res: { sql, costTime } as DMLResponse });
