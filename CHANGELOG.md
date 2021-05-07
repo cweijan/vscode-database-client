@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 1.6.10 2021-5-7
+
+- Fix struct sync open fail.
+- Mssql add  windows auth option.
+- Fix first data load fail.
+
 # 3.6.9 2021-4-28
 
 - Support show multi DML execute result.
