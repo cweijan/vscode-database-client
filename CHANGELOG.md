@@ -5,6 +5,7 @@
 - Fix struct sync open fail.
 - Mssql add  windows auth option.
 - Fix first data load fail.
+- Trigger refresh when create object.
 
 # 3.6.9 2021-4-28
 
