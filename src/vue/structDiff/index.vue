@@ -100,6 +100,7 @@ export default {
           }
         }
       }
+      this.$forceUpdate()
     },
     startCompare() {
       this.loading.compare = true;
