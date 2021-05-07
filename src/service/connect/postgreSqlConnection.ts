@@ -23,7 +23,7 @@ export class PostgreSqlConnection extends IConnection {
             database: opt.database,
             connectionTimeoutMillis: opt.connectTimeout || 5000,
             statement_timeout: opt.requestTimeout || 10000,
-            ssl:opt.encrypt===true
+            ssl:opt.useSsl===true
         };
         this.client = new Client(config);
 

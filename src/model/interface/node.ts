@@ -58,16 +58,13 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public context?: Memento;
     public parent?: Node;
 
-    /**
-     * mysql only
-     */
     public certPath?: string;
+    public useSsl?: boolean;
 
     /**
       * mssql only
       */
     public encrypt?: boolean;
-    public trustServerCertificate?: boolean;
     public instanceName?: string;
     public authType?: string;
 
@@ -116,7 +113,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             source.requestTimeout = parseInt(source.requestTimeout as any)
         }
         this.encrypt = source.encrypt
-        this.trustServerCertificate = source.trustServerCertificate
+        this.useSsl = source.useSsl
         this.instanceName = source.instanceName
         this.authType = source.authType
         this.disable = source.disable

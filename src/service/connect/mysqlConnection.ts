@@ -22,9 +22,11 @@ export class MysqlConnection extends IConnection {
                 return buf?.toString();
             }
         } as mysql.ConnectionConfig;
-        if (node.certPath && fs.existsSync(node.certPath)) {
+        if(node.useSsl){
             newConnectionOptions.ssl = {
-                ca: fs.readFileSync(node.certPath),
+                cert: node.certPath && fs.readFileSync(node.certPath),
+                rejectUnauthorized: false,
+                minVersion: 'TLSv1'
             };
         }
         this.con = mysql.createConnection(newConnectionOptions);
