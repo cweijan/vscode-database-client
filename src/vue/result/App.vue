@@ -225,6 +225,9 @@ export default {
           handlerCommon(response);
           this.info.error = false;
           this.info.needRefresh = false;
+          if(response.message.indexOf("AffectedRows")!=-1){
+            this.refresh()
+          }
           break;
         case "ERROR":
           handlerCommon(response);
