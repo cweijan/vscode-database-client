@@ -21,7 +21,7 @@ export default {
     isDateTime(type){
       if(!type)return false;
       type=type.toUpperCase()
-      return type=='DATETIME' || type=='TIMESTAMP' || type=='TIMESTAMP WITHOUT TIME ZONE'
+      return type=='DATETIME' || type=='TIMESTAMP' || type=='TIMESTAMP WITHOUT TIME ZONE' ||type=='TIMESTAMP WITH TIME ZONE'
     },
     sync(value) {
       // console.log(value)
