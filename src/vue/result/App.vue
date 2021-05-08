@@ -15,6 +15,9 @@
         </el-button>
         <el-button @click="exportOption.visible = true" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
         <el-button type="success" size="mini" icon="el-icon-caret-right" :disabled="!toolbar.sql" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
+        <div style="display:inline-block;font-size:14px;padding-left: 8px;" class="el-pagination__total">
+          CostTime: {{result.costTime}}ms
+        </div>
         <div style="display:inline-block">
           <el-pagination @size-change="changePageSize" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,30,50,300,500]" :layout="page.total!=null?'sizes,prev,pager, next, total':'sizes,prev, next'" :total="page.total">
           </el-pagination>
@@ -95,6 +98,7 @@ export default {
       result: {
         data: [],
         dbType: "",
+        costTime: 0,
         sql: "",
         primaryKey: null,
         columnList: null,
