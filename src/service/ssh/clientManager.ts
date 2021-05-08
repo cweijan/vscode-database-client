@@ -18,7 +18,7 @@ export class ClientManager {
         if (this.activeClient[key]) {
             return Promise.resolve(this.activeClient[key]);
         }
-        if (sshConfig.privateKeyPath && !sshConfig.privateKey && existsSync(sshConfig.privateKeyPath)) {
+        if (sshConfig.privateKeyPath) {
             sshConfig.privateKey = readFileSync(sshConfig.privateKeyPath)
         }
 
