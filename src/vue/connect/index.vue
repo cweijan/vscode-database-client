@@ -278,6 +278,7 @@ export default {
     vscodeEvent
       .on("edit", (node) => {
         this.editModel = true;
+        console.log(node)
         this.connectionOption = node;
       })
       .on("connect", (node) => {

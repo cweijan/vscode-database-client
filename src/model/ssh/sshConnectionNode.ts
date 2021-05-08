@@ -1,4 +1,4 @@
-import { CodeCommand, Constants, ModelType } from "@/common/constants";
+import { CodeCommand, Constants, DatabaseType, ModelType } from "@/common/constants";
 import { FileManager, FileModel } from "@/common/filesManager";
 import { Util } from "@/common/util";
 import { ClientManager } from "@/service/ssh/clientManager";
@@ -22,8 +22,9 @@ export class SSHConnectionNode extends Node {
     fullPath: string;
     private terminalService: TerminalService = new XtermTerminal();
 
-    constructor(readonly key:string,readonly sshConfig: SSHConfig, readonly name: string, readonly file?: FileEntry, readonly parentName?: string, iconPath?: string) {
+    constructor(readonly key:string,parent: Node,readonly sshConfig: SSHConfig, readonly name: string, readonly file?: FileEntry, readonly parentName?: string, iconPath?: string) {
         super(name);
+        super.init(parent)
         this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
         this.fullPath = this.parentName + this.name;
         if (!file) {
@@ -209,7 +210,7 @@ export class SSHConnectionNode extends Node {
 
         for (const entry of entryList) {
             if (entry.longname.startsWith("d")) {
-                folderList.push(new SSHConnectionNode(this.key,this.sshConfig, entry.filename, entry, parentName))
+                folderList.push(new SSHConnectionNode(this.key,this,this.sshConfig, entry.filename, entry, parentName))
             } else if (entry.longname.startsWith("l")) {
                 fileList.push(new LinkNode(entry.filename))
             } else {

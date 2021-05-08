@@ -112,7 +112,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         } else if (connectInfo.dbType == DatabaseType.REDIS) {
             node = new RedisConnectionNode(key, connectInfo)
         } else if (connectInfo.dbType == DatabaseType.SSH) {
-            node = new SSHConnectionNode(key,connectInfo.ssh,connectInfo.name)
+            node = new SSHConnectionNode(key,connectInfo,connectInfo.ssh,connectInfo.name)
         } else if (connectInfo.dbType == DatabaseType.FTP) {
             node = new FTPConnectionNode(key,connectInfo)
         } else {
