@@ -44,17 +44,22 @@
           </el-popover>
         </template>
       </ux-table-column>
-      <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field.name,0,index,toolbar.filter[field.name])" edit-render>
+      <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field,0,index,toolbar.filter[field.name])" edit-render>
         <template slot="header" slot-scope="scope">
           <el-tooltip class="item" effect="dark" :content="getTip(result.columnList[index],scope.column)" placement="left-start">
-            <span>
-              <span v-if="result.columnList[index]&& (result.columnList[index].nullable != 'YES')" style="color: #f94e4e; position: relative; top: .2em;">
-                *
+            <div>
+              <span>
+                <span v-if="result.columnList[index]&& (result.columnList[index].nullable != 'YES')" style="color: #f94e4e; position: relative; top: .2em;">
+                  *
+                </span>
+                <span class="column-name">
+                  {{ scope.column.title }}<br/>
+                </span>
               </span>
-              <span class="column-name">
-                {{ scope.column.title }}
+              <span class="column-type" v-if="result.columnList[index]">
+                {{result.columnList[index].type}}
               </span>
-            </span>
+            </div>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
@@ -259,9 +264,9 @@ export default {
   },
   methods: {
     getTip(column,scopeColumn){
-      if(!column)return scopeColumn.title
+      if(!column || !column.comment)return scopeColumn.title
       
-      return `${column.type}${column.comment?`#${column.comment}`:""}`
+      return column.comment;
     },
     editListen(event, scope) {
       const { row, column, rowIndex } = scope;
@@ -520,17 +525,20 @@ export default {
           }
         });
     },
-    computeWidth(key, index, keyIndex, value) {
+    computeWidth(field, index, keyIndex, value) {
+      let key=field.name;
       if (this.table.widthItem[keyIndex]) return this.table.widthItem[keyIndex];
       if (!index) index = 0;
       if (!this.result.data[index] || index > 10) return 70;
       if (!value) {
         value = this.result.data[index][key];
       }
-      var dynamic = value ? (value + "").length * 10 : (key + "").length * 10;
+      var dynamic = value ? (value + "").length * 10 : 
+        Math.max((key + "").length * 10,(field.type+"").length*10)
+      ;
       if (dynamic > 150) dynamic = 150;
       if (dynamic < 70) dynamic = 70;
-      var nextDynamic = this.computeWidth(key, index + 1, keyIndex);
+      var nextDynamic = this.computeWidth(field, index + 1, keyIndex);
       if (dynamic < nextDynamic) dynamic = nextDynamic;
       this.table.widthItem[keyIndex] = dynamic;
       return dynamic;

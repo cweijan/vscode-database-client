@@ -61,6 +61,10 @@ https://www.umyui.com/
 
 .plx-cell span {
   margin: auto !important;
+  line-height: 16px;
+}
+.plx-cell .column-type{
+  color:var(--vscode-input-placeholderForeground);
 }
 
 .plx-table.size--small .plx-cell--checkbox .plx-checkbox--icon,
