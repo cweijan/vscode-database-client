@@ -13,7 +13,6 @@ export class RedisConnectionNode extends RedisBaseNode {
 
     contextValue = ModelType.REDIS_CONNECTION;
     iconPath: string = path.join(Constants.RES_PATH, `image/redis_connection.png`);
-    iconDetailPath: string = path.join(Constants.RES_PATH, `image/code-terminal.svg`);
 
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
@@ -39,7 +38,10 @@ export class RedisConnectionNode extends RedisBaseNode {
         const client = await this.getClient()
         ViewManager.createWebviewPanel({
             splitView: true, title: `${this.host}@${this.port}`, preserveFocus: false,
-            iconPath: this.iconDetailPath, path: "app",
+            iconPath:  {
+                light: Util.getExtPath( "light", "terminal.png"),
+                dark: Util.getExtPath( "dark", "terminal.svg"),
+            }, path: "app",
             eventHandler: (handler) => {
                 handler.on("init", () => {
                     handler.emit("route", 'terminal')

@@ -177,8 +177,8 @@
 				"title": "%command.connection.delete%",
 				"category": "MySQL",
 				"icon": {
-					"light": "resources/ssh/light/delete.svg",
-					"dark": "resources/ssh/dark/delete.png"
+					"light": "resources/light/delete.svg",
+					"dark": "resources/dark/delete.png"
 				}
 			},
 			{
@@ -428,7 +428,10 @@
 				"command": "mysql.redis.connection.terminal",
 				"title": "%command.redis.connection.terminal%",
 				"category": "Redis",
-				"icon": "resources/image/terminal.svg"
+				"icon": {
+					"light": "resources/light/terminal.png",
+					"dark": "resources/dark/terminal.svg"
+				}
 			},
 			{
 				"command": "mysql.redis.connection.status",
@@ -437,7 +440,10 @@
 			{
 				"command": "mysql.redis.key.del",
 				"title": "%command.redis.key.del%",
-				"icon": "resources/image/delete.png"
+				"icon": {
+					"light": "resources/light/delete.svg",
+					"dark": "resources/dark/delete.png"
+				}
 			},
 			{
 				"command": "mysql.redis.key.detail",
@@ -447,8 +453,8 @@
 				"command": "mysql.ssh.connection.terminal",
 				"title": "Open Terminal",
 				"icon": {
-					"light": "resources/ssh/light/terminal.png",
-					"dark": "resources/ssh/dark/terminal.svg"
+					"light": "resources/light/terminal.png",
+					"dark": "resources/dark/terminal.svg"
 				}
 			},
 			{
