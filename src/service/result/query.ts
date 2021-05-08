@@ -24,14 +24,11 @@ export class QueryParam<T> {
 export class QueryPage {
 
     private static exportService: ExportService = new ExportService()
-    private static statusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -200);
-    private static costStatusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, -250);
 
     public static async send(queryParam: QueryParam<any>) {
 
         const dbOption: Node = queryParam.connection;
         await QueryPage.adaptData(queryParam);
-        this.updateStatusBar(queryParam);
         const type = this.keepSingle(queryParam);
 
         ViewManager.createWebviewPanel({
@@ -40,14 +37,6 @@ export class QueryPage {
             path: 'result', title: 'Query', type,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
             eventHandler: async (handler) => {
-                handler.panel.onDidChangeViewState(e => {
-                    if (!e.webviewPanel.visible) {
-                        this.statusBar.hide()
-                        this.costStatusBar.hide()
-                    } else {
-                        this.updateStatusBar(queryParam);
-                    }
-                })
                 handler.on("init", () => {
                     if (queryParam.res?.table) {
                         handler.panel.title = `${queryParam.res.table}@${dbOption.schema}`
@@ -135,17 +124,6 @@ export class QueryPage {
             }
         }
         return queryParam.queryOption.viewId;
-    }
-
-    private static updateStatusBar(queryParam: QueryParam<any>) {
-        if (queryParam.type != MessageType.RUN && queryParam.res.costTime) {
-            this.costStatusBar.text = `$(scrollbar-button-right) ${queryParam.res.costTime}ms`;
-            this.costStatusBar.show();
-        }
-        if (queryParam.type == MessageType.DATA) {
-            this.statusBar.text = `$(list-flat) ${queryParam.res.table}       Row ${queryParam.res.data?.length}, Col ${queryParam.res.fields?.length}`;
-            this.statusBar.show();
-        }
     }
 
     private static isActiveSql(option: QueryOption): boolean {
