@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.7.1 2021-5-8
+
+- Add cost time to result view.
+- Fix ssh connnection private key not persist.
+
 # 3.7.0 2021-5-7
 
 - Fix struct sync open fail.
