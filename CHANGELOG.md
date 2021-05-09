@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.7.3 2021-5-9
+
+- Compatible icon with version 1.56.0 of vscode.
+- Fix include database not work.
+
 # 3.7.2 2021-5-8
 
 - Add cost time to result view.
