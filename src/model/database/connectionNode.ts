@@ -70,13 +70,13 @@ export class ConnectionNode extends Node implements CopyAble {
                 const includeDatabaseArray = this.includeDatabases?.toLowerCase()?.split(",")
                 const usingInclude = this.includeDatabases && includeDatabaseArray && includeDatabaseArray.length >= 1;
                 const databaseNodes = databases.filter((db) => {
-                    if (usingInclude) {
-                        return includeDatabaseArray.indexOf((db.schema || db.Database).toLocaleLowerCase()) != -1;
+                    if (usingInclude  && !db.schema) {
+                        return includeDatabaseArray.indexOf(db.Database.toLocaleLowerCase()) != -1;
                     }
                     return true;
                 }).map<SchemaNode | CatalogNode>((database) => {
                     return hasCatalog ?
-                        new CatalogNode(database.db, this)
+                        new CatalogNode(database.Database, this)
                         : new SchemaNode(database.schema || database.Database, this);
                 });
 

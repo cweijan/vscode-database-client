@@ -10,7 +10,7 @@ export default class KeyNode extends RedisBaseNode {
 
     readonly contextValue = ModelType.REDIS_KEY;
     readonly iconPath = path.join(Constants.RES_PATH, `image/redis_key.png`);
-    readonly iconDetailPath = path.join(Constants.RES_PATH, `image/redis.svg`);
+    readonly iconDetailPath = path.join(Constants.RES_PATH, `image/redis_connection.png`);
     constructor(readonly label: string, readonly prefix: string, readonly parent: Node) {
         super(label);
         this.init(parent)

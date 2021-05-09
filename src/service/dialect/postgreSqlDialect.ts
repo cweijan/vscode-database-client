@@ -186,7 +186,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         AND t.table_schema='${database}' order by t.table_name;`
     }
     showDatabases(){
-        return `SELECT datname "db" FROM pg_database WHERE datistemplate = false;`
+        return `SELECT datname "Database" FROM pg_database WHERE datistemplate = false;`
     }
     showSchemas(): string {
         return `select catalog_name "Database",schema_name "schema" from information_schema.schemata;`
