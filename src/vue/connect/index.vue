@@ -56,19 +56,18 @@
           <input class="w-64 field__input" placeholder="The port of connection" required type="number" v-model="connectionOption.port" />
         </div>
       </section>
+
+      <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-32">Instance Name</label>
+          <input class="w-64 field__input" placeholder="Connection named instance" title="The instance name to connect to. The SQL Server Browser service must be running on the database server, and UDP port 1434 on the database server must be reachable.(no default)" v-model="connectionOption.instanceName" />
+        </div>
+        <span>
+          (If instance name is specified, the port config is ignored)
+        </span>
+      </section>
   
       <template v-if="connectionOption.dbType!='ElasticSearch'">
-  
-        <section class="mb-2">
-          <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
-            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Username</label>
-            <input class="w-64 field__input" placeholder="Username" required v-model="connectionOption.user" />
-          </div>
-          <div class="inline-block mr-10">
-            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Password</label>
-            <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
-          </div>
-        </section>
   
         <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
           <div class="inline-block mr-10" v-if="connectionOption.dbType=='SqlServer'">
@@ -87,10 +86,14 @@
           </div>
         </section>
 
-        <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
+        <section class="mb-2">
+          <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
+            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Username</label>
+            <input class="w-64 field__input" placeholder="Username" required v-model="connectionOption.user" />
+          </div>
           <div class="inline-block mr-10">
-            <label class="font-bold mr-5 inline-block w-32">Instance Name</label>
-            <input class="w-64 field__input" placeholder="Connection named instance" title="The instance name to connect to. The SQL Server Browser service must be running on the database server, and UDP port 1434 on the database server must be reachable.(no default)" v-model="connectionOption.instanceName" />
+            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Password</label>
+            <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
           </div>
         </section>
   
