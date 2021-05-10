@@ -130,7 +130,7 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         AND TABLE_SCHEMA = '${database}' order by TABLE_NAME`
     }
     showDatabases(){
-        return "SELECT name 'db' FROM sys.databases"
+        return "SELECT name 'Database' FROM sys.databases"
     }
     showSchemas(): string {
         return "SELECT SCHEMA_NAME [schema] FROM INFORMATION_SCHEMA.SCHEMATA"
