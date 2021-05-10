@@ -8,7 +8,7 @@ import { getProcedureDump } from './getProcedureDump';
 import { getTableDump } from './getTableDump';
 import { getTriggerDump } from './getTriggerDump';
 import { getViewDump } from './getViewDump';
-import { HEADER_VARIABLES, FOOTER_VARIABLES } from './sessionVariables';
+import { HEADER_VARIABLES } from './sessionVariables';
 import {
     CompletedOptions, Options
 } from './interfaces/Options';
@@ -59,7 +59,7 @@ export default async function main(inputOptions: Options, node: Node): Promise<v
     fs.writeFileSync(options.dumpToFile, '');
 
     // write the initial headers
-    if (node.schema && options.dump.withDatabase && isMysql(node)) {
+    if (node.schema && isMysql(node)) {
         fs.appendFileSync(options.dumpToFile, `${HEADER_VARIABLES}\n`);
     }
 
@@ -73,12 +73,12 @@ USE ${node.schema};\n\n`);
     // dump the schema if requested
     if (options.dump.schema !== false) {
         const tableDatas = await getTableDump(node, sessionId, options.dump.schema, options.dump.tables)
-        fs.appendFileSync(options.dumpToFile, `${tableDatas}\n\n`);
+        if(tableDatas) fs.appendFileSync(options.dumpToFile, `${tableDatas}`);
     }
 
     if (options.dump.schema !== false) {
         const viewDatas = await getViewDump(node, sessionId, options.dump.schema, options.dump.viewList);
-        fs.appendFileSync(options.dumpToFile, `${viewDatas}\n\n`);
+        if(viewDatas) fs.appendFileSync(options.dumpToFile, `\n\n${viewDatas}`);
     }
 
     if (options.dump.data !== false) {
@@ -87,22 +87,17 @@ USE ${node.schema};\n\n`);
 
     if (options.dump.procedure !== false) {
         const predecureDatas = await getProcedureDump(node, sessionId, options.dump.procedure, options.dump.procedureList);
-        fs.appendFileSync(options.dumpToFile, `${predecureDatas}\n\n`);
+        if(predecureDatas) fs.appendFileSync(options.dumpToFile, `${predecureDatas}`);
     }
 
     if (options.dump.procedure !== false) {
         const functionDatas = await getFunctionDump(node, sessionId, options.dump.function, options.dump.functionList);
-        fs.appendFileSync(options.dumpToFile, `${functionDatas}\n\n`);
+        if(functionDatas) fs.appendFileSync(options.dumpToFile, `\n\n${functionDatas}`);
     }
 
     if (options.dump.trigger !== false) {
         const triggerDatas = await getTriggerDump(node, sessionId, options.dump.trigger, options.dump.triggerList);
-        fs.appendFileSync(options.dumpToFile, `${triggerDatas}\n\n`);
-    }
-
-      // reset all of the variables
-      if (node.schema && options.dump.withDatabase && isMysql(node)) {
-        fs.appendFileSync(options.dumpToFile, FOOTER_VARIABLES);
+        if(triggerDatas) fs.appendFileSync(options.dumpToFile, `\n\n${triggerDatas}`);
     }
 
 }

@@ -59,7 +59,7 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
 
         // write to file if configured
         if (outFileStream) {
-            str.forEach(s => outFileStream.write(`${s}\n`));
+            str.forEach(s => outFileStream.write(`\n${s}`));
         }
 
         // write to memory if configured
@@ -136,7 +136,6 @@ async function getDataDump(node: Node, sessionId: string, options: Required<Data
 
         }
 
-        saveChunk('');
     } finally {
         if (options.lockTables) {
             // see: https://dev.mysql.com/doc/refman/5.7/en/replication-solutions-backups-read-only.html

@@ -5,8 +5,6 @@ import { Console } from "../../common/Console";
 import { ExportContext, ExportType } from "./exportContext";
 import { ProgressLocation } from "vscode";
 import { ConnectionManager } from "../connectionManager";
-import { DatabaseType } from "@/common/constants";
-import { ESIndexNode } from "@/model/es/model/esIndexNode";
 
 export class ExportService {
 
