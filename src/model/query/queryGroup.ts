@@ -10,10 +10,7 @@ import { QueryNode } from "./queryNode";
 
 export class QueryGroup extends Node {
     public contextValue = ModelType.QUERY_GROUP;
-    public iconPath: { light: string; dark: string } = {
-        dark: path.join(Constants.RES_PATH, "dark/select.svg"),
-        light: path.join(Constants.RES_PATH, "light/select.png")
-    };
+    public iconPath = new vscode.ThemeIcon("code")
     private storePath: string;
     constructor(readonly parent: Node) {
         super("Query")

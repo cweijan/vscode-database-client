@@ -1,6 +1,5 @@
 import * as path from "path";
 import { Constants, ModelType } from "../../common/constants";
-import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
@@ -11,7 +10,7 @@ export class ProcedureGroup extends Node {
     public contextValue = ModelType.PROCEDURE_GROUP
     public iconPath = path.join(Constants.RES_PATH, "icon/procedure.png")
     constructor(readonly parent: Node) {
-        super("PROCEDURE")
+        super("Procedure")
         this.init(parent)
     }
 

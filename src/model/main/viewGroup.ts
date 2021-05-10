@@ -1,6 +1,5 @@
 import * as path from "path";
-import { Constants, DatabaseType, ModelType } from "../../common/constants";
-import { DatabaseCache } from "../../service/common/databaseCache";
+import { Constants, ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
@@ -9,13 +8,10 @@ import { ViewNode } from "./viewNode";
 
 export class ViewGroup extends Node {
 
-    public iconPath: { light: string; dark: string } = {
-        dark: path.join(Constants.RES_PATH, "icon/table.svg"),
-        light: path.join(Constants.RES_PATH, "light/view_group.png")
-    };
+    public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue = ModelType.VIEW_GROUP
     constructor(readonly parent: Node) {
-        super("VIEW")
+        super("View")
         this.init(parent)
     }
 

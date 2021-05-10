@@ -1,6 +1,5 @@
-import * as path from "path";
-import { Constants, ModelType } from "../../common/constants";
-import { DatabaseCache } from "../../service/common/databaseCache";
+import { ThemeIcon } from "vscode";
+import { ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
@@ -9,9 +8,9 @@ import { FunctionNode } from "./function";
 export class FunctionGroup extends Node {
 
     public contextValue = ModelType.FUNCTION_GROUP;
-    public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
+    public iconPath = new ThemeIcon("symbol-function")
     constructor(readonly parent: Node) {
-        super("FUNCTION")
+        super("Function")
         this.init(parent)
     }
 

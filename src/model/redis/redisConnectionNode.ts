@@ -5,7 +5,7 @@ import { CommandKey, Node } from "@/model/interface/node";
 import { NodeUtil } from "@/model/nodeUtil";
 import * as path from "path";
 import * as vscode from "vscode";
-import { FolderNode } from "./folderNode";
+import { RedisFolderNode } from "./folderNode";
 import RedisBaseNode from "./redisBaseNode";
 
 export class RedisConnectionNode extends RedisBaseNode {
@@ -32,7 +32,7 @@ export class RedisConnectionNode extends RedisBaseNode {
     async getChildren(): Promise<RedisBaseNode[]> {
         const client = await this.getClient()
         let keys: string[] = await client.keys(this.pattern)
-        return FolderNode.buildChilds(this, keys)
+        return RedisFolderNode.buildChilds(this, keys)
     }
     async openTerminal(): Promise<any> {
         const client = await this.getClient()

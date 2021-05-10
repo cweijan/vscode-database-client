@@ -1,3 +1,4 @@
+import { ColumnMeta, TableMeta } from "@/common/typeDef";
 import { Hanlder, ViewManager } from "@/common/viewManager";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -5,13 +6,11 @@ import { ConfigKey, Constants, DatabaseType, ModelType, Template } from "../../c
 import { Global } from "../../common/global";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { MockRunner } from "../../service/mock/mockRunner";
 import { QueryUnit } from "../../service/queryUnit";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
-import { ColumnMeta, TableMeta } from "@/common/typeDef";
 import { ColumnNode } from "../other/columnNode";
 import { InfoNode } from "../other/infoNode";
 const prettyBytes = require("pretty-bytes")

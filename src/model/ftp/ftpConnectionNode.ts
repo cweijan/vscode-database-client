@@ -1,14 +1,14 @@
 import { CodeCommand, Constants, ModelType } from "@/common/constants";
 import { FileManager, FileModel } from "@/common/filesManager";
 import { Util } from "@/common/util";
+import * as Client from '@/model/ftp/lib/connection';
 import * as path from "path";
 import * as vscode from "vscode";
+import { TreeItemCollapsibleState } from "vscode";
 import { CommandKey, Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
 import { FtpBaseNode } from "./ftpBaseNode";
 import { FTPFileNode } from "./ftpFileNode";
-import * as Client from '@/model/ftp/lib/connection'
-import { TreeItemCollapsibleState } from "vscode";
 
 export class FTPConnectionNode extends FtpBaseNode {
 
@@ -18,7 +18,11 @@ export class FTPConnectionNode extends FtpBaseNode {
         super(key);
         this.contextValue = this.file ? ModelType.FTP_FOLDER : ModelType.FTP_CONNECTION;
         this.init(parent)
-        this.iconPath = path.join(Constants.RES_PATH, this.file ? "ssh/folder.svg" : "ssh/chain.svg");
+        if (this.file) {
+            this.iconPath = path.join(Constants.RES_PATH, "ssh/folder.svg");
+        } else {
+            this.iconPath = new vscode.ThemeIcon("link");
+        }
         if (this.disable) {
             this.collapsibleState = TreeItemCollapsibleState.None;
             this.iconPath = path.join(Constants.RES_PATH, "icon/close.svg");

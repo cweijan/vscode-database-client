@@ -29,7 +29,7 @@ export class SSHConnectionNode extends Node {
         this.fullPath = this.parentName + this.name;
         if (!file) {
             this.contextValue = ModelType.SSH_CONNECTION;
-            this.iconPath = path.join(Constants.RES_PATH, "ssh/chain.svg");
+            this.iconPath = new vscode.ThemeIcon("link");
             this.label=`${sshConfig.username}@${sshConfig.host}`
             this.description=this.name
         } else {

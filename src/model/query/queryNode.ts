@@ -9,7 +9,7 @@ import { Node } from "../interface/node";
 
 export class QueryNode extends Node {
     public contextValue = ModelType.QUERY;
-    public iconPath = path.join(Constants.RES_PATH, "icon/select.svg")
+    public iconPath = new vscode.ThemeIcon("code")
     constructor(public name: string, readonly parent: Node) {
         super(name)
         this.init(parent)

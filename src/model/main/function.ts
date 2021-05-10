@@ -1,16 +1,14 @@
-import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/constants";
+import { ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 
 export class FunctionNode extends Node {
 
     public contextValue: string = ModelType.FUNCTION;
-    public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
+    public iconPath = new vscode.ThemeIcon("symbol-function")
     constructor(readonly name: string, readonly parent: Node) {
         super(name)
         this.init(parent)

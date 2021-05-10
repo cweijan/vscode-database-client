@@ -6,7 +6,7 @@
 	"publisher": "cweijan",
 	"icon": "resources/logo.png",
 	"engines": {
-		"vscode": "^1.38.0"
+		"vscode": "^1.46.0"
 	},
 	"categories": [
 		"Programming Languages",
@@ -75,7 +75,7 @@
 				{
 					"id": "github-cweijan-nosql",
 					"title": "Other Explorer",
-					"icon": "resources/image/icon.png"
+					"icon": "resources/image/other-container.png"
 				}
 			]
 		},
@@ -193,10 +193,7 @@
 				"command": "mysql.query.switch",
 				"title": "%command.query.switch%",
 				"category": "MySQL",
-				"icon": {
-					"light": "resources/light/query.svg",
-					"dark": "resources/dark/query.svg"
-				}
+				"icon": "$(book)"
 			},
 			{
 				"command": "mysql.data.import",
@@ -932,7 +929,7 @@
 		"@types/mockjs": "^1.0.2",
 		"@types/node": "^12.12.6",
 		"@types/ssh2": "^0.5.43",
-		"@types/vscode": "1.38.0",
+		"@types/vscode": "1.46.0",
 		"@types/pg": "^7.14.7",
 		"@types/tedious": "^4.0.3",
 		"copy-webpack-plugin": "^6.3.0",

@@ -12,7 +12,7 @@ export class TriggerGroup extends Node {
     public contextValue = ModelType.TRIGGER_GROUP
 
     constructor(readonly parent: Node) {
-        super("TRIGGER")
+        super("Trigger")
         this.init(parent)
     }
 
