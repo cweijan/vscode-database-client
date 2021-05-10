@@ -87,12 +87,12 @@
           </div>
         </section>
 
-        <section class="mb-2" v-if="connectionOption.dbType=='MySQL' || connectionOption.dbType=='PostgreSQL'">
+        <!-- <section class="mb-2" v-if="connectionOption.dbType=='MySQL' || connectionOption.dbType=='PostgreSQL'">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-18">Use SSL</label>
             <el-switch v-model="connectionOption.useSsl"></el-switch>
           </div>
-        </section>
+        </section> -->
 
         <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
           <div class="inline-block mr-10">

@@ -1,5 +1,5 @@
 import { Node } from "@/model/interface/node";
-import { Client, QueryArrayResult, types } from "pg";
+import { Client, ClientConfig, QueryArrayResult, types } from "pg";
 import { IConnection, queryCallback } from "./connection";
 import { EventEmitter } from "events";
 import * as sqlstring from 'sqlstring';
@@ -11,14 +11,17 @@ export class PostgreSqlConnection extends IConnection {
     private client: Client;
     constructor(opt: Node) {
         super()
-        const config = {
+        let config = {
             host: opt.host, port: opt.port,
             user: opt.user, password: opt.password,
             database: opt.database,
             connectionTimeoutMillis: opt.connectTimeout || 5000,
             statement_timeout: opt.requestTimeout || 10000,
-            ssl:opt.useSsl===true
-        };
+            ssl:{
+                rejectUnauthorized:false,
+                minVersion: 'TLSv1'
+            },
+        } as ClientConfig;
         this.client = new Client(config);
 
     }

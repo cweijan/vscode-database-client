@@ -15,6 +15,8 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
         super()
         this.config = {
             server: node.host,
+            // add option
+            domain:null,
             options: {
                 port:node.port,
                 instanceName: node.instanceName,
@@ -22,6 +24,8 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
                 database: node.database || undefined,
                 connectTimeout: node.connectTimeout? parseInt(node.connectTimeout as any): 5000,
                 requestTimeout: node.requestTimeout? parseInt(node.requestTimeout as any): 10000,
+                // change to true and test.
+                useColumnNames:false,
                 encrypt: node.encrypt
             },
             authentication: {

@@ -12,7 +12,12 @@ export class MysqlConnection extends IConnection {
             host: node.host, port: node.port, user: node.user, password: node.password, database: node.database,
             timezone: node.timezone,
             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
-            connectTimeout: node.connectTimeout||5000,
+            connectTimeout: node.connectTimeout || 5000,
+            ssl: {
+                rejectUnauthorized: false,
+                cert: (node.useSsl && node.certPath) ? fs.readFileSync(node.certPath) : null,
+                minVersion: 'TLSv1'
+            },
             typeCast: (field, next) => {
                 if (this.dumpMode) return dumpTypeCast(field as mysql.TypecastField)
                 const buf = field.buffer();
@@ -22,13 +27,6 @@ export class MysqlConnection extends IConnection {
                 return buf?.toString();
             }
         } as mysql.ConnectionConfig;
-        if(node.useSsl){
-            newConnectionOptions.ssl = {
-                cert: node.certPath && fs.readFileSync(node.certPath),
-                rejectUnauthorized: false,
-                minVersion: 'TLSv1'
-            };
-        }
         this.con = mysql.createConnection(newConnectionOptions);
     }
     isAlive(): boolean {
