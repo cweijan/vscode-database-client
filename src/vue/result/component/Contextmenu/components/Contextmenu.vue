@@ -68,7 +68,6 @@ export default {
     },
     mouseClickListener(e) {
       let el = e.target;
-      console.log('click')
       const menus = getElementsByClassName(this.$style.menu);
       const menuItems = getElementsByClassName(this.$style.menu_item);
       const unclickableMenuItems = getElementsByClassName(

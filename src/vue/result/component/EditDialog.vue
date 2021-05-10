@@ -31,7 +31,7 @@ import { wrapByDb } from "@/common/wrapper";
 export default {
   mixins: [util],
   components: { CellEditor },
-  props: ["dbType", "table", "primaryKey", "columnList"],
+  props: ["dbType", "table", "primaryKey","primaryKeyList", "columnList"],
   data() {
     return {
       model: "insert",
@@ -116,7 +116,7 @@ export default {
         this.$message.error("This table has not primary key, cannot update!");
         throw new Error("This table has not primary key, cannot update!")
       }
-      const primary = oldRow[this.primaryKey];
+      
       let change = "";
       for (const key in currentNew) {
         if (this.getTypeByColumn(key) == null) continue;
@@ -132,9 +132,20 @@ export default {
       if (!change) {
         return "";
       }
-      return `UPDATE ${this.table} SET ${change.replace(/,$/, "")} WHERE ${
-        this.primaryKey
-      }=${this.wrapQuote(this.getTypeByColumn(this.primaryKey), primary)};`;
+
+      let updateSql=`UPDATE ${this.table} SET ${change.replace(/,$/, "")}`;
+      for (let i = 0; i < this.primaryKeyList.length; i++) {
+        const pk = this.primaryKeyList[i];
+        const pkName = pk.name;
+        const pkType = pk.simpleType || pk.type;
+        if(i==0){
+          updateSql=`${updateSql} WHERE ${ pkName }=${this.wrapQuote(pkType, oldRow[pkName])}`
+        }else{
+          updateSql=`${updateSql} AND ${ pkName }=${this.wrapQuote(pkType, oldRow[pkName])}`
+        }
+      }
+      console.log(updateSql)
+      return updateSql;
     },
     confirmUpdate(row, oldRow) {
       if (!oldRow) {

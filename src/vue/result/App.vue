@@ -74,7 +74,7 @@
       </ux-table-column>
     </ux-grid>
     <!-- table result -->
-    <EditDialog ref="editor" :dbType="result.dbType" :table="result.table" :primaryKey="result.primaryKey" :columnList="result.columnList" @execute="execute" />
+    <EditDialog ref="editor" :dbType="result.dbType" :table="result.table" :primaryKey="result.primaryKey" :primaryKeyList="result.primaryKeyList" :columnList="result.columnList" @execute="execute" />
     <ExportDialog :visible.sync="exportOption.visible" @exportHandle="confirmExport" />
   </div>
 </template>
@@ -107,6 +107,7 @@ export default {
         sql: "",
         primaryKey: null,
         columnList: null,
+        primaryKeyList: null,
         database: null,
         table: null,
         tableCount: null,
@@ -207,7 +208,7 @@ export default {
     window.addEventListener("message", ({ data }) => {
       if (!data) return;
       const response = data.content;
-      console.log(response);
+      console.log(data);
       this.table.loading = false;
       switch (data.type) {
         case "EXPORT_DONE":
