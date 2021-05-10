@@ -1,7 +1,5 @@
-import { DatabaseCache } from "@/service/common/databaseCache";
-import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/constants";
+import { ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { QueryUnit } from "../../service/queryUnit";
@@ -11,7 +9,7 @@ import { Node } from "../interface/node";
 export class UserNode extends Node implements CopyAble {
 
     public contextValue = ModelType.USER;
-    public iconPath = path.join(Constants.RES_PATH, "icon/user2.png")
+    public iconPath = new vscode.ThemeIcon("person")
     constructor(readonly username: string, readonly host: string, readonly parent: Node) {
         super(username)
         this.init(parent)

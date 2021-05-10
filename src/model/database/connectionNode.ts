@@ -18,7 +18,7 @@ import { UserGroup } from "./userGroup";
  */
 export class ConnectionNode extends Node implements CopyAble {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "icon/server.png");
+    public iconPath: string|vscode.ThemeIcon = path.join(Constants.RES_PATH, "icon/server.png");
     public contextValue: string = ModelType.CONNECTION;
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
@@ -31,7 +31,8 @@ export class ConnectionNode extends Node implements CopyAble {
         }
         if (this.disable) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None;
-            this.iconPath = path.join(Constants.RES_PATH, "icon/close.svg");
+            this.iconPath = Global.disableIcon;
+            this.label=this.label+" (closed)"
             return;
         }
         const lcp = ConnectionManager.activeNode;

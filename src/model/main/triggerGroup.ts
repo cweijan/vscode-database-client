@@ -1,6 +1,5 @@
-import * as path from "path";
-import { Constants, ModelType } from "../../common/constants";
-import { DatabaseCache } from "../../service/common/databaseCache";
+import { ThemeIcon } from "vscode";
+import { ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
@@ -8,7 +7,7 @@ import { TriggerNode } from "./trigger";
 
 export class TriggerGroup extends Node {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "icon/trigger.svg");
+    public iconPath = new ThemeIcon("zap");
     public contextValue = ModelType.TRIGGER_GROUP
 
     constructor(readonly parent: Node) {

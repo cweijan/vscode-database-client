@@ -1,5 +1,5 @@
-import * as path from "path";
-import { Constants, ModelType } from "../../common/constants";
+import { ThemeIcon } from "vscode";
+import { ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 import { InfoNode } from "../other/infoNode";
@@ -8,7 +8,7 @@ import { ProcedureNode } from "./procedure";
 export class ProcedureGroup extends Node {
 
     public contextValue = ModelType.PROCEDURE_GROUP
-    public iconPath = path.join(Constants.RES_PATH, "icon/procedure.png")
+    public iconPath =new ThemeIcon("gear")
     constructor(readonly parent: Node) {
         super("Procedure")
         this.init(parent)

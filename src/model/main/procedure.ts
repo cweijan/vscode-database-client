@@ -1,6 +1,5 @@
-import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/constants";
+import { ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { QueryUnit } from "../../service/queryUnit";
@@ -10,7 +9,7 @@ import { Node } from "../interface/node";
 export class ProcedureNode extends Node {
 
     public contextValue: string = ModelType.PROCEDURE;
-    public iconPath = path.join(Constants.RES_PATH, "icon/procedure.png")
+    public iconPath =new vscode.ThemeIcon("gear")
     constructor(readonly name: string, readonly parent: Node) {
         super(name)
         this.init(parent)

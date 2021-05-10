@@ -1,4 +1,5 @@
 import { Constants, ModelType } from "@/common/constants";
+import { Global } from "@/common/global";
 import { Util } from "@/common/util";
 import { ViewManager } from "@/common/viewManager";
 import { CommandKey, Node } from "@/model/interface/node";
@@ -12,7 +13,7 @@ export class RedisConnectionNode extends RedisBaseNode {
 
 
     contextValue = ModelType.REDIS_CONNECTION;
-    iconPath: string = path.join(Constants.RES_PATH, `image/redis_connection.png`);
+    iconPath: string|vscode.ThemeIcon = path.join(Constants.RES_PATH, `image/redis_connection.png`);
 
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
@@ -24,7 +25,8 @@ export class RedisConnectionNode extends RedisBaseNode {
         this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
         if (this.disable) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None;
-            this.iconPath = path.join(Constants.RES_PATH, "icon/close.svg");
+            this.iconPath = Global.disableIcon;
+            this.label=this.label+" (closed)"
             return;
         }
     }

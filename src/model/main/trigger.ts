@@ -1,16 +1,14 @@
-import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, DatabaseType, ModelType } from "../../common/constants";
+import { DatabaseType, ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { DatabaseCache } from "../../service/common/databaseCache";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 
 export class TriggerNode extends Node {
 
     public contextValue: string = ModelType.TRIGGER;
-    public iconPath = path.join(Constants.RES_PATH, "icon/trigger.svg")
+    public iconPath = new vscode.ThemeIcon("zap");
     constructor(readonly name: string, readonly parent: Node) {
         super(name)
         this.init(parent)

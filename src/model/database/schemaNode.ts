@@ -20,7 +20,7 @@ export class SchemaNode extends Node implements CopyAble {
 
 
     public contextValue: string = ModelType.SCHEMA;
-    public iconPath: string = path.join(Constants.RES_PATH, "icon/database.svg");
+    public iconPath: string|vscode.ThemeIcon = path.join(Constants.RES_PATH, "icon/database.svg");
     constructor(public schema: string, readonly parent: Node) {
         super(schema)
         this.init(this.parent)

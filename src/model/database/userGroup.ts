@@ -1,4 +1,5 @@
 import * as path from "path";
+import { ThemeIcon } from "vscode";
 import { Constants, ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
@@ -9,7 +10,7 @@ import { UserNode } from "./userNode";
 export class UserGroup extends SchemaNode {
 
     public contextValue: string = ModelType.USER_GROUP;
-    public iconPath = path.join(Constants.RES_PATH, "icon/userGroup.svg")
+    public iconPath =new ThemeIcon("account")
     constructor(readonly name: string, readonly parent: Node) {
         super(name,parent)
         this.init(parent)

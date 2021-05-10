@@ -7,6 +7,7 @@ import { join } from "path";
 export class Global {
 
     public static context: vscode.ExtensionContext;
+    public static disableIcon=new vscode.ThemeIcon("close");
     private static mysqlStatusBarItem: vscode.StatusBarItem;
 
     public static getExtPath(...paths: string[]) {
