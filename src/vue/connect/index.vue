@@ -1,5 +1,5 @@
 <template>
-  <div class="container flex flex-col mx-auto">
+  <div class="connect-container flex flex-col mx-auto">
     <h1 class="py-4 text-2xl">Connect to Database Server</h1>
 
     <blockquote class="p-3 mb-2 panel error" v-if="connect.error">
@@ -370,6 +370,12 @@ export default {
 </script>
 
 <style scoped>
+
+.connect-container{
+  width: 100%;
+  max-width: 1300px;
+}
+
 .tab {
   border-bottom: 1px solid var(--vscode-dropdown-border);
   display: flex;
