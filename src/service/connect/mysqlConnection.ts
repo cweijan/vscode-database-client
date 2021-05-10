@@ -15,7 +15,8 @@ export class MysqlConnection extends IConnection {
             connectTimeout: node.connectTimeout || 5000,
             ssl: {
                 rejectUnauthorized: false,
-                cert: (node.useSsl && node.certPath) ? fs.readFileSync(node.certPath) : null,
+                cert: ( node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
+                key: ( node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
                 minVersion: 'TLSv1'
             },
             typeCast: (field, next) => {

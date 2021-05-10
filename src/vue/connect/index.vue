@@ -87,13 +87,6 @@
           </div>
         </section>
 
-        <!-- <section class="mb-2" v-if="connectionOption.dbType=='MySQL' || connectionOption.dbType=='PostgreSQL'">
-          <div class="inline-block mr-10">
-            <label class="font-bold mr-5 inline-block w-18">Use SSL</label>
-            <el-switch v-model="connectionOption.useSsl"></el-switch>
-          </div>
-        </section> -->
-
         <section class="mb-2" v-if="connectionOption.dbType=='SqlServer'">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">Instance Name</label>
@@ -137,13 +130,20 @@
       </template>
   
       <section class="flex items-center mb-2" v-if="connectionOption.dbType=='MySQL'">
-        <!-- <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32">SSL Certificate</label>
-          <input class="w-64 field__input" placeholder="SSL Certificate Path" v-model="connectionOption.certPath" />
-        </div> -->
         <div class="inline-block mr-10">
           <label class="font-bold mr-5 inline-block w-32">Timezone</label>
           <input class="w-64 field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
+        </div>
+      </section>
+
+      <section class="flex items-center mb-2" v-if="connectionOption.dbType=='MySQL' || connectionOption.dbType=='PostgreSQL'">
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-32">SSL Client Cert</label>
+          <input class="w-64 field__input" placeholder="SSL Client Certificate Path" v-model="connectionOption.clientCertPath" />
+        </div>
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-32">SSL Client Key</label>
+          <input class="w-64 field__input" placeholder="SSL Client Key Path" v-model="connectionOption.clientKeyPath" />
         </div>
       </section>
   

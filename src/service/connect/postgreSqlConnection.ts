@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import { Node } from "@/model/interface/node";
 import { Client, ClientConfig, QueryArrayResult, types } from "pg";
 import { IConnection, queryCallback } from "./connection";
@@ -19,7 +20,9 @@ export class PostgreSqlConnection extends IConnection {
             statement_timeout: opt.requestTimeout || 10000,
             ssl:{
                 rejectUnauthorized:false,
-                minVersion: 'TLSv1'
+                minVersion: 'TLSv1',
+                cert: ( opt.clientCertPath) ? fs.readFileSync(opt.clientCertPath) : null,
+                key: (opt.clientKeyPath) ? fs.readFileSync(opt.clientKeyPath) : null,
             },
         } as ClientConfig;
         this.client = new Client(config);
