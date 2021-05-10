@@ -136,24 +136,28 @@
         </div>
       </section>
 
-      <section class="flex items-center mb-2" v-if="connectionOption.dbType=='MySQL' || connectionOption.dbType=='PostgreSQL'">
-        <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32">SSL Client Cert</label>
-          <input class="w-64 field__input" placeholder="SSL Client Certificate Path" v-model="connectionOption.clientCertPath" />
-        </div>
-        <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32">SSL Client Key</label>
-          <input class="w-64 field__input" placeholder="SSL Client Key Path" v-model="connectionOption.clientKeyPath" />
-        </div>
-      </section>
-  
       <section class="flex items-center mb-2">
         <div class="inline-block mr-10">
           <label class="mr-2 font-bold">SSH Tunnel</label>
           <el-switch v-model="connectionOption.usingSSH"></el-switch>
         </div>
+        <div class="inline-block mr-10" v-if="connectionOption.dbType=='MySQL' || connectionOption.dbType=='PostgreSQL'">
+          <label class="font-bold mr-5 inline-block w-18">Use SSL</label>
+          <el-switch v-model="connectionOption.useSSL"></el-switch>
+        </div>
       </section>
     </template>
+
+    <section class="flex items-center mb-2" v-if="connectionOption.useSSL">
+      <div class="inline-block mr-10">
+        <label class="font-bold mr-5 inline-block w-32">SSL Client Cert</label>
+        <input class="w-64 field__input" placeholder="SSL Client Certificate Path" v-model="connectionOption.clientCertPath" />
+      </div>
+      <div class="inline-block mr-10">
+        <label class="font-bold mr-5 inline-block w-32">SSL Client Key</label>
+        <input class="w-64 field__input" placeholder="SSL Client Key Path" v-model="connectionOption.clientKeyPath" />
+      </div>
+    </section>
 
     <div v-if="connectionOption.usingSSH || connectionOption.dbType=='SSH'">
       <section class="mb-2">

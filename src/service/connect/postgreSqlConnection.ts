@@ -10,21 +10,22 @@ import * as sqlstring from 'sqlstring';
  */
 export class PostgreSqlConnection extends IConnection {
     private client: Client;
-    constructor(opt: Node) {
+    constructor(node: Node) {
         super()
         let config = {
-            host: opt.host, port: opt.port,
-            user: opt.user, password: opt.password,
-            database: opt.database,
-            connectionTimeoutMillis: opt.connectTimeout || 5000,
-            statement_timeout: opt.requestTimeout || 10000,
-            ssl:{
-                rejectUnauthorized:false,
-                minVersion: 'TLSv1',
-                cert: ( opt.clientCertPath) ? fs.readFileSync(opt.clientCertPath) : null,
-                key: (opt.clientKeyPath) ? fs.readFileSync(opt.clientKeyPath) : null,
-            },
+            host: node.host, port: node.port,
+            user: node.user, password: node.password,
+            database: node.database,
+            connectionTimeoutMillis: node.connectTimeout || 5000,
+            statement_timeout: node.requestTimeout || 10000,
         } as ClientConfig;
+        if (node.useSSL) {
+            config.ssl = {
+                rejectUnauthorized: false,
+                cert: (node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
+                key: (node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
+            }
+        }
         this.client = new Client(config);
 
     }

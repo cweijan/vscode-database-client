@@ -58,6 +58,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public context?: Memento;
     public parent?: Node;
 
+    public useSSL?: boolean;
     public clientCertPath?: string;
     public clientKeyPath?: string;
 
@@ -93,6 +94,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.password = source.password
         if (!this.database) this.database = source.database
         this.timezone = source.timezone
+        this.useSSL = source.useSSL
         this.clientCertPath = source.clientCertPath
         this.clientKeyPath = source.clientKeyPath
         this.ssh = source.ssh
