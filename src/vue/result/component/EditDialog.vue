@@ -1,5 +1,5 @@
 <template>
-  <el-dialog ref="editDialog" :title="editorTilte" :visible.sync="visible" width="60%" top="3vh" size="mini">
+  <el-dialog ref="editDialog" :title="editorTilte" :visible.sync="visible" width="60%" top="3vh" size="mini" :closeOnClickModal="false">
     <el-form ref="infoForm" :model="editModel" :inline="true">
       <el-form-item :prop="column.name" :key="column.name" v-for="column in columnList" size="mini">
         <template>
