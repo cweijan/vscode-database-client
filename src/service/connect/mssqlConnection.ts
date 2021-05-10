@@ -23,14 +23,12 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
                 database: node.database || undefined,
                 connectTimeout: node.connectTimeout ? parseInt(node.connectTimeout as any) : 5000,
                 requestTimeout: node.requestTimeout ? parseInt(node.requestTimeout as any) : 10000,
-                // change to true and test.
-                useColumnNames: false,
                 encrypt: node.encrypt
             },
             authentication: {
                 type: node.authType,
                 options: {
-                    // domain: "DESKTOP-S5KRS1E",
+                    domain: node.domain,
                     userName: node.user,
                     password: node.password,
                 }

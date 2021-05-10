@@ -86,6 +86,13 @@
           </div>
         </section>
 
+        <section class="mb-2" v-if="connectionOption.dbType=='SqlServer' && connectionOption.authType=='ntlm'">
+          <div class="inline-block mr-10">
+            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Domain</label>
+            <input class="w-64 field__input" placeholder="Domain"  v-model="connectionOption.domain" />
+          </div>
+        </section>
+
         <section class="mb-2">
           <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
             <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Username</label>

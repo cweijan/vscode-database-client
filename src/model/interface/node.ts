@@ -67,6 +67,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
       */
     public encrypt?: boolean;
     public instanceName?: string;
+    public domain?: string;
     public authType?: string;
 
     /**
@@ -117,6 +118,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         }
         this.encrypt = source.encrypt
         this.instanceName = source.instanceName
+        this.domain = source.domain
         this.authType = source.authType
         this.disable = source.disable
         this.includeDatabases = source.includeDatabases
