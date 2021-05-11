@@ -19,6 +19,7 @@
 	"command.db.drop": "Drop Database",
 	"command.runQuery": "Run Selected SQL",
 	"command.runAllQuery": "Run All SQL",
+	"command.util.github": "Star the project to represent support.",
 	"command.query.switch": "Open Query",
 	"command.data.import": "Import Sql",
 	"command.data.export": "Export Data",

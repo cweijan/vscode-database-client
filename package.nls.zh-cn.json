@@ -19,6 +19,7 @@
 	"command.db.drop": "删除数据库",
 	"command.runQuery": "执行选中的SQL",
 	"command.runAllQuery": "执行全部SQL",
+	"command.util.github": "关注项目以表支持",
 	"command.query.switch": "打开查询",
 	"command.data.import": "导入SQL文件",
 	"command.data.export": "导出数据",

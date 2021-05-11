@@ -146,6 +146,12 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.util.github",
+				"title": "%command.util.github%",
+				"icon":"$(github)",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.connection.edit",
 				"title": "%command.connection.edit%",
 				"category": "MySQL"
@@ -501,6 +507,11 @@
 					"command": "mysql.struct.diff",
 					"when": "view == github.cweijan.mysql",
 					"group": "navigation@-2"
+				},
+				{
+					"command": "mysql.util.github",
+					"when": "view == github.cweijan.mysql",
+					"group": "navigation@-3"
 				}
 			],
 			"view/item/context": [
