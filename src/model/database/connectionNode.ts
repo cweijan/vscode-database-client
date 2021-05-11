@@ -23,7 +23,7 @@ export class ConnectionNode extends Node implements CopyAble {
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
         this.init(parent)
-        this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
+        this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName?this.instanceName:this.port}`;
         this.cacheSelf()
         if (parent.name) {
             this.description = parent.name

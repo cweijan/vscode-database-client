@@ -101,13 +101,13 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         and tc.table_catalog=c.TABLE_CATALOG and tc.TABLE_SCHEMA=c.TABLE_SCHEMA and tc.table_name=c.table_name WHERE c.TABLE_SCHEMA = '${database}' AND c.table_name = '${table}' ORDER BY ORDINAL_POSITION`;
     }
     showTriggers(database: string): string {
-        return `SELECT OBJECT_NAME(PARENT_OBJECT_ID) AS PARENT_TABLE, concat(SCHEMA_NAME(schema_id),'.',name) TRIGGER_NAME FROM SYS.OBJECTS WHERE TYPE = 'TR'`;
+        return `SELECT t.name TRIGGER_NAME FROM SYS.OBJECTS t INNER JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE TYPE = 'TR' and s.name='${database}'`;
     }
     showProcedures(database: string): string {
-        return `SELECT concat(ROUTINE_SCHEMA,'.',ROUTINE_NAME) ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_SCHEMA = '${database}' and ROUTINE_TYPE='PROCEDURE'`;
+        return `SELECT ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_SCHEMA = '${database}' and ROUTINE_TYPE='PROCEDURE'`;
     }
     showFunctions(database: string): string {
-        return `SELECT concat(ROUTINE_SCHEMA,'.',ROUTINE_NAME) ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_SCHEMA = '${database}' and ROUTINE_TYPE='FUNCTION'`;
+        return `SELECT ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_SCHEMA = '${database}' and ROUTINE_TYPE='FUNCTION'`;
     }
     showViews(database: string): string {
         return `SELECT name FROM sys.all_views t where SCHEMA_NAME(t.schema_id)='${database}' order by name`;

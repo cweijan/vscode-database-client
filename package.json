@@ -667,7 +667,12 @@
 				},
 				{
 					"command": "mysql.table.source",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|view)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table)$/",
+					"group": "1_inline@2"
+				},
+				{
+					"command": "mysql.view.source",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(view)$/",
 					"group": "1_inline@2"
 				},
 				{

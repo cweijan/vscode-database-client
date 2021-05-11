@@ -8,17 +8,11 @@ export class MysqlConnection extends IConnection {
     private con: mysql.Connection;
     constructor(node: Node) {
         super()
-        const newConnectionOptions = {
+        let config = {
             host: node.host, port: node.port, user: node.user, password: node.password, database: node.database,
             timezone: node.timezone,
             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
             connectTimeout: node.connectTimeout || 5000,
-            ssl: {
-                rejectUnauthorized: false,
-                cert: ( node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
-                key: ( node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
-                minVersion: 'TLSv1'
-            },
             typeCast: (field, next) => {
                 if (this.dumpMode) return dumpTypeCast(field as mysql.TypecastField)
                 const buf = field.buffer();
@@ -28,7 +22,15 @@ export class MysqlConnection extends IConnection {
                 return buf?.toString();
             }
         } as mysql.ConnectionConfig;
-        this.con = mysql.createConnection(newConnectionOptions);
+        if(node.useSSL){
+            config.ssl={
+                rejectUnauthorized: false,
+                cert: ( node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
+                key: ( node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
+                minVersion: 'TLSv1'
+            }
+        }
+        this.con = mysql.createConnection(config);
     }
     isAlive(): boolean {
         return !this.dead && (this.con.state == 'authenticated' || this.con.authorized)

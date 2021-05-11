@@ -58,6 +58,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public context?: Memento;
     public parent?: Node;
 
+    public useSSL?: boolean;
     public clientCertPath?: string;
     public clientKeyPath?: string;
 
@@ -66,6 +67,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
       */
     public encrypt?: boolean;
     public instanceName?: string;
+    public domain?: string;
     public authType?: string;
 
     /**
@@ -93,6 +95,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.password = source.password
         if (!this.database) this.database = source.database
         this.timezone = source.timezone
+        this.useSSL = source.useSSL
         this.clientCertPath = source.clientCertPath
         this.clientKeyPath = source.clientKeyPath
         this.ssh = source.ssh
@@ -115,6 +118,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         }
         this.encrypt = source.encrypt
         this.instanceName = source.instanceName
+        this.domain = source.domain
         this.authType = source.authType
         this.disable = source.disable
         this.includeDatabases = source.includeDatabases
@@ -232,7 +236,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public getConnectId(opt?: SwitchOpt): string {
 
 
-        let uid = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
+        let uid = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName?this.instanceName:this.port}`;
 
         uid = `${this.key}@@${uid}`
 

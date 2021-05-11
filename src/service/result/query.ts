@@ -168,6 +168,10 @@ export class QueryPage {
             database = fields[0].schema || fields[0].db;
         }
 
+        if(queryParam.connection.dbType==DatabaseType.MSSQL && tableName.indexOf(".")!=-1){
+            tableName=tableName.split(".")[1]
+        }
+
         const tableNode = queryParam.connection.getByRegion(tableName)
         if (tableNode) {
             let primaryKey: string;
