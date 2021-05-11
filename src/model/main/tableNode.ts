@@ -21,7 +21,7 @@ export class TableNode extends Node implements CopyAble {
     public contextValue: string = ModelType.TABLE;
     public table: string;
 
-    constructor(meta: TableMeta, readonly parent: Node) {
+    constructor(readonly meta: TableMeta, readonly parent: Node) {
         super(`${meta.name}`)
         this.table = meta.name
         this.description = `${meta.comment || ''} ${(meta.rows && meta.rows != '0') ? `Rows ${meta.rows}` : ''}`
@@ -139,10 +139,9 @@ export class TableNode extends Node implements CopyAble {
                         }
                         return columnNode.column;
                     });
-                    const node = this.getByRegion(this.table) as TableNode || this
-                    handler.emit('design-data', { indexs: result, table: node.table, comment: node.description, columnList, primaryKey, dbType: node.dbType })
+                    handler.emit('design-data', { indexs: result, table: this.table, comment: this.meta.comment, columnList, primaryKey, dbType: this.dbType })
                 }).on("updateTable", async ({ newTableName, newComment }) => {
-                    const sql = this.dialect.updateTable({ table: this.table, newTableName, comment: this.description, newComment });
+                    const sql = this.dialect.updateTable({ table: this.table, newTableName, comment: this.meta.comment, newComment });
                     await executeAndRefresh(sql, handler)
                     this.parent.setChildCache(null)
                     this.provider.reload(this.parent)
