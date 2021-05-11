@@ -433,7 +433,8 @@
 			},
 			{
 				"command": "mysql.ssh.file.download",
-				"title": "Download File"
+				"title": "Download File",
+				"icon":"$(cloud-download)"
 			},
 			{
 				"command": "mysql.ssh.file.upload",
@@ -510,14 +511,14 @@
 				},
 				{
 					"command": "mysql.util.github",
-					"when": "view == github.cweijan.mysql",
+					"when": "view =~ /cweijan.+?ql/",
 					"group": "navigation@-3"
 				}
 			],
 			"view/item/context": [
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|esConnection|sshConnection|redisConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|esConnection|sshConnection|folder|redisConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
 					"group": "inline@-2"
 				},
 				{
@@ -874,6 +875,11 @@
 					"command": "mysql.ssh.file.download",
 					"when": "view == github.cweijan.nosql && viewItem =~ /(file|ftpFile)/",
 					"group": "file@1"
+				},
+				{
+					"command": "mysql.ssh.file.download",
+					"when": "view == github.cweijan.nosql && viewItem =~ /(file|ftpFile)/",
+					"group": "inline@1"
 				}
 			]
 		},
