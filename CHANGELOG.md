@@ -1,5 +1,13 @@
 # CHANGELOG
 
+# 3.7.4 2021-5-11
+
+- Support config ssl connection.
+- Update ui operation icon.
+- Better sql server support.
+- Fix sqlserver cannot edit.
+- Fix sqlserver show object source fail.
+
 # 3.7.3 2021-5-9
 
 - Compatible icon with version 1.56.0 of vscode.
