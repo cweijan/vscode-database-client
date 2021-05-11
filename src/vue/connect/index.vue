@@ -201,6 +201,13 @@
         </div>
       </section>
 
+      <section class="mb-2" v-if="connectionOption.dbType=='SSH'">
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-32">Show Hidden File</label>
+          <el-switch v-model="connectionOption.showHidden"></el-switch>
+        </div>
+      </section>
+
       <section class="mb-2">
         <label class="font-bold mr-5 inline-block w-28">Type</label>
         <el-radio v-model="type" label="password">Password</el-radio>

@@ -205,6 +205,10 @@ export class SSHConnectionNode extends Node {
 
     build(entryList: FileEntry[], parentName: string): Node[] {
 
+        if (!this.showHidden) {
+            entryList = entryList.filter(item => !item.filename.startsWith("."))
+        }
+
         const folderList: Node[] = []
         const fileList: Node[] = []
 
