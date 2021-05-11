@@ -16,8 +16,9 @@ export class XtermTerminal implements TerminalService {
     private static handlerMap = new Map<string, Hanlder>();
 
     public async openPath(sshConfig: SSHConfig, fullPath: string) {
-        const handler = XtermTerminal.handlerMap[this.getSshUrl(sshConfig)]
+        const handler: Hanlder = XtermTerminal.handlerMap[this.getSshUrl(sshConfig)]
         if (handler) {
+            handler.panel.reveal()
             handler.emit('path', fullPath)
         } else {
             this.openMethod(sshConfig, () => { this.openPath(sshConfig, fullPath) })
@@ -26,12 +27,16 @@ export class XtermTerminal implements TerminalService {
 
     public async openMethod(sshConfig: SSHConfig, callback?: () => void) {
 
+        const title = this.getTitle(sshConfig);
+        const sshUrl = this.getSshUrl(sshConfig)
+        const type = XtermTerminal.handlerMap[sshUrl] ? `${sshUrl}_${new Date().getTime()}` : sshUrl
+
         ViewManager.createWebviewPanel({
             splitView: false, path: "app", iconPath: {
-                light: Util.getExtPath( "light", "terminal.png"),
-                dark: Util.getExtPath( "dark", "terminal.svg"),
+                light: Util.getExtPath("light", "terminal.png"),
+                dark: Util.getExtPath("dark", "terminal.svg"),
             },
-            title: this.getTitle(sshConfig),
+            title, type,
             eventHandler: (handler) => {
                 this.handlerEvent(handler, sshConfig, callback)
             }
