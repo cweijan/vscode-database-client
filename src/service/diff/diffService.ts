@@ -18,7 +18,7 @@ export class DiffService {
 
         ViewManager.createWebviewPanel({
             path: "app", title: "Struct Sync",
-            splitView: false, iconPath: Global.getExtPath("resources", "icon", "add.svg"),
+            splitView: false, iconPath: Global.getExtPath("resources", "icon", "cloud-sync.svg"),
             eventHandler: (handler => {
                 handler.on("init", () => {
                     handler.emit('route', 'structDiff')

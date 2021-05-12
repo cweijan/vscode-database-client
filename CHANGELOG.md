@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# 3.7.5 2021-5-12
+
+- Update ui operation icon.
+- Set ssh terminal as full height.
+- Support open mysql and postgresql terminal.
+- Fix some legacy bugs.
+
 # 3.7.4 2021-5-11
 
 - Support config ssl connection.
