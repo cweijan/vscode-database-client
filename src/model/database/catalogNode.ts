@@ -23,8 +23,9 @@ export class CatalogNode extends Node implements CopyAble {
         if (this.isActive(lcp) && (lcp.database == this.database)) {
             if (compare(vscode.version, "1.51.0", ">=")) {
                 this.iconPath=new vscode.ThemeIcon("database", new vscode.ThemeColor('charts.blue'));
+            }else{
+                this.description = `Active`
             }
-            this.description = `Active`
         }
     }
 

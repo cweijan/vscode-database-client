@@ -18,12 +18,12 @@ import { UserGroup } from "./userGroup";
  */
 export class ConnectionNode extends Node implements CopyAble {
 
-    public iconPath: string|vscode.ThemeIcon = path.join(Constants.RES_PATH, "icon/server.png");
+    public iconPath: string | vscode.ThemeIcon = path.join(Constants.RES_PATH, "icon/server.png");
     public contextValue: string = ModelType.CONNECTION;
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
         this.init(parent)
-        this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName?this.instanceName:this.port}`;
+        this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName ? this.instanceName : this.port}`;
         this.cacheSelf()
         if (parent.name) {
             this.description = parent.name
@@ -32,14 +32,12 @@ export class ConnectionNode extends Node implements CopyAble {
         if (this.disable) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None;
             this.iconPath = Global.disableIcon;
-            this.label=this.label+" (closed)"
+            this.label = this.label + " (closed)"
             return;
         }
         const lcp = ConnectionManager.activeNode;
-        if (this.isActive(lcp)) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/connection-active.svg");
+        if (lcp && lcp.getConnectId().includes(this.getConnectId())) {
             this.description = `${parent.name ? parent.name + " " : ""}Active`
-            return;
         }
         if (this.dbType == DatabaseType.PG) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/pg_server.svg");
@@ -71,7 +69,7 @@ export class ConnectionNode extends Node implements CopyAble {
                 const includeDatabaseArray = this.includeDatabases?.toLowerCase()?.split(",")
                 const usingInclude = this.includeDatabases && includeDatabaseArray && includeDatabaseArray.length >= 1;
                 const databaseNodes = databases.filter((db) => {
-                    if (usingInclude  && !db.schema) {
+                    if (usingInclude && !db.schema) {
                         return includeDatabaseArray.indexOf(db.Database.toLocaleLowerCase()) != -1;
                     }
                     return true;
