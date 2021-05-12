@@ -5,12 +5,6 @@
       <el-button @click="column.visible=true" type="primary" title="Insert" icon="el-icon-circle-plus-outline" size="mini" circle> </el-button>
     </div>
     <ux-grid :data="designData.editColumnList" stripe style="width: 100%" :cell-style="{height: '25px'}" :height="remainHeight()">
-      <ux-table-column title="Operation" width="120">
-        <template v-slot="{ row }">
-          <el-button @click="openEdit(row)" title="edit" size="mini" icon="el-icon-edit" circle> </el-button>
-          <el-button @click="deleteConfirm(row)" title="delete" type="danger" size="mini" icon="el-icon-delete" circle> </el-button>
-        </template>
-      </ux-table-column>
       <ux-table-column align="center" field="name" title="Name" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column align="center" field="type" title="Type" show-overflow-tooltip="true"></ux-table-column>
       <ux-table-column align="center" field="comment" title="Comment" show-overflow-tooltip="true"></ux-table-column>
@@ -34,6 +28,12 @@
       <ux-table-column align="center" title="Auto Incrment" width="140" show-overflow-tooltip="true">
         <template v-slot="{ row }">
           <el-checkbox disabled :checked="row.isAutoIncrement"></el-checkbox>
+        </template>
+      </ux-table-column>
+      <ux-table-column title="Operation" width="120">
+        <template v-slot="{ row }">
+          <el-button @click="openEdit(row)" title="edit" size="mini" icon="el-icon-edit" circle> </el-button>
+          <el-button @click="deleteConfirm(row)" title="delete" type="danger" size="mini" icon="el-icon-delete" circle> </el-button>
         </template>
       </ux-table-column>
     </ux-grid>
