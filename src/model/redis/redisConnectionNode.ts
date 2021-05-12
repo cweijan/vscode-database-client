@@ -1,5 +1,4 @@
 import { Constants, ModelType } from "@/common/constants";
-import { Global } from "@/common/global";
 import { Util } from "@/common/util";
 import { ViewManager } from "@/common/viewManager";
 import { CommandKey, Node } from "@/model/interface/node";
@@ -26,8 +25,7 @@ export class RedisConnectionNode extends RedisBaseNode {
         this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
         if (this.disable) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None;
-            this.iconPath = Global.disableIcon;
-            this.label = this.label + " (closed)"
+            this.description = (this.description||'') + " closed"
             return;
         }
     }

@@ -1,4 +1,3 @@
-import { Global } from "@/common/global";
 import { Util } from "@/common/util";
 import { QueryGroup } from "@/model/query/queryGroup";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
@@ -35,8 +34,7 @@ export class EsConnectionNode extends Node {
 
         if (this.disable) {
             this.collapsibleState = TreeItemCollapsibleState.None;
-            this.iconPath = Global.disableIcon;
-            this.label=this.label+" (closed)"
+            this.description=(this.description||'')+" closed"
             return;
         }
 
