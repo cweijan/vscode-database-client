@@ -199,7 +199,7 @@
 				"command": "mysql.query.switch",
 				"title": "%command.query.switch%",
 				"category": "MySQL",
-				"icon": "$(book)"
+				"icon": "$(symbol-file)"
 			},
 			{
 				"command": "mysql.data.import",

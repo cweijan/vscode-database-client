@@ -33,8 +33,8 @@ export class XtermTerminal implements TerminalService {
 
         ViewManager.createWebviewPanel({
             splitView: false, path: "app", iconPath: {
-                light: Util.getExtPath("light", "terminal.png"),
-                dark: Util.getExtPath("dark", "terminal.svg"),
+                light: Util.getExtPath( "image", "terminal_light.png"),
+                dark: Util.getExtPath( "image", "terminal_dark.svg"),
             },
             title, type,
             eventHandler: (handler) => {
