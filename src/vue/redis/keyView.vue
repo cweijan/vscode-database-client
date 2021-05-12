@@ -301,8 +301,12 @@ body {
 }
 
 .key-tab-container {
-  margin-top: 30px;
+  margin-top: 10px;
   padding-left: 5px;
+}
+
+.el-form-item{
+margin: 3px;
 }
 
 .key-header-info {
