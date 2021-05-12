@@ -19,7 +19,7 @@ const extPackage=require("@/../package.json")
 export class EsConnectionNode extends Node {
 
     private static versionMap = {}
-    public iconPath: string|ThemeIcon = path.join(Constants.RES_PATH, "icon/es.png");
+    public iconPath: string|ThemeIcon = path.join(Constants.RES_PATH, "icon/elasticsearch.svg");
     public contextValue: string = ModelType.ES_CONNECTION;
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
@@ -40,10 +40,6 @@ export class EsConnectionNode extends Node {
             return;
         }
 
-        if (this.isActive(lcp)) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/connection-active.svg");
-        }
-
         if (EsConnectionNode.versionMap[this.label]) {
             this.description = EsConnectionNode.versionMap[this.label]
         } else {
@@ -54,6 +50,10 @@ export class EsConnectionNode extends Node {
             }).catch(err=>{
                 console.log(err)
             })
+        }
+
+        if (this.isActive(lcp)) {
+            this.description = `${this.description}   Active`;
         }
 
     }

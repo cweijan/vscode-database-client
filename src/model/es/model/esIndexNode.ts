@@ -1,9 +1,8 @@
-import { ConfigKey, Constants, ModelType } from "@/common/constants";
+import { ConfigKey, ModelType } from "@/common/constants";
 import { FileManager } from "@/common/filesManager";
 import { Global } from "@/common/global";
 import { QueryUnit } from "@/service/queryUnit";
-import * as path from "path";
-import { Range } from "vscode";
+import { Range, ThemeIcon } from "vscode";
 import { Node } from "../../interface/node";
 import { EsColumnNode } from "./esColumnNode";
 import { EsTemplate } from "./esTemplate";
@@ -11,7 +10,7 @@ import { EsTemplate } from "./esTemplate";
 
 export class ESIndexNode extends Node {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
+    public iconPath = new ThemeIcon("type-hierarchy");
     public contextValue: string = ModelType.ES_INDEX;
     public properties: string;
     constructor(readonly info: string, readonly parent: Node) {

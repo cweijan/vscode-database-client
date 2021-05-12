@@ -1,4 +1,5 @@
 import * as path from "path";
+import { ThemeIcon } from "vscode";
 import { Constants, ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
@@ -7,7 +8,7 @@ import { TableNode } from "./tableNode";
 
 export class TableGroup extends Node {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
+    public iconPath: string|ThemeIcon = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.TABLE_GROUP;
     constructor(readonly parent: Node) {
         super("Table")
