@@ -57,7 +57,7 @@
                 this.emit('data', data)
             })
 
-            function resizeScreen() {
+            const resizeScreen=()=>{
                 fitAddon.fit()
                 this.emit('resize', { cols: terminal.cols, rows: terminal.rows })
             }

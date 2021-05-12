@@ -51,7 +51,7 @@ export class XtermTerminal implements TerminalService {
         handler.on("init", () => {
             handler.emit("route", 'sshTerminal')
         }).on("initTerminal", (content) => {
-            handler.emit('connecting', `connecting ${sshConfig.username}@${sshConfig.host}...\n`);
+            handler.emit('connecting', `connecting ${sshConfig.username}@${sshConfig.host}...`);
             let termCols: number, termRows: number;
             if (content) {
                 termCols = content.cols;

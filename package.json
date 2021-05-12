@@ -969,12 +969,7 @@
 		"vue-style-loader": "^4.1.2",
 		"vue-template-compiler": "^2.6.11",
 		"webpack": "^4.43.0",
-		"webpack-cli": "^3.3.11",
-		"xterm": "^4.6.0",
-		"xterm-addon-fit": "^0.3.0",
-		"xterm-addon-search": "^0.7.0",
-		"xterm-addon-web-links": "^0.2.1",
-		"xterm-addon-search-bar": "^0.2.0"
+		"webpack-cli": "^3.3.11"
 	},
 	"dependencies": {
 		"axios": "^0.21.1",
@@ -1000,7 +995,12 @@
 		"umy-table": "1.0.8",
 		"vue": "^2.6.11",
 		"vue-router": "^3.4.1",
-		"xregexp": "2.0.0"
+		"xregexp": "2.0.0",
+		"xterm": "^4.12.0",
+		"xterm-addon-fit": "^0.5.0",
+		"xterm-addon-search": "^0.8.0",
+		"xterm-addon-search-bar": "^0.2.0",
+		"xterm-addon-web-links": "^0.4.0"
 	},
 	"__metadata": {
 		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",
