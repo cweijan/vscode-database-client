@@ -22,7 +22,7 @@ export class FTPConnectionNode extends FtpBaseNode {
         if (this.file) {
             this.iconPath = path.join(Constants.RES_PATH, "ssh/folder.svg");
         } else {
-            this.iconPath = new vscode.ThemeIcon("link");
+            this.iconPath = new vscode.ThemeIcon("server");
         }
         if (this.disable) {
             this.collapsibleState = TreeItemCollapsibleState.None;

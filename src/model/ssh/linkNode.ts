@@ -6,7 +6,7 @@ export class LinkNode extends Node {
     contextValue = ModelType.Link;
     constructor(info: string) {
         super(info)
-        this.iconPath=new ThemeIcon("link-external")
+        this.iconPath=new ThemeIcon("link")
         this.collapsibleState = TreeItemCollapsibleState.None
     }
     getChildren(): Promise<Node[]> {
