@@ -98,7 +98,7 @@ export class ConnectionNode extends Node implements CopyAble {
         let childMap = {};
         const dbNameList = (await this.getChildren()).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => {
             childMap[databaseNode.uid] = databaseNode
-            return databaseNode.schema
+            return this.dbType == DatabaseType.MYSQL ? databaseNode.schema : databaseNode.database;
         });
         let dbName: string;
         if (dbNameList.length == 1) {
@@ -107,9 +107,7 @@ export class ConnectionNode extends Node implements CopyAble {
         if (dbNameList.length > 1) {
             dbName = await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" })
         }
-        if (dbName) {
-            ConnectionManager.changeActive(childMap[`${this.getConnectId()}_${dbName}`])
-        }
+        ConnectionManager.changeActive(dbName ? childMap[`${this.getConnectId()}@${dbName}`] : this)
 
     }
 

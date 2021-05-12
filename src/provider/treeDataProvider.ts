@@ -106,6 +106,8 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     }
 
     private getNode(connectInfo: Node, key: string) {
+        // 兼容老版本的连接信息
+        if(!connectInfo.dbType)connectInfo.dbType=DatabaseType.MYSQL
         let node: Node;
         if (connectInfo.dbType == DatabaseType.ES) {
             node = new EsConnectionNode(key, connectInfo);
