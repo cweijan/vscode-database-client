@@ -1,7 +1,6 @@
 import sqlFormatter from "@/service/format/sqlFormatter";
-import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/constants";
+import { ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { QueryUnit } from "../../service/queryUnit";
@@ -9,7 +8,6 @@ import { TableNode } from "./tableNode";
 
 export class ViewNode extends TableNode {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
     public contextValue: string = ModelType.VIEW;
 
     public async showSource(open = true) {

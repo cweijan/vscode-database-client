@@ -1,8 +1,7 @@
 import { ColumnMeta, TableMeta } from "@/common/typeDef";
 import { Hanlder, ViewManager } from "@/common/viewManager";
-import * as path from "path";
 import * as vscode from "vscode";
-import { ConfigKey, Constants, DatabaseType, ModelType, Template } from "../../common/constants";
+import { ConfigKey, DatabaseType, ModelType, Template } from "../../common/constants";
 import { Global } from "../../common/global";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
@@ -13,11 +12,10 @@ import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { ColumnNode } from "../other/columnNode";
 import { InfoNode } from "../other/infoNode";
-const prettyBytes = require("pretty-bytes")
 
 export class TableNode extends Node implements CopyAble {
 
-    public iconPath: string = path.join(Constants.RES_PATH, "icon/table.svg");
+    public iconPath=new vscode.ThemeIcon("split-horizontal")
     public contextValue: string = ModelType.TABLE;
     public table: string;
 
