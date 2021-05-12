@@ -8,6 +8,7 @@ import { QueryUnit } from "../../service/queryUnit";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
 import { ColumnMeta } from "@/common/typeDef";
+import { compare } from "compare-versions";
 
 export class ColumnNode extends Node implements CopyAble {
     public type: string;
@@ -17,7 +18,15 @@ export class ColumnNode extends Node implements CopyAble {
         super(column.name)
         this.init(parent)
         this.buildInfo()
-        this.iconPath = path.join(Constants.RES_PATH, this.isPrimaryKey ? "icon/b_primary.png" : "icon/b_props.png");
+        if (this.isPrimaryKey) {
+            if (compare(vscode.version, "1.51.0", ">=")) {
+                this.iconPath = new vscode.ThemeIcon("key", new vscode.ThemeColor('charts.yellow'));
+            } else {
+                this.iconPath = path.join(Constants.RES_PATH, "icon/b_primary.png")
+            }
+        } else {
+            this.iconPath = new vscode.ThemeIcon("symbol-property");
+        }
         this.command = {
             command: "mysql.column.update",
             title: "Update Column Statement",
@@ -35,7 +44,7 @@ export class ColumnNode extends Node implements CopyAble {
         this.column.isNotNull = this.column.nullable != 'YES'
         this.type = `${this.column.type}`
         this.description = `${this.column.type} ${this.column.comment}`
-        this.tooltip=`${this.label} ${this.column.comment}
+        this.tooltip = `${this.label} ${this.column.comment}
 ${this.column.type} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"}`
         const columnKey: string = this.column.key;
         switch (columnKey) {
