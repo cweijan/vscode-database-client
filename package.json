@@ -372,9 +372,8 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.redis.connection.terminal",
-				"title": "%command.redis.connection.terminal%",
-				"category": "Redis",
+				"command": "mysql.connection.terminal",
+				"title": "%command.connection.terminal%",
 				"icon": "$(terminal)"
 			},
 			{
@@ -389,11 +388,6 @@
 			{
 				"command": "mysql.redis.key.detail",
 				"title": "%command.redis.key.detail%"
-			},
-			{
-				"command": "mysql.ssh.connection.terminal",
-				"title": "Open Terminal",
-				"icon": "$(terminal)"
 			},
 			{
 				"command": "mysql.ssh.terminal.hear",
@@ -572,14 +566,19 @@
 					"group": "10mysql@2"
 				},
 				{
-					"command": "mysql.query.switch",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|catalog|database|esConnection|esIndex)$/",
-					"group": "inline@1"
-				},
-				{
 					"command": "mysql.database.add",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == connection",
 					"group": "inline@0"
+				},
+				{
+					"command": "mysql.connection.terminal",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == connection",
+					"group": "inline@2"
+				},
+				{
+					"command": "mysql.query.switch",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|catalog|database|esConnection|esIndex)$/",
+					"group": "inline@5"
 				},
 				{
 					"command": "mysql.query.add",
@@ -792,7 +791,7 @@
 					"group": "1_mysql@1"
 				},
 				{
-					"command": "mysql.redis.connection.terminal",
+					"command": "mysql.connection.terminal",
 					"when": "view == github.cweijan.nosql && viewItem == redisConnection",
 					"group": "inline@1"
 				},
@@ -812,7 +811,7 @@
 					"group": "inline@0"
 				},
 				{
-					"command": "mysql.ssh.connection.terminal",
+					"command": "mysql.connection.terminal",
 					"when": "view == github.cweijan.nosql && viewItem == sshConnection",
 					"group": "inline@1"
 				},

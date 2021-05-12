@@ -8,7 +8,7 @@ import { QueryUnit } from "@/service/queryUnit";
 import { ServiceManager } from "@/service/serviceManager";
 import * as vscode from "vscode";
 import { Memento } from "vscode";
-import { resourceLimits } from "worker_threads";
+var commandExistsSync = require('command-exists').sync;
 import { DatabaseCache } from "../../service/common/databaseCache";
 import { NodeUtil } from "../nodeUtil";
 import { CopyAble } from "./copyAble";
@@ -268,6 +268,32 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public wrap(origin: string) {
         return Util.wrap(origin, this.dbType)
+    }
+
+
+    public openTerminal() {
+        let command: string;
+        if (this.dbType == DatabaseType.MYSQL) {
+            this.checkCommand('mysql');
+            command = `mysql -u ${this.user} -p${this.password} -h ${this.host} -P ${this.port} \n`;
+        } else if (this.dbType == DatabaseType.PG) {
+            this.checkCommand('psql');
+            command = `set "PGPASSWORD=${this.password}" && psql -U ${this.user} -h ${this.host} -p ${this.port} \n`;
+        }else if(this.dbType==DatabaseType.REDIS){
+            this.checkCommand('redis-cli');
+            command = `redis-cli -h ${this.host} -p ${this.port} \n`;   
+        }
+        const terminal = vscode.window.createTerminal(this.dbType.toString())
+        terminal.sendText(command)
+        terminal.show()
+    }
+
+    checkCommand(command: string) {
+        if (!commandExistsSync(command)) {
+            const errText = `Command ${command} not exists in path!`;
+            vscode.window.showErrorMessage(errText)
+            throw new Error(errText);
+        }
     }
 
 }

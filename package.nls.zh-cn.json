@@ -53,7 +53,7 @@
 	"command.delete.procedure": "删除存储过程",
 	"command.delete.function": "删除函数",
 	"command.delete.trigger": "删除触发器",
-	"command.redis.connection.terminal": "打卡命令行模拟器",
+	"command.connection.terminal": "打开终端",
     "command.redis.connection.status": "服务状态",
     "command.redis.key.del": "删除键",
 	"command.redis.key.detail": "查看键详情",

@@ -8,25 +8,26 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { RedisFolderNode } from "./folderNode";
 import RedisBaseNode from "./redisBaseNode";
+var commandExistsSync = require('command-exists').sync;
 
 export class RedisConnectionNode extends RedisBaseNode {
 
 
     contextValue = ModelType.REDIS_CONNECTION;
-    iconPath: string|vscode.ThemeIcon = path.join(Constants.RES_PATH, `image/redis_connection.png`);
+    iconPath: string | vscode.ThemeIcon = path.join(Constants.RES_PATH, `image/redis_connection.png`);
 
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
         this.init(parent)
         if (parent.name) {
-            this.description=parent.name
+            this.description = parent.name
             this.name = parent.name
         }
         this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
         if (this.disable) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None;
             this.iconPath = Global.disableIcon;
-            this.label=this.label+" (closed)"
+            this.label = this.label + " (closed)"
             return;
         }
     }
@@ -37,12 +38,16 @@ export class RedisConnectionNode extends RedisBaseNode {
         return RedisFolderNode.buildChilds(this, keys)
     }
     async openTerminal(): Promise<any> {
+        if (!this.password && commandExistsSync('redis-cli')) {
+            super.openTerminal();
+            return;
+        }
         const client = await this.getClient()
         ViewManager.createWebviewPanel({
             splitView: true, title: `${this.host}@${this.port}`, preserveFocus: false,
-            iconPath:  {
-                light: Util.getExtPath( "image", "terminal_light.png"),
-                dark: Util.getExtPath( "image", "terminal_dark.svg"),
+            iconPath: {
+                light: Util.getExtPath("image", "terminal_light.png"),
+                dark: Util.getExtPath("image", "terminal_dark.svg"),
             }, path: "app",
             eventHandler: (handler) => {
                 handler.on("init", () => {
@@ -55,7 +60,7 @@ export class RedisConnectionNode extends RedisBaseNode {
                     }
                     const splitCommand: string[] = content.replace(/ +/g, " ").split(' ')
                     const command = splitCommand.shift()
-                    const reply=await client.send_command(command, splitCommand)
+                    const reply = await client.send_command(command, splitCommand)
                     handler.emit("result", reply)
                 }).on("exit", () => {
                     handler.panel.dispose()

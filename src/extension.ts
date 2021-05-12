@@ -126,7 +126,6 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // ssh
             ...{
-                'mysql.ssh.connection.terminal': (parentNode: SSHConnectionNode) => parentNode.openTerminal(),
                 'mysql.ssh.folder.new': (parentNode: SSHConnectionNode) => parentNode.newFolder(),
                 'mysql.ssh.file.new': (parentNode: SSHConnectionNode) => parentNode.newFile(),
                 'mysql.ssh.host.copy': (parentNode: SSHConnectionNode) => parentNode.copyIP(),
@@ -206,7 +205,7 @@ export function activate(context: vscode.ExtensionContext) {
             // redis
             ...{
                 "mysql.redis.connection.status": (connectionNode: RedisConnectionNode) => connectionNode.showStatus(),
-                "mysql.redis.connection.terminal": (connectionNode: RedisConnectionNode) => connectionNode.openTerminal(),
+                "mysql.connection.terminal": (node: Node) => node.openTerminal(),
                 "mysql.redis.key.detail": (keyNode: KeyNode) => keyNode.detail(),
                 "mysql.redis.key.del": (keyNode: KeyNode) => keyNode.delete(),
             },

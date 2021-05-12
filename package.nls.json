@@ -53,7 +53,7 @@
 	"command.delete.procedure": "Drop Procedure",
 	"command.delete.function": "Drop Function",
 	"command.delete.trigger": "Drop Trigger",
-	"command.redis.connection.terminal": "Open Terminal",
+	"command.connection.terminal": "Open Terminal",
     "command.redis.connection.status": "Server status",
     "command.redis.key.del": "Delete Key",
 	"command.redis.key.detail": "View Key Detail",
