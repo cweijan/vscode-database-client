@@ -41,6 +41,7 @@
                 const searchAddonBar = new SearchBarAddon({ searchAddon });
 
                 terminal.loadAddon(fitAddon)
+                terminal.loadAddon(searchAddon)
                 terminal.loadAddon(searchAddonBar);
                 terminal.loadAddon(new WebLinksAddon(() => { }, {
                     willLinkActivate: (e, uri) => {
