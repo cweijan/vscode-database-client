@@ -1,6 +1,7 @@
 import { Global } from "@/common/global";
 import * as path from "path";
 import * as vscode from "vscode";
+import { compare } from 'compare-versions';
 import { Constants, DatabaseType, ModelType } from "../../common/constants";
 import { Util } from '../../common/util';
 import { DbTreeDataProvider } from '../../provider/treeDataProvider';
@@ -20,16 +21,25 @@ export class SchemaNode extends Node implements CopyAble {
 
 
     public contextValue: string = ModelType.SCHEMA;
-    public iconPath: string|vscode.ThemeIcon = path.join(Constants.RES_PATH, "icon/database.svg");
     constructor(public schema: string, readonly parent: Node) {
         super(schema)
         this.init(this.parent)
         this.cacheSelf()
+        this.iconPath = this.getIcon()
         const lcp = ConnectionManager.activeNode;
         if (this.isActive(lcp) && (lcp.database == this.database) && (lcp.schema == this.schema)) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/database-active.svg");
+            this.iconPath=this.getIcon(true)
             this.description = `Active`
         }
+    }
+
+    private getIcon(active?: boolean): vscode.ThemeIcon {
+
+        const iconId = this.dbType == DatabaseType.MYSQL ? "database" : "type-hierarchy"
+        if (active && compare(vscode.version, "1.51.0", ">=")) {
+            return new vscode.ThemeIcon(iconId, new vscode.ThemeColor('charts.blue'));
+        }
+        return new vscode.ThemeIcon(iconId);
     }
 
     public getChildren(): Promise<Node[]> | Node[] {
