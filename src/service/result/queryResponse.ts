@@ -35,6 +35,7 @@ export class DMLResponse {
     public costTime: number;
     public message?: string;
     public affectedRows: number;
+    public isInsert: boolean;
 }
 
 /**

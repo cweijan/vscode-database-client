@@ -235,7 +235,7 @@ export default {
           handlerCommon(response);
           this.info.error = false;
           this.info.needRefresh = false;
-          if(response.message.indexOf("AffectedRows")!=-1){
+          if(response.message.indexOf("AffectedRows")!=-1 || response.isInsert){
             this.refresh()
           }
           break;
