@@ -15,7 +15,7 @@ import { InfoNode } from "../other/infoNode";
 
 export class TableNode extends Node implements CopyAble {
 
-    public iconPath=new vscode.ThemeIcon("split-horizontal")
+    public iconPath = new vscode.ThemeIcon("split-horizontal")
     public contextValue: string = ModelType.TABLE;
     public table: string;
 
@@ -181,7 +181,7 @@ export class TableNode extends Node implements CopyAble {
 
     public getToolTipe(meta: TableMeta): string {
         if (this.dbType == DatabaseType.MYSQL && meta.data_length) {
-            return `AUTO_INCREMENT : ${meta.auto_increment||'null'}
+            return `AUTO_INCREMENT : ${meta.auto_increment || 'null'}
 ROW_FORMAT : ${meta.row_format}
 `
         }
@@ -243,7 +243,10 @@ ROW_FORMAT : ${meta.row_format}
         const primaryKey = MockRunner.primaryKeyMap[this.uid];
         if (primaryKey != null) {
             const count = await this.execute(`select max(${primaryKey}) max from ${this.wrap(this.table)}`);
-            if (count && count[0]?.max) { return count[0].max }
+            if (count && count[0]?.max) {
+                const max = count[0].max;
+                return Number.isInteger(max)?max:0;
+            }
         }
 
 

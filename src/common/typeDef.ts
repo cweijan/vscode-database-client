@@ -94,6 +94,7 @@ export interface ColumnMeta {
     isAutoIncrement:boolean;
     isUnique:boolean;
     isPrimary:boolean;
+    pk:string;
 }
 
 export interface TableMeta{

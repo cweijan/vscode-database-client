@@ -36,6 +36,15 @@ export class ColumnNode extends Node implements CopyAble {
     }
 
     private buildInfo() {
+        if(!this.column.simpleType){
+            this.column.simpleType=this.column.type
+        }
+        // sqlite
+        if(this.column.pk=='1'){
+            this.isPrimaryKey=true;
+            MockRunner.primaryKeyMap[this.parent.uid] = this.column.name
+            this.column.isPrimary=true;
+        }
         if (this.column.extra == 'auto_increment') {
             this.column.isAutoIncrement = true;
         }
