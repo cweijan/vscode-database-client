@@ -34,7 +34,7 @@ export class SSHConnectionNode extends Node {
             this.description=this.name
         } else {
             this.contextValue = ModelType.FOLDER;
-            this.iconPath = path.join(Constants.RES_PATH, "ssh/folder.svg");
+            this. iconPath =new vscode.ThemeIcon("folder")
         }
         if (file && file.filename.toLocaleLowerCase() == "home") {
             this.iconPath = path.join(Constants.RES_PATH, "ssh/folder-core.svg");
@@ -160,17 +160,15 @@ export class SSHConnectionNode extends Node {
     }
 
     delete(): any {
-        vscode.window.showQuickPick(["YES", "NO"], { canPickMany: false }).then(async str => {
-            if (str == "YES") {
-                const { sftp } = await ClientManager.getSSH(this.sshConfig)
-                sftp.rmdir(this.fullPath, (err) => {
-                    if (err) {
-                        vscode.window.showErrorMessage(err.message)
-                    } else {
-                        vscode.commands.executeCommand(CodeCommand.Refresh)
-                    }
-                })
-            }
+        Util.confirm("Are you wang to delete this folder?",async ()=>{
+            const { sftp } = await ClientManager.getSSH(this.sshConfig)
+            sftp.rmdir(this.fullPath, (err) => {
+                if (err) {
+                    vscode.window.showErrorMessage(err.message)
+                } else {
+                    vscode.commands.executeCommand(CodeCommand.Refresh)
+                }
+            })
         })
     }
 

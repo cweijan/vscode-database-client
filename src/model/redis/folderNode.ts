@@ -2,6 +2,7 @@ import { Constants, ModelType } from "@/common/constants";
 import { Util } from "@/common/util";
 import { Node } from "@/model/interface/node";
 import * as path from "path";
+import { ThemeColor, ThemeIcon } from "vscode";
 import KeyNode from "./keyNode";
 import RedisBaseNode from "./redisBaseNode";
 
@@ -9,6 +10,7 @@ import RedisBaseNode from "./redisBaseNode";
 export class RedisFolderNode extends RedisBaseNode {
     contextValue = ModelType.REDIS_FOLDER;
     readonly iconPath = path.join(Constants.RES_PATH, `image/redis_folder.svg`);
+    // readonly iconPath =new ThemeIcon("folder")
     constructor(readonly label: string, readonly childens: string[], readonly parent: RedisBaseNode) {
         super(label)
         this.init(parent)

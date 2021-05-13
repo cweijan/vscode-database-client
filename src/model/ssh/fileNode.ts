@@ -1,5 +1,6 @@
 import { CodeCommand, Constants, ModelType } from '@/common/constants';
 import { FileManager, FileModel } from '@/common/filesManager';
+import { Util } from '@/common/util';
 import { ClientManager } from '@/service/ssh/clientManager';
 import { createWriteStream } from 'fs';
 import * as path from 'path';
@@ -19,7 +20,7 @@ export class FileNode extends Node {
     fullPath: string;
     constructor(readonly sshConfig: SSHConfig, readonly file: FileEntry, readonly parentName: string) {
         super(file.filename)
-        this.collapsibleState=TreeItemCollapsibleState.None
+        this.collapsibleState = TreeItemCollapsibleState.None
         this.description = prettyBytes(file.attrs.size)
         this.iconPath = this.getIcon(this.file.filename)
         this.fullPath = this.parentName + this.file.filename;
@@ -34,17 +35,15 @@ export class FileNode extends Node {
         return [];
     }
     delete(): any {
-        vscode.window.showQuickPick(["YES", "NO"], { canPickMany: false }).then(async str => {
-            if (str == "YES") {
-                const { sftp } = await ClientManager.getSSH(this.sshConfig)
-                sftp.unlink(this.fullPath, (err) => {
-                    if (err) {
-                        vscode.window.showErrorMessage(err.message)
-                    } else {
-                        vscode.commands.executeCommand(CodeCommand.Refresh)
-                    }
-                })
-            }
+        Util.confirm("Are you wang to delete this file?", async () => {
+            const { sftp } = await ClientManager.getSSH(this.sshConfig)
+            sftp.unlink(this.fullPath, (err) => {
+                if (err) {
+                    vscode.window.showErrorMessage(err.message)
+                } else {
+                    vscode.commands.executeCommand(CodeCommand.Refresh)
+                }
+            })
         })
     }
     async open() {
@@ -79,7 +78,7 @@ export class FileNode extends Node {
                     vscode.window.withProgress({
                         location: vscode.ProgressLocation.Notification,
                         title: `Start downloading ${this.fullPath}`,
-                        cancellable:true
+                        cancellable: true
                     }, (progress, token) => {
                         return new Promise((resolve) => {
                             const fileReadStream = sftp.createReadStream(this.fullPath)
@@ -87,7 +86,7 @@ export class FileNode extends Node {
                                 length: this.file.attrs.size,
                                 time: 100
                             });
-                            let before=0;
+                            let before = 0;
                             str.on("progress", (progressData: any) => {
                                 if (progressData.percentage == 100) {
                                     resolve(null)
@@ -98,10 +97,10 @@ export class FileNode extends Node {
                                     })
                                     return;
                                 }
-                                progress.report({ increment: progressData.percentage-before,message:`remaining : ${prettyBytes(progressData.remaining)}` });
-                                before=progressData.percentage
+                                progress.report({ increment: progressData.percentage - before, message: `remaining : ${prettyBytes(progressData.remaining)}` });
+                                before = progressData.percentage
                             })
-                            str.on("error",err=>{
+                            str.on("error", err => {
                                 vscode.window.showErrorMessage(err.message)
                             })
                             const outStream = createWriteStream(uri.fsPath);
@@ -116,7 +115,7 @@ export class FileNode extends Node {
             })
     }
 
-    getIcon(fileName: string): string {
+    getIcon(fileName: string): string|vscode.ThemeIcon {
 
         const extPath = `${Constants.RES_PATH}`;
 
@@ -140,7 +139,7 @@ export class FileNode extends Node {
 
         }
 
-        return `${extPath}/ssh/icon/${fileIcon}`
+        return `${extPath}/ssh/${fileIcon}`
     }
 
 

@@ -1,10 +1,10 @@
 
-import { ServiceManager } from "@/service/serviceManager";
 import { join } from "path";
 import * as vscode from "vscode";
 import { Position, TextDocument } from "vscode";
 import { Confirm, Constants, DatabaseType } from "./constants";
 import { Global } from "./global";
+import { compare } from 'compare-versions';
 import { wrapByDb } from "./wrapper.js";
 
 export class Util {
@@ -105,9 +105,28 @@ export class Util {
         Global.context.globalState.update(key, object)
     }
 
-    public static is(object: any, type: string) :boolean{
-        if(!object) return false;
+    public static is(object: any, type: string): boolean {
+        if (!object) return false;
         return object.__proto__.constructor.name == type;
+    }
+
+
+    private static supportColor: boolean = null;
+    /**
+     * Check current vscode treeitem support ref theme icon with color.
+     */
+    public static supportColorIcon(): boolean {
+
+        if (this.supportColor === null) {
+            try {
+                new vscode.ThemeIcon("key", new vscode.ThemeColor('charts.yellow'));
+                this.supportColor = true;
+            } catch (error) {
+                this.supportColor = false;
+            }
+        }
+
+        return this.supportColor;
     }
 
 }

@@ -1,8 +1,6 @@
 import { Global } from "@/common/global";
-import * as path from "path";
 import * as vscode from "vscode";
-import { compare } from 'compare-versions';
-import { Constants, DatabaseType, ModelType } from "../../common/constants";
+import { DatabaseType, ModelType } from "../../common/constants";
 import { Util } from '../../common/util';
 import { DbTreeDataProvider } from '../../provider/treeDataProvider';
 import { DatabaseCache } from "../../service/common/databaseCache";
@@ -36,7 +34,7 @@ export class SchemaNode extends Node implements CopyAble {
     private getIcon(active?: boolean): vscode.ThemeIcon {
 
         const iconId = this.dbType == DatabaseType.MYSQL ? "database" : "symbol-struct"
-        if (active && compare(vscode.version, "1.51.0", ">=")) {
+        if (active && Util.supportColorIcon()) {
             return new vscode.ThemeIcon(iconId, new vscode.ThemeColor('charts.blue'));
         }
         return new vscode.ThemeIcon(iconId);

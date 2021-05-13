@@ -3,18 +3,21 @@ import { Util } from "@/common/util";
 import { ViewManager } from "@/common/viewManager";
 import { Node } from "@/model/interface/node";
 import * as path from "path";
-import { TreeItemCollapsibleState } from "vscode";
+import { ThemeIcon, TreeItemCollapsibleState } from "vscode";
 import RedisBaseNode from "./redisBaseNode";
 
 export default class KeyNode extends RedisBaseNode {
 
     readonly contextValue = ModelType.REDIS_KEY;
-    readonly iconPath = path.join(Constants.RES_PATH, `image/redis_key.png`);
+    readonly iconPath = new ThemeIcon("key");
     readonly iconDetailPath = path.join(Constants.RES_PATH, `image/redis_connection.png`);
     constructor(readonly label: string, readonly prefix: string, readonly parent: Node) {
         super(label);
         this.init(parent)
         this.collapsibleState = TreeItemCollapsibleState.None
+        if (Util.supportColorIcon()) {
+            this.iconPath = new ThemeIcon("key", new ThemeIcon('charts.yellow'))
+        }
         this.command = {
             title: 'View Key Detail',
             command: 'mysql.redis.key.detail',

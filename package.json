@@ -432,7 +432,8 @@
 			},
 			{
 				"command": "mysql.ssh.file.upload",
-				"title": "Upload File"
+				"title": "Upload File",
+				"icon":"$(cloud-upload)"
 			}
 		],
 		"keybindings": [
@@ -547,7 +548,7 @@
 				},
 				{
 					"command": "mysql.refresh",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection|folder|ftpConnection|ftpFolder)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(esConnection|ftpConnection|ftpFolder)$/",
 					"group": "2_mysql@1"
 				},
 				{
@@ -842,13 +843,13 @@
 				},
 				{
 					"command": "mysql.ssh.path.copy",
-					"when": "view == github.cweijan.nosql && viewItem != connection",
-					"group": "a@1"
+					"when": "view == github.cweijan.nosql && viewItem =~ /(folder|file|link)/",
+					"group": "ssh@1"
 				},
 				{
 					"command": "mysql.ssh.folder.open",
 					"when": "view == github.cweijan.nosql && viewItem == folder",
-					"group": "a@2"
+					"group": "ssh@2"
 				},
 				{
 					"command": "mysql.ssh.file.new",
@@ -863,7 +864,7 @@
 				{
 					"command": "mysql.ssh.file.upload",
 					"when": "view == github.cweijan.nosql && viewItem =~ /(folder|ftpFolder)/",
-					"group": "folder@2"
+					"group": "inline@-2"
 				},
 				{
 					"command": "mysql.ssh.file.delete",

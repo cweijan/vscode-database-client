@@ -1,10 +1,8 @@
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { DatabaseCache } from "@/service/common/databaseCache";
 import { QueryUnit } from "@/service/queryUnit";
-import { compare } from "compare-versions";
-import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/constants";
+import { ModelType } from "../../common/constants";
 import { Util } from '../../common/util';
 import { ConnectionManager } from "../../service/connectionManager";
 import { CopyAble } from "../interface/copyAble";
@@ -21,7 +19,7 @@ export class CatalogNode extends Node implements CopyAble {
         this.cacheSelf()
         const lcp = ConnectionManager.activeNode;
         if (this.isActive(lcp) && (lcp.database == this.database)) {
-            if (compare(vscode.version, "1.51.0", ">=")) {
+            if (Util.supportColorIcon()) {
                 this.iconPath=new vscode.ThemeIcon("database", new vscode.ThemeColor('charts.blue'));
             }else{
                 this.description = `Active`
