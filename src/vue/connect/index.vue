@@ -40,8 +40,8 @@
         <section class="mb-2">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-28">SQLite File Path</label>
-            <input class="w-64 field__input" placeholder="SQLite File Path"
-              v-model="connectionOption.dbPath" />
+            <input class="w-80 field__input" placeholder="SQLite File Path" v-model="connectionOption.dbPath" />
+            <button class="button button--primary w-128 inline" @click="choose('sqlite')">Choose Database File</button>
           </div>
         </section>
       </div>
@@ -252,8 +252,9 @@
           <section class="mb-2">
             <div class="inline-block mr-10">
               <label class="font-bold mr-5 inline-block w-28">Private Key Path</label>
-              <input class="w-64 field__input" placeholder="Private Key Path"
+              <input class="w-52 field__input" placeholder="Private Key Path"
                 v-model="connectionOption.ssh.privateKeyPath" />
+              <button @click="choose('privateKey')" class=" w-12">Choose</button>
             </div>
             <div class="inline-block mr-10">
               <label class="font-bold mr-5 inline-block w-28">Passphrase</label>
@@ -281,6 +282,7 @@
       return {
         connectionOption: {
           host: "127.0.0.1",
+          dbPath: '',
           port: "3306",
           user: "root",
           authType: "default",
@@ -298,6 +300,7 @@
           timezone: "+00:00",
           ssh: {
             host: "",
+            privateKeyPath: "",
             port: 22,
             username: "root",
             algorithms: {
@@ -337,6 +340,16 @@
         .on("connect", (node) => {
           this.editModel = false;
         })
+        .on("choose", ({ event, path }) => {
+          switch (event) {
+            case 'sqlite':
+              this.connectionOption.dbPath = path;
+              break;
+            case 'privateKey':
+              this.connectionOption.ssh.privateKeyPath = path;
+              break;
+          }
+        })
         .on("error", (err) => {
           this.connect.loading = false;
           this.connect.success = false;
@@ -366,6 +379,21 @@
         vscodeEvent.emit("connecting", {
           connectionOption: this.connectionOption,
         });
+      },
+      choose(event) {
+        let filters = {};
+        switch (event) {
+          case 'sqlite':
+            filters["SQLiteDb"] = ["db"]
+            break;
+          case 'privateKey':
+          filters["PrivateKey"] = ["key","cer","crt","der","pub","pem","pk"]
+            break;
+        }
+        filters["File"] = ["*"]
+        vscodeEvent.emit("choose", {
+          event, filters
+        })
       },
       close() {
         vscodeEvent.emit("close");

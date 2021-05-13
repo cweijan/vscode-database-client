@@ -26,6 +26,9 @@ export class ConnectionNode extends Node implements CopyAble {
         super(key)
         this.init(parent)
         this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName ? this.instanceName : this.port}`;
+        if(this.dbType==DatabaseType.SQLITE){
+            this.label=this.dbPath;
+        }
         this.cacheSelf()
         if (parent.name) {
             this.description = parent.name

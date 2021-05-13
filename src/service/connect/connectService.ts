@@ -8,6 +8,7 @@ import { Global } from "../../common/global";
 import { ConnectionManager } from "@/service/connectionManager";
 import { DatabaseType } from "@/common/constants";
 import { ClientManager } from "../ssh/clientManager";
+import { window } from "vscode";
 
 export class ConnectService {
 
@@ -53,6 +54,13 @@ export class ConnectService {
                     }
                 }).on("close", () => {
                     handler.panel.dispose()
+                }).on("choose",({event,filters})=>{
+                    window.showOpenDialog({filters}).then((uris)=>{
+                        const uri=uris[0]
+                        if(uri){
+                            handler.emit("choose",{event,path:uri.fsPath})
+                        }
+                    })
                 })
             }
         });
