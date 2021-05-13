@@ -53,10 +53,10 @@ export class SqliTeDialect extends SqlDialect{
         throw new Error("Method not implemented.");
     }
     showTableSource(database: string, table: string): string {
-        throw new Error("Method not implemented.");
+        return `SELECT sql "Create Table" FROM sqlite_master where name='${table}' and type='table';`
     }
     showViewSource(database: string, table: string): string {
-        throw new Error("Method not implemented.");
+        return `SELECT sql "Create View" FROM sqlite_master where name='${table}' and type='view';`
     }
     showProcedureSource(database: string, name: string): string {
         throw new Error("Method not implemented.");

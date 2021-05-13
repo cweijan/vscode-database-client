@@ -1,3 +1,4 @@
+import { FieldInfo } from "@/common/typeDef";
 import { Util } from "@/common/util";
 import { EsRequest } from "@/model/es/esRequest";
 import { ServiceManager } from "@/service/serviceManager";
@@ -39,7 +40,7 @@ export class QueryPage {
             eventHandler: async (handler) => {
                 handler.on("init", () => {
                     if (queryParam.res?.table) {
-                        handler.panel.title = `${queryParam.res.table}@${dbOption.schema}`
+                        handler.panel.title = queryParam.res.table;
                     }
                     queryParam.res.transId = Trans.transId;
                     queryParam.res.viewId = queryParam.queryOption?.viewId;
@@ -168,14 +169,14 @@ export class QueryPage {
             database = fields[0].schema || fields[0].db;
         }
 
-        if(queryParam.connection.dbType==DatabaseType.MSSQL && tableName.indexOf(".")!=-1){
-            tableName=tableName.split(".")[1]
+        if (queryParam.connection.dbType == DatabaseType.MSSQL && tableName.indexOf(".") != -1) {
+            tableName = tableName.split(".")[1]
         }
 
         const tableNode = queryParam.connection.getByRegion(tableName)
         if (tableNode) {
             let primaryKey: string;
-            let primaryKeyList=[];
+            let primaryKeyList = [];
             const columnList = (await tableNode.getChildren()).map((columnNode: ColumnNode) => {
                 if (columnNode.isPrimaryKey) {
                     primaryKey = columnNode.column.name;
@@ -186,6 +187,10 @@ export class QueryPage {
             queryParam.res.primaryKey = primaryKey;
             queryParam.res.columnList = columnList;
             queryParam.res.primaryKeyList = primaryKeyList;
+            // compatible sqlite empty result.
+            if (queryParam.res.fields.length == 0) {
+                queryParam.res.fields = columnList as any as FieldInfo[];
+            }
         }
         queryParam.res.tableCount = sqlList.length;
         queryParam.res.table = tableName;
