@@ -1,3 +1,5 @@
+import { FieldInfo } from "@/common/typeDef";
+
 export type Schema = Schema.Database;
 
 export namespace Schema {
@@ -33,4 +35,10 @@ export interface Result {
     stmt: string;
     header: string[];
     rows: string[][];
+}
+
+export interface ResultNew {
+    sql: string;
+    fields: FieldInfo[];
+    rows: object[];
 }

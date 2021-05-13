@@ -2,6 +2,8 @@ import { spawnSync } from 'child_process';
 import { platform, arch } from 'os';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { resolve } from 'path';
+import { Global } from '@/common/global';
 
 /**
  * Validate the sqlite3 command/path passed as argument, if not valid fallback to the binary in the bin directory.
@@ -83,7 +85,7 @@ export function getSqliteBinariesPath(): string {
             break;
     }
     if (sqliteBin) {
-        let path = join('sqlite', sqliteBin);
+        let path = `${Global.context.extensionPath}/sqlite/${sqliteBin}`;
         if (existsSync(path)) {
             console.debug(`Fallback SQLite binary found: '${path}'.`);
             return path;

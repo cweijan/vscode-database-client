@@ -38,7 +38,7 @@ export class SqliTeDialect extends SqlDialect{
         throw new Error("Method not implemented.");
     }
     buildPageSql(database: string, table: string, pageSize: number): string {
-        throw new Error("Method not implemented.");
+        return `SELECT * FROM ${table} LIMIT ${pageSize};`;
     }
     countSql(database: string, table: string): string {
         throw new Error("Method not implemented.");
