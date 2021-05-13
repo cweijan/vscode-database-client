@@ -22,7 +22,7 @@ class SQLite implements Disposable {
 
     query(query: string): Promise<ResultNew | ResultNew[]> {
         if (!this.sqliteCommand) Promise.resolve({ error: "Unable to execute query: provide a valid sqlite3 executable in the setting sqlite.sqlite3." });
-        return new Promise((res,rej) => {
+        return new Promise((res, rej) => {
 
 
             let resultSet: Array<Result>;
@@ -56,11 +56,13 @@ class SQLite implements Disposable {
             });
 
             proc.once('close', () => {
-                if(errorMessage){
+                if (errorMessage) {
                     rej(new Error(errorMessage))
                     return;
                 }
-                if(!resultSet)resultSet=[];
+                if (!resultSet) resultSet = [{
+                    stmt: query, rows: [], header: []
+                }];
                 const newResult = resultSet.map(result => {
                     return {
                         sql: result.stmt,

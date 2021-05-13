@@ -11,16 +11,16 @@ export class SqliTeDialect extends SqlDialect{
         throw new Error("Method not implemented.");
     }
     showTables(database: string): string {
-        return `SELECT name FROM sqlite_master;`;
+        return `SELECT name, type FROM sqlite_master WHERE type="table" AND name <> 'sqlite_sequence' AND name <> 'sqlite_stat1' ORDER BY type ASC, name ASC;`;
     }
     addColumn(table: string): string {
         throw new Error("Method not implemented.");
     }
     showColumns(database: string, table: string): string {
-        throw new Error("Method not implemented.");
+        return `PRAGMA table_info(${table})`;
     }
     showViews(database: string): string {
-        throw new Error("Method not implemented.");
+        return `SELECT name, type FROM sqlite_master WHERE type="view" AND name <> 'sqlite_sequence' AND name <> 'sqlite_stat1' ORDER BY type ASC, name ASC;`;
     }
     showUsers(): string {
         throw new Error("Method not implemented.");
@@ -68,10 +68,15 @@ export class SqliTeDialect extends SqlDialect{
         throw new Error("Method not implemented.");
     }
     tableTemplate(): string {
-        throw new Error("Method not implemented.");
+        return `CREATE TABLE [name](  
+    id INTEGER NOT NULL primary key,
+    [column] TEXT
+);`
     }
     viewTemplate(): string {
-        throw new Error("Method not implemented.");
+        return `CREATE VIEW [name]
+AS
+SELECT * FROM ...;`
     }
     procedureTemplate(): string {
         throw new Error("Method not implemented.");

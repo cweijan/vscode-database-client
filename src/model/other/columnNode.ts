@@ -1,14 +1,12 @@
+import { ColumnMeta } from "@/common/typeDef";
 import { MockRunner } from "@/service/mock/mockRunner";
-import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, DatabaseType, ModelType, Template } from "../../common/constants";
+import { DatabaseType, ModelType, Template } from "../../common/constants";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { QueryUnit } from "../../service/queryUnit";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
-import { ColumnMeta } from "@/common/typeDef";
-import { compare } from "compare-versions";
 
 export class ColumnNode extends Node implements CopyAble {
     public type: string;
@@ -43,7 +41,7 @@ export class ColumnNode extends Node implements CopyAble {
         }
         this.column.isNotNull = this.column.nullable != 'YES'
         this.type = `${this.column.type}`
-        this.description = `${this.column.type} ${this.column.comment}`
+        this.description = `${this.column.type} ${this.column.comment||''}`
         this.tooltip = `${this.label} ${this.column.comment}
 ${this.column.type} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"}`
         const columnKey: string = this.column.key;

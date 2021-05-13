@@ -1,6 +1,6 @@
 # CHANGELOG
 
-# 3.7.5 2021-5-12
+# 3.7.6 2021-5-12
 
 - Update ui operation icon.
 - Set ssh terminal as full height.
