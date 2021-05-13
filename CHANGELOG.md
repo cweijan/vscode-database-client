@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.8.0 2021-5-14
+
+- Support sqlite.
+- SSH support download folder.
+
 # 3.7.6 2021-5-12
 
 - Update ui operation icon.
