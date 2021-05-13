@@ -74,45 +74,53 @@ export class FileNode extends Node {
         vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(this.file.filename), filters: { "Type": [extName] }, saveLabel: "Select Download Path" })
             .then(async uri => {
                 if (uri) {
-                    const { sftp } = await ClientManager.getSSH(this.sshConfig)
-                    vscode.window.withProgress({
-                        location: vscode.ProgressLocation.Notification,
-                        title: `Start downloading ${this.fullPath}`,
-                        cancellable: true
-                    }, (progress, token) => {
-                        return new Promise((resolve) => {
-                            const fileReadStream = sftp.createReadStream(this.fullPath)
-                            var str = progressStream({
-                                length: this.file.attrs.size,
-                                time: 100
-                            });
-                            let before = 0;
-                            str.on("progress", (progressData: any) => {
-                                if (progressData.percentage == 100) {
-                                    resolve(null)
-                                    vscode.window.showInformationMessage(`Download ${this.fullPath} success, cost time: ${progressData.runtime}s`, 'Open').then(action => {
-                                        if (action) {
-                                            vscode.commands.executeCommand('vscode.open', uri);
-                                        }
-                                    })
-                                    return;
-                                }
-                                progress.report({ increment: progressData.percentage - before, message: `remaining : ${prettyBytes(progressData.remaining)}` });
-                                before = progressData.percentage
-                            })
-                            str.on("error", err => {
-                                vscode.window.showErrorMessage(err.message)
-                            })
-                            const outStream = createWriteStream(uri.fsPath);
-                            fileReadStream.pipe(str).pipe(outStream);
-                            token.onCancellationRequested(() => {
-                                fileReadStream.destroy()
-                                outStream.destroy()
-                            });
-                        })
-                    })
+                    this.downloadByPath(uri.fsPath,true)
                 }
             })
+    }
+
+    public async downloadByPath(path:string,showDialog?:boolean){
+        
+        const { sftp } = await ClientManager.getSSH(this.sshConfig)
+        vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Start downloading ${this.fullPath}`,
+            cancellable: true
+        }, (progress, token) => {
+            return new Promise((resolve) => {
+                const fileReadStream = sftp.createReadStream(this.fullPath)
+                var str = progressStream({
+                    length: this.file.attrs.size,
+                    time: 100
+                });
+                let before = 0;
+                str.on("progress", (progressData: any) => {
+                    if (progressData.percentage == 100) {
+                        resolve(null)
+                        if(showDialog){
+                            vscode.window.showInformationMessage(`Download ${this.fullPath} success, cost time: ${progressData.runtime}s`, 'Open').then(action => {
+                                if (action) {
+                                    vscode.commands.executeCommand('vscode.open', vscode.Uri.file(path));
+                                }
+                            })
+                        }
+                        return;
+                    }
+                    progress.report({ increment: progressData.percentage - before, message: `remaining : ${prettyBytes(progressData.remaining)}` });
+                    before = progressData.percentage
+                })
+                str.on("error", err => {
+                    vscode.window.showErrorMessage(err.message)
+                })
+                const outStream = createWriteStream(path);
+                fileReadStream.pipe(str).pipe(outStream);
+                token.onCancellationRequested(() => {
+                    fileReadStream.destroy()
+                    outStream.destroy()
+                });
+            })
+        })
+    
     }
 
     getIcon(fileName: string): string|vscode.ThemeIcon {

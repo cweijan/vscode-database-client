@@ -1,11 +1,11 @@
-import { CodeCommand, Constants, DatabaseType, ModelType } from "@/common/constants";
+import { CodeCommand, Constants, ModelType } from "@/common/constants";
 import { FileManager, FileModel } from "@/common/filesManager";
 import { Util } from "@/common/util";
 import { ClientManager } from "@/service/ssh/clientManager";
 import { ForwardService } from "@/service/ssh/forward/forwardService";
 import { TerminalService } from "@/service/ssh/terminal/terminalService";
 import { XtermTerminal } from "@/service/ssh/terminal/xtermTerminalService";
-import { createReadStream, statSync } from "fs";
+import { createReadStream, existsSync, mkdirSync, statSync } from "fs";
 import * as path from "path";
 import { FileEntry } from "ssh2-streams";
 import * as vscode from "vscode";
@@ -22,7 +22,7 @@ export class SSHConnectionNode extends Node {
     fullPath: string;
     private terminalService: TerminalService = new XtermTerminal();
 
-    constructor(readonly key:string,parent: Node,readonly sshConfig: SSHConfig, readonly name: string, readonly file?: FileEntry, readonly parentName?: string, iconPath?: string) {
+    constructor(readonly key: string, parent: Node, readonly sshConfig: SSHConfig, readonly name: string, readonly file?: FileEntry, readonly parentName?: string, iconPath?: string) {
         super(name);
         super.init(parent)
         this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
@@ -30,11 +30,11 @@ export class SSHConnectionNode extends Node {
         if (!file) {
             this.contextValue = ModelType.SSH_CONNECTION;
             this.iconPath = new vscode.ThemeIcon("remote");
-            this.label=`${sshConfig.username}@${sshConfig.host}`
-            this.description=this.name
+            this.label = `${sshConfig.username}@${sshConfig.host}`
+            this.description = this.name
         } else {
             this.contextValue = ModelType.FOLDER;
-            this. iconPath =new vscode.ThemeIcon("folder")
+            this.iconPath = new vscode.ThemeIcon("folder")
         }
         if (file && file.filename.toLocaleLowerCase() == "home") {
             this.iconPath = path.join(Constants.RES_PATH, "ssh/folder-core.svg");
@@ -159,8 +159,34 @@ export class SSHConnectionNode extends Node {
             })
     }
 
+    download(): any {
+
+        vscode.window.showOpenDialog({ defaultUri: vscode.Uri.file(this.file.filename), canSelectFiles: false, canSelectFolders: true, openLabel: "Select Download Path" })
+            .then(async (uris) => {
+                const uri = uris[0]
+                if (uri) {
+                    this.downloadByPath(uri.fsPath)
+                }
+            })
+    }
+
+    public async downloadByPath(path: string) {
+        const childs = await this.getChildren()
+        for (const child of childs) {
+            const childPath = path + "/" + child.label;
+            if (child instanceof FileNode) {
+                child.downloadByPath(childPath)
+            } else if (child instanceof SSHConnectionNode) {
+                if(!existsSync(childPath)){
+                    mkdirSync(childPath)
+                }
+                child.downloadByPath(childPath)
+            }
+        }
+    }
+
     delete(): any {
-        Util.confirm("Are you wang to delete this folder?",async ()=>{
+        Util.confirm("Are you wang to delete this folder?", async () => {
             const { sftp } = await ClientManager.getSSH(this.sshConfig)
             sftp.rmdir(this.fullPath, (err) => {
                 if (err) {
@@ -212,7 +238,7 @@ export class SSHConnectionNode extends Node {
 
         for (const entry of entryList) {
             if (entry.longname.startsWith("d")) {
-                folderList.push(new SSHConnectionNode(this.key,this,this.sshConfig, entry.filename, entry, parentName))
+                folderList.push(new SSHConnectionNode(this.key, this, this.sshConfig, entry.filename, entry, parentName))
             } else if (entry.longname.startsWith("l")) {
                 fileList.push(new LinkNode(entry.filename))
             } else {

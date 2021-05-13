@@ -873,7 +873,7 @@
 				},
 				{
 					"command": "mysql.ssh.file.download",
-					"when": "view == github.cweijan.nosql && viewItem =~ /(file|ftpFile)/",
+					"when": "view == github.cweijan.nosql && viewItem =~ /(folder|file|ftpFile)/",
 					"group": "file@1"
 				},
 				{
