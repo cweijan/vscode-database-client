@@ -5,6 +5,7 @@ out/**/*.map
 .idea/**
 src/**
 images/**
+sqlite/**
 .gitignore
 tsconfig.json
 vsc-extension-quickstart.md
