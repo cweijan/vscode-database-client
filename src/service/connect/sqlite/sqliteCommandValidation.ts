@@ -1,9 +1,7 @@
-import { spawnSync } from 'child_process';
-import { platform, arch } from 'os';
-import { join } from 'path';
-import { existsSync } from 'fs';
-import { resolve } from 'path';
 import { Global } from '@/common/global';
+import { spawnSync } from 'child_process';
+import { existsSync } from 'fs';
+import { arch, platform } from 'os';
 
 /**
  * Validate the sqlite3 command/path passed as argument, if not valid fallback to the binary in the bin directory.

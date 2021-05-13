@@ -2,15 +2,12 @@ import * as child_process from 'child_process';
 import { StreamParser } from './streamParser';
 import { ResultSetParser } from './resultSetParser';
 import { EOL } from 'os';
-import { Schema } from "./schema";
-import { Disposable } from "vscode";
 import { Result, ResultNew, ResultSet } from "./common";
-import { executeQuery } from "./queryExecutor";
 import { validateSqliteCommand } from "./sqliteCommandValidation";
 import { FieldInfo } from "../../../common/typeDef";
 
 // TODO: Improve how the sqlite command is set
-class SQLite implements Disposable {
+class SQLite {
 
     private dbPath: string;
     private sqliteCommand!: string;
@@ -84,16 +81,6 @@ class SQLite implements Disposable {
                 }
             });
         })
-    }
-
-    schema(dbPath: string): Promise<Schema.Database> {
-        if (!this.sqliteCommand) Promise.resolve({ error: "Unable to execute query: provide a valid sqlite3 executable in the setting sqlite.sqlite3." });
-
-        return Promise.resolve(Schema.build(dbPath, this.sqliteCommand));
-    }
-
-    dispose() {
-        // Nothing to dispose
     }
 
     setSqliteCommand(sqliteCommand: string) {
