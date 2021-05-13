@@ -19,10 +19,10 @@ export class ColumnNode extends Node implements CopyAble {
         this.init(parent)
         this.buildInfo()
         if (this.isPrimaryKey) {
-            if (compare(vscode.version, "1.51.0", ">=")) {
+            try {
                 this.iconPath = new vscode.ThemeIcon("key", new vscode.ThemeColor('charts.yellow'));
-            } else {
-                this.iconPath = path.join(Constants.RES_PATH, "icon/b_primary.png")
+            } catch (error) {
+                this.iconPath = new vscode.ThemeIcon("key");
             }
         } else {
             this.iconPath = new vscode.ThemeIcon("symbol-property");
