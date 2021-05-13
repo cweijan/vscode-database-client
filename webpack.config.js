@@ -35,7 +35,8 @@ module.exports = [
         plugins: [
             new webpack.IgnorePlugin(/^(pg-native|supports-color|cardinal|encoding)$/),
             new CopyWebpackPlugin({
-                patterns: [{ from: 'src/bin', to: './bin' }]
+                patterns: [{ from: 'src/bin', to: './bin' }],
+                patterns: [{ from: 'sqlite', to: './sqlite' }]
             }),
         ],
         module: { rules: [{ test: /\.ts$/, exclude: /(node_modules|bin)/, use: ['ts-loader'] }] },

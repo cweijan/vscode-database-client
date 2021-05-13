@@ -9,6 +9,8 @@ import { DatabaseCache } from "../../service/common/databaseCache";
 import { ConnectionManager } from "../../service/connectionManager";
 import { CopyAble } from "../interface/copyAble";
 import { CommandKey, Node } from "../interface/node";
+import { TableGroup } from "../main/tableGroup";
+import { ViewGroup } from "../main/viewGroup";
 import { CatalogNode } from "./catalogNode";
 import { SchemaNode } from "./schemaNode";
 import { UserGroup } from "./userGroup";
@@ -47,6 +49,11 @@ export class ConnectionNode extends Node implements CopyAble {
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
+
+
+        if(this.dbType==DatabaseType.SQLITE){
+            return [new TableGroup(this),new ViewGroup(this)];
+        }
 
         let dbNodes = DatabaseCache.getSchemaListOfConnection(this.uid);
         if (dbNodes && !isRresh) {

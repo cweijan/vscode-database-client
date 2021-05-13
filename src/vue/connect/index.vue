@@ -279,6 +279,7 @@ export default {
         "MySQL",
         "PostgreSQL",
         "SqlServer",
+        "SQLite",
         "ElasticSearch",
         "Redis",
         "SSH",

@@ -32,6 +32,7 @@ import { PostgreSqlPageService } from "./page/postgreSqlPageService";
 import { MysqlSettingService } from "./setting/MysqlSettingService";
 import { SettingService } from "./setting/settingService";
 import ConnectionProvider from "@/model/ssh/connectionProvider";
+import { SqliTeDialect } from "./dialect/sqliteDialect";
 
 export class ServiceManager {
 
@@ -74,7 +75,7 @@ export class ServiceManager {
 
 
     private initTreeView() {
-        this.provider = new DbTreeDataProvider(this.context,CacheKey.ConectionsKey);
+        this.provider = new DbTreeDataProvider(this.context, CacheKey.ConectionsKey);
         const treeview = vscode.window.createTreeView("github.cweijan.mysql", {
             treeDataProvider: this.provider,
         });
@@ -88,7 +89,7 @@ export class ServiceManager {
     }
 
     private initTreeProvider() {
-        this.nosqlProvider = new DbTreeDataProvider(this.context,CacheKey.NOSQL_CONNECTION);
+        this.nosqlProvider = new DbTreeDataProvider(this.context, CacheKey.NOSQL_CONNECTION);
         const treeview = vscode.window.createTreeView("github.cweijan.nosql", {
             treeDataProvider: this.nosqlProvider,
         });
@@ -124,6 +125,8 @@ export class ServiceManager {
         switch (dbType) {
             case DatabaseType.MSSQL:
                 return new MssqlDIalect()
+            case DatabaseType.SQLITE:
+                return new SqliTeDialect()
             case DatabaseType.PG:
                 return new PostgreSqlDialect();
             case DatabaseType.ES:

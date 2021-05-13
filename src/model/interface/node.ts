@@ -63,6 +63,11 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public clientKeyPath?: string;
 
     /**
+     * sqlite only
+     */
+    public dbPath?: string;
+
+    /**
       * mssql only
       */
     public encrypt?: boolean;
@@ -118,6 +123,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         }
         this.encrypt = source.encrypt
         this.instanceName = source.instanceName
+        this.dbPath = source.dbPath
         this.domain = source.domain
         this.authType = source.authType
         this.disable = source.disable

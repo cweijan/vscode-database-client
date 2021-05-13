@@ -16,6 +16,7 @@ import { MysqlConnection } from "./connect/mysqlConnection";
 import { PostgreSqlConnection } from "./connect/postgreSqlConnection";
 import { RedisConnection } from "./connect/redisConnection";
 import { FTPConnection } from "./connect/ftpConnection";
+import { SqliteConnection } from "./connect/sqliteConnection";
 
 interface ConnectionWrapper {
     connection: IConnection;
@@ -137,11 +138,13 @@ export class ConnectionManager {
                 return new MSSqlConnnection(opt)
             case DatabaseType.PG:
                 return new PostgreSqlConnection(opt)
+            case DatabaseType.SQLITE:
+                return new SqliteConnection(opt);
             case DatabaseType.ES:
                 return new EsConnection(opt);
             case DatabaseType.REDIS:
                 return new RedisConnection(opt);
-                case DatabaseType.FTP:
+            case DatabaseType.FTP:
                 return new FTPConnection(opt);
         }
         return new MysqlConnection(opt)
@@ -162,8 +165,8 @@ export class ConnectionManager {
             if (fileName.includes('cweijan')) {
                 const queryName = path.basename(path.resolve(fileName, '..'))
                 const [host, port, database, schema] = queryName
-                .replace(/^.*@@/, '') // new connection id
-                .replace(/#.+$/, '').split('@')
+                    .replace(/^.*@@/, '') // new connection id
+                    .replace(/#.+$/, '').split('@')
                 if (host != null) {
                     const node = NodeUtil.of({ key: queryName.split('@@')[0], host, port: parseInt(port), database, schema });
                     if (node.getCache()) {
