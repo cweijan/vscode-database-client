@@ -349,6 +349,7 @@
               this.connectionOption.ssh.privateKeyPath = path;
               break;
           }
+          this.$forceUpdate()
         })
         .on("error", (err) => {
           this.connect.loading = false;
@@ -387,7 +388,7 @@
             filters["SQLiteDb"] = ["db"]
             break;
           case 'privateKey':
-          filters["PrivateKey"] = ["key","cer","crt","der","pub","pem","pk"]
+            filters["PrivateKey"] = ["key", "cer", "crt", "der", "pub", "pem", "pk"]
             break;
         }
         filters["File"] = ["*"]
@@ -445,6 +446,7 @@
           case "SSH":
             break;
         }
+        this.$forceUpdate()
       },
     },
   };
