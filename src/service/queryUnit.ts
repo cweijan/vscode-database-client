@@ -99,11 +99,13 @@ export class QueryUnit {
                 }
 
                 // query result
-                if (Array.isArray(fields) && (fields[0] != null && fields[0].name != undefined) ||
-                    (fields.length == 0 && sql.match(/\bselect\b/i))
-                ) {
-                    QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
-                    return;
+                if (Array.isArray(fields)) {
+                    const isQuery = fields[0] != null && fields[0].name != undefined;
+                    const isSqliteEmptyQuery = fields.length == 0 && sql.match(/\bselect\b/i);
+                    if (isQuery || isSqliteEmptyQuery) {
+                        QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+                        return;
+                    }
                 }
 
                 if (Array.isArray(data)) {
@@ -117,7 +119,7 @@ export class QueryUnit {
                     }
                 }
 
-                QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE_BLOCK, queryOption, res: { sql, costTime,isInsert:sql.match(/\binsert\b/i)!=null} as DMLResponse });
+                QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE_BLOCK, queryOption, res: { sql, costTime, isInsert: sql.match(/\binsert\b/i) != null } as DMLResponse });
 
             });
         } catch (error) {
