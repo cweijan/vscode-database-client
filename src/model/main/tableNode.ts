@@ -102,7 +102,8 @@ export class TableNode extends Node implements CopyAble {
     public truncateTable() {
 
         Util.confirm(`Are you want to clear table ${this.table} all data ?`, async () => {
-            this.execute(`truncate table ${this.wrap(this.table)}`).then(() => {
+            const truncateSql=this.dbType==DatabaseType.SQLITE?`DELETE FROM ${this.wrap(this.table)}`:`truncate table ${this.wrap(this.table)}`;
+            this.execute(truncateSql).then(() => {
                 vscode.window.showInformationMessage(`Clear table ${this.table} all data success!`);
             });
         })
