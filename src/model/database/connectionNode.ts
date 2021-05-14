@@ -107,7 +107,7 @@ export class ConnectionNode extends Node implements CopyAble {
 
         await FileManager.show(`${new Date().getTime()}.sql`);
         let childMap = {};
-        const dbNameList = (await this.getChildren()).filter((databaseNode) => !(databaseNode instanceof UserGroup)).map((databaseNode) => {
+        const dbNameList = (await this.getChildren()).filter((databaseNode) => (databaseNode instanceof SchemaNode||databaseNode instanceof CatalogNode)).map((databaseNode) => {
             childMap[databaseNode.uid] = databaseNode
             return this.dbType == DatabaseType.MYSQL ? databaseNode.schema : databaseNode.database;
         });
