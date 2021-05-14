@@ -58,9 +58,12 @@ export class TableNode extends Node implements CopyAble {
 
     public async showSource(open = true) {
         let sql: string;
-        if (this.dbType == DatabaseType.MYSQL || this.dbType==DatabaseType.SQLITE) {
+        if (this.dbType == DatabaseType.MYSQL || this.dbType == DatabaseType.SQLITE) {
             const sourceResule = await this.execute<any[]>(this.dialect.showTableSource(this.schema, this.table))
             sql = sourceResule[0]['Create Table'];
+            if (this.dbType == DatabaseType.SQLITE) {
+                sql = sql.replace(/\\n/g, '\n');
+            }
         } else {
             const childs = await this.getChildren()
             let table = this.table;
@@ -102,7 +105,7 @@ export class TableNode extends Node implements CopyAble {
     public truncateTable() {
 
         Util.confirm(`Are you want to clear table ${this.table} all data ?`, async () => {
-            const truncateSql=this.dbType==DatabaseType.SQLITE?`DELETE FROM ${this.wrap(this.table)}`:`truncate table ${this.wrap(this.table)}`;
+            const truncateSql = this.dbType == DatabaseType.SQLITE ? `DELETE FROM ${this.wrap(this.table)}` : `truncate table ${this.wrap(this.table)}`;
             this.execute(truncateSql).then(() => {
                 vscode.window.showInformationMessage(`Clear table ${this.table} all data success!`);
             });
@@ -246,7 +249,7 @@ ROW_FORMAT : ${meta.row_format}
             const count = await this.execute(`select max(${primaryKey}) max from ${this.wrap(this.table)}`);
             if (count && count[0]?.max) {
                 const max = count[0].max;
-                return Number.isInteger(max)?max:0;
+                return Number.isInteger(max) ? max : 0;
             }
         }
 
