@@ -21,7 +21,7 @@ export class SchemaChain implements ComplectionChain {
     private async generateDatabaseComplectionItem() {
 
         const lcp = ConnectionManager.tryGetConnection() as (SchemaNode | CatalogNode)
-        if (!lcp || !lcp.parent) { return []; }
+        if (!lcp || !lcp?.parent?.getChildren) { return []; }
 
         const databaseNodes = await lcp.parent.getChildren()
         return databaseNodes.filter((databaseNode) => !(databaseNode instanceof UserGroup)).map<vscode.CompletionItem>((databaseNode) => {

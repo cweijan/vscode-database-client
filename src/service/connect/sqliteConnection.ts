@@ -16,15 +16,23 @@ export class SqliteConnection extends IConnection {
         if (!callback && values instanceof Function) {
             callback = values;
         }
+        const event = new EventEmitter()
         this.sqlite.query(sql + ";").then(res => {
             if (Array.isArray(res)) {
                 callback(null, res)
-            } else {
+            } else if (callback) {
                 callback(null, res.rows, res.fields)
+            } else {
+                for (let i = 1; i <= res.rows.length; i++) {
+                    const row = res.rows[i - 1];
+                    event.emit("result", this.convertToDump(row), res.rows.length == i)
+                }
             }
         }).catch(err => {
-            callback(err)
+            if (callback) callback(err)
+            event.emit("error", err.message)
         })
+        return event;
     }
     connect(callback: (err: Error) => void): void {
         callback(null)

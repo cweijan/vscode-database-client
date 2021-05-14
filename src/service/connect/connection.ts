@@ -1,5 +1,6 @@
 import { EventEmitter } from "events";
 import { FieldInfo } from "@/common/typeDef";
+import * as sqlstring from 'sqlstring';
 
 export abstract class IConnection {
     public dumpMode: boolean = false;
@@ -12,6 +13,17 @@ export abstract class IConnection {
     abstract commit(): void;
     abstract end(): void;
     abstract isAlive(): boolean;
+    convertToDump(row: any): any {
+        for (const key in row) {
+            const element = row[key];
+            if (!element) {
+                row[key] = 'NULL'
+            } else {
+                row[key] = sqlstring.escape(element)
+            }
+        }
+        return row;
+    }
 }
 
 
