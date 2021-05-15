@@ -45,6 +45,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     /**
      * status
      */
+    public connectionKey: string;
     public description: string;
     public global?: boolean;
     public disable?: boolean;
@@ -111,6 +112,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         if (!this.schema) {
             this.schema = source.schema
         }
+        this.connectionKey = source.connectionKey
         this.global = source.global
         this.dbType = source.dbType
         if (source.connectTimeout) {
@@ -156,8 +158,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public async indent(command: IndentCommand) {
 
         try {
-            const cacheKey = command.cacheKey || this.provider?.connectionKey;
-            const connections = this.context.get<{ [key: string]: Node }>(cacheKey, {});
+            const connectionKey = command.connectionKey || this.connectionKey;
+            const connections = this.context.get<{ [key: string]: Node }>(connectionKey, {});
             const key = this.key 
 
             switch (command.command) {
@@ -176,7 +178,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             }
 
 
-            await this.context.update(cacheKey, connections);
+            await this.context.update(connectionKey, connections);
 
             if (command.refresh !== false) {
                 DbTreeDataProvider.refresh();
@@ -305,7 +307,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 export class IndentCommand {
     command: CommandKey;
     refresh?: boolean;
-    cacheKey?: string;
+    connectionKey?: string;
 }
 export enum CommandKey {
     update, add, delete

@@ -55,19 +55,27 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     public async addConnection(node: Node) {
 
         node.initKey();
-        if ((node as any).isGlobal != null) {
-            node.context = (node as any).isGlobal === false ? this.context.workspaceState : this.context.globalState
-            await node.indent({ command: CommandKey.delete, cacheKey: this.connectionKey })
+        const newKey = this.getKeyByNode(node)
+        node.context = node.global ? this.context.globalState : this.context.workspaceState
+
+        const isGlobal = (node as any).isGlobal;
+        const configNotChange = newKey == node.connectionKey && isGlobal == node.global
+        if (configNotChange) {
+            node.indent({ command: CommandKey.update })
+            return;
+        } else if (isGlobal != null) {
+            // config has change, remove old connection.
+            node.context = isGlobal ? this.context.globalState : this.context.workspaceState
+            await node.indent({ command: CommandKey.delete, connectionKey: node.connectionKey })
         }
 
-        node.context = node.global === false ? this.context.workspaceState : this.context.globalState
-        node.indent({ command: CommandKey.add, cacheKey: this.getKeyByNode(node) })
+        node.indent({ command: CommandKey.add, connectionKey: newKey })
 
     }
 
     private getKeyByNode(connectionNode: Node): string {
         const dbType = connectionNode.dbType;
-        if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS || dbType==DatabaseType.SSH || dbType==DatabaseType.FTP) {
+        if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS || dbType == DatabaseType.SSH || dbType == DatabaseType.FTP) {
             return CacheKey.NOSQL_CONNECTION;
         }
         return CacheKey.ConectionsKey;
@@ -93,39 +101,37 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async getConnectionNodes(): Promise<Node[]> {
 
-        let globalConnections = this.context.globalState.get<{ [key: string]: Node }>(this.connectionKey, {});
-        let workspaceConnections = this.context.workspaceState.get<{ [key: string]: Node }>(this.connectionKey, {});
-
-        const connections = { ...globalConnections, ...workspaceConnections };
-
-        return Object.keys(connections).map(key => {
-            const connectInfo = connections[key];
-            return this.getNode(connectInfo, key);
-        })
-
+        const connetKey = this.connectionKey;
+        let globalConnections = this.context.globalState.get<{ [key: string]: Node }>(connetKey, {});
+        let workspaceConnections = this.context.workspaceState.get<{ [key: string]: Node }>(connetKey, {});
+        
+        return Object.keys(workspaceConnections).map(key => this.getNode(workspaceConnections[key], key, false, connetKey)).concat(
+            Object.keys(globalConnections).map(key => this.getNode(globalConnections[key], key, true, connetKey))
+        )
     }
 
-    private getNode(connectInfo: Node, key: string) {
+    private getNode(connectInfo: Node, key: string, global: boolean, connectionKey: string) {
         // 兼容老版本的连接信息
-        if(!connectInfo.dbType)connectInfo.dbType=DatabaseType.MYSQL
+        if (!connectInfo.dbType) connectInfo.dbType = DatabaseType.MYSQL
         let node: Node;
         if (connectInfo.dbType == DatabaseType.ES) {
             node = new EsConnectionNode(key, connectInfo);
         } else if (connectInfo.dbType == DatabaseType.REDIS) {
             node = new RedisConnectionNode(key, connectInfo)
         } else if (connectInfo.dbType == DatabaseType.SSH) {
-            node = new SSHConnectionNode(key,connectInfo,connectInfo.ssh,connectInfo.name)
+            node = new SSHConnectionNode(key, connectInfo, connectInfo.ssh, connectInfo.name)
         } else if (connectInfo.dbType == DatabaseType.FTP) {
-            node = new FTPConnectionNode(key,connectInfo)
+            node = new FTPConnectionNode(key, connectInfo)
         } else {
             node = new ConnectionNode(key, connectInfo)
         }
+        node.connectionKey = connectionKey;
         node.provider = this
-        // Compatible with older versions
-        if (node.global !== false) {
-            node.global = true;
+        node.global = global;
+        node.context = node.global ? this.context.globalState : this.context.workspaceState;
+        if (!node.global) {
+            node.description = `${node.description || ''} workspace`
         }
-        node.context = node.global === false ? this.context.workspaceState : this.context.globalState;
         return node;
     }
 

@@ -15,10 +15,7 @@ export class ConnectService {
     public async openConnect(provider: DbTreeDataProvider, connectionNode?: ConnectionNode) {
         let node: any;
         if (connectionNode) {
-            if (connectionNode.global == null) {
-                connectionNode.global = true
-            }
-            node = { ...NodeUtil.removeParent(connectionNode), isGlobal: connectionNode.global !== false }
+            node = { ...NodeUtil.removeParent(connectionNode), isGlobal: connectionNode.global }
             if (node.ssh) {
                 node.ssh.tunnelPort = null
                 if (!node.ssh.algorithms) {
