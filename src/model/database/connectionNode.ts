@@ -1,3 +1,4 @@
+import { Console } from "@/common/Console";
 import { Global } from "@/common/global";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -50,7 +51,11 @@ export class ConnectionNode extends Node implements CopyAble {
         if (lcp && lcp.getConnectId().includes(this.getConnectId())) {
             this.description = `${parent.name ? parent.name + " " : ""}Active`
         }
-        this.getChildren()
+        try {
+            this.getChildren()
+        } catch (error) {
+            Console.log(error)
+        }
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
