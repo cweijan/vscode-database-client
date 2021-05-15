@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 3.8.2 2021-5-15
+
+- Connection keep origin position when edit.
+- Support export SQLite data and struct.
+- Fix possible connection delete bug.
+
 # 3.8.0 2021-5-14
 
 - Support sqlite.
