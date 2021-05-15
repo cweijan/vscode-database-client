@@ -158,7 +158,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         try {
             const cacheKey = command.cacheKey || this.provider?.connectionKey;
             const connections = this.context.get<{ [key: string]: Node }>(cacheKey, {});
-            const key = this.key || this.getConnectId()
+            const key = this.key 
 
             switch (command.command) {
                 case CommandKey.add:
