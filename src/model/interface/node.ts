@@ -167,7 +167,6 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
                 case CommandKey.update:
                     connections[key] = NodeUtil.removeParent(this);
                     ConnectionManager.removeConnection(key)
-                    DatabaseCache.clearDatabaseCache(key)
                     break;
                 case CommandKey.delete:
                     ConnectionManager.removeConnection(key)

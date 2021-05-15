@@ -17,6 +17,7 @@ import { PostgreSqlConnection } from "./connect/postgreSqlConnection";
 import { RedisConnection } from "./connect/redisConnection";
 import { FTPConnection } from "./connect/ftpConnection";
 import { SqliteConnection } from "./connect/sqliteConnection";
+import { Console } from "@/common/Console";
 
 interface ConnectionWrapper {
     connection: IConnection;
@@ -46,15 +47,19 @@ export class ConnectionManager {
 
     public static removeConnection(uid: string) {
 
-        const lcp = this.activeNode;
-        if (lcp?.getConnectId() == uid) {
-            delete this.activeNode
+        try {
+            const lcp = this.activeNode;
+            if (lcp?.getConnectId() == uid) {
+                delete this.activeNode
+            }
+            const activeConnect = this.alivedConnection[uid];
+            if (activeConnect) {
+                this.end(uid, activeConnect)
+            }
+            DatabaseCache.clearDatabaseCache(uid)            
+        } catch (error) {
+            Console.log(error)
         }
-        const activeConnect = this.alivedConnection[uid];
-        if (activeConnect) {
-            this.end(uid, activeConnect)
-        }
-        DatabaseCache.clearDatabaseCache(uid)
 
     }
 
