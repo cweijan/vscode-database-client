@@ -1,11 +1,15 @@
-import { CreateIndexParam } from "./param/createIndexParam";
-import { UpdateColumnParam } from "./param/updateColumnParam";
 import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
 export class SqliTeDialect extends SqlDialect{
     updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
         throw new Error("Method not implemented.");
+    }
+    showIndex(database: string, table: string):string{
+        return `SELECT name index_name FROM sqlite_master WHERE type='index' and tbl_name='${table}' `;
+    }
+    dropIndex(table: string, indexName: string): string {
+        return `DROP INDEX ${indexName};`
     }
     showSchemas(): string {
         throw new Error("Method not implemented.");
