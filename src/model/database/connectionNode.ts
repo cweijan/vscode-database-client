@@ -41,6 +41,8 @@ export class ConnectionNode extends Node implements CopyAble {
             this.iconPath = path.join(Constants.RES_PATH, "icon/mssql_server.png");
         }else if(this.dbType==DatabaseType.SQLITE){
             this.iconPath = path.join(Constants.RES_PATH, "icon/sqlite-icon.svg");
+        }else if(this.dbType==DatabaseType.MONGO_DB){
+            this.iconPath = path.join(Constants.RES_PATH, "icon/mongodb-icon.svg");
         }
         if (this.disable) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None;
