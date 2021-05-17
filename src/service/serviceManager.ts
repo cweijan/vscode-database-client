@@ -1,4 +1,5 @@
 import { CacheKey, DatabaseType } from "@/common/constants";
+import { EsIndexGroup } from "@/model/es/model/esIndexGroupNode";
 import { SqlCodeLensProvider } from "@/provider/sqlCodeLensProvider";
 import * as vscode from "vscode";
 import { ExtensionContext } from "vscode";
@@ -15,6 +16,7 @@ import { ViewManager } from "../common/viewManager";
 import { DatabaseCache } from "./common/databaseCache";
 import { HistoryRecorder } from "./common/historyRecorder";
 import { EsDialect } from "./dialect/esDialect";
+import { MongoDialect } from "./dialect/mongoDialect";
 import { MssqlDIalect } from "./dialect/mssqlDIalect";
 import { MysqlDialect } from "./dialect/mysqlDialect";
 import { PostgreSqlDialect } from "./dialect/postgreSqlDialect";
@@ -131,6 +133,8 @@ export class ServiceManager {
                 return new PostgreSqlDialect();
             case DatabaseType.ES:
                 return new EsDialect();
+            case DatabaseType.MONGO_DB:
+                return new MongoDialect();
         }
         return new MysqlDialect()
     }

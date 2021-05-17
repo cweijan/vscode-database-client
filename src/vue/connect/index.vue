@@ -315,6 +315,7 @@
           "SqlServer",
           "SQLite",
           "ElasticSearch",
+          "MongoDB",
           "Redis",
           "SSH",
           "FTP"
@@ -438,6 +439,9 @@
             this.connectionOption.port = 6379;
             this.connectionOption.user = null;
             this.connectionOption.database = "0";
+            break;
+          case "MongoDB":
+            this.connectionOption.port = 27017;
             break;
           case "FTP":
             this.connectionOption.port = 21;

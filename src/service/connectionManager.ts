@@ -18,6 +18,7 @@ import { RedisConnection } from "./connect/redisConnection";
 import { FTPConnection } from "./connect/ftpConnection";
 import { SqliteConnection } from "./connect/sqliteConnection";
 import { Console } from "@/common/Console";
+import { MongoConnection } from "./connect/mongoConnection";
 
 interface ConnectionWrapper {
     connection: IConnection;
@@ -56,7 +57,7 @@ export class ConnectionManager {
             if (activeConnect) {
                 this.end(uid, activeConnect)
             }
-            DatabaseCache.clearDatabaseCache(uid)            
+            DatabaseCache.clearDatabaseCache(uid)
         } catch (error) {
             Console.log(error)
         }
@@ -147,6 +148,8 @@ export class ConnectionManager {
                 return new SqliteConnection(opt);
             case DatabaseType.ES:
                 return new EsConnection(opt);
+            case DatabaseType.MONGO_DB:
+                return new MongoConnection(opt);
             case DatabaseType.REDIS:
                 return new RedisConnection(opt);
             case DatabaseType.FTP:

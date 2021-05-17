@@ -948,11 +948,14 @@
 		"vscode:prepublish": "npm run build"
 	},
 	"devDependencies": {
+		"@antv/g2": "^4.0.9",
 		"@types/mockjs": "^1.0.2",
+		"@types/mongodb": "^3.6.3",
 		"@types/node": "^12.12.6",
 		"@types/ssh2": "^0.5.43",
 		"@types/vscode": "1.51.0",
 		"@types/pg": "^7.14.7",
+		"@types/redis": "^2.8.18",
 		"@types/tedious": "^4.0.3",
 		"copy-webpack-plugin": "^6.3.0",
 		"css-loader": "^3.5.3",
@@ -984,6 +987,7 @@
 		"json-format-highlight": "^1.0.4",
 		"lodash": "^4.17.20",
 		"lodash.defaults": "^4.1.0",
+		"mongodb": "^3.6.3",
 		"mysql2": "^2.2.5",
 		"pg": "^8.5.1",
 		"portfinder": "^1.0.26",

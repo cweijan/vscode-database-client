@@ -13,6 +13,7 @@ import { ProcedureGroup } from "../main/procedureGroup";
 import { TableGroup } from "../main/tableGroup";
 import { TriggerGroup } from "../main/triggerGroup";
 import { ViewGroup } from "../main/viewGroup";
+import { MongoTableGroup } from "../mongo/mongoTableGroup";
 import { QueryGroup } from "../query/queryGroup";
 
 export class SchemaNode extends Node implements CopyAble {
@@ -41,6 +42,10 @@ export class SchemaNode extends Node implements CopyAble {
     }
 
     public getChildren(): Promise<Node[]> | Node[] {
+
+        if(this.dbType==DatabaseType.MONGO_DB){
+            return [ new MongoTableGroup(this) ]
+        }
 
         let childs: Node[] = [new TableGroup(this)];
 

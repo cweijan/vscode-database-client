@@ -12,6 +12,9 @@ export function wrapByDb(origin, databaseType) {
         if (databaseType == 'PostgreSQL') {
             return origin.split(".").map(text => `"${text}"`).join(".")
         }
+        if (databaseType == 'MongoDB') {
+            return origin;
+        }
         return `\`${origin}\``;
     }
 
