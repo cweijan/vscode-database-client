@@ -155,8 +155,9 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         information_schema.columns c
         left join  information_schema.constraint_column_usage ccu
         on c.COLUMN_NAME=ccu.column_name and c.table_name=ccu.table_name and ccu.table_catalog=c.TABLE_CATALOG
+        and c.table_schema=ccu.table_schema
         left join  information_schema.table_constraints tc
-        on tc.constraint_name=ccu.constraint_name
+        on tc.constraint_name=ccu.constraint_name and tc.table_schema=ccu.table_schema
         and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name WHERE c.TABLE_SCHEMA = '${database}' AND c.table_name = '${view ? view : table}' ORDER BY ORDINAL_POSITION;`;
     }
     showTriggers(database: string): string {
