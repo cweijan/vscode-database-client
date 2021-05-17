@@ -35,6 +35,7 @@ export class ConnectionNode extends Node implements CopyAble {
             this.description = parent.name
             this.name = parent.name
         }
+        // https://www.iloveimg.com/zh-cn/resize-image/resize-svg
         if (this.dbType == DatabaseType.PG) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/pg_server.svg");
         } else if (this.dbType == DatabaseType.MSSQL) {
