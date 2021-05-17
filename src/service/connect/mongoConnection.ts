@@ -78,7 +78,7 @@ export class MongoConnection extends IConnection {
         //     const indexNode = Node.nodeCache[`${this.opt.getConnectId()}_${indexName}`] as Node;
         //     fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' }; }) as any;
         // }
-        callback(null, rows, fields);
+        callback(null, rows, fields||[]);
     }
 
 }

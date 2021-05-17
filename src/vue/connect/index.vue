@@ -314,9 +314,9 @@
           "PostgreSQL",
           "SqlServer",
           "SQLite",
-          "ElasticSearch",
           "MongoDB",
           "Redis",
+          "ElasticSearch",
           "SSH",
           "FTP"
         ],

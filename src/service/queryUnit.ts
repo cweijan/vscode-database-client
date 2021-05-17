@@ -102,7 +102,8 @@ export class QueryUnit {
                 if (Array.isArray(fields)) {
                     const isQuery = fields[0] != null && fields[0].name != undefined;
                     const isSqliteEmptyQuery = fields.length == 0 && sql.match(/\bselect\b/i);
-                    if (isQuery || isSqliteEmptyQuery) {
+                    const isMongoEmptyQuery = fields.length == 0 && sql.match(/\.collection\b/i);
+                    if (isQuery || isSqliteEmptyQuery || isMongoEmptyQuery) {
                         QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
                         return;
                     }

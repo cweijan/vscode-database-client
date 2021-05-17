@@ -2,11 +2,12 @@ import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { DatabaseCache } from "@/service/common/databaseCache";
 import { QueryUnit } from "@/service/queryUnit";
 import * as vscode from "vscode";
-import { ModelType } from "../../common/constants";
+import { DatabaseType, ModelType } from "../../common/constants";
 import { Util } from '../../common/util';
 import { ConnectionManager } from "../../service/connectionManager";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
+import { MongoTableGroup } from "../mongo/mongoTableGroup";
 
 export class CatalogNode extends Node implements CopyAble {
 
@@ -28,6 +29,9 @@ export class CatalogNode extends Node implements CopyAble {
     }
 
     public getChildren(): Promise<Node[]> | Node[] {
+          if(this.dbType==DatabaseType.MONGO_DB){
+            return [ new MongoTableGroup(this) ]
+        }
         return this.parent.getChildren.call(this,true)
     }
 
