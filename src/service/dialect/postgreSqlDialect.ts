@@ -181,8 +181,8 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
     showTables(database: string): string {
         return `  SELECT t.table_name "name", pg_catalog.obj_description(pgc.oid, 'pg_class') "comment"
         FROM information_schema.tables t
-        INNER JOIN pg_catalog.pg_class pgc
-        ON t.table_name = pgc.relname 
+        JOIN pg_catalog.pg_class pgc ON t.table_name = pgc.relname 
+        JOIN pg_catalog.pg_namespace pgn ON pgn.oid=pgc.relnamespace and pgn.nspname=t.table_schema
         WHERE t.table_type='BASE TABLE'
         AND t.table_schema='${database}' order by t.table_name;`
     }
