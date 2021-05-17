@@ -30,7 +30,7 @@ export class CatalogNode extends Node implements CopyAble {
 
     public getChildren(): Promise<Node[]> | Node[] {
           if(this.dbType==DatabaseType.MONGO_DB){
-            return [ new MongoTableGroup(this) ]
+              return new MongoTableGroup(this).getChildren()
         }
         return this.parent.getChildren.call(this,true)
     }
