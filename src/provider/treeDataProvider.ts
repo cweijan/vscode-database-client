@@ -28,18 +28,25 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     }
 
     public async getChildren(element?: Node): Promise<Node[]> {
-        if (!element) {
-            return this.getConnectionNodes();
-        }
-        try {
-            const children = await element.getChildren();
-            for (const child of children) {
-                child.parent = element;
+        return new Promise(async (res,rej)=>{
+            if (!element) {
+                res(this.getConnectionNodes())
+                return;
             }
-            return children;
-        } catch (error) {
-            return [new InfoNode(error)]
-        }
+            try {
+                const mark=setTimeout(() => {
+                    res([new InfoNode(`Connect time out!`)])
+                }, element.connectTimeout||5000);
+                const children = await element.getChildren();
+                clearTimeout(mark)
+                for (const child of children) {
+                    child.parent = element;
+                }
+                res(children);
+            } catch (error) {
+                res([new InfoNode(error)])
+            }
+        })
     }
 
     public async openConnection(connectionNode: ConnectionNode) {
