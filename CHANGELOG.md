@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.8.3 2021-5-18
+
+- Support connect to MongoDB.
+- Fix postgresql duplicate tables.
+
 # 3.8.2 2021-5-15
 
 - Connection keep origin position when edit.

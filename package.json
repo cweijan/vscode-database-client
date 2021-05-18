@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-client2",
 	"displayName": "MySQL",
 	"description": "Database Client for vscode",
-	"version": "3.8.2",
+	"version": "3.8.3",
 	"publisher": "cweijan",
 	"icon": "resources/logo.png",
 	"engines": {
@@ -618,7 +618,7 @@
 				},
 				{
 					"command": "mysql.name.copy",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|user|database|esColumn|column|table|view|esIndex|procedure|function|trigger)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|user|database|esColumn|column|table|view|esIndex|procedure|function|trigger|mongoTable|redisKey)$/",
 					"group": "-1_mysql@-5"
 				},
 				{

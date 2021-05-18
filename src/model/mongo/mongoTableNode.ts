@@ -7,7 +7,7 @@ import { TreeItemCollapsibleState } from "vscode";
 import { TableNode } from "../main/tableNode";
 
 export class MongoTableNode extends TableNode {
-    contextValue = ModelType.TABLE_GROUP;
+    contextValue = ModelType.MONGO_TABLE;
     collapsibleState=TreeItemCollapsibleState.None;
     public async getChildren() {
         return [];
