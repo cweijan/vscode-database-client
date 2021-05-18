@@ -10,18 +10,7 @@ export class MongoTableNode extends TableNode {
     contextValue = ModelType.TABLE_GROUP;
     collapsibleState=TreeItemCollapsibleState.None;
     public async getChildren() {
-        const client = await this.getClient()
-
-        const tables = await client.db(this.database).listCollections().toArray()
-
-        const tableNodes = tables.map<TableNode>((table) => {
-            const mongoNode:TableNode = new MongoTableNode({ name: table.name } as TableMeta, this);
-            mongoNode.schema=mongoNode.database
-            return mongoNode;
-        });
-
-
-        return tableNodes;
+        return [];
     }
 
 
