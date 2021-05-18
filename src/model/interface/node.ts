@@ -2,6 +2,7 @@ import { Console } from "@/common/Console";
 import { DatabaseType, ModelType } from "@/common/constants";
 import { Util } from "@/common/util";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
+import { getSqliteBinariesPath } from "@/service/connect/sqlite/sqliteCommandValidation";
 import { ConnectionManager } from "@/service/connectionManager";
 import { SqlDialect } from "@/service/dialect/sqlDialect";
 import { QueryUnit } from "@/service/queryUnit";
@@ -292,6 +293,9 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         }else if(this.dbType==DatabaseType.MONGO_DB){
             this.checkCommand('mongo');
             command = `mongo --host ${this.host} --port ${this.port} ${this.user&&this.password?` -u ${this.user} -p ${this.password}`:''} \n`;   
+        }else if(this.dbType==DatabaseType.SQLITE){
+            
+            command = `${getSqliteBinariesPath()} ${this.dbPath} \n`;   
         }
         const terminal = vscode.window.createTerminal(this.dbType.toString())
         terminal.sendText(command)
