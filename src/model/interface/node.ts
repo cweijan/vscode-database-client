@@ -289,6 +289,9 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         }else if(this.dbType==DatabaseType.REDIS){
             this.checkCommand('redis-cli');
             command = `redis-cli -h ${this.host} -p ${this.port} \n`;   
+        }else if(this.dbType==DatabaseType.MONGO_DB){
+            this.checkCommand('mongo');
+            command = `mongo --host ${this.host} --port ${this.port} ${this.user&&this.password?` -u ${this.user} -p ${this.password}`:''} \n`;   
         }
         const terminal = vscode.window.createTerminal(this.dbType.toString())
         terminal.sendText(command)
