@@ -10,7 +10,13 @@ export class MongoConnection extends IConnection {
     }
 
     connect(callback: (err: Error) => void): void {
-        MongoClient.connect(`mongodb://${this.opt.host}:${this.opt.port}`, (err, client) => {
+        let url = `mongodb://${this.opt.host}:${this.opt.port}`;
+        if (this.opt.user && this.opt.password) {
+            url = `mongodb://${this.opt.user}:${this.opt.password}@${this.opt.host}:${this.opt.port}`;
+        }
+        MongoClient.connect(url, {
+            connectTimeoutMS: this.opt.connectTimeout || 5000, waitQueueTimeoutMS: this.opt.requestTimeout
+        }, (err, client) => {
             if (!err) {
                 this.client = client;
                 this.conneted = true;
@@ -49,7 +55,7 @@ export class MongoConnection extends IConnection {
                 console.log(res)
             })
         } else {
-            const result = await eval('this.client.'+sql)
+            const result = await eval('this.client.' + sql)
             this.handleSearch(sql, result, callback)
         }
     }
@@ -78,7 +84,7 @@ export class MongoConnection extends IConnection {
         //     const indexNode = Node.nodeCache[`${this.opt.getConnectId()}_${indexName}`] as Node;
         //     fields = (await indexNode?.getChildren())?.map((node: any) => { return { name: node.label, type: node.type, nullable: 'YES' }; }) as any;
         // }
-        callback(null, rows, fields||[]);
+        callback(null, rows, fields || []);
     }
 
 }
