@@ -1,4 +1,4 @@
-import { FieldInfo } from "@/common/typeDef";
+import { ColumnMeta, FieldInfo } from "@/common/typeDef";
 import { Util } from "@/common/util";
 import { EsRequest } from "@/model/es/esRequest";
 import { ServiceManager } from "@/service/serviceManager";
@@ -98,7 +98,9 @@ export class QueryPage {
             case MessageType.DATA:
                 if (queryParam.connection.dbType == DatabaseType.ES) {
                     await this.loadEsColumnList(queryParam);
-                } else {
+                }else if (queryParam.connection.dbType == DatabaseType.MONGO_DB) {
+                    await this.loadMongoColumnList(queryParam);
+                }  else {
                     await this.loadColumnList(queryParam);
                 }
                 break;
@@ -149,6 +151,15 @@ export class QueryPage {
         queryParam.res.tableCount = 1
 
         queryParam.res.columnList = queryParam.res.fields.slice(4) as any[]
+    }
+
+    private static async loadMongoColumnList(queryParam: QueryParam<DataResponse>) {
+        const parse = queryParam.res.sql.match(/db\('(.+?)'\)\.collection\('(.+?)'\)/);
+        queryParam.res.database = parse[1]
+        queryParam.res.table = parse[2]
+        queryParam.res.primaryKey = '_id'
+        queryParam.res.tableCount = 1
+        queryParam.res.columnList = queryParam.res.fields as any[]
     }
 
     private static async loadColumnList(queryParam: QueryParam<DataResponse>) {

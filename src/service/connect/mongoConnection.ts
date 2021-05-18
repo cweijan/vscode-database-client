@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { Node } from "@/model/interface/node";
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { MongoClient, MongoClientOptions, ObjectId as MObjectId } from "mongodb";
 import { IConnection, queryCallback } from "./connection";
 
 export class MongoConnection extends IConnection {
@@ -61,10 +61,26 @@ export class MongoConnection extends IConnection {
                 console.log(res)
             })
         } else {
-            const result = await eval('this.client.' + sql)
-            this.handleSearch(sql, result, callback)
+            try {
+                const result = await eval('this.client.' + sql)
+                if (!result) {
+                    callback(null)
+                } else if (result.insertedCount != undefined) {
+                    callback(null, { affectedRows: result.insertedCount })
+                } else if (result.updatedCount != undefined) {
+                    callback(null, { affectedRows: result.updatedCount })
+                } else if (result.deletedCount != undefined) {
+                    callback(null, { affectedRows: result.deletedCount })
+                } else {
+                    this.handleSearch(sql, result, callback)
+                }
+            } catch (error) {
+                callback(error)
+            }
         }
     }
+
+
 
     private async handleSearch(sql: any, data: any, callback: any) {
         let fields = null;
@@ -79,7 +95,9 @@ export class MongoConnection extends IConnection {
             let row = {};
             for (const key in document) {
                 row[key] = document[key];
-                if (row[key] instanceof Object) {
+                if (row[key] instanceof MObjectId) {
+                    row[key] = `ObjectID('${row[key]}')`;
+                } else if (row[key] instanceof Object) {
                     row[key] = JSON.stringify(row[key]);
                 }
             }
@@ -93,4 +111,8 @@ export class MongoConnection extends IConnection {
         callback(null, rows, fields || []);
     }
 
+}
+
+function ObjectID(objectId: string) {
+    return new MObjectId(objectId)
 }

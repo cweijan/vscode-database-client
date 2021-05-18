@@ -74,7 +74,7 @@
       </ux-table-column>
     </ux-grid>
     <!-- table result -->
-    <EditDialog ref="editor" :dbType="result.dbType" :table="result.table" :primaryKey="result.primaryKey" :primaryKeyList="result.primaryKeyList" :columnList="result.columnList" @execute="execute" />
+    <EditDialog ref="editor" :dbType="result.dbType" :database="result.database" :table="result.table" :primaryKey="result.primaryKey" :primaryKeyList="result.primaryKeyList" :columnList="result.columnList" @execute="execute" />
     <ExportDialog :visible.sync="exportOption.visible" @exportHandle="confirmExport" />
   </div>
 </template>
@@ -508,7 +508,10 @@ export default {
                     )
                     .join("\n")}`
                 : `DELETE /${this.result.table}/_doc/${checkboxRecords[0]}`;
-          } else {
+          } else if (this.result.dbType == "MongoDB") {
+            deleteSql = `db('${this.result.database}').collection("${this.result.table}")
+              .deleteMany({_id:{$in:[${checkboxRecords.join(",")}]}})`;
+          }else {
             deleteSql =
               checkboxRecords.length > 1
                 ? `DELETE FROM ${this.result.table} WHERE ${

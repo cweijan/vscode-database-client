@@ -31,7 +31,7 @@ import { wrapByDb } from "@/common/wrapper";
 export default {
   mixins: [util],
   components: { CellEditor },
-  props: ["dbType", "table", "primaryKey","primaryKeyList", "columnList"],
+  props: ["dbType","database", "table", "primaryKey","primaryKeyList", "columnList"],
   data() {
     return {
       model: "insert",
@@ -86,6 +86,9 @@ export default {
       if (this.dbType == "ElasticSearch") {
         this.confirmInsertEs();
         return;
+      }else if (this.dbType == "MongoDB") {
+        this.confirmInsertMongo();
+        return;
       }
       let columns = "";
       let values = "";
@@ -111,6 +114,8 @@ export default {
     buildUpdateSql(currentNew, oldRow) {
        if (this.dbType == "ElasticSearch") {
         return this.confirmUpdateEs(currentNew);
+      }else if (this.dbType == "MongoDB") {
+        return this.confirmUpdateMongo(currentNew,oldRow);
       }
        if (!this.primaryKey) {
         this.$message.error("This table has not primary key, cannot update!");
@@ -165,6 +170,21 @@ export default {
       this.$emit(
         "execute",
         `POST /${this.table}/_doc\n` + JSON.stringify(this.editModel)
+      );
+    },
+    confirmInsertMongo() {
+      this.$emit(
+        "execute",
+        `db('${this.database}').collection("${this.table}").insertOne(${JSON.stringify(this.editModel)})\n`
+      );
+    },
+    confirmUpdateMongo(row, oldRow) {
+      const temp=Object.assign({},row)
+      delete temp['_id']
+      const id=oldRow._id.indexOf("ObjectID") != -1 ?oldRow._id:`'${oldRow._id}'`
+      this.$emit(
+        "execute",
+        `db('${this.database}').collection("${this.table}").updateOne({_id:${id}},{ $set:${JSON.stringify(temp)}})\n`
       );
     },
     confirmUpdateEs(row) {
