@@ -1,22 +1,28 @@
+import * as fs from "fs";
 import { Node } from "@/model/interface/node";
-import { MongoClient } from "mongodb";
+import { MongoClient, MongoClientOptions } from "mongodb";
 import { IConnection, queryCallback } from "./connection";
 
 export class MongoConnection extends IConnection {
     private conneted: boolean;
     private client: MongoClient;
-    constructor(private opt: Node) {
+    private option: MongoClientOptions;
+    constructor(private node: Node) {
         super()
+        this.option = {
+            connectTimeoutMS: this.node.connectTimeout || 5000, waitQueueTimeoutMS: this.node.requestTimeout,
+            ssl: this.node.useSSL, sslValidate: false,
+            sslCert: (node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
+            sslKey: (node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
+        } as MongoClientOptions;
     }
 
     connect(callback: (err: Error) => void): void {
-        let url = `mongodb://${this.opt.host}:${this.opt.port}`;
-        if (this.opt.user && this.opt.password) {
-            url = `mongodb://${this.opt.user}:${this.opt.password}@${this.opt.host}:${this.opt.port}`;
+        let url = `mongodb://${this.node.host}:${this.node.port}`;
+        if (this.node.user && this.node.password) {
+            url = `mongodb://${this.node.user}:${this.node.password}@${this.node.host}:${this.node.port}`;
         }
-        MongoClient.connect(url, {
-            connectTimeoutMS: this.opt.connectTimeout || 5000, waitQueueTimeoutMS: this.opt.requestTimeout
-        }, (err, client) => {
+        MongoClient.connect(url, this.option, (err, client) => {
             if (!err) {
                 this.client = client;
                 this.conneted = true;

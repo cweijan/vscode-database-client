@@ -175,7 +175,7 @@
             <el-switch v-model="connectionOption.usingSSH"></el-switch>
           </div>
           <div class="inline-block mr-10"
-            v-if="connectionOption.dbType=='MySQL' || connectionOption.dbType=='PostgreSQL'">
+            v-if="connectionOption.dbType=='MySQL' || connectionOption.dbType=='PostgreSQL' || connectionOption.dbType=='MongoDB'">
             <label class="font-bold mr-5 inline-block w-18">Use SSL</label>
             <el-switch v-model="connectionOption.useSSL"></el-switch>
           </div>
