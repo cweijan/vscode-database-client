@@ -6,8 +6,8 @@ import { Node } from "../interface/node";
 export class MonggoBaseNode extends Node{
 
     public async getClient(): Promise<MongoClient> {
-        const redis = (await ConnectionManager.getConnection(this)) as MongoConnection
-        return new Promise(res => { redis.run(res) })
+        const mongo = (await ConnectionManager.getConnection(this)) as MongoConnection
+        return new Promise(res => { mongo.run(res) })
     }
 
     

@@ -46,7 +46,7 @@ export class MongoConnection extends IConnection {
     end(): void {
     }
     isAlive(): boolean {
-        return this.conneted;
+        return this.conneted && this.client && this.client.isConnected();
     }
 
     query(sql: string, callback?: queryCallback): void;
