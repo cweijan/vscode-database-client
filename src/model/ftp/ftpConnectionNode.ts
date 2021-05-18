@@ -19,7 +19,7 @@ export class FTPConnectionNode extends FtpBaseNode {
         this.contextValue = this.file ? ModelType.FTP_FOLDER : ModelType.FTP_CONNECTION;
         this.init(parent)
         if (this.file) {
-            this.iconPath = path.join(Constants.RES_PATH, "ssh/folder.svg");
+            this.iconPath =  new vscode.ThemeIcon("folder");
         } else {
             this.iconPath = new vscode.ThemeIcon("server");
         }

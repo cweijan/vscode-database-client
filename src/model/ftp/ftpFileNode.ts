@@ -141,7 +141,7 @@ export class FTPFileNode extends FtpBaseNode {
 
         }
 
-        return `${extPath}/ssh/icon/${fileIcon}`
+        return `${extPath}/ssh/${fileIcon}`
     }
 
 
