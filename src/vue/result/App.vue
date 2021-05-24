@@ -32,42 +32,13 @@
     <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe @selection-change="selectionChange" :checkboxConfig="{ checkMethod: ({row})=>editable&&!row.isFilter,highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" :show-header-overflow="false" :show-overflow="false">
       <ux-table-column type="checkbox" width="40" fixed="left"> </ux-table-column>
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined">
-        <template slot="header">
-          <el-popover placement="bottom" title="Select columns to show" width="200" trigger="click" type="primary">
-            <el-checkbox-group v-model="toolbar.showColumns">
-              <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
-                {{ column.name }}
-              </el-checkbox>
-            </el-checkbox-group>
-            <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference">
-            </el-button>
-          </el-popover>
-        </template>
+        <Controller slot="header" :result="result" :toolbar="toolbar" />
       </ux-table-column>
-      <ux-table-column v-if="result.fields && field.name && toolbar.showColumns.includes(field.name.toLowerCase())" v-for="(field,index) in result.fields" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field,0)" edit-render>
-        <template slot="header" slot-scope="scope">
-          <el-tooltip class="item" effect="dark" :content="getTip(result.columnList[index],scope.column)" placement="left-start">
-            <div>
-              <span>
-                <span v-if="result.columnList[index]&& (result.columnList[index].nullable != 'YES')" style="color: #f94e4e; position: relative; top: .2em;">
-                  *
-                </span>
-                <span class="column-name">
-                  {{ scope.column.title }}<br />
-                </span>
-              </span>
-              <span class="column-type" v-if="result.columnList[index]">
-                {{result.columnList[index].type}}
-              </span>
-            </div>
-          </el-tooltip>
-        </template>
-        <template slot-scope="scope">
-          <Row :scope="scope" :result="result" @execute="execute" :filterObj="toolbar.filter" :editList.sync="update.editList" @sendToVscode="sendToVscode" @openEditor="openEditor"></Row>
-        </template>
+      <ux-table-column v-for="(field,index) in (result.fields||[]).filter(field=>toolbar.showColumns.includes(field.name.toLowerCase()))" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field,0)" edit-render>
+        <Header slot="header" slot-scope="scope" :result="result" :scope="scope" :index="index" />
+        <Row slot-scope="scope" :scope="scope" :result="result" :filterObj="toolbar.filter" :editList.sync="update.editList" @execute="execute" @sendToVscode="sendToVscode" @openEditor="openEditor" />
       </ux-table-column>
     </ux-grid>
-    <!-- table result -->
     <EditDialog ref="editor" :dbType="result.dbType" :database="result.database" :table="result.table" :primaryKey="result.primaryKey" :primaryKeyList="result.primaryKeyList" :columnList="result.columnList" @execute="execute" />
     <ExportDialog :visible.sync="exportOption.visible" @exportHandle="confirmExport" />
   </div>
@@ -75,7 +46,9 @@
 
 <script>
 import { getVscodeEvent } from "../util/vscode";
-import Row from "./component/Row.vue";
+import Row from "./component/Row";
+import Controller from "./component/Row/Controller.vue";
+import Header from "./component/Row/Header.vue";
 import ExportDialog from "./component/ExportDialog.vue";
 import EditDialog from "./component/EditDialog";
 import { util } from "./mixin/util";
@@ -86,7 +59,9 @@ export default {
   components: {
     ExportDialog,
     EditDialog,
+    Controller,
     Row,
+    Header,
   },
   data() {
     return {
@@ -264,10 +239,6 @@ export default {
     });
   },
   methods: {
-    getTip(column, scopeColumn) {
-      if (!column || !column.comment) return scopeColumn.title;
-      return column.comment;
-    },
     save() {
       if (Object.keys(this.update.editList).length == 0 && this.update.lock) {
         return;
