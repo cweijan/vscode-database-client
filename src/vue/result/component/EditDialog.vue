@@ -150,7 +150,7 @@ export default {
         }
       }
       console.log(updateSql)
-      return updateSql;
+      return updateSql+";";
     },
     confirmUpdate(row, oldRow) {
       if (!oldRow) {
