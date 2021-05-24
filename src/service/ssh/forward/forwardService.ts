@@ -24,7 +24,7 @@ export class ForwardService {
 
     public createForwardView(sshConfig: SSHConfig) {
         ViewManager.createWebviewPanel({
-            iconPath: join(Constants.RES_PATH,'ssh/icon/forward.svg'),
+            iconPath: join(Constants.RES_PATH,'ssh/forward.svg'),
             splitView: false, path: "app", title: `forward://${sshConfig.username}@${sshConfig.host}`,
             eventHandler: (handler) => {
                 handler.on("init", () => {
