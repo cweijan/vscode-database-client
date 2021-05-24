@@ -75,18 +75,15 @@
 
 <script>
 import { getVscodeEvent } from "../util/vscode";
-import CellEditor from "./component/CellEditor.vue";
 import Row from "./component/Row.vue";
 import ExportDialog from "./component/ExportDialog.vue";
-import EditDialog from "./component/EditDialog.vue";
+import EditDialog from "./component/EditDialog";
 import { util } from "./mixin/util";
-import { wrapByDb } from "@/common/wrapper";
 let vscodeEvent;
 
 export default {
   mixins: [util],
   components: {
-    CellEditor,
     ExportDialog,
     EditDialog,
     Row,

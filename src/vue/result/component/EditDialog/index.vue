@@ -25,7 +25,7 @@
 
 <script>
 import CellEditor from "./CellEditor.vue";
-import { util } from "../mixin/util";
+import { util } from "../../mixin/util";
 import { wrapByDb } from "@/common/wrapper";
 
 export default {
