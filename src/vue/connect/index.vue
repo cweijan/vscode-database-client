@@ -28,11 +28,10 @@
       <label class="block font-bold">Database Type</label>
       <ul class="tab">
         <li class="tab__item " :class="{'tab__item--active':supportDatabase==connectionOption.dbType}"
-          v-for="supportDatabase in supportDatabases" @click="connectionOption.dbType=supportDatabase">
+          v-for="supportDatabase in supportDatabases" :key="supportDatabase" @click="connectionOption.dbType=supportDatabase">
           {{supportDatabase}}
         </li>
       </ul>
-      </el-select>
     </section>
 
     <template v-if="connectionOption.dbType=='SQLite'">
@@ -132,7 +131,7 @@
             </div>
             <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis' ">
               <label class="font-bold mr-5 inline-block w-32">Include Databases</label>
-              <input class="w-64 field__input" placeholder="Which databases need to be displayed"
+              <input class="w-64 field__input" placeholder="Which databases need to be displayed" title="Example: mysql,test"
                 v-model="connectionOption.includeDatabases" />
             </div>
           </section>

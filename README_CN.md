@@ -41,7 +41,7 @@
 ## 生成测试数据
 
 - 该扩展提供一键生成虚拟数据的功能, 再也不用为没有测试数据而烦恼.
-  ![mockData](images/mockData.png)
+  ![mockData](images/mockData.jpg)
 
 ## 历史记录
 
@@ -57,7 +57,7 @@
 
 该扩展包含一些设置, 可通过以下方式打开设置界面.
 
-![](image/README/1611910592756.png)
+![](images/1611910592756.png)
 
 ## 表过滤
 

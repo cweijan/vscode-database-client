@@ -25,7 +25,7 @@ Install from vscode marketplace [vscode-database-client](https://marketplace.vis
 ## Connect
 
 1. Open Database Explorer panel, then click the `+` button.
-2. Select your database type, input your database connection information then click the connect button.
+2. Select your database type, input connection config then click the connect button.
 
 ![connection](images/connection.jpg)
 
@@ -46,15 +46,16 @@ That will open a sql editor bind of database, it provider:
 
 1. IntelliSense sql edit.
 2. snippets: `sel、del、ins、upd、joi`...
-3. run sql (Shortcut : F9).
+3. Run selected or current cursor sql (Shortcut : F9).
+4. Run all sql (Shortcut : Ctrl+F9).
 
 ![run](images/run.jpg)
 
 ## Generate Mock Data
 
-Now you do not need to spend time writing test data.
+You can easily generate test data.
 
-![mockData](images/mockData.png)
+![mockData](images/mockData.jpg)
 
 ## History
 
@@ -72,7 +73,7 @@ Move to ant DatabaseNode or TableNode. The export/import options are listed in t
 
 This extension contain some setting, find him in the following way.
 
-![](image/README/1611910592756.png)
+![](images/1611910592756.png)
 
 ## Filter
 
