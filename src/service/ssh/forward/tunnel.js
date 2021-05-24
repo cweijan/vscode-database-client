@@ -16,6 +16,9 @@ function bindSSHConnection(config, netConnection) {
     let id = getId(config)
 
     function forward(sshConnection, netConnection) {
+        /**
+         * forwardOut() doesn't actually listen on the local port, so need create net server to forward.
+         */
         sshConnection.forwardOut(config.srcHost, config.srcPort, config.dstHost, config.dstPort, function (err, sshStream) {
             if (err) {
                 netConnection.emit('error', err);
