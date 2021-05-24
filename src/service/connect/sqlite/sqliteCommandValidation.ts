@@ -2,6 +2,7 @@ import { Global } from '@/common/global';
 import { spawnSync } from 'child_process';
 import { existsSync } from 'fs';
 import { arch, platform } from 'os';
+var commandExistsSync = require('command-exists').sync;
 
 /**
  * Validate the sqlite3 command/path passed as argument, if not valid fallback to the binary in the bin directory.
@@ -11,16 +12,7 @@ export function validateSqliteCommand(sqliteCommand: string): string {
     if (isValid) {
         return sqliteCommand;
     } else {
-        sqliteCommand = getSqliteBinariesPath();
-        if (!sqliteCommand) {
-            throw new Error(`Unable to find a valid SQLite command. Fallback binary not found.`);
-        }
-        isValid = isSqliteCommandValid(sqliteCommand);
-        if (isValid) {
-            return sqliteCommand;
-        } else {
-            throw new Error(`Unable to find a valid SQLite command. Fallback binary is not valid.`);
-        }
+        return getSqliteBinariesPath();
     }
 }
 
@@ -33,7 +25,7 @@ export function isSqliteCommandValid(sqliteCommand: string) {
     }
     let error = proc.stderr.toString();
     let output = proc.stdout.toString();
-    
+
     // if there is any error the command is note valid
     // Note: the string match is a workaround for CentOS (and maybe other OS's) where the command throws an error at the start but everything works fine
     if (error && !error.match(/\: \/lib64\/libtinfo\.so\.[0-9]+: no version information available \(required by /)) {
@@ -44,12 +36,12 @@ export function isSqliteCommandValid(sqliteCommand: string) {
     // out must be: {version at least 3} {date} {time}}
     // this is a naive way to check that the command is for sqlite3 after version 3.9
     let match = output.match(/3\.(?:9|[0-9][0-9])\.[0-9]{1,2} [0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}\:[0-9]{2}\:[0-9]{2}/);
-    
-    if(!match) {
+
+    if (!match) {
         console.debug(`'${sqliteCommand}' is not a valid SQLite command: version must be >= 3.9`);
     }
-    
-    return match? true : false;
+
+    return match ? true : false;
 }
 
 
@@ -68,6 +60,9 @@ export function getSqliteBinariesPath(): string {
             sqliteBin = 'sqlite-v3.26.0-win32-x86.exe';
             break;
         case 'linux':
+            if (commandExistsSync('sqlite3')) {
+                return 'sqlite3';
+            }
             if (os_arch === 'x64') {
                 sqliteBin = 'sqlite-v3.26.0-linux-x64';
             } else {
