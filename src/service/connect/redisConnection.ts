@@ -1,21 +1,30 @@
 import { Node } from "@/model/interface/node";
 import { IConnection, queryCallback } from "./connection";
-
+import * as fs from "fs";
 import * as IoRedis from "ioredis";
 
 export class RedisConnection extends IConnection {
     private conneted: boolean;
     private client: IoRedis.Redis;
-    constructor(opt: Node) {
+    constructor(node: Node) {
         super()
-        this.client = new IoRedis({
-            port: opt.port, 
-            host: opt.host,
-            password: opt.password,
-            connectTimeout: opt.connectTimeout || 5000,
-            db: opt.database as any as number,
-            family: 4, // 4 (IPv4) or 6 (IPv6)
-        });
+        let config = {
+            port: node.port,
+            host: node.host,
+            password: node.password,
+            connectTimeout: node.connectTimeout || 5000,
+            db: node.database as any as number,
+            family: 4,
+        }as IoRedis.RedisOptions;
+        if(node.useSSL){
+            config.tls={
+                rejectUnauthorized: false,
+                cert: ( node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
+                key: ( node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
+                minVersion: 'TLSv1'
+            }
+        }
+        this.client = new IoRedis(config);
 
 
     }
@@ -39,11 +48,11 @@ export class RedisConnection extends IConnection {
                 callback(new Error("Connect to redis server time out."))
             }
         }, 5000);
-        this.client.ping(() => {
+        this.client.ping((err) => {
             if (timeout) {
                 this.conneted = true;
                 timeout = false;
-                callback(null)
+                callback(err)
             }
         })
     }
