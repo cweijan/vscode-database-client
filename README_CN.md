@@ -1,6 +1,6 @@
 # Database Client
 
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client2.svg)
+  [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client2.svg)
 
 该项目为Visual Studio Code的数据库客户端插件, 支持MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis以及ElasticSearch的管理.
 
@@ -28,30 +28,31 @@
 ## 数据表
 
 1. 点击数据库表打开数据视图
-2. 之后便可在页面进行CRUD、数据导出(**Excel、JSON**)等操作.
-   ![query](images/QueryTable.jpg)
+2. 之后便可在页面进行CRUD、数据导出(**Excel、JSON**)等操作.![query](images/QueryTable.jpg)
 
 ## 执行SQL
 
-* 点击数据库节点的 `New Query` 按钮.
-  ![newquery](images/newquery.jpg)
+* 点击数据库节点的`New Query` 按钮.![newquery](images/newquery.jpg)
 * 之后可在编辑器中编辑和执行SQL(快捷键 : F9).
 * ![run](images/run.jpg)
 
 ## 生成测试数据
 
-- 该扩展提供一键生成虚拟数据的功能, 再也不用为没有测试数据而烦恼.
-  ![mockData](images/mockData.jpg)
+- 该扩展提供一键生成虚拟数据的功能, 再也不用为没有测试数据而烦恼.![mockData](images/mockData.jpg)
 
 ## 历史记录
 
-- 点击历史记录按钮后可查看以往执行的Sql记录.
-  ![history](images/history.jpg)
+- 点击历史记录按钮后可查看以往执行的Sql记录.![history](images/history.jpg)
+
+## Sqlite
+
+如果你用Linux系统, 需要先安装sqlite3.
+
+- Ubuntu:`sudo apt-get install sqlite`
 
 ## 备份/导入
 
-* 在表或者数据库节点右击, 之后便可以进行数据的导入导出.
-  ![bakcup](images/Backup.jpg)
+* 在表或者数据库节点右击, 之后便可以进行数据的导入导出.![bakcup](images/Backup.jpg)
 
 ## 设置
 

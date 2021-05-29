@@ -1,6 +1,6 @@
 # Database Client
 
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client2.svg)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2)
+  
 
 Database Client for Visual Studio Code. It supports databases MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis, and ElasticSearch.
 
@@ -24,7 +24,7 @@ Install from vscode marketplace [vscode-database-client](https://marketplace.vis
 
 ## Connect
 
-1. Open Database Explorer panel, then click the `+` button.
+1. Open Database Explorer panel, then click the`+` button.
 2. Select your database type, input connection config then click the connect button.
 
 ![connection](images/connection.jpg)
@@ -45,7 +45,7 @@ In the Database Explorer panel, click the `Open Query` button.
 That will open a sql editor bind of database, it provider:
 
 1. IntelliSense sql edit.
-2. snippets: `sel、del、ins、upd、joi`...
+2. snippets:`sel、del、ins、upd、joi`...
 3. Run selected or current cursor sql (Shortcut : F9).
 4. Run all sql (Shortcut : Ctrl+F9).
 
@@ -62,6 +62,12 @@ You can easily generate test data.
 Click the history button to open the list of recently executed query history records.
 
 ![history](images/history.jpg)
+
+## Sqlite
+
+If you using Linux that must install sqlite3 first.
+
+- Ubuntu:`sudo apt-get install sqlite`
 
 ## Backup/Import
 
