@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.8.6 2021-6-3
+
+- Support connect redis with ssl.
+- Fix parse empty string or zero as null on result.
+
 # 3.8.3 2021-5-18
 
 - Support connect to MongoDB.
