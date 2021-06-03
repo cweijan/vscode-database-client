@@ -9,11 +9,11 @@
     </template>
     <template v-else>
       <div class="edit-column" :contenteditable="editable" style="height: 100%; line-height: 33px;" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)">
-        <template v-if="scope.row[scope.column.title]">
-          <span v-text='dataformat(scope.row[scope.column.title])'></span>
+        <template v-if="scope.row[scope.column.title]==null || scope.row[scope.column.title]==undefined">
+          <span class='null-column'>(NULL)</span>
         </template>
         <template v-else>
-          <span class='null-column'>(NULL)</span>
+          <span v-text='dataformat(scope.row[scope.column.title])'></span>
         </template>
       </div>
     </template>
