@@ -50,7 +50,7 @@ export abstract class SqlDialect {
         return null;
     }
     dropTriggerTemplate(name: string): string {
-        return `DROP IF EXISTS TRIGGER ${name}`
+        return `DROP TRIGGER IF EXISTS ${name}`
     }
 }
 
