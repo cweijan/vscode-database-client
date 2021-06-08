@@ -19,7 +19,7 @@ export class MongoConnection extends IConnection {
 
     connect(callback: (err: Error) => void): void {
         let url = `mongodb://${this.node.host}:${this.node.port}`;
-        if (this.node.user && this.node.password) {
+        if (this.node.user || this.node.password) {
             url = `mongodb://${this.node.user}:${this.node.password}@${this.node.host}:${this.node.port}`;
         }
         MongoClient.connect(url, this.option, (err, client) => {
