@@ -20,13 +20,13 @@
 
 <script>
 export default {
-  props: ["costTime", "search", "showFullBtn","page"],
+  props: ["costTime", "search", "showFullBtn", "page"],
   data() {
     return {
       searchInput: null,
     };
   },
-  methods:{
+  methods: {
     changePageSize(size) {
       this.page.pageSize = size;
       vscodeEvent.emit("changePageSize", size);
@@ -55,13 +55,31 @@ export default {
   padding: 0;
   border: none;
   font-size: 19px;
-  margin-left:7px;
+  margin-left: 7px;
 }
 
-.el-button:focus, .el-button:hover {
-    color: #409EFF !important;
-    border-color: #c6e2ff ;
-    background-color: var(--vscode-editor-background);
+.el-button:focus,
+.el-button:hover {
+  color: #409eff !important;
+  border-color: #c6e2ff;
+  background-color: var(--vscode-editor-background);
 }
 
+.el-pagination {
+  padding: 0;
+}
+>>> .el-input{
+  bottom: 2px;
+}
+>>> .el-input--mini .el-input__inner{
+  height: 24px;
+}
+
+</style>
+
+<style>
+.el-pagination span,.el-pagination li,
+.btn-prev i,.btn-next i{
+  line-height: 27px !important;
+}
 </style>
