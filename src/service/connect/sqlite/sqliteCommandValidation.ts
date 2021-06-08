@@ -50,6 +50,11 @@ export function isSqliteCommandValid(sqliteCommand: string) {
  * If there are no binaries for the platform returns an empty string.
  */
 export function getSqliteBinariesPath(): string {
+
+    if (commandExistsSync('sqlite3')) {
+        return 'sqlite3';
+    }
+
     let plat = platform();
     let os_arch = arch();
     let sqliteBin: string;
@@ -60,9 +65,6 @@ export function getSqliteBinariesPath(): string {
             sqliteBin = 'sqlite-v3.26.0-win32-x86.exe';
             break;
         case 'linux':
-            if (commandExistsSync('sqlite3')) {
-                return 'sqlite3';
-            }
             if (os_arch === 'x64') {
                 sqliteBin = 'sqlite-v3.26.0-linux-x64';
             } else {
