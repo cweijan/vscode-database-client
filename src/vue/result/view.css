@@ -13,10 +13,6 @@ body {
   margin-top: 8px;
 }
 
-.el-button--mini.is-circle {
-  padding: 6px;
-}
-
 .sql-pannel{
   width:100%;
   font-size: 14px;
@@ -25,11 +21,6 @@ body {
   font-family: "Segoe UI"; 
   padding-top: 0;
   padding-left: 10px;
-}
-
-.toolbar {
-  margin-top: 3px;
-  margin-bottom: 3px;
 }
 
 .hint {

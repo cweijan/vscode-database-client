@@ -4,13 +4,7 @@
       <div style="width:95%;">
         <el-input type="textarea" :autosize="{ minRows:2, maxRows:5}" v-model="toolbar.sql" class="sql-pannel" />
       </div>
-      <div class="toolbar">
-        <Toolbar :showFullBtn="showFullBtn" :search.sync="table.search" :costTime="result.costTime" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="$refs.editor.openInsert()" @deleteConfirm="deleteConfirm" @run="info.visible = false;execute(toolbar.sql);" />
-        <div style="display:inline-block">
-          <el-pagination @size-change="changePageSize" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,30,50,300,500]" :layout="page.total!=null?'sizes,prev,pager, next, total':'sizes,prev, next'" :total="page.total">
-          </el-pagination>
-        </div>
-      </div>
+      <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :costTime="result.costTime" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="$refs.editor.openInsert()" @deleteConfirm="deleteConfirm" @run="info.visible = false;execute(toolbar.sql);" />
       <div v-if="info.visible ">
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
         <div v-if="!info.error" class="info-panel" style="color: green !important;" v-html="info.message"></div>
@@ -264,11 +258,6 @@ export default {
           table: this.result.table,
         },
       });
-    },
-    changePageSize(size) {
-      this.page.pageSize = size;
-      vscodeEvent.emit("changePageSize", size);
-      this.changePage(0);
     },
     sort(row) {
       if (this.result.dbType == "ElasticSearch") {

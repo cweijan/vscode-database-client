@@ -3,25 +3,35 @@
     <el-button v-if="showFullBtn" @click="()=>$emit('sendToVscode','full')" type="primary" title="Full Result View" icon="el-icon-rank" size="mini" circle>
     </el-button>
     <el-input v-model="searchInput" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
-    <i class="icon-github" title="Star the project to represent support." @click='()=>$emit("sendToVscode", "openGithub")'></i>
-    <!-- :disabled="result.tableCount!=1"  -->
-    <i class="el-icon-circle-plus-outline" @click="$emit('insert')" title="Insert new row"></i>
-    <i class="el-icon-delete" @click="$emit('deleteConfirm');" title="delete"></i>
-    <i class="el-icon-bottom" @click="$emit('export');" title="Export"></i>
-    <i class="el-icon-caret-right" title="Execute Sql" @click="$emit('run');"></i>
+    <el-button icon="icon-github" title="Star the project to represent support." @click='()=>$emit("sendToVscode", "openGithub")'></el-button>
+    <el-button icon="el-icon-circle-plus-outline" @click="$emit('insert')" title="Insert new row"></el-button>
+    <el-button icon="el-icon-delete" style="color:#f56c6c" @click="$emit('deleteConfirm');" title="delete"></el-button>
+    <el-button icon="el-icon-bottom" @click="$emit('export');" style="color:#4ba3ff;" title="Export"></el-button>
+    <el-button icon="el-icon-caret-right" title="Execute Sql" style="color: #54ea54;margin-left:0;" @click="$emit('run');"></el-button>
     <div style="display:inline-block;font-size:14px;padding-left: 8px;" class="el-pagination__total">
-      CostTime: {{costTime}}ms
+      Cost: {{costTime}}ms
+    </div>
+    <div style="display:inline-block">
+      <el-pagination @size-change="changePageSize" @current-change="page=>$emit('changePage',page,true)" @next-click="()=>$emit('changePage',1)" @prev-click="()=>$emit('changePage',-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,30,50,300,500]" :layout="page.total!=null?'prev,pager, next, total':'sizes,prev, next'" :total="page.total">
+      </el-pagination>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  props: ["costTime", "search", "showFullBtn"],
+  props: ["costTime", "search", "showFullBtn","page"],
   data() {
     return {
       searchInput: null,
     };
+  },
+  methods:{
+    changePageSize(size) {
+      this.page.pageSize = size;
+      vscodeEvent.emit("changePageSize", size);
+      this.changePage(0);
+    },
   },
   watch: {
     searchInput: function () {
@@ -33,10 +43,25 @@ export default {
 
 <style scoped>
 .toolbar {
-  display: inline-block;
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
-.toolbar>i {
-  margin-right: 3px;
+
+.el-button--mini.is-circle {
+  padding: 6px;
+}
+
+.el-button--default {
+  padding: 0;
+  border: none;
   font-size: 19px;
+  margin-left:7px;
 }
+
+.el-button:focus, .el-button:hover {
+    color: #409EFF !important;
+    border-color: #c6e2ff ;
+    background-color: var(--vscode-editor-background);
+}
+
 </style>

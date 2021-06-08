@@ -13461,9 +13461,9 @@ body {
 }
 
 .el-button:focus, .el-button:hover {
-    color: #409EFF;
-    border-color: #c6e2ff;
-    background-color: #ecf5ff
+    color: #409EFF ;
+    border-color: #c6e2ff ;
+    background-color: #ecf5ff;
 }
 
 .el-button:active {

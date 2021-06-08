@@ -69,7 +69,7 @@ export default {
       if(this.result.tableCount!=1){
         this.$message({
           type: "warning",
-          message: "Only one table support insert!",
+          message: "Not table found!",
         });
         return;
       }
