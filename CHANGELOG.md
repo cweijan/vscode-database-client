@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 3.8.7 2021-6-8
+
+- Update toolbar style.
+- Fix trigger template error.
+- Support using sqlite3 from path.
+
 # 3.8.6 2021-6-3
 
 - Support connect redis with ssl.
