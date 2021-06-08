@@ -76,6 +76,8 @@ export class QueryPage {
                     })
                 }).on('changePageSize', (pageSize) => {
                     Global.updateConfig(ConfigKey.DEFAULT_LIMIT, pageSize)
+                }).on('openGithub', () => {
+                    env.openExternal(Uri.parse('https://github.com/cweijan/vscode-database-client'));
                 }).on('openCoffee', () => {
                     env.openExternal(Uri.parse('https://www.buymeacoffee.com/cweijan'));
                 }).on('dataModify', () => {

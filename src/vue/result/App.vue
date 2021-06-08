@@ -5,19 +5,7 @@
         <el-input type="textarea" :autosize="{ minRows:2, maxRows:5}" v-model="toolbar.sql" class="sql-pannel" />
       </div>
       <div class="toolbar">
-        <el-button v-if="showFullBtn" @click="()=>sendToVscode('full')" type="primary" title="Full Result View" icon="el-icon-rank" size="mini" circle>
-        </el-button>
-        <el-input v-model="table.search" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
-        <el-button type="primary" size="mini" icon="el-icon-milk-tea" title="Buy the author a cup of coffee" circle @click="()=>sendToVscode('openCoffee')"></el-button>
-        <el-button @click="$refs.editor.openInsert()" :disabled="result.tableCount!=1" type="info" title="Insert new row" icon="el-icon-circle-plus-outline" size="mini" circle>
-        </el-button>
-        <el-button @click="deleteConfirm" title="delete" type="danger" size="mini" icon="el-icon-delete" circle :disabled="!toolbar.show">
-        </el-button>
-        <el-button @click="exportOption.visible = true" type="primary" size="mini" icon="el-icon-bottom" circle title="Export"></el-button>
-        <el-button type="success" size="mini" icon="el-icon-caret-right" :disabled="!toolbar.sql" title="Execute Sql" circle @click='info.visible = false;execute(toolbar.sql);'></el-button>
-        <div style="display:inline-block;font-size:14px;padding-left: 8px;" class="el-pagination__total">
-          CostTime: {{result.costTime}}ms
-        </div>
+        <Toolbar :showFullBtn="showFullBtn" :search.sync="table.search" :costTime="result.costTime" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="$refs.editor.openInsert()" @deleteConfirm="deleteConfirm" @run="info.visible = false;execute(toolbar.sql);" />
         <div style="display:inline-block">
           <el-pagination @size-change="changePageSize" @current-change="page=>changePage(page,true)" @next-click="()=>changePage(1)" @prev-click="()=>changePage(-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,30,50,300,500]" :layout="page.total!=null?'sizes,prev,pager, next, total':'sizes,prev, next'" :total="page.total">
           </el-pagination>
@@ -39,7 +27,7 @@
         <Row slot-scope="scope" :scope="scope" :result="result" :filterObj="toolbar.filter" :editList.sync="update.editList" @execute="execute" @sendToVscode="sendToVscode" @openEditor="openEditor" />
       </ux-table-column>
     </ux-grid>
-    <EditDialog ref="editor" :dbType="result.dbType" :database="result.database" :table="result.table" :primaryKey="result.primaryKey" :primaryKeyList="result.primaryKeyList" :columnList="result.columnList" @execute="execute" />
+    <EditDialog ref="editor" :dbType="result.dbType" :result="result" :database="result.database" :table="result.table" :primaryKey="result.primaryKey" :primaryKeyList="result.primaryKeyList" :columnList="result.columnList" @execute="execute" />
     <ExportDialog :visible.sync="exportOption.visible" @exportHandle="confirmExport" />
   </div>
 </template>
@@ -50,6 +38,7 @@ import Row from "./component/Row";
 import Controller from "./component/Row/Controller.vue";
 import Header from "./component/Row/Header.vue";
 import ExportDialog from "./component/ExportDialog.vue";
+import Toolbar from "./component/Toolbar";
 import EditDialog from "./component/EditDialog";
 import { util } from "./mixin/util";
 let vscodeEvent;
@@ -59,6 +48,7 @@ export default {
   components: {
     ExportDialog,
     EditDialog,
+    Toolbar,
     Controller,
     Row,
     Header,
@@ -301,14 +291,21 @@ export default {
       }
     },
     deleteConfirm() {
+      const datas = this.$refs.dataTable.getCheckboxRecords();
+      if (!datas || datas.length == 0) {
+        this.$message({
+          type: "warning",
+          message: "You need to select at least one row of data.",
+        });
+        return;
+      }
       this.$confirm("Are you sure you want to delete this data?", "Warning", {
         confirmButtonText: "OK",
         cancelButtonText: "Cancel",
         type: "warning",
       })
         .then(() => {
-          let checkboxRecords = this.$refs.dataTable
-            .getCheckboxRecords()
+          let checkboxRecords = datas
             .filter(
               (checkboxRecord) => checkboxRecord[this.result.primaryKey] != null
             )

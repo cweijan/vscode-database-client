@@ -10,6 +10,7 @@ import 'umy-table/lib/theme-chalk/index.css';
 import '@/../public/theme/auto.css'
 import '@/../public/theme/umyui.css'
 import './view.css'
+import './icon/iconfont.css'
 Vue.use(UmyTable);
 
 Vue.config.productionTip = false

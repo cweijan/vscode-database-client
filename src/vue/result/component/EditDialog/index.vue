@@ -31,7 +31,7 @@ import { wrapByDb } from "@/common/wrapper";
 export default {
   mixins: [util],
   components: { CellEditor },
-  props: ["dbType","database", "table", "primaryKey","primaryKeyList", "columnList"],
+  props: ["result","dbType","database", "table", "primaryKey","primaryKeyList", "columnList"],
   data() {
     return {
       model: "insert",
@@ -66,6 +66,13 @@ export default {
       this.visible = true;
     },
     openInsert() {
+      if(this.result.tableCount!=1){
+        this.$message({
+          type: "warning",
+          message: "Only one table support insert!",
+        });
+        return;
+      }
       this.model = "insert";
       this.editModel = {};
       this.loading = false;
