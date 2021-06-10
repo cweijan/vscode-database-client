@@ -58,7 +58,11 @@ export default {
   margin-left: 7px;
 }
 
-.el-button:focus,
+.el-button:focus{
+  color: inherit !important;
+  background-color: var(--vscode-editor-background);
+}
+
 .el-button:hover {
   color: #409eff !important;
   border-color: #c6e2ff;
