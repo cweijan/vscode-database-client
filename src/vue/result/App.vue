@@ -99,10 +99,10 @@ export default {
     };
   },
   mounted() {
-    this.remainHeight = window.innerHeight - 120;
+    this.remainHeight = window.innerHeight - 90;
     this.showFullBtn = window.outerWidth / window.innerWidth >= 2;
     window.addEventListener("resize", () => {
-      this.remainHeight = window.innerHeight - 120;
+      this.remainHeight = window.innerHeight - 90;
       this.showFullBtn = window.outerWidth / window.innerWidth >= 2;
     });
     const handlerData = (data, sameTable) => {
