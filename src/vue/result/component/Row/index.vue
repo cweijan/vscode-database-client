@@ -4,7 +4,7 @@
       <el-input class='edit-filter' v-model="filterObj[scope.column.title]" :clearable='true' placeholder="Filter" @clear="filter(null,scope.column.title)" @keyup.enter.native="filter($event,scope.column.title)">
       </el-input>
     </template>
-    <template v-if="!scope.row.isFilter && result.dbType=='ElasticSearch'">
+    <template v-else-if="!scope.row.isFilter && result.dbType=='ElasticSearch'">
       <div class="edit-column" :contenteditable="editable" style="height: 100%; line-height: 33px;" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])'></div>
     </template>
     <template v-else>

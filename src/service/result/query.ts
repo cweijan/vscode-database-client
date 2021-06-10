@@ -1,11 +1,11 @@
-import { ColumnMeta, FieldInfo } from "@/common/typeDef";
+import { FieldInfo } from "@/common/typeDef";
 import { Util } from "@/common/util";
 import { EsRequest } from "@/model/es/esRequest";
 import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
-import { env, StatusBarAlignment, StatusBarItem, Uri, ViewColumn, window } from "vscode";
+import { env, Uri, ViewColumn, window } from "vscode";
 import { Trans } from "~/common/trans";
-import { ConfigKey, DatabaseType, MessageType, OperateType } from "../../common/constants";
+import { ConfigKey, DatabaseType, MessageType } from "../../common/constants";
 import { Global } from "../../common/global";
 import { ViewManager } from "../../common/viewManager";
 import { Node } from "../../model/interface/node";
@@ -45,9 +45,9 @@ export class QueryPage {
                     queryParam.res.transId = Trans.transId;
                     queryParam.res.viewId = queryParam.queryOption?.viewId;
                     handler.emit(queryParam.type, { ...queryParam.res, dbType: dbOption.dbType })
-                }).on(OperateType.execute, (params) => {
+                }).on('execute', (params) => {
                     QueryUnit.runQuery(params.sql, dbOption, queryParam.queryOption);
-                }).on(OperateType.next, async (params) => {
+                }).on('next', async (params) => {
                     const sql = ServiceManager.getPageService(dbOption.dbType).build(params.sql, params.pageNum, params.pageSize)
                     dbOption.execute(sql).then((rows) => {
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
@@ -70,7 +70,7 @@ export class QueryPage {
                     dbOption.execute(params.sql.replace(/\bSELECT\b.+?\bFROM\b/i, 'select count(*) count from')).then((rows) => {
                         handler.emit('COUNT', { data: rows[0].count })
                     })
-                }).on(OperateType.export, (params) => {
+                }).on('export', (params) => {
                     this.exportService.export({ ...params.option, request: queryParam.res.request, dbOption }).then(() => {
                         handler.emit('EXPORT_DONE')
                     })

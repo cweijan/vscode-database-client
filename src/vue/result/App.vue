@@ -4,15 +4,15 @@
       <div style="width:95%;">
         <el-input type="textarea" :autosize="{ minRows:2, maxRows:5}" v-model="toolbar.sql" class="sql-pannel" />
       </div>
-      <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :costTime="result.costTime" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="$refs.editor.openInsert()" @deleteConfirm="deleteConfirm" @run="info.visible = false;execute(toolbar.sql);" />
-      <div v-if="info.visible ">
+      <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :costTime="result.costTime" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="$refs.editor.openInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
+      <div v-if="info.message ">
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
         <div v-if="!info.error" class="info-panel" style="color: green !important;" v-html="info.message"></div>
       </div>
     </div>
     <!-- trigger when click -->
-    <ux-grid ref="dataTable" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe @selection-change="selectionChange" :checkboxConfig="{ checkMethod: ({row})=>editable&&!row.isFilter,highlight: true}" :data="result.data.filter(data => !table.search || JSON.stringify(data).toLowerCase().includes(table.search.toLowerCase()))" :show-header-overflow="false" :show-overflow="false">
-      <ux-table-column type="checkbox" width="40" fixed="left"> </ux-table-column>
+    <ux-grid ref="dataTable" :data="filterData" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe :checkboxConfig="{ checkMethod: selectable}">
+      <ux-table-column type="checkbox" width="40" fixed="left"></ux-table-column>
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined">
         <Controller slot="header" :result="result" :toolbar="toolbar" />
       </ux-table-column>
@@ -77,7 +77,6 @@ export default {
       },
       toolbar: {
         sql: null,
-        show: false,
         // using to clear filter input value
         filter: {},
         showColumns: [],
@@ -88,7 +87,6 @@ export default {
       info: {
         sql: null,
         message: null,
-        visible: false,
         error: false,
         needRefresh: true,
       },
@@ -132,7 +130,6 @@ export default {
       if (this.$refs.editor) {
         this.$refs.editor.close();
       }
-      this.info.visible = true;
       this.info.message = res.message;
     };
     vscodeEvent = getVscodeEvent();
@@ -223,6 +220,9 @@ export default {
     });
   },
   methods: {
+    selectable({row}) {
+      return this.editable && !row.isFilter;
+    },
     save() {
       if (Object.keys(this.update.editList).length == 0 && this.update.lock) {
         return;
@@ -368,7 +368,7 @@ export default {
     },
     count() {
       if (!this.result.table) return;
-      this.info.visible = false;
+      this.info.message = null;
       vscodeEvent.emit("count", { sql: this.result.sql });
     },
     execute(sql) {
@@ -404,20 +404,12 @@ export default {
       this.page.total = null;
       // info
       if (this.info.needRefresh) {
-        this.info.visible = false;
+        this.info.message = null;
       } else {
         this.info.needRefresh = true;
       }
       // loading
       this.table.loading = false;
-      // toolbar
-      this.toolbar.show = false;
-    },
-    selectionChange(selection) {
-      this.toolbar.show =
-        this.result.primaryKey &&
-        selection.length > 0 &&
-        this.result.tableCount == 1;
     },
     // show call when change table
     reset() {
@@ -437,6 +429,15 @@ export default {
     },
   },
   computed: {
+    filterData() {
+      return this.result.data.filter(
+        (data) =>
+          !this.table.search ||
+          JSON.stringify(data)
+            .toLowerCase()
+            .includes(this.table.search.toLowerCase())
+      );
+    },
     editable() {
       return this.result.primaryKey && this.result.tableCount == 1;
     },

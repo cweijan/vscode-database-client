@@ -14,11 +14,6 @@ export class Pattern {
     public static MULTI_PATTERN = /\b(TRIGGER|PROCEDURE|FUNCTION)\b/ig
 }
 
-export enum OperateType {
-    execute = 'execute', export = 'export',
-    next = 'next', init = 'init', changeTheme = "changeTheme"
-}
-
 export enum CacheKey {
     ConectionsKey = "mysql.connections",
     CollapseSate = "mysql.database.cache.collapseState",
