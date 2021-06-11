@@ -32,8 +32,8 @@ export class Global {
      * get configuration from vscode setting.
      * @param key config key
      */
-    public static getConfig<T>(key: string): T {
-        return vscode.workspace.getConfiguration(Constants.CONFIG_PREFIX).get<T>(key);
+    public static getConfig<T>(key: string,defaultValue?:any): T {
+        return vscode.workspace.getConfiguration(Constants.CONFIG_PREFIX).get<T>(key,defaultValue);
     }
 
     /**

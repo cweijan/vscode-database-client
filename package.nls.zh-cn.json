@@ -58,5 +58,6 @@
     "command.redis.key.del": "删除键",
 	"command.redis.key.detail": "查看键详情",
 	"config.title":"_数据库配置",
+	"config.prefreConnectionName":"使用连接名称作为连接的显示名",
 	"config.defaultSelectLimit":"默认的分页大小."
 }

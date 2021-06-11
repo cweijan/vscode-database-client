@@ -27,16 +27,20 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         return element;
     }
 
+    public getParent(element?: Node) {
+        return element?.parent;
+    }
+
     public async getChildren(element?: Node): Promise<Node[]> {
-        return new Promise(async (res,rej)=>{
+        return new Promise(async (res, rej) => {
             if (!element) {
                 res(this.getConnectionNodes())
                 return;
             }
             try {
-                const mark=setTimeout(() => {
+                const mark = setTimeout(() => {
                     res([new InfoNode(`Connect time out!`)])
-                }, element.connectTimeout||5000);
+                }, element.connectTimeout || 5000);
                 const children = await element.getChildren();
                 clearTimeout(mark)
                 for (const child of children) {
@@ -82,7 +86,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     private getKeyByNode(connectionNode: Node): string {
         const dbType = connectionNode.dbType;
-        if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS || dbType == DatabaseType.SSH || dbType == DatabaseType.FTP || dbType ==  DatabaseType.MONGO_DB) {
+        if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS || dbType == DatabaseType.SSH || dbType == DatabaseType.FTP || dbType == DatabaseType.MONGO_DB) {
             return CacheKey.NOSQL_CONNECTION;
         }
         return CacheKey.ConectionsKey;
@@ -111,7 +115,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         const connetKey = this.connectionKey;
         let globalConnections = this.context.globalState.get<{ [key: string]: Node }>(connetKey, {});
         let workspaceConnections = this.context.workspaceState.get<{ [key: string]: Node }>(connetKey, {});
-        
+
         return Object.keys(workspaceConnections).map(key => this.getNode(workspaceConnections[key], key, false, connetKey)).concat(
             Object.keys(globalConnections).map(key => this.getNode(globalConnections[key], key, true, connetKey))
         )

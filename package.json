@@ -892,6 +892,11 @@
 					"default": 100,
 					"description": "%config.defaultSelectLimit%"
 				},
+				"database-client.prefreConnectionName": {
+					"type": "boolean",
+					"default": true,
+					"description": "%config.prefreConnectionName%"
+				},
 				"database-client.disableSqlCodeLen": {
 					"type": "boolean",
 					"default": false,

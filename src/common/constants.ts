@@ -23,6 +23,7 @@ export enum CacheKey {
 
 export enum ConfigKey {
     DEFAULT_LIMIT = "defaultSelectLimit",
+    PREFRE_CONNECTION_NAME = "prefreConnectionName",
     DISABLE_SQL_CODELEN = "disableSqlCodeLen",
 }
 
