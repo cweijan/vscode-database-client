@@ -23,6 +23,7 @@
 	"command.query.switch": "Open Query",
 	"command.data.import": "Import Sql",
 	"command.data.export": "Export Data",
+	"command.document.generate": "Generate Document",
 	"command.struct.export": "Export Struct",
 	"command.db.active": "Change Active Database",
 	"command.table.truncate": "Truncate Table",

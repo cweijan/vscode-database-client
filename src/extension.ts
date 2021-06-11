@@ -116,6 +116,9 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.struct.export": (node: SchemaNode | TableNode) => {
                     serviceManager.dumpService.dump(node, false)
                 },
+                "mysql.document.generate": (node: SchemaNode | TableNode) => {
+                    serviceManager.dumpService.generateDocument(node)
+                },
                 "mysql.data.import": (node: SchemaNode | ConnectionNode) => {
                     vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
                         if (filePath) {

@@ -217,6 +217,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.document.generate",
+				"title": "%command.document.generate%",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.db.active",
 				"title": "%command.db.active%",
 				"category": "MySQL"
@@ -647,9 +652,14 @@
 					"group": "mysql@6"
 				},
 				{
+					"command": "mysql.document.generate",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
+					"group": "mysql@7"
+				},
+				{
 					"command": "mysql.data.import",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
-					"group": "mysql@6"
+					"group": "mysql@8"
 				},
 				{
 					"command": "mysql.table.show",
@@ -984,6 +994,7 @@
 		"lodash.defaults": "^4.1.0",
 		"mongodb": "^3.6.3",
 		"mysql2": "^2.2.5",
+		"officegen": "^0.6.5",
 		"pg": "^8.5.1",
 		"portfinder": "^1.0.26",
 		"pretty-bytes": "^5.3.0",

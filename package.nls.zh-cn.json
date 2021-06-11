@@ -23,6 +23,7 @@
 	"command.query.switch": "打开查询",
 	"command.data.import": "导入SQL文件",
 	"command.data.export": "导出数据",
+	"command.document.generate": "生成数据库文档",
 	"command.struct.export": "导出表结构",
 	"command.db.active": "修改活动数据库",
 	"command.table.truncate": "清空表",

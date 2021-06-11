@@ -13,6 +13,9 @@ import { Util } from "@/common/util";
 import mysqldump, { Options } from './mysql/main';
 import { Global } from "@/common/global";
 import { SchemaNode } from "@/model/database/schemaNode";
+import { DumpDocument as GenerateDocument } from "./generateDocument";
+import { createWriteStream } from "fs";
+import { ColumnNode } from "@/model/other/columnNode";
 
 export class DumpService {
 
@@ -24,16 +27,16 @@ export class DumpService {
         } else {
             const tableList = await new TableGroup(node).getChildren();
             let childrenList = [...tableList]
-            if(Global.getConfig("showView")){
+            if (Global.getConfig("showView")) {
                 childrenList.push(...(await new ViewGroup(node).getChildren()))
             }
-            if(Global.getConfig("showProcedure")){
+            if (Global.getConfig("showProcedure")) {
                 childrenList.push(...(await new ProcedureGroup(node).getChildren()))
             }
-            if(Global.getConfig("showFunction")){
+            if (Global.getConfig("showFunction")) {
                 childrenList.push(...(await new FunctionGroup(node).getChildren()))
             }
-            if(Global.getConfig("showTrigger")){
+            if (Global.getConfig("showTrigger")) {
                 childrenList.push(...(await new TriggerGroup(node).getChildren()))
             }
             const pickItems = childrenList.filter(item => item.contextValue != ModelType.INFO)
@@ -81,6 +84,68 @@ export class DumpService {
                     }
                 })
             }).finally(done)
+        })
+
+    }
+
+    public async generateDocument(node: Node) {
+
+        const exportSqlName = `${format('yyyy-MM-dd_hhmmss', new Date())}_${node.schema}.docx`;
+
+        vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(exportSqlName), filters: { 'docx': ['docx'] } }).then(async (generatePath) => {
+            if (generatePath) {
+                const nodes = await new TableGroup(node).getChildren();
+                const officegen = require('officegen')
+                var docx = officegen('docx')
+                docx.on('finalize', (written) => {
+                    console.log(
+                        'Finish to create Word file.\nTotal bytes created: ' + written + '\n'
+                    )
+                })
+                docx.on('error', (err) => {
+                    console.log(err)
+                })
+                let data = []
+                for (const tableNode of nodes) {
+                    data.push(...[{
+                        type: 'text',
+                        val: tableNode.label
+                    },
+                    {
+                        type: 'table',
+                        val: [
+                            GenerateDocument.header,
+                            ...(await tableNode.getChildren()).map((child: ColumnNode) => {
+                                const column = child.column;
+                                return [
+                                    child.label, child.type, child.isPrimaryKey, column.nullable,
+                                    column.defaultValue, column.comment
+                                ]
+                            })
+                        ],
+                        opt: GenerateDocument.tableStyle
+                    },
+                    {
+                        type: 'linebreak'
+                    }, {
+                        type: 'linebreak'
+                    }
+                    ])
+                }
+                docx.createByJson(data)
+                var out = createWriteStream(generatePath.fsPath)
+                out.on('error', function (err) {
+                    console.log(err)
+                })
+                out.on("close", () => {
+                    vscode.window.showInformationMessage(`Generate ${node.schema} document success!`, 'open').then(action => {
+                        if (action == 'open') {
+                            vscode.commands.executeCommand('vscode.open', generatePath);
+                        }
+                    })
+                })
+                docx.generate(out)
+            }
         })
 
     }
