@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# 3.8.8 2021-6-11
+
+- Fix date incorrect of sqlserver #199.
+- Prefre using connection name #215.
+- Postgresql query with quote #217.
+- Fix export occur undefined #218.
+
 # 3.8.7 2021-6-8
 
 - Update toolbar style.
