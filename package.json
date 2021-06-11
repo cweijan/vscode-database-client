@@ -887,20 +887,10 @@
 			"type": "object",
 			"title": "%config.title%",
 			"properties": {
-				"database-client.enableDelimiter": {
-					"type": "boolean",
-					"default": false,
-					"description": "%config.enableDelimiter%"
-				},
 				"database-client.defaultSelectLimit": {
 					"type": "integer",
 					"default": 100,
 					"description": "%config.defaultSelectLimit%"
-				},
-				"database-client.showTotal": {
-					"type": "boolean",
-					"default": true,
-					"description": "%config.showTotal%"
 				},
 				"database-client.disableSqlCodeLen": {
 					"type": "boolean",

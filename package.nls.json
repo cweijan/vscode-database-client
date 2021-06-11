@@ -58,7 +58,5 @@
     "command.redis.key.del": "Delete Key",
 	"command.redis.key.detail": "View Key Detail",
 	"config.title":"Database Client",
-	"config.enableDelimiter":"Support delimiter when import sql.",
-	"config.defaultSelectLimit":"Default limit of query sql.",
-	"config.showTotal": "Show total on result view."
+	"config.defaultSelectLimit":"Default limit of query sql."
 }

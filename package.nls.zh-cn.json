@@ -58,7 +58,5 @@
     "command.redis.key.del": "删除键",
 	"command.redis.key.detail": "查看键详情",
 	"config.title":"_数据库配置",
-	"config.enableDelimiter":"导入Sql文件时是否支持delimiter语句.",
-	"config.defaultSelectLimit":"默认的分页大小.",
-	"config.showTotal": "是否在数据视图自动加载表总数."
+	"config.defaultSelectLimit":"默认的分页大小."
 }
