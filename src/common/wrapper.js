@@ -4,13 +4,13 @@
  */
 export function wrapByDb(origin, databaseType) {
     if (origin == null) { return origin; }
+    if (databaseType == 'PostgreSQL') {
+        return origin.split(".").map(text => `"${text}"`).join(".")
+    }
 
     if (origin.match(/\b[-\s]+\b/ig) || origin.match(/^( |if|key|desc|length)$/i)) {
         if (databaseType == 'SqlServer') {
             return origin.split(".").map(text => `[${text}]`).join(".")
-        }
-        if (databaseType == 'PostgreSQL') {
-            return origin.split(".").map(text => `"${text}"`).join(".")
         }
         if (databaseType == 'MongoDB') {
             return origin;
