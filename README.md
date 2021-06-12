@@ -1,7 +1,5 @@
 # Database Client
 
-  
-
 Database Client for Visual Studio Code. It supports databases MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis, and ElasticSearch.
 
 > Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
@@ -65,9 +63,11 @@ Click the history button to open the list of recently executed query history rec
 
 ## Sqlite
 
-If you using Linux that must install sqlite3 first.
+If you using Linux or MacOS that must install sqlite3 first.
 
-- Ubuntu:`sudo apt-get install sqlite`
+- Debian, Ubuntu:`sudo apt-get install sqlite`
+- CentOS, Fedora, RedHat:`sudo yum install sqlite3`
+- MacOS:`brew install sqlite3`
 
 ## Backup/Import
 
