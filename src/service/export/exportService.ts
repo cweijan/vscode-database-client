@@ -80,6 +80,10 @@ export class ExportService {
     }
 
     private exportToJson(context: ExportContext) {
+        for (const row of context.rows)
+            for (const key in row)
+                if (row[key] === undefined)
+                    row[key] = null;
         fs.writeFileSync(context.exportPath, JSON.stringify(context.rows, null, 2));
     }
 
