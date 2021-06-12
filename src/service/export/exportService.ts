@@ -80,11 +80,7 @@ export class ExportService {
     }
 
     private exportToJson(context: ExportContext) {
-        for (const row of context.rows)
-            for (const key in row)
-                if (row[key] === undefined)
-                    row[key] = null;
-        fs.writeFileSync(context.exportPath, JSON.stringify(context.rows, null, 2));
+        fs.writeFileSync(context.exportPath, JSON.stringify(context.rows, (k, v)=> { return v === undefined ? null : v; }, 2));
     }
 
     private exportToSql(exportContext: ExportContext) {
