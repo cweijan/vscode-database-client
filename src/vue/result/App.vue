@@ -63,7 +63,6 @@ export default {
         database: null,
         table: null,
         tableCount: null,
-        pageSize: null,
       },
       page: {
         pageNum: 1,

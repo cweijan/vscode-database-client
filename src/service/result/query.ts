@@ -67,9 +67,16 @@ export class QueryPage {
                 }).on('copy', value => {
                     Util.copyToBoard(value)
                 }).on('count', async (params) => {
-                    dbOption.execute(params.sql.replace(/\bSELECT\b.+?\bFROM\b/i, 'select count(*) count from')).then((rows) => {
-                        handler.emit('COUNT', { data: rows[0].count })
-                    })
+                    if(dbOption.dbType==DatabaseType.MONGO_DB){
+                        const sql=params.sql.replace(/(.+?find\(.+?\)).+/i, '$1').replace("find","count");
+                        dbOption.execute(sql).then((count) => {
+                            handler.emit('COUNT', { data: count })
+                        })
+                    }else{
+                        dbOption.execute(params.sql.replace(/\bSELECT\b.+?\bFROM\b/i, 'select count(*) count from')).then((rows) => {
+                            handler.emit('COUNT', { data: rows[0].count })
+                        })
+                    }
                 }).on('export', (params) => {
                     this.exportService.export({ ...params.option, request: queryParam.res.request, dbOption }).then(() => {
                         handler.emit('EXPORT_DONE')

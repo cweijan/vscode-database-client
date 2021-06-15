@@ -63,8 +63,10 @@ export class MongoConnection extends IConnection {
         } else {
             try {
                 const result = await eval('this.client.' + sql)
-                if (!result) {
+                if (result == null) {
                     callback(null)
+                } else if (Number.isInteger(result)) {
+                    callback(null, result)
                 } else if (result.insertedCount != undefined) {
                     callback(null, { affectedRows: result.insertedCount })
                 } else if (result.updatedCount != undefined) {
