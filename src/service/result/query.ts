@@ -182,15 +182,17 @@ export class QueryPage {
         let tableName = sqlList[0]
         let database: string;
 
+        if (queryParam.connection.dbType == DatabaseType.MSSQL && tableName.indexOf(".") != -1) {
+            tableName = tableName.split(".")[1]
+        }
+
         // mysql直接从结果集拿
         const fields = queryParam.res.fields
         if (fields && fields[0]?.orgTable) {
             tableName = fields[0].orgTable;
             database = fields[0].schema || fields[0].db;
-        }
-
-        if (queryParam.connection.dbType == DatabaseType.MSSQL && tableName.indexOf(".") != -1) {
-            tableName = tableName.split(".")[1]
+        }else{
+            tableName=tableName.replace(/^"?(.+?)"?$/,'$1')
         }
 
         const tableNode = queryParam.connection.getByRegion(tableName)
