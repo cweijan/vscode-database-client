@@ -6,6 +6,8 @@ export class DumpDocument {
         align: 'center',
         // tableSize: 24,
         // tableColor: 'ada',
+        borders: true, 
+        borderSize: 1, 
         tableAlign: 'left',
         tableFontFamily: 'Microsoft YaHei',
         columns: [{ width: 20 }, { width: 20 }, { width: 20 },{ width: 40 },{ width: 20 },{ width: 20 }],
@@ -20,7 +22,7 @@ export class DumpDocument {
                 b: true,
                 sz: 16,
                 shd: {
-                    themeFillTint: '40'
+                    themeFillTint: '25'
                 }
             }
         },
@@ -32,7 +34,7 @@ export class DumpDocument {
                 b: true,
                 sz: 16,
                 shd: {
-                    themeFillTint: '40'
+                    themeFillTint: '25'
                 }
             }
         },
@@ -44,19 +46,19 @@ export class DumpDocument {
                 b: true,
                 sz: 16,
                 shd: {
-                    themeFillTint: '40'
+                    themeFillTint: '25'
                 }
             }
         },
         {
-            val: 'Primary Key',
+            val: 'PK',
             opts: {
-                // cellColWidth: 40,
+                cellColWidth: 400,
                 align: 'center',
                 b: true,
                 sz: 16,
                 shd: {
-                    themeFillTint: '40'
+                    themeFillTint: '25'
                 }
             }
         },
@@ -69,7 +71,7 @@ export class DumpDocument {
                 b: true,
                 sz: 16,
                 shd: {
-                    themeFillTint: '40'
+                    themeFillTint: '25'
                 }
             }
         },
@@ -81,7 +83,7 @@ export class DumpDocument {
                 b: true,
                 sz: 16,
                 shd: {
-                    themeFillTint: '40'
+                    themeFillTint: '25'
                 }
             }
         },
