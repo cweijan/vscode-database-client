@@ -8,4 +8,8 @@ export class MongoPageService extends AbstractPageSerivce{
         return sql.replace(/(\.find.+?\))/,`$1.skip(${start})`);
     }
 
+    protected pageMatch() {
+        return /limit\((\d+)\)/i;
+    }
+
 }
