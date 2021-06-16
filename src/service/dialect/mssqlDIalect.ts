@@ -123,7 +123,7 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         TABLE_NAME 'name',ds.row_count rows
       FROM
         INFORMATION_SCHEMA.TABLES t
-        join sys.dm_db_partition_stats ds on ds.object_id = object_id(concat(t.TABLE_SCHEMA, '.', t.TABLE_NAME))
+        join sys.dm_db_partition_stats ds on ds.object_id = object_id(t.TABLE_SCHEMA+ '.'+ t.TABLE_NAME)
         and ds.index_id IN (0, 1)
       WHERE
         TABLE_TYPE = 'BASE TABLE'
