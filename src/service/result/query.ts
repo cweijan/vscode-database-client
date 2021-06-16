@@ -67,9 +67,16 @@ export class QueryPage {
                 }).on('copy', value => {
                     Util.copyToBoard(value)
                 }).on('count', async (params) => {
-                    dbOption.execute(params.sql.replace(/\bSELECT\b.+?\bFROM\b/i, 'select count(*) count from')).then((rows) => {
-                        handler.emit('COUNT', { data: rows[0].count })
-                    })
+                    if(dbOption.dbType==DatabaseType.MONGO_DB){
+                        const sql=params.sql.replace(/(.+?find\(.+?\)).+/i, '$1').replace("find","count");
+                        dbOption.execute(sql).then((count) => {
+                            handler.emit('COUNT', { data: count })
+                        })
+                    }else{
+                        dbOption.execute(params.sql.replace(/\bSELECT\b.+?\bFROM\b/i, 'select count(*) count from')).then((rows) => {
+                            handler.emit('COUNT', { data: rows[0].count })
+                        })
+                    }
                 }).on('export', (params) => {
                     this.exportService.export({ ...params.option, request: queryParam.res.request, dbOption }).then(() => {
                         handler.emit('EXPORT_DONE')
@@ -175,15 +182,17 @@ export class QueryPage {
         let tableName = sqlList[0]
         let database: string;
 
+        if (queryParam.connection.dbType == DatabaseType.MSSQL && tableName.indexOf(".") != -1) {
+            tableName = tableName.split(".")[1]
+        }
+
         // mysql直接从结果集拿
         const fields = queryParam.res.fields
         if (fields && fields[0]?.orgTable) {
             tableName = fields[0].orgTable;
             database = fields[0].schema || fields[0].db;
-        }
-
-        if (queryParam.connection.dbType == DatabaseType.MSSQL && tableName.indexOf(".") != -1) {
-            tableName = tableName.split(".")[1]
+        }else{
+            tableName=tableName.replace(/^"?(.+?)"?$/,'$1')
         }
 
         const tableNode = queryParam.connection.getByRegion(tableName)

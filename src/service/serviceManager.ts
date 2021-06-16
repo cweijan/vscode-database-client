@@ -35,6 +35,7 @@ import { MysqlSettingService } from "./setting/MysqlSettingService";
 import { SettingService } from "./setting/settingService";
 import ConnectionProvider from "@/model/ssh/connectionProvider";
 import { SqliTeDialect } from "./dialect/sqliteDialect";
+import { MongoPageService } from "./page/mongoPageService";
 
 export class ServiceManager {
 
@@ -146,6 +147,8 @@ export class ServiceManager {
                 return new MssqlPageService();
             case DatabaseType.PG:
                 return new PostgreSqlPageService();
+            case DatabaseType.MONGO_DB:
+                return new MongoPageService();
             case DatabaseType.ES:
                 return new EsPageService();
         }

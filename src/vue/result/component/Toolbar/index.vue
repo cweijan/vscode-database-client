@@ -12,7 +12,7 @@
       Cost: {{costTime}}ms
     </div>
     <div style="display:inline-block">
-      <el-pagination @size-change="changePageSize" @current-change="page=>$emit('changePage',page,true)" @next-click="()=>$emit('changePage',1)" @prev-click="()=>$emit('changePage',-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize" :page-sizes="[100,30,50,300,500]" :layout="page.total!=null?'prev,pager, next, total':'sizes,prev, next'" :total="page.total">
+      <el-pagination @size-change="changePageSize" @current-change="page=>$emit('changePage',page,true)" @next-click="()=>$emit('changePage',1)" @prev-click="()=>$emit('changePage',-1)" :current-page.sync="page.pageNum" :small="true" :page-size="page.pageSize"  :layout="page.total!=null?'prev,pager, next, total':'prev, next'" :total="page.total">
       </el-pagination>
     </div>
   </div>
