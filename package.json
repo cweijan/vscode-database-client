@@ -903,10 +903,10 @@
 					"default": 100,
 					"description": "%config.defaultSelectLimit%"
 				},
-				"database-client.prefreConnectionName": {
+				"database-client.preferConnectionName": {
 					"type": "boolean",
 					"default": true,
-					"description": "%config.prefreConnectionName%"
+					"description": "%config.preferConnectionName%"
 				},
 				"database-client.disableSqlCodeLen": {
 					"type": "boolean",
