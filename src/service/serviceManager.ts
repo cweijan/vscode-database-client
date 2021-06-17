@@ -36,6 +36,7 @@ import { SettingService } from "./setting/settingService";
 import ConnectionProvider from "@/model/ssh/connectionProvider";
 import { SqliTeDialect } from "./dialect/sqliteDialect";
 import { MongoPageService } from "./page/mongoPageService";
+import { HistoryProvider } from "@/provider/history/historyProvider";
 
 export class ServiceManager {
 
@@ -71,6 +72,7 @@ export class ServiceManager {
         this.initMysqlService();
         res.push(this.initTreeView())
         res.push(this.initTreeProvider())
+        // res.push(vscode.window.createTreeView("github.cweijan.history",{treeDataProvider:new HistoryProvider(this.context)}))
         ServiceManager.instance = this;
         this.isInit = true
         return res

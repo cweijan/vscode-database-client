@@ -1,3 +1,5 @@
+import { HistoryNode } from "@/provider/history/historyNode";
+import { HistoryProvider } from "@/provider/history/historyProvider";
 import { TextEditor, Selection } from "vscode";
 import { FileManager } from "../../common/filesManager";
 export class HistoryRecorder {
@@ -17,6 +19,7 @@ export class HistoryRecorder {
         if (!sql || sql==this.preSql) { return; }
         this.preSql=sql;
         FileManager.record('history.sql', `/* ${this.getNowDate()} [${costTime} ms] */ ${sql.replace(/[\r\n]/g, " ")}\n`);
+        HistoryProvider.recordHistory(new HistoryNode(sql,this.getNowDate(),costTime))
     }
 
     private getNowDate(): string {

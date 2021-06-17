@@ -15,10 +15,14 @@ export class Pattern {
 }
 
 export enum CacheKey {
+    // sql
     ConectionsKey = "mysql.connections",
     CollapseSate = "mysql.database.cache.collapseState",
+    // nosql
     NOSQL_CONNECTION = "redis.connections",
     COLLAPSE_SATE = "redis.cache.collapseState",
+    // history
+    GLOBAL_HISTORY="sql.history"
 }
 
 export enum ConfigKey {

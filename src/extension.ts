@@ -38,6 +38,7 @@ import { DatabaseCache } from "./service/common/databaseCache";
 import { FileNode } from "./model/ssh/fileNode";
 import { SSHConnectionNode } from "./model/ssh/sshConnectionNode";
 import { FTPFileNode } from "./model/ftp/ftpFileNode";
+import { HistoryNode } from "./provider/history/historyNode";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -176,6 +177,12 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.user.sql": (userNode: UserNode) => {
                     userNode.selectSqlTemplate();
                 },
+            },
+            // history
+            ...{
+                "mysql.history.view":(historyNode:HistoryNode)=>{
+                    historyNode.view()
+                }
             },
             // query node
             ...{
