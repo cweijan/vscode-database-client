@@ -1,4 +1,5 @@
-import { ThemeIcon } from "vscode";
+import { Util } from "@/common/util";
+import { ThemeColor, ThemeIcon } from "vscode";
 import { ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
@@ -13,6 +14,9 @@ export class TriggerGroup extends Node {
     constructor(readonly parent: Node) {
         super("Trigger")
         this.init(parent)
+        if(Util.supportColorIcon){
+            this.iconPath=new ThemeIcon("zap",new ThemeColor("terminal.ansiYellow"))
+        }
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
