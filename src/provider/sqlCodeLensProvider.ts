@@ -15,30 +15,49 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
 
     public parseCodeLens(document: vscode.TextDocument): vscode.ProviderResult<vscode.CodeLens[]> {
 
-        if(Global.getConfig<number>(ConfigKey.DISABLE_SQL_CODELEN)){
+        if (Global.getConfig<number>(ConfigKey.DISABLE_SQL_CODELEN)) {
             return []
         }
 
-        const delimter=this.getDelimter();
+        const delimter = this.getDelimter();
 
         const codeLens = []
 
         let start: vscode.Position;
         let end: vscode.Position;
         let sql: string = "";
+        let inBlockComment = false;
         const lineCount = Math.min(document.lineCount, 3000);
         for (var i = 0; i < lineCount; i++) {
+            let col = 0;
             var line = document.lineAt(i)
-            var text = line.text?.replace(/(--|#).+/,'');
-            sql = sql +"\n"+ text;
+            var text = line.text?.replace(/(--|#).+/, '');
+            if (inBlockComment) {
+                const blockEndMatch = text.match(/.*?(\*\/)/)
+                if (!blockEndMatch) {
+                    continue;
+                }
+                inBlockComment = false;
+                text = text.replace(/.*?(\*\/)/, '')
+                col = blockEndMatch[0].length
+            } else {
+                const blockComment = text.match(/(\/\*).*?(\*\/)?/)
+                inBlockComment = blockComment && blockComment[2] == null;
+                if (inBlockComment) {
+                    continue;
+                }
+            }
+
+            if (text == '') continue;
+            sql = sql + "\n" + text;
 
             if (text?.trim() && !start) {
-                start = new vscode.Position(i, 0)
+                start = new vscode.Position(i, col)
             }
 
             let sep = text.indexOf(delimter)
             if (start && (lineCount - 1 == i)) {
-                sep=text.length;
+                sep = text.length;
             }
             if (sep != -1) {
                 end = new vscode.Position(i, sep)
@@ -48,7 +67,7 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
                     arguments: [sql],
                 }));
                 start = null;
-                sql = text.substr(sep+delimter.length)
+                sql = text.substr(sep + delimter.length)
                 continue;
             }
         }
@@ -58,9 +77,9 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
     }
     private getDelimter() {
 
-        const node=ConnectionManager.tryGetConnection()
-        if(node){
-            return DelimiterHolder.get(node.getConnectId()).replace(/\\/g,'')
+        const node = ConnectionManager.tryGetConnection()
+        if (node) {
+            return DelimiterHolder.get(node.getConnectId()).replace(/\\/g, '')
         }
         return ";";
     }
