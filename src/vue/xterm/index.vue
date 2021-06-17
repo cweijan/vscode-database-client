@@ -52,7 +52,8 @@
                     }
                 }))
 
-                terminal.open(document.getElementById('terminal-container'))
+                const container=document.getElementById('terminal-container');
+                terminal.open(container)
                 fitAddon.fit()
                 terminal.focus()
                 terminal.onData((data) => {
@@ -78,14 +79,15 @@
                     }
                 });
 
-                window.addEventListener("contextmenu", async () => {
+                container.oncontextmenu=async (event)=>{
+                    event.stopPropagation()
                     if (terminal.hasSelection()) {
                         document.execCommand('copy')
                         terminal.clearSelection()
                     } else {
                         this.emit('data', await navigator.clipboard.readText())
                     }
-                })
+                }
 
                 const status = document.getElementById('status')
                 this

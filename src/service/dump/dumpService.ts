@@ -118,7 +118,7 @@ export class DumpService {
                             ...(await tableNode.getChildren()).map((child: ColumnNode) => {
                                 const column = child.column;
                                 return [
-                                    child.label, child.type, column.comment, child.isPrimaryKey, column.nullable,
+                                    child.label, child.type, column.comment, child.isPrimaryKey?'YES':'', column.nullable,
                                     column.defaultValue
                                 ]
                             })

@@ -112,6 +112,7 @@ export class QueryPage {
                 }  else {
                     await this.loadColumnList(queryParam);
                 }
+                ((queryParam.res)as DataResponse).pageSize=ServiceManager.getPageService(queryParam.connection.dbType).getPageSize(queryParam.res.sql)
                 break;
             case MessageType.MESSAGE_BLOCK:
                 queryParam.res.message = `EXECUTE SUCCESS:<br><br>&nbsp;&nbsp;${queryParam.res.sql}`;
@@ -191,6 +192,7 @@ export class QueryPage {
         if (fields && fields[0]?.orgTable) {
             tableName = fields[0].orgTable;
             database = fields[0].schema || fields[0].db;
+            queryParam.res.database = database;
         }else{
             tableName=tableName.replace(/^"?(.+?)"?$/,'$1')
         }
@@ -216,7 +218,6 @@ export class QueryPage {
         }
         queryParam.res.tableCount = sqlList.length;
         queryParam.res.table = tableName;
-        queryParam.res.database = database;
     }
 
 }

@@ -34,7 +34,7 @@ module.exports = [
             }
         },
         plugins: [
-            new webpack.IgnorePlugin(/^(pg-native|supports-color|cardinal|encoding)$/),
+            new webpack.IgnorePlugin(/^(pg-native|supports-color|cardinal|encoding|aws4)$/),
             new CopyWebpackPlugin({
                 patterns: [{ from: 'src/bin', to: './bin' }]
             }),

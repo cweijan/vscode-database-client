@@ -104,7 +104,7 @@ export class QueryUnit {
                     const isSqliteEmptyQuery = fields.length == 0 && sql.match(/\bselect\b/i);
                     const isMongoEmptyQuery = fields.length == 0 && sql.match(/\.collection\b/i);
                     if (isQuery || isSqliteEmptyQuery || isMongoEmptyQuery) {
-                        QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+                        QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total} as DataResponse });
                         return;
                     }
                 }
@@ -115,7 +115,7 @@ export class QueryUnit {
                     if (data.length > 2 && Util.is(lastEle, 'ResultSetHeader') && Util.is(data[0], 'TextRow')) {
                         data = data[data.length - 2]
                         fields = fields[fields.length - 2] as any as FieldInfo[]
-                        QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total, pageSize: Global.getConfig(ConfigKey.DEFAULT_LIMIT) } as DataResponse });
+                        QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total} as DataResponse });
                         return;
                     }
                 }

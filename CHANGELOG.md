@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 3.8.9 2021-6-16
+
+- Add shortcut of run sql on result view(ctrl+enter).
+- Support generate database document.
+- Fix bugs.
+
 # 3.8.8 2021-6-11
 
 - Fix date incorrect of sqlserver #199.
