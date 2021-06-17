@@ -18,7 +18,7 @@
       <el-form :inline='true'>
         <el-form-item label="Column">
           <el-select v-model="index.column">
-            <el-option :label="column.name" :value="column.name" v-for="column in designData.columnList"></el-option>
+            <el-option :label="column.name" :value="column.name" :key="column.name" v-for="column in designData.columnList"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="Index Type">
