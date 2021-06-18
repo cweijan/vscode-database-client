@@ -33,8 +33,8 @@ export class ConnectionNode extends Node implements CopyAble {
         this.cacheSelf()
         if (parent.name) {
             this.name = parent.name
-            const prefreName = Global.getConfig(ConfigKey.PREFRE_CONNECTION_NAME, true)
-            prefreName ? this.label = parent.name : this.description = parent.name;
+            const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true)
+            preferName ? this.label = parent.name : this.description = parent.name;
         }
         // https://www.iloveimg.com/zh-cn/resize-image/resize-svg
         if (this.dbType == DatabaseType.PG) {

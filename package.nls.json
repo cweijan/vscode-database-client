@@ -59,6 +59,6 @@
     "command.redis.key.del": "Delete Key",
 	"command.redis.key.detail": "View Key Detail",
 	"config.title":"Database Client",
-	"config.prefreConnectionName":"Using connection name as connection node name",
+	"config.preferConnectionName":"Using connection name as connection node name",
 	"config.defaultSelectLimit":"Default limit of query sql."
 }
