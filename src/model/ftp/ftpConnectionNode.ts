@@ -1,5 +1,6 @@
-import { CodeCommand, Constants, ModelType } from "@/common/constants";
+import { CodeCommand, ConfigKey, Constants, ModelType } from "@/common/constants";
 import { FileManager, FileModel } from "@/common/filesManager";
+import { Global } from "@/common/global";
 import { Util } from "@/common/util";
 import * as Client from '@/model/ftp/lib/connection';
 import * as path from "path";
@@ -19,20 +20,26 @@ export class FTPConnectionNode extends FtpBaseNode {
         this.contextValue = this.file ? ModelType.FTP_FOLDER : ModelType.FTP_CONNECTION;
         this.init(parent)
         if (this.file) {
-            this.iconPath =  new vscode.ThemeIcon("folder");
+            this.iconPath = new vscode.ThemeIcon("folder");
         } else {
             this.iconPath = new vscode.ThemeIcon("server");
         }
+        if (this.contextValue == ModelType.FTP_CONNECTION) {
+            this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
+            if (parent.name) {
+                this.name = parent.name
+                const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true)
+                preferName ? this.label = parent.name : this.description = parent.name;
+            }
+        } else {
+            this.fullPath = (parent as FTPConnectionNode).fullPath + key + "/"
+        }
+
         if (this.disable) {
             this.collapsibleState = TreeItemCollapsibleState.None;
-            this.description=(this.description||'')+" closed"
+            this.description = (this.description || '') + " closed"
         }
-        if (file) {
-            this.fullPath = (parent as FTPConnectionNode).fullPath + key + "/"
-        } else {
-            this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
-            this.description = this.name
-        }
+
     }
 
     public async deleteConnection(context: vscode.ExtensionContext) {

@@ -1,3 +1,4 @@
+import { Global } from "@/common/global";
 import { Util } from "@/common/util";
 import { QueryGroup } from "@/model/query/queryGroup";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
@@ -5,7 +6,7 @@ import { QueryUnit } from "@/service/queryUnit";
 import * as compareVersions from 'compare-versions';
 import * as path from "path";
 import { ExtensionContext, ThemeIcon, TreeItemCollapsibleState } from "vscode";
-import { Constants, ModelType } from "../../../common/constants";
+import { ConfigKey, Constants, ModelType } from "../../../common/constants";
 import { ConnectionManager } from "../../../service/connectionManager";
 import { CommandKey, Node } from "../../interface/node";
 import { EsIndexGroup } from "./esIndexGroupNode";
@@ -27,6 +28,12 @@ export class EsConnectionNode extends Node {
             this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}`;
         }else{
             this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
+        }
+
+        if (parent.name) {
+            this.name = parent.name
+            const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true)
+            preferName ? this.label = parent.name : this.description = parent.name;
         }
         
         this.cacheSelf()

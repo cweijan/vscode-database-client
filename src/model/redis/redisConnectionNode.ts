@@ -1,4 +1,5 @@
-import { Constants, ModelType } from "@/common/constants";
+import { ConfigKey, Constants, ModelType } from "@/common/constants";
+import { Global } from "@/common/global";
 import { Util } from "@/common/util";
 import { ViewManager } from "@/common/viewManager";
 import { CommandKey, Node } from "@/model/interface/node";
@@ -18,11 +19,12 @@ export class RedisConnectionNode extends RedisBaseNode {
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
         this.init(parent)
-        if (parent.name) {
-            this.description = parent.name
-            this.name = parent.name
-        }
         this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
+        if ( parent.name) {
+            this.name = parent.name
+            const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true)
+            preferName ? this.label = parent.name : this.description = parent.name;
+        }
         if (this.disable) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None;
             this.description = (this.description||'') + " closed"

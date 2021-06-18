@@ -1,4 +1,4 @@
-import { CodeCommand, Constants, ModelType } from "@/common/constants";
+import { CodeCommand, ConfigKey, Constants, ModelType } from "@/common/constants";
 import { FileManager, FileModel } from "@/common/filesManager";
 import { Util } from "@/common/util";
 import { ClientManager } from "@/service/ssh/clientManager";
@@ -15,6 +15,7 @@ import { InfoNode } from "../other/infoNode";
 import { FileNode } from "./fileNode";
 import { LinkNode } from "./linkNode";
 import prettyBytes = require("pretty-bytes");
+import { Global } from "@/common/global";
 var progressStream = require('progress-stream');
 
 export class SSHConnectionNode extends Node {
@@ -31,10 +32,14 @@ export class SSHConnectionNode extends Node {
             this.contextValue = ModelType.SSH_CONNECTION;
             this.iconPath = new vscode.ThemeIcon("remote");
             this.label = `${sshConfig.username}@${sshConfig.host}`
-            this.description = this.name
         } else {
             this.contextValue = ModelType.FOLDER;
             this.iconPath = new vscode.ThemeIcon("folder")
+        }
+        if (this.contextValue == ModelType.SSH_CONNECTION && parent.name) {
+            this.name = parent.name
+            const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true)
+            preferName ? this.label = parent.name : this.description = parent.name;
         }
         if (file && file.filename.toLocaleLowerCase() == "home") {
             this.iconPath = path.join(Constants.RES_PATH, "ssh/folder-core.svg");
@@ -177,7 +182,7 @@ export class SSHConnectionNode extends Node {
             if (child instanceof FileNode) {
                 child.downloadByPath(childPath)
             } else if (child instanceof SSHConnectionNode) {
-                if(!existsSync(childPath)){
+                if (!existsSync(childPath)) {
                     mkdirSync(childPath)
                 }
                 child.downloadByPath(childPath)
