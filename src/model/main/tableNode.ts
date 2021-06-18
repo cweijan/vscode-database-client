@@ -24,7 +24,7 @@ export class TableNode extends Node implements CopyAble {
         this.table = meta.name
         this.description = `${meta.comment || ''} ${(meta.rows!=null) ? `Rows ${meta.rows}` : ''}`
         if(Util.supportColorIcon){
-            this.iconPath=new vscode.ThemeIcon("split-horizontal",new vscode.ThemeColor("terminal.ansiGreen"))
+            // this.iconPath=new vscode.ThemeIcon("split-horizontal",new vscode.ThemeColor("problemsWarningIcon.foreground"))
         }
         this.init(parent)
         this.tooltip = this.getToolTipe(meta)

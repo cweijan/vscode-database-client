@@ -35,8 +35,8 @@ export class SchemaNode extends Node implements CopyAble {
     private getIcon(active?: boolean): vscode.ThemeIcon {
 
         const iconId = this.dbType == DatabaseType.MYSQL ? "database" : "symbol-struct"
-        if (active && Util.supportColorIcon()) {
-            return new vscode.ThemeIcon(iconId, new vscode.ThemeColor('charts.blue'));
+        if(Util.supportColorIcon()){
+            return new vscode.ThemeIcon(iconId, new vscode.ThemeColor(active?'charts.blue':'dropdown.foreground'));
         }
         return new vscode.ThemeIcon(iconId);
     }
