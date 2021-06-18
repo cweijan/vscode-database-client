@@ -24,7 +24,7 @@ export class ConnectService {
             }
         }
         ViewManager.createWebviewPanel({
-            path: "app", title: "connect",
+            path: "app", title: connectionNode?"edit":"connect",
             splitView: false, iconPath: Global.getExtPath("resources", "icon", "connection.svg"),
             eventHandler: (handler) => {
                 handler.on("init", () => {
