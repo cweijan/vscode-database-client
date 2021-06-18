@@ -19,7 +19,8 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     public readonly onDidChangeTreeData: vscode.Event<Node> = this._onDidChangeTreeData.event;
     public static instances: DbTreeDataProvider[] = []
 
-    constructor(protected context: vscode.ExtensionContext, public readonly connectionKey: string) {
+    constructor(protected context: vscode.ExtensionContext, public connectionKey: string) {
+        this.connectionKey+=vscode.env.remoteName||""
         DbTreeDataProvider.instances.push(this)
     }
 
@@ -87,9 +88,9 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     private getKeyByNode(connectionNode: Node): string {
         const dbType = connectionNode.dbType;
         if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS || dbType == DatabaseType.SSH || dbType == DatabaseType.FTP || dbType == DatabaseType.MONGO_DB) {
-            return CacheKey.NOSQL_CONNECTION;
+            return CacheKey.NOSQL_CONNECTION+(vscode.env.remoteName||"");
         }
-        return CacheKey.ConectionsKey;
+        return CacheKey.ConectionsKey+(vscode.env.remoteName||"");
     }
 
 
