@@ -36,6 +36,7 @@ export class ClientManager {
                 }
                 
             }).on('error', (err) => {
+                this.activeClient[key] = null
                 vscode.window.showErrorMessage(err.message)
                 reject(err)
             }).on('end', () => {
