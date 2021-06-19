@@ -61,14 +61,6 @@ Click the history button to open the list of recently executed query history rec
 
 ![history](images/history.jpg)
 
-## Sqlite
-
-If you using Linux or MacOS that must install sqlite3 first.
-
-- Debian, Ubuntu:`sudo apt-get install sqlite`
-- CentOS, Fedora, RedHat:`sudo yum install sqlite3`
-- MacOS:`brew install sqlite3`
-
 ## Backup/Import
 
 Move to ant DatabaseNode or TableNode. The export/import options are listed in the context menu (right click to open).
