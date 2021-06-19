@@ -39,15 +39,20 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
                 return;
             }
             try {
-                const mark = setTimeout(() => {
+                let mark = setTimeout(() => {
                     res([new InfoNode(`Connect time out!`)])
+                    mark=null;
                 }, element.connectTimeout || 5000);
                 const children = await element.getChildren();
-                clearTimeout(mark)
-                for (const child of children) {
-                    child.parent = element;
+                if(mark){
+                    clearTimeout(mark)
+                    for (const child of children) {
+                        child.parent = element;
+                    }
+                    res(children);
+                }else{
+                    this.reload(element)
                 }
-                res(children);
             } catch (error) {
                 res([new InfoNode(error)])
             }
