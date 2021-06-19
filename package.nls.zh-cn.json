@@ -11,6 +11,7 @@
 	"command.diagram.drop": "删除实体图",
 	"command.connection.add": "连接数据库",
 	"command.connection.edit": "编辑数据库连接",
+	"command.connection.config": "编辑数据库连接配置",
 	"command.connection.disable": "关闭连接",
 	"command.struct.diff": "数据库结构同步",
 	"command.server.info": "数据库状态",

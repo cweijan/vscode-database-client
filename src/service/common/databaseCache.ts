@@ -51,10 +51,10 @@ export class DatabaseCache {
 
         if (element.global === false) {
             this.workspaceCollpaseState[element.uid] = collapseState;
-            this.context.workspaceState.update(CacheKey.CollapseSate, this.globalCollpaseState);
+            this.context.workspaceState.update(CacheKey.DATABASE_SATE, this.globalCollpaseState);
         } else {
             this.globalCollpaseState[element.uid] = collapseState;
-            this.context.globalState.update(CacheKey.CollapseSate, this.globalCollpaseState);
+            this.context.globalState.update(CacheKey.DATABASE_SATE, this.globalCollpaseState);
         }
 
     }
@@ -65,8 +65,8 @@ export class DatabaseCache {
      */
     public static initCache(context: ExtensionContext) {
         this.context = context;
-        this.globalCollpaseState = this.context.globalState.get(CacheKey.CollapseSate, {});
-        this.workspaceCollpaseState = this.context.workspaceState.get(CacheKey.CollapseSate, {});
+        this.globalCollpaseState = this.context.globalState.get(CacheKey.DATABASE_SATE, {});
+        this.workspaceCollpaseState = this.context.workspaceState.get(CacheKey.DATABASE_SATE, {});
     }
 
     public static clearCache() {

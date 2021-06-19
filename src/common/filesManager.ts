@@ -45,6 +45,9 @@ export class FileManager {
         });
     }
 
+    public static getPath(fileName:string){
+        return `${this.storagePath}/${fileName}`;
+    }
 
 
     private static check(checkPath: string) {

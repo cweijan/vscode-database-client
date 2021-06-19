@@ -20,6 +20,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     public static instances: DbTreeDataProvider[] = []
 
     constructor(protected context: vscode.ExtensionContext, public connectionKey: string) {
+        // TODO remote key
         this.connectionKey += vscode.env.remoteName || ""
         DbTreeDataProvider.instances.push(this)
     }
@@ -91,11 +92,12 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     }
 
     private getKeyByNode(connectionNode: Node): string {
+        // TODO remote key
         const dbType = connectionNode.dbType;
         if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS || dbType == DatabaseType.SSH || dbType == DatabaseType.FTP || dbType == DatabaseType.MONGO_DB) {
             return CacheKey.NOSQL_CONNECTION + (vscode.env.remoteName || "");
         }
-        return CacheKey.ConectionsKey + (vscode.env.remoteName || "");
+        return CacheKey.DATBASE_CONECTIONS + (vscode.env.remoteName || "");
     }
 
 

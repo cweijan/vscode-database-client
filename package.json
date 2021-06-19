@@ -158,6 +158,12 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.connection.config",
+				"title": "%command.connection.config%",
+				"icon": "$(gear)",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.connection.disable",
 				"title": "%command.connection.disable%",
 				"category": "MySQL"
@@ -511,8 +517,13 @@
 					"group": "navigation@-2"
 				},
 				{
+					"command": "mysql.connection.config",
+					"when": "view == github.cweijan.mysql",
+					"group": "navigation@-3"
+				},
+				{
 					"command": "mysql.util.github",
-					"when": "view =~ /cweijan.+?ql/",
+					"when": "view == github.cweijan.nosql",
 					"group": "navigation@-3"
 				}
 			],

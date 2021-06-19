@@ -39,13 +39,13 @@ import { FileNode } from "./model/ssh/fileNode";
 import { SSHConnectionNode } from "./model/ssh/sshConnectionNode";
 import { FTPFileNode } from "./model/ftp/ftpFileNode";
 import { HistoryNode } from "./provider/history/historyNode";
+import { ConnectService } from "./service/connect/connectService";
 
 export function activate(context: vscode.ExtensionContext) {
 
     const serviceManager = new ServiceManager(context)
 
     activeEs(context)
-
 
     ConnectionNode.init()
     context.subscriptions.push(
@@ -56,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
                 ConnectionManager.changeActive(fileNode)
             }
         }),
-
+        ConnectService.listenConfig(),
         ...initCommand({
             // util
             ...{
@@ -89,6 +89,9 @@ export function activate(context: vscode.ExtensionContext) {
                 },
                 "mysql.connection.edit": (connectionNode: ConnectionNode) => {
                     serviceManager.connectService.openConnect(connectionNode.provider, connectionNode)
+                },
+                "mysql.connection.config": () => {
+                    serviceManager.connectService.openConfig()
                 },
                 "mysql.connection.open": (connectionNode: ConnectionNode) => {
                     connectionNode.provider.openConnection(connectionNode)

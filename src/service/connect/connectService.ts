@@ -1,8 +1,9 @@
-import { DatabaseType } from "@/common/constants";
+import { CacheKey, CodeCommand, DatabaseType } from "@/common/constants";
+import { FileManager, FileModel } from "@/common/filesManager";
 import { ConnectionManager } from "@/service/connectionManager";
-import * as os from "os";
+import { resolve } from "path";
 import { platform } from "os";
-import { window } from "vscode";
+import { commands, Disposable, window, workspace } from "vscode";
 import { Global } from "../../common/global";
 import { Util } from "../../common/util";
 import { ViewManager } from "../../common/viewManager";
@@ -11,6 +12,8 @@ import { Node } from "../../model/interface/node";
 import { NodeUtil } from "../../model/nodeUtil";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ClientManager } from "../ssh/clientManager";
+import { ConnnetionConfig } from "./config/connnetionConfig";
+import { readFileSync } from "fs";
 var commandExistsSync = require('command-exists').sync;
 
 export class ConnectService {
@@ -26,7 +29,7 @@ export class ConnectService {
                 }
             }
         }
-        let plat:string = platform();
+        let plat: string = platform();
         ViewManager.createWebviewPanel({
             path: "app", title: connectionNode ? "edit" : "connect",
             splitView: false, iconPath: Global.getExtPath("resources", "icon", "connection.svg"),
@@ -52,7 +55,7 @@ export class ConnectService {
                                 command = `sudo apt -y install sqlite`;
                             } else if (commandExistsSync("yum")) {
                                 command = `sudo yum -y install sqlite3`;
-                            } else if (commandExistsSync("dnf")) { 
+                            } else if (commandExistsSync("dnf")) {
                                 command = `sudo dnf install sqlite` // Fedora
                             } else {
                                 command = `sudo pkg install -y sqlite3` // freebsd
@@ -98,6 +101,83 @@ export class ConnectService {
         }
         ConnectionManager.removeConnection(connectionNode.getConnectId())
         await ConnectionManager.getConnection(connectionNode)
+    }
+
+    static listenConfig(): Disposable {
+        const configPath = resolve(FileManager.getPath("config.json"))
+        return workspace.onDidSaveTextDocument(e => {
+            const changePath = resolve(e.uri.fsPath);
+            if (changePath == configPath) {
+                this.saveConfig(configPath)
+            }
+        });
+    }
+
+    private  static async saveConfig(path: string) {
+        const configContent = readFileSync(path, { encoding: 'utf8' })
+        try {
+            const connectonConfig: ConnnetionConfig = JSON.parse(configContent)
+            await Global.context.globalState.update(CacheKey.DATBASE_CONECTIONS,connectonConfig.database.global);
+            await Global.context.workspaceState.update(CacheKey.DATBASE_CONECTIONS,connectonConfig.database.workspace);
+            await Global.context.globalState.update(CacheKey.NOSQL_CONNECTION,connectonConfig.nosql.global);
+            await Global.context.workspaceState.update(CacheKey.NOSQL_CONNECTION,connectonConfig.nosql.workspace);
+            DbTreeDataProvider.refresh();
+        } catch (error) {
+            window.showErrorMessage("Parse connect config fail!")
+        }
+    }
+
+    public openConfig() {
+
+        // TODO remote suffix
+
+        const connectonConfig: ConnnetionConfig = {
+            database: {
+                global: Global.context.globalState.get(CacheKey.DATBASE_CONECTIONS),
+                workspace: Global.context.workspaceState.get(CacheKey.DATBASE_CONECTIONS),
+            },
+            nosql: {
+                global: Global.context.globalState.get(CacheKey.NOSQL_CONNECTION),
+                workspace: Global.context.workspaceState.get(CacheKey.NOSQL_CONNECTION),
+            }
+        };
+
+        FileManager.record("config.json", JSON.stringify(connectonConfig, this.trim, 2), FileModel.WRITE).then(filePath => {
+            FileManager.show(filePath)
+        })
+
+    }
+
+    public trim(key: string, value: any): any {
+        switch (key) {
+            case "iconPath":
+            case "contextValue":
+            case "parent":
+            case "key":
+            case "label":
+            case "id":
+            case "resourceUri":
+            case "pattern":
+            case "level":
+            case "tooltip":
+            case "descriptionz":
+            case "collapsibleState":
+            case "terminalService":
+            case "forwardService":
+            case "file":
+            case "parentName":
+            case "connectionKey":
+            case "sshConfig":
+            case "fullPath":
+            case "uid":
+            case "command":
+            case "dialect":
+            case "provider":
+            case "context":
+            case "isGlobal":
+                return undefined;
+        }
+        return value;
     }
 
 }
