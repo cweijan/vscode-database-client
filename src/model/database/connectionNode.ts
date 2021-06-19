@@ -114,7 +114,7 @@ export class ConnectionNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        await FileManager.show(`${new Date().getTime()}.sql`);
+        await FileManager.show(`${this.label}.sql`);
         let childMap = {};
         const dbNameList = (await this.getChildren()).filter((databaseNode) => (databaseNode instanceof SchemaNode || databaseNode instanceof CatalogNode)).map((databaseNode) => {
             childMap[databaseNode.uid] = databaseNode

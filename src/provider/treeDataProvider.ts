@@ -20,7 +20,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     public static instances: DbTreeDataProvider[] = []
 
     constructor(protected context: vscode.ExtensionContext, public connectionKey: string) {
-        this.connectionKey+=vscode.env.remoteName||""
+        this.connectionKey += vscode.env.remoteName || ""
         DbTreeDataProvider.instances.push(this)
     }
 
@@ -41,16 +41,16 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
             try {
                 let mark = setTimeout(() => {
                     res([new InfoNode(`Connect time out!`)])
-                    mark=null;
+                    mark = null;
                 }, element.connectTimeout || 5000);
                 const children = await element.getChildren();
-                if(mark){
+                if (mark) {
                     clearTimeout(mark)
                     for (const child of children) {
                         child.parent = element;
                     }
                     res(children);
-                }else{
+                } else {
                     this.reload(element)
                 }
             } catch (error) {
@@ -93,9 +93,9 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     private getKeyByNode(connectionNode: Node): string {
         const dbType = connectionNode.dbType;
         if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS || dbType == DatabaseType.SSH || dbType == DatabaseType.FTP || dbType == DatabaseType.MONGO_DB) {
-            return CacheKey.NOSQL_CONNECTION+(vscode.env.remoteName||"");
+            return CacheKey.NOSQL_CONNECTION + (vscode.env.remoteName || "");
         }
-        return CacheKey.ConectionsKey+(vscode.env.remoteName||"");
+        return CacheKey.ConectionsKey + (vscode.env.remoteName || "");
     }
 
 
@@ -161,24 +161,39 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         }
 
         const dbIdList: string[] = [];
-        const dbIdMap = new Map<string, SchemaNode>();
-        const numbers = (await this.getConnectionNodes()).length > 1
-        for (const dbNode of DatabaseCache.getDatabaseNodeList()) {
-            if (dbNode instanceof UserGroup || dbNode instanceof CatalogNode) { continue }
-            const uid = numbers ? dbNode.uid : dbNode.schema
-            dbIdList.push(uid)
-            dbIdMap.set(uid, dbNode)
-        }
-        if (dbIdList) {
-            vscode.window.showQuickPick(dbIdList).then(async (dbId) => {
-                if (dbId) {
-                    const dbNode = dbIdMap.get(dbId);
-                    ConnectionManager.changeActive(dbNode)
-                    vscode.window.showInformationMessage(`Change active schema to ${dbNode.schema} success!`)
-                }
+        const dbIdMap = new Map<string, Node>();
+        const connectionNodes = await this.getConnectionNodes()
+        for (const cNode of connectionNodes) {
+            if (cNode.dbType == DatabaseType.SQLITE) {
+                const uid = cNode.label;
+                dbIdList.push(uid)
+                dbIdMap.set(uid, cNode)
+                continue;
+            }
 
-            })
+            const schemaList = DatabaseCache.getSchemaListOfConnection(cNode.uid)
+            for (const schemaNode of schemaList) {
+                if (schemaNode instanceof UserGroup || schemaNode instanceof CatalogNode) { continue }
+                let uid = `${cNode.label}#${schemaNode.schema}`
+                if (cNode.dbType == DatabaseType.PG || cNode.dbType == DatabaseType.MSSQL) {
+                    uid = `${cNode.label}#${schemaNode.database}#${schemaNode.schema}`
+                }
+                dbIdList.push(uid)
+                dbIdMap.set(uid, schemaNode)
+            }
+
         }
+
+        if (dbIdList.length == 0) {
+            return;
+        }
+        
+        vscode.window.showQuickPick(dbIdList).then(async (dbId) => {
+            if (dbId) {
+                const dbNode = dbIdMap.get(dbId);
+                ConnectionManager.changeActive(dbNode)
+            }
+        })
 
     }
 
