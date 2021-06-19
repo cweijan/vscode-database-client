@@ -93,11 +93,11 @@
                 this
                     .on('connecting', content => {
                         terminal.write(content)
-                        terminal.focus()
+                        // terminal.focus()
                     })
                     .on('data', (content) => {
                         terminal.write(content)
-                        terminal.focus()
+                        // terminal.focus()
                     })
                     .on('path', path => {
                         this.emit('data', `cd ${path}\n`)
@@ -106,7 +106,7 @@
                         resizeScreen()
                         status.innerHTML = data
                         status.style.backgroundColor = '#338c33'
-                        terminal.focus()
+                        // terminal.focus()
                     })
                     .on('ssherror', (data) => {
                         status.innerHTML = data
