@@ -28,7 +28,8 @@
       <label class="block font-bold">Database Type</label>
       <ul class="tab">
         <li class="tab__item " :class="{'tab__item--active':supportDatabase==connectionOption.dbType}"
-          v-for="supportDatabase in supportDatabases" :key="supportDatabase" @click="connectionOption.dbType=supportDatabase">
+          v-for="supportDatabase in supportDatabases" :key="supportDatabase"
+          @click="connectionOption.dbType=supportDatabase">
           {{supportDatabase}}
         </li>
       </ul>
@@ -36,6 +37,14 @@
 
     <template v-if="connectionOption.dbType=='SQLite'">
       <div>
+        <section class="mb-2" v-if="!sqliteState">
+          <div class="font-bold mr-5 inline-block w-1/4">
+            <el-alert title="sqlite not installed" type="warning" show-icon/>
+          </div>
+          <div class="font-bold mr-5 inline-block w-36">
+            <button class="button button--primary w-128 inline" @click="installSqlite">Install Sqlite</button>
+          </div>
+        </section>
         <section class="mb-2">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-28">SQLite File Path</label>
@@ -131,8 +140,8 @@
             </div>
             <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis' ">
               <label class="font-bold mr-5 inline-block w-32">Include Databases</label>
-              <input class="w-64 field__input" placeholder="Which databases need to be displayed" title="Example: mysql,test"
-                v-model="connectionOption.includeDatabases" />
+              <input class="w-64 field__input" placeholder="Which databases need to be displayed"
+                title="Example: mysql,test" v-model="connectionOption.includeDatabases" />
             </div>
           </section>
 
@@ -307,6 +316,7 @@
             },
           },
         },
+        sqliteState: false,
         type: "password",
         supportDatabases: [
           "MySQL",
@@ -351,6 +361,9 @@
           }
           this.$forceUpdate()
         })
+        .on("sqliteState", sqliteState => {
+          this.sqliteState = sqliteState;
+        })
         .on("error", (err) => {
           this.connect.loading = false;
           this.connect.success = false;
@@ -375,6 +388,10 @@
       vscodeEvent.destroy();
     },
     methods: {
+      installSqlite() {
+        vscodeEvent.emit("installSqlite")
+        this.sqliteState=true;
+      },
       tryConnect() {
         this.connect.loading = true;
         vscodeEvent.emit("connecting", {
@@ -440,8 +457,8 @@
             this.connectionOption.database = "0";
             break;
           case "MongoDB":
-          this.connectionOption.user = null;
-          this.connectionOption.password = null;
+            this.connectionOption.user = null;
+            this.connectionOption.password = null;
             this.connectionOption.port = 27017;
             break;
           case "FTP":

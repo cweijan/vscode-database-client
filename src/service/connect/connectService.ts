@@ -1,14 +1,17 @@
-import { ConnectionNode } from "../../model/database/connectionNode";
-import { DbTreeDataProvider } from "../../provider/treeDataProvider";
+import { DatabaseType } from "@/common/constants";
+import { ConnectionManager } from "@/service/connectionManager";
+import * as os from "os";
+import { platform } from "os";
+import { window } from "vscode";
+import { Global } from "../../common/global";
+import { Util } from "../../common/util";
 import { ViewManager } from "../../common/viewManager";
+import { ConnectionNode } from "../../model/database/connectionNode";
 import { Node } from "../../model/interface/node";
 import { NodeUtil } from "../../model/nodeUtil";
-import { Util } from "../../common/util";
-import { Global } from "../../common/global";
-import { ConnectionManager } from "@/service/connectionManager";
-import { DatabaseType } from "@/common/constants";
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ClientManager } from "../ssh/clientManager";
-import { window } from "vscode";
+var commandExistsSync = require('command-exists').sync;
 
 export class ConnectService {
 
@@ -23,8 +26,9 @@ export class ConnectService {
                 }
             }
         }
+        let plat:string = platform();
         ViewManager.createWebviewPanel({
-            path: "app", title: connectionNode?"edit":"connect",
+            path: "app", title: connectionNode ? "edit" : "connect",
             splitView: false, iconPath: Global.getExtPath("resources", "icon", "connection.svg"),
             eventHandler: (handler) => {
                 handler.on("init", () => {
@@ -35,6 +39,30 @@ export class ConnectService {
                     } else {
                         handler.emit("connect")
                     }
+                    const exists = plat == 'win32' ? true : commandExistsSync("sqlite");
+                    handler.emit("sqliteState", exists)
+                }).on("installSqlite", () => {
+                    let command: string;
+                    switch (plat) {
+                        case 'darwin':
+                            command = `brew install sqlite3`
+                            break;
+                        case 'linux':
+                            if (commandExistsSync("apt")) {
+                                command = `sudo apt -y install sqlite`;
+                            } else if (commandExistsSync("yum")) {
+                                command = `sudo yum -y install sqlite3`;
+                            } else if (commandExistsSync("dnf")) { 
+                                command = `sudo dnf install sqlite` // Fedora
+                            } else {
+                                command = `sudo pkg install -y sqlite3` // freebsd
+                            }
+                            break;
+                        default: return;
+                    }
+                    const terminal = window.createTerminal("installSqlite")
+                    terminal.sendText(command)
+                    terminal.show()
                 }).on("connecting", async (data) => {
                     const connectionOption = data.connectionOption
                     const connectNode = Util.trim(NodeUtil.of(connectionOption))
@@ -51,11 +79,11 @@ export class ConnectService {
                     }
                 }).on("close", () => {
                     handler.panel.dispose()
-                }).on("choose",({event,filters})=>{
-                    window.showOpenDialog({filters}).then((uris)=>{
-                        const uri=uris[0]
-                        if(uri){
-                            handler.emit("choose",{event,path:uri.fsPath})
+                }).on("choose", ({ event, filters }) => {
+                    window.showOpenDialog({ filters }).then((uris) => {
+                        const uri = uris[0]
+                        if (uri) {
+                            handler.emit("choose", { event, path: uri.fsPath })
                         }
                     })
                 })

@@ -35,6 +35,10 @@ export class SqliteConnection extends IConnection {
         return event;
     }
     connect(callback: (err: Error) => void): void {
+        if(!this.sqlite.dbPath){
+            callback(new Error("Sqlite db path cannot be null!"))
+            return;
+        }
         callback(null)
         this.conneted = true;
     }

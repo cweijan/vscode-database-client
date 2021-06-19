@@ -9,7 +9,7 @@ import { FieldInfo } from "../../../common/typeDef";
 // TODO: Improve how the sqlite command is set
 class SQLite {
 
-    private dbPath: string;
+    public readonly dbPath: string;
     private sqliteCommand!: string;
 
     constructor(dbPath: string) {
