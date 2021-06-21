@@ -518,7 +518,7 @@
 				},
 				{
 					"command": "mysql.connection.config",
-					"when": "view == github.cweijan.mysql",
+					"when": "view =~ /cweijan.+?ql/",
 					"group": "navigation@-3"
 				},
 				{
@@ -846,12 +846,12 @@
 				{
 					"command": "mysql.ssh.forward.port",
 					"when": "view == github.cweijan.nosql && viewItem == sshConnection",
-					"group": "1_connection@0"
+					"group": "1_nosql@0"
 				},
 				{
 					"command": "mysql.ssh.socks.port",
 					"when": "view == github.cweijan.nosql && viewItem == sshConnection",
-					"group": "1_connection@1"
+					"group": "1_nosql@1"
 				},
 				{
 					"command": "mysql.ssh.file.new",
