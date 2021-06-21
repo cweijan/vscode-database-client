@@ -141,7 +141,9 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         if (this.disable) {
             this.command = { command: "mysql.connection.open", title: "Open Connection", arguments: [this] }
         }
-        this.key = source.key;
+        if(source.key){
+            this.key = source.key;
+        }
         this.initUid();
         // init tree state
         this.collapsibleState = DatabaseCache.getElementState(this)
