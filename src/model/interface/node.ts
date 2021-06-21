@@ -1,5 +1,6 @@
 import { Console } from "@/common/Console";
 import { DatabaseType, ModelType } from "@/common/constants";
+import { getKey } from "@/common/state";
 import { Util } from "@/common/util";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { getSqliteBinariesPath } from "@/service/connect/sqlite/sqliteCommandValidation";
@@ -159,9 +160,9 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public async indent(command: IndentCommand) {
 
         try {
-            const connectionKey = command.connectionKey || this.connectionKey;
+            const connectionKey = getKey(command.connectionKey || this.connectionKey);
             const connections = this.context.get<{ [key: string]: Node }>(connectionKey, {});
-            const key = this.key 
+            const key = this.key
 
             switch (command.command) {
                 case CommandKey.add:
@@ -244,7 +245,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public getConnectId(opt?: SwitchOpt): string {
 
 
-        let uid = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName?this.instanceName:this.port}`;
+        let uid = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName ? this.instanceName : this.port}`;
 
         uid = `${this.key}@@${uid}`
 
@@ -287,15 +288,15 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         } else if (this.dbType == DatabaseType.PG) {
             this.checkCommand('psql');
             command = `set "PGPASSWORD=${this.password}" && psql -U ${this.user} -h ${this.host} -p ${this.port} \n`;
-        }else if(this.dbType==DatabaseType.REDIS){
+        } else if (this.dbType == DatabaseType.REDIS) {
             this.checkCommand('redis-cli');
-            command = `redis-cli -h ${this.host} -p ${this.port} \n`;   
-        }else if(this.dbType==DatabaseType.MONGO_DB){
+            command = `redis-cli -h ${this.host} -p ${this.port} \n`;
+        } else if (this.dbType == DatabaseType.MONGO_DB) {
             this.checkCommand('mongo');
-            command = `mongo --host ${this.host} --port ${this.port} ${this.user&&this.password?` -u ${this.user} -p ${this.password}`:''} \n`;   
-        }else if(this.dbType==DatabaseType.SQLITE){
-            
-            command = `${getSqliteBinariesPath()} ${this.dbPath} \n`;   
+            command = `mongo --host ${this.host} --port ${this.port} ${this.user && this.password ? ` -u ${this.user} -p ${this.password}` : ''} \n`;
+        } else if (this.dbType == DatabaseType.SQLITE) {
+
+            command = `${getSqliteBinariesPath()} ${this.dbPath} \n`;
         }
         const terminal = vscode.window.createTerminal(this.dbType.toString())
         terminal.sendText(command)

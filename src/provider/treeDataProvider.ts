@@ -1,3 +1,4 @@
+import { GlobalState, WorkState } from "@/common/state";
 import { CatalogNode } from "@/model/database/catalogNode";
 import { EsConnectionNode } from "@/model/es/model/esConnectionNode";
 import { FTPConnectionNode } from "@/model/ftp/ftpConnectionNode";
@@ -20,8 +21,6 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     public static instances: DbTreeDataProvider[] = []
 
     constructor(protected context: vscode.ExtensionContext, public connectionKey: string) {
-        // TODO remote key
-        this.connectionKey += vscode.env.remoteName || ""
         DbTreeDataProvider.instances.push(this)
     }
 
@@ -92,12 +91,11 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     }
 
     private getKeyByNode(connectionNode: Node): string {
-        // TODO remote key
         const dbType = connectionNode.dbType;
         if (dbType == DatabaseType.ES || dbType == DatabaseType.REDIS || dbType == DatabaseType.SSH || dbType == DatabaseType.FTP || dbType == DatabaseType.MONGO_DB) {
-            return CacheKey.NOSQL_CONNECTION + (vscode.env.remoteName || "");
+            return CacheKey.NOSQL_CONNECTION;
         }
-        return CacheKey.DATBASE_CONECTIONS + (vscode.env.remoteName || "");
+        return CacheKey.DATBASE_CONECTIONS;
     }
 
 
@@ -121,8 +119,8 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     public async getConnectionNodes(): Promise<Node[]> {
 
         const connetKey = this.connectionKey;
-        let globalConnections = this.context.globalState.get<{ [key: string]: Node }>(connetKey, {});
-        let workspaceConnections = this.context.workspaceState.get<{ [key: string]: Node }>(connetKey, {});
+        let globalConnections = GlobalState.get<{ [key: string]: Node }>(connetKey, {});
+        let workspaceConnections = WorkState.get<{ [key: string]: Node }>(connetKey, {});
 
         return Object.keys(workspaceConnections).map(key => this.getNode(workspaceConnections[key], key, false, connetKey)).concat(
             Object.keys(globalConnections).map(key => this.getNode(globalConnections[key], key, true, connetKey))

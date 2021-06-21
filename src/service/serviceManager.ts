@@ -1,5 +1,4 @@
 import { CacheKey, DatabaseType } from "@/common/constants";
-import { EsIndexGroup } from "@/model/es/model/esIndexGroupNode";
 import { SqlCodeLensProvider } from "@/provider/sqlCodeLensProvider";
 import * as vscode from "vscode";
 import { ExtensionContext } from "vscode";
@@ -54,7 +53,7 @@ export class ServiceManager {
     constructor(private readonly context: ExtensionContext) {
         Global.context = context;
         this.mockRunner = new MockRunner();
-        DatabaseCache.initCache(context);
+        DatabaseCache.initCache();
         ViewManager.initExtesnsionPath(context.extensionPath);
         FileManager.init(context)
         new ConnectionProvider();

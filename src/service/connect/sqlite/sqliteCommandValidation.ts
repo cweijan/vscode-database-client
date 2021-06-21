@@ -59,7 +59,6 @@ export function getSqliteBinariesPath(): string {
     let os_arch = arch();
     let sqliteBin: string;
 
-    // TODO: move sqlite version number to package.json and import it from there
     switch (plat) {
         case 'win32':
             sqliteBin = 'sqlite-v3.26.0-win32-x86.exe';

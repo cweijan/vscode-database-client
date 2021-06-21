@@ -1,5 +1,6 @@
 import { CacheKey } from "@/common/constants";
 import { Global } from "@/common/global";
+import { GlobalState } from "@/common/state";
 import * as vscode from "vscode";
 import { HistoryNode } from "./historyNode";
 
@@ -14,7 +15,7 @@ export class HistoryProvider implements vscode.TreeDataProvider<HistoryNode>{
         return element;
     }
     getChildren(element?: HistoryNode): vscode.ProviderResult<HistoryNode[]> {
-        let globalHistories = this.context.globalState.get<Array<HistoryNode>>(CacheKey.GLOBAL_HISTORY, []);
+        let globalHistories = GlobalState.get<Array<HistoryNode>>(CacheKey.GLOBAL_HISTORY, []);
         return globalHistories.map(history => {
             return new HistoryNode(history.sql, history.date, history.costTime)
         })
@@ -24,12 +25,12 @@ export class HistoryProvider implements vscode.TreeDataProvider<HistoryNode>{
     }
 
     public static recordHistory(historyNode: HistoryNode) {
-        let glboalHistoryies = Global.context.globalState.get<Array<HistoryNode>>(CacheKey.GLOBAL_HISTORY, []);
+        let glboalHistoryies = GlobalState.get<Array<HistoryNode>>(CacheKey.GLOBAL_HISTORY, []);
         glboalHistoryies.unshift(historyNode)
-        if(glboalHistoryies.length>100){
-            glboalHistoryies=glboalHistoryies.splice(-1,1)
+        if (glboalHistoryies.length > 100) {
+            glboalHistoryies = glboalHistoryies.splice(-1, 1)
         }
-        Global.context.globalState.update(CacheKey.GLOBAL_HISTORY, glboalHistoryies);
+        GlobalState.update(CacheKey.GLOBAL_HISTORY, glboalHistoryies);
         HistoryProvider._onDidChangeTreeData.fire(null)
     }
 

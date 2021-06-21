@@ -6,6 +6,7 @@ import { Confirm, Constants, DatabaseType } from "./constants";
 import { Global } from "./global";
 import { compare } from 'compare-versions';
 import { wrapByDb } from "./wrapper.js";
+import { GlobalState } from "./state";
 
 export class Util {
 
@@ -99,10 +100,10 @@ export class Util {
     }
 
     public static getStore(key: string): any {
-        return Global.context.globalState.get(key);
+        return GlobalState.get(key);
     }
     public static store(key: string, object: any) {
-        Global.context.globalState.update(key, object)
+        GlobalState.update(key, object)
     }
 
     public static is(object: any, type: string): boolean {

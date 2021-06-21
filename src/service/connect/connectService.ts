@@ -14,6 +14,7 @@ import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ClientManager } from "../ssh/clientManager";
 import { ConnnetionConfig } from "./config/connnetionConfig";
 import { readFileSync } from "fs";
+import { GlobalState, WorkState } from "@/common/state";
 var commandExistsSync = require('command-exists').sync;
 
 export class ConnectService {
@@ -113,14 +114,14 @@ export class ConnectService {
         });
     }
 
-    private  static async saveConfig(path: string) {
+    private static async saveConfig(path: string) {
         const configContent = readFileSync(path, { encoding: 'utf8' })
         try {
             const connectonConfig: ConnnetionConfig = JSON.parse(configContent)
-            await Global.context.globalState.update(CacheKey.DATBASE_CONECTIONS,connectonConfig.database.global);
-            await Global.context.workspaceState.update(CacheKey.DATBASE_CONECTIONS,connectonConfig.database.workspace);
-            await Global.context.globalState.update(CacheKey.NOSQL_CONNECTION,connectonConfig.nosql.global);
-            await Global.context.workspaceState.update(CacheKey.NOSQL_CONNECTION,connectonConfig.nosql.workspace);
+            await GlobalState.update(CacheKey.DATBASE_CONECTIONS, connectonConfig.database.global);
+            await WorkState.update(CacheKey.DATBASE_CONECTIONS, connectonConfig.database.workspace);
+            await GlobalState.update(CacheKey.NOSQL_CONNECTION, connectonConfig.nosql.global);
+            await WorkState.update(CacheKey.NOSQL_CONNECTION, connectonConfig.nosql.workspace);
             DbTreeDataProvider.refresh();
         } catch (error) {
             window.showErrorMessage("Parse connect config fail!")
@@ -129,16 +130,14 @@ export class ConnectService {
 
     public openConfig() {
 
-        // TODO remote suffix
-
         const connectonConfig: ConnnetionConfig = {
             database: {
-                global: Global.context.globalState.get(CacheKey.DATBASE_CONECTIONS),
-                workspace: Global.context.workspaceState.get(CacheKey.DATBASE_CONECTIONS),
+                global: GlobalState.get(CacheKey.DATBASE_CONECTIONS),
+                workspace: WorkState.get(CacheKey.DATBASE_CONECTIONS),
             },
             nosql: {
-                global: Global.context.globalState.get(CacheKey.NOSQL_CONNECTION),
-                workspace: Global.context.workspaceState.get(CacheKey.NOSQL_CONNECTION),
+                global: GlobalState.get(CacheKey.NOSQL_CONNECTION),
+                workspace: WorkState.get(CacheKey.NOSQL_CONNECTION),
             }
         };
 

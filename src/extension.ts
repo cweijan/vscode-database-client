@@ -50,12 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
     ConnectionNode.init()
     context.subscriptions.push(
         ...serviceManager.init(),
-        vscode.window.onDidChangeActiveTextEditor((e) => {
-            const fileNode = ConnectionManager.getByActiveFile()
-            if (fileNode) {
-                ConnectionManager.changeActive(fileNode)
-            }
-        }),
+        vscode.window.onDidChangeActiveTextEditor(detectActive),
         ConnectService.listenConfig(),
         ...initCommand({
             // util
@@ -142,7 +137,7 @@ export function activate(context: vscode.ExtensionContext) {
                 'mysql.ssh.path.copy': (node: Node) => node.copyName(),
                 'mysql.ssh.socks.port': (parentNode: SSHConnectionNode) => parentNode.startSocksProxy(),
                 'mysql.ssh.file.delete': (fileNode: FileNode | SSHConnectionNode) => fileNode.delete(),
-                'mysql.ssh.file.open': (fileNode: FileNode|FTPFileNode) => fileNode.open(),
+                'mysql.ssh.file.open': (fileNode: FileNode | FTPFileNode) => fileNode.open(),
                 'mysql.ssh.file.download': (fileNode: FileNode) => fileNode.download(),
             },
             // database
@@ -183,7 +178,7 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // history
             ...{
-                "mysql.history.view":(historyNode:HistoryNode)=>{
+                "mysql.history.view": (historyNode: HistoryNode) => {
                     historyNode.view()
                 }
             },
@@ -191,10 +186,10 @@ export function activate(context: vscode.ExtensionContext) {
             ...{
                 "mysql.runQuery": (sql) => {
                     if (typeof sql != 'string') { sql = null; }
-                    QueryUnit.runQuery(sql,ConnectionManager.tryGetConnection());
+                    QueryUnit.runQuery(sql, ConnectionManager.tryGetConnection());
                 },
                 "mysql.runAllQuery": () => {
-                    QueryUnit.runQuery(null,ConnectionManager.tryGetConnection(),{runAll:true});
+                    QueryUnit.runQuery(null, ConnectionManager.tryGetConnection(), { runAll: true });
                 },
                 "mysql.query.switch": async (databaseOrConnectionNode: SchemaNode | ConnectionNode | EsConnectionNode | ESIndexNode) => {
                     if (databaseOrConnectionNode) {
@@ -267,7 +262,7 @@ export function activate(context: vscode.ExtensionContext) {
                     tableNode.openTable();
                 },
                 "mysql.codeLens.run": (sql: string) => {
-                    QueryUnit.runQuery(sql,ConnectionManager.tryGetConnection(),{split:true,recordHistory:true})
+                    QueryUnit.runQuery(sql, ConnectionManager.tryGetConnection(), { split: true, recordHistory: true })
                 },
                 "mysql.table.design": (tableNode: TableNode) => {
                     tableNode.designTable();
@@ -325,12 +320,18 @@ export function activate(context: vscode.ExtensionContext) {
                 },
             },
         }),
-
     );
 
 }
 
 export function deactivate() {
+}
+
+function detectActive(): void {
+    const fileNode = ConnectionManager.getByActiveFile();
+    if (fileNode) {
+        ConnectionManager.changeActive(fileNode);
+    }
 }
 
 function commandWrapper(commandDefinition: any, command: string): (...args: any[]) => any {

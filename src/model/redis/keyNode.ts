@@ -25,9 +25,6 @@ export default class KeyNode extends RedisBaseNode {
         }
     }
 
-    /**
-     * @todo Split the key by ':' and group them
-     */
     async getChildren(): Promise<RedisBaseNode[]> {
         return [];
     }

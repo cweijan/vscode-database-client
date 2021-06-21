@@ -1,3 +1,4 @@
+import { GlobalState, WorkState } from "@/common/state";
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
 import { CacheKey, ModelType } from "../../common/constants";
 import { SchemaNode } from "../../model/database/schemaNode";
@@ -5,7 +6,6 @@ import { Node } from "../../model/interface/node";
 
 export class DatabaseCache {
 
-    private static context: ExtensionContext;
     private static cache = { database: {} };
     private static childCache = {};
     private static globalCollpaseState: { key?: TreeItemCollapsibleState };
@@ -51,22 +51,20 @@ export class DatabaseCache {
 
         if (element.global === false) {
             this.workspaceCollpaseState[element.uid] = collapseState;
-            this.context.workspaceState.update(CacheKey.DATABASE_SATE, this.globalCollpaseState);
+            WorkState.update(CacheKey.DATABASE_SATE, this.globalCollpaseState);
         } else {
             this.globalCollpaseState[element.uid] = collapseState;
-            this.context.globalState.update(CacheKey.DATABASE_SATE, this.globalCollpaseState);
+            GlobalState.update(CacheKey.DATABASE_SATE, this.globalCollpaseState);
         }
 
     }
 
     /**
      * cache init, Mainly initializing context object
-     * @param context 
      */
-    public static initCache(context: ExtensionContext) {
-        this.context = context;
-        this.globalCollpaseState = this.context.globalState.get(CacheKey.DATABASE_SATE, {});
-        this.workspaceCollpaseState = this.context.workspaceState.get(CacheKey.DATABASE_SATE, {});
+    public static initCache() {
+        this.globalCollpaseState = GlobalState.get(CacheKey.DATABASE_SATE, {});
+        this.workspaceCollpaseState = WorkState.get(CacheKey.DATABASE_SATE, {});
     }
 
     public static clearCache() {

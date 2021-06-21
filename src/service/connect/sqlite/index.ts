@@ -6,7 +6,6 @@ import { Result, ResultNew, ResultSet } from "./common";
 import { validateSqliteCommand } from "./sqliteCommandValidation";
 import { FieldInfo } from "../../../common/typeDef";
 
-// TODO: Improve how the sqlite command is set
 class SQLite {
 
     public readonly dbPath: string;

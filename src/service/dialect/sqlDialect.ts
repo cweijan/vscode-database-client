@@ -2,11 +2,6 @@ import { CreateIndexParam } from "./param/createIndexParam";
 import { UpdateColumnParam } from "./param/updateColumnParam";
 import { UpdateTableParam } from "./param/updateTableParam";
 
-/**
- * TODO
- * 1. 增加用户角色分配视图
- * 2. 增加system view节点
- */
 export abstract class SqlDialect {
     dropIndex(table: string, indexName: string): string {
         throw new Error("Method not implemented.");
