@@ -1,5 +1,16 @@
 # CHANGELOG
 
+# 3.9.0 2021-6-22
+
+- Support edit connection config.
+- Isolate the configuration of vscode and ssh-remote.
+- Support load data when load timeout.
+- Support install sqlite3 from connect page.
+- Better change active database item.
+- Fix vscode shortcut not working on ssh terminal.
+- Fix mongo export data fail.
+- Update some ui.
+
 # 3.8.9 2021-6-16
 
 - Add shortcut of run sql on result view(ctrl+enter).
