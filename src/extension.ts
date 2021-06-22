@@ -119,9 +119,10 @@ export function activate(context: vscode.ExtensionContext) {
                     serviceManager.dumpService.generateDocument(node)
                 },
                 "mysql.data.import": (node: SchemaNode | ConnectionNode) => {
-                    vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
+                    const importService=ServiceManager.getImportService(node.dbType);
+                    vscode.window.showOpenDialog({ filters: importService.filter(), canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
                         if (filePath) {
-                            ServiceManager.getImportService(node.dbType).importSql(filePath[0].fsPath, node)
+                            importService.importSql(filePath[0].fsPath, node)
                         }
                     });
                 },

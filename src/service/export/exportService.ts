@@ -5,6 +5,7 @@ import { Console } from "../../common/Console";
 import { ExportContext, ExportType } from "./exportContext";
 import { ProgressLocation } from "vscode";
 import { ConnectionManager } from "../connectionManager";
+import { DatabaseType } from "@/common/constants";
 
 export class ExportService {
 
@@ -16,7 +17,7 @@ export class ExportService {
                 if (filePath) {
                     context.exportPath = filePath.fsPath;
                     if (context.withOutLimit) {
-                        context.sql = context.sql.replace(/\blimit\b.+/gi, "")
+                        context.sql = context.sql.replace(/\blimit\s.+/gi, "")
                     }
                     vscode.window.withProgress({ title: `Start exporting data to ${context.type}...`, location: ProgressLocation.Notification }, () => {
                         return new Promise((resolve) => {
@@ -80,7 +81,12 @@ export class ExportService {
     }
 
     private exportToJson(context: ExportContext) {
-        fs.writeFileSync(context.exportPath, JSON.stringify(context.rows, (k, v)=> { return v === undefined ? null : v; }, 2));
+        fs.writeFileSync(context.exportPath, JSON.stringify(context.rows, (k, v:any) => {
+            if(context.dbOption.dbType==DatabaseType.MONGO_DB && v.indexOf && v.indexOf("ObjectID")!=-1){
+                return undefined;
+            }
+            return v === undefined ? null : v;
+        }, 2));
     }
 
     private exportToSql(exportContext: ExportContext) {
@@ -97,7 +103,7 @@ export class ExportService {
             let values = "";
             for (const key in row) {
                 columns += `${key},`
-                values += `${row[key]!=null?`'${row[key]}'`:'null'},`
+                values += `${row[key] != null ? `'${row[key]}'` : 'null'},`
             }
             sql += `insert into ${exportContext.table}(${columns.replace(/.$/, '')}) values(${values.replace(/.$/, '')});\n`
         }
@@ -127,7 +133,7 @@ export class ExportService {
         let csvContent = "";
         for (const row of rows) {
             for (const key in row) {
-                csvContent += `${row[key]!=null?row[key]:''},`
+                csvContent += `${row[key] != null ? row[key] : ''},`
             }
             csvContent = csvContent.replace(/.$/, "") + "\n"
         }

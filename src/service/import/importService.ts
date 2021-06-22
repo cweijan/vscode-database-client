@@ -25,4 +25,8 @@ export abstract class ImportService {
 
     }
 
+    public filter():any {
+        return { Sql: ['sql'] };
+    }
+
 }
