@@ -375,7 +375,9 @@
           this.connect.error = false;
           this.connect.success = true;
           this.connect.successMessage = res.message;
+          this.connectionOption.connectionKey = res.connectionKey;
           this.connectionOption.key = res.key;
+          this.connectionOption.isGlobal = this.connectionOption.global;
         });
       vscodeEvent.emit("route-" + this.$route.name);
       window.onkeydown = (e) => {
