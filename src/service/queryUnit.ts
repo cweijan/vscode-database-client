@@ -1,7 +1,6 @@
 "use strict";
 import * as vscode from "vscode";
-import { CodeCommand, ConfigKey, Cursor, DatabaseType, MessageType } from "../common/constants";
-import { Global } from "../common/global";
+import { CodeCommand, MessageType } from "../common/constants";
 import { Console } from "../common/Console";
 import { FileManager, FileModel } from "../common/filesManager";
 import { Node } from "../model/interface/node";
@@ -51,7 +50,7 @@ export class QueryUnit {
             sql = this.getSqlFromEditor(connectionNode, queryOption.runAll);
             queryOption.recordHistory = true;
         }
-        
+
         sql = sql.replace(/^\s*--.+/igm, '').trim();
 
         const parseResult = DelimiterHolder.parseBatch(sql, connectionNode.getConnectId())
@@ -150,34 +149,6 @@ export class QueryUnit {
         }
 
         return ServiceManager.instance.codeLenProvider.parseCodeLensEnhance(editor.document, editor.selection.active) as string;
-    }
-
-    public static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string, delimiter?: string) {
-        if (!content) { content = document.getText(new vscode.Range(new vscode.Position(0, 0), current)); }
-        if (delimiter) {
-            content = content.replace(new RegExp(delimiter, 'g'), ";")
-        }
-        const sqlList = content.match(/(?:[^;"']+|["'][^"']*["'])+/g);
-        if (!sqlList) return "";
-        if (sqlList.length == 1) return sqlList[0];
-
-        const trimSqlList = []
-        const docCursor = document.getText(Cursor.getRangeStartTo(current)).length;
-        let index = 0;
-        for (let i = 0; i < sqlList.length; i++) {
-            const sql = sqlList[i];
-            const trimSql = sql.trim();
-            if (trimSql) {
-                trimSqlList.push(trimSql)
-            }
-            index += (sql.length + 1);
-            if (docCursor < index) {
-                if (!trimSql && sqlList.length > 1) { return sqlList[i - 1]; }
-                return trimSql;
-            }
-        }
-
-        return trimSqlList[trimSqlList.length - 1];
     }
 
     public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql"): Promise<vscode.TextEditor> {

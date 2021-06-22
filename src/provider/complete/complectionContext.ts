@@ -1,3 +1,4 @@
+import { Cursor } from "@/common/constants";
 import * as vscode from "vscode";
 import { QueryUnit } from "../../service/queryUnit";
 
@@ -18,8 +19,8 @@ export class ComplectionContext {
     public static build(document: vscode.TextDocument, position: vscode.Position): ComplectionContext {
 
         const context = new ComplectionContext();
-        const currentSql = QueryUnit.obtainCursorSql(document, position).trim();
-        context.currentSqlFull = QueryUnit.obtainCursorSql(document, position, document.getText()).trim();
+        const currentSql = this.obtainCursorSql(document, position).trim();
+        context.currentSqlFull = this.obtainCursorSql(document, position, document.getText()).trim();
         if (!context.currentSqlFull) { return context; }
 
         const prePostion = position.character === 0 ? position : new vscode.Position(position.line, position.character - 1);
@@ -33,7 +34,7 @@ export class ComplectionContext {
                 context.preWord = wordMatch[wordMatch.length - 2];
             }
         }
-        context.preWord=context.preWord?.replace(/\.$/,'')
+        context.preWord = context.preWord?.replace(/\.$/, '')
         const codeMatch = currentSql.match(/(\w|=|<|>|\()+$/);
         if (codeMatch) {
             context.currentWord = codeMatch[0];
@@ -42,6 +43,34 @@ export class ComplectionContext {
         context.preChart = preChart;
         context.currentSql = currentSql.trim();
         return context;
+    }
+
+    public static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string, delimiter?: string) {
+        if (!content) { content = document.getText(new vscode.Range(new vscode.Position(0, 0), current)); }
+        if (delimiter) {
+            content = content.replace(new RegExp(delimiter, 'g'), ";")
+        }
+        const sqlList = content.match(/(?:[^;"']+|["'][^"']*["'])+/g);
+        if (!sqlList) return "";
+        if (sqlList.length == 1) return sqlList[0];
+
+        const trimSqlList = []
+        const docCursor = document.getText(Cursor.getRangeStartTo(current)).length;
+        let index = 0;
+        for (let i = 0; i < sqlList.length; i++) {
+            const sql = sqlList[i];
+            const trimSql = sql.trim();
+            if (trimSql) {
+                trimSqlList.push(trimSql)
+            }
+            index += (sql.length + 1);
+            if (docCursor < index) {
+                if (!trimSql && sqlList.length > 1) { return sqlList[i - 1]; }
+                return trimSql;
+            }
+        }
+
+        return trimSqlList[trimSqlList.length - 1];
     }
 
 }
