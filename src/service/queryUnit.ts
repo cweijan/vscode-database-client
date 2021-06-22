@@ -35,61 +35,48 @@ export class QueryUnit {
     }
 
 
-    private static importPattern = /^\s*\bsource\b\s+(.+)/i;
-    public static async runQuery(sql: string, connectionNode: Node, queryOption: QueryOption = {}): Promise<null> {
+    public static async runQuery(sql: string, connectionNode: Node, queryOption: QueryOption = {}): Promise<void> {
 
         if (!connectionNode) {
             vscode.window.showErrorMessage("Not active database connection found!")
-            throw new Error("Not active database connection found!")
+            return;
         }
 
         Trans.begin()
         connectionNode = NodeUtil.of(connectionNode)
-        if (queryOption.split == null) queryOption.split = sql == null;
+        if (queryOption.split == null)
+            queryOption.split = (sql == null);
 
-        let recordHistory = queryOption.recordHistory;
         if (!sql) {
             sql = this.getSqlFromEditor(connectionNode, queryOption.runAll);
-            recordHistory = true;
+            queryOption.recordHistory = true;
         }
+        
         sql = sql.replace(/^\s*--.+/igm, '').trim();
 
-        if (connectionNode.dbType != DatabaseType.ES) {
-            // Trim empty sql.
-            const sqlList: string[] = sql?.match(/(?:[^;"']+|["'][^"']*["'])+/g)?.filter((s) => (s.trim() != '' && s.trim() != ';'))
-            if (sqlList?.length == 1) {
-                sql = sqlList[0]
-            }
-
-            const parseResult = DelimiterHolder.parseBatch(sql, connectionNode.getConnectId())
-            sql = parseResult.sql
-            if (!sql && parseResult.replace) {
-                QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, queryOption, res: { message: `change delimiter success`, success: true } as MessageResponse });
-                return;
-            }
-
-            const importMatch = sql.match(this.importPattern);
-            if (importMatch) {
-                ServiceManager.getImportService(connectionNode.dbType).importSql(importMatch[1], connectionNode)
-                return;
-            }
-
-            QueryPage.send({ connection: connectionNode, type: MessageType.RUN, queryOption, res: { sql } as RunResponse });
+        const parseResult = DelimiterHolder.parseBatch(sql, connectionNode.getConnectId())
+        sql = parseResult.sql
+        if (!sql && parseResult.replace) {
+            QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, queryOption, res: { message: `change delimiter success`, success: true } as MessageResponse });
+            return;
         }
+
+        QueryPage.send({ connection: connectionNode, type: MessageType.RUN, queryOption, res: { sql } as RunResponse });
 
         const executeTime = new Date().getTime();
         try {
-            (await ConnectionManager.getConnection(connectionNode)).query(sql, (err: Error, data, fields, total) => {
+            const connection = await ConnectionManager.getConnection(connectionNode)
+            connection.query(sql, (err: Error, data, fields, total) => {
                 if (err) {
                     QueryPage.send({ connection: connectionNode, type: MessageType.ERROR, queryOption, res: { sql, message: err.message } as ErrorResponse });
                     return;
                 }
                 const costTime = new Date().getTime() - executeTime;
-                if (recordHistory) {
+                if (queryOption.recordHistory) {
                     vscode.commands.executeCommand(CodeCommand.RecordHistory, sql, costTime);
                 }
 
-                if (sql.match(/create (table|prcedure|FUNCTION|VIEW)/i)) {
+                if (sql.match(/(create|drop|alter)\s+(table|prcedure|FUNCTION|VIEW)/i)) {
                     vscode.commands.executeCommand(CodeCommand.Refresh);
                 }
 
@@ -104,7 +91,7 @@ export class QueryUnit {
                     const isSqliteEmptyQuery = fields.length == 0 && sql.match(/\bselect\b/i);
                     const isMongoEmptyQuery = fields.length == 0 && sql.match(/\.collection\b/i);
                     if (isQuery || isSqliteEmptyQuery || isMongoEmptyQuery) {
-                        QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total} as DataResponse });
+                        QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total } as DataResponse });
                         return;
                     }
                 }
@@ -115,7 +102,7 @@ export class QueryUnit {
                     if (data.length > 2 && Util.is(lastEle, 'ResultSetHeader') && Util.is(data[0], 'TextRow')) {
                         data = data[data.length - 2]
                         fields = fields[fields.length - 2] as any as FieldInfo[]
-                        QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total} as DataResponse });
+                        QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total } as DataResponse });
                         return;
                     }
                 }
@@ -147,32 +134,22 @@ export class QueryUnit {
 
     }
 
-
-    private static batchPattern = /\s+(TRIGGER|PROCEDURE|FUNCTION)\s+/ig;
-
     private static getSqlFromEditor(connectionNode: Node, runAll: boolean): string {
         if (!vscode.window.activeTextEditor) {
             throw new Error("No SQL file selected!");
 
         }
-        const activeTextEditor = vscode.window.activeTextEditor;
+        const editor = vscode.window.activeTextEditor;
         if (runAll) {
-            return activeTextEditor.document.getText()
+            return editor.document.getText()
         }
 
-        const selection = activeTextEditor.selection;
-        const newLocal = !selection.isEmpty ? activeTextEditor.document.getText(selection) :
-            this.obtainSql(activeTextEditor, DelimiterHolder.get(connectionNode.getConnectId()));
-        return newLocal;
-    }
+        const selection = editor.selection;
+        if (!selection.isEmpty) {
+            return editor.document.getText(selection);
+        }
 
-    public static obtainSql(activeTextEditor: vscode.TextEditor, delimiter?: string): string {
-
-        const content = activeTextEditor.document.getText();
-        if (content.match(this.batchPattern)) { return content; }
-
-        return this.obtainCursorSql(activeTextEditor.document, activeTextEditor.selection.active, content, delimiter);
-
+        return ServiceManager.instance.codeLenProvider.parseCodeLensEnhance(editor.document, editor.selection.active) as string;
     }
 
     public static obtainCursorSql(document: vscode.TextDocument, current: vscode.Position, content?: string, delimiter?: string) {
@@ -203,14 +180,10 @@ export class QueryUnit {
         return trimSqlList[trimSqlList.length - 1];
     }
 
-    private static sqlDocument: vscode.TextEditor;
-    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql") {
+    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql"): Promise<vscode.TextEditor> {
 
-        this.sqlDocument = await vscode.window.showTextDocument(
-            await vscode.workspace.openTextDocument(await FileManager.record(`${node.uid}/${template}`, sql, FileModel.WRITE))
-        );
-
-        return this.sqlDocument;
+        const document = await vscode.workspace.openTextDocument(await FileManager.record(`${node.uid}/${template}`, sql, FileModel.WRITE));
+        return await vscode.window.showTextDocument(document);
     }
 
 }

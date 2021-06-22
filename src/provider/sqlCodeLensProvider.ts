@@ -14,6 +14,12 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
     }
 
     public parseCodeLens(document: vscode.TextDocument): vscode.ProviderResult<vscode.CodeLens[]> {
+        return this.parseCodeLensEnhance(document) as vscode.ProviderResult<vscode.CodeLens[]>;
+    }
+
+    public parseCodeLensEnhance(document: vscode.TextDocument,current?: vscode.Position): vscode.ProviderResult<vscode.CodeLens[]> | string {
+
+        // DelimiterHolder.parseBatch(sql, connectionNode.getConnectId())
 
         if (Global.getConfig<number>(ConfigKey.DISABLE_SQL_CODELEN)) {
             return []
@@ -31,7 +37,7 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
         for (var i = 0; i < lineCount; i++) {
             let col = 0;
             var line = document.lineAt(i)
-            var text = line.text?.replace(/(--|#).+/, '')?.replace(/(\/\*).*?(\*\/)/g,'');
+            var text = line.text?.replace(/(--|#).+/, '')?.replace(/(\/\*).*?(\*\/)/g, '');
             if (inBlockComment) {
                 const blockEndMatch = text.match(/.*?(\*\/)/)
                 if (!blockEndMatch) {
@@ -61,7 +67,11 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
             }
             if (sep != -1) {
                 end = new vscode.Position(i, sep)
-                codeLens.push(new vscode.CodeLens(new vscode.Range(start, end), {
+                const range = new vscode.Range(start, end);
+                if(current && (range.contains(current) || range.start.line > current.line) ){
+                    return sql;
+                }
+                codeLens.push(new vscode.CodeLens(range, {
                     command: "mysql.codeLens.run",
                     title: "▶ Run SQL",
                     // title: "$(debug-start) Run SQL",
@@ -71,6 +81,10 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
                 sql = text.substr(sep + delimter.length)
                 continue;
             }
+        }
+
+        if(current){
+            return document.getText()
         }
 
         return codeLens
