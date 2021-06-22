@@ -45,6 +45,11 @@
 					"es"
 				],
 				"configuration": "./syntaxes/es.configuration.json"
+			},{
+				"id": "sql",
+				"extensions": [ ".sql", ".dsql" ],
+				"aliases": [ "SQL" ],
+				"configuration": "./syntaxes/language-configuration.json"
 			}
 		],
 		"snippets": [

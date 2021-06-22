@@ -31,7 +31,7 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
         for (var i = 0; i < lineCount; i++) {
             let col = 0;
             var line = document.lineAt(i)
-            var text = line.text?.replace(/(--|#).+/, '');
+            var text = line.text?.replace(/(--|#).+/, '')?.replace(/(\/\*).*?(\*\/)/g,'');
             if (inBlockComment) {
                 const blockEndMatch = text.match(/.*?(\*\/)/)
                 if (!blockEndMatch) {
@@ -41,7 +41,7 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
                 text = text.replace(/.*?(\*\/)/, '')
                 col = blockEndMatch[0].length
             } else {
-                const blockComment = text.match(/(\/\*).*?(\*\/)?/)
+                const blockComment = text.match(/(\/\*)/)
                 inBlockComment = blockComment && blockComment[2] == null;
                 if (inBlockComment) {
                     continue;

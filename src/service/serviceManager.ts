@@ -47,6 +47,7 @@ export class ServiceManager {
     public nosqlProvider: DbTreeDataProvider;
     public settingService: SettingService;
     public statusService: StatusService;
+    public codeLenProvider: SqlCodeLensProvider;
     public dumpService: DumpService;
     private isInit = false;
 
@@ -61,9 +62,11 @@ export class ServiceManager {
 
     public init(): vscode.Disposable[] {
         if (this.isInit) { return [] }
+        const codeLenProvider = new SqlCodeLensProvider();
+        this.codeLenProvider=codeLenProvider;
         const res: vscode.Disposable[] = [
             vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormattingProvider()),
-            vscode.languages.registerCodeLensProvider('sql', new SqlCodeLensProvider()),
+            vscode.languages.registerCodeLensProvider('sql', codeLenProvider),
             vscode.languages.registerHoverProvider('sql', new TableInfoHoverProvider()),
             vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.', ">", "<", "=", "(")
         ]
