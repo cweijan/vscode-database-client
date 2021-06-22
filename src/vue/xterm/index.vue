@@ -23,7 +23,7 @@
             return {};
         },
         mounted() {
-            this.on("terminalConfig",(data)=>{
+            this.on("terminalConfig", (data) => {
                 var errorExists = false;
                 const terminal = new Terminal({
                     theme: auto(),
@@ -52,7 +52,20 @@
                     }
                 }))
 
-                const container=document.getElementById('terminal-container');
+                const container = document.getElementById('terminal-container');
+                // TODO 搜索插件报错.
+                terminal.onKey(async e => {
+                    const event = e.domEvent;
+                    if ((event.code == "KeyC" && event.ctrlKey && !event.altKey && !event.shiftKey) ||
+                        (event.code == "KeyV" && event.ctrlKey && !event.altKey && !event.shiftKey) ||
+                        (event.code == "KeyF" && event.ctrlKey && !event.altKey && !event.shiftKey)
+                    ) {
+                        return;
+                    } else {
+                        const new_e = new event.constructor(event.type, event);
+                        document.getElementById("header").dispatchEvent(new_e);
+                    }
+                })
                 terminal.open(container)
                 fitAddon.fit()
                 terminal.focus()
@@ -60,7 +73,7 @@
                     this.emit('data', data)
                 })
 
-                const resizeScreen=()=>{
+                const resizeScreen = () => {
                     fitAddon.fit()
                     this.emit('resize', { cols: terminal.cols, rows: terminal.rows })
                 }
@@ -69,17 +82,17 @@
                 window.addEventListener("keyup", async event => {
                     if (event.code == "KeyV" && event.ctrlKey && !event.altKey && !event.shiftKey) {
                         this.emit('data', await navigator.clipboard.readText())
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-                    if (event.code == "KeyF" && event.ctrlKey && !event.altKey && !event.shiftKey) {
+                    } else if (event.code == "KeyF" && event.ctrlKey && !event.altKey && !event.shiftKey) {
                         searchAddonBar.show();
-                        event.preventDefault()
-                        event.stopPropagation()
+                    } else if (event.code == "Escape") {
+                        searchAddonBar.hidden();
                     }
-                });
+                })
+                window.onfocus = () => {
+                    terminal.focus()
+                }
 
-                container.oncontextmenu=async (event)=>{
+                container.oncontextmenu = async (event) => {
                     event.stopPropagation()
                     if (terminal.hasSelection()) {
                         document.execCommand('copy')
@@ -127,100 +140,113 @@
     };
 </script>
 <style scoped>
-    body, html  {
-  font-family: helvetica, sans-serif, arial;
-  font-size: 1em;
-  color: #111;
-  /* background-color: #2f3032; */
-  color: rgb(240, 240, 240);
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+    body,
+    html {
+        font-family: helvetica, sans-serif, arial;
+        font-size: 1em;
+        color: #111;
+        /* background-color: #2f3032; */
+        color: rgb(240, 240, 240);
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
 
-.dropup-content {
-    display: none;
-}
+    .dropup-content {
+        display: none;
+    }
 
-#header {
-    background-color: rgb(84, 84, 84);
-    color: #fafafa;
-    width: 100%;
-    border-color: white;
-    border-style: none none solid none;
-    border-width: 1px;
-    text-align: center;
-    flex: 0 1 auto;
-    z-index: 99;
-    height:19px;
-}
+    #header {
+        background-color: rgb(84, 84, 84);
+        color: #fafafa;
+        width: 100%;
+        border-color: white;
+        border-style: none none solid none;
+        border-width: 1px;
+        text-align: center;
+        flex: 0 1 auto;
+        z-index: 99;
+        height: 19px;
+    }
 
-#header a{
-    color: #fafafa;
-}
+    #header a {
+        color: #fafafa;
+    }
 
-.box {
-    display: block;
-    height: 100%;
-}
-#terminal-container {
-    display: block;
-    width: calc(100% - 1 px);
-    margin: 0 auto;
-    /* padding-top: 2px;
+    .box {
+        display: block;
+        height: 100%;
+    }
+
+    #terminal-container {
+        display: block;
+        width: calc(100% - 1 px);
+        margin: 0 auto;
+        /* padding-top: 2px;
     padding-left: 3px; */
-    height: 95vh;
-}
-#terminal-container .terminal {
-    background-color: #000000;
-    color: #fafafa;
-    /* padding: 2px; */
-    height: 95vh;
-}
-#terminal-container .terminal:focus .terminal-cursor {
-    background-color: #fafafa;
-}
-#bottomdiv {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    background-color: rgb(50, 50, 50);
-    border-color: white;
-    border-style: solid none none none;
-    border-width: 1px;
-    z-index: 99;
-    height: 19px;
-}
-#status {
-    background-color: #338c33;
-    display: inline-block;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-color: white;
-    border-style: none solid none solid;
-    border-width: 1px;
-    text-align: left;
-    z-index: 100;
-}
-@keyframes countdown {
-    from {
-        background-color: rgb(255, 255, 0);
+        height: 95vh;
     }
-    to {
-        background-color: inherit;
+
+    #terminal-container .terminal {
+        background-color: #000000;
+        color: #fafafa;
+        /* padding: 2px; */
+        height: 95vh;
     }
-}
-#menu {
-    display: inline-block;
-    font-size: 16px;
-    color: rgb(255, 255, 255);
-    z-index: 100;
-}
-#menu:hover .dropup-content {
-    display: block;
-}
-#logBtn, #credentialsBtn, #reauthBtn {
-    color: #000;
-}
+
+    #terminal-container .terminal:focus .terminal-cursor {
+        background-color: #fafafa;
+    }
+
+    #bottomdiv {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: rgb(50, 50, 50);
+        border-color: white;
+        border-style: solid none none none;
+        border-width: 1px;
+        z-index: 99;
+        height: 19px;
+    }
+
+    #status {
+        background-color: #338c33;
+        display: inline-block;
+        padding-left: 10px;
+        padding-right: 10px;
+        border-color: white;
+        border-style: none solid none solid;
+        border-width: 1px;
+        text-align: left;
+        z-index: 100;
+    }
+
+    @keyframes countdown {
+        from {
+            background-color: rgb(255, 255, 0);
+        }
+
+        to {
+            background-color: inherit;
+        }
+    }
+
+    #menu {
+        display: inline-block;
+        font-size: 16px;
+        color: rgb(255, 255, 255);
+        z-index: 100;
+    }
+
+    #menu:hover .dropup-content {
+        display: block;
+    }
+
+    #logBtn,
+    #credentialsBtn,
+    #reauthBtn {
+        color: #000;
+    }
 </style>
