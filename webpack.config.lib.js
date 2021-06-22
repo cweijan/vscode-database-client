@@ -1,7 +1,7 @@
 const path = require('path');
 var webpack = require('webpack');
 
-// 1. npm i tedious mysql2 node-xlsx tunnelSsh g2
+// 1. npm i tedious node-xlsx g2 mongodb
 // 2. npm run lib
 
 module.exports = [
@@ -13,11 +13,10 @@ module.exports = [
             global: true, __dirname: true
         },
         entry: {
-            tedious: './node_modules/tedious/lib/tedious.js',
-            mysql2: './node_modules/mysql2/index.js',
-            'node-xlsx': './node_modules/node-xlsx/lib/index.js',
-            'tunnel-ssh': './node_modules/tunnel-ssh/index.js',
-            'g2': './node_modules/@antv/g2/lib/index.js',
+            // 'node-xlsx': './node_modules/node-xlsx/lib/index.js',
+            // tedious: './node_modules/tedious/lib/tedious.js',
+            mongodb: './node_modules/mongodb/index.js',
+            // g2: './node_modules/@antv/g2/lib/index.js',
         } ,
         output: {
             path: path.resolve(__dirname, 'src/bin'),
@@ -35,7 +34,7 @@ module.exports = [
             }
         },
         plugins: [
-            new webpack.IgnorePlugin(/^(pg-native|supports-color)$/)
+            new webpack.IgnorePlugin(/^(pg-native|supports-color|mongodb-client-encryption)$/)
         ],
         module: { rules: [{ test: /\.ts$/, exclude: /node_modules/, use: ['ts-loader'] }] },
         optimization: { minimize: true },

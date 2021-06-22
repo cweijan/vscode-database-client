@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { Node } from "@/model/interface/node";
-import { MongoClient, MongoClientOptions, ObjectId as MObjectId } from "mongodb";
+import { MongoClient, MongoClientOptions, ObjectId as MObjectId } from "@/bin/mongodb";
 import { IConnection, queryCallback } from "./connection";
 
 export class MongoConnection extends IConnection {
