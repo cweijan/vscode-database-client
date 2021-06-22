@@ -53,7 +53,6 @@
                 }))
 
                 const container = document.getElementById('terminal-container');
-                // TODO 搜索插件报错.
                 terminal.onKey(async e => {
                     const event = e.domEvent;
                     if ((event.code == "KeyC" && event.ctrlKey && !event.altKey && !event.shiftKey) ||
