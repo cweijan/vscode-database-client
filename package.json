@@ -454,8 +454,18 @@
 				"when": "editorLangId == sql"
 			},
 			{
+				"command": "mysql.runQuery",
+				"key": "ctrl+enter",
+				"when": "editorLangId == sql"
+			},
+			{
 				"command": "mysql.runAllQuery",
 				"key": "ctrl+f9",
+				"when": "editorLangId == sql"
+			},
+			{
+				"command": "mysql.runAllQuery",
+				"key": "ctrl+shift+enter",
 				"when": "editorLangId == sql"
 			},
 			{

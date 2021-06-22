@@ -63,7 +63,8 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
                 end = new vscode.Position(i, sep)
                 codeLens.push(new vscode.CodeLens(new vscode.Range(start, end), {
                     command: "mysql.codeLens.run",
-                    title: "Run SQL",
+                    title: "▶ Run SQL",
+                    // title: "$(debug-start) Run SQL",
                     arguments: [sql],
                 }));
                 start = null;
