@@ -69,11 +69,12 @@ export class ConnectService {
                     terminal.show()
                 }).on("connecting", async (data) => {
                     const connectionOption = data.connectionOption
-                    const connectNode = Util.trim(NodeUtil.of(connectionOption))
+                    const node:Node = Util.trim(NodeUtil.of(connectionOption))
                     try {
-                        await this.connect(connectNode)
-                        await provider.addConnection(connectNode)
-                        const { key, connectionKey } = connectNode
+                        node.initKey();
+                        await this.connect(node)
+                        await provider.addConnection(node)
+                        const { key, connectionKey } = node
                         handler.emit("success", { message: 'connect success!', key, connectionKey })
                     } catch (err) {
                         if (err?.message) {
@@ -98,7 +99,8 @@ export class ConnectService {
 
     public async connect(connectionNode: Node): Promise<void> {
         if (connectionNode.dbType == DatabaseType.SSH) {
-            await ClientManager.getSSH(connectionNode.ssh, false)
+            connectionNode.ssh.key=connectionNode.key;
+            await ClientManager.getSSH(connectionNode.ssh, {withSftp:false})
             return;
         }
         ConnectionManager.removeConnection(connectionNode.getConnectId())

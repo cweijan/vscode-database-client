@@ -14,6 +14,10 @@ export interface SSHConfig {
     privateKey?: Buffer;
     passphrase?: string;
     algorithms?: Algorithms;
+    /**
+     * only ssh connection
+     */
+    key: string;
 }
 
 export interface Algorithms {

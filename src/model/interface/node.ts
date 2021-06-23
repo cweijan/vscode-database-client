@@ -53,7 +53,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public disable?: boolean;
 
     /**
-     * context
+     * using to distingush connectHolder, childCache, elementState
      */
     public uid: string;
     public key: string;
@@ -101,7 +101,6 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.port = source.port
         this.user = source.user
         this.password = source.password
-        if (!this.database) this.database = source.database
         this.timezone = source.timezone
         this.useSSL = source.useSSL
         this.clientCertPath = source.clientCertPath
@@ -111,9 +110,6 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.scheme = source.scheme
         this.encoding = source.encoding
         this.showHidden = source.showHidden
-        if (!this.schema) {
-            this.schema = source.schema
-        }
         this.connectionKey = source.connectionKey
         this.global = source.global
         this.dbType = source.dbType
@@ -132,6 +128,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.authType = source.authType
         this.disable = source.disable
         this.includeDatabases = source.includeDatabases
+        if (!this.database) this.database = source.database
+        if (!this.schema) this.schema = source.schema
         if (!this.provider) this.provider = source.provider
         if (!this.context) this.context = source.context
         // init dialect
@@ -141,9 +139,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         if (this.disable) {
             this.command = { command: "mysql.connection.open", title: "Open Connection", arguments: [this] }
         }
-        if(source.key){
-            this.key = source.key;
-        }
+        this.key = source.key || this.key;
         this.initUid();
         // init tree state
         this.collapsibleState = DatabaseCache.getElementState(this)

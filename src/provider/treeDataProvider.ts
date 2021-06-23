@@ -71,7 +71,6 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
     public async addConnection(node: Node) {
 
-        node.initKey();
         const newKey = this.getKeyByNode(node)
         node.context = node.global ? this.context.globalState : this.context.workspaceState
 
@@ -89,7 +88,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
             node.context = node.global ? this.context.globalState : this.context.workspaceState
         }
 
-        node.connectionKey=newKey
+        node.connectionKey = newKey
         await node.indent({ command: CommandKey.add, connectionKey: newKey })
 
     }
@@ -140,6 +139,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         } else if (connectInfo.dbType == DatabaseType.REDIS) {
             node = new RedisConnectionNode(key, connectInfo)
         } else if (connectInfo.dbType == DatabaseType.SSH) {
+            connectInfo.ssh.key = connectInfo.key
             node = new SSHConnectionNode(key, connectInfo, connectInfo.ssh, connectInfo.name)
         } else if (connectInfo.dbType == DatabaseType.FTP) {
             node = new FTPConnectionNode(key, connectInfo)
