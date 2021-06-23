@@ -17,7 +17,7 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
         return this.parseCodeLensEnhance(document) as vscode.ProviderResult<vscode.CodeLens[]>;
     }
 
-    public parseCodeLensEnhance(document: vscode.TextDocument,current?: vscode.Position): vscode.ProviderResult<vscode.CodeLens[]> | string {
+    public parseCodeLensEnhance(document: vscode.TextDocument, current?: vscode.Position): vscode.ProviderResult<vscode.CodeLens[]> | string {
 
         // DelimiterHolder.parseBatch(sql, connectionNode.getConnectId())
 
@@ -27,7 +27,7 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
 
         const delimter = this.getDelimter();
 
-        const codeLens = []
+        const codeLens: vscode.CodeLens[] = []
 
         let start: vscode.Position;
         let end: vscode.Position;
@@ -37,7 +37,10 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
         for (var i = 0; i < lineCount; i++) {
             let col = 0;
             var line = document.lineAt(i)
-            var text = line.text?.replace(/(--|#).+/, '')?.replace(/(\/\*).*?(\*\/)/g, '');
+            var text = line.text?.replace(/(--|#).+/, '')
+                ?.replace(/\/\*.*?\*\//g, '')
+                ?.replace(/'.*?'/g, '')
+                ?.replace(/".*?"/g, '')
             if (inBlockComment) {
                 const blockEndMatch = text.match(/.*?(\*\/)/)
                 if (!blockEndMatch) {
@@ -68,7 +71,7 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
             if (sep != -1) {
                 end = new vscode.Position(i, sep)
                 const range = new vscode.Range(start, end);
-                if(current && (range.contains(current) || range.start.line > current.line) ){
+                if (current && (range.contains(current) || range.start.line > current.line)) {
                     return sql;
                 }
                 codeLens.push(new vscode.CodeLens(range, {
@@ -83,7 +86,10 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
             }
         }
 
-        if(current){
+        if (current) {
+            if (codeLens.length > 0) {
+                return codeLens[codeLens.length - 1].command.arguments[0]
+            }
             return document.getText()
         }
 
