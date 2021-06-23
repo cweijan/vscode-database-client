@@ -27,11 +27,7 @@ export abstract class NodeUtil {
             return NodeUtil.of( { ...nodes, parent: null, provider: null, context: null, command: null })
         }
         if (nodes instanceof Array) {
-            let tempNodes = []
-            for (const node of nodes) {
-                tempNodes.push(this.removeParent(node))
-            }
-            return tempNodes;
+            return nodes.map(this.removeParent)
         }
         // if is node object map
         let result = {};

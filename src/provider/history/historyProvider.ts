@@ -1,6 +1,7 @@
 import { CacheKey } from "@/common/constants";
 import { Global } from "@/common/global";
 import { GlobalState } from "@/common/state";
+import { NodeUtil } from "@/model/nodeUtil";
 import * as vscode from "vscode";
 import { HistoryNode } from "./historyNode";
 
@@ -30,7 +31,7 @@ export class HistoryProvider implements vscode.TreeDataProvider<HistoryNode>{
         if (glboalHistoryies.length > 100) {
             glboalHistoryies = glboalHistoryies.splice(-1, 1)
         }
-        GlobalState.update(CacheKey.GLOBAL_HISTORY, glboalHistoryies);
+        GlobalState.update(CacheKey.GLOBAL_HISTORY, NodeUtil.removeParent(glboalHistoryies));
         HistoryProvider._onDidChangeTreeData.fire(null)
     }
 
