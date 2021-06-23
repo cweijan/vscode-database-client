@@ -175,7 +175,18 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
                 continue;
             }
 
-            const schemaList = DatabaseCache.getSchemaListOfConnection(cNode.uid)
+            let schemaList: Node[];
+            if (cNode.dbType == DatabaseType.MSSQL || cNode.dbType == DatabaseType.PG) {
+                const tempList = DatabaseCache.getSchemaListOfConnection(cNode.uid);
+                schemaList = [];
+                for (const catalogNode of tempList) {
+                    if (catalogNode instanceof UserGroup) continue;
+                    schemaList.push(...(await catalogNode.getChildren()))
+                }
+            } else {
+                schemaList = DatabaseCache.getSchemaListOfConnection(cNode.uid)
+            }
+
             for (const schemaNode of schemaList) {
                 if (schemaNode instanceof UserGroup || schemaNode instanceof CatalogNode) { continue }
                 let uid = `${cNode.label}#${schemaNode.schema}`
