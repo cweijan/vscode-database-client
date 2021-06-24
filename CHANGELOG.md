@@ -1,9 +1,11 @@
 # CHANGELOG
 
-# 3.9.1 2021-6-24
+# 3.9.2 2021-6-24
 
 - Enhance sql detect.
 - Update run query shortcut.
+- Keep query file content.
+- Create SQL document outline.
 
 # 3.9.0 2021-6-22
 
