@@ -28,11 +28,13 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
         const delimter = this.getDelimter();
 
         const codeLens: vscode.CodeLens[] = []
+        let lastLineLength: number;
         const context = { inSingleQuoteString: false, inDoubleQuoteString: false, inComment: false, sql: '', start: null }
 
         const lineCount = Math.min(document.lineCount, 5000);
         for (var i = 0; i < lineCount; i++) {
             var text = document.lineAt(i).text
+            lastLineLength = text.length;
             for (let j = 0; j < text.length; j++) {
                 const ch = text.charAt(j);
                 // comment check
@@ -77,14 +79,17 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
                     context.start = new vscode.Position(i, j)
                 }
                 context.sql = context.sql + ch;
-                // if end withtout delimter
-                if (i == lineCount - 1 && j == text.length - 1) {
-                    const range = new vscode.Range(context.start, new vscode.Position(i, j + 1));
-                    if (current) return context.sql;
-                    codeLens.push(new vscode.CodeLens(range, { command: "mysql.codeLens.run", title: "▶ Run SQL", arguments: [context.sql], }));
-                }
             }
+            if(context.sql)
+                context.sql = context.sql + '\n';
 
+        }
+
+        // if end withtout delimter
+        if (context.start) {
+            const range = new vscode.Range(context.start, new vscode.Position(lineCount, lastLineLength));
+            if (current) return context.sql;
+            codeLens.push(new vscode.CodeLens(range, { command: "mysql.codeLens.run", title: "▶ Run SQL", arguments: [context.sql], }));
         }
 
         return codeLens

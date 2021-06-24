@@ -50,6 +50,10 @@ export class QueryUnit {
             sql = this.getSqlFromEditor(connectionNode, queryOption.runAll);
             queryOption.recordHistory = true;
         }
+        if(!sql){
+            vscode.window.showErrorMessage("Not sql found!")
+            return;
+        }
 
         sql = sql.replace(/^\s*--.+/igm, '').trim();
 
