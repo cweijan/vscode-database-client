@@ -161,6 +161,7 @@ export default {
       if (!data) return;
       const response = data.content;
       console.log(data);
+      this.result.transId=response.transId;
       this.table.loading = false;
       switch (data.type) {
         case "EXPORT_DONE":
