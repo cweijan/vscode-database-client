@@ -42,25 +42,24 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
                 ?.replace(/'.*?'/g, '')
                 ?.replace(/".*?"/g, '')
             if (inBlockComment) {
-                const blockEndMatch = text.match(/.*?(\*\/)/)
+                const blockEndMatch = text.match(/.*?\*\//)
                 if (!blockEndMatch) {
                     continue;
                 }
                 inBlockComment = false;
-                text = text.replace(/.*?(\*\/)/, '')
+                text = text.replace(/.*?\*\//, '')
                 col = blockEndMatch[0].length
             } else {
-                const blockComment = text.match(/(\/\*)/)
-                inBlockComment = blockComment && blockComment[2] == null;
+                inBlockComment = text.match(/\/\*/) != null
                 if (inBlockComment) {
-                    continue;
+                    text = text.replace(/\/\*.*?/, '')
                 }
             }
 
+            text=text.trim()
             if (text == '') continue;
-            sql = sql + "\n" + text;
 
-            if (text?.trim() && !start) {
+            if (text && !start) {
                 start = new vscode.Position(i, col)
             }
 
@@ -68,6 +67,9 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
             if (start && (lineCount - 1 == i)) {
                 sep = text.length;
             }
+
+            sql = sql + "\n" + (sep != -1 ? text.substr(0, sep) : text);
+
             if (sep != -1) {
                 end = new vscode.Position(i, sep)
                 const range = new vscode.Range(start, end);
@@ -77,7 +79,6 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
                 codeLens.push(new vscode.CodeLens(range, {
                     command: "mysql.codeLens.run",
                     title: "▶ Run SQL",
-                    // title: "$(debug-start) Run SQL",
                     arguments: [sql],
                 }));
                 start = null;
