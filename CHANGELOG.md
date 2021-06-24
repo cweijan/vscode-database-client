@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.9.1 2021-6-24
+
+- Enhance sql detect.
+- Update run query shortcut.
+
 # 3.9.0 2021-6-22
 
 - Support edit connection config.
