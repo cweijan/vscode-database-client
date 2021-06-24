@@ -1,5 +1,5 @@
 import { CacheKey, DatabaseType } from "@/common/constants";
-import { SqlCodeLensProvider } from "@/provider/sqlCodeLensProvider";
+import { SqlCodeLensProvider } from "@/provider/codelen/sqlCodeLensProvider";
 import * as vscode from "vscode";
 import { ExtensionContext } from "vscode";
 import { FileManager } from "../common/filesManager";
@@ -35,7 +35,7 @@ import { SettingService } from "./setting/settingService";
 import ConnectionProvider from "@/model/ssh/connectionProvider";
 import { SqliTeDialect } from "./dialect/sqliteDialect";
 import { MongoPageService } from "./page/mongoPageService";
-import { HistoryProvider } from "@/provider/history/historyProvider";
+import { HighlightCreator } from "@/provider/codelen/highlightCreator";
 
 export class ServiceManager {
 
@@ -64,6 +64,7 @@ export class ServiceManager {
         if (this.isInit) { return [] }
         const codeLenProvider = new SqlCodeLensProvider();
         this.codeLenProvider=codeLenProvider;
+        new HighlightCreator(codeLenProvider)
         const res: vscode.Disposable[] = [
             vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormattingProvider()),
             vscode.languages.registerCodeLensProvider('sql', codeLenProvider),

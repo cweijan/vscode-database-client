@@ -928,6 +928,11 @@
 					"default": 100,
 					"description": "%config.defaultSelectLimit%"
 				},
+				"database-client.highlightSQLBlock": {
+					"type": "boolean",
+					"default": false,
+					"description": "Highlight SQL Code block."
+				},
 				"database-client.preferConnectionName": {
 					"type": "boolean",
 					"default": true,

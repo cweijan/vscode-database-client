@@ -5,6 +5,8 @@ import { ConnectionManager } from '@/service/connectionManager';
 import * as vscode from 'vscode';
 
 export class SqlCodeLensProvider implements vscode.CodeLensProvider {
+
+ 
     onDidChangeCodeLenses?: vscode.Event<void>;
     provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
         return this.parseCodeLens(document)
@@ -19,13 +21,17 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
 
     public parseCodeLensEnhance(document: vscode.TextDocument, current?: vscode.Position): vscode.ProviderResult<vscode.CodeLens[]> | string {
 
-        // DelimiterHolder.parseBatch(sql, connectionNode.getConnectId())
-
         if (Global.getConfig<number>(ConfigKey.DISABLE_SQL_CODELEN)) {
             return []
         }
 
         const delimter = this.getDelimter();
+
+        /**
+         * TODO
+         * 1. if string include delimter
+         * 2. if one line include two sql.
+         */
 
         const codeLens: vscode.CodeLens[] = []
 
@@ -36,11 +42,9 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
         const lineCount = Math.min(document.lineCount, 3000);
         for (var i = 0; i < lineCount; i++) {
             let col = 0;
-            var line = document.lineAt(i)
-            var text = line.text?.replace(/(--|#).+/, '')
+            var originText = document.lineAt(i).text
+            var text = originText?.replace(/(--|#).+/, '')
                 ?.replace(/\/\*.*?\*\//g, '')
-                ?.replace(/'.*?'/g, '')
-                ?.replace(/".*?"/g, '')
             if (inBlockComment) {
                 const blockEndMatch = text.match(/.*?\*\//)
                 if (!blockEndMatch) {

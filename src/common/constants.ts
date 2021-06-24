@@ -26,6 +26,7 @@ export enum CacheKey {
 }
 
 export enum ConfigKey {
+    HIGHLIGHT_SQL_BLOCK = "highlightSQLBlock",
     DEFAULT_LIMIT = "defaultSelectLimit",
     PREFER_CONNECTION_NAME = "preferConnectionName",
     DISABLE_SQL_CODELEN = "disableSqlCodeLen",
