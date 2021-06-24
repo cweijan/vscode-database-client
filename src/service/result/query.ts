@@ -67,12 +67,12 @@ export class QueryPage {
                 }).on('copy', value => {
                     Util.copyToBoard(value)
                 }).on('count', async (params) => {
-                    if(dbOption.dbType==DatabaseType.MONGO_DB){
-                        const sql=params.sql.replace(/(.+?find\(.+?\)).+/i, '$1').replace("find","count");
+                    if (dbOption.dbType == DatabaseType.MONGO_DB) {
+                        const sql = params.sql.replace(/(.+?find\(.+?\)).+/i, '$1').replace("find", "count");
                         dbOption.execute(sql).then((count) => {
                             handler.emit('COUNT', { data: count })
                         })
-                    }else{
+                    } else {
                         dbOption.execute(params.sql.replace(/\bSELECT\b.+?\bFROM\b/i, 'select count(*) count from')).then((rows) => {
                             handler.emit('COUNT', { data: rows[0].count })
                         })
@@ -107,12 +107,14 @@ export class QueryPage {
             case MessageType.DATA:
                 if (queryParam.connection.dbType == DatabaseType.ES) {
                     await this.loadEsColumnList(queryParam);
-                }else if (queryParam.connection.dbType == DatabaseType.MONGO_DB) {
+                } else if (queryParam.connection.dbType == DatabaseType.MONGO_DB) {
                     await this.loadMongoColumnList(queryParam);
-                }  else {
+                } else {
                     await this.loadColumnList(queryParam);
                 }
-                ((queryParam.res)as DataResponse).pageSize=ServiceManager.getPageService(queryParam.connection.dbType).getPageSize(queryParam.res.sql)
+                const pageSize = ServiceManager.getPageService(queryParam.connection.dbType).getPageSize(queryParam.res.sql);
+                ((queryParam.res) as DataResponse).pageSize = (queryParam.res.data?.length && queryParam.res.data.length > pageSize)
+                    ? queryParam.res.data.length : pageSize;
                 break;
             case MessageType.MESSAGE_BLOCK:
                 queryParam.res.message = `EXECUTE SUCCESS:<br><br>&nbsp;&nbsp;${queryParam.res.sql}`;
@@ -193,8 +195,8 @@ export class QueryPage {
             tableName = fields[0].orgTable;
             database = fields[0].schema || fields[0].db;
             queryParam.res.database = database;
-        }else{
-            tableName=tableName.replace(/^"?(.+?)"?$/,'$1')
+        } else {
+            tableName = tableName.replace(/^"?(.+?)"?$/, '$1')
         }
 
         const tableNode = queryParam.connection.getByRegion(tableName)
