@@ -73,6 +73,7 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
                 }
 
                 if (!context.start) {
+                    if (ch.match(/\s/)) continue;
                     context.start = new vscode.Position(i, j)
                 }
                 context.sql = context.sql + ch;
