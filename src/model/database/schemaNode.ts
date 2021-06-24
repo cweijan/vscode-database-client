@@ -1,3 +1,4 @@
+import { FileModel } from "@/common/filesManager";
 import { Global } from "@/common/global";
 import * as vscode from "vscode";
 import { DatabaseType, ModelType } from "../../common/constants";
@@ -109,7 +110,7 @@ export class SchemaNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        QueryUnit.showSQLTextDocument(this, '', `${this.schema}.sql`)
+        QueryUnit.showSQLTextDocument(this,'',`${this.schema}.sql`,FileModel.APPEND)
 
     }
 

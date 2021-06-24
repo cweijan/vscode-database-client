@@ -1,3 +1,4 @@
+import { FileModel } from "@/common/filesManager";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { DatabaseCache } from "@/service/common/databaseCache";
 import { QueryUnit } from "@/service/queryUnit";
@@ -37,7 +38,7 @@ export class CatalogNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        QueryUnit.showSQLTextDocument(this,'',`${this.database}.sql`)
+        QueryUnit.showSQLTextDocument(this,'',`${this.database}.sql`,FileModel.APPEND)
 
     }
 

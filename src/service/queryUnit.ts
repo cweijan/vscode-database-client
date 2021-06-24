@@ -151,9 +151,9 @@ export class QueryUnit {
         return ServiceManager.instance.codeLenProvider.parseCodeLensEnhance(editor.document, editor.selection.active) as string;
     }
 
-    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql"): Promise<vscode.TextEditor> {
+    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql",fileMode?:FileModel): Promise<vscode.TextEditor> {
 
-        const document = await vscode.workspace.openTextDocument(await FileManager.record(`${node.uid}/${template}`, sql, FileModel.WRITE));
+        const document = await vscode.workspace.openTextDocument(await FileManager.record(`${node.uid}/${template}`, sql, fileMode));
         return await vscode.window.showTextDocument(document);
     }
 

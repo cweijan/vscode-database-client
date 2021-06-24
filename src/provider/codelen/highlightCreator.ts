@@ -37,16 +37,18 @@ export class HighlightCreator {
             return;
         }
 
-        const document = textEditor.document;
-        if (document.languageId != 'sql') {
+        const document = textEditor?.document;
+        if (document?.languageId != 'sql') {
             return;
         }
 
         if (!ranges) {
+            if (!this) return;
             const range = (await this.codeLensProvider.parseCodeLens(document))
                 .map(len => len.range)
                 .find(range => range.contains(textEditor.selection) || range.start.line > textEditor.selection.start.line)
-            ranges = [range]
+            if (range)
+                ranges = [range]
         }
 
         if (ranges?.length > 0) {
