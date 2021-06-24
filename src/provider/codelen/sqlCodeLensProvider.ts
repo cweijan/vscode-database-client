@@ -45,31 +45,31 @@ export class SqlCodeLensProvider implements vscode.CodeLensProvider {
                 // string check
                 if (ch == `'`) {
                     context.inSingleQuoteString = !context.inSingleQuoteString;
-                    continue;
                 } else if (ch == `"`) {
                     context.inDoubleQuoteString = !context.inDoubleQuoteString;
-                    continue;
                 }
-                if (context.inSingleQuoteString || context.inDoubleQuoteString) continue;
-                // line comment
-                if (ch == '-' && text.charAt(j + 1) == '-') break;
-                // block comment start
-                if (ch == '/' && text.charAt(j + 1) == '*') {
-                    j++;
-                    context.inComment = true;
-                    continue;
-                }
-                // check sql end 
-                if (ch == delimter) {
-                    if (!context.start) continue;
-                    const range = new vscode.Range(context.start, new vscode.Position(i, j + 1));
-                    if (current && (range.contains(current) || range.start.line > current.line)) {
-                        return context.sql;
+                const inString = context.inSingleQuoteString || context.inDoubleQuoteString;
+                if (!inString) {
+                    // line comment
+                    if (ch == '-' && text.charAt(j + 1) == '-') break;
+                    // block comment start
+                    if (ch == '/' && text.charAt(j + 1) == '*') {
+                        j++;
+                        context.inComment = true;
+                        continue;
                     }
-                    codeLens.push(new vscode.CodeLens(range, { command: "mysql.codeLens.run", title: "▶ Run SQL", arguments: [context.sql], }));
-                    context.sql = ''
-                    context.start = null
-                    continue;
+                    // check sql end 
+                    if (ch == delimter) {
+                        if (!context.start) continue;
+                        const range = new vscode.Range(context.start, new vscode.Position(i, j + 1));
+                        if (current && (range.contains(current) || range.start.line > current.line)) {
+                            return context.sql;
+                        }
+                        codeLens.push(new vscode.CodeLens(range, { command: "mysql.codeLens.run", title: "▶ Run SQL", arguments: [context.sql], }));
+                        context.sql = ''
+                        context.start = null
+                        continue;
+                    }
                 }
 
                 if (!context.start) {
