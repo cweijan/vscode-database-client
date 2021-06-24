@@ -36,6 +36,7 @@ import ConnectionProvider from "@/model/ssh/connectionProvider";
 import { SqliTeDialect } from "./dialect/sqliteDialect";
 import { MongoPageService } from "./page/mongoPageService";
 import { HighlightCreator } from "@/provider/codelen/highlightCreator";
+import { SQLSymbolProvide } from "@/provider/sqlSymbolProvide";
 
 export class ServiceManager {
 
@@ -68,6 +69,7 @@ export class ServiceManager {
         const res: vscode.Disposable[] = [
             vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormattingProvider()),
             vscode.languages.registerCodeLensProvider('sql', codeLenProvider),
+            vscode.languages.registerDocumentSymbolProvider('sql', new SQLSymbolProvide(codeLenProvider)),
             vscode.languages.registerHoverProvider('sql', new TableInfoHoverProvider()),
             vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.', ">", "<", "=", "(")
         ]
