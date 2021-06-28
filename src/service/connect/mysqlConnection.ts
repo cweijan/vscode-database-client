@@ -22,11 +22,11 @@ export class MysqlConnection extends IConnection {
                 return buf?.toString();
             }
         } as mysql.ConnectionConfig;
-        if(node.useSSL){
-            config.ssl={
+        if (node.useSSL) {
+            config.ssl = {
                 rejectUnauthorized: false,
-                cert: ( node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
-                key: ( node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
+                cert: (node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
+                key: (node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
                 minVersion: 'TLSv1'
             }
         }
@@ -38,7 +38,7 @@ export class MysqlConnection extends IConnection {
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
     query(sql: any, values?: any, callback?: any) {
-        return this.con.query(sql, values, callback)
+        return this.con.query({ sql, infileStreamFactory: (path: string) => fs.createReadStream(path) } as any, values, callback)
     }
     connect(callback: (err: Error) => void): void {
         this.con.connect(callback)
