@@ -14,6 +14,7 @@ import { Trans } from "~/common/trans";
 import { IConnection } from "./connect/connection";
 import { FieldInfo } from "@/common/typeDef";
 import { Util } from "@/common/util";
+import { SQLParser } from "@/provider/parser/sqlParser";
 
 export class QueryUnit {
 
@@ -50,7 +51,7 @@ export class QueryUnit {
             sql = this.getSqlFromEditor(connectionNode, queryOption.runAll);
             queryOption.recordHistory = true;
         }
-        if(!sql){
+        if (!sql) {
             vscode.window.showErrorMessage("Not sql found!")
             return;
         }
@@ -152,10 +153,10 @@ export class QueryUnit {
             return editor.document.getText(selection);
         }
 
-        return ServiceManager.instance.codeLenProvider.parseCodeLensEnhance(editor.document, editor.selection.active) as string;
+        return SQLParser.parseBlockSingle(editor.document, editor.selection.active)?.sql
     }
 
-    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql",fileMode:FileModel=FileModel.WRITE): Promise<vscode.TextEditor> {
+    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql", fileMode: FileModel = FileModel.WRITE): Promise<vscode.TextEditor> {
 
         const document = await vscode.workspace.openTextDocument(await FileManager.record(`${node.uid}/${template}`, sql, fileMode));
         return await vscode.window.showTextDocument(document);

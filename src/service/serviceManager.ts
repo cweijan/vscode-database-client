@@ -64,12 +64,12 @@ export class ServiceManager {
     public init(): vscode.Disposable[] {
         if (this.isInit) { return [] }
         const codeLenProvider = new SqlCodeLensProvider();
-        this.codeLenProvider=codeLenProvider;
-        new HighlightCreator(codeLenProvider)
+        this.codeLenProvider = codeLenProvider;
+        new HighlightCreator()
         const res: vscode.Disposable[] = [
             vscode.languages.registerDocumentRangeFormattingEditProvider('sql', new SqlFormattingProvider()),
             vscode.languages.registerCodeLensProvider('sql', codeLenProvider),
-            vscode.languages.registerDocumentSymbolProvider('sql', new SQLSymbolProvide(codeLenProvider)),
+            vscode.languages.registerDocumentSymbolProvider('sql', new SQLSymbolProvide()),
             vscode.languages.registerHoverProvider('sql', new TableInfoHoverProvider()),
             vscode.languages.registerCompletionItemProvider('sql', new CompletionProvider(), ' ', '.', ">", "<", "=", "(")
         ]

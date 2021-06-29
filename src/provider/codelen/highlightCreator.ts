@@ -1,13 +1,13 @@
 import { ConfigKey } from '@/common/constants';
 import { Global } from '@/common/global';
 import * as vscode from 'vscode';
-import { SqlCodeLensProvider } from "./sqlCodeLensProvider";
+import { SQLParser } from '../parser/sqlParser';
 
 export class HighlightCreator {
 
     private highLightColor: vscode.TextEditorDecorationType;
 
-    constructor(private codeLensProvider: SqlCodeLensProvider) {
+    constructor() {
 
         this.highLightColor = vscode.window.createTextEditorDecorationType({
             light: { backgroundColor: '#5B8DDE20' },
@@ -44,7 +44,7 @@ export class HighlightCreator {
 
         if (!ranges) {
             if (!this) return;
-            const range = (await this.codeLensProvider.parseCodeLens(document))
+            const range = (SQLParser.parseBlocks(document))
                 .map(len => len.range)
                 .find(range => range.contains(textEditor.selection) || range.start.line > textEditor.selection.start.line)
             if (range)
