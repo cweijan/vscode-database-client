@@ -2,6 +2,7 @@ import { DelimiterHolder } from '@/service/common/delimiterHolder';
 import { ConnectionManager } from '@/service/connectionManager';
 import * as vscode from 'vscode';
 import { SQLBlock, SQLToken } from './sqlBlcok';
+import { TokenContext } from './tokenContext';
 
 export class SQLParser {
 
@@ -17,8 +18,7 @@ export class SQLParser {
         const blocks: SQLBlock[] = []
         let lastLineLength: number;
         const context = { inSingleQuoteString: false, inDoubleQuoteString: false, inComment: false, sql: '', start: null }
-        let tokens: SQLToken[] = []
-        const tokenContext = { word: '', wordStart: null }
+        let tokenContext = new TokenContext()
 
         const lineCount = Math.min(document.lineCount, 5000);
         for (var i = 0; i < lineCount; i++) {
@@ -52,48 +52,26 @@ export class SQLParser {
                     // check sql end 
                     if (ch == delimter) {
                         if (!context.start) continue;
-                        if (tokenContext.wordStart) {
-                            tokens.push({
-                                content: tokenContext.word,
-                                range: new vscode.Range(tokenContext.wordStart, new vscode.Position(i, j))
-                            })
-                        }
+                        tokenContext.endToken(i, j)
                         const range = new vscode.Range(context.start, new vscode.Position(i, j + 1));
-                        const block = { sql: context.sql, range, tokens };
+                        const block = { sql: context.sql, range, tokens: tokenContext.tokens };
                         if (current && (range.contains(current) || range.start.line > current.line)) {
                             return [block];
                         }
                         blocks.push(block);
                         context.sql = ''
                         context.start = null
-                        tokens = []
-                        tokenContext.wordStart = null;
-                        tokenContext.word = ''
+                        tokenContext = new TokenContext()
                         continue;
                     }
                 }
 
-                if (ch.match(/\s/)) {
-                    if (tokenContext.wordStart) {
-                        tokens.push({
-                            content: tokenContext.word,
-                            range: new vscode.Range(tokenContext.wordStart, new vscode.Position(i, j))
-                        })
-                        tokenContext.wordStart = null;
-                        tokenContext.word = ''
-                    }
-                    context.sql = context.sql + ch;
-                    continue;
-                }
-
-                if (!tokenContext.wordStart) {
-                    tokenContext.wordStart = new vscode.Position(i, j)
-                }
+                tokenContext.appendChar(i, j, ch)
 
                 if (!context.start) {
+                    if (ch.match(/\s/)) continue;
                     context.start = new vscode.Position(i, j)
                 }
-                tokenContext.word = tokenContext.word + ch
                 context.sql = context.sql + ch;
             }
             if (context.sql)
@@ -104,7 +82,7 @@ export class SQLParser {
         // if end withtout delimter
         if (context.start) {
             const range = new vscode.Range(context.start, new vscode.Position(lineCount, lastLineLength));
-            const block = { sql: context.sql, range, tokens };
+            const block = { sql: context.sql, range, tokens: tokenContext.tokens };
             if (current) return [block];
             blocks.push(block)
         }
