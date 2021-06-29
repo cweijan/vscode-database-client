@@ -73,15 +73,7 @@ export class SQLParser {
                     }
                 }
 
-                if (!context.start) {
-                    if (!ch.match(/\s/)) {
-                        context.start = new vscode.Position(i, j)
-                        if (!tokenContext.wordStart) {
-                            tokenContext.wordStart = new vscode.Position(i, j)
-                        }
-                        tokenContext.word = tokenContext.word + ch
-                        continue;
-                    }
+                if (ch.match(/\s/)) {
                     if (tokenContext.wordStart) {
                         tokens.push({
                             content: tokenContext.word,
@@ -90,7 +82,18 @@ export class SQLParser {
                         tokenContext.wordStart = null;
                         tokenContext.word = ''
                     }
+                    context.sql = context.sql + ch;
+                    continue;
                 }
+
+                if (!tokenContext.wordStart) {
+                    tokenContext.wordStart = new vscode.Position(i, j)
+                }
+
+                if (!context.start) {
+                    context.start = new vscode.Position(i, j)
+                }
+                tokenContext.word = tokenContext.word + ch
                 context.sql = context.sql + ch;
             }
             if (context.sql)

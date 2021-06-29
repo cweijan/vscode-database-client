@@ -1,6 +1,8 @@
 import { Cursor } from "@/common/constants";
 import * as vscode from "vscode";
 import { QueryUnit } from "../../service/queryUnit";
+import { SQLBlock, SQLToken } from "../parser/sqlBlcok";
+import { SQLParser } from "../parser/sqlParser";
 
 export interface ComplectionChain {
     getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] | Promise<vscode.CompletionItem[]>;
@@ -15,11 +17,23 @@ export class ComplectionContext {
     public currentWord: string;
     public currentSql: string;
     public currentSqlFull: string;
+    public position: vscode.Position;
+    public currentToken: SQLToken;
+    public tokens: SQLToken[];
+    public sqlBlock: SQLBlock;
 
     public static build(document: vscode.TextDocument, position: vscode.Position): ComplectionContext {
 
         const context = new ComplectionContext();
         const currentSql = this.obtainCursorSql(document, position).trim();
+        context.position = position;
+        context.sqlBlock = SQLParser.parseBlockSingle(document, position)
+        context.tokens=context.sqlBlock.tokens
+        for (const token of context.sqlBlock.tokens) {
+            if (token.range.contains(position)) {
+                context.currentToken = token;
+            }
+        }
         context.currentSqlFull = this.obtainCursorSql(document, position, document.getText()).trim();
         if (!context.currentSqlFull) { return context; }
 

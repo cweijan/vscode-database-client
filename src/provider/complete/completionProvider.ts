@@ -2,13 +2,13 @@ import * as vscode from "vscode";
 import { ColumnChain } from "./chain/columnChain";
 import { KeywordChain } from "./chain/keywordChain";
 import { TableChain } from "./chain/tableChain";
-import { TableCreateChain } from "./chain/tableCreatingChain";
 import { TypeKeywordChain } from "./chain/typeKeywordChain";
 import { ComplectionChain, ComplectionContext } from "./complectionContext";
 import { TableDetecherChain } from "./chain/tableDetecherChain";
 import { FunctionChain } from "./chain/functionChain";
 import { Console } from "../../common/Console";
 import { SchemaChain } from "./chain/schemaChain";
+import { DDLChain } from "./chain/ddlChain";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
     constructor() {
@@ -20,7 +20,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     private initDefaultComplectionItem() {
         // The chain is orderly
         this.fullChain = [
-            new TableCreateChain(),
+            new DDLChain(),
             new TypeKeywordChain(),
             new SchemaChain(),
             new TableChain(),
