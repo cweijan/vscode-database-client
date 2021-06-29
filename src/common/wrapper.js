@@ -7,13 +7,13 @@ export function wrapByDb(origin, databaseType) {
     if (databaseType == 'PostgreSQL') {
         return origin.split(".").map(text => `"${text}"`).join(".")
     }
+    if (databaseType == 'MongoDB') {
+        return origin;
+    }
 
-    if (origin.match(/\b[-\s]+\b/ig) || origin.match(/^( |if|key|desc|length)$/i)) {
+    if (origin.match(/\b[-\s]+\b/ig) || origin.match(/^( |if|key|desc|length|group|order)$/i)) {
         if (databaseType == 'SqlServer') {
             return origin.split(".").map(text => `[${text}]`).join(".")
-        }
-        if (databaseType == 'MongoDB') {
-            return origin;
         }
         return `\`${origin}\``;
     }
