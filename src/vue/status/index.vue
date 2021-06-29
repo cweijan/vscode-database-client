@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { Chart } from "@/bin/g2";
+import { Chart } from "g2";
 import { inject } from "../mixin/vscodeInject";
 
 export default {

@@ -34,13 +34,10 @@ module.exports = [
             }
         },
         plugins: [
-            new webpack.IgnorePlugin(/^(pg-native|supports-color|cardinal|encoding|aws4)$/),
-            new CopyWebpackPlugin({
-                patterns: [{ from: 'src/bin', to: './bin' }]
-            }),
+            new webpack.IgnorePlugin(/^(pg-native|supports-color|cardinal|encoding|aws4)$/)
         ],
         module: { rules: [{ test: /\.ts$/, exclude: /(node_modules|bin)/, use: ['ts-loader'] }] },
-        optimization: { minimize: false },
+        optimization: { minimize: isProd },
         watch: !isProd,
         mode: isProd ? 'production' : 'development',
         devtool: isProd ? false : 'source-map',

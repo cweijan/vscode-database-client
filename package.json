@@ -45,10 +45,16 @@
 					"es"
 				],
 				"configuration": "./syntaxes/es.configuration.json"
-			},{
+			},
+			{
 				"id": "sql",
-				"extensions": [ ".sql", ".dsql" ],
-				"aliases": [ "SQL" ],
+				"extensions": [
+					".sql",
+					".dsql"
+				],
+				"aliases": [
+					"SQL"
+				],
 				"configuration": "./syntaxes/language-configuration.json"
 			}
 		],
@@ -1019,10 +1025,13 @@
 		"date-format": "^3.0.0",
 		"deepmerge": "^3.2.0",
 		"element-ui": "^2.13.2",
+		"g2": "^2.3.13",
 		"ioredis": "^4.23.0",
 		"json-format-highlight": "^1.0.4",
 		"lodash": "^4.17.20",
 		"lodash.defaults": "^4.1.0",
+		"mockjs": "^1.1.0",
+		"mongodb": "^3.6.9",
 		"mysql2": "^2.2.5",
 		"officegen": "^0.6.5",
 		"pg": "^8.5.1",

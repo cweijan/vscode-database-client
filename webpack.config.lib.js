@@ -1,7 +1,7 @@
 const path = require('path');
 var webpack = require('webpack');
 
-// 1. npm i tedious node-xlsx g2 mongodb
+// 1. npm i tedious node-xlsx
 // 2. npm run lib
 
 module.exports = [
@@ -13,10 +13,8 @@ module.exports = [
             global: true, __dirname: true
         },
         entry: {
-            // 'node-xlsx': './node_modules/node-xlsx/lib/index.js',
-            // tedious: './node_modules/tedious/lib/tedious.js',
-            mongodb: './node_modules/mongodb/index.js',
-            // g2: './node_modules/@antv/g2/lib/index.js',
+            'node-xlsx': './node_modules/node-xlsx/lib/index.js',
+            tedious: './node_modules/tedious/lib/tedious.js',
         } ,
         output: {
             path: path.resolve(__dirname, 'src/bin'),
