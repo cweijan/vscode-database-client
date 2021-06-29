@@ -5,7 +5,7 @@ import { SQLBlock, SQLToken } from "../parser/sqlBlcok";
 import { SQLParser } from "../parser/sqlParser";
 
 export interface ComplectionChain {
-    getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] | Promise<vscode.CompletionItem[]>;
+    getComplection(context: ComplectionContext): vscode.CompletionItem[] | Promise<vscode.CompletionItem[]>;
 
     stop(): boolean;
 }
@@ -18,6 +18,7 @@ export class ComplectionContext {
     public currentSql: string;
     public currentSqlFull: string;
     public position: vscode.Position;
+    public previousToken: SQLToken;
     public currentToken: SQLToken;
     public tokens: SQLToken[];
     public sqlBlock: SQLBlock;
@@ -29,10 +30,15 @@ export class ComplectionContext {
         context.position = position;
         context.sqlBlock = SQLParser.parseBlockSingle(document, position)
         context.tokens=context.sqlBlock.tokens
-        for (const token of context.sqlBlock.tokens) {
+        for (let i = 0; i < context.tokens.length; i++) {
+            const token = context.tokens[i];
             if (token.range.contains(position)) {
                 context.currentToken = token;
+                if(context.tokens[i-1]){
+                    context.previousToken = context.tokens[i-1];
+                }
             }
+            
         }
         context.currentSqlFull = this.obtainCursorSql(document, position, document.getText()).trim();
         if (!context.currentSqlFull) { return context; }

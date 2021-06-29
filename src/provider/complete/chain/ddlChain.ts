@@ -6,6 +6,8 @@ import { BaseChain } from "./baseChain";
 export class DDLChain extends BaseChain {
 
     private keywordComplectionItems: vscode.CompletionItem[] = this.strToComplection(["Table", "Procedure", "View", "Function", "Trigger"])
+    private typeList: vscode.CompletionItem[] = this.strToComplection(["INTEGER", "CHAR", "VARCHAR", "DECIMAL", "SMALLINT", "TINYINT", "MEDIUMINT", "BIGINT", "CHARACTER",
+        "NUMERIC", "BIT", "INT", "FLOAT", "DOUBLE", "TEXT", "SET", "BLOB", "TIMESTAMP", "DATE", "TIME", "YEAR", "DATETIME"],vscode.CompletionItemKind.Variable);
 
     getComplection(complectionContext: ComplectionContext): CompletionItem[] | Promise<CompletionItem[]> {
 
@@ -26,14 +28,17 @@ export class DDLChain extends BaseChain {
             switch (secondToken) {
                 case 'table':
                     return this.strToComplection(["AUTO_INCREMENT", "NULL", "NOT", "PRIMARY", "CURRENT_TIME", "REFERENCES",
-                        "DEFAULT", "COMMENT", "UNIQUE", "KEY", "FOREIGN", "CASCADE", "RESTRICT", "UNSIGNED", "CURRENT_TIMESTAMP"])
+                        "DEFAULT", "COMMENT", "UNIQUE", "KEY", "FOREIGN", "CASCADE", "RESTRICT", "UNSIGNED", "CURRENT_TIMESTAMP"]).concat(this.typeList)
             }
         } else {
             switch (secondToken) {
-                case 'table': break;
+                case 'table':
+                    return this.typeList;
+                case 'procedure':
+                    return this.typeList;
+                case 'function':
+                    return this.typeList;
                 case 'view': break;
-                case 'procedure': break;
-                case 'function': break;
                 case 'trigger': break;
             }
         }

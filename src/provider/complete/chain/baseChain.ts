@@ -3,7 +3,7 @@ import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export abstract class BaseChain implements ComplectionChain {
     protected needStop: boolean = false;
-    abstract getComplection(complectionContext: ComplectionContext): CompletionItem[] | Promise<CompletionItem[]>;
+    abstract getComplection(context: ComplectionContext): CompletionItem[] | Promise<CompletionItem[]>;
     stop(): boolean {
         return this.needStop;
     }

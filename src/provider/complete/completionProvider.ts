@@ -2,7 +2,6 @@ import * as vscode from "vscode";
 import { ColumnChain } from "./chain/columnChain";
 import { KeywordChain } from "./chain/keywordChain";
 import { TableChain } from "./chain/tableChain";
-import { TypeKeywordChain } from "./chain/typeKeywordChain";
 import { ComplectionChain, ComplectionContext } from "./complectionContext";
 import { TableDetecherChain } from "./chain/tableDetecherChain";
 import { FunctionChain } from "./chain/functionChain";
@@ -21,7 +20,6 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         // The chain is orderly
         this.fullChain = [
             new DDLChain(),
-            new TypeKeywordChain(),
             new SchemaChain(),
             new TableChain(),
             new ColumnChain(),
