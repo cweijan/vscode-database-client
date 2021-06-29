@@ -3,19 +3,22 @@ import { SchemaNode } from "@/model/database/schemaNode";
 import * as vscode from "vscode";
 import { UserGroup } from "../../../model/database/userGroup";
 import { ConnectionManager } from "../../../service/connectionManager";
-import { ComplectionChain, ComplectionContext } from "../complectionContext";
+import { ComplectionContext } from "../complectionContext";
+import { BaseChain } from "./baseChain";
 
-export class SchemaChain implements ComplectionChain {
+export class SchemaChain extends BaseChain {
 
-    public getComplection(complectionContext: ComplectionContext) {
-        if (complectionContext.preWord && complectionContext.preWord.match(/into|from|update|table|join/ig)) {
+    public getComplection(context: ComplectionContext) {
+        const firstToken = context.tokens[0]?.content?.toLowerCase()
+        if (!firstToken || ['select', 'insert', 'update', 'delete', 'call', 'execute'].indexOf(firstToken) == -1) {
+            return null;
+        }
+        const previous = context.previousToken?.content?.toLowerCase()
+        if (previous && previous.match(/into|from|update|table|join/ig)) {
             return this.generateDatabaseComplectionItem();
         }
-        return null;
-    }
 
-    public stop(): boolean {
-        return false;
+        return null;
     }
 
     private async generateDatabaseComplectionItem() {

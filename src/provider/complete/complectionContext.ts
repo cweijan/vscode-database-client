@@ -29,16 +29,18 @@ export class ComplectionContext {
         const currentSql = this.obtainCursorSql(document, position).trim();
         context.position = position;
         context.sqlBlock = SQLParser.parseBlockSingle(document, position)
-        context.tokens=context.sqlBlock.tokens
+        context.tokens = context.sqlBlock.tokens
         for (let i = 0; i < context.tokens.length; i++) {
             const token = context.tokens[i];
             if (token.range.contains(position)) {
                 context.currentToken = token;
-                if(context.tokens[i-1]){
-                    context.previousToken = context.tokens[i-1];
+                if (context.tokens[i - 1]) {
+                    context.previousToken = context.tokens[i - 1];
                 }
             }
-            
+        }
+        if (!context.previousToken && context.tokens.length > 1) {
+            context.previousToken = context.tokens[context.tokens.length - 1]
         }
         context.currentSqlFull = this.obtainCursorSql(document, position, document.getText()).trim();
         if (!context.currentSqlFull) { return context; }
