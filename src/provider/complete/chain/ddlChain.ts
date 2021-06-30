@@ -1,20 +1,25 @@
+import { ModelType } from "@/common/constants";
 import * as vscode from "vscode";
 import { CompletionItem } from "vscode";
 import { ComplectionContext } from "../complectionContext";
+import { NodeFinder } from "../nodeFinder";
 import { BaseChain } from "./baseChain";
 
 export class DDLChain extends BaseChain {
 
     private keywordComplectionItems: vscode.CompletionItem[] = this.strToComplection(["Table", "Procedure", "View", "Function", "Trigger"])
     private typeList: vscode.CompletionItem[] = this.strToComplection(["INTEGER", "CHAR", "VARCHAR", "DECIMAL", "SMALLINT", "TINYINT", "MEDIUMINT", "BIGINT", "CHARACTER",
-        "NUMERIC", "BIT", "INT", "FLOAT", "DOUBLE", "TEXT", "SET", "BLOB", "TIMESTAMP", "DATE", "TIME", "YEAR", "DATETIME"],vscode.CompletionItemKind.Variable);
+        "NUMERIC", "BIT", "INT", "FLOAT", "DOUBLE", "TEXT", "SET", "BLOB", "TIMESTAMP", "DATE", "TIME", "YEAR", "DATETIME"], vscode.CompletionItemKind.Variable);
 
-    getComplection(complectionContext: ComplectionContext): CompletionItem[] | Promise<CompletionItem[]> {
+    async getComplection(complectionContext: ComplectionContext): Promise<CompletionItem[]> {
 
         const firstToken = complectionContext.tokens[0]?.content?.toLowerCase()
         if (!firstToken) return []
         const secondToken = complectionContext.tokens[1]?.content?.toLowerCase()
 
+        const isCreate = firstToken == 'create';
+        const isAlter = firstToken == 'alter';
+        const isDrop = firstToken == 'drop';
         if (['create', 'alter', 'drop'].indexOf(firstToken) == -1) {
             return []
         }
@@ -24,22 +29,37 @@ export class DDLChain extends BaseChain {
             return this.keywordComplectionItems;
         }
 
-        if (firstToken == 'create') {
+        if (isCreate) {
             switch (secondToken) {
                 case 'table':
                     return this.strToComplection(["AUTO_INCREMENT", "NULL", "NOT", "PRIMARY", "CURRENT_TIME", "REFERENCES",
                         "DEFAULT", "COMMENT", "UNIQUE", "KEY", "FOREIGN", "CASCADE", "RESTRICT", "UNSIGNED", "CURRENT_TIMESTAMP"]).concat(this.typeList)
             }
         } else {
+            let modelType: ModelType;
             switch (secondToken) {
                 case 'table':
-                    return this.typeList;
+                    modelType = ModelType.TABLE;
+                    break;
                 case 'procedure':
-                    return this.typeList;
+                    modelType = ModelType.PROCEDURE;
+                    break;
                 case 'function':
-                    return this.typeList;
-                case 'view': break;
-                case 'trigger': break;
+                    modelType = ModelType.FUNCTION;
+                    break;
+                case 'view':
+                    modelType = ModelType.VIEW;
+                    break;
+                case 'trigger':
+                    modelType = ModelType.TRIGGER;
+                    break;
+            }
+            if (modelType) {
+                if (isAlter) {
+                    return this.nodeToComplection(await NodeFinder.findNodes(null, modelType), vscode.CompletionItemKind.Function).concat(this.typeList)
+                } else {
+                    return this.nodeToComplection(await NodeFinder.findNodes(null, modelType), vscode.CompletionItemKind.Function)
+                }
             }
         }
 

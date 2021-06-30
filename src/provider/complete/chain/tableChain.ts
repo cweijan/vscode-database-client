@@ -19,10 +19,6 @@ export class TableChain implements ComplectionChain {
             } else {
                 return await this.generateTableComplectionItem(complectionContext.preWord);
             }
-
-        }
-        if (complectionContext.preWord && complectionContext.preWord.match(/\b(into|from|update|table|join)\b/ig)) {
-            return await this.generateTableComplectionItem();
         }
         return null;
     }

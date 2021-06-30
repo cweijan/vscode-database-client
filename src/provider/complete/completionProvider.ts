@@ -10,15 +10,13 @@ import { SchemaChain } from "./chain/schemaChain";
 import { DDLChain } from "./chain/ddlChain";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
-    constructor() {
-        this.initDefaultComplectionItem();
-    }
 
-    private fullChain: ComplectionChain[];
-
-    private initDefaultComplectionItem() {
-        // The chain is orderly
-        this.fullChain = [
+    /**
+     * The chain is orderly
+     * @returns 
+     */
+    private completeChain() {
+        return [
             new DDLChain(),
             new SchemaChain(),
             new TableChain(),
@@ -38,7 +36,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
         const context = ComplectionContext.build(document, position);
         let completionItemList = [];
-        for (const chain of this.fullChain) {
+        for (const chain of this.completeChain()) {
             try {
                 const tempComplection = await chain.getComplection(context);
                 if (tempComplection != null) {
