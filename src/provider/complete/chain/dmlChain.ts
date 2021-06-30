@@ -8,17 +8,17 @@ export class DMLChain extends BaseChain {
 
     public async getComplection(context: ComplectionContext) {
         const firstToken = context.tokens[0]?.content?.toLowerCase()
-        if (!firstToken || ['select', 'insert', 'update', 'delete', 'call', 'execute'].indexOf(firstToken) == -1) {
+        if (!firstToken || ['select', 'insert', 'update', 'delete', 'call'].indexOf(firstToken) == -1) {
             return null;
         }
         const previous = context.previousToken?.content?.toLowerCase()
         if (previous && previous.match(/into|from|update|table|join/i)) {
             this.requestStop()
-            return this.nodeToComplection(await NodeFinder.findNodes(null, null, ModelType.SCHEMA), vscode.CompletionItemKind.Folder).concat(
-                this.nodeToComplection(await NodeFinder.findNodes(null, null, ModelType.TABLE, ModelType.VIEW), vscode.CompletionItemKind.Function)
-                );
-            }
-            
+            return (await this.findNodes(null, null, vscode.CompletionItemKind.Folder, ModelType.SCHEMA)).concat(
+                await this.findNodes(null, null, vscode.CompletionItemKind.Function, ModelType.TABLE, ModelType.VIEW, ModelType.FUNCTION)
+            );
+        }
+
         switch (firstToken) {
             case 'select':
                 return this.functionList;
@@ -29,6 +29,10 @@ export class DMLChain extends BaseChain {
                 if (context.sqlBlock.tokens.find(token => token.content == 'where' && context.position.isAfter(token.range.end))) {
                     return this.functionList;
                 }
+            case 'call':
+                return (await this.findNodes(null, null, vscode.CompletionItemKind.Folder, ModelType.SCHEMA)).concat(
+                    await this.findNodes(null, null, vscode.CompletionItemKind.Function, ModelType.PROCEDURE)
+                );
             case 'insert':
                 if (firstToken == 'insert') {
                     // insert into [table] ($1)

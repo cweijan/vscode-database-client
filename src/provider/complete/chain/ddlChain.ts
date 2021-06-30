@@ -2,7 +2,6 @@ import { ModelType } from "@/common/constants";
 import * as vscode from "vscode";
 import { CompletionItem } from "vscode";
 import { ComplectionContext } from "../complectionContext";
-import { NodeFinder } from "../nodeFinder";
 import { BaseChain } from "./baseChain";
 
 export class DDLChain extends BaseChain {
@@ -56,9 +55,13 @@ export class DDLChain extends BaseChain {
             }
             if (modelType) {
                 if (isAlter) {
-                    return this.nodeToComplection(await NodeFinder.findNodes(null, null, modelType), vscode.CompletionItemKind.Function).concat(this.typeList)
+                    return (await this.findNodes(null, null, vscode.CompletionItemKind.Function, modelType)).concat(
+                        await this.findNodes(null, null, vscode.CompletionItemKind.Folder, ModelType.SCHEMA)
+                    ).concat(this.typeList)
                 } else {
-                    return this.nodeToComplection(await NodeFinder.findNodes(null, null, modelType), vscode.CompletionItemKind.Function)
+                    return (await this.findNodes(null, null, vscode.CompletionItemKind.Function, modelType)).concat(
+                        await this.findNodes(null, null, vscode.CompletionItemKind.Folder, ModelType.SCHEMA)
+                    )
                 }
             }
         }

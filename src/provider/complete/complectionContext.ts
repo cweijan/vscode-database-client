@@ -12,11 +12,7 @@ export interface ComplectionChain {
 
 export class ComplectionContext {
 
-    public preChart: string;
-    public preWord: string;
-    public currentWord: string;
     public currentSql: string;
-    public currentSqlFull: string;
     public position: vscode.Position;
     public previousToken: SQLToken;
     public currentToken: SQLToken;
@@ -42,27 +38,8 @@ export class ComplectionContext {
         if (!context.previousToken && context.tokens.length > 0) {
             context.previousToken = context.tokens[context.tokens.length - 1]
         }
-        context.currentSqlFull = this.obtainCursorSql(document, position, document.getText()).trim();
-        if (!context.currentSqlFull) { return context; }
+        if (!context.sqlBlock.sql.trim()) { return context; }
 
-        const prePostion = position.character === 0 ? position : new vscode.Position(position.line, position.character - 1);
-        const preChart = position.character === 0 ? null : document.getText(new vscode.Range(prePostion, position));
-
-        const wordMatch = currentSql.match(/(\w|-|\_|\*|\.)+/g);
-        if (wordMatch) {
-            if ((preChart == null || preChart.match(/[\. \(\)\[\]\'\"]/)) && wordMatch.length >= 1) {
-                context.preWord = wordMatch[wordMatch.length - 1];
-            } else {
-                context.preWord = wordMatch[wordMatch.length - 2];
-            }
-        }
-        context.preWord = context.preWord?.replace(/\.$/, '')
-        const codeMatch = currentSql.match(/(\w|=|<|>|\()+$/);
-        if (codeMatch) {
-            context.currentWord = codeMatch[0];
-        }
-
-        context.preChart = preChart;
         context.currentSql = currentSql.trim();
         return context;
     }

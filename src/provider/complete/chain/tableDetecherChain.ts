@@ -4,16 +4,14 @@ import { Pattern } from "../../../common/constants";
 
 export class TableDetecherChain implements ComplectionChain {
 
-    public getComplection(complectionContext: ComplectionContext): vscode.CompletionItem[] | Promise<vscode.CompletionItem[]> {
+    public getComplection(context: ComplectionContext): vscode.CompletionItem[] | Promise<vscode.CompletionItem[]> {
 
         const tableMatch = new RegExp(Pattern.TABLE_PATTERN + " *((\\w)*)?", 'ig');
-        if (
-            (complectionContext.preWord && complectionContext.preWord.match(/\b(select|HAVING|\(|on|where|and|,|=|<|>)\b/ig))
-            ||
-            (complectionContext.currentWord && complectionContext.currentWord.match(/(<|>|,|=)$/))
+        if (context.previousToken?.content?.match(/\b(select|HAVING|\(|on|where|and|,|=|<|>)\b/ig)
+            || context.currentToken?.content?.match(/(<|>|,|=)$/)
         ) {
             const completionItem = [];
-            let result = tableMatch.exec(complectionContext.currentSqlFull);
+            let result = tableMatch.exec(context.sqlBlock.sql);
             while (result != null) {
                 const alias = result[4];
                 if (alias) {
@@ -22,7 +20,7 @@ export class TableDetecherChain implements ComplectionChain {
                     const tableName = result[2].replace(/\w*?\./, "");
                     completionItem.push(new vscode.CompletionItem(tableName, vscode.CompletionItemKind.Interface));
                 }
-                result = tableMatch.exec(complectionContext.currentSqlFull);
+                result = tableMatch.exec(context.sqlBlock.sql);
             }
 
             return completionItem;

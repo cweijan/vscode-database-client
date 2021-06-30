@@ -10,11 +10,11 @@ export class ColumnChain implements ComplectionChain {
     private needStop = true;
     public async getComplection(context: ComplectionContext): Promise<vscode.CompletionItem[]> {
 
-        if (context.preChart === ".") {
-            let subComplectionItems = await this.generateColumnComplectionItem(context.preWord);
+        if (context.currentToken?.content === ".") {
+            let subComplectionItems = await this.generateColumnComplectionItem(context.previousToken?.content);
             if (subComplectionItems != null && subComplectionItems.length > 0) { this.needStop = true }
-            const tableReg = new RegExp(Pattern.TABLE_PATTERN + "(?=\\s*\\b" + context.preWord + "\\b)", "ig");
-            let result = tableReg.exec(context.currentSqlFull);
+            const tableReg = new RegExp(Pattern.TABLE_PATTERN + "(?=\\s*\\b" + context.previousToken?.content + "\\b)", "ig");
+            let result = tableReg.exec(context.sqlBlock.sql);
             while (result != null && subComplectionItems.length === 0) {
                 subComplectionItems = await this.generateColumnComplectionItem(
                     Util.getTableName(result[0], Pattern.TABLE_PATTERN)
@@ -23,7 +23,7 @@ export class ColumnChain implements ComplectionChain {
                 if (subComplectionItems.length > 0) {
                     break;
                 }
-                result = tableReg.exec(context.currentSqlFull);
+                result = tableReg.exec(context.sqlBlock.sql);
             }
             return subComplectionItems;
         }

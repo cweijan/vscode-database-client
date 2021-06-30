@@ -9,14 +9,14 @@ import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class TableChain implements ComplectionChain {
 
-    public async getComplection(complectionContext: ComplectionContext): Promise<vscode.CompletionItem[]> {
-
-        if (complectionContext.preChart == ".") {
-            const temp = await this.generateTableComplectionItem(complectionContext.preWord);
-            if (temp.length == 0) {
-                return null;
-            } else {
-                return await this.generateTableComplectionItem(complectionContext.preWord);
+    public async getComplection(context: ComplectionContext): Promise<vscode.CompletionItem[]> {
+        
+        const current=context.currentToken?.content
+        if (current == ".") {
+            const previous = context.previousToken?.content;
+            const temp = await this.generateTableComplectionItem(previous);
+            if (temp.length > 0) {
+                return temp;
             }
         }
         return null;
@@ -45,17 +45,7 @@ export class TableChain implements ComplectionChain {
                 case ModelType.VIEW:
                     completionItem.kind = vscode.CompletionItemKind.Module;
                     break;
-                case ModelType.PROCEDURE:
-                    completionItem.kind = vscode.CompletionItemKind.Reference;
-                    break;
-                case ModelType.FUNCTION:
-                    completionItem.kind = vscode.CompletionItemKind.Method;
-                    break;
-                case ModelType.TRIGGER:
-                    completionItem.kind = vscode.CompletionItemKind.Event;
-                    break;
             }
-
             return completionItem;
         });
     }
@@ -67,7 +57,7 @@ export class TableChain implements ComplectionChain {
 
         // If has input, try find schema of current catalog.
         if (inputWord) {
-            const connectcionid = lcp.getConnectId({ schema: inputWord,withSchema:true });
+            const connectcionid = lcp.getConnectId({ schema: inputWord, withSchema: true });
             lcp = Node.nodeCache[connectcionid]
             if (!lcp) return []
         }

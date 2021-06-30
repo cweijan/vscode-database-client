@@ -1,9 +1,12 @@
+import { ModelType } from "@/common/constants";
 import { Node } from "@/model/interface/node";
 import { CompletionItem, CompletionItemKind, SnippetString } from "vscode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
+import { NodeFinder } from "../nodeFinder";
 
 export abstract class BaseChain implements ComplectionChain {
     protected needStop: boolean = false;
+    // TODO 1: 分离聚合函数 2:提示是需要加上自定义函数
     protected functionList: CompletionItem[] = this.strToComplection(["CHAR_LENGTH", "CONCAT", "NOW", "DATE_ADD", "DATE_SUB", "MAX", "COUNT", "MIN", "SUM", "AVG", "LENGTH", "IF", "IFNULL", "MD5", "SHA", "CURRENT_DATE", "DATE_FORMAT", "CAST", "TRIM", "LAST_INSERT_ID", "MOD"], CompletionItemKind.Function, '($1)');
     abstract getComplection(context: ComplectionContext): CompletionItem[] | Promise<CompletionItem[]>;
     stop(): boolean {
@@ -19,6 +22,10 @@ export abstract class BaseChain implements ComplectionChain {
             completionItem.kind = kind;
             return completionItem;
         })
+    }
+    protected async findNodes(schema: string, table: string, kind: CompletionItemKind, ...types: ModelType[]): Promise<CompletionItem[]> {
+        const nodes = await NodeFinder.findNodes(schema, table, ...types)
+        return this.nodeToComplection(nodes, kind)
     }
     protected nodeToComplection(nodes: Node[], kind: CompletionItemKind, span = ' '): CompletionItem[] {
         return nodes.map(item => {
