@@ -54,7 +54,7 @@ export class SQLParser {
                         if (!context.start) continue;
                         tokenContext.endToken(i, j)
                         const range = new vscode.Range(context.start, new vscode.Position(i, j + 1));
-                        const block = { sql: context.sql, range, tokens: tokenContext.tokens };
+                        const block: SQLBlock = { sql: context.sql, range, tokens: tokenContext.tokens, scopes: tokenContext.scopes };
                         if (current && (range.contains(current) || range.start.line > current.line)) {
                             return [block];
                         }
@@ -74,7 +74,7 @@ export class SQLParser {
                 }
                 context.sql = context.sql + ch;
             }
-            if (context.sql){
+            if (context.sql) {
                 context.sql = context.sql + '\n';
                 tokenContext.appendChar(i, text.length, '\n')
             }
@@ -84,7 +84,7 @@ export class SQLParser {
         // if end withtout delimter
         if (context.start) {
             const range = new vscode.Range(context.start, new vscode.Position(lineCount, lastLineLength));
-            const block = { sql: context.sql, range, tokens: tokenContext.tokens };
+            const block: SQLBlock = { sql: context.sql, range, tokens: tokenContext.tokens, scopes: tokenContext.scopes };
             if (current) return [block];
             blocks.push(block)
         }

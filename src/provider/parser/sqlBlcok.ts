@@ -4,6 +4,7 @@ export class SQLBlock {
     sql: string;
     range: Range;
     tokens: SQLToken[];
+    scopes: Range[] = [];
 }
 
 export class SQLToken {
