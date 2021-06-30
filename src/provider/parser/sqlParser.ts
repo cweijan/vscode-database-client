@@ -74,8 +74,10 @@ export class SQLParser {
                 }
                 context.sql = context.sql + ch;
             }
-            if (context.sql)
+            if (context.sql){
                 context.sql = context.sql + '\n';
+                tokenContext.appendChar(i, text.length, '\n')
+            }
 
         }
 
