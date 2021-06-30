@@ -19,6 +19,10 @@ export class DMLChain extends BaseChain {
             );
         }
 
+        if (context.currentToken?.content === ".") {
+            return;
+        }
+
         switch (firstToken) {
             case 'select':
                 return this.functionList;
