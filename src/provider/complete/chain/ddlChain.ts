@@ -56,9 +56,9 @@ export class DDLChain extends BaseChain {
             }
             if (modelType) {
                 if (isAlter) {
-                    return this.nodeToComplection(await NodeFinder.findNodes(null, modelType), vscode.CompletionItemKind.Function).concat(this.typeList)
+                    return this.nodeToComplection(await NodeFinder.findNodes(null, null, modelType), vscode.CompletionItemKind.Function).concat(this.typeList)
                 } else {
-                    return this.nodeToComplection(await NodeFinder.findNodes(null, modelType), vscode.CompletionItemKind.Function)
+                    return this.nodeToComplection(await NodeFinder.findNodes(null, null, modelType), vscode.CompletionItemKind.Function)
                 }
             }
         }

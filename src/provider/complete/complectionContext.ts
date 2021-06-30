@@ -39,7 +39,7 @@ export class ComplectionContext {
                 }
             }
         }
-        if (!context.previousToken && context.tokens.length > 1) {
+        if (!context.previousToken && context.tokens.length > 0) {
             context.previousToken = context.tokens[context.tokens.length - 1]
         }
         context.currentSqlFull = this.obtainCursorSql(document, position, document.getText()).trim();

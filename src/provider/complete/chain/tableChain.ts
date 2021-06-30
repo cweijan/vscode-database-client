@@ -1,7 +1,6 @@
 import { Node } from "@/model/interface/node";
 import { TableGroup } from "@/model/main/tableGroup";
 import { ViewGroup } from "@/model/main/viewGroup";
-import { DatabaseCache } from "@/service/common/databaseCache";
 import * as vscode from "vscode";
 import { DatabaseType, ModelType } from "../../../common/constants";
 import { TableNode } from "../../../model/main/tableNode";

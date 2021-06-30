@@ -1,13 +1,12 @@
 import * as vscode from "vscode";
+import { Console } from "../../common/Console";
 import { ColumnChain } from "./chain/columnChain";
+import { DDLChain } from "./chain/ddlChain";
+import { DMLChain } from "./chain/dmlChain";
 import { KeywordChain } from "./chain/keywordChain";
 import { TableChain } from "./chain/tableChain";
-import { ComplectionChain, ComplectionContext } from "./complectionContext";
 import { TableDetecherChain } from "./chain/tableDetecherChain";
-import { FunctionChain } from "./chain/functionChain";
-import { Console } from "../../common/Console";
-import { SchemaChain } from "./chain/schemaChain";
-import { DDLChain } from "./chain/ddlChain";
+import { ComplectionContext } from "./complectionContext";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
 
@@ -18,10 +17,9 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     private completeChain() {
         return [
             new DDLChain(),
-            new SchemaChain(),
+            new DMLChain(),
             new TableChain(),
             new ColumnChain(),
-            new FunctionChain(),
             new TableDetecherChain(),
             new KeywordChain(),
         ];

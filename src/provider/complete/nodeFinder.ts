@@ -10,13 +10,13 @@ import { ConnectionManager } from "@/service/connectionManager";
 
 export class NodeFinder {
 
-    public static async findNodes(suffix: string, ...types: ModelType[]): Promise<Node[]> {
+    public static async findNodes(schema: string, table: string, ...types: ModelType[]): Promise<Node[]> {
 
         let lcp = ConnectionManager.tryGetConnection();
         if (!lcp) return [];
 
-        if (suffix) {
-            const connectcionid = lcp.getConnectId({ schema: suffix, withSchema: true });
+        if (schema) {
+            const connectcionid = lcp.getConnectId({ schema: schema, withSchema: true });
             lcp = Node.nodeCache[connectcionid]
             if (!lcp) return []
         }
@@ -25,6 +25,9 @@ export class NodeFinder {
         const groupNodes = await lcp.getChildren();
         for (const type of types) {
             switch (type) {
+                case ModelType.COLUMN:
+                    nodeList.push(...(await lcp.getByRegion(table)?.getChildren()))
+                    break;
                 case ModelType.SCHEMA:
                     if (!lcp || !lcp?.parent?.getChildren) { break; }
                     const databaseNodes = await lcp.parent.getChildren()

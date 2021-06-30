@@ -6,7 +6,7 @@ export class TokenContext {
     scopes: Range[] = [];
     word: string = '';
     wordStart: Position;
-    bracketStart: SQLToken[]=[];
+    bracketStart: SQLToken[] = [];
 
     public appendChar(i: number, j: number, char: string) {
         if (char.match(/\s/)) {
@@ -77,7 +77,9 @@ export class TokenContext {
             if ((preivous.content.match(/into|from|update|table|join/i)) || (preivous.type == 'schema_dot')) {
                 return 'table'
             }
-            if (preivous.content == '(' && this.word.toLowerCase() == 'select') {
+            if (preivous.content == '(' &&
+                (this.word.toLowerCase() == 'select' || this.getToken(-2)?.type=='table')
+            ) {
                 preivous.type = 'bracketStart'
             }
         }
