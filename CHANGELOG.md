@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.9.3 2021-7-2
+
+- Better sql complection.
+- Fix multi line space ignored.
+
 # 3.9.2 2021-6-24
 
 - Enhance sql detect.
