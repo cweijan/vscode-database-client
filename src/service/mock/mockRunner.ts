@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'fs';
-import * as Mock from 'mockjs';
+import * as Mock from '@/bin/mockjs';
 import * as vscode from "vscode";
 import { MessageType } from "../../common/constants";
 import { ConnectionManager } from "../connectionManager";

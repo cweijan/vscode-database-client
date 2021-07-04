@@ -252,7 +252,7 @@ ROW_FORMAT : ${meta.row_format}
             const count = await this.execute(`select max(${primaryKey}) max from ${this.wrap(this.table)}`);
             if (count && count[0]?.max) {
                 const max = count[0].max;
-                return Number.isInteger(max) ? max : 0;
+                return Number.isInteger(max)||max.match(/^\d+$/) ? max : 0;
             }
         }
 

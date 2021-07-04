@@ -991,7 +991,6 @@
 	},
 	"devDependencies": {
 		"@antv/g2": "^4.0.9",
-		"@types/mockjs": "^1.0.2",
 		"@types/mongodb": "^3.6.3",
 		"@types/node": "^12.12.6",
 		"@types/ssh2": "^0.5.43",
@@ -1030,7 +1029,6 @@
 		"json-format-highlight": "^1.0.4",
 		"lodash": "^4.17.20",
 		"lodash.defaults": "^4.1.0",
-		"mockjs": "^1.1.0",
 		"mongodb": "^3.6.9",
 		"mysql2": "^2.2.5",
 		"officegen": "^0.6.5",
