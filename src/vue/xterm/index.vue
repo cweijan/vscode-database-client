@@ -55,8 +55,12 @@
                 const container = document.getElementById('terminal-container');
                 terminal.onKey(async e => {
                     const event = e.domEvent;
-                    if ((event.code == "KeyC" && event.ctrlKey && !event.altKey && !event.shiftKey) ||
-                        (event.code == "KeyV" && event.ctrlKey && !event.altKey && !event.shiftKey) ||
+                    if (event.code == "KeyC" && event.ctrlKey && !event.altKey && !event.shiftKey) {
+                        if (terminal.hasSelection()) {
+                            document.execCommand('copy')
+                        }
+                        return;
+                    } else if ((event.code == "KeyV" && event.ctrlKey && !event.altKey && !event.shiftKey) ||
                         (event.code == "KeyF" && event.ctrlKey && !event.altKey && !event.shiftKey)
                     ) {
                         return;
