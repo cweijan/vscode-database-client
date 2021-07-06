@@ -3,7 +3,7 @@ import { Node } from "@/model/interface/node";
 import { IConnection, queryCallback } from "./connection";
 import { EsIndexGroup } from "@/model/es/model/esIndexGroupNode";
 import * as compareVersions from 'compare-versions';
-const extPackage=require("@/../package.json")
+const extPackage = require("@/../package.json")
 
 export class EsConnection extends IConnection {
 
@@ -11,9 +11,9 @@ export class EsConnection extends IConnection {
     private conneted: boolean;
     constructor(private opt: Node) {
         super()
-        if(compareVersions(extPackage.version,'3.6.6')===1){
-            this.url = `${opt.scheme}://${opt.host}`
-        }else{
+        if (compareVersions(extPackage.version, '3.6.6') === 1) {
+            this.url = opt.usingSSH ? `${opt.scheme}://${opt.host}:${opt.port}` : `${opt.scheme}://${opt.host}`
+        } else {
             this.url = `${opt.scheme}://${opt.host}:${opt.port}`
         }
     }

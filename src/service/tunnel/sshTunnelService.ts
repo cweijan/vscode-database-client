@@ -3,6 +3,7 @@ import { Node } from '../../model/interface/node';
 import { Console } from '../../common/Console';
 import { existsSync } from 'fs';
 import * as portfinder from 'portfinder'
+import { DatabaseType } from '@/common/constants';
 
 export class SSHTunnelService {
 
@@ -15,26 +16,26 @@ export class SSHTunnelService {
         }
     }
 
-    public createTunnel(connectionNode: Node, errorCallback: (error) => void): Promise<Node> {
-        return new Promise(async (resolve,reject) => {
-            const ssh = connectionNode.ssh
-            const key = connectionNode.getConnectId();
+    public createTunnel(node: Node, errorCallback: (error) => void): Promise<Node> {
+        return new Promise(async (resolve, reject) => {
+            const ssh = node.ssh
+            const key = node.getConnectId();
             if (this.tunelMark[key]) {
-                resolve({ ...connectionNode, host: "127.0.0.1", port: this.tunelMark[key].tunnelPort } as Node)
+                resolve({ ...node, host: "127.0.0.1", port: this.tunelMark[key].tunnelPort } as Node)
                 return;
             }
             const port = await portfinder.getPortPromise();
-            connectionNode.ssh.tunnelPort = port
+            node.ssh.tunnelPort = port
             const config = {
                 username: ssh.username,
                 password: ssh.password,
                 host: ssh.host,
                 port: ssh.port,
-                dstHost: connectionNode.host,
-                dstPort: connectionNode.port,
+                dstHost: node.host,
+                dstPort: node.port,
                 localHost: '127.0.0.1',
                 localPort: port,
-                algorithms:ssh.algorithms,
+                algorithms: ssh.algorithms,
                 passphrase: ssh.passphrase,
                 privateKey: (() => {
                     if (ssh.privateKeyPath && existsSync(ssh.privateKeyPath)) {
@@ -43,6 +44,12 @@ export class SSHTunnelService {
                     return null
                 })()
             };
+            if (node.dbType == DatabaseType.ES) {
+                config.dstHost = node.host.split(":")[0]
+                // config.dstPort= (node.host.split(":")[1] || '80') as any
+                const portStr = node.host.split(":")[1] || '80'
+                config.dstPort = parseInt(portStr)
+            }
 
             const localTunnel = tunnel(config, (error, server) => {
                 this.tunelMark[key] = { tunnel: localTunnel, tunnelPort: port }
@@ -50,7 +57,7 @@ export class SSHTunnelService {
                     delete this.tunelMark[key]
                     errorCallback(error)
                 }
-                resolve({ ...connectionNode, host: "127.0.0.1", port } as Node)
+                resolve({ ...node, host: "127.0.0.1", port } as Node)
             });
             localTunnel.on('error', (err) => {
                 Console.log('Ssh tunel occur error : ' + err);

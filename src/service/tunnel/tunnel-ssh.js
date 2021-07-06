@@ -36,15 +36,15 @@ function createServer(config) {
         netConnection.on('error', server.emit.bind(server, 'error'));
         netConnection.on('close', function () {
             connectionCount--;
-            if (connectionCount === 0) {
-                if (!config.keepAlive) {
-                    setTimeout(function () {
-                        if (connectionCount === 0) {
-                            server.close();
-                        }
-                    }, 2);
-                }
-            }
+            // if (connectionCount === 0) {
+            //     if (!config.keepAlive) {
+            //         setTimeout(function () {
+            //             if (connectionCount === 0) {
+            //                 server.close();
+            //             }
+            //         }, 2);
+            //     }
+            // }
         });
 
         server.emit('netConnection', netConnection, server);

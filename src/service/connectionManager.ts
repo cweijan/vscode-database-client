@@ -105,6 +105,7 @@ export class ConnectionManager {
             let connectOption = connectionNode;
             if (connectOption.usingSSH) {
                 connectOption = await this.tunnelService.createTunnel(connectOption, (err) => {
+                    reject(err?.message || err?.errno);
                     if (err.errno == 'EADDRINUSE') { return; }
                     this.alivedConnection[key] = null
                 })
