@@ -110,13 +110,13 @@ export function activate(context: vscode.ExtensionContext) {
                     new DiffService().startDiff(serviceManager.provider);
                 },
                 "mysql.data.export": (node: SchemaNode | TableNode) => {
-                    serviceManager.dumpService.dump(node, true)
+                    ServiceManager.getDumpService(node.dbType).dump(node, true)
                 },
                 "mysql.struct.export": (node: SchemaNode | TableNode) => {
-                    serviceManager.dumpService.dump(node, false)
+                    ServiceManager.getDumpService(node.dbType).dump(node, false)
                 },
                 "mysql.document.generate": (node: SchemaNode | TableNode) => {
-                    serviceManager.dumpService.generateDocument(node)
+                    ServiceManager.getDumpService(node.dbType).generateDocument(node)
                 },
                 "mysql.data.import": (node: SchemaNode | ConnectionNode) => {
                     const importService=ServiceManager.getImportService(node.dbType);

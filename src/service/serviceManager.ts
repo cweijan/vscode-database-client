@@ -37,6 +37,7 @@ import { SqliTeDialect } from "./dialect/sqliteDialect";
 import { MongoPageService } from "./page/mongoPageService";
 import { HighlightCreator } from "@/provider/codelen/highlightCreator";
 import { SQLSymbolProvide } from "@/provider/sqlSymbolProvide";
+import { MysqlDumpService } from "./dump/mysqlDumpService";
 
 export class ServiceManager {
 
@@ -49,7 +50,6 @@ export class ServiceManager {
     public settingService: SettingService;
     public statusService: StatusService;
     public codeLenProvider: SqlCodeLensProvider;
-    public dumpService: DumpService;
     private isInit = false;
 
     constructor(private readonly context: ExtensionContext) {
@@ -115,8 +115,16 @@ export class ServiceManager {
 
     private initMysqlService() {
         this.settingService = new MysqlSettingService();
-        this.dumpService = new DumpService();
         this.statusService = new MysqlStatusService()
+    }
+
+    public static getDumpService(dbType: DatabaseType): DumpService {
+        if (!dbType) dbType = DatabaseType.MYSQL
+        switch (dbType) {
+            case DatabaseType.MYSQL:
+                return new MysqlDumpService()
+        }
+        return new DumpService()
     }
 
     public static getImportService(dbType: DatabaseType) {

@@ -3,10 +3,11 @@ import { join } from "path";
 import * as vscode from "vscode";
 import { Position, TextDocument } from "vscode";
 import { Confirm, Constants, DatabaseType } from "./constants";
-import { Global } from "./global";
-import { compare } from 'compare-versions';
+import { exec } from "child_process";
 import { wrapByDb } from "./wrapper.js";
 import { GlobalState } from "./state";
+import { Console } from "./Console";
+import { close } from "node:fs";
 
 export class Util {
 
@@ -128,6 +129,27 @@ export class Util {
         }
 
         return this.supportColor;
+    }
+
+    public static execute(command: string): Promise<void> {
+        return new Promise((res, rej) => {
+            let hasTrigger = false;
+            exec(command, (err, stdout, stderr) => {
+                if (hasTrigger) return;
+                hasTrigger = true;
+                if (err) {
+                    rej(err)
+                } else if (stderr) {
+                    rej(stderr)
+                } else {
+                    res(null)
+                }
+            }).on("exit", (code) => {
+                if (hasTrigger) return;
+                hasTrigger = true;
+                code ? rej(null) : res(null);
+            })
+        })
     }
 
 }

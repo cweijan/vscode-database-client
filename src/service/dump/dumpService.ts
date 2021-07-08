@@ -58,7 +58,7 @@ export class DumpService {
 
     }
 
-    protected dumpData(node: Node, dumpFilePath: string, withData: boolean, items: vscode.QuickPickItem[]): void {
+    private dumpData(node: Node, dumpFilePath: string, withData: boolean, items: vscode.QuickPickItem[]): void {
 
         const tables = items.filter(item => item.description == ModelType.TABLE).map(item => item.label)
         const viewList = items.filter(item => item.description == ModelType.VIEW).map(item => item.label)
@@ -77,7 +77,7 @@ export class DumpService {
             option.dump.data = false;
         }
         Util.process(`Doing backup ${node.host}_${node.schema}...`, (done) => {
-            mysqldump(option, node).then(() => {
+            this.processDump(option, node).then(() => {
                 vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.schema} success!`, 'open').then(action => {
                     if (action == 'open') {
                         vscode.commands.executeCommand('vscode.open', vscode.Uri.file(dumpFilePath));
@@ -86,6 +86,10 @@ export class DumpService {
             }).finally(done)
         })
 
+    }
+
+    protected processDump(option: Options, node: Node): Promise<void> {
+        return mysqldump(option, node);
     }
 
     public async generateDocument(node: Node) {
@@ -118,7 +122,7 @@ export class DumpService {
                             ...(await tableNode.getChildren()).map((child: ColumnNode) => {
                                 const column = child.column;
                                 return [
-                                    child.label, child.type, column.comment, child.isPrimaryKey?'YES':'', column.nullable,
+                                    child.label, child.type, column.comment, child.isPrimaryKey ? 'YES' : '', column.nullable,
                                     column.defaultValue
                                 ]
                             })
