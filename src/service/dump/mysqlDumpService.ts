@@ -18,7 +18,8 @@ export class MysqlDumpService extends DumpService {
             const host = node.usingSSH ? "127.0.0.1" : node.host
             const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
             const data = option.dump.data === false ? ' --no-data' : '';
-            const command = `mysqldump -h ${host} -P ${port} -u ${node.user}${data} -p${node.password} ${node.schema}>${option.dumpToFile}`
+            const tables=option.dump.tables?.length>0?' --tables '+option.dump.tables.join(" "):'';
+            const command = `mysqldump -h ${host} -P ${port} -u ${node.user} -p${node.password}${data}${tables} ${node.schema}>${option.dumpToFile}`
             Console.log(`Executing: ${command}`);
             return Util.execute(command)
         }
