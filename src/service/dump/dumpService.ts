@@ -48,15 +48,19 @@ export class DumpService {
             }
         }
 
-        const tableName = node instanceof TableNode ? node.table : null;
-        const exportSqlName = `${tableName ? tableName : ''}_${format('yyyy-MM-dd_hhmmss', new Date())}_${node.schema}.sql`;
-
-        vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(exportSqlName), filters: { 'sql': ['sql'] } }).then((folderPath) => {
+        this.triggerSave(node).then((folderPath) => {
             if (folderPath) {
                 this.dumpData(node, folderPath.fsPath, withData, nodes)
             }
         })
 
+    }
+
+    protected triggerSave(node: Node) {
+        const tableName = node instanceof TableNode ? node.table : null;
+        const exportSqlName = `${tableName ? tableName : ''}_${format('yyyy-MM-dd_hhmmss', new Date())}_${node.schema}.sql`;
+
+        return vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(exportSqlName), filters: { 'sql': ['sql'] } });
     }
 
     private dumpData(node: Node, dumpFilePath: string, withData: boolean, items: vscode.QuickPickItem[]): void {
@@ -78,7 +82,7 @@ export class DumpService {
             option.dump.data = false;
         }
         Util.process(`Doing backup ${node.host}_${node.schema}...`, (done) => {
-            this.processDump(option, node).then(() => {
+            mysqldump(option, node).then(() => {
                 vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.schema} success!`, 'open').then(action => {
                     if (action == 'open') {
                         vscode.commands.executeCommand('vscode.open', vscode.Uri.file(dumpFilePath));
@@ -87,10 +91,6 @@ export class DumpService {
             }).catch(err => Console.log(err.message)).finally(done)
         })
 
-    }
-
-    protected processDump(option: Options, node: Node): Promise<void> {
-        return mysqldump(option, node);
     }
 
     public async generateDocument(node: Node) {
