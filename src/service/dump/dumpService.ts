@@ -16,6 +16,7 @@ import { SchemaNode } from "@/model/database/schemaNode";
 import { DumpDocument as GenerateDocument } from "./generateDocument";
 import { createWriteStream } from "fs";
 import { ColumnNode } from "@/model/other/columnNode";
+import { Console } from "@/common/Console";
 
 export class DumpService {
 
@@ -83,7 +84,7 @@ export class DumpService {
                         vscode.commands.executeCommand('vscode.open', vscode.Uri.file(dumpFilePath));
                     }
                 })
-            }).finally(done)
+            }).catch(err => Console.log(err.message)).finally(done)
         })
 
     }

@@ -136,18 +136,19 @@ export class Util {
             let hasTrigger = false;
             exec(command, (err, stdout, stderr) => {
                 if (hasTrigger) return;
-                hasTrigger = true;
                 if (err) {
                     rej(err)
                 } else if (stderr) {
                     rej(stderr)
-                } else {
+                } else if(!hasTrigger){
+                    hasTrigger = true;
                     res(null)
                 }
             }).on("exit", (code) => {
-                if (hasTrigger) return;
-                hasTrigger = true;
-                code ? rej(null) : res(null);
+                if (!hasTrigger && code===0){
+                    hasTrigger = true;
+                    res(null)
+                };
             })
         })
     }

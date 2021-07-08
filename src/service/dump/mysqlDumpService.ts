@@ -10,11 +10,15 @@ export class MysqlDumpService extends DumpService {
 
     protected processDump(option: Options, node: Node): Promise<void> {
 
+        /**
+         * https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html
+         */
         if (commandExistsSync('mysqldump')) {
             NodeUtil.of(node)
             const host = node.usingSSH ? "127.0.0.1" : node.host
             const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
-            const command = `mysqldump -h ${host} -P ${port} -u ${node.user} -p${node.password} ${node.schema}>${option.dumpToFile}`
+            const data = option.dump.data === false ? ' --no-data' : '';
+            const command = `mysqldump -h ${host} -P ${port} -u ${node.user}${data} -p${node.password} ${node.schema}>${option.dumpToFile}`
             Console.log(`Executing: ${command}`);
             return Util.execute(command)
         }
