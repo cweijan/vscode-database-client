@@ -177,6 +177,7 @@ export default {
           break;
         case "NEXT_PAGE":
           this.result.data = response.data;
+          this.result.costTime=response.costTime;
           this.toolbar.sql = response.sql;
           this.result.data.unshift({ isFilter: true, content: "" });
           break;

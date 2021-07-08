@@ -48,9 +48,11 @@ export class QueryPage {
                 }).on('execute', (params) => {
                     QueryUnit.runQuery(params.sql, dbOption, queryParam.queryOption);
                 }).on('next', async (params) => {
+                    const executeTime = new Date().getTime();
                     const sql = ServiceManager.getPageService(dbOption.dbType).build(params.sql, params.pageNum, params.pageSize)
                     dbOption.execute(sql).then((rows) => {
-                        handler.emit(MessageType.NEXT_PAGE, { sql, data: rows })
+                        const costTime = new Date().getTime() - executeTime;
+                        handler.emit(MessageType.NEXT_PAGE, { sql, data: rows ,costTime})
                     })
                 }).on("full", () => {
                     handler.panel.reveal(ViewColumn.One)
