@@ -145,7 +145,8 @@ export default {
         return "";
       }
 
-      let updateSql=`UPDATE ${this.table} SET ${change.replace(/,$/, "")}`;
+      const table=wrapByDb(this.table, this.dbType);
+      let updateSql=`UPDATE ${table} SET ${change.replace(/,$/, "")}`;
       for (let i = 0; i < this.primaryKeyList.length; i++) {
         const pk = this.primaryKeyList[i];
         const pkName = pk.name;
