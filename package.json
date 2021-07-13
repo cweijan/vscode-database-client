@@ -610,7 +610,7 @@
 				},
 				{
 					"command": "mysql.connection.terminal",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == connection",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|catalog)$/",
 					"group": "inline@2"
 				},
 				{

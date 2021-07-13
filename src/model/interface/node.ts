@@ -285,7 +285,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             command = `mysql -u ${this.user} -p${this.password} -h ${this.host} -P ${this.port} \n`;
         } else if (this.dbType == DatabaseType.PG) {
             this.checkCommand('psql');
-            command = `set "PGPASSWORD=${this.password}" && psql -U ${this.user} -h ${this.host} -p ${this.port} \n`;
+            command = `set "PGPASSWORD=${this.password}" && psql -U ${this.user} -h ${this.host} -p ${this.port} -d ${this.database} \n`;
         } else if (this.dbType == DatabaseType.REDIS) {
             this.checkCommand('redis-cli');
             command = `redis-cli -h ${this.host} -p ${this.port} \n`;
