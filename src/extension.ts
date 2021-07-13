@@ -339,8 +339,7 @@ function commandWrapper(commandDefinition: any, command: string): (...args: any[
     return (...args: any[]) => {
         try {
             commandDefinition[command](...args);
-        }
-        catch (err) {
+        }catch (err) {
             Console.log(err);
         }
     };

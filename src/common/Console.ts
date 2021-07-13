@@ -7,6 +7,9 @@ export class Console {
         if (this.outputChannel == null) {
             this.outputChannel = vscode.window.createOutputChannel("MySQL");
         }
+        if(value instanceof Error){
+            console.trace(value)
+        }
         this.outputChannel.show(true);
         const begin = format('yyyy-MM-dd hh:mm:ss', new Date());
         this.outputChannel.appendLine(`${begin} ${value}`);
