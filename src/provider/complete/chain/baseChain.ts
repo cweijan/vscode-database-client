@@ -15,7 +15,7 @@ export abstract class BaseChain implements ComplectionChain {
     protected requestStop() {
         this.needStop = true;
     }
-    protected strToComplection(complections: string[], kind: CompletionItemKind = CompletionItemKind.Keyword, span = ' '): CompletionItem[] {
+    protected strToComplection(complections: string[], kind: CompletionItemKind = CompletionItemKind.Keyword, span = ''): CompletionItem[] {
         return complections.map(item => {
             const completionItem = new CompletionItem(item + ' ');
             completionItem.insertText = new SnippetString(item + span);
@@ -27,7 +27,7 @@ export abstract class BaseChain implements ComplectionChain {
         const nodes = await NodeFinder.findNodes(schema, table, ...types)
         return this.nodeToComplection(nodes, kind)
     }
-    protected nodeToComplection(nodes: Node[], kind: CompletionItemKind, span = ' '): CompletionItem[] {
+    protected nodeToComplection(nodes: Node[], kind: CompletionItemKind, span = ''): CompletionItem[] {
         return nodes.map(item => {
             const completionItem = new CompletionItem(item.label + ' ');
             completionItem.insertText = new SnippetString(item + span);

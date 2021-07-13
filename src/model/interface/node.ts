@@ -8,7 +8,7 @@ import { ConnectionManager } from "@/service/connectionManager";
 import { SqlDialect } from "@/service/dialect/sqlDialect";
 import { QueryUnit } from "@/service/queryUnit";
 import { ServiceManager } from "@/service/serviceManager";
-import { platform } from "node:os";
+import { platform } from "os";
 import * as vscode from "vscode";
 import { Memento } from "vscode";
 var commandExistsSync = require('command-exists').sync;

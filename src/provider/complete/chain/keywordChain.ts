@@ -12,7 +12,7 @@ export class KeywordChain implements ComplectionChain {
 
     constructor() {
         this.keywordList.forEach((keyword) => {
-            const keywordComplectionItem = new vscode.CompletionItem(keyword + " ");
+            const keywordComplectionItem = new vscode.CompletionItem(keyword);
             keywordComplectionItem.kind = vscode.CompletionItemKind.Keyword;
             this.keywordComplectionItems.push(keywordComplectionItem);
         });
