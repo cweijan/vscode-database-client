@@ -1,4 +1,5 @@
 import { ModelType } from "@/common/constants";
+import { ConnectionNode } from "@/model/database/connectionNode";
 import { UserGroup } from "@/model/database/userGroup";
 import { Node } from "@/model/interface/node";
 import { FunctionGroup } from "@/model/main/functionGroup";
@@ -34,18 +35,23 @@ export class NodeFinder {
                     nodeList.push(...databaseNodes.filter(databaseNodes => !(databaseNodes instanceof UserGroup)))
                     break;
                 case ModelType.TABLE:
+                    if(lcp instanceof ConnectionNode) break;
                     nodeList.push(...await groupNodes.find(n => n instanceof TableGroup).getChildren())
                     break;
                 case ModelType.VIEW:
+                    if(lcp instanceof ConnectionNode) break;
                     nodeList.push(...await groupNodes.find(n => n instanceof ViewGroup).getChildren())
                     break;
                 case ModelType.PROCEDURE:
+                    if(lcp instanceof ConnectionNode) break;
                     nodeList.push(...await groupNodes.find(n => n instanceof ProcedureGroup).getChildren())
                     break;
                 case ModelType.TRIGGER:
+                    if(lcp instanceof ConnectionNode) break;
                     nodeList.push(...await groupNodes.find(n => n instanceof TriggerGroup).getChildren())
                     break;
                 case ModelType.FUNCTION:
+                    if(lcp instanceof ConnectionNode) break;
                     nodeList.push(...await groupNodes.find(n => n instanceof FunctionGroup).getChildren())
                     break;
             }
