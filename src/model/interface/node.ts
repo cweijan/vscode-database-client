@@ -293,8 +293,10 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             this.checkCommand('mongo');
             command = `mongo --host ${this.host} --port ${this.port} ${this.user && this.password ? ` -u ${this.user} -p ${this.password}` : ''} \n`;
         } else if (this.dbType == DatabaseType.SQLITE) {
-
             command = `${getSqliteBinariesPath()} ${this.dbPath} \n`;
+        } else{
+            vscode.window.showErrorMessage(`Database type ${this.dbType} not support open terminal.`)
+            return;
         }
         const terminal = vscode.window.createTerminal(this.dbType.toString())
         terminal.sendText(command)
