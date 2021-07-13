@@ -7,7 +7,6 @@ import { exec } from "child_process";
 import { wrapByDb } from "./wrapper.js";
 import { GlobalState } from "./state";
 import { Console } from "./Console";
-import { close } from "node:fs";
 
 export class Util {
 
