@@ -65,14 +65,8 @@ export class TableNode extends Node implements CopyAble {
                 sql = sql.replace(/\\n/g, '\n');
             }
         } else {
-            const childs = await this.getChildren()
-            let table = this.table;
-            if (this.dbType == DatabaseType.MSSQL) {
-                const tables = this.table.split(".")
-                tables.shift()
-                table = tables.join(".")
-            }
-            sql = `CREATE TABLE ${table}(\n`
+            const childs = await this.getChildren();
+            sql = `CREATE TABLE ${this.table}(\n`
             for (let i = 0; i < childs.length; i++) {
                 const child: ColumnNode = childs[i] as ColumnNode;
                 if (i == childs.length - 1) {
