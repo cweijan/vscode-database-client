@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 3.9.5 2021-7-19
+
+- Using mysqldump to dump database.
+- Fix connect to elasticsearch using ssh tunnel fail.
+- Better postgresql support.
+
 # 3.9.3 2021-7-2
 
 - Better sql complection.
