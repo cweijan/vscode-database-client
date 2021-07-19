@@ -169,6 +169,13 @@
 
         </template>
 
+        <section class="mb-2" v-if="connectionOption.dbType=='ElasticSearch'">
+            <div class="inline-block mr-10">
+              <label class="font-bold mr-5 inline-block w-32">ConnectTimeout</label>
+              <input class="w-64 field__input" placeholder="2000" required v-model="connectionOption.connectTimeout" />
+            </div>
+        </section>
+
         <section class="flex items-center mb-2" v-if="connectionOption.dbType=='MySQL'">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">Timezone</label>
