@@ -80,12 +80,12 @@
 			"activitybar": [
 				{
 					"id": "github-cweijan-mysql",
-					"title": "Explorer",
+					"title": "Database",
 					"icon": "resources/icon/database-container.svg"
 				},
 				{
 					"id": "github-cweijan-nosql",
-					"title": "Explorer",
+					"title": "NoSQL",
 					"icon": "resources/image/other-container.png"
 				}
 			]
