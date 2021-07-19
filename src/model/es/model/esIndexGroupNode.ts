@@ -1,5 +1,6 @@
 import { Node } from "@/model/interface/node";
 import { TableGroup } from "@/model/main/tableGroup";
+import { InfoNode } from "@/model/other/infoNode";
 import { QueryUnit } from "@/service/queryUnit";
 import { ThemeIcon } from "vscode";
 import { ESIndexNode } from "./esIndexNode";
@@ -15,6 +16,9 @@ export class EsIndexGroup extends TableGroup {
         return this.execute(`get /_cat/indices`).then((res: string) => {
             let indexes = [];
             const results = res.match(/[^\r\n]+/g);
+            if(!results){
+                return [new InfoNode("This server has no index!")]
+            }
             for (const result of results) {
                 indexes.push(new ESIndexNode(result, this))
             }
