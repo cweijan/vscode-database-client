@@ -2,7 +2,7 @@ const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const isProd = process.argv.indexOf('-p') >= 0;
+const isProd = process.argv.indexOf('--mode=production') >= 0;
 var webpack = require('webpack');
 
 module.exports = [
