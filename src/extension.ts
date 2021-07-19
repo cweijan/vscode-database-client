@@ -185,7 +185,7 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // query node
             ...{
-                "mysql.runQuery": (sql) => {
+                "mysql.runQuery": (sql:string) => {
                     if (typeof sql != 'string') { sql = null; }
                     QueryUnit.runQuery(sql, ConnectionManager.tryGetConnection());
                 },

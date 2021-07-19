@@ -17,6 +17,18 @@ export class TableInfoHoverProvider implements HoverProvider {
             return new vscode.Hover(markdownStr);
         }
 
+        const selections = vscode.window.activeTextEditor?.selections || []
+        for (const selection of selections) {
+            if (selection.contains(position)) {
+                const args = [{ sql: document.getText(selection) }];
+                const runCommandUri = vscode.Uri.parse(`command:mysql.runQuery?${encodeURIComponent(JSON.stringify(args))}`);
+                const contents = new vscode.MarkdownString(`[Run Selected SQL](${runCommandUri})`);
+                contents.isTrusted = true;
+                const hover = new vscode.Hover(contents);
+                return hover;
+            }
+        }
+
         return null;
     }
 
