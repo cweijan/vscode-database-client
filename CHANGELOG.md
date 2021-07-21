@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 3.9.6 2021-7-22
+
+- Add hover to run selected sql.
+- Add sql template action icon to table node.
+
 # 3.9.5 2021-7-19
 
 - Using mysqldump to dump database.
