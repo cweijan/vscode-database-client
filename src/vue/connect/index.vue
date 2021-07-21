@@ -186,8 +186,23 @@
             <label class="font-bold mr-5 inline-block w-18">Use SSL</label>
             <el-switch v-model="connectionOption.useSSL"></el-switch>
           </div>
+           <div class="inline-block mr-10" v-if="connectionOption.dbType === 'MongoDB'">
+              <label class="inline-block mr-5 font-bold w-18">SRV Record</label>
+              <el-switch v-model="connectionOption.srv"></el-switch>
+           </div>
+           <div class="inline-block mr-10" v-if="connectionOption.dbType === 'MongoDB'">
+             <label class="inline-block mr-5 font-bold w-18">Use Connection String</label>
+             <el-switch v-model="connectionOption.useConnectionString"></el-switch>
+           </div>
         </section>
       </template>
+        <section class="flex items-center mb-2" v-if="connectionOption.useConnectionString">
+          <div class="flex w-full mr-10">
+            <label class="inline-block w-32 mr-5 font-bold">Connection String</label>
+            <input class="w-4/5 field__input" placeholder="e.g mongodb+srv://username:password@server-url/admin" v-model="connectionOption.connectionUrl"
+            />
+          </div>
+        </section>
 
       <section class="flex items-center mb-2" v-if="connectionOption.useSSL">
         <div class="inline-block mr-10">
@@ -301,6 +316,9 @@
           includeDatabases: null,
           dbType: "MySQL",
           encrypt: true,
+          connectionUrl: "",
+          srv: false,
+
           global: true,
           key: null,
           scheme: "http",
@@ -469,6 +487,51 @@
           case "SSH":
             break;
         }
+        this.$forceUpdate()
+      },
+        "connectionOption.connectionUrl"(value) {
+          let connectionUrl = this.connectionOption.connectionUrl;
+      
+          const srvRegex = /(?<=mongodb\+).+?(?=:\/\/)/
+          const srv = connectionUrl.match(srvRegex)
+          if (srv) {
+            this.connectionOption.srv = true
+            connectionUrl = connectionUrl.replace(srvRegex, "")
+          }
+          const userRegex = /(?<=\/\/).+?(?=\:)/
+          const user = connectionUrl.match(userRegex)
+          if (user) {
+            this.connectionOption.user = user[0]
+            connectionUrl = connectionUrl.replace(userRegex, "")
+          }
+          const passwordRegex = /(?<=\/\/:).+?(?=@)/
+          const password = connectionUrl.match(passwordRegex)
+          if (password) {
+            this.connectionOption.password = password[0]
+            connectionUrl = connectionUrl.replace(passwordRegex, "")
+
+          }
+     
+          const hostRegex = /(?<=@).+?(?=[:\/])/
+          const host = connectionUrl.match(hostRegex)
+          if (host) {
+            this.connectionOption.host = host[0]
+            connectionUrl = connectionUrl.replace(hostRegex, "")
+
+          }
+
+
+          if (!this.connectionOption.srv) {
+             const portRegex = /(?<=\:).\d+/
+             const port = connectionUrl.match(portRegex)
+             if (port) {
+               this.connectionOption.port = port[0]
+               connectionUrl = connectionUrl.replace(portRegex, "")
+
+            }
+
+          }
+
         this.$forceUpdate()
       },
     },
