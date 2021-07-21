@@ -43,6 +43,7 @@
 	"command.column.update": "修改列",
 	"command.column.drop": "删除列",
 	"command.template.table": "新建表",
+	"command.template.sql": "查询表SQL",
 	"command.template.view": "新建视图",
 	"command.template.procedure": "新建存储过程",
 	"command.template.trigger": "新建触发器",

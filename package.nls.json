@@ -43,6 +43,7 @@
 	"command.column.update": "Modify Column",
 	"command.column.drop": "Drop column",
 	"command.template.table": "Create New Table",
+	"command.template.sql": "Select Table SQL",
 	"command.template.view": "Create New View",
 	"command.template.procedure": "Create New Procedure",
 	"command.template.trigger": "Create New Trigger",

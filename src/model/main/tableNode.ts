@@ -22,8 +22,8 @@ export class TableNode extends Node implements CopyAble {
     constructor(readonly meta: TableMeta, readonly parent: Node) {
         super(`${meta.name}`)
         this.table = meta.name
-        this.description = `${meta.comment || ''} ${(meta.rows!=null) ? `Rows ${meta.rows}` : ''}`
-        if(Util.supportColorIcon){
+        this.description = `${meta.comment || ''} ${(meta.rows != null) ? `Rows ${meta.rows}` : ''}`
+        if (Util.supportColorIcon) {
             // this.iconPath=new vscode.ThemeIcon("split-horizontal",new vscode.ThemeColor("problemsWarningIcon.foreground"))
         }
         this.init(parent)
@@ -209,6 +209,12 @@ ROW_FORMAT : ${meta.row_format}
         })
     }
 
+    public async selectSqlTemplate() {
+        const sql = `SELECT * FROM ${Util.wrap(this.table)}`;
+        QueryUnit.showSQLTextDocument(this, sql, Template.table);
+
+    }
+
     public deleteSqlTemplate(): any {
         this
             .getChildren()
@@ -246,7 +252,7 @@ ROW_FORMAT : ${meta.row_format}
             const count = await this.execute(`select max(${primaryKey}) max from ${this.wrap(this.table)}`);
             if (count && count[0]?.max) {
                 const max = count[0].max;
-                return Number.isInteger(max)||max.match(/^\d+$/) ? max : 0;
+                return Number.isInteger(max) || max.match(/^\d+$/) ? max : 0;
             }
         }
 

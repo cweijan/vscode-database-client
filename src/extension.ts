@@ -283,6 +283,9 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // create template
             ...{
+                "mysql.template.sql": (tableNode: TableNode) => {
+                    tableNode.selectSqlTemplate();
+                },
                 "mysql.template.table": (tableGroup: TableGroup) => {
                     tableGroup.createTemplate();
                 },

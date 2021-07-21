@@ -323,6 +323,12 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.template.sql",
+				"title": "%command.template.sql%",
+				"category": "MySQL",
+				"icon": "$(symbol-file)"
+			},
+			{
 				"command": "mysql.template.table",
 				"title": "%command.template.table%",
 				"category": "MySQL",
@@ -707,6 +713,11 @@
 					"command": "mysql.table.design",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
 					"group": "1_inline@0"
+				},
+				{
+					"command": "mysql.template.sql",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
+					"group": "inline@5"
 				},
 				{
 					"command": "mysql.table.source",
