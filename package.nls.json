@@ -7,6 +7,7 @@
 	"command.diagram.add": "Create Diagram",
 	"command.query.add": "Create Query",
 	"command.query.rename": "Rename Query",
+	"command.query.run": "Run This Query",
 	"command.diagram.open": "Open Diagram",
 	"command.diagram.drop": "Drop Diagram",
 	"command.connection.add": "Add Connection",

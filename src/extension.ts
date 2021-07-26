@@ -201,6 +201,9 @@ export function activate(context: vscode.ExtensionContext) {
                         });
                     }
                 },
+                "mysql.query.run": (queryNode: QueryNode) => {
+                    queryNode.run()
+                },
                 "mysql.query.open": (queryNode: QueryNode) => {
                     queryNode.open()
                 },

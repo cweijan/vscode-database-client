@@ -151,6 +151,12 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.query.run",
+				"title": "%command.query.run%",
+				"icon": "$(run)",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.connection.add",
 				"title": "%command.connection.add%",
 				"icon": "$(add)",
@@ -590,6 +596,11 @@
 					"group": "2_mysql@0"
 				},
 				{
+					"command": "mysql.query.run",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == query",
+					"group": "2_mysql@0"
+				},
+				{
 					"command": "mysql.refresh",
 					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(esConnection|ftpConnection|ftpFolder)$/",
 					"group": "2_mysql@1"
@@ -627,6 +638,11 @@
 				{
 					"command": "mysql.query.add",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == queryGroup",
+					"group": "inline@0"
+				},
+				{
+					"command": "mysql.query.run",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == query",
 					"group": "inline@0"
 				},
 				{

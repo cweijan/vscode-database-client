@@ -1,7 +1,8 @@
 import { Constants, ModelType } from "@/common/constants";
 import { FileManager } from "@/common/filesManager";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
-import { renameSync } from "fs";
+import { QueryUnit } from "@/service/queryUnit";
+import { readFileSync, renameSync, writeFileSync } from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { TreeItemCollapsibleState } from "vscode";
@@ -19,6 +20,11 @@ export class QueryNode extends Node {
             title: "Open Query",
             arguments: [this, true],
         }
+    }
+
+    public async run() {
+        const content = readFileSync(this.getFilePath(),'utf8')
+        QueryUnit.runQuery(content,this)
     }
 
     public async open() {

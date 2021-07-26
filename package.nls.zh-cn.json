@@ -7,6 +7,7 @@
 	"command.diagram.add": "新建实体图",
 	"command.query.add": "新建查询",
 	"command.query.rename": "重命名查询",
+	"command.query.run": "执行该查询",
 	"command.diagram.open": "打开实体图",
 	"command.diagram.drop": "删除实体图",
 	"command.connection.add": "连接数据库",
