@@ -93,10 +93,10 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
      */
     showColumns(database: string, table: string): string {
         return `SELECT c.COLUMN_NAME "name", DATA_TYPE "simpleType", DATA_TYPE "type", IS_NULLABLE nullable, CHARACTER_MAXIMUM_LENGTH "maxLength", COLUMN_DEFAULT "defaultValue", '' "comment", tc.constraint_type "key" FROM
-        information_schema.columns c
-        left join  information_schema.constraint_column_usage ccu
+        INFORMATION_SCHEMA.COLUMNS c
+        left join  INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE ccu
         on c.COLUMN_NAME=ccu.column_name and c.table_name=ccu.table_name and ccu.table_catalog=c.TABLE_CATALOG and ccu.TABLE_SCHEMA=c.TABLE_SCHEMA
-        left join  information_schema.table_constraints tc
+        left join  INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
         on tc.constraint_name=ccu.constraint_name
         and tc.table_catalog=c.TABLE_CATALOG and tc.TABLE_SCHEMA=c.TABLE_SCHEMA and tc.table_name=c.table_name WHERE c.TABLE_SCHEMA = '${database}' AND c.table_name = '${table}' ORDER BY ORDINAL_POSITION`;
     }
@@ -104,10 +104,10 @@ ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
         return `SELECT t.name TRIGGER_NAME FROM SYS.OBJECTS t INNER JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE TYPE = 'TR' and s.name='${database}'`;
     }
     showProcedures(database: string): string {
-        return `SELECT ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_SCHEMA = '${database}' and ROUTINE_TYPE='PROCEDURE'`;
+        return `SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES WHERE SPECIFIC_SCHEMA = '${database}' and ROUTINE_TYPE='PROCEDURE'`;
     }
     showFunctions(database: string): string {
-        return `SELECT ROUTINE_NAME FROM information_schema.routines WHERE SPECIFIC_SCHEMA = '${database}' and ROUTINE_TYPE='FUNCTION'`;
+        return `SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES WHERE SPECIFIC_SCHEMA = '${database}' and ROUTINE_TYPE='FUNCTION'`;
     }
     showViews(database: string): string {
         return `SELECT name FROM sys.all_views t where SCHEMA_NAME(t.schema_id)='${database}' order by name`;
