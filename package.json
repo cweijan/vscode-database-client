@@ -1035,6 +1035,7 @@
 		"date-format": "^3.0.0",
 		"deepmerge": "^3.2.0",
 		"element-ui": "^2.13.2",
+		"esbuild": "^0.12.16",
 		"g2": "^2.3.13",
 		"ioredis": "^4.23.0",
 		"json-format-highlight": "^1.0.4",
