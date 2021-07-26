@@ -2,7 +2,7 @@ import axios from "axios";
 import { Node } from "@/model/interface/node";
 import { IConnection, queryCallback } from "./connection";
 import { EsIndexGroup } from "@/model/es/model/esIndexGroupNode";
-import * as compareVersions from 'compare-versions';
+import compareVersions from 'compare-versions';
 const extPackage = require("@/../package.json")
 
 export class EsConnection extends IConnection {

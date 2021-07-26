@@ -1,7 +1,7 @@
 import { Node } from "@/model/interface/node";
 import { IConnection, queryCallback } from "./connection";
 import * as fs from "fs";
-import * as IoRedis from "ioredis";
+import IoRedis from "ioredis";
 
 export class RedisConnection extends IConnection {
     private conneted: boolean;

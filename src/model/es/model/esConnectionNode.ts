@@ -3,7 +3,7 @@ import { Util } from "@/common/util";
 import { QueryGroup } from "@/model/query/queryGroup";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { QueryUnit } from "@/service/queryUnit";
-import * as compareVersions from 'compare-versions';
+import compareVersions from 'compare-versions';
 import * as path from "path";
 import { ExtensionContext, ThemeIcon, TreeItemCollapsibleState } from "vscode";
 import { ConfigKey, Constants, ModelType } from "../../../common/constants";

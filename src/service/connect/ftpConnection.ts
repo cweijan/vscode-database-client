@@ -1,7 +1,7 @@
 import { Node } from "@/model/interface/node";
 import EventEmitter = require("events");
 import { IConnection, queryCallback } from "./connection";
-import * as Client from '@/model/ftp/lib/connection'
+import Client from '@/model/ftp/lib/connection'
 
 export class FTPConnection extends IConnection {
 
