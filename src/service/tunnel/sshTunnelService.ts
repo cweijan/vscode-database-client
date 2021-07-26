@@ -4,6 +4,7 @@ import { Console } from '../../common/Console';
 import { existsSync } from 'fs';
 import * as portfinder from 'portfinder'
 import { DatabaseType } from '@/common/constants';
+import { spawn } from "child_process";
 
 export class SSHTunnelService {
 
@@ -49,6 +50,27 @@ export class SSHTunnelService {
                 // config.dstPort= (node.host.split(":")[1] || '80') as any
                 const portStr = node.host.split(":")[1] || '80'
                 config.dstPort = parseInt(portStr)
+            }
+
+            if (ssh.type == 'native') {
+                let args = ['-TnNL', `${port}:${config.dstHost}:${config.dstPort}`, config.host, '-p', `${config.port}`];
+                if (ssh.privateKeyPath) {
+                    args.push('-i', ssh.privateKeyPath)
+                }
+                const bat = spawn('ssh', args);
+                const successHandler = setTimeout(() => {
+                    resolve({ ...node, host: "127.0.0.1", port } as Node)
+                }, ssh.watingTime);
+                bat.stderr.on('data', (chunk) => {
+                    if (chunk?.toString().match(/^[@\s]+$/)) return;
+                    delete this.tunelMark[key]
+                    errorCallback(new Error(chunk.toString()?.replace(/@/g, '')))
+                    clearTimeout(successHandler)
+                });
+                bat.on('close', (code, signal) => {
+                    delete this.tunelMark[key]
+                });
+                return;
             }
 
             const localTunnel = tunnel(config, (error, server) => {

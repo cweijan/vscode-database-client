@@ -274,11 +274,12 @@
 
         <section class="mb-2">
           <label class="font-bold mr-5 inline-block w-28">Type</label>
-          <el-radio v-model="type" label="password">Password</el-radio>
-          <el-radio v-model="type" label="privateKey">Private Key</el-radio>
+          <el-radio v-model="connectionOption.ssh.type" label="password">Password</el-radio>
+          <el-radio v-model="connectionOption.ssh.type" label="privateKey">Private Key</el-radio>
+          <el-radio v-model="connectionOption.ssh.type" label="native">Native SSH</el-radio>
         </section>
 
-        <div v-if="type == 'password'">
+        <div v-if="connectionOption.ssh.type == 'password'">
           <section class="mb-2">
             <label class="font-bold mr-5 inline-block w-28">Password</label>
             <input class="w-64 field__input" placeholder="Password" required type="password"
@@ -297,6 +298,12 @@
               <label class="font-bold mr-5 inline-block w-28">Passphrase</label>
               <input class="w-64 field__input" placeholder="Passphrase" type="passphrase"
                 v-model="connectionOption.ssh.passphrase" />
+            </div>
+          </section>
+          <section class="mb-2" v-if="connectionOption.ssh.type == 'native'">
+            <div class="inline-block mr-10">
+              <label class="font-bold mr-5 inline-block w-28">Waiting Time</label>
+              <input class="w-64 field__input" placeholder="Waiting time for ssh command." v-model="connectionOption.ssh.watingTime" />
             </div>
           </section>
         </div>
@@ -343,6 +350,8 @@
             privateKeyPath: "",
             port: 22,
             username: "root",
+            type: "password",
+            watingTime: 5000,
             algorithms: {
               cipher: [],
             },
