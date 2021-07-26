@@ -63,6 +63,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public parent?: Node;
 
     public useSSL?: boolean;
+    public caPath?: string;
     public clientCertPath?: string;
     public clientKeyPath?: string;
 

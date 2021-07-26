@@ -25,6 +25,7 @@ export class MysqlConnection extends IConnection {
         if (node.useSSL) {
             config.ssl = {
                 rejectUnauthorized: false,
+                ca: (node.caPath) ? fs.readFileSync(node.caPath) : null,
                 cert: (node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
                 key: (node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
                 minVersion: 'TLSv1'
