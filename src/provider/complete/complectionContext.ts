@@ -28,11 +28,12 @@ export class ComplectionContext {
         context.tokens = context.sqlBlock.tokens
         for (let i = 0; i < context.tokens.length; i++) {
             const token = context.tokens[i];
-            if (token.range.contains(position)) {
+            if (token.range.contains(position) || token.range.start.isAfter(position)) {
                 context.currentToken = token;
                 if (context.tokens[i - 1]) {
                     context.previousToken = context.tokens[i - 1];
                 }
+                break;
             }
         }
         if (!context.previousToken && context.tokens.length > 0) {
