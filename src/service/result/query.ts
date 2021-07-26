@@ -4,7 +4,7 @@ import { EsRequest } from "@/model/es/esRequest";
 import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
 import { env, Uri, ViewColumn, window } from "vscode";
-import { Trans } from "~/common/trans";
+import { Trans } from "@/common/trans";
 import { ConfigKey, DatabaseType, MessageType } from "../../common/constants";
 import { Global } from "../../common/global";
 import { ViewManager } from "../../common/viewManager";

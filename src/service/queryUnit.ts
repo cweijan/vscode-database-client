@@ -9,8 +9,8 @@ import { DataResponse, DMLResponse, ErrorResponse, MessageResponse, RunResponse 
 import { ConnectionManager } from "./connectionManager";
 import { DelimiterHolder } from "./common/delimiterHolder";
 import { ServiceManager } from "./serviceManager";
-import { NodeUtil } from "~/model/nodeUtil";
-import { Trans } from "~/common/trans";
+import { NodeUtil } from "@/model/nodeUtil";
+import { Trans } from "@/common/trans";
 import { IConnection } from "./connect/connection";
 import { FieldInfo } from "@/common/typeDef";
 import { Util } from "@/common/util";
