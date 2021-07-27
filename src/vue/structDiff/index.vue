@@ -3,12 +3,12 @@
     <div class="opt-panel">
       <el-form>
         <el-form-item label-width="80px" label="Target">
-          <el-select v-model="option.from.connection" @change="clearFrom">
+          <el-select v-model="option.from.connection" @change="clearFrom" :loading="loadingConnection">
             <el-option :label="node.label" :value="node.uid" :key="node.uid" v-for="node in initData.nodes"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label-width="80px" label="database">
-          <el-select v-model="option.from.database"  @change="(db)=>changeActive(db,true)">
+          <el-select v-model="option.from.database"  @change="(db)=>changeActive(db,true)" :loading="loadingConnection">
             <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in initData.databaseList[option.from.connection]"></el-option>
           </el-select>
         </el-form-item>
@@ -17,12 +17,12 @@
     <div class="opt-panel">
       <el-form>
         <el-form-item label-width="90px" label="Sync From">
-          <el-select v-model="option.to.connection" @change="clearTo">
+          <el-select v-model="option.to.connection" @change="clearTo" :loading="loadingConnection">
             <el-option :label="node.label" :value="node.uid" :key="node.uid" v-for="node in initData.nodes" ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label-width="90px" label="database">
-          <el-select v-model="option.to.database" @change="(db)=>changeActive(db,false)">
+        <el-form-item label-width="90px" label="database" >
+          <el-select v-model="option.to.database" @change="(db)=>changeActive(db,false)" :loading="loadingConnection">
             <el-option :label="db.label" :value="db.label" :key="db.label" v-for="db in initData.databaseList[option.to.connection]" ></el-option>
           </el-select>
         </el-form-item>
@@ -52,6 +52,7 @@ export default {
   mixins: [inject],
   data() {
     return {
+      loadingConnection:true,
       initData: { nodes: [], databaseList: {} },
       option: { from: { connection: null, database: null,db:null }, to: {db:null} },
       loading: { compare: false, sync: false },
@@ -60,8 +61,8 @@ export default {
   },
   mounted() {
     this.on("structDiffData", (data) => {
-      console.log(123123);
       this.initData = data;
+      this.loadingConnection=false;
     })
       .on("compareResult", (compareResult) => {
         this.compareResult = compareResult;
