@@ -162,10 +162,10 @@ export default {
         encrypt: true,
         connectionUrl: "",
         srv: false,
-
+        esAuth:'account',
         global: true,
         key: null,
-        scheme: "http",
+        // scheme: "http",
         timezone: "+00:00",
         ssh: {
           host: "",

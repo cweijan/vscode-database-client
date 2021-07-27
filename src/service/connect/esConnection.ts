@@ -1,9 +1,7 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { Node } from "@/model/interface/node";
 import { IConnection, queryCallback } from "./connection";
 import { EsIndexGroup } from "@/model/es/model/esIndexGroupNode";
-import compareVersions from 'compare-versions';
-const extPackage = require("@/../package.json")
 
 export class EsConnection extends IConnection {
 
@@ -11,10 +9,9 @@ export class EsConnection extends IConnection {
     private conneted: boolean;
     constructor(private opt: Node) {
         super()
-        if (compareVersions(extPackage.version, '3.6.6') === 1) {
-            this.url = opt.usingSSH ? `${opt.scheme}://${opt.host}:${opt.port}` : `${opt.scheme}://${opt.host}`
-        } else {
-            this.url = `${opt.scheme}://${opt.host}:${opt.port}`
+        this.url = opt.usingSSH ? `${opt.host}:${opt.port}` : `${opt.host}`
+        if (!this.url.match(/^(http|https):/)) {
+            this.url = `${opt.scheme || "http"}://${this.url}`;
         }
     }
 
@@ -31,7 +28,7 @@ export class EsConnection extends IConnection {
         }
         const body = splitIndex == -1 ? null : sql.substring(splitIndex + 1) + "\n"
 
-        axios({
+        let config: AxiosRequestConfig = {
             method: type,
             url: `${this.url}${path}`,
             headers: {
@@ -40,7 +37,11 @@ export class EsConnection extends IConnection {
             timeout: this.opt.connectTimeout || 2000,
             responseType: 'json',
             data: body
-        }).then(async ({ data }) => {
+        };
+
+        this.bindAuth(config);
+
+        axios(config).then(async ({ data }) => {
             if (values == "dontParse") {
                 callback(null, data)
                 return;
@@ -63,6 +64,22 @@ export class EsConnection extends IConnection {
             console.log(err)
             callback(err)
         })
+    }
+    bindAuth(config: AxiosRequestConfig) {
+        if (this.opt.esAuth == 'account' && this.opt.user && this.opt.password) {
+            config.auth = {
+                username: this.opt.user,
+                password: this.opt.password
+            }
+        } else if (this.opt.esAuth == 'token' && this.opt.esToken) {
+            if (config.headers) {
+                config.headers.Authorization = this.opt.esToken;
+            } else {
+                config.headers = {
+                    Authorization: this.opt.esToken
+                }
+            }
+        }
     }
     private async handleSearch(path: any, data: any, callback: any) {
         let fields = null;
@@ -98,7 +115,9 @@ export class EsConnection extends IConnection {
     }
 
     connect(callback: (err: Error) => void): void {
-        axios.get(`${this.url}/_cluster/health`).then(res => {
+        const config = {};
+        this.bindAuth(config)
+        axios.get(`${this.url}/_cluster/health`, config).then(res => {
             this.conneted = true;
             callback(null)
         }).catch(err => {

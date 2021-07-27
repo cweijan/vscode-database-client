@@ -45,12 +45,8 @@ export class SSHTunnelService {
                     return null
                 })()
             };
-            if (node.dbType == DatabaseType.ES) {
-                config.dstHost = node.host.split(":")[0]
-                // config.dstPort= (node.host.split(":")[1] || '80') as any
-                const portStr = node.host.split(":")[1] || '80'
-                config.dstPort = parseInt(portStr)
-            }
+
+            this.adapterES(node, config);
 
             if (ssh.type == 'native') {
                 let args = ['-TnNL', `${port}:${config.dstHost}:${config.dstPort}`, config.host, '-p', `${config.port}`];
@@ -91,6 +87,15 @@ export class SSHTunnelService {
                 resolve(null)
             });
         })
+    }
+
+    private adapterES(node: Node, config: any) {
+        if (node.dbType == DatabaseType.ES) {
+            const split = node.host.split(":");
+            let splitIndex = split[0]?.match(/^(http|https):/) ? 1 : 0;
+            config.dstHost = split[splitIndex]
+            config.dstPort = parseInt(split[++splitIndex] || '80')
+        }
     }
 
 }

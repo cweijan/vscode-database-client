@@ -84,6 +84,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
      * es only
      */
     public scheme: string;
+    public esAuth: string;
+    public esToken: string;
 
     /**
      * encoding, ftp only
@@ -110,6 +112,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.ssh = source.ssh
         this.usingSSH = source.usingSSH
         this.scheme = source.scheme
+        this.esAuth = source.esAuth
+        this.esToken = source.esToken
         this.encoding = source.encoding
         this.showHidden = source.showHidden
         this.connectionKey = source.connectionKey
