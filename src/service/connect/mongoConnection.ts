@@ -25,7 +25,9 @@ export class MongoConnection extends IConnection {
         } else {
           let url = `mongodb://${this.node.host}:${this.node.port}`;
           if (this.node.user || this.node.password) {
-            url = `mongodb://${this.node.user}:${this.node.password}@${this.node.host}:${this.node.port}`;
+            const escapedUser = encodeURIComponent(this.node.user)
+            const escapedPassword = encodeURIComponent(this.node.password)
+            url = `mongodb://${escapedUser}:${escapedPassword}@${this.node.host}:${this.node.port}`;
           }
         }
         MongoClient.connect(url, this.option, (err, client) => {
