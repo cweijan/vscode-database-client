@@ -12,6 +12,7 @@ import { QueryUnit } from "../queryUnit";
 import { SchemaNode } from "@/model/database/schemaNode";
 import { UserGroup } from "@/model/database/userGroup";
 import { TableGroup } from "@/model/main/tableGroup";
+import { InfoNode } from "@/model/other/infoNode";
 
 export class DiffService {
     startDiff(provider: DbTreeDataProvider) {
@@ -26,7 +27,11 @@ export class DiffService {
                     const nodes = (await provider.getConnectionNodes())
                     let databaseList = {}
                     for (const node of nodes) {
-                        databaseList[node.uid] = (await node.getChildren()).filter(dbNode => !(dbNode instanceof UserGroup))
+                        try {
+                            databaseList[node.uid] = (await node.getChildren()).filter(dbNode => !(dbNode instanceof UserGroup))
+                        } catch (error) {
+                            databaseList[node.uid] = [new InfoNode("Load fail.")]
+                        }
                     }
                     const data = { nodes: NodeUtil.removeParent(nodes), databaseList: NodeUtil.removeParent(databaseList) };
                     handler.emit('structDiffData', data)
@@ -38,8 +43,8 @@ export class DiffService {
                         handler.emit("error", error.message)
                     }
                 }).on("start", async (opt) => {
-                    const fromTables =await new TableGroup(Node.nodeCache[opt.from.db.uid]).getChildren()
-                    const toTables =await new TableGroup(Node.nodeCache[opt.to.db.uid]).getChildren()
+                    const fromTables = await new TableGroup(Node.nodeCache[opt.from.db.uid]).getChildren()
+                    const toTables = await new TableGroup(Node.nodeCache[opt.to.db.uid]).getChildren()
                     let sqlList = await this.compareTables(fromTables, toTables);
                     handler.emit("compareResult", { sqlList })
                 }).on("sync", async ({ option, sqlList }) => {
