@@ -162,7 +162,7 @@ export default {
         encrypt: true,
         connectionUrl: "",
         srv: false,
-        esAuth:'account',
+        esAuth:'none',
         global: true,
         key: null,
         // scheme: "http",

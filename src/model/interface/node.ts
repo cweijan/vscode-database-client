@@ -86,6 +86,10 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public scheme: string;
     public esAuth: string;
     public esToken: string;
+    /**
+     * using when ssh tunnel
+     */
+    public esUrl: string;
 
     /**
      * encoding, ftp only

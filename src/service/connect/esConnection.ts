@@ -9,7 +9,7 @@ export class EsConnection extends IConnection {
     private conneted: boolean;
     constructor(private opt: Node) {
         super()
-        this.url = opt.usingSSH ? `${opt.host}:${opt.port}` : `${opt.host}`
+        this.url = opt.esUrl || opt.host
         if (!this.url.match(/^(http|https):/)) {
             this.url = `${opt.scheme || "http"}://${this.url}`;
         }

@@ -91,10 +91,19 @@ export class SSHTunnelService {
 
     private adapterES(node: Node, config: any) {
         if (node.dbType == DatabaseType.ES) {
-            const split = node.host.split(":");
-            let splitIndex = split[0]?.match(/^(http|https):/) ? 1 : 0;
-            config.dstHost = split[splitIndex]
-            config.dstPort = parseInt(split[++splitIndex] || '80')
+            let url = node.host;
+            url = url.replace(/^(http|https):\/\//i, '')
+            if (url.includes(":")) {
+                const split = url.split(":");
+                config.dstHost = split[0]
+                const portStr = split[1]?.match(/^\d+/)[0]
+                config.dstPort = parseInt(portStr)
+                node.esUrl = node.host.replace(config.dstHost, '127.0.0.1').replace(config.dstPort, config.localPort)
+            } else {
+                config.dstHost = url.split("/")[0]
+                config.dstPort = '80'
+                node.esUrl = node.host.replace(config.dstHost, '127.0.0.1')
+            }
         }
     }
 
