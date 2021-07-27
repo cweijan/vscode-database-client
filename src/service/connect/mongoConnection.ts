@@ -18,12 +18,11 @@ export class MongoConnection extends IConnection {
     }
 
     connect(callback: (err: Error) => void): void {
-        let url;
-        if (this.node.connectionUrl) {
-          url = this.node.connectionUrl;
+        let url=this.node.connectionUrl;
+        if (url) {
           this.option = { useNewUrlParser: true}
         } else {
-          let url = `mongodb://${this.node.host}:${this.node.port}`;
+          url = `mongodb://${this.node.host}:${this.node.port}`;
           if (this.node.user || this.node.password) {
             const escapedUser = encodeURIComponent(this.node.user)
             const escapedPassword = encodeURIComponent(this.node.password)
