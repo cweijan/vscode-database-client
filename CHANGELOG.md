@@ -1,5 +1,14 @@
 # CHANGELOG
 
+# 3.9.8 2021-7-27
+
+- Support special ssl ca certificate.
+- Hover info add action to query table data.
+- Fix complection bug.
+- ElasticSearch support connect with token or account.
+- Support connect by native ssh command.
+- Fix open struct sync fail.
+
 # 3.9.6 2021-7-22
 
 - Add hover to run selected sql.
