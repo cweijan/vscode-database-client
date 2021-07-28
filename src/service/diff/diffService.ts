@@ -85,6 +85,7 @@ export class DiffService {
 
         for (const newTable in toTablesMap) {
             const newTableNode = toTablesMap[newTable] as TableNode;
+            if(newTableNode instanceof InfoNode) continue;
             sqlList.push({ type: 'add', sql: await newTableNode.showSource(false) });
         }
         return sqlList;
