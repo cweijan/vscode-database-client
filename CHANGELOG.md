@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# 3.9.9 2021-8-2
+
+- Fix hover query table action not work.
+
 # 3.9.8 2021-7-27
 
 - Support special ssl ca certificate.
