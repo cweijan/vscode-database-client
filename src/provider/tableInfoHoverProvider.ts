@@ -12,7 +12,7 @@ export class TableInfoHoverProvider implements HoverProvider {
 
         const sourceCode = await tableNode?.execute<any[]>(tableNode.dialect.showTableSource(tableNode.schema, tableNode.table))
         if (sourceCode) {
-            const args = [{ sql: `SELECT * FROM ${tableNode.table}` }];
+            const args = [`SELECT * FROM ${tableNode.table}`];
             const runCommandUri = vscode.Uri.parse(`command:mysql.runQuery?${encodeURIComponent(JSON.stringify(args))}`);
             const markdownStr = new vscode.MarkdownString(`[Query Table](${runCommandUri})`);
             markdownStr.isTrusted=true;
@@ -23,7 +23,7 @@ export class TableInfoHoverProvider implements HoverProvider {
         const selections = vscode.window.activeTextEditor?.selections || []
         for (const selection of selections) {
             if (selection.contains(position)) {
-                const args = [{ sql: document.getText(selection) }];
+                const args = [document.getText(selection)];
                 const runCommandUri = vscode.Uri.parse(`command:mysql.runQuery?${encodeURIComponent(JSON.stringify(args))}`);
                 const contents = new vscode.MarkdownString(`[Run Selected SQL](${runCommandUri})`);
                 contents.isTrusted = true;
