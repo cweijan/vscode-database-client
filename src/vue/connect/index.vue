@@ -70,7 +70,7 @@
           <label class="font-bold mr-5 inline-block w-32">Databases</label>
           <input class="w-64 field__input" placeholder="Special connection database" v-model="connectionOption.database" />
         </div>
-        <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis' ">
+        <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
           <label class="font-bold mr-5 inline-block w-32">Include Databases</label>
           <input class="w-64 field__input" placeholder="Example: mysql,information_schema" v-model="connectionOption.includeDatabases" />
         </div>
@@ -84,7 +84,7 @@
           <input class="w-64 field__input" placeholder="5000" required v-model="connectionOption.connectTimeout" />
         </div>
         <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32">RequestTimeout</label>
+          <label class="font-bold mr-5 inline-block w-32" v-if="connectionOption.dbType!='Redis'">RequestTimeout</label>
           <input class="w-64 field__input" placeholder="10000" required type="number" v-model="connectionOption.requestTimeout" />
         </div>
       </section>
@@ -429,7 +429,6 @@ input::-webkit-inner-spin-button {
   border: 0;
   display: inline-block;
   outline: none;
-  @apply font-bold;
   cursor: pointer;
 }
 

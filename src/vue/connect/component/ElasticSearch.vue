@@ -10,7 +10,7 @@
     </section>
     <section class="mb-2">
       <section class="mb-2">
-        <label class="font-bold mr-5 inline-block w-36">Basic Auth(Optional)</label>
+        <label class="font-bold mr-5 inline-block w-36">Basic Auth</label>
         <el-radio v-model="connectionOption.esAuth" label="none">Not Auth</el-radio>
         <el-radio v-model="connectionOption.esAuth" label="account">Account</el-radio>
         <el-radio v-model="connectionOption.esAuth" label="token">Token</el-radio>
