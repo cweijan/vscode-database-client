@@ -46,7 +46,7 @@ interface ViewState {
 
 export class ViewManager {
 
-    private static viewStatu: { [key: string]: ViewState } = {};
+    private static viewStatus: { [key: string]: ViewState } = {};
     private static webviewPath: string;
     public static initExtesnsionPath(extensionPath: string) {
         this.webviewPath = extensionPath + "/out/webview"
@@ -69,7 +69,7 @@ export class ViewManager {
             }
 
             const viewColumn = viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One;
-            const currentStatus = this.viewStatu[viewOption.type]
+            const currentStatus = this.viewStatus[viewOption.type]
             if (viewOption.singlePage && currentStatus) {
                 if (viewColumn==vscode.ViewColumn.Two && currentStatus.instance?.visible == false) {
                     currentStatus.instance.dispose()
@@ -95,7 +95,7 @@ export class ViewManager {
                 { enableScripts: true, retainContextWhenHidden: true },
             );
             const newStatus = { creating: true, instance: webviewPanel, eventEmitter: new EventEmitter() }
-            this.viewStatu[viewOption.type] = newStatus
+            this.viewStatus[viewOption.type] = newStatus
             const targetPath = `${this.webviewPath}/${viewOption.path}.html`;
             fs.readFile(targetPath, 'utf8', async (err, data) => {
                 if (err) {
@@ -117,7 +117,7 @@ export class ViewManager {
                 webviewPanel.webview.html = this.buildPath(data, webviewPanel.webview, contextPath);
 
                 webviewPanel.onDidDispose(() => {
-                    this.viewStatu[viewOption.type] = null
+                    this.viewStatus[viewOption.type] = null
                 })
                 if (viewOption.eventHandler) {
                     viewOption.eventHandler(new Hanlder(webviewPanel, newStatus.eventEmitter))
@@ -137,6 +137,11 @@ export class ViewManager {
 
         });
 
+    }
+
+    public static bindStatus(key:string,newKey:string){
+        this.viewStatus[newKey]=this.viewStatus[key];
+        delete this.viewStatus[key];
     }
 
     private static buildPath(data: string, webview: vscode.Webview, contextPath: string): string {

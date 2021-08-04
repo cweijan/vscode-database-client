@@ -4,7 +4,7 @@
       <div style="width:95%;">
         <el-input type="textarea" :autosize="{ minRows:2, maxRows:5}" v-model="toolbar.sql" class="sql-pannel" @keypress.native="panelInput" />
       </div>
-      <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :costTime="result.costTime" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="$refs.editor.openInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
+      <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :result="result" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="$refs.editor.openInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
       <div v-if="info.message ">
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
         <div v-if="!info.error" class="info-panel" style="color: green !important;" v-html="info.message"></div>
@@ -56,6 +56,7 @@ export default {
       result: {
         data: [],
         dbType: "",
+        single:true,
         costTime: 0,
         sql: "",
         primaryKey: null,
@@ -147,7 +148,11 @@ export default {
         message: "Update Success",
         type: "success",
       });
-    });
+    })
+    .on("isSingle",(isSingle)=>{
+      this.result.single=isSingle;
+    })
+    
     window.onkeypress = (e) => {
       if (
         (e.code == "Enter" && e.target.classList.contains("edit-column")) ||

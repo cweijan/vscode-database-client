@@ -44,7 +44,7 @@ export class QueryPage {
                     }
                     queryParam.res.transId = Trans.transId;
                     queryParam.res.viewId = queryParam.queryOption?.viewId;
-                    handler.emit(queryParam.type, { ...queryParam.res, dbType: dbOption.dbType })
+                    handler.emit(queryParam.type, { ...queryParam.res, dbType: dbOption.dbType,single:queryParam.singlePage })
                 }).on('execute', (params) => {
                     QueryUnit.runQuery(params.sql, dbOption, queryParam.queryOption);
                 }).on('next', async (params) => {
@@ -54,6 +54,15 @@ export class QueryPage {
                         const costTime = new Date().getTime() - executeTime;
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows ,costTime})
                     })
+                }).on("removeSingle",()=>{
+                    const newKey=new Date().getTime()+"";
+                    ViewManager.bindStatus(handler.panel.viewType,newKey)
+                    queryParam.queryOption.viewId=newKey;
+                    handler.emit("isSingle",false)
+                }).on("toSingle",()=>{
+                    ViewManager.bindStatus(handler.panel.viewType,"query")
+                    queryParam.queryOption.viewId='query';
+                    handler.emit("isSingle",true)
                 }).on("full", () => {
                     handler.panel.reveal(ViewColumn.One)
                 }).on('esFilter', (query) => {
