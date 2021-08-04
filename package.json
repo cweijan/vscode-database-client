@@ -124,7 +124,7 @@
 				"icon": "resources/icon/settings.svg"
 			},
 			{
-				"command": "mysql.refresh",
+				"command": "mysql2.refresh",
 				"title": "%command.refresh%",
 				"category": "MySQL",
 				"icon": "$(refresh)"
@@ -207,7 +207,7 @@
 				"category": "MySQL"
 			},
 			{
-				"command": "mysql.runQuery",
+				"command": "mysql.runSQL",
 				"title": "%command.runQuery%",
 				"category": "MySQL",
 				"icon": "$(run)"
@@ -472,12 +472,12 @@
 		],
 		"keybindings": [
 			{
-				"command": "mysql.runQuery",
+				"command": "mysql.runSQL",
 				"key": "f9",
 				"when": "editorLangId == sql"
 			},
 			{
-				"command": "mysql.runQuery",
+				"command": "mysql.runSQL",
 				"key": "ctrl+enter",
 				"when": "editorLangId == sql"
 			},
@@ -500,7 +500,7 @@
 		"menus": {
 			"editor/context": [
 				{
-					"command": "mysql.runQuery",
+					"command": "mysql.runSQL",
 					"when": "editorLangId == sql",
 					"group": "navigation@-2"
 				},
@@ -522,7 +522,7 @@
 					"group": "navigation"
 				},
 				{
-					"command": "mysql.runQuery",
+					"command": "mysql.runSQL",
 					"when": "editorLangId == sql || resourceFilename =~ /.sql$/ ",
 					"group": "navigation"
 				}
@@ -534,7 +534,7 @@
 					"group": "navigation@3"
 				},
 				{
-					"command": "mysql.refresh",
+					"command": "mysql2.refresh",
 					"when": "view =~ /cweijan.+?ql/",
 					"group": "navigation@2"
 				},
@@ -561,7 +561,7 @@
 			],
 			"view/item/context": [
 				{
-					"command": "mysql.refresh",
+					"command": "mysql2.refresh",
 					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|esConnection|sshConnection|folder|redisConnection|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table)$/",
 					"group": "inline@-2"
 				},
@@ -601,7 +601,7 @@
 					"group": "2_mysql@0"
 				},
 				{
-					"command": "mysql.refresh",
+					"command": "mysql2.refresh",
 					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(esConnection|ftpConnection|ftpFolder)$/",
 					"group": "2_mysql@1"
 				},
@@ -651,7 +651,7 @@
 					"group": "1_mysql@1"
 				},
 				{
-					"command": "mysql.refresh",
+					"command": "mysql2.refresh",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == userGroup",
 					"group": "1_mysql@2"
 				},
@@ -681,7 +681,7 @@
 					"group": "-1_mysql@-5"
 				},
 				{
-					"command": "mysql.refresh",
+					"command": "mysql2.refresh",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == database",
 					"group": "3_mysql@0"
 				},
@@ -776,7 +776,7 @@
 					"group": "2_mysql@2"
 				},
 				{
-					"command": "mysql.refresh",
+					"command": "mysql2.refresh",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == tableGroup",
 					"group": "1_mysql@2"
 				},
@@ -801,7 +801,7 @@
 					"group": "3_mysql@1"
 				},
 				{
-					"command": "mysql.refresh",
+					"command": "mysql2.refresh",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == viewGroup",
 					"group": "1_mysql@2"
 				},
@@ -816,7 +816,7 @@
 					"group": "1_mysql@1"
 				},
 				{
-					"command": "mysql.refresh",
+					"command": "mysql2.refresh",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == procedureGroup",
 					"group": "1_mysql@2"
 				},
@@ -831,7 +831,7 @@
 					"group": "2_mysql@1"
 				},
 				{
-					"command": "mysql.refresh",
+					"command": "mysql2.refresh",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == functionGroup",
 					"group": "1_mysql@2"
 				},
@@ -846,7 +846,7 @@
 					"group": "1_mysql@1"
 				},
 				{
-					"command": "mysql.refresh",
+					"command": "mysql2.refresh",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == triggerGroup",
 					"group": "1_mysql@2"
 				},

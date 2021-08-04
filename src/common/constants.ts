@@ -34,7 +34,7 @@ export enum ConfigKey {
 
 export enum CodeCommand {
     RecordHistory = "mysql.history.record",
-    Refresh = "mysql.refresh"
+    Refresh = "mysql2.refresh"
 }
 
 export class Cursor {
