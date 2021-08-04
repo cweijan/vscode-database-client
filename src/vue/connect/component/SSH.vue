@@ -42,7 +42,7 @@
       <label class="font-bold mr-5 inline-block w-28">Type</label>
       <el-radio v-model="connectionOption.ssh.type" label="password">Password</el-radio>
       <el-radio v-model="connectionOption.ssh.type" label="privateKey">Private Key</el-radio>
-      <el-radio v-model="connectionOption.ssh.type" label="native">Native SSH(Experiment)</el-radio>
+      <!-- <el-radio v-model="connectionOption.ssh.type" label="native">Native SSH(Experiment)</el-radio> -->
     </section>
 
     <div v-if="connectionOption.ssh.type == 'password'">
