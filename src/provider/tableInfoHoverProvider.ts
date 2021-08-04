@@ -13,7 +13,7 @@ export class TableInfoHoverProvider implements HoverProvider {
         const sourceCode = await tableNode?.execute<any[]>(tableNode.dialect.showTableSource(tableNode.schema, tableNode.table))
         if (sourceCode) {
             const args = [`SELECT * FROM ${tableNode.table}`];
-            const runCommandUri = vscode.Uri.parse(`command:mysql.runSQL?${encodeURIComponent(JSON.stringify(args))}`);
+            const runCommandUri = vscode.Uri.parse(`command:mysql.codeLens.run?${encodeURIComponent(JSON.stringify(args))}`);
             const markdownStr = new vscode.MarkdownString(`[Query Table](${runCommandUri})`);
             markdownStr.isTrusted=true;
             markdownStr.appendCodeblock(sourceCode[0]['Create Table'], "sql");
