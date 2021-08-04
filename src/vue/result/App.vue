@@ -14,7 +14,18 @@
     <ux-grid ref="dataTable" :data="filterData" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe :checkboxConfig="{ checkMethod: selectable}">
       <ux-table-column type="checkbox" width="40" fixed="left"></ux-table-column>
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined">
-        <Controller slot="header" :result="result" :toolbar="toolbar" />
+        <template #header>  
+          <el-popover placement="bottom" title="Select columns to show" width="200" trigger="hover" type="primary">
+            <el-checkbox-group v-model="toolbar.showColumns">
+              <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
+                {{ column.name }}
+              </el-checkbox>
+            </el-checkbox-group>
+            <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference">
+            </el-button>
+          </el-popover>
+        </template>
+        <!-- <Controller slot="header" :result="result" :toolbar="toolbar" /> -->
       </ux-table-column>
       <ux-table-column v-for="(field,index) in (result.fields||[]).filter(field=>toolbar.showColumns.includes(field.name.toLowerCase()))" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field,0)" edit-render>
         <Header slot="header" slot-scope="scope" :result="result" :scope="scope" :index="index" />
@@ -405,7 +416,7 @@ export default {
       this.toolbar.showColumns = [];
       for (let i = 0; i < fields.length; i++) {
         if (!fields[i].name) continue;
-        this.toolbar.showColumns.push(fields[i].name.toLowerCase());
+        this.toolbar.showColumns.push(fields[i].name);
       }
     },
     // show call when load same table data
