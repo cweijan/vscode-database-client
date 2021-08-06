@@ -2,8 +2,8 @@
   <div class="toolbar">
     <el-button v-if="showFullBtn" @click="()=>$emit('sendToVscode','full')" type="primary" title="Full Result View" icon="el-icon-rank" size="mini" circle>
     </el-button>
-    <el-button v-if="!result.single" @click="()=>$emit('sendToVscode','toSingle')" type="success" title="Lock This Panel" icon="el-icon-lock" size="mini" circle>
-    </el-button>
+    <!-- <el-button v-if="!result.single" @click="()=>$emit('sendToVscode','toSingle')" type="success" title="Lock This Panel" icon="el-icon-lock" size="mini" circle>
+    </el-button> -->
     <el-button v-if="result.single" @click="()=>$emit('sendToVscode','removeSingle')" type="danger" title="Unlock This Panel" icon="el-icon-unlock" size="mini" circle>
     </el-button>
     <el-input v-model="searchInput" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
