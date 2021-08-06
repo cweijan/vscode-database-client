@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <div class="hint">
-      <div style="width:95%;">
+    <div class="hint" ref="hint">
+      <div style="width:95%;" >
         <el-input type="textarea" :autosize="{ minRows:2, maxRows:5}" v-model="toolbar.sql" class="sql-pannel" @keypress.native="panelInput" />
       </div>
       <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :result="result" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="$refs.editor.openInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
@@ -109,12 +109,14 @@ export default {
     };
   },
   mounted() {
-    this.remainHeight = window.innerHeight - 90;
-    this.showFullBtn = window.outerWidth / window.innerWidth >= 2;
-    window.addEventListener("resize", () => {
-      this.remainHeight = window.innerHeight - 90;
+    const hint=this.$refs.hint;
+    const updateHeight=()=>{
+      this.remainHeight = window.innerHeight -15 - hint.clientHeight ;
       this.showFullBtn = window.outerWidth / window.innerWidth >= 2;
-    });
+    }
+    updateHeight()
+    new ResizeObserver(updateHeight).observe(hint)
+    window.addEventListener("resize", updateHeight);
     const handlerData = (data, sameTable) => {
       this.result = data;
       this.toolbar.sql = data.sql;
