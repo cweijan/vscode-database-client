@@ -1,5 +1,13 @@
 # CHANGELOG
 
+# 4.0.0 2021-8-7
+
+- Support multiple result view.
+- Fix result view show vertical scrollbar.
+- Fix conflict with other extension.
+- Fix connect and result view legacy bugs.
+- Remove native ssh from connect view.
+
 # 3.9.9 2021-8-2
 
 - Fix hover query table action not work.
