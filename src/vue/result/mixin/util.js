@@ -12,7 +12,7 @@ export const util = {
                 value = value.replace(/'/g, "\\'")
             }
             if(!type){
-                return value;
+                return `'${value}'`
             }
             type = type.toLowerCase()
             switch (type) {
