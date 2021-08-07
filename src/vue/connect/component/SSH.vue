@@ -56,7 +56,7 @@
         <div class="inline-block mr-10">
           <label class="font-bold mr-5 inline-block w-28">Private Key Path</label>
           <input class="w-52 field__input" placeholder="Private Key Path" v-model="connectionOption.ssh.privateKeyPath" />
-          <button @click="choose('privateKey')" class=" w-12">Choose</button>
+          <button @click="$emit('choose','privateKey')" class=" w-12">Choose</button>
         </div>
         <div class="inline-block mr-10">
           <label class="font-bold mr-5 inline-block w-28">Passphrase</label>

@@ -34,8 +34,8 @@
     </section>
 
     <ElasticSearch v-if="connectionOption.dbType=='ElasticSearch'" :connectionOption="connectionOption" />
-    <SQLite v-else-if="connectionOption.dbType=='SQLite'" :connectionOption="connectionOption" :sqliteState="sqliteState" @install="installSqlite" />
-    <SSH v-else-if="connectionOption.dbType=='SSH'" :connectionOption="connectionOption" />
+    <SQLite v-else-if="connectionOption.dbType=='SQLite'" :connectionOption="connectionOption" :sqliteState="sqliteState" @install="installSqlite" @choose="choose"/>
+    <SSH v-else-if="connectionOption.dbType=='SSH'" :connectionOption="connectionOption" @choose="choose"/>
 
     <template v-else>
 
@@ -123,7 +123,7 @@
     </section>
 
     <SSL :connectionOption="connectionOption" v-if="connectionOption.useSSL" />
-    <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH" />
+    <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH" @choose="choose"/>
 
     <div>
       <button class="button button--primary w-28 inline mr-4" @click="tryConnect" v-loading="connect.loading">Connect</button>
@@ -155,6 +155,7 @@ export default {
         password: "",
         encoding: "utf8",
         database: null,
+        useSSL: false,
         usingSSH: false,
         showHidden: false,
         includeDatabases: null,
@@ -318,12 +319,14 @@ export default {
           this.connectionOption.encrypt = true;
           this.connectionOption.port = 1433;
           this.connectionOption.database = "master";
+          this.connectionOption.useSSL=false;
           break;
         case "ElasticSearch":
           this.connectionOption.host = "127.0.0.1:9200";
           this.connectionOption.user = null;
           this.connectionOption.port = null;
           this.connectionOption.database = null;
+          this.connectionOption.useSSL=false;
           break;
         case "Redis":
           this.connectionOption.port = 6379;
@@ -338,8 +341,12 @@ export default {
         case "FTP":
           this.connectionOption.port = 21;
           this.connectionOption.user = null;
+          this.connectionOption.useSSL=false;
           break;
+        case "SQLite":
         case "SSH":
+          this.connectionOption.usingSSH=false;
+          this.connectionOption.useSSL=false;
           break;
       }
       this.$forceUpdate();

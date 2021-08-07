@@ -87,8 +87,8 @@ export class ConnectService {
                     handler.panel.dispose()
                 }).on("choose", ({ event, filters }) => {
                     window.showOpenDialog({ filters }).then((uris) => {
-                        const uri = uris[0]
-                        if (uri) {
+                        if (uris && uris[0]) {
+                            const uri = uris[0]
                             handler.emit("choose", { event, path: uri.fsPath })
                         }
                     })

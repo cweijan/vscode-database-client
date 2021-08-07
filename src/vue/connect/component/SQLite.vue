@@ -13,7 +13,7 @@
         <div class="inline-block mr-10">
           <label class="font-bold mr-5 inline-block w-28">SQLite File Path</label>
           <input class="w-80 field__input" placeholder="SQLite File Path" v-model="connectionOption.dbPath" />
-          <button class="button button--primary w-128 inline" @click="choose('sqlite')">Choose Database File</button>
+          <button class="button button--primary w-128 inline" @click="$emit('choose','sqlite')">Choose Database File</button>
         </div>
       </section>
     </div>
