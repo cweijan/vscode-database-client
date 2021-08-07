@@ -177,7 +177,7 @@ export default {
       }
     };
     window.addEventListener("message", ({ data }) => {
-      if (!data) return;
+      if (!data || !data.content) return;
       const response = data.content;
       console.log(data);
       this.result.transId=response.transId;
