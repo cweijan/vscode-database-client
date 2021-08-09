@@ -168,6 +168,9 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         const dbIdMap = new Map<string, Node>();
         const connectionNodes = await this.getConnectionNodes()
         for (const cNode of connectionNodes) {
+            if(cNode.disable){
+                continue;
+            }
             if (cNode.dbType == DatabaseType.SQLITE) {
                 const uid = cNode.label;
                 dbIdList.push(uid)
@@ -185,6 +188,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
                 }
             } else {
                 schemaList = DatabaseCache.getSchemaListOfConnection(cNode.uid)
+                if(!schemaList)continue;
             }
 
             for (const schemaNode of schemaList) {
