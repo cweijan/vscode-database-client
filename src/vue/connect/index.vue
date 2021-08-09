@@ -34,7 +34,7 @@
     </section>
 
     <ElasticSearch v-if="connectionOption.dbType=='ElasticSearch'" :connectionOption="connectionOption" />
-    <SQLite v-else-if="connectionOption.dbType=='SQLite'" :connectionOption="connectionOption" :sqliteState="sqliteState" @install="installSqlite" @choose="choose"/>
+    <SQLite v-else-if="connectionOption.dbType=='SQLite'" :connectionOption="connectionOption" :sqliteState="sqliteState" @installSqlite="installSqlite" @choose="choose"/>
     <SSH v-else-if="connectionOption.dbType=='SSH'" :connectionOption="connectionOption" @choose="choose"/>
 
     <template v-else>

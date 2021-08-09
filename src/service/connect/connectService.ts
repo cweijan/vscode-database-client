@@ -43,7 +43,7 @@ export class ConnectService {
                     } else {
                         handler.emit("connect")
                     }
-                    const exists = plat == 'win32' ? true : commandExistsSync("sqlite");
+                    const exists = plat == 'win32' ? true : commandExistsSync("sqlite") || commandExistsSync("sqlite3");
                     handler.emit("sqliteState", exists)
                 }).on("installSqlite", () => {
                     let command: string;
