@@ -1,5 +1,13 @@
 # CHANGELOG
 
+# 4.0.5 2021-8-13
+
+- Struct sync remove disable connection.
+- Fix auto complete fail on SQL file.
+- Support close ssh connection.
+- Fix result view border not fit for theme.`activeDocument`
+- Fix untitle document cannot split.
+
 # 4.0.0 2021-8-7
 
 - Support multiple result view.
