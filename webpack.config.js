@@ -34,6 +34,9 @@ module.exports = [
         plugins: [
             new webpack.IgnorePlugin(/^(pg-native|cardinal|encoding|aws4)$/)
         ],
+        stats: {
+            warningsFilter: [/critical dependency:/i],
+        },
         module: { rules: [{ test: /\.ts$/, exclude: /(node_modules|bin)/, use: ['ts-loader'] }] },
         optimization: { minimize: isProd },
         watch: !isProd,
