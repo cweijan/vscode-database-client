@@ -44,7 +44,7 @@ export class QueryPage {
                     }
                     queryParam.res.transId = Trans.transId;
                     queryParam.res.viewId = queryParam.queryOption?.viewId;
-                    handler.emit(queryParam.type, { ...queryParam.res, dbType: dbOption.dbType,single:queryParam.singlePage })
+                    handler.emit(queryParam.type, { ...queryParam.res, dbType: dbOption.dbType, single: queryParam.singlePage })
                 }).on('execute', (params) => {
                     QueryUnit.runQuery(params.sql, dbOption, queryParam.queryOption);
                 }).on('next', async (params) => {
@@ -52,17 +52,17 @@ export class QueryPage {
                     const sql = ServiceManager.getPageService(dbOption.dbType).build(params.sql, params.pageNum, params.pageSize)
                     dbOption.execute(sql).then((rows) => {
                         const costTime = new Date().getTime() - executeTime;
-                        handler.emit(MessageType.NEXT_PAGE, { sql, data: rows ,costTime})
+                        handler.emit(MessageType.NEXT_PAGE, { sql, data: rows, costTime })
                     })
-                }).on("removeSingle",()=>{
-                    const newKey=new Date().getTime()+"";
-                    ViewManager.bindStatus(handler.panel.viewType,newKey)
-                    queryParam.queryOption.viewId=newKey;
-                    handler.emit("isSingle",false)
-                }).on("toSingle",()=>{
-                    ViewManager.bindStatus(handler.panel.viewType,"query")
-                    queryParam.queryOption.viewId='query';
-                    handler.emit("isSingle",true)
+                }).on("removeSingle", () => {
+                    const newKey = new Date().getTime() + "";
+                    ViewManager.bindStatus(handler.panel.viewType, newKey)
+                    queryParam.queryOption.viewId = newKey;
+                    handler.emit("isSingle", false)
+                }).on("toSingle", () => {
+                    ViewManager.bindStatus(handler.panel.viewType, "query")
+                    queryParam.queryOption.viewId = 'query';
+                    handler.emit("isSingle", true)
                 }).on("full", () => {
                     handler.panel.reveal(ViewColumn.One)
                 }).on('esFilter', (query) => {
@@ -154,12 +154,14 @@ export class QueryPage {
 
     private static isActiveSql(option: QueryOption): boolean {
 
-        if (!window.activeTextEditor || !window.activeTextEditor.document || option.split === false) { return false; }
+        const activeDocument = window.activeTextEditor?.document;
+        if (!activeDocument || option.split === false) { return false; }
 
-        const extName = extname(window.activeTextEditor.document.fileName)?.toLowerCase()
-        const fileName = basename(window.activeTextEditor.document.fileName)?.toLowerCase()
+        const extName = extname(activeDocument.fileName)?.toLowerCase()
+        const fileName = basename(activeDocument.fileName)?.toLowerCase()
+        const languageId = basename(activeDocument.languageId)?.toLowerCase()
 
-        return extName == '.sql' || fileName.match(/mock.json$/) != null || extName == '.es';
+        return languageId == 'sql' || languageId == 'es' || extName == '.sql' || extName == '.es' || fileName.match(/mock.json$/) != null;
     }
 
     private static async loadEsColumnList(queryParam: QueryParam<DataResponse>) {
