@@ -6,6 +6,41 @@
 /**
 https://www.umyui.com/
 */
+
+
+/* checkbox color */
+
+.plx-checkbox--unchecked-icon:before{
+  background-color: var(--vscode-editor-background) !important;
+  border:1px solid var(--border-color) !important;
+  border-radius: 2px !important;
+}
+
+.el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner,
+.is--checked.plx-custom--option .plx-checkbox--icon:before, .is--checked.plx-custom--panel-column-option .plx-checkbox--icon:before, .is--checked.plx-export--panel-column-option .plx-checkbox--icon:before, .is--checked.plx-table--filter-option .plx-checkbox--icon:before, .is--indeterminate.plx-custom--option .plx-checkbox--icon:before, .is--indeterminate.plx-custom--panel-column-option .plx-checkbox--icon:before, .is--indeterminate.plx-export--panel-column-option .plx-checkbox--icon:before, .is--indeterminate.plx-table--filter-option .plx-checkbox--icon:before, .plx-table .is--checked.plx-cell--checkbox .plx-checkbox--icon:before, .plx-table .is--indeterminate.plx-cell--checkbox .plx-checkbox--icon:before{
+  border-color: var(--border-color) !important;
+  background-color: var(--vscode-editor-background) !important;
+}
+
+.plx-custom--option .plx-checkbox--checked-icon:after, .plx-custom--panel-column-option .plx-checkbox--checked-icon:after, .plx-export--panel-column-option .plx-checkbox--checked-icon:after, .plx-table .plx-cell--checkbox .plx-checkbox--checked-icon:after, .plx-table--filter-option .plx-checkbox--checked-icon:after{
+  border-color: var(--primary-color);
+}
+
+.el-checkbox__input.is-checked + .el-checkbox__label{
+ color: var(--primary-color); 
+}
+
+/* focus color */
+.el-select .el-input.is-focus .el-input__inner {
+  border-color: #409EFF
+}
+
+.el-checkbox__input.is-focus .el-checkbox__inner {
+  border-color: #409EFF
+}
+
+/* contents color */
+
 .el-input.is-disabled input {
   border: none !important;
   user-select: all;
@@ -119,10 +154,6 @@ https://www.umyui.com/
   background: var(--vscode-editor-background) !important;
 }
 
-.el-checkbox__input.is-checked + .el-checkbox__label{
-  /* color: var(--vscode-terminal-ansiBlue) !important; */
-}
-
 .plx-table .plx-body--row {
   background: var(--vscode-editor-background) !important;
   color: var(--second-color) !important;
@@ -144,10 +175,4 @@ https://www.umyui.com/
   margin-right: 10px;
   font-weight: 400;
   color: var(--second-color);
-}
-
-.plx-checkbox--unchecked-icon:before{
-  background-color: var(--vscode-editor-background) !important;
-  border:1px solid var(--border-color) !important;
-  border-radius: 2px !important;
 }

@@ -42,6 +42,8 @@ overflow: unset;
 
 .el-popover{
   border: none;
+  width: unset !important;
+  max-width: 300px;
 }
 
 .el-popover__reference{
