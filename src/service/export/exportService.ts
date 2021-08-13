@@ -81,8 +81,8 @@ export class ExportService {
     }
 
     private exportToJson(context: ExportContext) {
-        fs.writeFileSync(context.exportPath, JSON.stringify(context.rows, (k, v:any) => {
-            if(context.dbOption.dbType==DatabaseType.MONGO_DB && v.indexOf && v.indexOf("ObjectID")!=-1){
+        fs.writeFileSync(context.exportPath, JSON.stringify(context.rows, (k, v: any) => {
+            if (context.dbOption.dbType == DatabaseType.MONGO_DB && v.indexOf && v.indexOf("ObjectID") != -1) {
                 return undefined;
             }
             return v === undefined ? null : v;
@@ -131,9 +131,13 @@ export class ExportService {
 
     private exportToCsv(filePath: string, fields: FieldInfo[], rows: any) {
         let csvContent = "";
+        for (const field of fields) {
+            csvContent += `${field.name || ''},`
+        }
+        csvContent = csvContent.replace(/.$/, "") + "\n"
         for (const row of rows) {
             for (const key in row) {
-                csvContent += `${row[key] != null ? row[key] : ''},`
+                csvContent += `${row[key] || ''},`
             }
             csvContent = csvContent.replace(/.$/, "") + "\n"
         }
