@@ -6,8 +6,8 @@ import VueRouter from 'vue-router'
 import UmyTable from 'umy-table'
 
 import 'umy-table/lib/theme-chalk/index.css';
-import '@/../public/theme/auto.css'
-import '@/../public/theme/umyui.css'
+import '@/../public/theme/element.css'
+import '@/../public/theme/custom.css'
 import "tailwindcss/tailwind.css"
 
 Vue.use(VueRouter)

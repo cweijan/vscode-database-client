@@ -1,3 +1,16 @@
+:root {
+  --editor-color: var(--vscode-menu-foreground);
+  --input-color: var(--vscode-tab-activeForeground);
+  --primary-color: var(--vscode-tab-activeForeground);
+  --second-color: var(--vscode-input-placeholderForeground);
+  --border-color: var(--vscode-quickInputTitle-background);
+  --bg-color: var(--vscode-editor-background);
+  --disable-bg-color: var(--vscode-editor-background);
+  --second-bg-color: var(--vscode-editorSuggestWidget-background);
+  --umy-border-color: var(--vscode-editor-foldBackground);
+  --umy-input-color: var(--vscode-menu-foreground);
+}
+
 /**
 https://www.umyui.com/
 */
@@ -79,14 +92,13 @@ https://www.umyui.com/
 .plx-body--column.col--checkbox,
   /* header */
 .plx-table .plx-table--header-wrapper .plx-table--header-border-line {
-  
-  border: 1px solid var(--vscode-textBlockQuote-background) !important;
+  border: 1px solid var(--umy-border-color) !important;
 }
 
 .plx-table .plx-table--fixed-left-wrapper,
 .plx-body--column, .plx-header--column {
   background: none !important;
-  border: 1px solid var(--vscode-textBlockQuote-background) !important;
+  border: 1px solid var(--umy-border-color) !important;
 }
 
 
@@ -113,6 +125,10 @@ https://www.umyui.com/
   background: var(--vscode-editor-background) !important;
 }
 
+.el-checkbox__input.is-checked + .el-checkbox__label{
+  /* color: var(--vscode-terminal-ansiBlue) !important; */
+}
+
 .plx-table .plx-body--row {
   background: var(--vscode-editor-background) !important;
   color: var(--primary-color) !important;
@@ -128,4 +144,17 @@ https://www.umyui.com/
 .plx-table .plx-body--row.row--current {
   background: var(--vscode-tab-hoverBackground) !important;
   color: var(--primary-color) !important;
+}
+
+.plx-checkbox--icon:before{
+border: none !important;
+background-color: var(--umy-input-color) !important;
+}
+
+.plx-checkbox--checked-icon:after{
+  border-color: var(--vscode-editor-background) !important;
+} 
+
+.plx-checkbox--indeterminate-icon:after{
+  background-color: var(--vscode-editor-background) !important;
 }
