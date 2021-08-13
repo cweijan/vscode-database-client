@@ -31,12 +31,16 @@ https://www.umyui.com/
 }
 
 /* focus color */
-.el-select .el-input.is-focus .el-input__inner {
-  border-color: #409EFF
+
+:root {
+  --umy-focus-color: var(--vscode-terminal-ansiBlue);
+}
+.el-textarea__inner:focus,.el-input.is-active .el-input__inner, .el-input__inner:focus {
+  border-color: var(--umy-focus-color) !important;
 }
 
 .el-checkbox__input.is-focus .el-checkbox__inner {
-  border-color: #409EFF
+  border-color: var(--umy-focus-color) !important;
 }
 
 /* contents color */

@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <div class="hint" ref="hint">
-      <div style="width:95%;" >
-        <el-input type="textarea" :autosize="{ minRows:2, maxRows:5}" v-model="toolbar.sql" class="sql-pannel" @keypress.native="panelInput" />
+      <div style="width:100%;" >
+        <el-input type="textarea" :autosize="{ minRows:2, maxRows:6}" v-model="toolbar.sql" class="sql-pannel" @keypress.native="panelInput" />
       </div>
       <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :result="result" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="$refs.editor.openInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
       <div v-if="info.message ">
