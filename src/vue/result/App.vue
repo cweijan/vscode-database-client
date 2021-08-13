@@ -177,10 +177,12 @@ export default {
       }
     };
     window.addEventListener("message", ({ data }) => {
-      if (!data || !data.content) return;
-      const response = data.content;
+      if (!data) return;
       console.log(data);
-      this.result.transId=response.transId;
+      const response = data.content;
+      if(response){
+        this.result.transId=response.transId;
+      }
       this.table.loading = false;
       switch (data.type) {
         case "EXPORT_DONE":

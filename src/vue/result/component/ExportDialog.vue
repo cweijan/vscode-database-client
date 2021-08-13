@@ -3,10 +3,10 @@
     <el-form :model="exportOption">
       <el-form-item label="Export File Type">
         <el-select v-model="exportOption.type">
-          <el-option :label="'Xlsx'" value="xlsx"></el-option>
-          <el-option :label="'Sql'" value="sql"></el-option>
-          <el-option :label="'Json'" value="json"></el-option>
-          <el-option :label="'Csv'" value="csv"> </el-option>
+          <el-option :label="'XLSX'" value="xlsx"></el-option>
+          <el-option :label="'SQL'" value="sql"></el-option>
+          <el-option :label="'JSON'" value="json"></el-option>
+          <el-option :label="'CSV'" value="csv"> </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="Remove Limit">
