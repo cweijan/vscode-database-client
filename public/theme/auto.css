@@ -9,7 +9,7 @@
     --input-color: var(--vscode-tab-activeForeground);
     --primary-color: var(--vscode-tab-activeForeground);
     --second-color: var(--vscode-input-placeholderForeground);
-    --border-color: var(--vscode-button-background);
+    --border-color: var(--vscode-quickInputTitle-background);
     --bg-color: var(--vscode-editor-background);
     --disable-bg-color: var(--vscode-editor-background);
     --second-bg-color: var(--vscode-editorSuggestWidget-background);
@@ -13440,7 +13440,8 @@ body {
     white-space: nowrap;
     cursor: pointer;
     background-color: var(--vscode-editor-background);
-    border: 1px solid var(--border-color);
+    /* border: 1px solid var(--border-color); */
+    border: none;
     color: var(--input-color);
     -webkit-appearance: none;
     text-align: center;

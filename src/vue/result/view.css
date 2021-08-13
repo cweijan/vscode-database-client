@@ -40,6 +40,10 @@ overflow: unset;
   margin-left: 6px;
 }
 
+.el-popover{
+  border: none;
+}
+
 .el-popover__reference{
   background-color: #409EFF;
 }
