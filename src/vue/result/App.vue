@@ -15,7 +15,7 @@
       <ux-table-column type="checkbox" width="40" fixed="left"></ux-table-column>
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined">
         <template #header>  
-          <el-popover placement="bottom" title="Select columns to show" width="200" trigger="hover" type="primary">
+          <el-popover placement="bottom" width="200" trigger="hover" type="primary">
             <el-checkbox-group v-model="toolbar.showColumns">
               <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
                 {{ column.name }}
