@@ -46,6 +46,11 @@ export class SSHConnectionNode extends Node {
         } else if (iconPath) {
             this.iconPath = iconPath;
         }
+        if (this.disable) {
+            this.collapsibleState = vscode.TreeItemCollapsibleState.None;
+            this.description = (this.description||'') + " closed"
+            return;
+        }
     }
 
     public async deleteConnection(context: vscode.ExtensionContext) {

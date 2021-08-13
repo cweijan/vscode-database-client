@@ -572,7 +572,7 @@
 				},
 				{
 					"command": "mysql.connection.disable",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection|ftpConnection)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(connection|esConnection|redisConnection|ftpConnection|sshConnection)$/",
 					"group": "1_mysql@4"
 				},
 				{
