@@ -24,7 +24,7 @@ export class DelimiterHolder {
 
         let delimiterMatch: RegExpExecArray
         while ((delimiterMatch = this.delimiterPattern.exec(sql)) != null) {
-            const target = delimiterMatch[1].replace(new RegExp(`${delimiter}\\s*$`, 'gm'), "").split("").map((c) => c.match(/\w/) ? c : "\\" + c).join("")
+            const target = delimiterMatch[1].split("").map((c) => c.match(/\w/) ? c : "\\" + c).join("")
             delimiterArray.push(target)
             if (key) {
                 this.delimiteMap.set(key, target)
