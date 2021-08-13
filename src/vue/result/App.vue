@@ -141,6 +141,7 @@ export default {
       this.update.lock = false;
     };
     const handlerCommon = (res) => {
+      this.table.loading = false;
       if (this.$refs.editor) {
         this.$refs.editor.close();
       }
@@ -180,22 +181,23 @@ export default {
       if (!data) return;
       console.log(data);
       const response = data.content;
+      const runLoading=this.result.transId==null || response.transId > this.result.transId;
       if(response){
         this.result.transId=response.transId;
       }
-      this.table.loading = false;
       switch (data.type) {
         case "EXPORT_DONE":
           this.exportOption.visible = false;
           break;
         case "RUN":
           this.toolbar.sql = response.sql;
-          this.table.loading = response.transId != this.result.transId;
+          this.table.loading = runLoading;
           break;
         case "DATA":
           handlerData(response);
           break;
         case "NEXT_PAGE":
+          this.table.loading = false;
           this.result.data = response.data;
           this.result.costTime=response.costTime;
           this.toolbar.sql = response.sql;
