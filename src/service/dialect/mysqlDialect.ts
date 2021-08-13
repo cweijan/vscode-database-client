@@ -11,7 +11,7 @@ export class MysqlDialect extends SqlDialect {
         return `ALTER TABLE ${table} DROP INDEX ${indexName}`
     }
     showIndex(database: string, table: string): string {
-        return `SELECT column_name,index_name,non_unique,index_type FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${database}' and table_name='${table}';`
+        return `SELECT column_name column_name,index_name index_name,non_unique non_unique,index_type index_type FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema='${database}' and table_name='${table}';`
     }
     variableList(): string {
         return 'show global VARIABLES'
