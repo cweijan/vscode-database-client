@@ -6,9 +6,10 @@
 
 :root {
     --editor-color: var(--vscode-menu-foreground);
-    --input-color: var(--vscode-tab-activeForeground);
+    --input-color: var(--vscode-foreground);
     --primary-color: var(--vscode-tab-activeForeground);
-    --second-color: var(--vscode-input-placeholderForeground);
+    /* --second-color: var(--vscode-input-placeholderForeground); */
+    --second-color: var(--vscode-foreground);
     --border-color: var(--vscode-quickInputTitle-background);
     --bg-color: var(--vscode-editor-background);
     --disable-bg-color: var(--vscode-editor-background);
