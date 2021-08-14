@@ -4,6 +4,7 @@ import { Util } from "@/common/util";
 import { ViewManager } from "@/common/viewManager";
 import { CommandKey, Node } from "@/model/interface/node";
 import { NodeUtil } from "@/model/nodeUtil";
+import { Cluster, Redis } from "ioredis";
 import * as path from "path";
 import * as vscode from "vscode";
 import { RedisFolderNode } from "./folderNode";
@@ -34,15 +35,25 @@ export class RedisConnectionNode extends RedisBaseNode {
 
     async getChildren(): Promise<RedisBaseNode[]> {
         const client = await this.getClient()
-        let keys: string[] = await client.keys(this.pattern)
+        let keys: string[] =this.isCluster?await this.keysCluster(client as Cluster,this.pattern): await client.keys(this.pattern)
         return RedisFolderNode.buildChilds(this, keys)
     }
+   
+    private async keysCluster(client: Cluster, pattern:string):Promise<string[]>{
+        const masters = client.nodes("master");
+        return (await Promise.all(masters.map((master) => master.keys('*')))).flat();
+    }
+  
     async openTerminal(): Promise<any> {
         if (!this.password && commandExistsSync('redis-cli')) {
             super.openTerminal();
             return;
         }
         const client = await this.getClient()
+        if(client instanceof Cluster){
+            vscode.window.showErrorMessage("Redis cluster not support open internal terminal!")
+            return;
+        }
         ViewManager.createWebviewPanel({
             splitView: true, title: `${this.host}@${this.port}`, preserveFocus: false,
             iconPath: {
@@ -60,7 +71,7 @@ export class RedisConnectionNode extends RedisBaseNode {
                     }
                     const splitCommand: string[] = content.replace(/ +/g, " ").split(' ')
                     const command = splitCommand.shift()
-                    const reply = await client.send_command(command, splitCommand)
+                    const reply = await (client as Redis).send_command(command, splitCommand)
                     handler.emit("result", reply)
                 }).on("exit", () => {
                     handler.panel.dispose()

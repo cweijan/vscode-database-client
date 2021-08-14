@@ -63,6 +63,10 @@
           <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Password</label>
           <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
         </div>
+        <div class="inline-block mr-10" v-if="connectionOption.dbType=='Redis'">
+          <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1"></span>IsCluster</label>
+          <el-switch v-model="connectionOption.isCluster"></el-switch>
+        </div>
       </section>
 
       <section class="mb-2" v-if="connectionOption.dbType!='FTP' && connectionOption.dbType!='MongoDB'">
@@ -161,6 +165,7 @@ export default {
         includeDatabases: null,
         dbType: "MySQL",
         encrypt: true,
+        isCluster: false,
         connectionUrl: "",
         srv: false,
         esAuth:'none',

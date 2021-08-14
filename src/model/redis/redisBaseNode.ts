@@ -1,7 +1,7 @@
 import { Node } from "@/model/interface/node";
 import { RedisConnection } from "@/service/connect/redisConnection";
 import { ConnectionManager } from "@/service/connectionManager";
-import {Redis} from "ioredis";
+import {Cluster, Redis} from "ioredis";
 
 
 export default abstract class RedisBaseNode extends Node {
@@ -10,7 +10,7 @@ export default abstract class RedisBaseNode extends Node {
 
     abstract getChildren(): Promise<Node[]>;
 
-    public async getClient(): Promise<Redis> {
+    public async getClient(): Promise<Redis|Cluster> {
 
         const redis = (await ConnectionManager.getConnection(this)) as RedisConnection
         return new Promise(res => { redis.run(res) })

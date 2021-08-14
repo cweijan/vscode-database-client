@@ -68,6 +68,11 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public clientKeyPath?: string;
 
     /**
+     * redis only
+     */
+    public isCluster?: boolean;
+
+    /**
      * sqlite only
      */
     public dbPath?: string;
@@ -111,6 +116,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.password = source.password
         this.timezone = source.timezone
         this.useSSL = source.useSSL
+        this.isCluster = source.isCluster
         this.clientCertPath = source.clientCertPath
         this.clientKeyPath = source.clientKeyPath
         this.ssh = source.ssh
@@ -300,7 +306,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             command = `${prefix} "PGPASSWORD=${this.password}" && psql -U ${this.user} -h ${this.host} -p ${this.port} -d ${this.database} \n`;
         } else if (this.dbType == DatabaseType.REDIS) {
             this.checkCommand('redis-cli');
-            command = `redis-cli -h ${this.host} -p ${this.port} \n`;
+            command = this.isCluster ? `redis-cli -h ${this.host} -p ${this.port} -c \n` : `redis-cli -h ${this.host} -p ${this.port} \n`;
         } else if (this.dbType == DatabaseType.MONGO_DB) {
             this.checkCommand('mongo');
             command = `mongo --host ${this.host} --port ${this.port} ${this.user && this.password ? ` -u ${this.user} -p ${this.password}` : ''} \n`;

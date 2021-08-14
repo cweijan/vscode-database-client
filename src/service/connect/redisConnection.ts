@@ -2,10 +2,11 @@ import { Node } from "@/model/interface/node";
 import { IConnection, queryCallback } from "./connection";
 import * as fs from "fs";
 import IoRedis from "ioredis";
+import IORedis from "ioredis";
 
 export class RedisConnection extends IConnection {
     private conneted: boolean;
-    private client: IoRedis.Redis;
+    private client: IoRedis.Redis|IORedis.Cluster;
     constructor(node: Node) {
         super()
         let config = {
@@ -15,17 +16,17 @@ export class RedisConnection extends IConnection {
             connectTimeout: node.connectTimeout || 5000,
             db: node.database as any as number,
             family: 4,
-        }as IoRedis.RedisOptions;
-        if(node.useSSL){
-            config.tls={
+        } as IoRedis.RedisOptions;
+        if (node.useSSL) {
+            config.tls = {
                 rejectUnauthorized: false,
                 ca: (node.caPath) ? fs.readFileSync(node.caPath) : null,
-                cert: ( node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
-                key: ( node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
+                cert: (node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
+                key: (node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
                 minVersion: 'TLSv1'
             }
         }
-        this.client = new IoRedis(config);
+        this.client = node.isCluster ? new IoRedis.Cluster([{ host: config.host, port: config.port }], { redisOptions: config }) : new IoRedis(config);
 
 
     }
@@ -34,9 +35,13 @@ export class RedisConnection extends IConnection {
     query(sql: any, values?: any, callback?: any) {
         const param: string[] = sql.replace(/ +/g, " ").split(' ')
         const command = param.shift()
-        this.client.send_command(command, param, callback)
+        if(this.client instanceof IoRedis){
+            this.client.send_command(command, param, callback)
+        }else{
+            throw new Error("Redis cluster not support send command!")
+        }
     }
-    run(callback: (client: IoRedis.Redis) => void) {
+    run(callback: (client: IoRedis.Redis|IORedis.Cluster) => void) {
 
         callback(this.client)
     }
