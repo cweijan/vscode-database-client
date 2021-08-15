@@ -1,5 +1,14 @@
 # CHANGELOG
 
+# 4.1.0 2021-8-15
+
+- Support connect to redis cluster, #242.
+- Better result view .
+- Export csv with header, #273.
+- Fix result view loading state gone.
+- Fix codelen check delimiter fail.
+- Fix mysql8 cannot show index.
+
 # 4.0.5 2021-8-13
 
 - Struct sync remove disable connection.
