@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <div class="hint" ref="hint">
+      <el-image v-if="result.showUgly" style="width: 225px; height: 300px" :src="result.uglyPath"></el-image>
       <div style="width:100%;" >
         <el-input type="textarea" :autosize="{ minRows:2, maxRows:6}" v-model="toolbar.sql" class="sql-pannel" @keypress.native="panelInput" />
       </div>

@@ -44,7 +44,10 @@ export class QueryPage {
                     }
                     queryParam.res.transId = Trans.transId;
                     queryParam.res.viewId = queryParam.queryOption?.viewId;
-                    handler.emit(queryParam.type, { ...queryParam.res, dbType: dbOption.dbType, single: queryParam.singlePage })
+                    const uglyPath=handler.panel.webview.asWebviewUri(Uri.file(Global.getExtPath('out','webview','ugly.jpg'))).toString();
+                    handler.emit(queryParam.type, { ...queryParam.res, dbType: dbOption.dbType, single: queryParam.singlePage,
+                        showUgly:Global.getConfig("showUgly",false) ,uglyPath
+                    })
                 }).on('execute', (params) => {
                     QueryUnit.runQuery(params.sql, dbOption, queryParam.queryOption);
                 }).on('next', async (params) => {
