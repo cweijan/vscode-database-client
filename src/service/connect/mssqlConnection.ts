@@ -90,7 +90,7 @@ export class MSSqlConnnection extends ConnectionPool<Connection>{
                         temp[column.metadata.colName] = format("yyyy-MM-dd hh:mm:ss", column.value)
                     }
                     if (this.dumpMode) {
-                        temp[column.metadata.colName] = `'${temp[column.metadata.colName]}'`
+                        temp[column.metadata.colName] = temp[column.metadata.colName]!=null?`'${temp[column.metadata.colName]}'`:"null"
                     }
                 });
                 if (!callback) {

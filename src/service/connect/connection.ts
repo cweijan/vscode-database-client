@@ -16,7 +16,7 @@ export abstract class IConnection {
     convertToDump(row: any): any {
         for (const key in row) {
             const element = row[key];
-            if (!element) {
+            if (element==null) {
                 row[key] = 'NULL'
             } else {
                 row[key] = sqlstring.escape(element)
