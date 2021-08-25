@@ -60,7 +60,12 @@ export default class KeyNode extends RedisBaseNode {
                 content = await client.smembers(this.label)
                 break;
             case RedisType.zset:
-                content = await client.zrange(this.label, 0, await client.zcard(this.label))
+                content = await client.zrange(this.label, 0, await client.zcard(this.label), 'WITHSCORES')
+                if (content && content instanceof Array) {
+                    content = content.filter((_, i) => i % 2 == 0).map((value, i) => ({
+                        value, score: content[i * 2 + 1]
+                    }))
+                }
                 break;
         }
         const title = `${type}:${this.label}`;

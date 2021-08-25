@@ -94,9 +94,16 @@
                 {{scope.row.key}}
               </template>
             </el-table-column>
+            <el-table-column v-if="key.type=='zset'" resizable sortable label="score" align="center" width="100">
+              <template slot-scope="scope">
+                {{scope.row.score}}
+              </template>
+            </el-table-column>
             <el-table-column resizable sortable show-overflow-tooltip label="Value" align="center">
               <template slot-scope="scope">
-                {{key.type=='hash'?scope.row.value:scope.row}}
+                <span v-if="key.type=='hash'" v-text="scope.row.value"></span>
+                <span v-else-if="key.type=='zset'" v-text="scope.row.value"></span>
+                <span v-else v-text="scope.row"></span>
               </template>
             </el-table-column>
             <el-table-column label="Operation" width="150" align="center">
