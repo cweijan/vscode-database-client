@@ -94,7 +94,7 @@
                 {{scope.row.key}}
               </template>
             </el-table-column>
-            <el-table-column v-if="key.type=='zset'" resizable sortable label="score" align="center" width="100">
+            <el-table-column v-if="key.type=='zset'" resizable sortable label="Score" align="center" width="100">
               <template slot-scope="scope">
                 {{scope.row.score}}
               </template>
