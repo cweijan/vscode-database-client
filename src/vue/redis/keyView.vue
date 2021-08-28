@@ -207,14 +207,25 @@ export default {
     },
     jsonContent() {
       try {
-        return formatHighlight(JSON.parse(this.edit.content), {
-          keyColor: "#C792EA",
-          numberColor: "#CE9178",
-          stringColor: "#92D69E",
-          trueColor: "#569cD6",
-          falseColor: "#569cD6",
-          nullColor: "#569cD6",
-        });
+        const lightTheme = {
+          keyColor: "#0451a5",
+          numberColor: "#098658",
+          stringColor: "#a31515",
+          trueColor: "#0000ff",
+          falseColor: "#0000ff",
+          nullColor: "#0000ff",
+        };
+        const darkTheme = {
+          keyColor: "#9cdcfe",
+          numberColor: "#9cdcfe",
+          stringColor: "#ce9178",
+          trueColor: "#569cd6",
+          falseColor: "#569cd6",
+          nullColor: "#569cd6",
+        };
+        const themeKind = document.body.dataset.vscodeThemeKind;
+        const colorOptions = themeKind === "vscode-light" ? lightTheme : darkTheme;
+        return formatHighlight(JSON.parse(this.edit.content), colorOptions);
       } catch (error) {
         console.log(error);
         return this.edit.content;
@@ -291,16 +302,17 @@ export default {
 <style scoped>
 .json-panel {
   line-height: 1.3;
-  background: #292a2b;
-  font-size: 20px;
-  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier,
-    monospace, "Avenir", Helvetica, Arial, sans-serif;
+  font-family: var(--vscode-editor-font-family);
+  font-weight: var(--vscode-editor-font-weight);
+  font-size: var(--vscode-editor-font-size);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 10px;
+  outline: none;
 }
 
-body {
-  background-color: #ffffff;
-  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", Arial, sans-serif;
+.json-panel:focus {
+  border-color: var(--umy-focus-color);
 }
 
 .value-panel {
