@@ -43,12 +43,10 @@ body {
   
   /* 滑块样式*/
   ::-webkit-scrollbar-thumb {
-    border-radius: 8px;
     background-color: var(--vscode-scrollbarSlider-background);
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    border-radius: 8px;
     background-color: var(--vscode-scrollbarSlider-hoverBackground);
   }
 
