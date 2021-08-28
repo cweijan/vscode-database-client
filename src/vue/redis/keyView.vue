@@ -5,7 +5,7 @@
       <el-form :inline="true">
         <!-- key name -->
         <el-form-item>
-          <el-input ref="keyNameInput" v-model="edit.name" @keyup.enter.native="rename" placeholder="set to rename key">
+          <el-input ref="keyNameInput" v-model="edit.name" @keyup.enter.native="rename" placeholder="set to rename key" size="medium">
             <span slot="prepend" class="key-detail-type">{{ key.type }}</span>
             <i class="el-icon-check el-input__icon cursor-pointer" slot="suffix" :title="'Click to rename'" @click="rename">
             </i>
@@ -14,7 +14,7 @@
 
         <!-- key ttl -->
         <el-form-item>
-          <el-input v-model="edit.ttl" @keyup.enter.native="ttlKey" type='number'>
+          <el-input v-model="edit.ttl" @keyup.enter.native="ttlKey" type='number' size="medium">
             <span slot="prepend">TTL</span>
             <i class="el-icon-check el-input__icon cursor-pointer" slot="suffix" :title="'Click to change ttl'" @click="ttlKey">
             </i>
@@ -23,18 +23,16 @@
 
         <!-- del refresh key btn -->
         <el-form-item>
-          <el-button type="danger" @click="deleteKey" icon="el-icon-delete"></el-button>
-          <el-button type="success" @click="refresh" icon="el-icon-refresh"></el-button>
+          <el-button type="danger" @click="deleteKey" icon="el-icon-delete" size="medium"></el-button>
+          <el-button type="success" @click="refresh" icon="el-icon-refresh" size="medium"></el-button>
           <template v-if="key.type=='string'">
-            <el-select v-model="selectedView" class='format-selector' :style='selectStyle' size='mini'>
+            <el-select v-model="selectedView" class='format-selector' :style='selectStyle' size="medium">
               <span slot="prefix" class="fa fa-sitemap"></span>
               <el-option v-for="item in viewers" :key="item.value" :label="item.text" :value="item.value">
               </el-option>
             </el-select>
             <!-- save btn -->
-            <el-form-item>
-              <el-button type="primary" @click="update()">Save</el-button>
-            </el-form-item>
+            <el-button type="primary" @click="update()" size="medium">Save</el-button>
           </template>
         </el-form-item>
       </el-form>
@@ -86,7 +84,7 @@
         </div>
         <!-- content table -->
         <div>
-          <el-table :data="key.content" stripe size="small" border>
+          <el-table :data="key.content" stripe size="mini" border :header-cell-style="{padding: 0}">
             <el-table-column type="index" label="ID" sortable width="60" align="center">
             </el-table-column>
             <el-table-column v-if="key.type=='hash'" sort-by="key" resizable sortable label="Key" align="center">
@@ -108,10 +106,10 @@
             </el-table-column>
             <el-table-column label="Operation" width="150" align="center">
               <template slot-scope="scope">
-                <el-button type="text" @click="showEditDialog(scope.row)" icon="el-icon-edit" circle  v-if="key.type=='hash'">
-                </el-button>
-                <el-button type="text" @click="deleteLine(scope.row)" icon="el-icon-delete" circle>
-                </el-button>
+                <el-link type="primary" @click="showEditDialog(scope.row)" icon="el-icon-edit" :underline="false" circle  v-if="key.type=='hash'">
+                </el-link>
+                <el-link type="primary" @click="deleteLine(scope.row)" icon="el-icon-delete" :underline="false" circle>
+                </el-link>
               </template>
             </el-table-column>
           </el-table>
@@ -363,8 +361,8 @@ margin: 3px;
 
 /* viewer */
 .format-selector {
-  margin-left: 20px;
-  margin-right: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
   width: 122px;
 }
 
@@ -407,5 +405,9 @@ margin: 3px;
   padding-left: 5px;
   color: #7ab3ef;
   font-size: 80%;
+}
+
+.el-form-item__content .el-input-group {
+  vertical-align: baseline;
 }
 </style>
