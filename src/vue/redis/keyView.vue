@@ -89,17 +89,17 @@
           <el-table :data="key.content" stripe size="small" border>
             <el-table-column type="index" label="ID" sortable width="60" align="center">
             </el-table-column>
-            <el-table-column v-if="key.type=='hash'" resizable sortable label="Key" align="center">
+            <el-table-column v-if="key.type=='hash'" sort-by="key" resizable sortable label="Key" align="center">
               <template slot-scope="scope">
                 {{scope.row.key}}
               </template>
             </el-table-column>
-            <el-table-column v-if="key.type=='zset'" resizable sortable label="Score" align="center" width="100">
+            <el-table-column v-if="key.type=='zset'" sort-by="score" resizable sortable label="Score" align="center" width="100">
               <template slot-scope="scope">
                 {{scope.row.score}}
               </template>
             </el-table-column>
-            <el-table-column resizable sortable show-overflow-tooltip label="Value" align="center">
+            <el-table-column sort-by="value" resizable sortable show-overflow-tooltip label="Value" align="center">
               <template slot-scope="scope">
                 <span v-if="key.type=='hash'" v-text="scope.row.value"></span>
                 <span v-else-if="key.type=='zset'" v-text="scope.row.value"></span>
