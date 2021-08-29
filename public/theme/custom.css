@@ -180,3 +180,11 @@ https://www.umyui.com/
   font-weight: 400;
   color: var(--second-color);
 }
+
+/* el-table border  */
+.el-table,.el-table td,.el-table th{
+border-color: var(--border-color) !important;
+}
+.el-table::before{
+  display: none;
+}

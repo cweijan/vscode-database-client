@@ -2773,7 +2773,7 @@ body {
     width: 100%;
     max-width: 100%;
     font-size: 14px;
-    color: var(--primary-color);
+    color: var(--second-color);
 }
 
 .el-table--mini, .el-table--small, .el-table__expand-icon {
@@ -3198,22 +3198,22 @@ body {
 
 .el-table--striped .el-table__body tr.el-table__row--striped td {
     background: var(--vscode-editorSuggestWidget-background) !important;
-    color: var(--primary-color) !important;
+    color: var(--second-color) !important;
 }
 
 .el-table--striped .el-table__body tr.el-table__row--striped.current-row td {
     background: var(--vscode-editorSuggestWidget-background) !important;
-    color: var(--primary-color) !important;
+    color: var(--second-color) !important;
 }
 
 .el-table__body tr.hover-row.current-row > td, .el-table__body tr.hover-row.el-table__row--striped.current-row > td, .el-table__body tr.hover-row.el-table__row--striped > td, .el-table__body tr.hover-row > td {
     background: var(--vscode-tab-hoverBackground) !important;
-    color: var(--primary-color) !important;
+    color: var(--second-color) !important;
 }
 
 .el-table__body tr.current-row > td {
     background: var(--vscode-editorSuggestWidget-background) !important;
-    color: var(--primary-color) !important;
+    color: var(--second-color) !important;
 }
 
 .el-table__column-resize-proxy {
