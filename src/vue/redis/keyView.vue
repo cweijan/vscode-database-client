@@ -106,7 +106,7 @@
             </el-table-column>
             <el-table-column label="Operation" width="150" align="center">
               <template slot-scope="scope">
-                <el-link type="primary" @click="showEditDialog(scope.row)" icon="el-icon-edit" :underline="false" circle  v-if="key.type=='hash'">
+                <el-link type="primary" @click="showEditDialog(scope.row)" icon="el-icon-edit" :underline="false" circle v-if="key.type=='hash'">
                 </el-link>
                 <el-link type="primary" @click="deleteLine(scope.row)" icon="el-icon-delete" :underline="false" circle>
                 </el-link>
@@ -153,7 +153,7 @@ export default {
       })
       .on("refresh", () => {
         this.editDialogVisiable = false;
-        this.editModel=false;
+        this.editModel = false;
         this.addData = null;
         this.addKey = null;
         this.refresh();
@@ -205,7 +205,7 @@ export default {
     },
     jsonContent() {
       try {
-        const lightTheme = {
+        let colorOptions = {
           keyColor: "#0451a5",
           numberColor: "#098658",
           stringColor: "#a31515",
@@ -221,8 +221,16 @@ export default {
           falseColor: "#569cd6",
           nullColor: "#569cd6",
         };
-        const themeKind = document.body.dataset.vscodeThemeKind;
-        const colorOptions = themeKind === "vscode-light" ? lightTheme : darkTheme;
+        if (document.body.dataset.vscodeThemeKind == "vscode-dark") {
+          colorOptions = document.body.dataset.vscodeThemeName == "Dark (Visual Studio)" ? darkTheme : {
+                keyColor: "var(--vscode-terminal-ansiMagenta)",
+                trueColor: "var(--vscode-terminal-ansiBlue)",
+                falseColor: "var(--vscode-terminal-ansiBlue)",
+                nullColor: "var(--vscode-terminal-ansiBlue)",
+                stringColor: "var(--vscode-terminal-ansiGreen)",
+                numberColor: "var(--vscode-terminal-ansiYellow)",
+            };
+        }
         return formatHighlight(JSON.parse(this.edit.content), colorOptions);
       } catch (error) {
         console.log(error);
@@ -240,10 +248,10 @@ export default {
       });
     },
     showEditDialog(row) {
-      this.addKey=row.key
-      this.addData=row.value
-      this.editModel=true;
-      this.editDialogVisiable=true
+      this.addKey = row.key;
+      this.addData = row.value;
+      this.editModel = true;
+      this.editDialogVisiable = true;
     },
     deleteLine(row) {
       vscodeEvent.emit("deleteLine", row);
@@ -322,8 +330,8 @@ export default {
   padding-left: 5px;
 }
 
-.el-form-item{
-margin: 3px;
+.el-form-item {
+  margin: 3px;
 }
 
 .key-header-info {
