@@ -5,7 +5,7 @@
       <el-form :inline="true">
         <!-- key name -->
         <el-form-item>
-          <el-input ref="keyNameInput" v-model="edit.name" @keyup.enter.native="rename" placeholder="set to rename key">
+          <el-input ref="keyNameInput" v-model="edit.name" @keyup.enter.native="rename" placeholder="set to rename key" size="medium">
             <span slot="prepend" class="key-detail-type">{{ key.type }}</span>
             <i class="el-icon-check el-input__icon cursor-pointer" slot="suffix" :title="'Click to rename'" @click="rename">
             </i>
@@ -14,7 +14,7 @@
 
         <!-- key ttl -->
         <el-form-item>
-          <el-input v-model="edit.ttl" @keyup.enter.native="ttlKey" type='number'>
+          <el-input v-model="edit.ttl" @keyup.enter.native="ttlKey" type='number' size="medium">
             <span slot="prepend">TTL</span>
             <i class="el-icon-check el-input__icon cursor-pointer" slot="suffix" :title="'Click to change ttl'" @click="ttlKey">
             </i>
@@ -23,18 +23,16 @@
 
         <!-- del refresh key btn -->
         <el-form-item>
-          <el-button type="danger" @click="deleteKey" icon="el-icon-delete"></el-button>
-          <el-button type="success" @click="refresh" icon="el-icon-refresh"></el-button>
+          <el-button type="danger" @click="deleteKey" icon="el-icon-delete" size="medium"></el-button>
+          <el-button type="success" @click="refresh" icon="el-icon-refresh" size="medium"></el-button>
           <template v-if="key.type=='string'">
-            <el-select v-model="selectedView" class='format-selector' :style='selectStyle' size='mini'>
+            <el-select v-model="selectedView" class='format-selector' :style='selectStyle' size="medium">
               <span slot="prefix" class="fa fa-sitemap"></span>
               <el-option v-for="item in viewers" :key="item.value" :label="item.text" :value="item.value">
               </el-option>
             </el-select>
             <!-- save btn -->
-            <el-form-item>
-              <el-button type="primary" @click="update()">Save</el-button>
-            </el-form-item>
+            <el-button type="primary" @click="update()" size="medium">Save</el-button>
           </template>
         </el-form-item>
       </el-form>
@@ -86,20 +84,20 @@
         </div>
         <!-- content table -->
         <div>
-          <el-table :data="key.content" stripe size="small" border>
+          <el-table :data="key.content" stripe size="mini" border :header-cell-style="{padding: 0}">
             <el-table-column type="index" label="ID" sortable width="60" align="center">
             </el-table-column>
-            <el-table-column v-if="key.type=='hash'" resizable sortable label="Key" align="center">
+            <el-table-column v-if="key.type=='hash'" sort-by="key" resizable sortable label="Key" align="center">
               <template slot-scope="scope">
                 {{scope.row.key}}
               </template>
             </el-table-column>
-            <el-table-column v-if="key.type=='zset'" resizable sortable label="Score" align="center" width="100">
+            <el-table-column v-if="key.type=='zset'" sort-by="score" resizable sortable label="Score" align="center" width="100">
               <template slot-scope="scope">
                 {{scope.row.score}}
               </template>
             </el-table-column>
-            <el-table-column resizable sortable show-overflow-tooltip label="Value" align="center">
+            <el-table-column sort-by="value" resizable sortable show-overflow-tooltip label="Value" align="center">
               <template slot-scope="scope">
                 <span v-if="key.type=='hash'" v-text="scope.row.value"></span>
                 <span v-else-if="key.type=='zset'" v-text="scope.row.value"></span>
@@ -108,10 +106,10 @@
             </el-table-column>
             <el-table-column label="Operation" width="150" align="center">
               <template slot-scope="scope">
-                <el-button type="text" @click="showEditDialog(scope.row)" icon="el-icon-edit" circle  v-if="key.type=='hash'">
-                </el-button>
-                <el-button type="text" @click="deleteLine(scope.row)" icon="el-icon-delete" circle>
-                </el-button>
+                <el-link type="primary" @click="showEditDialog(scope.row)" icon="el-icon-edit" :underline="false" circle  v-if="key.type=='hash'">
+                </el-link>
+                <el-link type="primary" @click="deleteLine(scope.row)" icon="el-icon-delete" :underline="false" circle>
+                </el-link>
               </template>
             </el-table-column>
           </el-table>
@@ -207,14 +205,25 @@ export default {
     },
     jsonContent() {
       try {
-        return formatHighlight(JSON.parse(this.edit.content), {
-          keyColor: "#C792EA",
-          numberColor: "#CE9178",
-          stringColor: "#92D69E",
-          trueColor: "#569cD6",
-          falseColor: "#569cD6",
-          nullColor: "#569cD6",
-        });
+        const lightTheme = {
+          keyColor: "#0451a5",
+          numberColor: "#098658",
+          stringColor: "#a31515",
+          trueColor: "#0000ff",
+          falseColor: "#0000ff",
+          nullColor: "#0000ff",
+        };
+        const darkTheme = {
+          keyColor: "#9cdcfe",
+          numberColor: "#9cdcfe",
+          stringColor: "#ce9178",
+          trueColor: "#569cd6",
+          falseColor: "#569cd6",
+          nullColor: "#569cd6",
+        };
+        const themeKind = document.body.dataset.vscodeThemeKind;
+        const colorOptions = themeKind === "vscode-light" ? lightTheme : darkTheme;
+        return formatHighlight(JSON.parse(this.edit.content), colorOptions);
       } catch (error) {
         console.log(error);
         return this.edit.content;
@@ -291,16 +300,17 @@ export default {
 <style scoped>
 .json-panel {
   line-height: 1.3;
-  background: #292a2b;
-  font-size: 20px;
-  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier,
-    monospace, "Avenir", Helvetica, Arial, sans-serif;
+  font-family: var(--vscode-editor-font-family);
+  font-weight: var(--vscode-editor-font-weight);
+  font-size: var(--vscode-editor-font-size);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 10px;
+  outline: none;
 }
 
-body {
-  background-color: #ffffff;
-  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", Arial, sans-serif;
+.json-panel:focus {
+  border-color: var(--umy-focus-color);
 }
 
 .value-panel {
@@ -351,8 +361,8 @@ margin: 3px;
 
 /* viewer */
 .format-selector {
-  margin-left: 20px;
-  margin-right: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
   width: 122px;
 }
 
@@ -395,5 +405,9 @@ margin: 3px;
   padding-left: 5px;
   color: #7ab3ef;
   font-size: 80%;
+}
+
+.el-form-item__content .el-input-group {
+  vertical-align: baseline;
 }
 </style>
