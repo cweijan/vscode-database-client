@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# 4.1.2 2021-8-29
+
+- Better redis view.
+
 # 4.1.0 2021-8-15
 
 - Support connect to redis cluster, #242.
