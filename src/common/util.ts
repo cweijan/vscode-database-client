@@ -130,6 +130,11 @@ export class Util {
         return this.supportColor;
     }
 
+    
+    public static limitTitle(title: string): string {
+        return title.length<=30?title:title.substring(0,25)+"...";
+    }
+
     public static execute(command: string): Promise<void> {
         return new Promise((res, rej) => {
             let hasTrigger = false;

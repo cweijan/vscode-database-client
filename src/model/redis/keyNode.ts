@@ -77,7 +77,7 @@ export default class KeyNode extends RedisBaseNode {
                 handler.on("init", () => {
                     handler.emit("route", 'keyView')
                 }).on("route-keyView", async () => {
-                    handler.panel.title = title
+                    handler.panel.title = Util.limitTitle(title)
                     handler.emit("detail", {
                         res: {
                             content, type, name: this.label,

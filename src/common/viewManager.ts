@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { WebviewPanel } from "vscode";
 import { Console } from "./Console";
 import { EventEmitter } from 'events'
+import { Util } from "./util";
 
 export class ViewOption {
     public iconPath?:  string|vscode.Uri | { light: vscode.Uri; dark: vscode.Uri };
@@ -90,7 +91,7 @@ export class ViewManager {
             }
             const webviewPanel = vscode.window.createWebviewPanel(
                 viewOption.type,
-                viewOption.title,
+                Util.limitTitle(viewOption.title),
                 { viewColumn, preserveFocus: viewOption.preserveFocus },
                 { enableScripts: true, retainContextWhenHidden: true },
             );
