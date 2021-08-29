@@ -23,16 +23,16 @@
 
         <!-- del refresh key btn -->
         <el-form-item>
-          <el-button type="danger" @click="deleteKey" icon="el-icon-delete" size="medium"></el-button>
-          <el-button type="success" @click="refresh" icon="el-icon-refresh" size="medium"></el-button>
+          <el-button type="danger" @click="deleteKey" icon="el-icon-delete" size="small"></el-button>
+          <el-button type="success" @click="refresh" icon="el-icon-refresh" size="small"></el-button>
           <template v-if="key.type=='string'">
-            <el-select v-model="selectedView" class='format-selector' :style='selectStyle' size="medium">
+            <el-select v-model="selectedView" class='format-selector' :style='selectStyle' size="small">
               <span slot="prefix" class="fa fa-sitemap"></span>
               <el-option v-for="item in viewers" :key="item.value" :label="item.text" :value="item.value">
               </el-option>
             </el-select>
             <!-- save btn -->
-            <el-button type="primary" @click="update()" size="medium">Save</el-button>
+            <el-button type="primary" @click="update()" size="small">Save</el-button>
           </template>
         </el-form-item>
       </el-form>
