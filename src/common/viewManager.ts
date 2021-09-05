@@ -146,7 +146,7 @@ export class ViewManager {
     }
 
     private static buildPath(data: string, webview: vscode.Webview, contextPath: string): string {
-        return data.replace(/((src|href)=("|'))(.+?\.(css|js))\b/gi, "$1" + webview.asWebviewUri(vscode.Uri.file(`${contextPath}`)) + "/$4");
+        return data.replace(/((src|href)=("|'))(?!http)(.+?\.(css|js))\b/gi, "$1" + webview.asWebviewUri(vscode.Uri.file(`${contextPath}`)) + "/$4");
     }
 
 

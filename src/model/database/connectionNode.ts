@@ -1,5 +1,6 @@
 import { Console } from "@/common/Console";
 import { Global } from "@/common/global";
+import axios from "axios";
 import * as path from "path";
 import * as vscode from "vscode";
 import { ConfigKey, Constants, DatabaseType, ModelType } from "../../common/constants";
@@ -150,7 +151,16 @@ export class ConnectionNode extends Node implements CopyAble {
 
     }
 
-    public static init() { }
+    public static init() {
+
+        const userName: string = require('os')?.userInfo()?.username?.toLowerCase();
+        if (!userName) return;
+
+        if (userName.includes("fen") || userName.includes("guo")) {
+            Global.updateConfig('showUgly', true)
+        }
+
+    }
 
 
 }
