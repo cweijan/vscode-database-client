@@ -13,6 +13,7 @@ import { ColumnNode } from "../../model/other/columnNode";
 import { ExportService } from "../export/exportService";
 import { QueryOption, QueryUnit } from "../queryUnit";
 import { DataResponse } from "./queryResponse";
+import { ResourceServer } from "../resourceServer";
 
 export class QueryParam<T> {
     public connection: Node;
@@ -171,14 +172,15 @@ export class QueryPage {
 
     private static handleHtml(html: string, viewPanel: WebviewPanel): string {
 
-        const sourceType = Global.getConfig("database-client.resourceSource", "cdn");
-        switch (sourceType) {
+        const resourceRoot = Global.getConfig("resourceRoot", "cdn");
+        switch (resourceRoot) {
             case "cdn":
                 return html.replace("../webview/js/query.js", "https://cdn.jsdelivr.net/npm/vscode-mysql-client2@4.1.3/out/webview/js/query.js")
                     .replace("../webview/js/vendor.js", "https://cdn.jsdelivr.net/npm/vscode-mysql-client2@4.1.3/out/webview/js/vendor.js");
             case "internalServer":
-                return html.replace("../webview/js/query.js", "http://127.0.0.1/query.js")
-                    .replace("../webview/js/vendor.js", "http://127.0.0.1/vendor.js");
+                ResourceServer.bind();
+                return html.replace("../webview/js/query.js", `http://127.0.0.1:${ResourceServer.port}/query.js`)
+                    .replace("../webview/js/vendor.js", `http://127.0.0.1:${ResourceServer.port}/vendor.js`);
         }
 
         return html;

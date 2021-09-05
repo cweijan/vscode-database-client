@@ -956,11 +956,11 @@
 			"type": "object",
 			"title": "%config.title%",
 			"properties": {
-				"database-client.resourceSource": {
+				"database-client.resourceRoot": {
 					"type": "string",
-					"default": "cdn",
+					"default": "internalServer",
 					"enum": ["file","cdn","internalServer"],
-					"description": "Webview resource soruce"
+					"description": "Webview resource root, using file will create a lot of cache."
 				},
 				"database-client.defaultSelectLimit": {
 					"type": "integer",
