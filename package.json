@@ -956,6 +956,12 @@
 			"type": "object",
 			"title": "%config.title%",
 			"properties": {
+				"database-client.resourceSource": {
+					"type": "string",
+					"default": "cdn",
+					"enum": ["file","cdn","internalServer"],
+					"description": "Webview resource soruce"
+				},
 				"database-client.defaultSelectLimit": {
 					"type": "integer",
 					"default": 100,

@@ -3,7 +3,7 @@ import { Util } from "@/common/util";
 import { EsRequest } from "@/model/es/esRequest";
 import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
-import { env, Uri, ViewColumn, window } from "vscode";
+import { env, Uri, ViewColumn, WebviewPanel, window } from "vscode";
 import { Trans } from "@/common/trans";
 import { ConfigKey, DatabaseType, MessageType } from "../../common/constants";
 import { Global } from "../../common/global";
@@ -37,6 +37,7 @@ export class QueryPage {
             splitView: this.isActiveSql(queryParam.queryOption),
             path: 'result', title: 'Query', type,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
+            handleHtml: this.handleHtml,
             eventHandler: async (handler) => {
                 handler.on("init", () => {
                     if (queryParam.res?.table) {
@@ -44,9 +45,10 @@ export class QueryPage {
                     }
                     queryParam.res.transId = Trans.transId;
                     queryParam.res.viewId = queryParam.queryOption?.viewId;
-                    const uglyPath=handler.panel.webview.asWebviewUri(Uri.file(Global.getExtPath('out','webview','ugly.jpg'))).toString();
-                    handler.emit(queryParam.type, { ...queryParam.res, dbType: dbOption.dbType, single: queryParam.singlePage,
-                        showUgly:Global.getConfig("showUgly",false) ,uglyPath
+                    const uglyPath = handler.panel.webview.asWebviewUri(Uri.file(Global.getExtPath('out', 'webview', 'ugly.jpg'))).toString();
+                    handler.emit(queryParam.type, {
+                        ...queryParam.res, dbType: dbOption.dbType, single: queryParam.singlePage,
+                        showUgly: Global.getConfig("showUgly", false), uglyPath
                     })
                 }).on('execute', (params) => {
                     QueryUnit.runQuery(params.sql, dbOption, queryParam.queryOption);
@@ -165,6 +167,21 @@ export class QueryPage {
         const languageId = basename(activeDocument.languageId)?.toLowerCase()
 
         return languageId == 'sql' || languageId == 'es' || extName == '.sql' || extName == '.es' || fileName.match(/mock.json$/) != null;
+    }
+
+    private static handleHtml(html: string, viewPanel: WebviewPanel): string {
+
+        const sourceType = Global.getConfig("database-client.resourceSource", "cdn");
+        switch (sourceType) {
+            case "cdn":
+                return html.replace("../webview/js/query.js", "https://cdn.jsdelivr.net/npm/vscode-mysql-client2@4.1.3/out/webview/js/query.js")
+                    .replace("../webview/js/vendor.js", "https://cdn.jsdelivr.net/npm/vscode-mysql-client2@4.1.3/out/webview/js/vendor.js");
+            case "internalServer":
+                return html.replace("../webview/js/query.js", "http://127.0.0.1/query.js")
+                    .replace("../webview/js/vendor.js", "http://127.0.0.1/vendor.js");
+        }
+
+        return html;
     }
 
     private static async loadEsColumnList(queryParam: QueryParam<DataResponse>) {
