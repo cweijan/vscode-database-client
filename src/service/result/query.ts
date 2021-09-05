@@ -172,7 +172,7 @@ export class QueryPage {
 
     private static handleHtml(html: string, viewPanel: WebviewPanel): string {
 
-        const resourceRoot = Global.getConfig("resourceRoot", "cdn");
+        const resourceRoot = Global.getConfig("resourceRoot", "internalServer");
         switch (resourceRoot) {
             case "cdn":
                 return html.replace("../webview/js/query.js", "https://cdn.jsdelivr.net/npm/vscode-mysql-client2@4.1.3/out/webview/js/query.js")

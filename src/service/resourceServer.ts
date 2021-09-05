@@ -9,7 +9,7 @@ export class ResourceServer {
     public static resPath: string;
 
     public static async init(extensionPath: string) {
-        this.resPath=extensionPath+ "/out/webview/js";
+        this.resPath = extensionPath + "/out/webview/js";
         this.bind()
     }
 
@@ -17,17 +17,21 @@ export class ResourceServer {
 
         if (this.port || !this.resPath) return;
 
-        const resourceRoot = Global.getConfig("resourceRoot", "cdn");
+        const resourceRoot = Global.getConfig("resourceRoot", "internalServer");
         if (resourceRoot != "internalServer") return;
 
-        const port = await portfinder.getPortPromise();
+        try {
+            const port = await portfinder.getPortPromise();
 
-        http.createServer((req, res) => {
-            const path = this.resPath + req.url;
-            res.end((fs.existsSync(path) && fs.statSync(path).isFile()) ? fs.readFileSync(path) : "404")
-        }).listen(port, "127.0.0.1")
-        console.debug(`Start Internal Server, port is ${port}`)
-        this.port = port;
+            http.createServer((req, res) => {
+                const path = this.resPath + req.url;
+                res.end((fs.existsSync(path) && fs.statSync(path).isFile()) ? fs.readFileSync(path) : "404")
+            }).listen(port, "127.0.0.1")
+            console.debug(`Start Internal Server, port is ${port}`)
+            this.port = port;
+        } catch (error) {
+            Global.updateConfig("resourceRoot","cdn")
+        }
 
     }
 
