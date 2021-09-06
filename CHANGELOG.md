@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# 4.1.3 2021-9-6
+
+- Reduce ram usage for webview cache.
+
 # 4.1.2 2021-8-29
 
 - Better redis view.
