@@ -17,7 +17,7 @@ export class ResourceServer {
 
         if (this.port || !this.resPath) return;
 
-        const resourceRoot = Global.getConfig("resourceRoot", "internalServer");
+        const resourceRoot = Global.getConfig("resourceRoot");
         if (resourceRoot != "internalServer") return;
 
         try {
