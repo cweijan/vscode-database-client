@@ -9,10 +9,11 @@ import { DatabaseType } from "@/common/constants";
 
 export class ExportService {
 
-    public export(context: ExportContext): Thenable<any> {
+    public export(context: ExportContext): any {
         const randomFileName = `${new Date().getTime()}.${context.type}`
-
-        return vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(randomFileName), filters: { 'file': [context.type] } }).then((filePath) => {
+        const folders = vscode.workspace.workspaceFolders
+        const workFolder = folders ? folders[0].uri?.path + "/" : ""
+        return vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(workFolder + randomFileName), filters: { 'file': [context.type] } }).then((filePath) => {
             return new Promise((res, rej) => {
                 if (filePath) {
                     context.exportPath = filePath.fsPath;
