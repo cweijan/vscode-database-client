@@ -60,10 +60,9 @@
         <div>
           <!-- add button -->
           <el-button size="small" type="primary" @click='editDialogVisiable=true'>
-                Add New
+            Add New
           </el-button>
-          <el-pagination style="display:inline-block" class="pagenation-table-page-container" :total="key.content.length" :page-size="pageSize" :current-page.sync="pageIndex"
-                 :page-sizes="[20,50,100, 200, 300]"          layout="total, sizes, prev, pager, next, jumper" background>
+          <el-pagination style="display:inline-block" class="pagenation-table-page-container" :total="key.content.length" :page-size="pageSize" :current-page.sync="pageIndex" :page-sizes="[20,50,100, 200, 300]" layout="total, sizes, prev, pager, next, jumper" background>
           </el-pagination>
           <!-- edit & add dialog -->
           <el-dialog :title="dialogTitle" :visible.sync="editDialogVisiable">
@@ -130,41 +129,13 @@ export default {
   destroyed() {
     vscodeEvent.destroy();
   },
-  mounted() {
-    vscodeEvent = getVscodeEvent();
-    vscodeEvent
-      .on("detail", (data) => {
-       
-        this.pageIndex=1;
-        this.pageSize=100;
-        this.key = data.res;
-        this.edit = this.deepClone(data.res);
-        this.editTemp = this.jsonContent();
-        const temp = this.edit.content + "".trim();
-        this.selectedView =
-          temp.startsWith("[") || temp.startsWith("{")
-            ? "ViewerJson"
-            : "ViewerText";
-      })
-      .on("msg", (content) => {
-        this.$message.success(content);
-      })
-      .on("refresh", () => {
-        this.editDialogVisiable = false;
-        this.editModel = false;
-        this.addData = null;
-        this.addKey = null;
-        this.refresh();
-      });
-    vscodeEvent.emit("route-" + this.$route.name);
-  },
   data() {
     return {
       addKey: "",
       addData: "",
       editModel: false,
-      pageIndex:1,
-      pageSize:100,
+      pageIndex: 1,
+      pageSize: 100,
       key: { name: "", ttl: -1, content: null },
       // copy from key
       edit: { name: "", ttl: -1, content: null },
@@ -180,9 +151,38 @@ export default {
       textrows: 6,
     };
   },
+  mounted() {
+    vscodeEvent = getVscodeEvent();
+    vscodeEvent
+      .on("detail", (data) => {
+        this.pageIndex = 1;
+        this.pageSize = 100;
+        this.key = data.res;
+        this.edit = this.deepClone(data.res);
+        if (this.key.type == "string") {
+          const isJSON = this.edit.content.match(/^\s*[{[]/);
+          this.selectedView = isJSON ? "ViewerJson" : "ViewerText";
+          this.editTemp = isJSON ? this.jsonContent() : this.edit.content;
+        }
+      })
+      .on("msg", (content) => {
+        this.$message.success(content);
+      })
+      .on("refresh", () => {
+        this.editDialogVisiable = false;
+        this.editModel = false;
+        this.addData = null;
+        this.addKey = null;
+        this.refresh();
+      });
+    vscodeEvent.emit("route-" + this.$route.name);
+  },
   computed: {
-    dataAfterFilter(){
-      return this.key.content.slice((this.pageIndex-1)*this.pageSize,this.pageIndex*this.pageSize);
+    dataAfterFilter() {
+      return this.key.content.slice(
+        (this.pageIndex - 1) * this.pageSize,
+        this.pageIndex * this.pageSize
+      );
     },
     dialogTitle() {
       const edit = this.editModel;
@@ -225,14 +225,17 @@ export default {
           nullColor: "#569cd6",
         };
         if (document.body.dataset.vscodeThemeKind == "vscode-dark") {
-          colorOptions = document.body.dataset.vscodeThemeName == "Dark (Visual Studio)" ? darkTheme : {
-                keyColor: "var(--vscode-terminal-ansiMagenta)",
-                trueColor: "var(--vscode-terminal-ansiBlue)",
-                falseColor: "var(--vscode-terminal-ansiBlue)",
-                nullColor: "var(--vscode-terminal-ansiBlue)",
-                stringColor: "var(--vscode-terminal-ansiGreen)",
-                numberColor: "var(--vscode-terminal-ansiYellow)",
-            };
+          colorOptions =
+            document.body.dataset.vscodeThemeName == "Dark (Visual Studio)"
+              ? darkTheme
+              : {
+                  keyColor: "var(--vscode-terminal-ansiMagenta)",
+                  trueColor: "var(--vscode-terminal-ansiBlue)",
+                  falseColor: "var(--vscode-terminal-ansiBlue)",
+                  nullColor: "var(--vscode-terminal-ansiBlue)",
+                  stringColor: "var(--vscode-terminal-ansiGreen)",
+                  numberColor: "var(--vscode-terminal-ansiYellow)",
+                };
         }
         return formatHighlight(JSON.parse(this.edit.content), colorOptions);
       } catch (error) {
