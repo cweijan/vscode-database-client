@@ -1425,7 +1425,7 @@ body {
 
 .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li {
     margin: 0 5px;
-    background-color: #f4f4f5;
+    background-color: var(--bg-color);
     color: var(--input-color);
     min-width: 30px;
     border-radius: 2px

@@ -2,7 +2,7 @@
   <div id="app">
     <el-container direction="vertical" class="key-tab-container">
       <!-- key info -->
-      <el-form :inline="true">
+      <el-form :inline="true" ref="infoForm">
         <!-- key name -->
         <el-form-item>
           <el-input ref="keyNameInput" v-model="edit.name" @keyup.enter.native="rename" placeholder="set to rename key" size="medium">
@@ -62,7 +62,8 @@
           <el-button size="small" type="primary" @click='editDialogVisiable=true'>
             Add New
           </el-button>
-          <el-pagination style="display:inline-block" class="pagenation-table-page-container" :total="key.content.length" :page-size="pageSize" :current-page.sync="pageIndex" :page-sizes="[20,50,100, 200, 300]" layout="total, sizes, prev, pager, next, jumper" background>
+          <el-input v-model="searchInput" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
+          <el-pagination style="display:inline-block" class="pagenation-table-page-container" :total="dataCount" :page-size="pageSize" :current-page.sync="pageIndex" :page-sizes="[20,50,100, 200, 300]" layout="total, sizes, prev, pager, next, jumper" background>
           </el-pagination>
           <!-- edit & add dialog -->
           <el-dialog :title="dialogTitle" :visible.sync="editDialogVisiable">
@@ -82,7 +83,7 @@
         </div>
         <!-- content table -->
         <div>
-          <el-table :data="dataAfterFilter" stripe size="mini" border :header-cell-style="{padding: 0}">
+          <el-table :data="dataAfterFilter" :height="remainHeight" stripe size="mini" border :header-cell-style="{padding: 0}">
             <el-table-column type="index" label="ID" sortable width="60" align="center">
             </el-table-column>
             <el-table-column v-if="key.type=='hash'" sort-by="key" resizable sortable label="Key" align="center">
@@ -133,9 +134,12 @@ export default {
     return {
       addKey: "",
       addData: "",
+      searchInput: "",
       editModel: false,
       pageIndex: 1,
       pageSize: 100,
+      dataCount:0,
+      remainHeight:0,
       key: { name: "", ttl: -1, content: null },
       // copy from key
       edit: { name: "", ttl: -1, content: null },
@@ -152,6 +156,12 @@ export default {
     };
   },
   mounted() {
+    const infoForm=this.$refs.infoForm.$el;
+    const updateHeight=()=>{
+      this.remainHeight = window.innerHeight -55 - infoForm.clientHeight ;
+    }
+    updateHeight()
+    new ResizeObserver(updateHeight).observe(document.body)
     vscodeEvent = getVscodeEvent();
     vscodeEvent
       .on("detail", (data) => {
@@ -179,7 +189,10 @@ export default {
   },
   computed: {
     dataAfterFilter() {
-      return this.key.content.slice(
+      const str=this.searchInput;
+      const filterData=this.key.content.filter(data=>!str || (data.value ? data.value.includes(str):data.includes(str)));
+      this.dataCount=filterData.length;
+      return filterData.slice(
         (this.pageIndex - 1) * this.pageSize,
         this.pageIndex * this.pageSize
       );
