@@ -59,13 +59,12 @@
       <div v-if="key.type=='list' || key.type=='set' || key.type=='zset' || key.type=='hash' ">
         <div>
           <!-- add button -->
-          <el-form :inline="true" size="small">
-            <el-form-item>
-              <el-button size="small" type="primary" @click='editDialogVisiable=true'>
+          <el-button size="small" type="primary" @click='editDialogVisiable=true'>
                 Add New
-              </el-button>
-            </el-form-item>
-          </el-form>
+          </el-button>
+          <el-pagination style="display:inline-block" class="pagenation-table-page-container" :total="key.content.length" :page-size="pageSize" :current-page.sync="pageIndex"
+                 :page-sizes="[20,50,100, 200, 300]"          layout="total, sizes, prev, pager, next, jumper" background>
+          </el-pagination>
           <!-- edit & add dialog -->
           <el-dialog :title="dialogTitle" :visible.sync="editDialogVisiable">
             <el-form>
@@ -84,7 +83,7 @@
         </div>
         <!-- content table -->
         <div>
-          <el-table :data="key.content" stripe size="mini" border :header-cell-style="{padding: 0}">
+          <el-table :data="dataAfterFilter" stripe size="mini" border :header-cell-style="{padding: 0}">
             <el-table-column type="index" label="ID" sortable width="60" align="center">
             </el-table-column>
             <el-table-column v-if="key.type=='hash'" sort-by="key" resizable sortable label="Key" align="center">
@@ -113,10 +112,6 @@
               </template>
             </el-table-column>
           </el-table>
-          <!-- <el-pagination class="pagenation-table-page-container" v-if="dataAfterFilter.length > pageSize"
-                        :total="dataAfterFilter.length" :page-size="pageSize" :current-page.sync="pageIndex"
-                        layout="total, prev, pager, next" background>
-                    </el-pagination> -->
         </div>
       </div>
       <!-- hset -->
@@ -139,6 +134,9 @@ export default {
     vscodeEvent = getVscodeEvent();
     vscodeEvent
       .on("detail", (data) => {
+       
+        this.pageIndex=1;
+        this.pageSize=100;
         this.key = data.res;
         this.edit = this.deepClone(data.res);
         this.editTemp = this.jsonContent();
@@ -165,6 +163,8 @@ export default {
       addKey: "",
       addData: "",
       editModel: false,
+      pageIndex:1,
+      pageSize:100,
       key: { name: "", ttl: -1, content: null },
       // copy from key
       edit: { name: "", ttl: -1, content: null },
@@ -181,6 +181,9 @@ export default {
     };
   },
   computed: {
+    dataAfterFilter(){
+      return this.key.content.slice((this.pageIndex-1)*this.pageSize,this.pageIndex*this.pageSize);
+    },
     dialogTitle() {
       const edit = this.editModel;
       switch (this.key.type) {
