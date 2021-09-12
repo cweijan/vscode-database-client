@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# 4.1.5 2021-9-12
+
+- Add pagination to view redis value with big data.
+- Improve sql complection.
+- Mongodb support sort by column.
+- Change default export path as workspace.
+
 # 4.1.3 2021-9-6
 
 - Reduce ram usage for webview cache.

@@ -5,7 +5,7 @@ import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
 import { env, Uri, ViewColumn, WebviewPanel, window } from "vscode";
 import { Trans } from "@/common/trans";
-import { ConfigKey, DatabaseType, MessageType } from "../../common/constants";
+import { ConfigKey, Constants, DatabaseType, MessageType } from "../../common/constants";
 import { Global } from "../../common/global";
 import { ViewManager } from "../../common/viewManager";
 import { Node } from "../../model/interface/node";
@@ -175,8 +175,8 @@ export class QueryPage {
         const resourceRoot = Global.getConfig("resourceRoot");
         switch (resourceRoot) {
             case "cdn":
-                return html.replace("../webview/js/query.js", "https://cdn.jsdelivr.net/npm/vscode-mysql-client2@4.1.3/out/webview/js/query.js")
-                    .replace("../webview/js/vendor.js", "https://cdn.jsdelivr.net/npm/vscode-mysql-client2@4.1.3/out/webview/js/vendor.js");
+                return html.replace("../webview/js/query.js", `https://cdn.jsdelivr.net/npm/vscode-mysql-client2@${Constants.CDN_VERSION}/out/webview/js/query.js`)
+                    .replace("../webview/js/vendor.js", `https://cdn.jsdelivr.net/npm/vscode-mysql-client2@${Constants.CDN_VERSION}/out/webview/js/vendor.js`);
             case "internalServer":
                 ResourceServer.bind();
                 return html.replace("../webview/js/query.js", `http://127.0.0.1:${ResourceServer.port}/query.js`)

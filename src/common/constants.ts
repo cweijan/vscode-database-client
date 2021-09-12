@@ -5,6 +5,7 @@ const extName=require("@/../package.json")
 
 export class Constants {
     public static CONFIG_PREFIX = "database-client"
+    public static CDN_VERSION = "4.1.5"
     public static RES_PATH = path.join(vscode.extensions.getExtension(`${extName.publisher}.${extName.name}`).extensionPath, "resources");
 }
 
