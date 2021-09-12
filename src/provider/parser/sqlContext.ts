@@ -52,6 +52,7 @@ export class SQLContext {
         this.inSingleQuoteString=false;
         this.inDoubleQuoteString=false;
         this.inComment=false;
+        this.tokenContext=new TokenContext()
     }
 
 }

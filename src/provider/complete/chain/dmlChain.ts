@@ -8,7 +8,7 @@ export class DMLChain extends BaseChain {
 
     public async getComplection(context: ComplectionContext) {
         const firstToken = context.tokens[0]?.content?.toLowerCase()
-        if (!firstToken || ['select', 'insert', 'update', 'delete', 'call'].indexOf(firstToken) == -1) {
+        if (!firstToken || ['explain','select', 'insert', 'update', 'delete', 'call'].indexOf(firstToken) == -1) {
             return null;
         }
         const previous = context.previousToken?.content?.toLowerCase()
