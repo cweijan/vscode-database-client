@@ -295,12 +295,19 @@ export default {
         vscodeEvent.emit("esSort", [{ [row.prop]: { order: row.order } }]);
         return;
       }
+      
+      if(this.result.dbType == "MongoDB"){
+        let sortSql = this.result.sql
+        .replace(/.sort\(.+?\)/gi, "")
+        .replace(/\s?(limit.+)?$/i, `sort({"${row.prop}": ${row.order.toLowerCase()=='desc'?-1:1}}).\$1 `);
+        this.execute(sortSql);
+        return;
+      }
+
       let sortSql = this.result.sql
-        .replace(/\n/, " ")
-        .replace(";", "")
         .replace(/order by .+? (desc|asc)?/gi, "")
         .replace(/\s?(limit.+)?$/i, ` ORDER BY ${row.prop} ${row.order} \$1 `);
-      this.execute(sortSql + ";");
+      this.execute(sortSql);
     },
     getTypeByColumn(key) {
       if (!this.result.columnList) return;
