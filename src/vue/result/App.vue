@@ -448,7 +448,9 @@ export default {
       this.table.widthItem = {};
       this.initShowColumn();
       // add filter row
-      if (this.result.columnList) {
+      if(!Array.isArray(this.result.data)){
+        this.$message.error("Unrecognized data!")
+      }else if (this.result.columnList) {
         this.result.data.unshift({ isFilter: true, content: "" });
       }
       // toolbar
@@ -460,6 +462,7 @@ export default {
   },
   computed: {
     filterData() {
+      if(!Array.isArray(this.result.data))return[]
       return this.result.data.filter(
         (data) =>
           !this.table.search ||
