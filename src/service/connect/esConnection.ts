@@ -2,6 +2,7 @@ import axios, { AxiosRequestConfig } from "axios";
 import { Node } from "@/model/interface/node";
 import { IConnection, queryCallback } from "./connection";
 import { EsIndexGroup } from "@/model/es/model/esIndexGroupNode";
+import { Agent } from "https";
 
 export class EsConnection extends IConnection {
 
@@ -29,6 +30,9 @@ export class EsConnection extends IConnection {
         const body = splitIndex == -1 ? null : sql.substring(splitIndex + 1) + "\n"
 
         let config: AxiosRequestConfig = {
+            httpsAgent: new Agent({  
+                rejectUnauthorized: false
+            }),
             method: type,
             url: `${this.url}${path}`,
             headers: {
