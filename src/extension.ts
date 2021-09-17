@@ -194,9 +194,11 @@ export function activate(context: vscode.ExtensionContext) {
                 },
                 "mysql.query.switch": async (node: SchemaNode | ConnectionNode | EsConnectionNode | ESIndexNode) => {
                     if (node) {
-                        await node.newQuery();
-                    }else if(node.dbType==DatabaseType.MONGO_DB){
-                        QueryUnit.showSQLTextDocument(node, `db('${node.name}').collection('').find({}).limit(100).toArray()`, Template.table);
+                        if(node.dbType==DatabaseType.MONGO_DB){
+                            QueryUnit.showSQLTextDocument(node, `db('${node.label}').collection('').find({}).limit(100).toArray()`, Template.table);
+                        }else{
+                            await node.newQuery();
+                        }
                     } else {
                         vscode.workspace.openTextDocument({ language: 'sql' }).then(async (doc) => {
                             vscode.window.showTextDocument(doc)
