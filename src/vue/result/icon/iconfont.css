@@ -21,3 +21,14 @@
   content: "\e601";
 }
 
+.icon-coffee:before {
+  content: "\e604";
+}
+
+.icon-run:before {
+  content: "\e605";
+}
+
+.icon-delete:before {
+  content: "\e607";
+}

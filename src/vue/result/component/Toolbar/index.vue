@@ -7,11 +7,12 @@
     <el-button v-if="result.single" @click="()=>$emit('sendToVscode','removeSingle')" type="danger" title="Unlock This Panel" icon="el-icon-unlock" size="mini" circle>
     </el-button>
     <el-input v-model="searchInput" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
+    <el-button icon="icon-coffee" title="Buy Author a Coffee." style="color:var(--vscode-charts-orange);" @click='()=>$emit("sendToVscode", "openCoffee")'></el-button>
     <el-button icon="icon-github" title="Star the project to represent support." @click='()=>$emit("sendToVscode", "openGithub")'></el-button>
-    <el-button icon="el-icon-circle-plus-outline" @click="$emit('insert')" title="Insert new row"></el-button>
-    <el-button icon="el-icon-delete" style="color:#f56c6c" @click="$emit('deleteConfirm');" title="delete"></el-button>
-    <el-button icon="el-icon-bottom" @click="$emit('export');" style="color:#4ba3ff;" title="Export"></el-button>
-    <el-button icon="el-icon-caret-right" title="Execute Sql" style="color: #54ea54;margin-left:0;" @click="$emit('run');"></el-button>
+    <el-button icon="el-icon-circle-plus-outline" style="color:var(--vscode-terminal-ansiCyan);"  @click="$emit('insert')" title="Insert new row"></el-button>
+    <el-button icon="icon-delete" style="color:var(--vscode-terminal-ansiBrightRed);" @click="$emit('deleteConfirm');" title="delete"></el-button>
+    <el-button icon="el-icon-bottom" @click="$emit('export');" style="color:var(--vscode-charts-blue);" title="Export"></el-button>
+    <el-button icon="icon-run" title="Execute Sql" style="color: var(--vscode-terminal-ansiBrightGreen);" @click="$emit('run');"></el-button>
     <div style="display:inline-block;font-size:14px;padding-left: 8px;" class="el-pagination__total">
       Cost: {{result.costTime}}ms
     </div>
@@ -82,7 +83,9 @@ export default {
 >>> .el-input--mini .el-input__inner{
   height: 24px;
 }
-
+.toolbar .el-button{
+margin-left: 4px;
+}
 </style>
 
 <style>
