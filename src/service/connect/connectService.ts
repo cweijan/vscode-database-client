@@ -13,7 +13,7 @@ import { NodeUtil } from "../../model/nodeUtil";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ClientManager } from "../ssh/clientManager";
 import { ConnnetionConfig } from "./config/connnetionConfig";
-import { readFileSync } from "fs";
+import { readFileSync, unlinkSync } from "fs";
 import { GlobalState, WorkState } from "@/common/state";
 var commandExistsSync = require('command-exists').sync;
 
@@ -109,6 +109,12 @@ export class ConnectService {
 
     static listenConfig(): Disposable {
         const configPath = resolve(FileManager.getPath("config.json"))
+        workspace.onDidCloseTextDocument(e => {
+            const changePath = resolve(e.uri.fsPath);
+            if (changePath == configPath) {
+                unlinkSync(configPath)
+            }
+        })
         return workspace.onDidSaveTextDocument(e => {
             const changePath = resolve(e.uri.fsPath);
             if (changePath == configPath) {
