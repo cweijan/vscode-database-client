@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CodeCommand } from "./common/constants";
+import { CodeCommand, DatabaseType, Template } from "./common/constants";
 import { ConnectionNode } from "./model/database/connectionNode";
 import { SchemaNode } from "./model/database/schemaNode";
 import { UserGroup } from "./model/database/userGroup";
@@ -192,9 +192,11 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.runAllQuery": () => {
                     QueryUnit.runQuery(null, ConnectionManager.tryGetConnection(), { runAll: true });
                 },
-                "mysql.query.switch": async (databaseOrConnectionNode: SchemaNode | ConnectionNode | EsConnectionNode | ESIndexNode) => {
-                    if (databaseOrConnectionNode) {
-                        await databaseOrConnectionNode.newQuery();
+                "mysql.query.switch": async (node: SchemaNode | ConnectionNode | EsConnectionNode | ESIndexNode) => {
+                    if (node) {
+                        await node.newQuery();
+                    }else if(node.dbType==DatabaseType.MONGO_DB){
+                        QueryUnit.showSQLTextDocument(node, `db('${node.name}').collection('').find({}).limit(100).toArray()`, Template.table);
                     } else {
                         vscode.workspace.openTextDocument({ language: 'sql' }).then(async (doc) => {
                             vscode.window.showTextDocument(doc)
