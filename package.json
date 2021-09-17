@@ -487,6 +487,11 @@
 				"when": "editorLangId == sql"
 			},
 			{
+				"command": "mysql.runES",
+				"key": "ctrl+enter",
+				"when": "editorLangId == es"
+			},
+			{
 				"command": "mysql.runAllQuery",
 				"key": "ctrl+f9",
 				"when": "editorLangId == sql"
