@@ -9,7 +9,9 @@ import 'umy-table/lib/theme-chalk/index.css';
 import '@/../public/theme/element.css'
 import '@/../public/theme/custom.css'
 import "tailwindcss/tailwind.css"
+import Contextmenu from "./Contextmenu"
 
+Vue.use(Contextmenu);
 Vue.use(VueRouter)
 Vue.use(ElementUI, { locale });
 Vue.use(UmyTable);

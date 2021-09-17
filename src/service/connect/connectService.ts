@@ -83,6 +83,8 @@ export class ConnectService {
                             handler.emit("error", err)
                         }
                     }
+                }).on('copy', value => {
+                    Util.copyToBoard(value)
                 }).on("close", () => {
                     handler.panel.dispose()
                 }).on("choose", ({ event, filters }) => {

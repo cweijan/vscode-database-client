@@ -3,7 +3,7 @@ import App from './App'
 import ElementUI from 'element-ui';
 import locale from 'element-ui/lib/locale/lang/en'
 Vue.use(ElementUI, { locale });
-import Contextmenu from "./component/Contextmenu"
+import Contextmenu from "../Contextmenu"
 Vue.use(Contextmenu);
 import UmyTable from 'umy-table'
 import 'umy-table/lib/theme-chalk/index.css';

@@ -1,5 +1,5 @@
 <template>
-  <div class="connect-container flex flex-col mx-auto">
+  <div class="connect-container flex flex-col mx-auto" @contextmenu.prevent="onContextmenu($event)">
     <h1 class="py-4 text-2xl">Connect To Server</h1>
 
     <blockquote class="p-3 mb-2 panel error" v-if="connect.error">
@@ -268,6 +268,34 @@ export default {
       vscodeEvent.emit("connecting", {
         connectionOption: this.connectionOption,
       });
+    },
+    onContextmenu(event) {
+      const obj=event.target;
+      if(!obj || !(obj instanceof HTMLInputElement) || !obj.select){
+        return;
+      }
+      const value=obj.value;
+      this.$contextmenu({
+        items: [
+          {
+            label: `Copy`,
+            onClick: () => {
+              vscodeEvent.emit("copy",value);
+            }
+          }
+          // ,{
+          //   label: `Paste`,
+          //   onClick: () => {
+          //     document.execCommand("paste")
+          //   }
+          // }
+        ],
+        event,
+        customClass: "class-a",
+        zIndex: 3,
+        minWidth: 230,
+      });
+      return false;
     },
     choose(event) {
       let filters = {};
