@@ -37,7 +37,7 @@
         </template>
       </ux-table-column>
     </ux-grid>
-    <el-dialog :title="'Update Column'" :visible.sync="column.editVisible" top="3vh" size="mini">
+    <el-dialog :title="'Update Column'" :visible.sync="column.editVisible" top="3vh" size="mini" :closeOnClickModal="false">
       <el-form :inline='true'>
         <el-form-item label="Name">
           <el-input v-model="editColumn.name"></el-input>
@@ -57,7 +57,7 @@
         <el-button @click="column.editVisible=false">Cancel</el-button>
       </span>
     </el-dialog>
-    <el-dialog :title="'Add Column'" :visible.sync="column.visible" top="3vh" size="mini">
+    <el-dialog :title="'Add Column'" :visible.sync="column.visible" top="3vh" size="mini" :closeOnClickModal="false">
       <el-form :inline='true'>
         <el-form-item label="Name">
           <el-input v-model="column.name"></el-input>

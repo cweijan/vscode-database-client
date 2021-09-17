@@ -22,7 +22,7 @@
         </template>
       </el-table-column>
       <el-table-column fixed="right" width="200">
-        <template slot="header" slot-scope="scope">
+        <template slot="header" >
           <el-button type="info" icon="el-icon-circle-plus-outline" size="small" circle @click="createRequest">
           </el-button>
           <el-button type="primary" icon="el-icon-refresh" size="small" circle @click="load"> </el-button>
@@ -44,7 +44,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog ref="editDialog" :title="panel.title" :visible.sync="panel.visible" width="90%" top="3vh" size="small">
+    <el-dialog ref="editDialog" :title="panel.title" :visible.sync="panel.visible" width="90%" top="3vh" size="small" :closeOnClickModal="false">
       <el-form ref="infoForm" :model="panel.edit" label-width="120px">
         <el-form-item size="mini" label="name">
           <el-input v-model="panel.edit.name"></el-input>

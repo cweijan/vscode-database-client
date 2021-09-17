@@ -14,7 +14,7 @@
         </template>
       </ux-table-column>
     </ux-grid>
-    <el-dialog :title="'Add Index'" :visible.sync="index.visible" top="3vh" size="mini">
+    <el-dialog :title="'Add Index'" :visible.sync="index.visible" top="3vh" size="mini" :closeOnClickModal="false">
       <el-form :inline='true'>
         <el-form-item label="Column">
           <el-select v-model="index.column">

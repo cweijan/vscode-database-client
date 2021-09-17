@@ -13439,8 +13439,7 @@ body {
     white-space: nowrap;
     cursor: pointer;
     background-color: var(--vscode-editor-background);
-    /* border: 1px solid var(--border-color); */
-    border: none;
+    border: 1px solid var(--border-color);
     color: var(--input-color);
     -webkit-appearance: none;
     text-align: center;

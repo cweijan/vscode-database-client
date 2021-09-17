@@ -1,6 +1,6 @@
 <template>
   <div class="connect-container flex flex-col mx-auto">
-    <h1 class="py-4 text-2xl">Connect to Database Server</h1>
+    <h1 class="py-4 text-2xl">Connect To Server</h1>
 
     <blockquote class="p-3 mb-2 panel error" v-if="connect.error">
       <section class="panel__text">
