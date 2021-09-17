@@ -43,6 +43,7 @@
 	"command.table.show": "在新的面板打开",
 	"command.column.update": "修改列",
 	"command.column.drop": "删除列",
+	"command.column.createIndex": "为此列创建索引",
 	"command.template.table": "新建表",
 	"command.template.sql": "查询表SQL",
 	"command.template.view": "新建视图",

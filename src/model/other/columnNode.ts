@@ -79,6 +79,12 @@ ${this.column.type} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"}`
         QueryUnit.showSQLTextDocument(this, this.dialect.updateColumn(this.table, this.column.name, this.column.type, this.column.comment, this.column.nullable), Template.alter);
 
     }
+
+    public createIndexTemplate() {
+        const indexSql = this.dialect.createIndex({ column:this.wrap(this.column.name), type:"INDEX", indexType:null, table: this.wrap(this.table) });
+        QueryUnit.showSQLTextDocument(this, indexSql, Template.alter);
+    }
+
     public async dropColumnTemplate() {
 
         const dropSql = `ALTER TABLE \n\t${this.wrap(this.table)} DROP COLUMN ${this.wrap(this.column.name)};`;

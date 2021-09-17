@@ -329,6 +329,11 @@
 				"category": "MySQL"
 			},
 			{
+				"command": "mysql.column.createIndex",
+				"title": "%command.column.createIndex%",
+				"category": "MySQL"
+			},
+			{
 				"command": "mysql.template.sql",
 				"title": "%command.template.sql%",
 				"category": "MySQL",
@@ -796,9 +801,14 @@
 					"group": "inline@2"
 				},
 				{
-					"command": "mysql.column.drop",
+					"command": "mysql.column.createIndex",
 					"when": "view =~ /cweijan.+?ql/ && viewItem == column",
 					"group": "3_mysql@1"
+				},
+				{
+					"command": "mysql.column.drop",
+					"when": "view =~ /cweijan.+?ql/ && viewItem == column",
+					"group": "3_mysql@4"
 				},
 				{
 					"command": "mysql2.refresh",

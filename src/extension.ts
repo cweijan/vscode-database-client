@@ -259,6 +259,9 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.column.drop": (columnNode: ColumnNode) => {
                     columnNode.dropColumnTemplate();
                 },
+                "mysql.column.createIndex": (columnNode: ColumnNode) => {
+                    columnNode.createIndexTemplate();
+                },
             },
             // template
             ...{
