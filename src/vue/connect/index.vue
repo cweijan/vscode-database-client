@@ -19,7 +19,7 @@
     <section class="mb-2">
       <label class="font-bold mr-5 inline-block ">Connection Name</label>
       <input class="w-1/4 field__input" placeholder="Connection name" v-model="connectionOption.name" />
-      <label class="font-bold ml-4 mr-5 inline-block ">Connection Target</label>
+      <label class="font-bold ml-4 mr-5 inline-block ">Connection Scope</label>
       <el-radio v-model="connectionOption.global" :label="true">Global</el-radio>
       <el-radio v-model="connectionOption.global" :label="false">Current Workspace</el-radio>
     </section>
@@ -72,7 +72,7 @@
       <section class="mb-2" v-if="connectionOption.dbType!='FTP' && connectionOption.dbType!='MongoDB'">
         <div class="inline-block mr-10">
           <label class="font-bold mr-5 inline-block w-32">Databases</label>
-          <input class="w-64 field__input" placeholder="Special connection database" v-model="connectionOption.database" />
+          <input class="w-64 field__input" placeholder="Connection database" v-model="connectionOption.database" />
         </div>
         <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
           <label class="font-bold mr-5 inline-block w-32">Include Databases</label>
@@ -130,8 +130,8 @@
     <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH" @choose="choose"/>
 
     <div>
-      <button class="button button--primary w-28 inline mr-4" @click="tryConnect" v-loading="connect.loading">Connect</button>
-      <button class="button button--primary w-28 inline" @click="close">Close</button>
+      <el-button size="mini" :loading="connect.loading" @click="tryConnect">Connect</el-button>
+      <el-button size="mini" @click="close">Close</el-button>
     </div>
   </div>
 </template>
