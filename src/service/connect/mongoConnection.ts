@@ -70,7 +70,7 @@ export class MongoConnection extends IConnection {
         } else {
             try {
                 const result = await eval('this.client.' + sql)
-                if (result == null) {
+                if (result == null || result?.constructor?.name=='Collection') {
                     callback(null)
                 } else if (Number.isInteger(result)) {
                     callback(null, result)

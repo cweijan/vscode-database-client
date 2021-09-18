@@ -84,7 +84,7 @@ export class QueryUnit {
                     vscode.commands.executeCommand(CodeCommand.Refresh);
                 }
 
-                if (data.affectedRows) {
+                if (data?.affectedRows) {
                     QueryPage.send({ connection: connectionNode, type: MessageType.DML, queryOption, res: { sql, costTime, affectedRows: data.affectedRows } as DMLResponse });
                     return;
                 }
