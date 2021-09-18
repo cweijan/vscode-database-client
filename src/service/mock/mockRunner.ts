@@ -100,7 +100,7 @@ export class MockRunner {
             case "varchar": case "char": case "date": case "time": case "timestamp": case "datetime": case "set": case "json":
                 return `'${value}'`
             default:
-                if (type.indexOf("text") != -1 || type.indexOf("blob") != -1 || type.indexOf("binary") != -1) { return `'${value}'` }
+                if (type.indexOf("text") != -1 || type.indexOf("character") != -1 || type.indexOf("timestamp") != -1 || type.indexOf("blob") != -1 || type.indexOf("binary") != -1) { return `'${value}'` }
         }
         return value;
     }
@@ -165,6 +165,11 @@ export class MockRunner {
                 return "@time()"
             case "timestamp": case "datetime":
                 return "@datetime()"
+        }
+        if(type.includes("character")){
+            return "@string('lower',5)"
+        } else if(type.includes("timestamp")){
+            return "@datetime()"
         }
         return "@integer(1," + length + ")";
     }
