@@ -1,5 +1,14 @@
 # CHANGELOG
 
+# 4.1.6 2021-9-18
+
+- Improve security, config.json will auto delete when close.
+- Update some buttion border and icon.
+- Add shortcut to run ElasticSearch query.
+- Fix run postgresql explain sql fail.
+- Fix show duplicate column nodes when have more constraint.
+- Fix generate postgresql mock data fail.
+
 # 4.1.5 2021-9-12
 
 - Add pagination to view redis value with big data.
