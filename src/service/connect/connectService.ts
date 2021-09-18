@@ -134,6 +134,7 @@ export class ConnectService {
             await GlobalState.update(CacheKey.NOSQL_CONNECTION, connectonConfig.nosql.global);
             await WorkState.update(CacheKey.NOSQL_CONNECTION, connectonConfig.nosql.workspace);
             DbTreeDataProvider.refresh();
+            unlinkSync(path)
         } catch (error) {
             window.showErrorMessage("Parse connect config fail!")
         }
