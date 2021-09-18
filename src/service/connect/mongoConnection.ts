@@ -93,6 +93,9 @@ export class MongoConnection extends IConnection {
 
     private async handleSearch(sql: any, data: any, callback: any) {
         let fields = null;
+        if(!data.map){
+            data=[data]
+        }
 
         let rows = data.map((document: any) => {
             if (!fields) {
