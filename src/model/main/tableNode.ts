@@ -43,9 +43,18 @@ export class TableNode extends Node implements CopyAble {
         }
         return this.execute<ColumnMeta[]>(this.dialect.showColumns(this.schema, this.table))
             .then((columns) => {
-                columnNodes = columns.map<ColumnNode>((column, index) => {
-                    return new ColumnNode(this.table, column, this, index);
-                });
+                columnNodes = [];
+                let temp:{[key:string]:ColumnNode} = {};
+                for (let index = 0; index < columns.length; index++) {
+                    const column = columns[index];
+                    if(temp[column.name]){
+                        temp[column.name].updateInfo(column)
+                    }else{
+                        const colNode = new ColumnNode(this.table, column, this, index);
+                        columnNodes.push(colNode)
+                        temp[column.name]=colNode
+                    }
+                }
                 this.setChildCache(columnNodes)
                 return columnNodes;
             })
