@@ -974,7 +974,11 @@
 				"database-client.resourceRoot": {
 					"type": "string",
 					"default": "cdn",
-					"enum": ["file","cdn","internalServer"],
+					"enum": [
+						"file",
+						"cdn",
+						"internalServer"
+					],
 					"description": "Webview resource root, using file will create a lot of cache."
 				},
 				"database-client.defaultSelectLimit": {
