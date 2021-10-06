@@ -24,7 +24,15 @@ export class MysqlDumpService extends DumpService {
                 const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
                 const data = withData ? '' : ' --no-data';
                 const tables = isTable ? ` --skip-triggers ${node.label}` : '';
-                const command = `mysqldump -h ${host} -P ${port} -u ${node.user} -p${node.password}${data} --skip-add-locks ${node.schema} ${tables}>${folderPath.fsPath}`
+
+                let command = "";
+
+                if (node.password) {
+                    command = `mysqldump -h ${host} -P ${port} -u ${node.user} -p${node.password}${data} --skip-add-locks ${node.schema} ${tables}>${folderPath.fsPath}`;
+                } else {
+                    command = `mysqldump -h ${host} -P ${port} -u ${node.user} ${data} --skip-add-locks ${node.schema} ${tables}>${folderPath.fsPath}`;
+                }
+                
                 // Console.log(`Executing: ${command}`);
                 Util.execute(command).then(() => {
                     vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.schema} success!`, 'open').then(action => {
