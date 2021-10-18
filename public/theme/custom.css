@@ -142,8 +142,9 @@ https://www.umyui.com/
   border: none !important;
 }
 
+.edit-filter .el-input__inner::placeholder,
 .null-column {
-  color: #666;
+  color: var(--vscode-titleBar-inactiveForeground);
   font-weight: 400;
 }
 
