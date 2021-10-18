@@ -1,5 +1,13 @@
 # CHANGELOG
 
+# 4.1.7 2021-10-8
+
+- Ignore ElasticSearch ssl certificate check.
+- Fix show error column type on result view.
+- Support config ssh connect timeout.
+- Update result view filter color.
+- Ftp node add refresh button.
+
 # 4.1.6 2021-9-18
 
 - Improve security, config.json will auto delete when close.
