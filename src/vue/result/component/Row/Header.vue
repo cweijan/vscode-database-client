@@ -6,9 +6,10 @@
           *
         </span>
         <span class="column-name">
-          {{ scope.column.title }}<br />
+          {{ scope.column.title }}
         </span>
       </span>
+      <br />
       <span class="column-type" v-if="result.columnList[index]">
         {{result.columnList[index].type}}
       </span>
