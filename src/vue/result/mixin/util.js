@@ -11,7 +11,7 @@ export const util = {
             if (typeof value == "string") {
                 value = value.replace(/'/g, "\\'")
             }
-            if(!type){
+            if (!type) {
                 return `'${value}'`
             }
             type = type.toLowerCase()
@@ -41,7 +41,7 @@ export const util = {
                 case "json":
                     return `'${value}'`
                 default:
-                    if (type.indexOf("timestamp") !== -1 || type.indexOf("text") !== -1 || type.indexOf("blob") !== -1 || type.indexOf("binary") !== -1) {
+                    if (type.includes("timestamp") || type.includes("text") || type.includes("blob") || type.includes("binary")) {
                         return `'${value}'`
                     }
             }

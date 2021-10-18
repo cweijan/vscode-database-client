@@ -23,7 +23,7 @@ export class MockRunner {
     public async create(tableNode: TableNode) {
         const columnList = (await tableNode.getChildren()) as ColumnNode[]
         const mockModel: MockModel = {
-            schema: tableNode.schema,table: tableNode.table,
+            table: tableNode.table,
             mockStartIndex: MockRunner.primaryKeyMap[tableNode.uid] ? 'auto' : 1
             , mockCount: 10, mockValueReference: "http://mockjs.com/examples.html#DPD", mock: {}
         }

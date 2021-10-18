@@ -1,5 +1,4 @@
 export interface MockModel {
-    schema: string;
     mockValueReference: string;
     table: string;
     mockStartIndex: number|string;
