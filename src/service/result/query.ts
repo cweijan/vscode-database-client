@@ -129,6 +129,7 @@ export class QueryPage {
                 } else {
                     await this.loadColumnList(queryParam);
                 }
+                this.createColumnTypeMap(queryParam)
                 const pageSize = ServiceManager.getPageService(queryParam.connection.dbType).getPageSize(queryParam.res.sql);
                 ((queryParam.res) as DataResponse).pageSize = (queryParam.res.data?.length && queryParam.res.data.length > pageSize)
                     ? queryParam.res.data.length : pageSize;
@@ -144,6 +145,15 @@ export class QueryPage {
                 queryParam.res.message = `EXECUTE FAIL:<br><br>&nbsp;&nbsp;${queryParam.res.sql}<br><br>Message :<br><br>&nbsp;&nbsp;${queryParam.res.message}`;
                 break;
         }
+    }
+    private static createColumnTypeMap(queryParam: QueryParam<DataResponse>) {
+        const columnList=queryParam.res.columnList
+        if(!columnList)return;
+        let columnTypeMap={};
+        for (const column of columnList) {
+            columnTypeMap[column.name]=column
+        }
+        queryParam.res.columnTypeMap=columnTypeMap;
     }
 
     private static keepSingle(queryParam: QueryParam<any>) {

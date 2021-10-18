@@ -73,6 +73,7 @@ export default {
         sql: "",
         primaryKey: null,
         columnList: null,
+        columnTypeMap: null,
         primaryKeyList: null,
         database: null,
         table: null,

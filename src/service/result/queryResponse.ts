@@ -22,6 +22,7 @@ export class DataResponse {
     public pageSize: number;
     public tableCount: number;
     public total?: number;
+    public columnTypeMap?: {};
 }
 
 export class ErrorResponse {

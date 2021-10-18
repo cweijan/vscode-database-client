@@ -1,8 +1,8 @@
 <template>
-  <el-tooltip class="item" effect="dark" :content="getTip(result.columnList[index],scope.column)" placement="left-start">
+  <el-tooltip class="item" effect="dark" :content="getTip(result.columnTypeMap[scope.column.title],scope.column)" placement="left-start">
     <div>
       <span>
-        <span v-if="result.columnList[index]&& (result.columnList[index].nullable != 'YES')" style="color: #f94e4e; position: relative; top: .2em;">
+        <span v-if="result.columnTypeMap[scope.column.title]&& (result.columnTypeMap[scope.column.title].nullable != 'YES')" style="color: #f94e4e; position: relative; top: .2em;">
           *
         </span>
         <span class="column-name">
@@ -10,8 +10,8 @@
         </span>
       </span>
       <br />
-      <span class="column-type" v-if="result.columnList[index]">
-        {{result.columnList[index].type}}
+      <span class="column-type" v-if="result.columnTypeMap[scope.column.title]">
+        {{result.columnTypeMap[scope.column.title].type}}
       </span>
     </div>
   </el-tooltip>
@@ -22,6 +22,7 @@ export default {
   props: ["scope", "result","index"],
   methods: {
     getTip(column, scopeColumn) {
+      console.log(this.result.columnTypeMap)
       if (!column || !column.comment) return scopeColumn.title;
       return column.comment;
     },
