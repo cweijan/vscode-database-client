@@ -30,7 +30,7 @@ export class EsConnection extends IConnection {
         const body = splitIndex == -1 ? null : sql.substring(splitIndex + 1) + "\n"
 
         let config: AxiosRequestConfig = {
-            httpsAgent: new Agent({  
+            httpsAgent: new Agent({
                 rejectUnauthorized: false
             }),
             method: type,
@@ -119,7 +119,11 @@ export class EsConnection extends IConnection {
     }
 
     connect(callback: (err: Error) => void): void {
-        const config = {};
+        const config = {
+            httpsAgent: new Agent({
+                rejectUnauthorized: false
+            })
+        };
         this.bindAuth(config)
         axios.get(`${this.url}/_cluster/health`, config).then(res => {
             this.conneted = true;
