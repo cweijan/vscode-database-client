@@ -56,7 +56,7 @@ export class SSHTunnelService {
                 const bat = spawn('ssh', args);
                 const successHandler = setTimeout(() => {
                     resolve({ ...node, host: "127.0.0.1", port } as Node)
-                }, ssh.watingTime);
+                }, ssh.connectTimeout);
                 bat.stderr.on('data', (chunk) => {
                     if (chunk?.toString().match(/^[@\s]+$/)) return;
                     delete this.tunelMark[key]

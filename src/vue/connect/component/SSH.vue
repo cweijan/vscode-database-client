@@ -63,13 +63,13 @@
           <input class="w-64 field__input" placeholder="Passphrase" type="passphrase" v-model="connectionOption.ssh.passphrase" />
         </div>
       </section>
-      <section class="mb-2" v-if="connectionOption.ssh.type == 'native'">
-        <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-28">Waiting Time</label>
-          <input class="w-64 field__input" placeholder="Waiting time for ssh command." v-model="connectionOption.ssh.watingTime" />
-        </div>
-      </section>
     </div>
+    <section class="mb-2">
+      <div class="inline-block mr-10">
+        <label class="font-bold mr-5 inline-block w-128">Connect Timeout</label>
+        <input class="w-64 field__input" placeholder="SSH connection timeout." v-model="connectionOption.ssh.connectTimeout" />
+      </div>
+    </section>
   </div>
 </template>
 

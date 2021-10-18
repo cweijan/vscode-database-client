@@ -84,11 +84,11 @@
 
       <section class="mb-2">
         <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32">ConnectTimeout</label>
+          <label class="font-bold mr-5 inline-block w-32">Connect Timeout</label>
           <input class="w-64 field__input" placeholder="5000" required v-model="connectionOption.connectTimeout" />
         </div>
         <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32" v-if="connectionOption.dbType!='Redis'">RequestTimeout</label>
+          <label class="font-bold mr-5 inline-block w-32" v-if="connectionOption.dbType!='Redis'">Request Timeout</label>
           <input class="w-64 field__input" placeholder="10000" required type="number" v-model="connectionOption.requestTimeout" />
         </div>
       </section>
@@ -179,7 +179,7 @@ export default {
           port: 22,
           username: "root",
           type: "password",
-          watingTime: 5000,
+          connectTimeout: 10000,
           algorithms: {
             cipher: [],
           },
