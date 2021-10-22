@@ -77,7 +77,9 @@ export class ResultSetParser implements ChunksParser<ResultSet|undefined> {
             } else {
                 if (this.isInString) {
                     // end of field
-                    if (char === `"` && prevChar() !== `\\`) {
+                    const rowEnd = (chunk[i + 1] && (chunk[i + 1] == '\r' || chunk[i + 1] == '\n'));
+                    const columnEnd = (chunk[i + 1] && chunk[i + 2] && chunk[i + 1] == ' ' && chunk[i + 2] == '\"');
+                    if (char === `"` && (prevChar() !== `\\` || rowEnd || columnEnd)) {
                         this.isInString = false;
 
                         this.row[this.row.length-1] = replaceEscapedOctetsWithChar(last(this.row));
