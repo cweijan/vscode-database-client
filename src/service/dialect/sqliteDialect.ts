@@ -73,7 +73,7 @@ export class SqliTeDialect extends SqlDialect{
     }
     tableTemplate(): string {
         return `CREATE TABLE [name](  
-    id INTEGER NOT NULL primary key,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     [column] TEXT
 );`
     }
