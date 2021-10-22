@@ -1,5 +1,5 @@
 export function replaceEscapedOctetsWithChar(s: string) {
-    return s.replace(/(?:^|[^\\])((?:\\[0-9]{3})+)/g, (substring: string, ...args: any[]) => {
+    return s.replace(/\\\\/g,'\\').replace(/(?:^|[^\\])((?:\\[0-9]{3})+)/g, (substring: string, ...args: any[]) => {
         let capgroup: string = args[0].toString();
         let prevChar: string = '';
         if (substring.length > capgroup.length) {
