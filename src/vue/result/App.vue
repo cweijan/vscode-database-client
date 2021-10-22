@@ -183,7 +183,7 @@ export default {
       if (!data) return;
       console.log(data);
       const response = data.content;
-      const runLoading=this.result.transId==null || response.transId > this.result.transId;
+      const runLoading=this.result.transId==null || (response && response.transId > this.result.transId);
       if(response){
         this.result.transId=response.transId;
       }
