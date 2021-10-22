@@ -74,7 +74,7 @@ export class TableNode extends Node implements CopyAble {
             const sourceResule = await this.execute<any[]>(this.dialect.showTableSource(this.schema, this.table))
             sql = sourceResule[0]['Create Table'];
             if (this.dbType == DatabaseType.SQLITE) {
-                sql = sql.replace(/\\n/g, '\n');
+                sql = sql.replace(/\\n/g, '\n').replace(/\\r/g, '');
             }
         } else {
             const childs = await this.getChildren();
