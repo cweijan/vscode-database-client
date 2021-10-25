@@ -36,14 +36,15 @@ export class MysqlDialect extends SqlDialect {
         let { name, type, comment, nullable, defaultValue } = column;
         nullable = nullable == "YES" ? "" : " NOT NULL";
         comment = comment ? ` COMMENT '${comment}'` : "";
-        defaultValue = defaultValue ? ` DEFAULT ${defaultValue=='CURRENT_TIMESTAMP' ? defaultValue : `'${defaultValue}'`}` : "";
+        defaultValue = defaultValue ? ` DEFAULT ${defaultValue == 'CURRENT_TIMESTAMP' ? defaultValue : `'${defaultValue}'`}` : "";
         return `ALTER TABLE\n\t${table} CHANGE ${name} ${name} ${type}${nullable}${comment}${defaultValue};`;
     }
     updateColumnSql(updateColumnParam: UpdateColumnParam): string {
-        let { columnName, columnType, newColumnName, comment, nullable, table } = updateColumnParam
-        const defaultDefinition = nullable ? "" : " NOT NULL";
+        let { columnName, columnType, newColumnName, comment, nullable, table, defaultValue } = updateColumnParam
+        const nullableDefinition = nullable ? "" : " NOT NULL";
         comment = comment ? ` comment '${comment}'` : "";
-        return `ALTER TABLE\n\t${table} CHANGE ${columnName} ${newColumnName} ${columnType}${defaultDefinition}${comment};`;
+        defaultValue = defaultValue ? ` DEFAULT ${defaultValue == 'CURRENT_TIMESTAMP' ? defaultValue : `'${defaultValue}'`}` : "";
+        return `ALTER TABLE ${table} CHANGE ${columnName} ${newColumnName} ${columnType}${nullableDefinition}${comment}${defaultValue};`;
     }
     showUsers(): string {
         return `SELECT concat(user,'@',host) user FROM mysql.user;`;

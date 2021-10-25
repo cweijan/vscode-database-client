@@ -48,6 +48,11 @@
         <el-form-item label="Comment">
           <el-input v-model="editColumn.comment"></el-input>
         </el-form-item>
+        <template v-if="designData.dbType=='MySQL'">
+          <el-form-item label="Default Value">
+            <el-input v-model="editColumn.defaultValue"></el-input>
+          </el-form-item>
+        </template>
         <el-form-item label="Not Null">
           <el-checkbox v-model="editColumn.isNotNull"></el-checkbox>
         </el-form-item>
@@ -127,6 +132,7 @@ export default {
       this.emit("updateColumn", {
         newColumnName: this.editColumn.name,
         columnType: this.editColumn.type,
+        defaultValue: this.editColumn.defaultValue,
         comment: this.editColumn.comment,
         nullable: !this.editColumn.isNotNull,
         table: this.designData.table,
