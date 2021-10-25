@@ -1,3 +1,4 @@
+import { ColumnMeta } from "@/common/typeDef";
 import { CreateIndexParam } from "./param/createIndexParam";
 import { UpdateColumnParam } from "./param/updateColumnParam";
 import { UpdateTableParam } from "./param/updateTableParam";
@@ -22,7 +23,7 @@ export class MongoDialect implements SqlDialect{
     updateTable(update: UpdateTableParam): string {
         throw new Error("Method not implemented.");
     }
-    updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
+    updateColumn(table: string, column: ColumnMeta): string {
         throw new Error("Method not implemented.");
     }
     showDatabases(): string {

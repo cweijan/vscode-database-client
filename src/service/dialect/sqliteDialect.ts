@@ -1,8 +1,9 @@
+import { ColumnMeta } from "@/common/typeDef";
 import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
 export class SqliTeDialect extends SqlDialect{
-    updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
+    updateColumn(table: string, column: ColumnMeta): string {
         throw new Error("Method not implemented.");
     }
     showIndex(database: string, table: string):string{

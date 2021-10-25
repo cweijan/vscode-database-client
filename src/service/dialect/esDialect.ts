@@ -1,3 +1,4 @@
+import { ColumnMeta } from "@/common/typeDef";
 import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
@@ -11,7 +12,7 @@ export class EsDialect extends SqlDialect{
     processList(): string {
         throw new Error("Method not implemented.");
     }
-    updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
+    updateColumn(table: string, column: ColumnMeta): string {
         return "";
     }
     showSchemas(): string {

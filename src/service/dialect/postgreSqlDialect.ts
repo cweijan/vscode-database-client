@@ -1,3 +1,4 @@
+import { ColumnMeta } from "@/common/typeDef";
 import { CreateIndexParam } from "./param/createIndexParam";
 import { UpdateColumnParam } from "./param/updateColumnParam";
 import { UpdateTableParam } from "./param/updateTableParam";
@@ -89,10 +90,11 @@ export class PostgreSqlDialect extends SqlDialect {
     createUser(): string {
         return `CREATE USER [name] WITH PASSWORD 'password'`
     }
-    updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
+    updateColumn(table: string, column: ColumnMeta): string {
+        let { name, type, comment, nullable, defaultValue } = column;
         comment = comment ? ` comment '${comment}'` : "";
-        return `ALTER TABLE ${table} ALTER COLUMN ${column} TYPE ${type};
-ALTER TABLE ${table} ALTER RENAME COLUMN ${column} TO [newColumnName];`;
+        return `ALTER TABLE ${table} ALTER COLUMN ${name} TYPE ${type};
+ALTER TABLE ${table} ALTER RENAME COLUMN ${name} TO [newColumnName];`;
     }
     updateColumnSql(updateColumnParam: UpdateColumnParam): string {
         let { columnName, columnType, newColumnName, comment, nullable, table } = updateColumnParam
@@ -186,7 +188,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         WHERE t.table_type='BASE TABLE'
         AND t.table_schema='${database}' order by t.table_name;`
     }
-    showDatabases(){
+    showDatabases() {
         return `SELECT datname "Database" FROM pg_database WHERE datistemplate = false;`
     }
     showSchemas(): string {

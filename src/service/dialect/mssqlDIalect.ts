@@ -1,3 +1,4 @@
+import { ColumnMeta } from "@/common/typeDef";
 import { window } from "vscode";
 import { CreateIndexParam } from "./param/createIndexParam";
 import { UpdateColumnParam } from "./param/updateColumnParam";
@@ -46,11 +47,12 @@ export class MssqlDIalect extends SqlDialect {
     createUser(): string {
         return `CREATE LOGIN [name] WITH PASSWORD = 'password'`;
     }
-    updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
+    updateColumn(table: string,column:ColumnMeta): string {
+        let { name, type, comment, nullable, defaultValue } = column;
         const defaultDefinition = nullable == "YES" ? "NULL":"NOT NULL" ;
         comment = comment ? ` comment '${comment}'` : "";
-        return `EXEC sp_rename '${table}.${column}', '${column}', 'COLUMN'
-ALTER TABLE ${table} ALTER COLUMN ${column} ${type} ${defaultDefinition};
+        return `EXEC sp_rename '${table}.${name}', '${name}', 'COLUMN'
+ALTER TABLE ${table} ALTER COLUMN ${name} ${type} ${defaultDefinition};
 `;
     }
     updateColumnSql(updateColumnParam: UpdateColumnParam): string {

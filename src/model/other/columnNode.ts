@@ -76,7 +76,7 @@ ${column.type} ${column.nullable == "YES" ? "Nullable" : "NotNull"}`
     }
 
     public updateColumnTemplate() {
-        QueryUnit.showSQLTextDocument(this, this.dialect.updateColumn(this.table, this.column.name, this.column.type, this.column.comment, this.column.nullable), Template.alter);
+        QueryUnit.showSQLTextDocument(this, this.dialect.updateColumn(this.table, this.column), Template.alter);
 
     }
 

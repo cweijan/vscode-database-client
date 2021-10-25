@@ -1,3 +1,4 @@
+import { ColumnMeta } from "@/common/typeDef";
 import { CreateIndexParam } from "./param/createIndexParam";
 import { UpdateColumnParam } from "./param/updateColumnParam";
 import { UpdateTableParam } from "./param/updateTableParam";
@@ -31,13 +32,15 @@ export class MysqlDialect extends SqlDialect {
     createUser(): string {
         return `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`;
     }
-    updateColumn(table: string, column: string, type: string, comment: string, nullable: string): string {
-        const defaultDefinition = nullable == "YES" ? "" : " NOT NULL";
-        comment = comment ? ` comment '${comment}'` : "";
-        return `ALTER TABLE\n\t${table} CHANGE ${column} ${column} ${type}${defaultDefinition}${comment};`;
+    updateColumn(table: string, column: ColumnMeta): string {
+        let { name, type, comment, nullable, defaultValue } = column;
+        nullable = nullable == "YES" ? "" : " NOT NULL";
+        comment = comment ? ` COMMENT '${comment}'` : "";
+        defaultValue = defaultValue ? ` DEFAULT ${defaultValue=='CURRENT_TIMESTAMP' ? defaultValue : `'${defaultValue}'`}` : "";
+        return `ALTER TABLE\n\t${table} CHANGE ${name} ${name} ${type}${nullable}${comment}${defaultValue};`;
     }
     updateColumnSql(updateColumnParam: UpdateColumnParam): string {
-        let {columnName,columnType,newColumnName,comment,nullable,table}=updateColumnParam
+        let { columnName, columnType, newColumnName, comment, nullable, table } = updateColumnParam
         const defaultDefinition = nullable ? "" : " NOT NULL";
         comment = comment ? ` comment '${comment}'` : "";
         return `ALTER TABLE\n\t${table} CHANGE ${columnName} ${newColumnName} ${columnType}${defaultDefinition}${comment};`;
@@ -113,9 +116,9 @@ export class MysqlDialect extends SqlDialect {
     }
     tableTemplate(): string {
         return `CREATE TABLE [name](  
-    id int NOT NULL primary key AUTO_INCREMENT COMMENT 'primary key',
-    create_time DATETIME COMMENT 'create time',
-    update_time DATETIME COMMENT 'update time',
+    id int NOT NULL primary key AUTO_INCREMENT COMMENT 'Primary Key',
+    create_time DATETIME COMMENT 'Create Time',
+    update_time DATETIME COMMENT 'Update Time',
     [column] varchar(255) COMMENT ''
 ) default charset utf8 COMMENT '';`
     }
