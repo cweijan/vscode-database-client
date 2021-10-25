@@ -7,7 +7,7 @@ import { BaseChain } from "./baseChain";
 export class DDLChain extends BaseChain {
 
     private keywordComplectionItems: vscode.CompletionItem[] = this.strToComplection(["Table", "Procedure", "View", "Function", "Trigger"])
-    private typeList: vscode.CompletionItem[] = this.strToComplection(["INTEGER", "CHAR", "VARCHAR", "DECIMAL", "SMALLINT", "TINYINT", "MEDIUMINT", "BIGINT", "CHARACTER",
+    private typeList: vscode.CompletionItem[] = this.strToComplection(["INTEGER", "CHAR", "VARCHAR", "DECIMAL", "SMALLINT","JSON", "TINYINT", "MEDIUMINT", "BIGINT", "CHARACTER",
         "NUMERIC", "BIT", "INT", "FLOAT", "DOUBLE", "TEXT", "SET", "BLOB", "TIMESTAMP", "DATE", "TIME", "YEAR", "DATETIME"], vscode.CompletionItemKind.Variable);
 
     async getComplection(complectionContext: ComplectionContext): Promise<CompletionItem[]> {

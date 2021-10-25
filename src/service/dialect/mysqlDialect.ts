@@ -113,11 +113,11 @@ export class MysqlDialect extends SqlDialect {
     }
     tableTemplate(): string {
         return `CREATE TABLE [name](  
-    id int NOT NULL primary key AUTO_INCREMENT comment 'primary key',
+    id int NOT NULL primary key AUTO_INCREMENT COMMENT 'primary key',
     create_time DATETIME COMMENT 'create time',
     update_time DATETIME COMMENT 'update time',
-    [column] varchar(255) comment ''
-) default charset utf8 comment '';`
+    [column] varchar(255) COMMENT ''
+) default charset utf8 COMMENT '';`
     }
     viewTemplate(): string {
         return `CREATE VIEW [name]
