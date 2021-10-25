@@ -1,7 +1,6 @@
 import { Client } from "ssh2";
 import * as vscode from 'vscode';
 import { TerminalService } from "./terminalService";
-import { TerminalTitle } from "./constant";
 import { FileManager, FileModel } from "@/common/filesManager";
 import { Util } from "@/common/util";
 import { Hanlder, ViewManager } from "@/common/viewManager";
@@ -15,26 +14,26 @@ export class XtermTerminal implements TerminalService {
 
     private static handlerMap = new Map<string, Hanlder>();
 
-    public async openPath(sshConfig: SSHConfig, fullPath: string) {
+    public async openPath(name: string, sshConfig: SSHConfig, fullPath: string) {
         const handler: Hanlder = XtermTerminal.handlerMap[this.getSshUrl(sshConfig)]
         if (handler) {
             handler.panel.reveal()
             handler.emit('path', fullPath)
         } else {
-            this.openMethod(sshConfig, () => { this.openPath(sshConfig, fullPath) })
+            this.openMethod(name, sshConfig, () => { this.openPath(name, sshConfig, fullPath) })
         }
     }
 
-    public async openMethod(sshConfig: SSHConfig, callback?: () => void) {
+    public async openMethod(name: string, sshConfig: SSHConfig, callback?: () => void) {
 
-        const title = this.getTitle(sshConfig);
+        const title = name || `${sshConfig.username}@${sshConfig.host}`;
         const sshUrl = this.getSshUrl(sshConfig)
         const type = XtermTerminal.handlerMap[sshUrl] ? `${sshUrl}_${new Date().getTime()}` : sshUrl
 
         ViewManager.createWebviewPanel({
             splitView: false, path: "app", iconPath: {
-                light: Util.getExtPath( "image", "terminal_light.png"),
-                dark: Util.getExtPath( "image", "terminal_dark.svg"),
+                light: Util.getExtPath("image", "terminal_light.png"),
+                dark: Util.getExtPath("image", "terminal_dark.svg"),
             },
             title, type,
             eventHandler: (handler) => {
@@ -46,14 +45,14 @@ export class XtermTerminal implements TerminalService {
 
     private handlerEvent(handler: Hanlder, sshConfig: SSHConfig, callback?: () => void) {
 
-        const fontSize=vscode.workspace.getConfiguration("terminal.integrated").get("fontSize",16)
+        const fontSize = vscode.workspace.getConfiguration("terminal.integrated").get("fontSize", 16)
 
         const sshUrl = this.getSshUrl(sshConfig);
         let dataBuffer = [];
         handler.on("init", () => {
             handler.emit("route", 'sshTerminal')
-        }).on("route-sshTerminal",()=>{
-            handler.emit("terminalConfig",{fontSize})
+        }).on("route-sshTerminal", () => {
+            handler.emit("terminalConfig", { fontSize })
         }).on("initTerminal", (content) => {
             handler.emit('connecting', `connecting ${sshConfig.username}@${sshConfig.host}...\n`);
             let termCols: number, termRows: number;
@@ -113,14 +112,6 @@ export class XtermTerminal implements TerminalService {
             })
         })
 
-    }
-
-    private getTitle(sshConfig: SSHConfig): string {
-        const type = vscode.workspace.getConfiguration("vscode-ssh").get<TerminalTitle>("terimanlTitle");
-        // if (type == TerminalTitle.connectionName && sshConfig.name) {
-        // return sshConfig.name;
-        // }
-        return `${sshConfig.username}@${sshConfig.host}`
     }
 
 }

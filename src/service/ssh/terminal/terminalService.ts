@@ -1,6 +1,6 @@
 import { SSHConfig } from "@/model/interface/sshConfig";
 
 export interface TerminalService {
-    openPath(sshConfig: SSHConfig, fullPath: string): void;
-    openMethod(sshConfig: SSHConfig): void;
+    openPath(name:string,sshConfig: SSHConfig, fullPath: string): void;
+    openMethod(name:string,sshConfig: SSHConfig): void;
 }

@@ -209,11 +209,11 @@ export class SSHConnectionNode extends Node {
     }
 
     openTerminal(): any {
-        this.terminalService.openMethod(this.sshConfig)
+        this.terminalService.openMethod(this.name,this.sshConfig)
     }
 
     openInTeriminal(): any {
-        this.terminalService.openPath(this.sshConfig, this.fullPath)
+        this.terminalService.openPath(this.name,this.sshConfig, this.fullPath)
     }
 
     async getChildren(): Promise<Node[]> {
