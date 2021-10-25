@@ -58,7 +58,9 @@ export class DumpService {
 
     protected triggerSave(node: Node) {
         const tableName = node instanceof TableNode ? node.table : null;
-        const exportSqlName = `${tableName ? tableName : ''}_${format('yyyy-MM-dd_hhmmss', new Date())}_${node.schema}.sql`;
+        const folders = vscode.workspace.workspaceFolders
+        const workFolder = (folders&&folders.length>0) ? folders[0].uri?.path + "/" : ""
+        const exportSqlName = `${workFolder}${tableName ? tableName : ''}_${format('yyyy-MM-dd_hhmmss', new Date())}_${node.schema}.sql`;
 
         return vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(exportSqlName), filters: { 'sql': ['sql'] } });
     }

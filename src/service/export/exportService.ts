@@ -12,7 +12,7 @@ export class ExportService {
     public export(context: ExportContext): any {
         const randomFileName = `${new Date().getTime()}.${context.type}`
         const folders = vscode.workspace.workspaceFolders
-        const workFolder = folders ? folders[0].uri?.path + "/" : ""
+        const workFolder = (folders&&folders.length>0) ? folders[0].uri?.path + "/" : ""
         return vscode.window.showSaveDialog({ saveLabel: "Select export file path", defaultUri: vscode.Uri.file(workFolder + randomFileName), filters: { 'file': [context.type] } }).then((filePath) => {
             return new Promise((res, rej) => {
                 if (filePath) {
