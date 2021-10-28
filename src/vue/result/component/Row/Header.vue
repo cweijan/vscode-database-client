@@ -22,7 +22,6 @@ export default {
   props: ["scope", "result","index"],
   methods: {
     getTip(column, scopeColumn) {
-      console.log(this.result.columnTypeMap)
       if (!column || !column.comment) return scopeColumn.title;
       return column.comment;
     },

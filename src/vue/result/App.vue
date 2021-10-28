@@ -185,7 +185,10 @@ export default {
       const response = data.content;
       const runLoading=this.result.transId==null || (response && response.transId > this.result.transId);
       if(response){
-        this.result.transId=response.transId;
+        this.result.transId=response.transId; 
+        if(response.language){
+          this.$i18n.locale = response.language
+        }
       }
       switch (data.type) {
         case "EXPORT_DONE":
@@ -323,7 +326,7 @@ export default {
       if (!datas || datas.length == 0) {
         this.$message({
           type: "warning",
-          message: "You need to select at least one row of data.",
+          message: this.$t("result.deleteNotice"),
         });
         return;
       }

@@ -2,22 +2,15 @@ import Vue from 'vue'
 import App from './App'
 import ElementUI from 'element-ui';
 import locale from 'element-ui/lib/locale/lang/en'
-import VueRouter from 'vue-router'
 import UmyTable from 'umy-table'
-
 import 'umy-table/lib/theme-chalk/index.css';
 import '@/../public/theme/element.css'
 import '@/../public/theme/custom.css'
 import "tailwindcss/tailwind.css"
 import Contextmenu from "./Contextmenu"
-
-Vue.use(Contextmenu);
-Vue.use(VueRouter)
-Vue.use(ElementUI, { locale });
-Vue.use(UmyTable);
-
-Vue.config.productionTip = false
-
+import VueI18n from 'vue-i18n'
+import {messages} from "./message"
+import VueRouter from 'vue-router'
 import connect from "./connect";
 import status from "./status";
 import design from "./design";
@@ -27,6 +20,20 @@ import terminal from "./redis/terminal";
 import redisStatus from "./redis/redisStatus";
 import forward from "./forward";
 import sshTerminal from "./xterm";
+
+Vue.use(Contextmenu).use(VueRouter)
+  .use(VueI18n)
+  .use(ElementUI, { locale })
+  .use(UmyTable);
+
+Vue.config.productionTip = false
+
+
+const i18n = new VueI18n({
+  locale:'en',
+  fallbackLocale: 'en',
+  messages
+})
 
 const router = new VueRouter({
   routes: [
@@ -45,7 +52,7 @@ const router = new VueRouter({
 })
 
 new Vue({
-  el: '#app',
+  el: '#app',i18n,
   components: { App },
   router,
   template: '<App/>'

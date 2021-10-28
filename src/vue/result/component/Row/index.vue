@@ -111,20 +111,20 @@ export default {
       this.$contextmenu({
         items: [
           {
-            label: `Copy`,
+            label: this.$t("result.copy"),
             onClick: () => {
               this.$emit("sendToVscode", "copy", value);
             },
             divided: true,
           },
           {
-            label: `Open Edit Dialog`,
+            label: this.$t("result.editDialog"),
             onClick: () => {
               this.$emit("openEditor", row, false);
             },
           },
           {
-            label: `Open Copy Dialog`,
+            label: this.$t("result.copyDialog"),
             onClick: () => {
               this.$emit("openEditor", row, true);
             },

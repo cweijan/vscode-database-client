@@ -16,6 +16,8 @@ export default {
       } else {
         this.$router.push("/" + path)
       }
+    }).on("language",language=>{
+      this.$i18n.locale = language
     })
     vscodeEvent.emit("init")
   },

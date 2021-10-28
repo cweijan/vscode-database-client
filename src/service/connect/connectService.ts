@@ -3,6 +3,7 @@ import { FileManager, FileModel } from "@/common/filesManager";
 import { ConnectionManager } from "@/service/connectionManager";
 import { resolve } from "path";
 import { platform } from "os";
+import * as vscode from 'vscode'
 import { commands, Disposable, window, workspace } from "vscode";
 import { Global } from "../../common/global";
 import { Util } from "../../common/util";
@@ -37,6 +38,7 @@ export class ConnectService {
             eventHandler: (handler) => {
                 handler.on("init", () => {
                     handler.emit('route', 'connect')
+                    handler.emit('language', vscode.env.language)
                 }).on("route-connect", async () => {
                     if (node) {
                         handler.emit("edit", node)

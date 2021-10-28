@@ -48,7 +48,7 @@ export class QueryPage {
                     queryParam.res.viewId = queryParam.queryOption?.viewId;
                     const uglyPath = handler.panel.webview.asWebviewUri(Uri.file(Global.getExtPath('out', 'webview', 'ugly.jpg'))).toString();
                     handler.emit(queryParam.type, {
-                        ...queryParam.res, dbType: dbOption.dbType, single: queryParam.singlePage,
+                        ...queryParam.res, dbType: dbOption.dbType, single: queryParam.singlePage,language:env.language,
                         showUgly: Global.getConfig("showUgly", false), uglyPath
                     })
                 }).on('execute', (params) => {
