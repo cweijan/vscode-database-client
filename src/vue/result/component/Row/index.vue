@@ -57,7 +57,6 @@ export default {
       this.$emit("update:editList", editList);
     },
     filter(event, column, operation) {
-      if (!operation) operation = "=";
       let inputvalue = "" + (event ? event.target.value : "");
       if (this.result.dbType == "ElasticSearch") {
         this.$emit("sendToVscode", "esFilter", {
@@ -66,11 +65,13 @@ export default {
         return;
       }
 
+      if (!operation) operation = "like";
+      if(inputvalue) inputvalue=`%${inputvalue}%`
       let filterSql =
         this.result.sql.replace(/\n/, " ").replace(";", " ") + " ";
 
       let existsCheck = new RegExp(
-        `(WHERE|AND)?\\s*\`?${column}\`?\\s*(=|is|>=|<=|<>)\\s*.+?\\s`,
+        `(WHERE|AND)?\\s*\`?${column}\`?\\s*(=|is|>=|<=|<>|like)\\s*.+?\\s`,
         "igm"
       );
 
@@ -101,7 +102,7 @@ export default {
       } else {
         // empty value, clear filter
         let beforeAndCheck = new RegExp(
-          `\\b${column}\\b\\s*(=|is)\\s*.+?\\s*AND`,
+          `\\b${column}\\b\\s*(=|is|>=|<=|<>|like)\\s*.+?\\s*AND`,
           "igm"
         );
         if (beforeAndCheck.exec(filterSql)) {
