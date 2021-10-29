@@ -1,5 +1,14 @@
 # CHANGELOG
 
+# 4.1.8 2021-10-29
+
+- Better support for sqlite.
+- Paste as plain text when edit on result view.
+- Change filter operation from = to like.
+- Support change default value for mysql #317.
+- Change default dump url is workspace #293.
+- Add more chinese support on web view.
+
 # 4.1.7 2021-10-8
 
 - Ignore ElasticSearch ssl certificate check.
