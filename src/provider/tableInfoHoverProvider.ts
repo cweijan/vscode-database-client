@@ -14,7 +14,7 @@ export class TableInfoHoverProvider implements HoverProvider {
         if (sourceCode) {
             const args = [`SELECT * FROM ${tableNode.table}`];
             const runCommandUri = vscode.Uri.parse(`command:mysql.codeLens.run?${encodeURIComponent(JSON.stringify(args))}`);
-            const markdownStr = new vscode.MarkdownString(`[Query Table](${runCommandUri})`);
+            const markdownStr = new vscode.MarkdownString(`[Show Data](${runCommandUri})`);
             markdownStr.isTrusted=true;
             markdownStr.appendCodeblock(sourceCode[0]['Create Table'], "sql");
             return new vscode.Hover(markdownStr);
