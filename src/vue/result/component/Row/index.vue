@@ -5,10 +5,10 @@
       </el-input>
     </template>
     <template v-else-if="!scope.row.isFilter && result.dbType=='ElasticSearch'">
-      <div class="edit-column" :contenteditable="editable" style="height: 100%; line-height: 33px;" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])'></div>
+      <div class="edit-column" :contenteditable="editable" style="height: 100%; line-height: 33px;" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])' @paste="onPaste"></div>
     </template>
     <template v-else>
-      <div class="edit-column" :contenteditable="editable" style="height: 100%; line-height: 33px;" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)">
+      <div class="edit-column" :contenteditable="editable" style="height: 100%; line-height: 33px;" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" @paste="onPaste">
         <template v-if="scope.row[scope.column.title]==null || scope.row[scope.column.title]==undefined">
           <span class='null-column'>(NULL)</span>
         </template>
@@ -24,7 +24,7 @@
 import { wrapByDb } from "@/common/wrapper";
 
 export default {
-  props: ["result", "scope", "editList","filterObj"],
+  props: ["result", "scope", "editList", "filterObj"],
   methods: {
     dataformat(origin) {
       if (origin == undefined || origin == null) {
@@ -34,6 +34,15 @@ export default {
         return String.fromCharCode.apply(null, new Uint16Array(origin.data));
       }
       return origin;
+    },
+    onPaste(e) {
+      let text = ''
+      e.preventDefault()
+      text = (e.originalEvent || e).clipboardData.getData('text/plain')
+      e.clipboardData.setData('text/plain', '')
+      setTimeout(() => {
+        window.document.execCommand('insertHTML', false, text.replace('/\x0D/g', "\\n"))// /\x0D/g return ASCII
+      }, 1);
     },
     editListen(event, scope) {
       const { row, column, rowIndex } = scope;
@@ -70,9 +79,9 @@ export default {
           inputvalue.toLowerCase() === "null"
             ? `${column} is null`
             : `${wrapByDb(
-                column,
-                this.result.dbType
-              )} ${operation} '${inputvalue}'`;
+              column,
+              this.result.dbType
+            )} ${operation} '${inputvalue}'`;
         if (existsCheck.exec(filterSql)) {
           // condition present
           filterSql = filterSql.replace(existsCheck, `$1 ${condition} `);
