@@ -7,7 +7,7 @@ import IORedis from "ioredis";
 export class RedisConnection extends IConnection {
     private conneted: boolean;
     private client: IoRedis.Redis|IORedis.Cluster;
-    constructor(node: Node) {
+    constructor(private node: Node) {
         super()
         let config = {
             port: node.port,
@@ -53,7 +53,7 @@ export class RedisConnection extends IConnection {
                 timeout = false;
                 callback(new Error("Connect to redis server time out."))
             }
-        }, 5000);
+        }, this.node.connectTimeout);
         this.client.ping((err) => {
             if (timeout) {
                 this.conneted = true;
