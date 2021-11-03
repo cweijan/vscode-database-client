@@ -297,19 +297,27 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public openTerminal() {
         let command: string;
+
+        const host = this.usingSSH ? "127.0.0.1" : this.host
+        const port = this.usingSSH ? NodeUtil.getTunnelPort(this.getConnectId()) : this.port;
+        if(!port){
+            vscode.window.showErrorMessage("SSH tunnel not created!")
+            return;
+        }
+
         if (this.dbType == DatabaseType.MYSQL) {
             this.checkCommand('mysql');
-            command = `mysql -u ${this.user} -p${this.password} -h ${this.host} -P ${this.port} \n`;
+            command = `mysql -u ${this.user} -p${this.password} -h ${host} -P ${port} \n`;
         } else if (this.dbType == DatabaseType.PG) {
             this.checkCommand('psql');
             let prefix = platform() == 'win32' ? 'set' : 'export';
-            command = `${prefix} "PGPASSWORD=${this.password}" && psql -U ${this.user} -h ${this.host} -p ${this.port} -d ${this.database} \n`;
+            command = `${prefix} "PGPASSWORD=${this.password}" && psql -U ${this.user} -h ${host} -p ${port} -d ${this.database} \n`;
         } else if (this.dbType == DatabaseType.REDIS) {
             this.checkCommand('redis-cli');
-            command = this.isCluster ? `redis-cli -h ${this.host} -p ${this.port} -c \n` : `redis-cli -h ${this.host} -p ${this.port} \n`;
+            command = this.isCluster ? `redis-cli -h ${host} -p ${port} -c \n` : `redis-cli -h ${host} -p ${port} \n`;
         } else if (this.dbType == DatabaseType.MONGO_DB) {
             this.checkCommand('mongo');
-            command = `mongo --host ${this.host} --port ${this.port} ${this.user && this.password ? ` -u ${this.user} -p ${this.password}` : ''} \n`;
+            command = `mongo --host ${host} --port ${port} ${this.user && this.password ? ` -u ${this.user} -p ${this.password}` : ''} \n`;
         } else if (this.dbType == DatabaseType.SQLITE) {
             command = `${getSqliteBinariesPath()} ${this.dbPath} \n`;
         } else {
