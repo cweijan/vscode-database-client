@@ -29,7 +29,7 @@ export class SSHTunnelService {
             node.ssh.tunnelPort = port
             const config = {
                 username: ssh.username,
-                password: ssh.password,
+                password: ssh.type=='password'?ssh.password:null,
                 host: ssh.host,
                 port: ssh.port,
                 dstHost: node.host,
@@ -39,7 +39,7 @@ export class SSHTunnelService {
                 algorithms: ssh.algorithms,
                 passphrase: ssh.passphrase,
                 privateKey: (() => {
-                    if (ssh.privateKeyPath && existsSync(ssh.privateKeyPath)) {
+                    if (ssh.type=="privateKey" && ssh.privateKeyPath && existsSync(ssh.privateKeyPath)) {
                         return require('fs').readFileSync(ssh.privateKeyPath)
                     }
                     return null
