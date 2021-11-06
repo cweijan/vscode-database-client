@@ -13,7 +13,7 @@
           <span class='null-column'>(NULL)</span>
         </template>
         <template v-else>
-          <span v-text='dataformat(scope.row[scope.column.title])'></span>
+          <span v-html='dataformat(scope.row[scope.column.title])'></span>
         </template>
       </div>
     </template>
@@ -32,6 +32,9 @@ export default {
       }
       if (origin.hasOwnProperty("type")) {
         return String.fromCharCode.apply(null, new Uint16Array(origin.data));
+      }
+      if(typeof origin=='string'){
+        return origin.replace(/ /g,"&nbsp;").replace(/</g,'&lt;');
       }
       return origin;
     },
@@ -210,4 +213,10 @@ export default {
 </script>
 
 <style>
+.col--edit .plx-cell{
+  text-align: unset !important;
+}
+.edit-column{
+  padding-left: 10px !important;
+}
 </style>
