@@ -7,8 +7,12 @@ import {Cluster, Redis} from "ioredis";
 export default abstract class RedisBaseNode extends Node {
     pattern = "";
     level = 0;
+    cursor = '0';
+    cursorHolder = {};
 
     abstract getChildren(): Promise<Node[]>;
+
+    public loadMore(){}
 
     public async getClient(): Promise<Redis|Cluster> {
 

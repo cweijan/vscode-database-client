@@ -9,11 +9,13 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { RedisFolderNode } from "./folderNode";
 import RedisBaseNode from "./redisBaseNode";
+import { RemainNode } from "./remainNode";
 var commandExistsSync = require('command-exists').sync;
 
 export class RedisConnectionNode extends RedisBaseNode {
 
-
+    private loadingMore = false;
+    keys: string[];
     contextValue = ModelType.REDIS_CONNECTION;
     iconPath: string | vscode.ThemeIcon = path.join(Constants.RES_PATH, `image/redis_connection.png`);
 
@@ -21,40 +23,87 @@ export class RedisConnectionNode extends RedisBaseNode {
         super(key)
         this.init(parent)
         this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
-        if ( parent.name) {
+        if (parent.name) {
             this.name = parent.name
             const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true)
             preferName ? this.label = parent.name : this.description = parent.name;
         }
         if (this.disable) {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None;
-            this.description = (this.description||'') + " closed"
+            this.description = (this.description || '') + " closed"
             return;
         }
     }
 
-    async getChildren(): Promise<RedisBaseNode[]> {
-        let keys: string[] = await this.getKeys()
-        return RedisFolderNode.buildChilds(this, keys)
+    async getChildren(isRresh?:boolean): Promise<RedisBaseNode[]> {
+        if(isRresh){
+            this.cursor = '0';
+            this.cursorHolder = {};
+        }
+        if (this.loadingMore) {
+            this.loadingMore = false;
+        } else {
+            this.keys = await this.getKeys()
+        }
+        const childens = RedisFolderNode.buildChilds(this, this.keys);
+        if (this.hasMore()) {
+            childens.unshift(new RemainNode(this))
+        }
+        return childens;
     }
 
-    public async getKeys(){
+    private hasMore() {
+        if (!this.isCluster) {
+            return this.cursor != '0';
+        }
+        for (const key in this.cursorHolder) {
+            const cursor = this.cursorHolder[key];
+            if (cursor != '0') return true;
+        }
+        return false;
+    }
+
+    public async loadMore() {
+        if (!this.hasMore()) {
+            vscode.window.showErrorMessage("Has no more keys!")
+            return;
+        }
+        this.loadingMore = true;
+        this.keys.push(...(await this.getKeys()))
+        this.provider.reload(this)
+    }
+
+    public async getKeys() {
         const client = await this.getClient()
-        return this.isCluster?await this.keysCluster(client as Cluster,this.pattern): await client.keys(this.pattern+"*");
+        if (this.isCluster) {
+            return await this.keysCluster(client as Cluster, this.pattern)
+        }
+        const scanResult = await client.scan(this.cursor, "COUNT", 2000, "MATCH", this.pattern + "*");
+        this.cursor = scanResult[0]
+        return scanResult[1];
     }
-   
-    private async keysCluster(client: Cluster, pattern:string):Promise<string[]>{
+
+    private async keysCluster(client: Cluster, pattern: string): Promise<string[]> {
         const masters = client.nodes("master");
-        return (await Promise.all(masters.map((master) => master.keys('*')))).flat();
+        const maxKeys=2000/masters.length | 0;
+        const mastersScan = await Promise.all(masters.map(async (master) => {
+            const mKey = master.options.host + "@" + master.options.port;
+            const cursor = this.cursorHolder[mKey] || 0;
+            if (cursor === '0') return null;
+            const scanResult = await master.scan(cursor, "COUNT", maxKeys, "MATCH", pattern + '*')
+            this.cursorHolder[mKey] = scanResult[0];
+            return scanResult[1]
+        }));
+        return mastersScan.filter(keys=>keys).flat();
     }
-  
+
     async openTerminal(): Promise<any> {
         if (!this.password && commandExistsSync('redis-cli')) {
             super.openTerminal();
             return;
         }
         const client = await this.getClient()
-        if(client instanceof Cluster){
+        if (client instanceof Cluster) {
             vscode.window.showErrorMessage("Redis cluster not support open internal terminal!")
             return;
         }

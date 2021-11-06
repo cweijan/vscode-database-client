@@ -19,12 +19,18 @@ export class RedisFolderNode extends RedisBaseNode {
 
     public async getChildren(isRresh?:boolean) {
         if(isRresh){
+            this.cursor = '0';
+            this.cursorHolder = {};
             this.childens=await RedisConnectionNode.prototype.getKeys.apply(this);
         }
         return RedisFolderNode.buildChilds(this, this.childens)
     }
 
-    public static buildChilds(parent: RedisBaseNode, keys: string[]) {
+    public async loadMore(){
+        RedisConnectionNode.prototype.loadMore.apply(this);
+    }
+
+    public static buildChilds(parent: RedisBaseNode, keys: string[]):RedisBaseNode[] {
         const prefixMap: { [key: string]: string[] } = {}
         for (const key of keys.sort()) {
             let prefix = key.split(":")[parent.level];

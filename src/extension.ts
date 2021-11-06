@@ -40,6 +40,7 @@ import { SSHConnectionNode } from "./model/ssh/sshConnectionNode";
 import { FTPFileNode } from "./model/ftp/ftpFileNode";
 import { HistoryNode } from "./provider/history/historyNode";
 import { ConnectService } from "./service/connect/connectService";
+import { RemainNode } from "./model/redis/remainNode";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -224,6 +225,7 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.connection.terminal": (node: Node) => node.openTerminal(),
                 "mysql.redis.key.detail": (keyNode: KeyNode) => keyNode.detail(),
                 "mysql.redis.key.del": (keyNode: KeyNode) => keyNode.delete(),
+                "mysql.redis.loadMore": (renmainNode: RemainNode) => renmainNode.click(),
             },
             // table node
             ...{
