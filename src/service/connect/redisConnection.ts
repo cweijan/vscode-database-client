@@ -53,7 +53,7 @@ export class RedisConnection extends IConnection {
                 timeout = false;
                 callback(new Error("Connect to redis server time out."))
             }
-        }, this.node.connectTimeout);
+        }, this.node.connectTimeout || 5000);
         this.client.ping((err) => {
             if (timeout) {
                 this.conneted = true;
