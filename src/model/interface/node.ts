@@ -66,6 +66,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public caPath?: string;
     public clientCertPath?: string;
     public clientKeyPath?: string;
+    public socketPath?: string;
 
     /**
      * redis only

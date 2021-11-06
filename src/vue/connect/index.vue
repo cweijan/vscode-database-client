@@ -95,6 +95,10 @@
 
       <section class="flex items-center mb-2" v-if="connectionOption.dbType=='MySQL'">
         <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-32">Socket Path</label>
+          <input class="w-64 field__input" placeholder="Unix Socket Path" v-model="connectionOption.socketPath" />
+        </div>
+        <div class="inline-block mr-10">
           <label class="font-bold mr-5 inline-block w-32">{{$t("config.timeZone")}}</label>
           <input class="w-64 field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
         </div>
