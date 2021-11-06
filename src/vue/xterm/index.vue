@@ -29,7 +29,7 @@
                     theme: auto(),
                     cursorStyle: "bar",
                     fontSize: data.fontSize,
-                    fontFamily: "'Consolas ligaturized',Consolas, 'Microsoft YaHei','Courier New', monospace",
+                    fontFamily: data.fontFamily,
                     disableStdin: false,
                     lineHeight: 1.1,
                     rightClickSelectsWord: true,

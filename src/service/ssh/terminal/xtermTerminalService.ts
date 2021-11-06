@@ -46,13 +46,14 @@ export class XtermTerminal implements TerminalService {
     private handlerEvent(handler: Hanlder, sshConfig: SSHConfig, callback?: () => void) {
 
         const fontSize = vscode.workspace.getConfiguration("terminal.integrated").get("fontSize", 16)
+        const fontFamily = vscode.workspace.getConfiguration("editor").get("fontFamily")
 
         const sshUrl = this.getSshUrl(sshConfig);
         let dataBuffer = [];
         handler.on("init", () => {
             handler.emit("route", 'sshTerminal')
         }).on("route-sshTerminal", () => {
-            handler.emit("terminalConfig", { fontSize })
+            handler.emit("terminalConfig", { fontSize,fontFamily })
         }).on("initTerminal", (content) => {
             handler.emit('connecting', `connecting ${sshConfig.username}@${sshConfig.host}...\n`);
             let termCols: number, termRows: number;
