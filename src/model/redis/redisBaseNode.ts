@@ -5,7 +5,7 @@ import {Cluster, Redis} from "ioredis";
 
 
 export default abstract class RedisBaseNode extends Node {
-    pattern = "*";
+    pattern = "";
     level = 0;
 
     abstract getChildren(): Promise<Node[]>;

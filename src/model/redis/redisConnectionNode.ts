@@ -34,9 +34,13 @@ export class RedisConnectionNode extends RedisBaseNode {
     }
 
     async getChildren(): Promise<RedisBaseNode[]> {
-        const client = await this.getClient()
-        let keys: string[] =this.isCluster?await this.keysCluster(client as Cluster,this.pattern): await client.keys(this.pattern)
+        let keys: string[] = await this.getKeys()
         return RedisFolderNode.buildChilds(this, keys)
+    }
+
+    public async getKeys(){
+        const client = await this.getClient()
+        return this.isCluster?await this.keysCluster(client as Cluster,this.pattern): await client.keys(this.pattern+"*");
     }
    
     private async keysCluster(client: Cluster, pattern:string):Promise<string[]>{
