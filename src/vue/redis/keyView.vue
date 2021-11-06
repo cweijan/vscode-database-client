@@ -301,6 +301,7 @@ export default {
       vscodeEvent.emit("update", {
         key: {
           name: this.key.name,
+          newName:this.edit.name,
           type: this.key.type,
           content: this.edit.content,
         },

@@ -1,9 +1,10 @@
-import { Constants, ModelType, RedisType } from "@/common/constants";
+import { CodeCommand, Constants, ModelType, RedisType } from "@/common/constants";
 import { Util } from "@/common/util";
 import { ViewManager } from "@/common/viewManager";
 import { Node } from "@/model/interface/node";
+import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import * as path from "path";
-import { ThemeIcon, TreeItemCollapsibleState } from "vscode";
+import { commands, ThemeIcon, TreeItemCollapsibleState } from "vscode";
 import RedisBaseNode from "./redisBaseNode";
 
 export default class KeyNode extends RedisBaseNode {
@@ -11,7 +12,7 @@ export default class KeyNode extends RedisBaseNode {
     readonly contextValue = ModelType.REDIS_KEY;
     readonly iconPath = new ThemeIcon("key");
     readonly iconDetailPath = path.join(Constants.RES_PATH, `image/redis_connection.png`);
-    constructor(readonly label: string, readonly prefix: string, readonly parent: Node) {
+    constructor(public label: string, readonly prefix: string, readonly parent: Node) {
         super(label);
         this.init(parent)
         this.collapsibleState = TreeItemCollapsibleState.None
@@ -87,15 +88,28 @@ export default class KeyNode extends RedisBaseNode {
                 }).on("refresh", () => {
                     this.detail()
                 }).on("update", async (content) => {
+                    let curKey=content.key.name;
+                    let newKey=content.key.newName;
+                    if(curKey != newKey){
+                        await client.rename(curKey,newKey)
+                        curKey=newKey;
+                        this.label=newKey;
+                    }
                     switch (content.key.type) {
                         case 'string':
-                            await client.set(content.key.name, content.key.content)
-                            handler.emit("msg", `Update key ${content.key.name} to new value success!`)
+                            await client.set(curKey, content.key.content)
+                            handler.emit("msg", `Update key ${curKey} to new value success!`)
+                            if(newKey){
+                                this.detail()
+                                commands.executeCommand(CodeCommand.Refresh,this.parent)
+                            }
                             break;
                     }
                 }).on("rename", async (content) => {
                     await client.rename(content.key.name, content.key.newName)
+                    this.label=content.key.newName
                     this.detail()
+                    this.provider.reload(this.parent)
                 }).on("del", async (content) => {
                     await client.del(content.key.name)
                 }).on("ttl", async (content) => {

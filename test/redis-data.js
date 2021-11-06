@@ -7,8 +7,12 @@ const Redis = require("ioredis");
     });
 
 
-    for (let i = 0; i < 250000; i++) {
-        redis.hset("test_hset", i, i)
+    // for (let i = 0; i < 250000; i++) {
+    //     redis.hset("test_hset", i, i)
+    // }
+
+    for (let i = 0; i < 3000; i++) {
+        redis.set(i, i)
     }
 
 })()
