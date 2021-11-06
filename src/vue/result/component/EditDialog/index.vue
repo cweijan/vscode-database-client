@@ -14,11 +14,16 @@
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
+      <el-button @click="showPreview" type="success">Preview</el-button>
       <el-button @click="visible = false">Cancel</el-button>
       <el-button v-if="model=='update'" type="primary" :loading="loading" @click="confirmUpdate(editModel)">
         Update</el-button>
       <el-button v-if="model=='insert'||model=='copy'" type="primary" :loading="loading" @click="confirmInsert(editModel)">
         Insert</el-button>
+      <br /> <br /> <br />
+      <div style="width:100%;" v-if="previewSQL">
+        <el-input type="textarea" :autosize="{ minRows:2, maxRows:6}" v-model="previewSQL" class="sql-pannel" />
+      </div>
     </span>
   </el-dialog>
 </template>
@@ -31,9 +36,18 @@ import { wrapByDb } from "@/common/wrapper";
 export default {
   mixins: [util],
   components: { CellEditor },
-  props: ["result","dbType","database", "table", "primaryKey","primaryKeyList", "columnList"],
+  props: [
+    "result",
+    "dbType",
+    "database",
+    "table",
+    "primaryKey",
+    "primaryKeyList",
+    "columnList",
+  ],
   data() {
     return {
+      previewSQL: null,
       model: "insert",
       originModel: {},
       editModel: {},
@@ -43,6 +57,7 @@ export default {
   },
   methods: {
     openEdit(originModel) {
+      this.previewSQL = null;
       if (!originModel) {
         this.$message.error("Edit row cannot be null!");
         return;
@@ -54,6 +69,7 @@ export default {
       this.visible = true;
     },
     openCopy(originModel) {
+      this.previewSQL = null;
       if (!originModel) {
         this.$message.error("Edit row cannot be null!");
         return;
@@ -66,7 +82,8 @@ export default {
       this.visible = true;
     },
     openInsert() {
-      if(this.result.tableCount!=1){
+      this.previewSQL = null;
+      if (this.result.tableCount != 1) {
         this.$message({
           type: "warning",
           message: "Not table found!",
@@ -77,6 +94,16 @@ export default {
       this.editModel = {};
       this.loading = false;
       this.visible = true;
+    },
+    showPreview() {
+      if (this.model == "insert") {
+        this.previewSQL = this.buildInsertSQL();
+      }else{
+        this.previewSQL=this.buildUpdateSql(this.editModel,this.originModel)
+      }
+      if(!this.previewSQL){
+        this.previewSQL="   "
+      }
     },
     close() {
       this.visible = false;
@@ -93,10 +120,19 @@ export default {
       if (this.dbType == "ElasticSearch") {
         this.confirmInsertEs();
         return;
-      }else if (this.dbType == "MongoDB") {
+      } else if (this.dbType == "MongoDB") {
         this.confirmInsertMongo();
         return;
       }
+      const insertSQL = this.buildInsertSQL();
+      if (insertSQL) {
+        this.loading = true;
+        this.$emit("execute", insertSql);
+      } else {
+        this.$message("Not any input, insert fail!");
+      }
+    },
+    buildInsertSQL() {
       let columns = "";
       let values = "";
       for (const key in this.editModel) {
@@ -107,28 +143,24 @@ export default {
           values += `${this.wrapQuote(this.getTypeByColumn(key), newEle)},`;
         }
       }
-      if (values) {
-        const insertSql = `INSERT INTO ${this.table}(${columns.replace(
-          /,$/,
-          ""
-        )}) VALUES(${values.replace(/,$/, "")})`;
-        this.loading = true;
-        this.$emit("execute", insertSql);
-      } else {
-        this.$message("Not any input, insert fail!");
-      }
+      return values
+        ? `INSERT INTO ${this.table}(${columns.replace(
+            /,$/,
+            ""
+          )}) VALUES(${values.replace(/,$/, "")})`
+        : null;
     },
     buildUpdateSql(currentNew, oldRow) {
-       if (this.dbType == "ElasticSearch") {
+      if (this.dbType == "ElasticSearch") {
         return this.confirmUpdateEs(currentNew);
-      }else if (this.dbType == "MongoDB") {
-        return this.confirmUpdateMongo(currentNew,oldRow);
+      } else if (this.dbType == "MongoDB") {
+        return this.confirmUpdateMongo(currentNew, oldRow);
       }
-       if (!this.primaryKey) {
+      if (!this.primaryKey) {
         this.$message.error("This table has not primary key, cannot update!");
-        throw new Error("This table has not primary key, cannot update!")
+        throw new Error("This table has not primary key, cannot update!");
       }
-      
+
       let change = "";
       for (const key in currentNew) {
         if (this.getTypeByColumn(key) == null) continue;
@@ -145,27 +177,33 @@ export default {
         return "";
       }
 
-      const table=wrapByDb(this.table, this.dbType);
-      let updateSql=`UPDATE ${table} SET ${change.replace(/,$/, "")}`;
+      const table = wrapByDb(this.table, this.dbType);
+      let updateSql = `UPDATE ${table} SET ${change.replace(/,$/, "")}`;
       for (let i = 0; i < this.primaryKeyList.length; i++) {
         const pk = this.primaryKeyList[i];
         const pkName = pk.name;
         const pkType = pk.simpleType || pk.type;
-        if(i==0){
-          updateSql=`${updateSql} WHERE ${ pkName }=${this.wrapQuote(pkType, oldRow[pkName])}`
-        }else{
-          updateSql=`${updateSql} AND ${ pkName }=${this.wrapQuote(pkType, oldRow[pkName])}`
+        if (i == 0) {
+          updateSql = `${updateSql} WHERE ${pkName}=${this.wrapQuote(
+            pkType,
+            oldRow[pkName]
+          )}`;
+        } else {
+          updateSql = `${updateSql} AND ${pkName}=${this.wrapQuote(
+            pkType,
+            oldRow[pkName]
+          )}`;
         }
       }
-      console.log(updateSql)
-      return updateSql+";";
+      console.log(updateSql);
+      return updateSql + ";";
     },
     confirmUpdate(row, oldRow) {
       if (!oldRow) {
         oldRow = this.originModel;
       }
       const currentNew = row ? row : this.editModel;
-      
+
       const sql = this.buildUpdateSql(currentNew, oldRow);
       if (sql) {
         this.$emit("execute", sql);
@@ -183,16 +221,21 @@ export default {
     confirmInsertMongo() {
       this.$emit(
         "execute",
-        `db('${this.database}').collection("${this.table}").insertOne(${JSON.stringify(this.editModel)})\n`
+        `db('${this.database}').collection("${
+          this.table
+        }").insertOne(${JSON.stringify(this.editModel)})\n`
       );
     },
     confirmUpdateMongo(row, oldRow) {
-      const temp=Object.assign({},row)
-      delete temp['_id']
-      const id=oldRow._id.indexOf("ObjectID") != -1 ?oldRow._id:`'${oldRow._id}'`
+      const temp = Object.assign({}, row);
+      delete temp["_id"];
+      const id =
+        oldRow._id.indexOf("ObjectID") != -1 ? oldRow._id : `'${oldRow._id}'`;
       this.$emit(
         "execute",
-        `db('${this.database}').collection("${this.table}").updateOne({_id:${id}},{ $set:${JSON.stringify(temp)}})\n`
+        `db('${this.database}').collection("${
+          this.table
+        }").updateOne({_id:${id}},{ $set:${JSON.stringify(temp)}})\n`
       );
     },
     confirmUpdateEs(row) {
