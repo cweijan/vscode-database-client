@@ -127,7 +127,7 @@ export default {
       const insertSQL = this.buildInsertSQL();
       if (insertSQL) {
         this.loading = true;
-        this.$emit("execute", insertSql);
+        this.$emit("execute", insertSQL);
       } else {
         this.$message("Not any input, insert fail!");
       }
