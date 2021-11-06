@@ -82,7 +82,7 @@ export default {
             : `${wrapByDb(
               column,
               this.result.dbType
-            )} ${operation} '${inputvalue}'`;
+            )} ${operation} '${inputvalue.replace(/'/g,"\\'")}'`;
         if (existsCheck.exec(filterSql)) {
           // condition present
           filterSql = filterSql.replace(existsCheck, `$1 ${condition} `);

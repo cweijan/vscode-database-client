@@ -12,11 +12,12 @@ export class SqliteConnection extends IConnection {
     }
     query(sql: string, callback?: queryCallback): void | EventEmitter;
     query(sql: string, values: any, callback?: queryCallback): void | EventEmitter;
-    query(sql: any, values?: any, callback?: any) {
+    query(sql: string, values?: any, callback?: any) {
         if (!callback && values instanceof Function) {
             callback = values;
         }
         const event = new EventEmitter()
+        sql=sql.replace(/\\'/g,"''")
         this.sqlite.query(sql + ";").then(res => {
             if (Array.isArray(res)) {
                 callback(null, res)
