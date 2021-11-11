@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# 4.1.9 2021-11-11
+
+- Using scan command instead keys for redis.
+- Result and ssh terminal view font style follow vscode setting.
+- Result view add sql preview feature.
+- Better support for singe quote #341.
+
 # 4.1.8 2021-10-29
 
 - Better support for sqlite.
