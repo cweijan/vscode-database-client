@@ -3,7 +3,7 @@ import { Util } from "@/common/util";
 import { EsRequest } from "@/model/es/esRequest";
 import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
-import { env, Uri, ViewColumn, WebviewPanel, window } from "vscode";
+import { env, Uri, ViewColumn, WebviewPanel, window, workspace } from "vscode";
 import { Trans } from "@/common/trans";
 import { ConfigKey, Constants, DatabaseType, MessageType } from "../../common/constants";
 import { Global } from "../../common/global";
@@ -32,6 +32,8 @@ export class QueryPage {
         const dbOption: Node = queryParam.connection;
         await QueryPage.adaptData(queryParam);
         const type = this.keepSingle(queryParam);
+        const fontSize = workspace.getConfiguration("terminal.integrated").get("fontSize", 16)
+        const fontFamily = workspace.getConfiguration("editor").get("fontFamily")
 
         ViewManager.createWebviewPanel({
             singlePage: true,
@@ -48,7 +50,7 @@ export class QueryPage {
                     queryParam.res.viewId = queryParam.queryOption?.viewId;
                     const uglyPath = handler.panel.webview.asWebviewUri(Uri.file(Global.getExtPath('out', 'webview', 'ugly.jpg'))).toString();
                     handler.emit(queryParam.type, {
-                        ...queryParam.res, dbType: dbOption.dbType, single: queryParam.singlePage,language:env.language,
+                        ...queryParam.res, dbType: dbOption.dbType, single: queryParam.singlePage,language:env.language,fontFamily,fontSize,
                         showUgly: Global.getConfig("showUgly", false), uglyPath
                     })
                 }).on('execute', (params) => {

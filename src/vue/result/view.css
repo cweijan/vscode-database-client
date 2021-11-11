@@ -19,10 +19,10 @@ overflow: unset;
 
 .sql-pannel{
   width:100%;
-  font-size: 14px;
+  /* font-size: 14px; */
 }
 .sql-pannel textarea{
-  font-family: "Segoe UI"; 
+  font-family: inherit; 
   padding-top: 0;
   padding-left: 10px;
 }
