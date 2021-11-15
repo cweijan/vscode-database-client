@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# 4.2.0 2021-11-15
+
+- Remove export file default path.
+
 # 4.1.9 2021-11-11
 
 - Using scan command instead keys for redis.
