@@ -140,7 +140,7 @@ export default {
         const newEle = this.editModel[key];
         if (newEle != null) {
           columns += `${wrapByDb(key, this.dbType)},`;
-          values += `${this.wrapQuote(this.getTypeByColumn(key), newEle)},`;
+          values += `${this.wrapQuote(this.dbType,this.getTypeByColumn(key), newEle)},`;
         }
       }
       return values
@@ -167,7 +167,7 @@ export default {
         const oldEle = oldRow[key];
         const newEle = currentNew[key];
         if (oldEle !== newEle) {
-          change += `${wrapByDb(key, this.dbType)}=${this.wrapQuote(
+          change += `${wrapByDb(key, this.dbType)}=${this.wrapQuote(this.dbType,
             this.getTypeByColumn(key),
             newEle
           )},`;
@@ -184,12 +184,12 @@ export default {
         const pkName = pk.name;
         const pkType = pk.simpleType || pk.type;
         if (i == 0) {
-          updateSql = `${updateSql} WHERE ${pkName}=${this.wrapQuote(
+          updateSql = `${updateSql} WHERE ${pkName}=${this.wrapQuote(this.dbType,
             pkType,
             oldRow[pkName]
           )}`;
         } else {
-          updateSql = `${updateSql} AND ${pkName}=${this.wrapQuote(
+          updateSql = `${updateSql} AND ${pkName}=${this.wrapQuote(this.dbType,
             pkType,
             oldRow[pkName]
           )}`;

@@ -1,6 +1,6 @@
 export const util = {
     methods: {
-        wrapQuote(type, value) {
+        wrapQuote(dbType, type, value) {
             if (value === "") {
                 return "null"
             }
@@ -9,7 +9,13 @@ export const util = {
                 return value
             }
             if (typeof value == "string") {
-                value = value.replace(/'/g, "\\'")
+                switch(dbType){
+                        case "PostgreSQL":
+                        case "SQLite":
+                        case "MySQL":
+                        case "SqlServer":
+                        value = value.replace(/'/g, "''")
+                }
             }
             if (!type) {
                 return `'${value}'`

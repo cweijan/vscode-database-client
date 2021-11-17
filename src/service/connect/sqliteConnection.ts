@@ -17,7 +17,6 @@ export class SqliteConnection extends IConnection {
             callback = values;
         }
         const event = new EventEmitter()
-        sql=sql.replace(/\\'/g,"''")
         this.sqlite.query(sql + ";").then(res => {
             if (Array.isArray(res)) {
                 callback(null, res)

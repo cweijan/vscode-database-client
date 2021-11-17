@@ -342,6 +342,7 @@ export default {
             )
             .map((checkboxRecord) =>
               this.wrapQuote(
+                this.result.dbType,
                 this.getTypeByColumn(this.result.primaryKey),
                 checkboxRecord[this.result.primaryKey]
               )
