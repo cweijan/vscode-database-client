@@ -22,36 +22,22 @@ export const util = {
             }
             type = type.toLowerCase()
             switch (type) {
-                // sql server
-                case "nvarchar":
-                case "nchar":
-                case "nvarchar":
-                case "datetimeoffset":
-                case "smalldatetime":
-                case "datetime2":
-                // pg
-                case "character":
-                case "xml":
-                case "uuid":
-                case "jsonb":
-                case "character varying":
-                case "timestamp with time zone":
-                // mysql
-                case "varchar":
-                case "char":
-                case "date":
-                case "time":
-                case "timestamp":
-                case "datetime":
-                case "set":
-                case "json":
-                    return `'${value}'`
+                case "int":
+                case "bit":
+                case "real":
+                case "numeric":
+                case "decimal":
+                case "float":
+                case "double":
+                case "bool":
+                case "boolean":
+                    return value
                 default:
-                    if (type.includes("timestamp") || type.includes("text") || type.includes("blob") || type.includes("binary")) {
-                        return `'${value}'`
+                    if (type.includes("int") || type.includes("serial")) {
+                        return value
                     }
             }
-            return value
+            return `'${value}'`
         }
     }
 }

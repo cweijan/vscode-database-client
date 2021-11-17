@@ -97,12 +97,22 @@ export class MockRunner {
     private wrapQuote(type: string, value: any): any {
         type = type.toLowerCase()
         switch (type) {
-            case "varchar": case "char": case "date": case "time": case "timestamp": case "datetime": case "set": case "json":
-                return `'${value}'`
+            case "int":
+            case "bit":
+            case "real":
+            case "numeric":
+            case "decimal":
+            case "float":
+            case "double":
+            case "bool":
+            case "boolean":
+                return value
             default:
-                if (type.indexOf("text") != -1 || type.indexOf("character") != -1 || type.indexOf("timestamp") != -1 || type.indexOf("blob") != -1 || type.indexOf("binary") != -1) { return `'${value}'` }
+                if (type.includes("int") || type.includes("serial")) {
+                    return value
+                }
         }
-        return value;
+        return `'${value}'`
     }
 
     // refrence : http://mockjs.com/examples.html
