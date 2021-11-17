@@ -44,15 +44,15 @@ export class TableNode extends Node implements CopyAble {
         return this.execute<ColumnMeta[]>(this.dialect.showColumns(this.schema, this.table))
             .then((columns) => {
                 columnNodes = [];
-                let temp:{[key:string]:ColumnNode} = {};
+                let temp: { [key: string]: ColumnNode } = {};
                 for (let index = 0; index < columns.length; index++) {
                     const column = columns[index];
-                    if(temp[column.name]){
+                    if (temp[column.name]) {
                         temp[column.name].updateInfo(column)
-                    }else{
+                    } else {
                         const colNode = new ColumnNode(this.table, column, this, index);
                         columnNodes.push(colNode)
-                        temp[column.name]=colNode
+                        temp[column.name] = colNode
                     }
                 }
                 this.setChildCache(columnNodes)
@@ -77,17 +77,17 @@ export class TableNode extends Node implements CopyAble {
                 sql = sql.replace(/\\n/g, '\n').replace(/\\r/g, '');
             }
         } else {
+            const pkList = [];
+            const colDefList=[];
             const childs = await this.getChildren();
-            sql = `CREATE TABLE ${this.table}(\n`
             for (let i = 0; i < childs.length; i++) {
                 const child: ColumnNode = childs[i] as ColumnNode;
-                if (i == childs.length - 1) {
-                    sql += `    ${child.column.name} ${child.type}${child.isPrimaryKey ? ' PRIMARY KEY' : ''}\n`
-                } else {
-                    sql += `    ${child.column.name} ${child.type}${child.isPrimaryKey ? ' PRIMARY KEY' : ''},\n`
-                }
+                if (child.isPrimaryKey) pkList.push(child.column.name);
+                colDefList.push(`    ${child.column.name} ${child.type}`);
             }
-            sql += ")"
+            sql = `CREATE TABLE ${this.table}(
+${colDefList.join(",\n")}${pkList.length>0?`,\n    PRIMARY KEY(${pkList.join(",")})`:""}
+)`
         }
         if (open) {
             QueryUnit.showSQLTextDocument(this, sql);
