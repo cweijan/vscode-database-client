@@ -27,7 +27,7 @@ export class EsConnection extends IConnection {
         if (path?.charAt(0) != "/") {
             path = "/" + path
         }
-        const body = splitIndex == -1 ? null : sql.substring(splitIndex + 1) + "\n"
+        const body = splitIndex == -1 ? undefined : sql.substring(splitIndex + 1) + "\n"
 
         let config: AxiosRequestConfig = {
             httpsAgent: new Agent({
