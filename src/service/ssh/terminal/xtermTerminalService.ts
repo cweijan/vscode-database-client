@@ -6,17 +6,24 @@ import { Util } from "@/common/util";
 import { Hanlder, ViewManager } from "@/common/viewManager";
 import { SSHConfig } from "@/model/interface/sshConfig";
 
+interface Holder {
+    handler?: Hanlder,
+    randomUrl: string,
+    sshUrl: string,
+};
+
 export class XtermTerminal implements TerminalService {
 
     private getSshUrl(sshConfig: SSHConfig): string {
         return 'ssh://' + sshConfig.username + '@' + sshConfig.host + ':' + sshConfig.port;
     }
 
-    private static handlerMap = new Map<string, Hanlder>();
+    private static handlerMap: { [key: string]: Array<Holder> } = {}
 
     public async openPath(name: string, sshConfig: SSHConfig, fullPath: string) {
-        const handler: Hanlder = XtermTerminal.handlerMap[this.getSshUrl(sshConfig)]
-        if (handler) {
+        const holders=XtermTerminal.handlerMap[this.getSshUrl(sshConfig)];
+        if (holders && holders.length>0) {
+            const handler=holders[0].handler
             handler.panel.reveal()
             handler.emit('path', fullPath)
         } else {
@@ -28,32 +35,46 @@ export class XtermTerminal implements TerminalService {
 
         const title = name || `${sshConfig.username}@${sshConfig.host}`;
         const sshUrl = this.getSshUrl(sshConfig)
-        const type = XtermTerminal.handlerMap[sshUrl] ? `${sshUrl}_${new Date().getTime()}` : sshUrl
+        const randomUrl = `${sshUrl}_${new Date().getTime()}`;
+        const holder: Holder = { sshUrl, randomUrl };
+        if (!XtermTerminal.handlerMap[sshUrl]) XtermTerminal.handlerMap[sshUrl] = []
+        XtermTerminal.handlerMap[sshUrl].push(holder)
 
         ViewManager.createWebviewPanel({
             splitView: false, path: "app", iconPath: {
                 light: Util.getExtPath("image", "terminal_light.png"),
                 dark: Util.getExtPath("image", "terminal_dark.svg"),
             },
-            title, type,
+            title, type: randomUrl,
             eventHandler: (handler) => {
-                this.handlerEvent(handler, sshConfig, callback)
+                this.handlerEvent(holder, handler, sshConfig, callback)
             }
         })
 
     }
 
-    private handlerEvent(handler: Hanlder, sshConfig: SSHConfig, callback?: () => void) {
+    private removeHolder(holder: Holder) {
+        const holders = XtermTerminal.handlerMap[holder.sshUrl];
+        if (!holders || holders.length == 0) return;
+        for (let i = 0; i < holders.length; i++) {
+            const h = holders[i];
+            if (h.randomUrl == holder.randomUrl) {
+                holders.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    private handlerEvent(holder: Holder, handler: Hanlder, sshConfig: SSHConfig, callback?: () => void) {
 
         const fontSize = vscode.workspace.getConfiguration("terminal.integrated").get("fontSize", 16)
         const fontFamily = vscode.workspace.getConfiguration("editor").get("fontFamily")
 
-        const sshUrl = this.getSshUrl(sshConfig);
         let dataBuffer = [];
         handler.on("init", () => {
             handler.emit("route", 'sshTerminal')
         }).on("route-sshTerminal", () => {
-            handler.emit("terminalConfig", { fontSize,fontFamily })
+            handler.emit("terminalConfig", { fontSize, fontFamily })
         }).on("initTerminal", (content) => {
             handler.emit('connecting', `connecting ${sshConfig.username}@${sshConfig.host}...\n`);
             let termCols: number, termRows: number;
@@ -62,10 +83,10 @@ export class XtermTerminal implements TerminalService {
                 termRows = content.rows
             }
             const client = new Client()
-            const end = () => { client.end(); XtermTerminal.handlerMap[sshUrl] = null; }
+            const end = () => { client.end(); this.removeHolder(holder) }
             const SSHerror = (message: string, err: any) => { handler.emit('ssherror', (err) ? `${message}: ${err.message}` : message); end(); }
             client.on('ready', () => {
-                XtermTerminal.handlerMap[sshUrl] = handler
+                holder.handler = handler;
                 client.shell({ term: 'xterm-color', cols: termCols, rows: termRows }, (err, stream) => {
                     if (err) {
                         SSHerror('EXEC ERROR' + err, null)
@@ -111,6 +132,8 @@ export class XtermTerminal implements TerminalService {
                 textEditor.selection = new vscode.Selection(range.end, range.end);
                 textEditor.revealRange(range);
             })
+        }).on("dispose",()=>{
+            this.removeHolder(holder)
         })
 
     }
