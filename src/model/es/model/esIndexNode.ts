@@ -1,6 +1,7 @@
 import { ConfigKey, ModelType } from "@/common/constants";
 import { FileManager } from "@/common/filesManager";
 import { Global } from "@/common/global";
+import { ConnectionManager } from "@/service/connectionManager";
 import { QueryUnit } from "@/service/queryUnit";
 import { Range, ThemeIcon } from "vscode";
 import { Node } from "../../interface/node";
@@ -65,6 +66,7 @@ export class ESIndexNode extends Node {
 
 
     viewData() {
+        ConnectionManager.changeActive(this)
         QueryUnit.runQuery(`GET /${this.label}/_search
 { "from": 0, "size": ${Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT)}, "query": { "match_all": {} } }`, this)
     }
