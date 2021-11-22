@@ -1,6 +1,25 @@
-# Database Client
+# Database Client for Visual Studio Code
 
-Database Client for Visual Studio Code. It supports databases MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis, and ElasticSearch.
+<p align="center">
+<a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
+    <img src="https://img.shields.io/vscode-marketplace/v/cweijan.vscode-mysql-client2.svg?label=vscode%20marketplace">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
+    <img src="https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client2.svg">
+  </a>
+  <a href="https://github.com/cweijan/vscode-database-client">
+    <img src="https://img.shields.io/github/stars/cweijan/vscode-database-client?logo=github&style=flat">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
+    <img src="https://img.shields.io/vscode-marketplace/r/cweijan.vscode-mysql-client2.svg">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
+  <img alt="GitHub" src="https://img.shields.io/github/license/cweijan/vscode-database-client">
+  </a>
+</p>
+<br>
+
+The Database Client make your life easy. It supports databases MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis, and ElasticSearch.
 
 > Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
 
@@ -22,7 +41,7 @@ Install from vscode marketplace [vscode-database-client](https://marketplace.vis
 
 ## Connect
 
-1. Open Database Explorer panel, then click the`+` button.
+1. Open Database Explorer panel, then click the `+` button.
 2. Select your database type, input connection config then click the connect button.
 
 ![connection](images/connection.jpg)

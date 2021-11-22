@@ -1,8 +1,25 @@
-# Database Client
+# Database Client for Visual Studio Code
 
-![Rating](https://vsmarketplacebadge.apphb.com/rating-short/cweijan.vscode-mysql-client2.svg)
+<p align="center">
+<a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
+    <img src="https://img.shields.io/vscode-marketplace/v/cweijan.vscode-mysql-client2.svg?label=vscode%20marketplace">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
+    <img src="https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client2.svg">
+  </a>
+  <a href="https://github.com/cweijan/vscode-database-client">
+    <img src="https://img.shields.io/github/stars/cweijan/vscode-database-client?logo=github&style=flat">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
+    <img src="https://img.shields.io/vscode-marketplace/r/cweijan.vscode-mysql-client2.svg">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
+  <img alt="GitHub" src="https://img.shields.io/github/license/cweijan/vscode-database-client">
+  </a>
+</p>
+<br>
 
-该项目为Visual Studio Code的数据库客户端插件, 支持**MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis**以及ElasticSearch的管理.
+该项目为Visual Studio Code的数据库客户端扩展, 意在让你的生活更加简单, 支持**MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis**以及**ElasticSearch**的管理.
 
 - 功能
   - [连接](#连接)
