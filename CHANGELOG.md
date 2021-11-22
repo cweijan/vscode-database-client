@@ -1,5 +1,14 @@
 # CHANGELOG
 
+# 4.2.1 2021-11-22
+
+- Using pg_dump to dump postgreSQL.
+- Fix es load index fail.
+- Fix socket path gone #364.
+- Always open new ssh terminal and enhance key event dispath.
+- Supports running in offline environment.
+- Fix filter operation error.
+
 # 4.2.0 2021-11-15
 
 - Remove export file default path.
