@@ -1,5 +1,25 @@
 export const util = {
     methods: {
+        isDbNumber(type){
+            if(!type)return false;
+            switch (type.toLowerCase()) {
+                case "int":
+                case "bit":
+                case "real":
+                case "numeric":
+                case "decimal":
+                case "float":
+                case "double":
+                case "bool":
+                case "boolean":
+                    return true
+                default:
+                    if (type.includes("int") || type.includes("serial")) {
+                        return true
+                    }
+            }
+            return false;
+        },
         wrapQuote(dbType, type, value) {
             if (value === "") {
                 return "null"
@@ -20,22 +40,8 @@ export const util = {
             if (!type) {
                 return `'${value}'`
             }
-            type = type.toLowerCase()
-            switch (type) {
-                case "int":
-                case "bit":
-                case "real":
-                case "numeric":
-                case "decimal":
-                case "float":
-                case "double":
-                case "bool":
-                case "boolean":
-                    return value
-                default:
-                    if (type.includes("int") || type.includes("serial")) {
-                        return value
-                    }
+            if(this.isDbNumber(type)){
+                return value;
             }
             return `'${value}'`
         }

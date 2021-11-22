@@ -21,10 +21,12 @@
 </template>
 
 <script>
+import { util } from "../../mixin/util";
 import { wrapByDb } from "@/common/wrapper";
 
 export default {
   props: ["result", "scope", "editList", "filterObj"],
+  mixins: [util],
   methods: {
     dataformat(origin) {
       if (origin == undefined || origin == null) {
@@ -33,18 +35,22 @@ export default {
       if (origin.hasOwnProperty("type")) {
         return String.fromCharCode.apply(null, new Uint16Array(origin.data));
       }
-      if(typeof origin=='string'){
-        return origin.replace(/ /g,"&nbsp;").replace(/</g,'&lt;');
+      if (typeof origin == "string") {
+        return origin.replace(/ /g, "&nbsp;").replace(/</g, "&lt;");
       }
       return origin;
     },
     onPaste(e) {
-      let text = ''
-      e.preventDefault()
-      text = (e.originalEvent || e).clipboardData.getData('text/plain')
-      e.clipboardData.setData('text/plain', '')
+      let text = "";
+      e.preventDefault();
+      text = (e.originalEvent || e).clipboardData.getData("text/plain");
+      e.clipboardData.setData("text/plain", "");
       setTimeout(() => {
-        window.document.execCommand('insertHTML', false, text.replace('/\x0D/g', "\\n"))// /\x0D/g return ASCII
+        window.document.execCommand(
+          "insertHTML",
+          false,
+          text.replace("/\x0D/g", "\\n")
+        ); // /\x0D/g return ASCII
       }, 1);
     },
     editListen(event, scope) {
@@ -59,7 +65,16 @@ export default {
       this.$emit("sendToVscode", "dataModify");
       this.$emit("update:editList", editList);
     },
+    getTypeByColumn(key) {
+      if (!this.result.columnList) return;
+      for (const column of this.result.columnList) {
+        if (column.name === key) {
+          return column.simpleType || column.type;
+        }
+      }
+    },
     filter(event, column, operation) {
+      const type = this.getTypeByColumn(column);
       let inputvalue = "" + (event ? event.target.value : "");
       if (this.result.dbType == "ElasticSearch") {
         this.$emit("sendToVscode", "esFilter", {
@@ -68,8 +83,14 @@ export default {
         return;
       }
 
-      if (!operation) operation = "like";
-      if(inputvalue) inputvalue=`%${inputvalue}%`
+      if (!operation) {
+        if (this.isDbNumber(type)) {
+          operation = "=";
+        } else {
+          operation = "like";
+          if (inputvalue) inputvalue = `%${inputvalue}%`;
+        }
+      }
       let filterSql =
         this.result.sql.replace(/\n/, " ").replace(";", " ") + " ";
 
@@ -83,9 +104,9 @@ export default {
           inputvalue.toLowerCase() === "null"
             ? `${column} is null`
             : `${wrapByDb(
-              column,
-              this.result.dbType
-            )} ${operation} '${inputvalue.replace(/'/g,"\\'")}'`;
+                column,
+                this.result.dbType
+              )} ${operation} '${inputvalue.replace(/'/g, "''")}'`;
         if (existsCheck.exec(filterSql)) {
           // condition present
           filterSql = filterSql.replace(existsCheck, `$1 ${condition} `);
@@ -213,10 +234,10 @@ export default {
 </script>
 
 <style>
-.col--edit .plx-cell{
+.col--edit .plx-cell {
   text-align: unset !important;
 }
-.edit-column{
+.edit-column {
   padding-left: 10px !important;
 }
 </style>
