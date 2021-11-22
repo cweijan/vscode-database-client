@@ -182,7 +182,7 @@ export class QueryPage {
         return languageId == 'sql' || languageId == 'es' || extName == '.sql' || extName == '.es' || fileName.match(/mock.json$/) != null;
     }
 
-    private static handleHtml(html: string, viewPanel: WebviewPanel): string {
+    private static async  handleHtml(html: string, viewPanel: WebviewPanel): Promise<string> {
 
         const resourceRoot = Global.getConfig("resourceRoot");
         switch (resourceRoot) {
@@ -190,7 +190,7 @@ export class QueryPage {
                 return html.replace("../webview/js/query.js", `https://cdn.jsdelivr.net/npm/vscode-mysql-client2@${Constants.CDN_VERSION}/out/webview/js/query.js`)
                     .replace("../webview/js/vendor.js", `https://cdn.jsdelivr.net/npm/vscode-mysql-client2@${Constants.CDN_VERSION}/out/webview/js/vendor.js`);
             case "internalServer":
-                ResourceServer.bind();
+                await ResourceServer.bind();
                 return html.replace("../webview/js/query.js", `http://127.0.0.1:${ResourceServer.port}/query.js`)
                     .replace("../webview/js/vendor.js", `http://127.0.0.1:${ResourceServer.port}/vendor.js`);
         }

@@ -20,7 +20,7 @@ export class ViewOption {
     /**
      * receive webview send message 
      */
-    public handleHtml?: (html: string, viewPanel: WebviewPanel) => string;
+    public handleHtml?: (html: string, viewPanel: WebviewPanel) => string|Promise<string>;
     public eventHandler?: (handler: Hanlder) => void;
 }
 
@@ -113,7 +113,7 @@ export class ViewManager {
                 }
                 const contextPath = path.resolve(targetPath, "..");
                 if (viewOption.handleHtml) {
-                    data = viewOption.handleHtml(data, webviewPanel)
+                    data = await viewOption.handleHtml(data, webviewPanel)
                 }
                 webviewPanel.webview.html = this.buildPath(data, webviewPanel.webview, contextPath);
 

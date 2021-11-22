@@ -21,7 +21,7 @@ export class ResourceServer {
         if (resourceRoot != "internalServer") return;
 
         try {
-            const port = await portfinder.getPortPromise();
+            const port = await portfinder.getPortPromise({port:12311});
 
             http.createServer((req, res) => {
                 const path = this.resPath + req.url;

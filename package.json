@@ -974,7 +974,7 @@
 			"properties": {
 				"database-client.resourceRoot": {
 					"type": "string",
-					"default": "cdn",
+					"default": "internalServer",
 					"enum": [
 						"file",
 						"cdn",
