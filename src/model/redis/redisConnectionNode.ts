@@ -78,14 +78,14 @@ export class RedisConnectionNode extends RedisBaseNode {
         if (this.isCluster) {
             return await this.keysCluster(client as Cluster, this.pattern)
         }
-        const scanResult = await client.scan(this.cursor, "COUNT", 2000, "MATCH", this.pattern + "*");
+        const scanResult = await client.scan(this.cursor, "COUNT", 3000, "MATCH", this.pattern + "*");
         this.cursor = scanResult[0]
         return scanResult[1];
     }
 
     private async keysCluster(client: Cluster, pattern: string): Promise<string[]> {
         const masters = client.nodes("master");
-        const maxKeys=2000/masters.length | 0;
+        const maxKeys=3000/masters.length | 0;
         const mastersScan = await Promise.all(masters.map(async (master) => {
             const mKey = master.options.host + "@" + master.options.port;
             const cursor = this.cursorHolder[mKey] || 0;
