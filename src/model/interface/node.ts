@@ -146,6 +146,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.authType = source.authType
         this.disable = source.disable
         this.includeDatabases = source.includeDatabases
+        this.socketPath=source.socketPath
         if (!this.database) this.database = source.database
         if (!this.schema) this.schema = source.schema
         if (!this.provider) this.provider = source.provider
