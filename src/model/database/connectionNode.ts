@@ -70,17 +70,9 @@ export class ConnectionNode extends Node implements CopyAble {
             return [new TableGroup(this), new ViewGroup(this)];
         }
 
-        let dbNodes = DatabaseCache.getSchemaListOfConnection(this.uid);
-        if (dbNodes && !isRresh) {
-            // update active state.
-            return dbNodes.map(dbNode => {
-                if (dbNode.contextValue == ModelType.USER_GROUP) {
-                    return new UserGroup(dbNode.label, this)
-                } else if (dbNode.contextValue == ModelType.CATALOG) {
-                    return new CatalogNode(dbNode.label, this)
-                }
-                return new SchemaNode(dbNode.label, this)
-            });
+        let dbOrSchemaNodes = DatabaseCache.getSchemaListOfConnection(this.uid);
+        if (dbOrSchemaNodes && !isRresh) {
+            return dbOrSchemaNodes;
         }
 
         const hasCatalog = this.dbType != DatabaseType.MYSQL && this.contextValue == ModelType.CONNECTION;
