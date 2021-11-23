@@ -50,7 +50,7 @@ export class QueryPage {
                     queryParam.res.viewId = queryParam.queryOption?.viewId;
                     const uglyPath = handler.panel.webview.asWebviewUri(Uri.file(Global.getExtPath('out', 'webview', 'ugly.jpg'))).toString();
                     handler.emit(queryParam.type, {
-                        ...queryParam.res, dbType: dbOption.dbType, single: queryParam.singlePage,language:env.language,fontFamily,fontSize,
+                        ...queryParam.res, dbType: dbOption.dbType, single: queryParam.singlePage, language: env.language, fontFamily, fontSize,
                         showUgly: Global.getConfig("showUgly", false), uglyPath
                     })
                 }).on('execute', (params) => {
@@ -149,13 +149,13 @@ export class QueryPage {
         }
     }
     private static createColumnTypeMap(queryParam: QueryParam<DataResponse>) {
-        const columnList=queryParam.res.columnList
-        if(!columnList)return;
-        let columnTypeMap={};
+        const columnList = queryParam.res.columnList
+        if (!columnList) return;
+        let columnTypeMap = {};
         for (const column of columnList) {
-            columnTypeMap[column.name]=column
+            columnTypeMap[column.name] = column
         }
-        queryParam.res.columnTypeMap=columnTypeMap;
+        queryParam.res.columnTypeMap = columnTypeMap;
     }
 
     private static keepSingle(queryParam: QueryParam<any>) {
@@ -182,14 +182,16 @@ export class QueryPage {
         return languageId == 'sql' || languageId == 'es' || extName == '.sql' || extName == '.es' || fileName.match(/mock.json$/) != null;
     }
 
-    private static async  handleHtml(html: string, viewPanel: WebviewPanel): Promise<string> {
+    private static async handleHtml(html: string, viewPanel: WebviewPanel): Promise<string> {
 
         const resourceRoot = Global.getConfig("resourceRoot");
         switch (resourceRoot) {
+            case "file": break;
             case "cdn":
                 return html.replace("../webview/js/query.js", `https://cdn.jsdelivr.net/npm/vscode-mysql-client2@${Constants.CDN_VERSION}/out/webview/js/query.js`)
                     .replace("../webview/js/vendor.js", `https://cdn.jsdelivr.net/npm/vscode-mysql-client2@${Constants.CDN_VERSION}/out/webview/js/vendor.js`);
             case "internalServer":
+            default:
                 await ResourceServer.bind();
                 return html.replace("../webview/js/query.js", `http://127.0.0.1:${ResourceServer.port}/query.js`)
                     .replace("../webview/js/vendor.js", `http://127.0.0.1:${ResourceServer.port}/vendor.js`);
