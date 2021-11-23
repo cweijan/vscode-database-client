@@ -31,25 +31,23 @@ export class SchemaNode extends Node implements CopyAble {
 
     public checkActive() {
         const lcp = ConnectionManager.activeNode;
-        if (this.isActive(lcp) && (lcp.database == this.database) && (lcp.schema == this.schema)) {
-            this.iconPath = this.getIcon(true);
-            this.description = `Active`;
-        }
+        const active = this.isActive(lcp) && (lcp.database == this.database) && (lcp.schema == this.schema);
+        this.iconPath = this.getIcon(active);
     }
 
     private getIcon(active?: boolean): vscode.ThemeIcon {
 
         const iconId = this.dbType == DatabaseType.MYSQL ? "database" : "symbol-struct"
-        if(Util.supportColorIcon()){
-            return new vscode.ThemeIcon(iconId, new vscode.ThemeColor(active?'charts.blue':'dropdown.foreground'));
+        if (Util.supportColorIcon()) {
+            return new vscode.ThemeIcon(iconId, new vscode.ThemeColor(active ? 'charts.blue' : 'dropdown.foreground'));
         }
         return new vscode.ThemeIcon(iconId);
     }
 
     public getChildren(): Promise<Node[]> | Node[] {
 
-        if(this.dbType==DatabaseType.MONGO_DB){
-            return [ new MongoTableGroup(this) ]
+        if (this.dbType == DatabaseType.MONGO_DB) {
+            return [new MongoTableGroup(this)]
         }
 
         let childs: Node[] = [new TableGroup(this)];
@@ -114,7 +112,7 @@ export class SchemaNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        QueryUnit.showSQLTextDocument(this,'',`${this.schema}.sql`,FileModel.APPEND)
+        QueryUnit.showSQLTextDocument(this, '', `${this.schema}.sql`, FileModel.APPEND)
 
     }
 
