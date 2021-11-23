@@ -256,7 +256,7 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.column.down": (columnNode: ColumnNode) => {
                     columnNode.moveDown();
                 },
-                "mysql.column.add": (tableNode: TableNode) => {
+                "mysql.column.add": (tableNode: (TableNode|ColumnNode)) => {
                     tableNode.addColumnTemplate();
                 },
                 "mysql.column.update": (columnNode: ColumnNode) => {

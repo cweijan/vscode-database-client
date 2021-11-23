@@ -17,7 +17,7 @@ export abstract class SqlDialect {
     abstract updateColumn(table: string, column: ColumnMeta): string;
     abstract showSchemas(): string;
     abstract showTables(database: string): string;
-    abstract addColumn(table: string): string;
+    abstract addColumn(table: string,column?:string): string;
     abstract showColumns(database: string, table: string): string;
     abstract showViews(database: string): string;
     abstract showUsers(): string;

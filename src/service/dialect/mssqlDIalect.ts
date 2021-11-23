@@ -38,7 +38,7 @@ export class MssqlDIalect extends SqlDialect {
     processList(): string {
         return 'sp_who'
     }
-    addColumn(table: string): string {
+    addColumn(table: string,column?:string): string {
         return `ALTER TABLE
         ${table} 
     ADD 

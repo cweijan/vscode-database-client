@@ -21,7 +21,7 @@ export class EsDialect extends SqlDialect{
     showTables(database: string): string {
         return "";
     }
-    addColumn(table: string): string {
+    addColumn(table: string,column?:string): string {
         return "";
     }
     showColumns(database: string, table: string): string {

@@ -35,6 +35,10 @@ export class ColumnNode extends Node implements CopyAble {
         Util.copyToBoard(this.column.name)
     }
 
+    public addColumnTemplate() {
+        QueryUnit.showSQLTextDocument(this, this.dialect.addColumn(this.wrap(this.table),this.label), Template.alter);
+    }
+
     public updateInfo(column: ColumnMeta) {
         if(!column.simpleType){
             column.simpleType=column.type

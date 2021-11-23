@@ -19,12 +19,16 @@ export class CatalogNode extends Node implements CopyAble {
         super(database)
         this.init(this.parent)
         this.cacheSelf()
+        this.checkActive();
+    }
+
+    public checkActive() {
         const lcp = ConnectionManager.activeNode;
         if (this.isActive(lcp) && (lcp.database == this.database)) {
             if (Util.supportColorIcon()) {
-                this.iconPath=new vscode.ThemeIcon("database", new vscode.ThemeColor('charts.blue'));
-            }else{
-                this.description = `Active`
+                this.iconPath = new vscode.ThemeIcon("database", new vscode.ThemeColor('charts.blue'));
+            } else {
+                this.description = `Active`;
             }
         }
     }

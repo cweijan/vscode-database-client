@@ -26,10 +26,14 @@ export class SchemaNode extends Node implements CopyAble {
         this.init(this.parent)
         this.cacheSelf()
         this.iconPath = this.getIcon()
+        this.checkActive();
+    }
+
+    public checkActive() {
         const lcp = ConnectionManager.activeNode;
         if (this.isActive(lcp) && (lcp.database == this.database) && (lcp.schema == this.schema)) {
-            this.iconPath=this.getIcon(true)
-            this.description = `Active`
+            this.iconPath = this.getIcon(true);
+            this.description = `Active`;
         }
     }
 

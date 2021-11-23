@@ -758,7 +758,7 @@
 				},
 				{
 					"command": "mysql.column.add",
-					"when": "view =~ /cweijan.+?ql/ && viewItem == table",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(table|column)$/",
 					"group": "1_inline@6"
 				},
 				{

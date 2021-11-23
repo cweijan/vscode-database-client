@@ -35,7 +35,7 @@ export class MongoDialect implements SqlDialect{
     showTables(database: string): string {
         throw new Error("Method not implemented.");
     }
-    addColumn(table: string): string {
+    addColumn(table: string,column?:string): string {
         throw new Error("Method not implemented.");
     }
     showColumns(database: string, table: string): string {

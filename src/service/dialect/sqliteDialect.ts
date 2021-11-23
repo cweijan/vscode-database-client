@@ -18,7 +18,7 @@ export class SqliTeDialect extends SqlDialect{
     showTables(database: string): string {
         return `SELECT name, type FROM sqlite_master WHERE type="table" AND name <> 'sqlite_sequence' AND name <> 'sqlite_stat1' ORDER BY type ASC, name ASC;`;
     }
-    addColumn(table: string): string {
+    addColumn(table: string,column?:string): string {
         throw new Error("Method not implemented.");
     }
     showColumns(database: string, table: string): string {

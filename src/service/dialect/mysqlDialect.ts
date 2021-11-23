@@ -26,11 +26,12 @@ export class MysqlDialect extends SqlDialect {
     processList(): string {
         return 'show processlist'
     }
-    addColumn(table: string): string {
+    addColumn(table: string,column?:string): string {
+        const after=column?` AFTER \`${column}\``:"";
         return `ALTER TABLE
-        ${table} 
-    ADD 
-        COLUMN [column] [type] NOT NULL comment '';`;
+    ${table} 
+ADD 
+    COLUMN [column] [type] NOT NULL comment ''${after};`;
     }
     createUser(): string {
         return `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`;
