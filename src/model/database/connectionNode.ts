@@ -91,7 +91,13 @@ export class ConnectionNode extends Node implements CopyAble {
                 const usingInclude = this.includeDatabases && includeDatabaseArray && includeDatabaseArray.length >= 1;
                 const databaseNodes = databases.filter((db) => {
                     if (usingInclude && !db.schema) {
-                        return includeDatabaseArray.indexOf(db.Database.toLocaleLowerCase()) != -1;
+                        return includeDatabaseArray.indexOf(db.Database.toLowerCase()) != -1;
+                    }
+                    if (this.hideSystemSchema) {
+                        if (this.dbType == DatabaseType.MYSQL && ["performance_schema", "information_schema", "sys", "mysql"].includes(db.Database.toLowerCase()) ||
+                            this.dbType == DatabaseType.PG && db.schema && ["pg_toast", "information_schema", "pg_catalog"].includes(db.schema.toLowerCase())) {
+                            return false;
+                        }
                     }
                     return true;
                 }).map<SchemaNode | CatalogNode>((database) => {

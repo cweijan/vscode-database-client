@@ -52,6 +52,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public description: string;
     public global?: boolean;
     public disable?: boolean;
+    public hideSystemSchema?: boolean;
 
     /**
      * using to distingush connectHolder, childCache, elementState
@@ -128,6 +129,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.encoding = source.encoding
         this.showHidden = source.showHidden
         this.connectionKey = source.connectionKey
+        this.hideSystemSchema = source.hideSystemSchema
         this.global = source.global
         this.dbType = source.dbType
         this.connectionUrl = source.connectionUrl

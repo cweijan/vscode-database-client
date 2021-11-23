@@ -103,6 +103,12 @@
           <input class="w-64 field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
         </div>
       </section>
+      <section class="flex items-center mb-2" v-if="connectionOption.dbType=='MySQL' || connectionOption.dbType=='PostgreSQL'">
+        <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-40">Hide System Schema</label>
+          <el-switch v-model="connectionOption.hideSystemSchema"></el-switch>
+        </div>
+      </section>
     </template>
 
     <section class="flex items-center mb-2">
