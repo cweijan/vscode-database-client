@@ -10,6 +10,7 @@ export abstract class SqlDialect {
     updateColumnSql(updateColumnParam: UpdateColumnParam): string {
         throw new Error("Method not implemented.");
     }
+    showVersion(): string { return null; }
     showIndex(database: string, table: string): string { return null; }
     createIndex(createIndexParam: CreateIndexParam): string { return null };
     showDatabases(): string { return null; }

@@ -22,6 +22,7 @@ import { UserGroup } from "./userGroup";
  */
 export class ConnectionNode extends Node implements CopyAble {
 
+    private static versionMap = {}
     public iconPath: string | vscode.ThemeIcon = path.join(Constants.RES_PATH, "icon/mysql.svg");
     public contextValue: string = ModelType.CONNECTION;
     constructor(readonly key: string, readonly parent: Node) {
@@ -31,54 +32,6 @@ export class ConnectionNode extends Node implements CopyAble {
         this.getLabel(parent);
         this.getIcon();
         this.getStatus();
-        this.getVersion();
-    }
-
-    private getVersion(){
-        
-    }
-
-    private getStatus() {
-        if (this.disable) {
-            this.collapsibleState = vscode.TreeItemCollapsibleState.None;
-            this.description = (this.description || '') + " closed"
-            return;
-        }
-        const lcp = ConnectionManager.activeNode;
-        if (lcp && lcp.getConnectId().includes(this.getConnectId())) {
-            this.description = (this.description || '') + " Active";
-        }
-        try {
-            // Help sql auto complection
-            this.getChildren();
-        } catch (error) {
-            Console.log(error);
-        }
-    }
-
-    private getLabel(parent: Node) {
-        this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName ? this.instanceName : this.port}`;
-        if (this.dbType == DatabaseType.SQLITE) {
-            this.label = this.dbPath;
-        }
-        if (parent.name) {
-            this.name = parent.name;
-            const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true);
-            preferName ? this.label = parent.name : this.description = parent.name;
-        }
-    }
-
-    private getIcon() {
-        // https://www.iloveimg.com/zh-cn/resize-image/resize-svg
-        if (this.dbType == DatabaseType.PG) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/pg_server.svg");
-        } else if (this.dbType == DatabaseType.MSSQL) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/mssql_server.png");
-        } else if (this.dbType == DatabaseType.SQLITE) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/sqlite-icon.svg");
-        } else if (this.dbType == DatabaseType.MONGO_DB) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/mongodb-icon.svg");
-        }
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
@@ -123,6 +76,71 @@ export class ConnectionNode extends Node implements CopyAble {
 
                 return databaseNodes;
             })
+    }
+
+
+    private getStatus() {
+        if (this.disable) {
+            this.collapsibleState = vscode.TreeItemCollapsibleState.None;
+            this.description = (this.description || '') + " closed"
+            return;
+        }
+        const lcp = ConnectionManager.activeNode;
+        if (lcp && lcp.getConnectId().includes(this.getConnectId())) {
+            this.description = (this.description || '') + " Active";
+        }
+        try {
+            // Help sql auto complection
+            this.getChildren();
+        } catch (error) {
+            Console.log(error);
+        }
+        const version = ConnectionNode.versionMap[this.uid]
+        if (version) {
+            this.description = (this.description || '') + " " + version
+        }
+        this.getVersion();
+    }
+
+    private getLabel(parent: Node) {
+        this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName ? this.instanceName : this.port}`;
+        if (this.dbType == DatabaseType.SQLITE) {
+            this.label = this.dbPath;
+        }
+        if (parent.name) {
+            this.name = parent.name;
+            const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true);
+            preferName ? this.label = parent.name : this.description = parent.name;
+        }
+    }
+
+
+    private async getVersion() {
+        if (ConnectionNode.versionMap[this.uid]) return;
+        const versionSql = this.dialect.showVersion()
+        if (!versionSql) return;
+        try {
+            const version = (await this.execute(versionSql))[0]?.server_version
+            ConnectionNode.versionMap[this.uid]=version
+            this.description = (this.description || '') + " " + version
+        } catch (error) {
+            Console.log(error)
+        }
+        DbTreeDataProvider.refresh(this)
+
+    }
+
+    private getIcon() {
+        // https://www.iloveimg.com/zh-cn/resize-image/resize-svg
+        if (this.dbType == DatabaseType.PG) {
+            this.iconPath = path.join(Constants.RES_PATH, "icon/pg_server.svg");
+        } else if (this.dbType == DatabaseType.MSSQL) {
+            this.iconPath = path.join(Constants.RES_PATH, "icon/mssql_server.png");
+        } else if (this.dbType == DatabaseType.SQLITE) {
+            this.iconPath = path.join(Constants.RES_PATH, "icon/sqlite-icon.svg");
+        } else if (this.dbType == DatabaseType.MONGO_DB) {
+            this.iconPath = path.join(Constants.RES_PATH, "icon/mongodb-icon.svg");
+        }
     }
 
     public copyName() {

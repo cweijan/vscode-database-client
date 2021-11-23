@@ -5,6 +5,9 @@ import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
 export class PostgreSqlDialect extends SqlDialect {
+    showVersion(){
+        return "SHOW server_version;"
+    }
     createIndex(createIndexParam: CreateIndexParam): string {
         const indexType = createIndexParam.indexType || "btree"
         return `CREATE INDEX ${createIndexParam.column}_${new Date().getTime()}_index ON ${createIndexParam.table} USING ${indexType} (${createIndexParam.column});`;

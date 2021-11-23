@@ -5,6 +5,9 @@ import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
 export class MysqlDialect extends SqlDialect {
+    showVersion(){
+        return "select @@version server_version;";
+    }
     createIndex(createIndexParam: CreateIndexParam): string {
         return `ALTER TABLE ${createIndexParam.table} ADD ${createIndexParam.type} (${createIndexParam.column})`;
     }
