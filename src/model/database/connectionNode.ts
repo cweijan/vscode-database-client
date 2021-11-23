@@ -27,16 +27,48 @@ export class ConnectionNode extends Node implements CopyAble {
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
         this.init(parent)
+        this.cacheSelf()
+        this.getLabel(parent);
+        this.getIcon();
+        this.getStatus();
+        this.getVersion();
+    }
+
+    private getVersion(){
+        
+    }
+
+    private getStatus() {
+        if (this.disable) {
+            this.collapsibleState = vscode.TreeItemCollapsibleState.None;
+            this.description = (this.description || '') + " closed"
+            return;
+        }
+        const lcp = ConnectionManager.activeNode;
+        if (lcp && lcp.getConnectId().includes(this.getConnectId())) {
+            this.description = (this.description || '') + " Active";
+        }
+        try {
+            // Help sql auto complection
+            this.getChildren();
+        } catch (error) {
+            Console.log(error);
+        }
+    }
+
+    private getLabel(parent: Node) {
         this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName ? this.instanceName : this.port}`;
         if (this.dbType == DatabaseType.SQLITE) {
             this.label = this.dbPath;
         }
-        this.cacheSelf()
         if (parent.name) {
-            this.name = parent.name
-            const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true)
+            this.name = parent.name;
+            const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true);
             preferName ? this.label = parent.name : this.description = parent.name;
         }
+    }
+
+    private getIcon() {
         // https://www.iloveimg.com/zh-cn/resize-image/resize-svg
         if (this.dbType == DatabaseType.PG) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/pg_server.svg");
@@ -46,20 +78,6 @@ export class ConnectionNode extends Node implements CopyAble {
             this.iconPath = path.join(Constants.RES_PATH, "icon/sqlite-icon.svg");
         } else if (this.dbType == DatabaseType.MONGO_DB) {
             this.iconPath = path.join(Constants.RES_PATH, "icon/mongodb-icon.svg");
-        }
-        if (this.disable) {
-            this.collapsibleState = vscode.TreeItemCollapsibleState.None;
-            this.description = (this.description || '') + " closed"
-            return;
-        }
-        const lcp = ConnectionManager.activeNode;
-        if (lcp && lcp.getConnectId().includes(this.getConnectId())) {
-            this.description = (this.description || '') + " Active"
-        }
-        try {
-            this.getChildren()
-        } catch (error) {
-            Console.log(error)
         }
     }
 
