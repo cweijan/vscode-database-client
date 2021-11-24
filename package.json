@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-client2",
 	"displayName": "MySQL",
 	"description": "Database Client for vscode",
-	"version": "4.2.1",
+	"version": "4.2.3",
 	"publisher": "cweijan",
 	"icon": "resources/logo.png",
 	"engines": {
@@ -976,7 +976,7 @@
 					"default": "internalServer",
 					"enum": [
 						"file",
-						"cdn",
+						"backup",
 						"internalServer"
 					],
 					"description": "Webview resource root, using file will create a lot of cache."

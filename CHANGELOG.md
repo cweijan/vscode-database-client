@@ -1,5 +1,13 @@
 # CHANGELOG
 
+# 4.2.3 2021-11-24
+
+- Upgrade ssh2 version, now support more ssh private key format.
+- Support connect postgresql and mysql by connectionUrl.
+- Show postgresql and mysql version on panel.
+- Fix result view not work on remote development.
+- Fix postgresql not reload data when execute DML.
+
 # 4.2.1 2021-11-22
 
 - Using pg_dump to dump postgreSQL.
