@@ -186,21 +186,21 @@ export class QueryPage {
 
         const resourceRoot = Global.getConfig("resourceRoot");
         switch (resourceRoot) {
-            case "file": break;
-            case "cdn":
+            case "file":
+                return html;
+            case "backup":
                 return html.replace("../webview/js/query.js", `https://cdn.jsdelivr.net/npm/vscode-mysql-client2@${Constants.CDN_VERSION}/out/webview/js/query.js`)
                     .replace("../webview/js/vendor.js", `https://cdn.jsdelivr.net/npm/vscode-mysql-client2@${Constants.CDN_VERSION}/out/webview/js/vendor.js`);
             case "internalServer":
             default:
                 //  remote can not access.
-                if(env.remoteName){
+                if (env.remoteName) {
                     break;
                 }
                 await ResourceServer.bind();
                 return html.replace("../webview/js/query.js", `http://127.0.0.1:${ResourceServer.port}/query.js`)
                     .replace("../webview/js/vendor.js", `http://127.0.0.1:${ResourceServer.port}/vendor.js`);
         }
-
         return html;
     }
 

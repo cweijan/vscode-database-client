@@ -18,10 +18,10 @@ export class ResourceServer {
         if (this.port || !this.resPath) return;
 
         const resourceRoot = Global.getConfig("resourceRoot");
-        if (resourceRoot == "cdn" || resourceRoot == "file") return;
+        if (resourceRoot == "backup" || resourceRoot == "file") return;
 
         try {
-            const port = await portfinder.getPortPromise({port:12311});
+            const port = await portfinder.getPortPromise({port:8828});
             return new Promise((res,rej)=>{
                 http.createServer((req, res) => {
                     const path = this.resPath + req.url;
@@ -33,7 +33,7 @@ export class ResourceServer {
                 })
             })
         } catch (error) {
-            Global.updateConfig("resourceRoot","cdn")
+            Global.updateConfig("resourceRoot","file")
         }
 
     }
