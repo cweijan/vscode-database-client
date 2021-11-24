@@ -313,17 +313,6 @@ export default {
         case "sqlite":
           filters["SQLiteDb"] = ["db"];
           break;
-        case "privateKey":
-          filters["PrivateKey"] = [
-            "key",
-            "cer",
-            "crt",
-            "der",
-            "pub",
-            "pem",
-            "pk",
-          ];
-          break;
       }
       filters["File"] = ["*"];
       vscodeEvent.emit("choose", {

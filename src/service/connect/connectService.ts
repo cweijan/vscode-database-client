@@ -2,7 +2,7 @@ import { CacheKey, CodeCommand, DatabaseType } from "@/common/constants";
 import { FileManager, FileModel } from "@/common/filesManager";
 import { ConnectionManager } from "@/service/connectionManager";
 import { resolve } from "path";
-import { platform } from "os";
+import { homedir, platform } from "os";
 import * as vscode from 'vscode'
 import { commands, Disposable, window, workspace } from "vscode";
 import { Global } from "../../common/global";
@@ -14,7 +14,7 @@ import { NodeUtil } from "../../model/nodeUtil";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ClientManager } from "../ssh/clientManager";
 import { ConnnetionConfig } from "./config/connnetionConfig";
-import { readFileSync, unlinkSync } from "fs";
+import { existsSync, fstatSync, readFileSync, unlinkSync } from "fs";
 import { GlobalState, WorkState } from "@/common/state";
 var commandExistsSync = require('command-exists').sync;
 
@@ -90,7 +90,11 @@ export class ConnectService {
                 }).on("close", () => {
                     handler.panel.dispose()
                 }).on("choose", ({ event, filters }) => {
-                    window.showOpenDialog({ filters }).then((uris) => {
+                    let defaultUri:vscode.Uri;
+                    if(event=="privateKey"){
+                        defaultUri=vscode.Uri.file(homedir()+"/.ssh")
+                    }
+                    window.showOpenDialog({ filters,defaultUri }).then((uris) => {
                         if (uris && uris[0]) {
                             const uri = uris[0]
                             handler.emit("choose", { event, path: uri.fsPath })
