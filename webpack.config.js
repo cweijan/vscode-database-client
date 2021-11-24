@@ -32,7 +32,7 @@ module.exports = [
             }
         },
         plugins: [
-            new webpack.IgnorePlugin(/^(pg-native|cardinal|encoding|aws4)$/)
+            new webpack.IgnorePlugin(/^(pg-native|cardinal|encoding|aws4|cpu-features)$/)
         ],
         stats: {
             warningsFilter: [/critical dependency:/i],
