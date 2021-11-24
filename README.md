@@ -23,6 +23,10 @@ The Database Client make your life easy. It supports databases MySQL/MariaDB, Mi
 
 > Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
 
+If you use this extension a lot, please consider a donation:
+
+<a href="https://www.buymeacoffee.com/cweijan" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+
 ## Features
 
 - [Database Client](#database-client)
