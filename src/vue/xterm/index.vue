@@ -107,6 +107,7 @@ export default {
       this
         .on('connecting', content => {
           terminal.write(content)
+          terminal.write('\x1b[2K\r')
           // terminal.focus()
         })
         .on('data', (content) => {
