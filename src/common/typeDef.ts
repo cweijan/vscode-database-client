@@ -115,3 +115,10 @@ export interface TableMeta{
      */
     index_length?:string;
 }
+
+export interface ViewMeta extends TableMeta{
+    /**
+     * pg only, material: material view
+     */
+    type?:string;
+}

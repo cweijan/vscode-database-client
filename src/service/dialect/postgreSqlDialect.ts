@@ -175,7 +175,11 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${database}' and ROUTINE_TYPE='FUNCTION'`;
     }
     showViews(database: string): string {
-        return `select table_name "name" from information_schema.tables where table_schema='${database}' and table_type='VIEW' order by "name";`
+        return `SELECT table_name "name",'simple' "type" from information_schema.tables where table_schema='${database}' and table_type='VIEW' 
+UNION ALL
+SELECT matviewname "name",'material' "type" from pg_matviews
+WHERE schemaname='${database}'
+        `
     }
     buildPageSql(database: string, table: string, pageSize: number): string {
         return `SELECT * FROM ${table} LIMIT ${pageSize};`;
