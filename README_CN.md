@@ -21,9 +21,13 @@
 
 该项目为Visual Studio Code的数据库客户端扩展, 意在让你的生活更加简单, 支持**MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis**以及**ElasticSearch**的管理.
 
-如果这个扩展对你有帮助, 考虑请作者喝杯咖啡:
+如果这个扩展对你有帮助, 可以请作者喝杯咖啡:
 
 <a href="https://www.buymeacoffee.com/cweijan" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+
+<a href="https://paypal.me/cweijan">
+  <img alt="Donate" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif">
+</a>
 
 - 功能
   - [连接](#连接)
