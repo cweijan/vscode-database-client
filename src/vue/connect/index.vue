@@ -280,6 +280,7 @@ export default {
       this.sqliteState = true;
     },
     tryConnect() {
+      this.connect.error=false;
       this.connect.loading = true;
       vscodeEvent.emit("connecting", {
         connectionOption: this.connectionOption,

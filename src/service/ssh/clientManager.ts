@@ -28,7 +28,12 @@ export class ClientManager {
 
         const client = new Client();
         return new Promise((resolve, reject) => {
+            const timeoutFlag=setTimeout(() => {
+                client.end()
+                reject("Connect to ssh server timeout.")
+            }, sshConfig.connectTimeout||1000 * 10);
             client.on('ready', () => {
+                clearTimeout(timeoutFlag)
                 if (option.withSftp) {
                     client.sftp((err, sftp) => {
                         if (err) throw err;
@@ -45,7 +50,7 @@ export class ClientManager {
                 reject(err)
             }).on('end', () => {
                 this.activeClient[key] = null
-            }).connect({ ...sshConfig, readyTimeout: sshConfig.connectTimeout||1000 * 10 });
+            }).connect(sshConfig);
             // https://blog.csdn.net/a351945755/article/details/22661411
         })
 
