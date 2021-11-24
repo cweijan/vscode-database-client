@@ -34,8 +34,8 @@
     </section>
 
     <ElasticSearch v-if="connectionOption.dbType=='ElasticSearch'" :connectionOption="connectionOption" />
-    <SQLite v-else-if="connectionOption.dbType=='SQLite'" :connectionOption="connectionOption" :sqliteState="sqliteState" @installSqlite="installSqlite" @choose="choose"/>
-    <SSH v-else-if="connectionOption.dbType=='SSH'" :connectionOption="connectionOption" @choose="choose"/>
+    <SQLite v-else-if="connectionOption.dbType=='SQLite'" :connectionOption="connectionOption" :sqliteState="sqliteState" @installSqlite="installSqlite" @choose="choose" />
+    <SSH v-else-if="connectionOption.dbType=='SSH'" :connectionOption="connectionOption" @choose="choose" />
 
     <template v-else>
 
@@ -87,7 +87,7 @@
           <label class="font-bold mr-5 inline-block w-32">{{$t("connect.connectTimeout")}}</label>
           <input class="w-64 field__input" placeholder="5000" required v-model="connectionOption.connectTimeout" />
         </div>
-        <div class="inline-block mr-10"  v-if="connectionOption.dbType!='Redis'">
+        <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
           <label class="font-bold mr-5 inline-block w-32">{{$t("connect.requestTimeout")}}</label>
           <input class="w-64 field__input" placeholder="10000" required type="number" v-model="connectionOption.requestTimeout" />
         </div>
@@ -112,7 +112,7 @@
     </template>
 
     <section class="flex items-center mb-2">
-      <div class="inline-block mr-10"  v-if="connectionOption.dbType!='SSH' && connectionOption.dbType!='SQLite'">
+      <div class="inline-block mr-10" v-if="connectionOption.dbType!='SSH' && connectionOption.dbType!='SQLite'">
         <label class="mr-2 font-bold">{{$t("connect.sshTunnel")}}</label>
         <el-switch v-model="connectionOption.usingSSH"></el-switch>
       </div>
@@ -124,7 +124,7 @@
         <label class="inline-block mr-5 font-bold w-18">SRV Record</label>
         <el-switch v-model="connectionOption.srv"></el-switch>
       </div>
-      <div class="inline-block mr-10" v-if="connectionOption.dbType === 'MongoDB'">
+      <div class="inline-block mr-10" v-if="connectionOption.dbType === 'MongoDB' || connectionOption.dbType=='PostgreSQL' || connectionOption.dbType=='MySQL'">
         <label class="inline-block mr-5 font-bold w-18">Use Connection String</label>
         <el-switch v-model="connectionOption.useConnectionString"></el-switch>
       </div>
@@ -132,12 +132,12 @@
     <section class="flex items-center mb-2" v-if="connectionOption.useConnectionString">
       <div class="flex w-full mr-10">
         <label class="inline-block w-32 mr-5 font-bold">Connection String</label>
-        <input class="w-4/5 field__input" placeholder="e.g mongodb+srv://username:password@server-url/admin" v-model="connectionOption.connectionUrl" />
+        <input class="w-4/5 field__input" :placeholder="connectUrlExample" v-model="connectionOption.connectionUrl" />
       </div>
     </section>
 
     <SSL :connectionOption="connectionOption" v-if="connectionOption.useSSL" />
-    <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH" @choose="choose"/>
+    <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH" @choose="choose" />
 
     <div>
       <el-button size="mini" :loading="connect.loading" @click="tryConnect">{{$t("connect.connecting")}}</el-button>
@@ -178,7 +178,7 @@ export default {
         isCluster: false,
         connectionUrl: "",
         srv: false,
-        esAuth:'none',
+        esAuth: 'none',
         global: true,
         key: null,
         // scheme: "http",
@@ -280,17 +280,17 @@ export default {
       });
     },
     onContextmenu(event) {
-      const obj=event.target;
-      if(!obj || !(obj instanceof HTMLInputElement) || !obj.select){
+      const obj = event.target;
+      if (!obj || !(obj instanceof HTMLInputElement) || !obj.select) {
         return;
       }
-      const value=obj.value;
+      const value = obj.value;
       this.$contextmenu({
         items: [
           {
             label: `Copy`,
             onClick: () => {
-              vscodeEvent.emit("copy",value);
+              vscodeEvent.emit("copy", value);
             }
           }
           // ,{
@@ -324,6 +324,17 @@ export default {
       vscodeEvent.emit("close");
     },
   },
+  computed: {
+    connectUrlExample() {
+      switch (this.connectionOption.dbType) {
+        case 'MySQL':
+          return 'e.g mysql://root:root@127.0.0.1:3306/db'
+        case 'PostgreSQL':
+          return 'e.g postgresql://dbuser:secretpassword@127.0.0.1:3211/mydb'
+      }
+      return 'e.g mongodb+srv://username:password@server-url/admin'
+    }
+  },
   watch: {
     "connectionOption.dbType"(value) {
       if (this.editModel) {
@@ -351,14 +362,14 @@ export default {
           this.connectionOption.encrypt = true;
           this.connectionOption.port = 1433;
           this.connectionOption.database = "master";
-          this.connectionOption.useSSL=false;
+          this.connectionOption.useSSL = false;
           break;
         case "ElasticSearch":
           this.connectionOption.host = "127.0.0.1:9200";
           this.connectionOption.user = null;
           this.connectionOption.port = null;
           this.connectionOption.database = null;
-          this.connectionOption.useSSL=false;
+          this.connectionOption.useSSL = false;
           break;
         case "Redis":
           this.connectionOption.port = 6379;
@@ -373,12 +384,12 @@ export default {
         case "FTP":
           this.connectionOption.port = 21;
           this.connectionOption.user = null;
-          this.connectionOption.useSSL=false;
+          this.connectionOption.useSSL = false;
           break;
         case "SQLite":
         case "SSH":
-          this.connectionOption.usingSSH=false;
-          this.connectionOption.useSSL=false;
+          this.connectionOption.usingSSH = false;
+          this.connectionOption.useSSL = false;
           break;
       }
       this.$forceUpdate();

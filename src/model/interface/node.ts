@@ -38,6 +38,8 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public connectTimeout?: number;
     public requestTimeout?: number;
     public includeDatabases?: string;
+    
+    public useConnectionString?: boolean;
     public connectionUrl?: string;
     /**
      * ssh
@@ -133,6 +135,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.global = source.global
         this.dbType = source.dbType
         this.connectionUrl = source.connectionUrl
+        this.useConnectionString = source.useConnectionString
         if (source.connectTimeout) {
             this.connectTimeout = parseInt(source.connectTimeout as any)
             source.connectTimeout = parseInt(source.connectTimeout as any)

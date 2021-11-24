@@ -8,6 +8,10 @@ export class MysqlConnection extends IConnection {
     private con: mysql.Connection;
     constructor(node: Node) {
         super()
+        if(node.useConnectionString){
+            this.con=mysql.createConnection(node.connectionUrl);
+            return;
+        }
         let config = {
             host: node.host, port: node.port, user: node.user, password: node.password, database: node.database,
             timezone: node.timezone,

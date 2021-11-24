@@ -11,6 +11,10 @@ export class PostgreSqlConnection extends IConnection {
     private client: Client;
     constructor(node: Node) {
         super()
+        if(node.useConnectionString){
+            this.client=new Client(node.connectionUrl)
+            return;
+        }
         let config = {
             host: node.host, port: node.port,
             user: node.user, password: node.password,
