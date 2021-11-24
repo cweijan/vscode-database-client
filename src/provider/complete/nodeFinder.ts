@@ -30,8 +30,9 @@ export class NodeFinder {
             }
         }
 
-        let nodeList = []
         const groupNodes = await lcp.getChildren();
+        if(!groupNodes)return [];
+        let nodeList = []
         for (const type of types) {
             switch (type) {
                 case ModelType.COLUMN:
