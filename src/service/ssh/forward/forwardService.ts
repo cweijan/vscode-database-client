@@ -1,10 +1,10 @@
-import tunnel = require('./tunnel')
 import { exec } from "child_process";
 import { ViewManager } from '@/common/viewManager';
 import { join } from 'path';
 import { Constants } from '@/common/constants';
 import { SSHConfig } from '@/model/interface/sshConfig';
 import { Util } from '@/common/util';
+import { SSHTunnel } from '../tunnel/sshTunnel';
 
 export class ForwardInfo {
     id: any;
@@ -19,17 +19,17 @@ export class ForwardInfo {
 
 export class ForwardService {
 
-    private tunelMark: { [key: string]: { tunnel: any } } = {};
+    private tunelMark: { [key: string]: { tunnel: SSHTunnel } } = {};
     private store_key = "forward_store"
 
     public createForwardView(sshConfig: SSHConfig) {
         ViewManager.createWebviewPanel({
-            iconPath: join(Constants.RES_PATH,'ssh/forward.svg'),
+            iconPath: join(Constants.RES_PATH, 'ssh/forward.svg'),
             splitView: false, path: "app", title: `forward://${sshConfig.username}@${sshConfig.host}`,
             eventHandler: (handler) => {
                 handler.on("init", () => {
                     handler.emit("route", 'forward')
-                }).on("route-forward",()=>{
+                }).on("route-forward", () => {
                     handler.emit("config", sshConfig)
                     handler.emit("forwardList", this.list(sshConfig))
                 }).on("update", async content => {
@@ -53,7 +53,7 @@ export class ForwardService {
                     handler.emit("success")
                 }).on("load", () => {
                     handler.emit("forwardList", this.list(sshConfig))
-                }).on("cmd",(content)=>{
+                }).on("cmd", (content) => {
                     exec(`cmd.exe /C start cmd /C ${content}`)
                 })
             }
@@ -97,12 +97,9 @@ export class ForwardService {
                 })()
             };
 
-            const localTunnel = tunnel(config, (error, server) => {
-                this.tunelMark[id] = { tunnel: localTunnel }
-                if (error) {
-                    delete this.tunelMark[id]
-                    reject(error)
-                }
+            const sshTunnel = new SSHTunnel(config)
+            sshTunnel.on("success", () => {
+                this.tunelMark[id] = { tunnel: sshTunnel }
                 if (create) {
                     forwardInfo.id = id
                     const forwardInfos = this.list(sshConfig)
@@ -110,7 +107,10 @@ export class ForwardService {
                     Util.store(`${this.store_key}_${sshConfig.host}_${sshConfig.port}`, forwardInfos)
                 }
                 resolve();
-            });
+            }).on("error", (error) => {
+                delete this.tunelMark[id]
+                reject(error)
+            }).start()
         })
 
     }

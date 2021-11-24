@@ -6,7 +6,7 @@ import { QueryUnit } from "./queryUnit";
 import { SSHConfig } from "../model/interface/sshConfig";
 import { DatabaseCache } from "./common/databaseCache";
 import { NodeUtil } from "../model/nodeUtil";
-import { SSHTunnelService } from "./tunnel/sshTunnelService";
+import { SSHTunnelService } from "./ssh/tunnel/sshTunnelService";
 import { DbTreeDataProvider } from "../provider/treeDataProvider";
 import { IConnection } from "./connect/connection";
 import { DatabaseType } from "@/common/constants";
@@ -104,14 +104,11 @@ export class ConnectionManager {
             const ssh = connectionNode.ssh;
             let connectOption = connectionNode;
             if (connectOption.usingSSH) {
-                connectOption = await this.tunnelService.createTunnel(connectOption, (err) => {
-                    reject(err?.message || err?.errno);
-                    if (err.errno == 'EADDRINUSE') { return; }
+                try {
+                    connectOption = await this.tunnelService.createTunnel(connectOption)
+                } catch (error) {
                     this.alivedConnection[key] = null
-                })
-                if (!connectOption) {
-                    reject("create ssh tunnel fail!");
-                    return;
+                    reject(error);
                 }
             }
             const newConnection = this.create(connectOption);

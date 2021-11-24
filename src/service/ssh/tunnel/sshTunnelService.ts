@@ -1,10 +1,8 @@
-import tunnel = require('./tunnel-ssh')
-import { Node } from '../../model/interface/node';
-import { Console } from '../../common/Console';
-import { existsSync } from 'fs';
-import * as portfinder from 'portfinder'
 import { DatabaseType } from '@/common/constants';
-import { spawn } from "child_process";
+import { existsSync } from 'fs';
+import * as portfinder from 'portfinder';
+import { Node } from '../../../model/interface/node';
+import { SSHTunnel } from './sshTunnel';
 
 export class SSHTunnelService {
 
@@ -17,7 +15,7 @@ export class SSHTunnelService {
         }
     }
 
-    public createTunnel(node: Node, errorCallback: (error) => void): Promise<Node> {
+    public createTunnel(node: Node): Promise<Node> {
         return new Promise(async (resolve, reject) => {
             const ssh = node.ssh
             const key = node.getConnectId();
@@ -48,44 +46,14 @@ export class SSHTunnelService {
 
             this.adapterES(node, config);
 
-            if (ssh.type == 'native') {
-                let args = ['-TnNL', `${port}:${config.dstHost}:${config.dstPort}`, config.host, '-p', `${config.port}`];
-                if (ssh.privateKeyPath) {
-                    args.push('-i', ssh.privateKeyPath)
-                }
-                const bat = spawn('ssh', args);
-                const successHandler = setTimeout(() => {
-                    resolve({ ...node, host: "127.0.0.1", port } as Node)
-                }, ssh.connectTimeout);
-                bat.stderr.on('data', (chunk) => {
-                    if (chunk?.toString().match(/^[@\s]+$/)) return;
-                    delete this.tunelMark[key]
-                    errorCallback(new Error(chunk.toString()?.replace(/@/g, '')))
-                    clearTimeout(successHandler)
-                });
-                bat.on('close', (code, signal) => {
-                    delete this.tunelMark[key]
-                });
-                return;
-            }
-
-            const localTunnel = tunnel(config, (error, server) => {
-                this.tunelMark[key] = { tunnel: localTunnel, tunnelPort: port }
-                if (error && errorCallback) {
-                    delete this.tunelMark[key]
-                    errorCallback(error)
-                }
+            const sshTunnel = new SSHTunnel(config)
+            sshTunnel.on("success", () => {
+                this.tunelMark[key] = { tunnel: sshTunnel, tunnelPort: port }
                 resolve({ ...node, host: "127.0.0.1", port } as Node)
-            });
-            localTunnel.on('error', (err) => {
-                Console.log('Ssh tunel occur error : ' + err);
-                if (err && errorCallback) {
-                    localTunnel.close()
-                    delete this.tunelMark[key]
-                    errorCallback(err)
-                }
-                resolve(null)
-            });
+            }).on("error", (error) => {
+                delete this.tunelMark[key]
+                reject(error)
+            }).start()
         })
     }
 

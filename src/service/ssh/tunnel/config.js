@@ -13,6 +13,12 @@ util.inherits(ConfigError, Error);
 function createConfig(config) {
     var env = process.env;
 
+    if(config.localPort){
+        config.localPort=parseInt(config.localPort)
+    }
+    if(config.dstPort){
+        config.dstPort=parseInt(config.dstPort)
+    }
     defaults(config || {}, {
         username: env.TUNNELSSH_USER || env.USER || env.USERNAME || 'root',
         port: 22,
@@ -33,7 +39,6 @@ function createConfig(config) {
     if (!config.dstPort) {
         throw new ConfigError('dstPort not set');
     }
-
     return config;
 }
 
