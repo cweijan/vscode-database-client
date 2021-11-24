@@ -94,17 +94,11 @@ export class ConnectionNode extends Node implements CopyAble {
         if (lcp && lcp.getConnectId().includes(this.getConnectId())) {
             this.description = (this.description || '') + " Active";
         }
-        try {
-            // Help sql auto complection
-            this.getChildren();
-        } catch (error) {
-            Console.log(error);
-        }
         const version = ConnectionNode.versionMap[this.uid]
         if (version) {
             this.description = (this.description || '') + " " + version
         }
-        this.getVersion();
+        this.fetchInfo();
     }
 
     private getLabel(parent: Node) {
@@ -120,7 +114,7 @@ export class ConnectionNode extends Node implements CopyAble {
     }
 
 
-    private async getVersion() {
+    private async fetchInfo() {
         if (ConnectionNode.versionMap[this.uid]) return;
         const versionSql = this.dialect.showVersion()
         if (!versionSql) return;
@@ -130,6 +124,12 @@ export class ConnectionNode extends Node implements CopyAble {
             this.description = (this.description || '') + " " + version
         } catch (error) {
             Console.log(error)
+        }
+        try {
+            // Help sql auto complection
+            await this.getChildren();
+        } catch (error) {
+            Console.log(error);
         }
         DbTreeDataProvider.refresh(this)
 

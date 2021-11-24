@@ -4,9 +4,21 @@ import * as portfinder from 'portfinder';
 import { Node } from '../../../model/interface/node';
 import { SSHTunnel } from './sshTunnel';
 
+interface TunnelState {
+    tunnel: any;
+    created?: boolean;
+    tunnelPort: number;
+    pendings: Pending[]
+}
+
+interface Pending {
+    resolve: (value: Node) => void;
+    reject: (reason?: any) => void;
+}
+
 export class SSHTunnelService {
 
-    private tunelMark: { [key: string]: { tunnel: any, tunnelPort: number } } = {};
+    private tunelMark: { [key: string]: TunnelState } = {};
 
     public closeTunnel(connectId: string) {
         if (this.tunelMark[connectId]) {
@@ -19,15 +31,20 @@ export class SSHTunnelService {
         return new Promise(async (resolve, reject) => {
             const ssh = node.ssh
             const key = node.getConnectId();
-            if (this.tunelMark[key]) {
-                resolve({ ...node, host: "127.0.0.1", port: this.tunelMark[key].tunnelPort } as Node)
+            const tunnelState = this.tunelMark[key];
+            if (tunnelState) {
+                if (tunnelState.created) {
+                    resolve({ ...node, host: "127.0.0.1", port: this.tunelMark[key].tunnelPort } as Node)
+                } else {
+                    tunnelState.pendings.push({ resolve, reject })
+                }
                 return;
             }
-            const port = await portfinder.getPortPromise({port:13322});
+            const port = await portfinder.getPortPromise({ port: 13322 });
             node.ssh.tunnelPort = port
             const config = {
                 username: ssh.username,
-                password: ssh.type=='password'?ssh.password:null,
+                password: ssh.type == 'password' ? ssh.password : null,
                 host: ssh.host,
                 port: ssh.port,
                 dstHost: node.host,
@@ -37,7 +54,7 @@ export class SSHTunnelService {
                 algorithms: ssh.algorithms,
                 passphrase: ssh.passphrase,
                 privateKey: (() => {
-                    if (ssh.type=="privateKey" && ssh.privateKeyPath && existsSync(ssh.privateKeyPath)) {
+                    if (ssh.type == "privateKey" && ssh.privateKeyPath && existsSync(ssh.privateKeyPath)) {
                         return require('fs').readFileSync(ssh.privateKeyPath)
                     }
                     return null
@@ -47,12 +64,17 @@ export class SSHTunnelService {
             this.adapterES(node, config);
 
             const sshTunnel = new SSHTunnel(config)
+            this.tunelMark[key] = { tunnel: sshTunnel, tunnelPort: port, pendings: [{ resolve, reject }] }
             sshTunnel.on("success", () => {
-                this.tunelMark[key] = { tunnel: sshTunnel, tunnelPort: port }
-                resolve({ ...node, host: "127.0.0.1", port } as Node)
+                this.tunelMark[key].created = true;
+                for (const pending of this.tunelMark[key].pendings) {
+                    pending.resolve({ ...node, host: "127.0.0.1", port } as Node)
+                }
             }).on("error", (error) => {
                 delete this.tunelMark[key]
-                reject(error)
+                for (const pending of this.tunelMark[key].pendings) {
+                    pending.reject(error)
+                }
             }).start()
         })
     }
