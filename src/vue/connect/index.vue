@@ -136,7 +136,7 @@
       </div>
     </section>
 
-    <SSL :connectionOption="connectionOption" v-if="connectionOption.useSSL" />
+    <SSL :connectionOption="connectionOption" v-if="connectionOption.useSSL" @choose="choose" />
     <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH" @choose="choose" />
 
     <div>
@@ -168,6 +168,9 @@ export default {
         authType: "default",
         password: "",
         encoding: "utf8",
+        clientKeyPath: null,
+        clientCertPath: null,
+        caPath: null,
         database: null,
         useSSL: false,
         usingSSH: false,
@@ -236,6 +239,9 @@ export default {
             break;
           case "privateKey":
             this.connectionOption.ssh.privateKeyPath = path;
+            break;
+          default:
+            this.connectionOption[event] = path;
             break;
         }
         this.$forceUpdate();

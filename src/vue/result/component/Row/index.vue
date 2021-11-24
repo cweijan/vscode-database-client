@@ -33,7 +33,6 @@ export default {
         return "<span class='null-column'>(NULL)</span>";
       }
       const originType=origin.constructor.name;
-      console.log(origin)
       if (origin.hasOwnProperty("type")) {
         return String.fromCharCode.apply(null, new Uint16Array(origin.data));
       }
@@ -65,7 +64,7 @@ export default {
       if (!editList[rowIndex]) {
         editList[rowIndex] = { ...row };
         delete editList[rowIndex]._XID;
-        console.log(editList[rowIndex]);
+        // console.log(editList[rowIndex]);
       }
       editList[rowIndex][column.title] = event.target.textContent;
       this.$emit("sendToVscode", "dataModify");
