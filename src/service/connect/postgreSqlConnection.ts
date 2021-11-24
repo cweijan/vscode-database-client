@@ -66,11 +66,13 @@ export class PostgreSqlConnection extends IConnection {
     }
     
     adaptResult(res: QueryArrayResult<any>) {
+        if(res.command=='DELETE' || res.command=='UPDATE' || res.command=="INSERT"){
+            return { affectedRows: res.rowCount }
+        }
         if (res.command != 'SELECT' && res.command != 'SHOW') {
             if(res.rows && res.rows instanceof Array){
                 return res.rows;
             }
-            return { affectedRows: res.rowCount }
         }
         return res.rows;
     }
