@@ -5,6 +5,8 @@ import { Constants } from '@/common/constants';
 import { SSHConfig } from '@/model/interface/sshConfig';
 import { Util } from '@/common/util';
 import { SSHTunnel } from '../tunnel/sshTunnel';
+import { platform } from "os";
+import { window } from "vscode";
 
 export class ForwardInfo {
     id: any;
@@ -16,10 +18,15 @@ export class ForwardInfo {
     state: boolean
 }
 
+interface TunnelInfo {
+    tunnel?: SSHTunnel,
+    index: number,
+    forwardInfo: ForwardInfo
+}
 
 export class ForwardService {
 
-    private tunelMark: { [key: string]: { tunnel: SSHTunnel } } = {};
+    private tunelMark: { [key: string]: TunnelInfo } = {};
     private store_key = "forward_store"
 
     public createForwardView(sshConfig: SSHConfig) {
@@ -32,21 +39,22 @@ export class ForwardService {
                 }).on("route-forward", () => {
                     handler.emit("config", sshConfig)
                     handler.emit("forwardList", this.list(sshConfig))
-                }).on("update", async content => {
-                    if (content.id) {
-                        this.remove(sshConfig, content.id)
+                }).on("save", async info => {
+                    if (info.id) {
+                        await this.stop(info.id)
+                    } else {
+                        info.id = new Date().getTime() + "";
                     }
-                    try {
-                        await this.forward(sshConfig, content)
-                        handler.emit("success")
-                    } catch (err) {
-                        handler.emit("error", err.message)
-                    }
-                }).on("start", async content => {
-                    await this.start(sshConfig, content)
-                    handler.emit("success")
-                }).on("stop", content => {
-                    this.stop(content)
+                    this.forward(sshConfig, info)
+                        .then(() => handler.emit("success"))
+                        .catch(err => handler.emit("error", err))
+                }).on("start", async id => {
+                    const info = this.tunelMark[id].forwardInfo
+                    this.forward(sshConfig, info)
+                        .then(() => handler.emit("success"))
+                        .catch(err => handler.emit("error", err))
+                }).on("stop", async id => {
+                    await this.stop(id)
                     handler.emit("success")
                 }).on("remove", content => {
                     this.remove(sshConfig, content)
@@ -54,35 +62,58 @@ export class ForwardService {
                 }).on("load", () => {
                     handler.emit("forwardList", this.list(sshConfig))
                 }).on("cmd", (content) => {
+                    if (platform() != "win32") {
+                        window.showErrorMessage("Only support windows system!")
+                        return;
+                    }
                     exec(`cmd.exe /C start cmd /C ${content}`)
                 })
             }
         })
     }
 
-    public closeTunnel(connectId: string) {
-        if (this.tunelMark[connectId]) {
-            this.tunelMark[connectId].tunnel.close()
-            delete this.tunelMark[connectId]
-        }
+
+    public list(sshConfig: SSHConfig): ForwardInfo[] {
+        return Util.getStore(`${this.store_key}_${sshConfig.host}_${sshConfig.port}`, [])
+            .map((forwardInfo, index) => {
+                if (!this.tunelMark[forwardInfo.id]) {
+                    this.tunelMark[forwardInfo.id] = { forwardInfo, index }
+                }
+                forwardInfo.state = this.tunelMark[forwardInfo.id].tunnel != null;
+                return forwardInfo;
+            })
     }
 
-    public forward(sshConfig: SSHConfig, forwardInfo: ForwardInfo, create?: boolean): Promise<void> {
-        if (create == null) create = true;
+    public save(sshConfig: SSHConfig, forwardInfo: ForwardInfo) {
+        const id = forwardInfo.id;
+        const storeKey = `${this.store_key}_${sshConfig.host}_${sshConfig.port}`;
+        const forwardInfos = Util.getStore(storeKey, [])
+        const curForwardInfo = this.tunelMark[id];
+        if (curForwardInfo) {
+            forwardInfos[curForwardInfo.index] = forwardInfo;
+        } else {
+            forwardInfos.push(forwardInfo)
+            this.tunelMark[id] = { forwardInfo, index: forwardInfos.length }
+        }
+        Util.store(storeKey, forwardInfos)
+    }
 
+    public remove(sshConfig: SSHConfig, id: any) {
+        const storeKey = `${this.store_key}_${sshConfig.host}_${sshConfig.port}`;
+        const forwardInfos = Util.getStore(storeKey, [])
+        this.stop(id)
+        forwardInfos.splice(this.tunelMark[id].index, 1)
+        Util.store(storeKey, forwardInfos)
+    }
+
+    public async stop(id: string): Promise<void> {
+        await this.tunelMark[id].tunnel?.close()
+        delete this.tunelMark[id]?.tunnel
+    }
+
+    public forward(sshConfig: SSHConfig, forwardInfo: ForwardInfo): Promise<void> {
         return new Promise((resolve, reject) => {
-
-            const id = `${sshConfig.host}_${sshConfig.port}_${forwardInfo.localHost}_${forwardInfo.localPort}_${forwardInfo.remoteHost}_${forwardInfo.remotePort}`
-            if (create) {
-                const forwards = this.list(sshConfig)
-                for (const forward of forwards) {
-                    if (forward.id == id) {
-                        reject({ message: "This forward is exists!" })
-                        return;
-                    }
-                }
-            }
-
+            const id = forwardInfo.id;
             const config = {
                 ...sshConfig,
                 localHost: forwardInfo.localHost,
@@ -96,62 +127,16 @@ export class ForwardService {
                     }
                 })()
             };
-
-            const sshTunnel = new SSHTunnel(config)
-            sshTunnel.on("success", () => {
-                this.tunelMark[id] = { tunnel: sshTunnel }
-                if (create) {
-                    forwardInfo.id = id
-                    const forwardInfos = this.list(sshConfig)
-                    forwardInfos.push(forwardInfo)
-                    Util.store(`${this.store_key}_${sshConfig.host}_${sshConfig.port}`, forwardInfos)
-                }
+            const tunnel = new SSHTunnel(config)
+            tunnel.on("success", () => {
+                this.tunelMark[id].tunnel = tunnel
+                this.save(sshConfig, forwardInfo)
                 resolve();
             }).on("error", (error) => {
-                delete this.tunelMark[id]
+                delete this.tunelMark[id]?.tunnel
                 reject(error)
             }).start()
         })
-
-    }
-
-    public stop(id: any): void {
-        this.closeTunnel(id)
-    }
-
-    public remove(sshConfig: SSHConfig, id: any) {
-        const forwardInfos = this.list(sshConfig)
-        for (let i = 0; i < forwardInfos.length; i++) {
-            const forwardInfo = forwardInfos[i]
-            if (forwardInfo.id == id) {
-                this.stop(id)
-                forwardInfos.splice(i, 1)
-                Util.store(`${this.store_key}_${sshConfig.host}_${sshConfig.port}`, forwardInfos)
-                return;
-            }
-        }
-    }
-
-    public async start(sshConfig: SSHConfig, id: any) {
-        for (const forwardInfo of this.list(sshConfig)) {
-            if (forwardInfo.id == id) {
-                await this.forward(sshConfig, forwardInfo, false)
-                return;
-            }
-        }
-    }
-
-    public list(sshConfig: SSHConfig): ForwardInfo[] {
-        const forwardInfos: ForwardInfo[] = Util.getStore(`${this.store_key}_${sshConfig.host}_${sshConfig.port}`)
-        if (!forwardInfos) return [];
-        for (const forwardInfo of forwardInfos) {
-            if (this.tunelMark[forwardInfo.id]) {
-                forwardInfo.state = true;
-            } else {
-                forwardInfo.state = false;
-            }
-        }
-        return forwardInfos;
     }
 
 }

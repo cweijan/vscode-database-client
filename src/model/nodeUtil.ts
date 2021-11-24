@@ -24,7 +24,7 @@ export abstract class NodeUtil {
         if (!nodes) return null;
         // if is node instance
         if (nodes instanceof Node || nodes.uid) {
-            return NodeUtil.of( { ...nodes, parent: null, provider: null, context: null, command: null })
+            return NodeUtil.of( { ...nodes, parent: null, provider: null, context: null, command: null,forwardService:null })
         }
         if (nodes instanceof Array) {
             return nodes.map(this.removeParent)

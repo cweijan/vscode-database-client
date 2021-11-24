@@ -1,8 +1,7 @@
-import { Console } from "@/common/Console";
 import EventEmitter from "events";
 import { createServer, Server, Socket } from "net";
 import { Client } from "ssh2";
-var createConfig = require('./config');
+const createConfig = require('./config');
 
 export class SSHTunnel extends EventEmitter {
     private client: Client;
@@ -18,26 +17,27 @@ export class SSHTunnel extends EventEmitter {
             await Promise.all([this.createNetAdapter(), this.createSSHConnection()])
             this.emit("success")
         } catch (error) {
-            this.error(error)
             this.emit("error", error)
         }
 
     }
 
     public close() {
-        if (this.adapatServer) {
-            this.adapatServer.close()
-            this.adapatServer = null;
-        }
-        if (this.client) {
-            this.client.end()
-            this.client = null;
-        }
-    }
+        return new Promise(res => {
+            if (this.adapatServer) {
+                this.adapatServer
+                    // .on("close", res)
+                    .close()
+                this.adapatServer = null;
+            }
+            if (this.client) {
+                this.client.on("close", res).end()
+                this.client = null;
+            } else {
+                res(null)
+            }
+        })
 
-    private error(error?: any) {
-        // Console.log(error)
-        this.close()
     }
 
     private createNetAdapter() {
@@ -45,7 +45,7 @@ export class SSHTunnel extends EventEmitter {
             this.adapatServer = createServer((socket) => {
                 this.forward(socket)
             })
-                .on("error", err => {this.error(err);rej(err)})
+                .on("error", err => { this.close(); rej(err) })
                 .on("close", () => this.close())
                 .listen(this.config.localPort, this.config.localHost, () => {
                     res(null)
@@ -61,10 +61,14 @@ export class SSHTunnel extends EventEmitter {
                 .on("ready", () => {
                     res(this.client)
                 })
-                .on("error", err => {this.error(err);rej(err)})
+                .on("error", err => { this.close(); rej(err) })
                 .on("close", () => this.close())
                 // .on("close", this.close) 错误示范.. 这样传this对象变了
-                .connect(this.config)
+                .connect({
+                    ...this.config,
+                    localhostHost:null,
+                    localPort:null
+                })
         })
     }
 
@@ -75,11 +79,11 @@ export class SSHTunnel extends EventEmitter {
          */
         this.client.forwardOut(config.srcHost, config.srcPort, config.dstHost, config.dstPort, (err, sshStream) => {
             if (err) {
-                this.error(err)
+                this.emit("error", err)
                 return;
             }
             sshStream.on('error', (error) => {
-                this.error(error)
+                this.emit("error", error)
             });
             socket.pipe(sshStream).pipe(socket);
         });
