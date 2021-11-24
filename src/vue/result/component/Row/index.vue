@@ -32,11 +32,17 @@ export default {
       if (origin == undefined || origin == null) {
         return "<span class='null-column'>(NULL)</span>";
       }
+      const originType=origin.constructor.name;
+      console.log(origin)
       if (origin.hasOwnProperty("type")) {
         return String.fromCharCode.apply(null, new Uint16Array(origin.data));
       }
-      if (typeof origin == "string") {
+      if (originType == "String") {
         return origin.replace(/ /g, "&nbsp;").replace(/</g, "&lt;");
+      }else if(originType=="Array" && this.result.dbType=="PostgreSQL"){
+        const parsedArray=JSON.stringify(origin).replace(/\[/g,'{').replace(/\]/g,'}');
+        this.scope.row[this.scope.column.title]=parsedArray;
+        return parsedArray;
       }
       return origin;
     },
