@@ -7,4 +7,4 @@ assignees: ''
 
 ---
 
-- OS Info:
+<!-- Not all FeatureRequests will be accepted, but if it is a PullRequest, the author is happy to accept it -->
