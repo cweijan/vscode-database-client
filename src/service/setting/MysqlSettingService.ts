@@ -7,8 +7,8 @@ export class MysqlSettingService implements SettingService {
     private x64 = "C:\\Program Files\\MySQL";
     private x86 = "C:\\Program Files (x86)\\MySQL";
     public open() {
-        if (!process.platform.match(/win/ig)) {
-            vscode.window.showErrorMessage("Only Support Windows OS.");
+        if(process.platform!="win32"){
+            vscode.window.showErrorMessage("Only Support Windows system!");
             return;
         }
         let isOpen = this.check(this.x86);

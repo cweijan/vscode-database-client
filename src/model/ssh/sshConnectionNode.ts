@@ -16,6 +16,7 @@ import { FileNode } from "./fileNode";
 import { LinkNode } from "./linkNode";
 import prettyBytes = require("pretty-bytes");
 import { Global } from "@/common/global";
+import { exec } from "child_process";
 var progressStream = require('progress-stream');
 
 export class SSHConnectionNode extends Node {
@@ -66,7 +67,10 @@ export class SSHConnectionNode extends Node {
     }
 
     public startSocksProxy() {
-        var exec = require('child_process').exec;
+        if(process.platform!="win32"){
+            vscode.window.showErrorMessage("Only Support Windows system!");
+            return;
+        }
         if (this.sshConfig.privateKeyPath) {
             exec(`cmd /c start ssh -i ${this.sshConfig.privateKeyPath} -qTnN -D 127.0.0.1:1080 root@${this.sshConfig.host}`)
         } else {

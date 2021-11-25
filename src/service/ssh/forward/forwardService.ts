@@ -5,7 +5,6 @@ import { Constants } from '@/common/constants';
 import { SSHConfig } from '@/model/interface/sshConfig';
 import { Util } from '@/common/util';
 import { SSHTunnel } from '../tunnel/sshTunnel';
-import { platform } from "os";
 import { window } from "vscode";
 
 export class ForwardInfo {
@@ -62,8 +61,8 @@ export class ForwardService {
                 }).on("load", () => {
                     handler.emit("forwardList", this.list(sshConfig))
                 }).on("cmd", (content) => {
-                    if (platform() != "win32") {
-                        window.showErrorMessage("Only support windows system!")
+                    if(process.platform!="win32"){
+                        window.showErrorMessage("Only Support Windows system!");
                         return;
                     }
                     exec(`cmd.exe /C start cmd /C ${content}`)
