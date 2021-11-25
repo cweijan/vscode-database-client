@@ -23,7 +23,7 @@ import { UserGroup } from "./userGroup";
 export class ConnectionNode extends Node implements CopyAble {
 
     private static versionMap = {}
-    public iconPath: string | vscode.ThemeIcon = path.join(Constants.RES_PATH, "icon/mysql.svg");
+    public iconPath: string | vscode.ThemeIcon = path.join(Constants.RES_PATH, "icon/server/mysql.svg");
     public contextValue: string = ModelType.CONNECTION;
     constructor(readonly key: string, readonly parent: Node) {
         super(key)
@@ -44,7 +44,7 @@ export class ConnectionNode extends Node implements CopyAble {
         let dbNodes = DatabaseCache.getSchemaListOfConnection(this.uid);
         if (dbNodes && !isRresh) {
             for (const dbNode of dbNodes) {
-                if(dbNode.checkActive){
+                if (dbNode.checkActive) {
                     dbNode.checkActive();
                 }
             }
@@ -90,10 +90,6 @@ export class ConnectionNode extends Node implements CopyAble {
             this.description = (this.description || '') + " closed"
             return;
         }
-        const lcp = ConnectionManager.activeNode;
-        if (lcp && lcp.getConnectId().includes(this.getConnectId())) {
-            this.description = (this.description || '') + " Active";
-        }
         const version = ConnectionNode.versionMap[this.uid]
         if (version) {
             this.description = (this.description || '') + " " + version
@@ -120,7 +116,7 @@ export class ConnectionNode extends Node implements CopyAble {
         if (!versionSql) return;
         try {
             const version = (await this.execute(versionSql))[0]?.server_version
-            ConnectionNode.versionMap[this.uid]=version
+            ConnectionNode.versionMap[this.uid] = version
             this.description = (this.description || '') + " " + version
         } catch (error) {
             Console.log(error)
@@ -135,16 +131,31 @@ export class ConnectionNode extends Node implements CopyAble {
 
     }
 
+    /**
+     * herlper site:
+     * - https://www.iloveimg.com/zh-cn/resize-image/resize-svg
+     * - https://vectorpaint.yaks.co.nz/
+     */
     private getIcon() {
-        // https://www.iloveimg.com/zh-cn/resize-image/resize-svg
-        if (this.dbType == DatabaseType.PG) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/pg_server.svg");
-        } else if (this.dbType == DatabaseType.MSSQL) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/mssql_server.png");
-        } else if (this.dbType == DatabaseType.SQLITE) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/sqlite-icon.svg");
-        } else if (this.dbType == DatabaseType.MONGO_DB) {
-            this.iconPath = path.join(Constants.RES_PATH, "icon/mongodb-icon.svg");
+        const basePath = Constants.RES_PATH + "/icon/server/";
+        const isActive = ConnectionManager.activeNode?.getConnectId().includes(this.getConnectId());
+
+        switch (this.dbType) {
+            case DatabaseType.MYSQL:
+                this.iconPath = basePath + (isActive ? "mysql_active.svg": "mysql.svg" );
+                break;
+                case DatabaseType.PG:
+                this.iconPath = basePath + (isActive ? "pgsql_active.svg": "pgsql.svg" );
+                break;
+                case DatabaseType.MSSQL:
+                this.iconPath = basePath + (isActive ? "mssql.png": "mssql.png" );
+                break;
+                case DatabaseType.SQLITE:
+                this.iconPath = basePath + (isActive ? "sqlite_active.svg": "sqlite.svg" );
+                break;
+                case DatabaseType.MONGO_DB:
+                this.iconPath = basePath + (isActive ? "mongo_active.svg": "mongo.svg" );
+                break;
         }
     }
 

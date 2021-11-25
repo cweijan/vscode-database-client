@@ -49,7 +49,7 @@ export class EsConnectionNode extends Node {
             this.description = EsConnectionNode.versionMap[this.label]
         } else {
             this.execute<any>('get /').then(res => {
-                this.description=`version: ${res.version.number}`
+                this.description=res.version.number
                 EsConnectionNode.versionMap[this.label]=this.description
                 DbTreeDataProvider.refresh(this)
             }).catch(err=>{
@@ -57,9 +57,8 @@ export class EsConnectionNode extends Node {
             })
         }
 
-        if (this.isActive(lcp)) {
-            this.description = `${this.description}   Active`;
-        }
+        const basePath = Constants.RES_PATH + "/icon/server/";
+        this.iconPath = basePath + (this.isActive(lcp) ? "elasticsearch_active.svg": "elasticsearch.svg" );
 
     }
 
