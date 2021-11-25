@@ -96,10 +96,10 @@ export default {
       this.visible = true;
     },
     showPreview() {
-      if (this.model == "insert") {
-        this.previewSQL = this.buildInsertSQL();
-      }else{
+      if (this.model == "update") {
         this.previewSQL=this.buildUpdateSql(this.editModel,this.originModel)
+      }else{
+        this.previewSQL = this.buildInsertSQL();
       }
       if(!this.previewSQL){
         this.previewSQL="   "
