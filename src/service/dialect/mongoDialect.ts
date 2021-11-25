@@ -6,6 +6,15 @@ import { SqlDialect } from "./sqlDialect";
 
 export class MongoDialect implements SqlDialect{
     showVersion(): string {
+        return 'show version';
+    }
+    showDatabases(): string {
+        return 'show dbs';
+    }
+    buildPageSql(database: string, table: string, pageSize: number): string {
+        return `db('${database}').collection('${table}').find({}).limit(${pageSize}).toArray()`;
+    }
+    pingDataBase(database: string): string {
         return null;
     }
     dropIndex(table: string, indexName: string): string {
@@ -28,9 +37,6 @@ export class MongoDialect implements SqlDialect{
     }
     updateColumn(table: string, column: ColumnMeta): string {
         throw new Error("Method not implemented.");
-    }
-    showDatabases(): string {
-        return 'show dbs';
     }
     showTables(database: string): string {
         throw new Error("Method not implemented.");
@@ -61,9 +67,6 @@ export class MongoDialect implements SqlDialect{
     }
     showFunctions(database: string): string {
         throw new Error("Method not implemented.");
-    }
-    buildPageSql(database: string, table: string, pageSize: number): string {
-        return `db('${database}').collection('${table}').find({}).limit(${pageSize}).toArray()`;
     }
     countSql(database: string, table: string): string {
         throw new Error("Method not implemented.");
@@ -115,9 +118,6 @@ export class MongoDialect implements SqlDialect{
     }
     statusList(): string {
         throw new Error("Method not implemented.");
-    }
-    pingDataBase(database: string): string {
-        return null;
     }
     dropTriggerTemplate(name: string): string {
         throw new Error("Method not implemented.");

@@ -18,25 +18,25 @@ export class MongoConnection extends IConnection {
     }
 
     connect(callback: (err: Error) => void): void {
-        let url=this.node.connectionUrl;
+        let url = this.node.connectionUrl;
         if (url) {
-          this.option = { useNewUrlParser: true}
+            this.option = { useNewUrlParser: true }
         } else {
-          url = `mongodb://${this.node.host}:${this.node.port}`;
-          if (this.node.user || this.node.password) {
-            const escapedUser = encodeURIComponent(this.node.user)
-            const escapedPassword = encodeURIComponent(this.node.password)
-            url = `mongodb://${escapedUser}:${escapedPassword}@${this.node.host}:${this.node.port}`;
-          }
+            url = `mongodb://${this.node.host}:${this.node.port}`;
+            if (this.node.user || this.node.password) {
+                const escapedUser = encodeURIComponent(this.node.user)
+                const escapedPassword = encodeURIComponent(this.node.password)
+                url = `mongodb://${escapedUser}:${escapedPassword}@${this.node.host}:${this.node.port}`;
+            }
         }
         MongoClient.connect(url, this.option, (err, client) => {
-          if (!err) {
-            this.client = client;
-            this.conneted = true;
-          }
-          callback(err)
+            if (!err) {
+                this.client = client;
+                this.conneted = true;
+            }
+            callback(err)
         })
-      }
+    }
 
     run(callback: (client: MongoClient) => void) {
 
@@ -62,39 +62,47 @@ export class MongoConnection extends IConnection {
         if (!callback && values instanceof Function) {
             callback = values;
         }
-        if (sql == 'show dbs') {
-            this.client.db().admin().listDatabases().then((res) => {
-                callback(null, res.databases.map((db: any) => ({ Database: db.name })))
-                console.log(res)
-            })
-        } else {
-            try {
-                const result = await eval('this.client.' + sql)
-                if (result == null || result?.constructor?.name=='Collection') {
-                    callback(null)
-                } else if (Number.isInteger(result)) {
-                    callback(null, result)
-                } else if (result.insertedCount != undefined) {
-                    callback(null, { affectedRows: result.insertedCount })
-                } else if (result.updatedCount != undefined) {
-                    callback(null, { affectedRows: result.updatedCount })
-                } else if (result.deletedCount != undefined) {
-                    callback(null, { affectedRows: result.deletedCount })
-                } else {
-                    this.handleSearch(sql, result, callback)
+        switch (sql) {
+            case 'show dbs':
+                this.client.db().admin().listDatabases().then((res) => {
+                    callback(null, res.databases.map((db: any) => ({ Database: db.name })))
+                    console.log(res)
+                })
+                break;
+                case 'show version':
+                this.client.db().admin().serverStatus().then((info) => {
+                    callback(null, [{server_version:info.version}])
+                })
+                break;
+            default:
+                try {
+                    const result = await eval('this.client.' + sql)
+                    if (result == null || result?.constructor?.name == 'Collection') {
+                        callback(null)
+                    } else if (Number.isInteger(result)) {
+                        callback(null, result)
+                    } else if (result.insertedCount != undefined) {
+                        callback(null, { affectedRows: result.insertedCount })
+                    } else if (result.updatedCount != undefined) {
+                        callback(null, { affectedRows: result.updatedCount })
+                    } else if (result.deletedCount != undefined) {
+                        callback(null, { affectedRows: result.deletedCount })
+                    } else {
+                        this.handleSearch(sql, result, callback)
+                    }
+                } catch (error) {
+                    callback(error)
                 }
-            } catch (error) {
-                callback(error)
-            }
         }
+
     }
 
 
 
     private async handleSearch(sql: any, data: any, callback: any) {
         let fields = null;
-        if(!data.map){
-            data=[data]
+        if (!data.map) {
+            data = [data]
         }
 
         let rows = data.map((document: any) => {
