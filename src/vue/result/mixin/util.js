@@ -25,7 +25,7 @@ export const util = {
                 return "null"
             }
             // method call 
-            if (/\(.*?\)/.exec(value)) {
+            if (/.+?\(.*?\)/.exec(value)) {
                 return value
             }
             if (typeof value == "string") {

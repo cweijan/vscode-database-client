@@ -4,13 +4,14 @@
       <el-input class='edit-filter' v-model="filterObj[scope.column.title]" :clearable='true' placeholder="Filter" @clear="filter(null,scope.column.title)" @keyup.enter.native="filter($event,scope.column.title)">
       </el-input>
     </template>
-    <template v-else-if="!scope.row.isFilter && result.dbType=='ElasticSearch'">
-      <div class="edit-column" :contenteditable="editable" style="height: 100%; line-height: 33px;" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" v-html='dataformat(scope.row[scope.column.title])' @paste="onPaste"></div>
-    </template>
     <template v-else>
-      <div class="edit-column" :contenteditable="editable" style="height: 100%; line-height: 33px;" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" @paste="onPaste">
-        <template v-if="scope.row[scope.column.title]==null || scope.row[scope.column.title]==undefined">
-          <span class='null-column'>(NULL)</span>
+      <div class="edit-column" :contenteditable="editable"  @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" @paste="onPaste" @focus="focus" @blur="bluer">
+        <template v-if="result.dbType=='ElasticSearch'" >
+          <div v-html='dataformat(scope.row[scope.column.title])'>
+          </div>
+        </template>
+        <template v-else-if="isNull">
+          <span class='null-column' >{{nullText}}</span>
         </template>
         <template v-else>
           <span v-html='dataformat(scope.row[scope.column.title])'></span>
@@ -27,20 +28,33 @@ import { wrapByDb } from "@/common/wrapper";
 export default {
   props: ["result", "scope", "editList", "filterObj"],
   mixins: [util],
+  data() {
+    return {
+      nullText: '(NULL)',
+    }
+  },
   methods: {
+    focus(e) {
+      if(!this.isNull || e.srcElement.innerText!='(NULL)')return;
+      this.nullText=""
+    },
+    bluer(e) {
+      if(!this.isNull || e.srcElement.innerText )return;
+      this.nullText = '(NULL)';
+    },
     dataformat(origin) {
       if (origin == undefined || origin == null) {
         return "<span class='null-column'>(NULL)</span>";
       }
-      const originType=origin.constructor.name;
+      const originType = origin.constructor.name;
       if (origin.hasOwnProperty("type")) {
         return String.fromCharCode.apply(null, new Uint16Array(origin.data));
       }
       if (originType == "String") {
         return origin.replace(/ /g, "&nbsp;").replace(/</g, "&lt;");
-      }else if(originType=="Array" && this.result.dbType=="PostgreSQL"){
-        const parsedArray=JSON.stringify(origin).replace(/\[/g,'{').replace(/\]/g,'}');
-        this.scope.row[this.scope.column.title]=parsedArray;
+      } else if (originType == "Array" && this.result.dbType == "PostgreSQL") {
+        const parsedArray = JSON.stringify(origin).replace(/\[/g, '{').replace(/\]/g, '}');
+        this.scope.row[this.scope.column.title] = parsedArray;
         return parsedArray;
       }
       return origin;
@@ -109,9 +123,9 @@ export default {
           inputvalue.toLowerCase() === "null"
             ? `${column} is null`
             : `${wrapByDb(
-                column,
-                this.result.dbType
-              )} ${operation} '${inputvalue.replace(/'/g, "''")}'`;
+              column,
+              this.result.dbType
+            )} ${operation} '${inputvalue.replace(/'/g, "''")}'`;
         if (existsCheck.exec(filterSql)) {
           // condition present
           filterSql = filterSql.replace(existsCheck, `$1 ${condition} `);
@@ -231,6 +245,9 @@ export default {
     },
   },
   computed: {
+    isNull(){
+      return this.scope.row[this.scope.column.title] == undefined;
+    },
     editable() {
       return this.result.primaryKey && this.result.tableCount == 1;
     },
@@ -238,11 +255,16 @@ export default {
 };
 </script>
 
-<style>
+<style >
 .col--edit .plx-cell {
   text-align: unset !important;
 }
 .edit-column {
   padding-left: 10px !important;
 }
+.edit-column{
+  height: 100%;
+  line-height: 33px;
+}
+
 </style>
