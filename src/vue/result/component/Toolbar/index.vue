@@ -4,12 +4,11 @@
     </el-button>
     <!-- <el-button v-if="!result.single" @click="()=>$emit('sendToVscode','toSingle')" type="success" title="Lock This Panel" icon="el-icon-lock" size="mini" circle>
     </el-button> -->
-    <el-button v-if="result.single" @click="()=>$emit('sendToVscode','removeSingle')" type="danger" title="Unlock This Panel" icon="el-icon-unlock" size="mini" circle>
-    </el-button>
     <el-input v-model="searchInput" size="mini" :placeholder="$t('result.searchNotice')" style="width:200px" :clearable="true" />
-    <el-button icon="icon-coffee" title="Buy Author a Coffee." style="color:var(--vscode-charts-orange);" @click='()=>$emit("sendToVscode", "openCoffee")'></el-button>
-    <el-button icon="icon-github" title="Star the project to represent support." @click='()=>$emit("sendToVscode", "openGithub")'></el-button>
-    <el-button icon="el-icon-circle-plus-outline" style="color:var(--vscode-terminal-ansiCyan);"  @click="$emit('insert')" title="Insert new row"></el-button>
+    <el-button icon="el-icon-unlock" v-if="result.single" @click="()=>$emit('sendToVscode','removeSingle')" title="Unlock This Panel"  />
+    <el-button icon="icon-coffee" title="Buy Author a Coffee." style="color:var(--vscode-charts-orange);" @click='()=>$emit("sendToVscode", "openCoffee")'/>
+    <el-button icon="icon-github" title="Star the project to represent support." @click='()=>$emit("sendToVscode", "openGithub")'/>
+    <el-button icon="el-icon-circle-plus-outline" style="color:var(--vscode-terminal-ansiCyan);"  @click="$emit('insert')" title="Insert new row"/>
     <el-button icon="el-icon-delete" style="color:#f56c6c" @click="$emit('deleteConfirm');" title="delete"></el-button>
     <el-button icon="el-icon-bottom" @click="$emit('export');" style="color:var(--vscode-charts-blue);" title="Export"></el-button>
     <el-button icon="icon-run" title="Execute Sql" style="color: var(--vscode-terminal-ansiBrightGreen);" @click="$emit('run');"></el-button>

@@ -22,8 +22,9 @@
                 {{ column.name }}
               </el-checkbox>
             </el-checkbox-group>
-            <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference">
-            </el-button>
+            <!-- <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference">
+            </el-button> -->
+            <el-button icon="el-icon-search" title="Select columns to show."  slot="reference"/>
           </el-popover>
         </template>
         <!-- <Controller slot="header" :result="result" :toolbar="toolbar" /> -->
@@ -113,7 +114,7 @@ export default {
   mounted() {
     const hint=this.$refs.hint;
     const updateHeight=()=>{
-      this.remainHeight = window.innerHeight -15 - hint.clientHeight ;
+      this.remainHeight = window.innerHeight -10 - hint.clientHeight ;
       this.showFullBtn = window.outerWidth / window.innerWidth >= 2;
     }
     updateHeight()
@@ -494,3 +495,25 @@ export default {
   },
 };
 </script>
+
+
+<style scoped>
+.el-button--default {
+  padding: 0;
+  border: none;
+  font-size: 17px;
+  margin-left: 7px;
+}
+
+.el-button:focus{
+  color: inherit !important;
+  background-color: var(--vscode-editor-background);
+}
+
+.el-button:hover {
+  color: #409eff !important;
+  border-color: #c6e2ff;
+  background-color: var(--vscode-editor-background);
+}
+
+</style>

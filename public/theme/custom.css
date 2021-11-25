@@ -126,10 +126,14 @@ https://www.umyui.com/
   border: 1px solid var(--umy-border-color) !important;
 }
 
+.plx-table .plx-body--column.col--checkbox{
+  height: 37px;
+}
+
 .plx-table .plx-table--fixed-left-wrapper,
 .plx-body--column, .plx-header--column {
   background: none !important;
-  border: 1px solid var(--umy-border-color) !important;
+  /* border: 1px solid var(--umy-border-color) !important; */
   border-left: none !important;
   border-right: none !important;
 }

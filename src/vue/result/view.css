@@ -47,5 +47,6 @@ overflow: unset;
 }
 
 .el-popover__reference{
-  background-color: #409EFF;
+  color: var(--input-color);
+  background-color: unset;
 }

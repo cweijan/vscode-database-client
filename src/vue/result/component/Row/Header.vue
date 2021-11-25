@@ -1,5 +1,5 @@
 <template>
-  <el-tooltip class="item" effect="dark" :content="getTip(result.columnTypeMap[scope.column.title],scope.column)" placement="left-start">
+  <!-- <el-tooltip class="item" effect="dark" :content="getTip(result.columnTypeMap[scope.column.title],scope.column)" placement="left-start"> -->
     <div>
       <span>
         <span v-if="result.columnTypeMap[scope.column.title]&& (result.columnTypeMap[scope.column.title].nullable != 'YES')" style="color: #f94e4e; position: relative; top: .2em;">
@@ -14,7 +14,7 @@
         {{result.columnTypeMap[scope.column.title].type}}
       </span>
     </div>
-  </el-tooltip>
+  <!-- </el-tooltip> -->
 </template>
 
 <script>
