@@ -4,7 +4,7 @@ import { ViewManager } from "@/common/viewManager";
 import { Node } from "@/model/interface/node";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import * as path from "path";
-import { commands, ThemeIcon, TreeItemCollapsibleState } from "vscode";
+import { commands, ThemeIcon, TreeItemCollapsibleState, window } from "vscode";
 import RedisBaseNode from "./redisBaseNode";
 
 export default class KeyNode extends RedisBaseNode {
@@ -68,6 +68,9 @@ export default class KeyNode extends RedisBaseNode {
                     }))
                 }
                 break;
+                default:
+                    window.showErrorMessage(`Unsupport type ${type}!`)
+                    return;
         }
         const title = `${type}:${this.label}`;
 
