@@ -153,11 +153,9 @@ export default {
     vscodeEvent = getVscodeEvent();
 
     vscodeEvent.on("updateSuccess", () => {
-      for (const index in this.update.editList) {
-        const element = this.update.editList[index];
-        this.result.data[index] = element;
-      }
       this.update.editList = [];
+      this.result.data=[]
+      this.refresh()
       this.update.lock = false;
       this.$message({
         showClose: true,

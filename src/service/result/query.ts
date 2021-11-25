@@ -12,7 +12,7 @@ import { Node } from "../../model/interface/node";
 import { ColumnNode } from "../../model/other/columnNode";
 import { ExportService } from "../export/exportService";
 import { QueryOption, QueryUnit } from "../queryUnit";
-import { DataResponse } from "./queryResponse";
+import { DataResponse, ErrorResponse } from "./queryResponse";
 import { ResourceServer } from "../resourceServer";
 
 export class QueryParam<T> {
@@ -113,7 +113,10 @@ export class QueryPage {
                         handler.emit('updateSuccess')
                         handler.panel.title = handler.panel.title.replace("*", "")
                     }).catch(err => {
-                        handler.emit("updateFail", err)
+                        QueryPage.send({
+                            connection: queryParam.connection, type: MessageType.ERROR, queryOption: queryParam.queryOption,
+                            res: { sql, message: err.message } as ErrorResponse
+                        });
                     })
                 })
             }
