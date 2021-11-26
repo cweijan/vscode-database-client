@@ -38,7 +38,7 @@ export class QueryUnit {
     public static async runQuery(sql: string, connectionNode: Node, queryOption: QueryOption = {}): Promise<void> {
 
         if (!connectionNode) {
-            vscode.window.showErrorMessage("Not active database connection found!")
+            vscode.window.showErrorMessage("No active database connection found!")
             return;
         }
 
@@ -52,7 +52,7 @@ export class QueryUnit {
             queryOption.recordHistory = true;
         }
         if (!sql) {
-            vscode.window.showErrorMessage("Not sql found!")
+            vscode.window.showErrorMessage("No SQL found!")
             return;
         }
 
@@ -61,7 +61,7 @@ export class QueryUnit {
         const parseResult = DelimiterHolder.parseBatch(sql, connectionNode.getConnectId())
         sql = parseResult.sql
         if (!sql && parseResult.replace) {
-            QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, queryOption, res: { message: `change delimiter success`, success: true } as MessageResponse });
+            QueryPage.send({ connection: connectionNode, type: MessageType.MESSAGE, queryOption, res: { message: `Change delimiter success`, success: true } as MessageResponse });
             return;
         }
 

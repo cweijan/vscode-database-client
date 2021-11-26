@@ -34,7 +34,7 @@ export class TriggerNode extends Node {
 
     public drop() {
         if (this.dbType == DatabaseType.PG) {
-            vscode.window.showErrorMessage("This extension not support drop postgresql trigger.")
+            vscode.window.showErrorMessage("Not support drop postgresql trigger.")
             return;
         }
         Util.confirm(`Are you want to drop trigger ${this.name} ?`, async () => {

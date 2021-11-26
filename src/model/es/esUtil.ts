@@ -9,7 +9,7 @@ export class EsUtil {
     public static async executeEsQueryFile(em: ElasticMatch, parse: boolean) {
         const node = ConnectionManager.tryGetConnection();
         if (node == null) {
-            vscode.window.showErrorMessage("Not active es server found!")
+            vscode.window.showErrorMessage("No active es server found!")
             return;
         }
         if (parse) {

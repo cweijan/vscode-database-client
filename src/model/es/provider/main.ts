@@ -35,5 +35,5 @@ function runES(){
             return;
         }
     }
-    vscode.window.showErrorMessage("Not elastic search query found!");
+    vscode.window.showErrorMessage("No elastic search query found!");
 }

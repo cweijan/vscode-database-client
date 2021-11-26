@@ -17,7 +17,7 @@ export class DocumentFinder {
 
         const docuemntPath = this.find(path)
         if (!docuemntPath) {
-            vscode.window.showErrorMessage("Not doucment found!")
+            vscode.window.showErrorMessage("No doucment found!")
             return;
         }
 
