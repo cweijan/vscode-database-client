@@ -24,6 +24,7 @@ export class TokenContext {
                 }
                 break;
             case ",":
+            case "=":
                 this.splitToken(i, j, char);
                 break;
             case "(":
