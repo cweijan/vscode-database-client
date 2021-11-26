@@ -30,6 +30,7 @@ export class ConnectionNode extends Node implements CopyAble {
         this.init(parent)
         this.cacheSelf()
         this.getLabel(parent);
+        this.bindToolTip()
         this.getIcon();
         this.getStatus();
     }
@@ -106,6 +107,12 @@ export class ConnectionNode extends Node implements CopyAble {
             this.name = parent.name;
             const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true);
             preferName ? this.label = parent.name : this.description = parent.name;
+        }
+    }
+
+    private bindToolTip() {
+        if(this.parent.name){
+            this.tooltip=`Host: ${this.host}, Port: ${this.port}`;
         }
     }
 
