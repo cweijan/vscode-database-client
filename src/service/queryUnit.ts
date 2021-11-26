@@ -80,8 +80,8 @@ export class QueryUnit {
                     vscode.commands.executeCommand(CodeCommand.RecordHistory, sql, costTime);
                 }
 
-                if (sql.match(/(create|drop|alter)\s+(table|prcedure|FUNCTION|VIEW)/i)) {
-                    vscode.commands.executeCommand(CodeCommand.Refresh);
+                if (sql.match(/(create|drop|alter)\s+(database|table|procedure|FUNCTION|VIEW)/i)) {
+                    vscode.commands.executeCommand(CodeCommand.Refresh,connectionNode);
                 }
 
                 if (data?.affectedRows) {
