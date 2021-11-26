@@ -12,7 +12,7 @@ export class UserGroup extends SchemaNode {
     public contextValue: string = ModelType.USER_GROUP;
     public iconPath =new ThemeIcon("account")
     constructor(readonly name: string, readonly parent: Node) {
-        super(name,parent)
+        super(name,null,parent)
         this.init(parent)
         // fix switch database fail.
         this.schema = null

@@ -21,27 +21,13 @@ export class SchemaNode extends Node implements CopyAble {
 
 
     public contextValue: string = ModelType.SCHEMA;
-    constructor(public schema: string, readonly parent: Node) {
+    constructor(public schema: string,readonly meta:any, readonly parent: Node) {
         super(schema)
         this.init(this.parent)
         this.cacheSelf()
         this.iconPath = this.getIcon()
+        this.bindTooTip();
         this.checkActive();
-    }
-
-    public checkActive() {
-        const lcp = ConnectionManager.activeNode;
-        const active = this.isActive(lcp) && (lcp.database == this.database) && (lcp.schema == this.schema);
-        this.iconPath = this.getIcon(active);
-    }
-
-    private getIcon(active?: boolean): vscode.ThemeIcon {
-
-        const iconId = this.dbType == DatabaseType.MYSQL ? "database" : "symbol-struct"
-        if (Util.supportColorIcon()) {
-            return new vscode.ThemeIcon(iconId, new vscode.ThemeColor(active ? 'charts.blue' : 'dropdown.foreground'));
-        }
-        return new vscode.ThemeIcon(iconId);
     }
 
     public getChildren(): Promise<Node[]> | Node[] {
@@ -70,6 +56,27 @@ export class SchemaNode extends Node implements CopyAble {
         }
 
         return childs;
+    }
+
+    public checkActive() {
+        const lcp = ConnectionManager.activeNode;
+        const active = this.isActive(lcp) && (lcp.database == this.database) && (lcp.schema == this.schema);
+        this.iconPath = this.getIcon(active);
+    }
+
+    private getIcon(active?: boolean): vscode.ThemeIcon {
+
+        const iconId = this.dbType == DatabaseType.MYSQL ? "database" : "symbol-struct"
+        if (Util.supportColorIcon()) {
+            return new vscode.ThemeIcon(iconId, new vscode.ThemeColor(active ? 'charts.blue' : 'dropdown.foreground'));
+        }
+        return new vscode.ThemeIcon(iconId);
+    }
+
+    private bindTooTip() {
+        if(this.dbType==DatabaseType.MYSQL && this.meta){
+            this.tooltip=`Charset: ${this.meta.charset}\nCollation: ${this.meta.collation}`
+        }
     }
 
     public dropDatatabase() {

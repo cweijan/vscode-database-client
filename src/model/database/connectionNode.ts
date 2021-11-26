@@ -71,7 +71,7 @@ export class ConnectionNode extends Node implements CopyAble {
                 }).map<SchemaNode | CatalogNode>((database) => {
                     return hasCatalog ?
                         new CatalogNode(database.Database, this)
-                        : new SchemaNode(database.schema || database.Database, this);
+                        : new SchemaNode(database.schema || database.Database,database, this);
                 });
 
                 if (Global.getConfig("showUser") && !hasCatalog) {

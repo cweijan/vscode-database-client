@@ -118,7 +118,7 @@ ADD
         return `SELECT table_comment \`comment\`,TABLE_NAME as \`name\`,TABLE_ROWS \`rows\`,auto_increment,\`row_format\`,data_length,index_length FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' order by table_name COLLATE utf8_bin;`
     }
     showSchemas(): string {
-        return "show databases"
+        return "SELECT SCHEMA_NAME `Database`,DEFAULT_CHARACTER_SET_NAME `charset`,DEFAULT_COLLATION_NAME `collation` FROM information_schema.schemata;"
     }
     tableTemplate(): string {
         return `CREATE TABLE [name](  
