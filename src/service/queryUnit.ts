@@ -98,14 +98,10 @@ export class QueryUnit {
                         QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total } as DataResponse });
                         return;
                     }
-                }
-
-                if (Array.isArray(data)) {
-                    // mysql procedrue call result
-                    const lastEle = data[data.length - 1]
-                    if (data.length >= 2 && Util.is(lastEle, 'ResultSetHeader') && Util.is(data[0], 'TextRow')) {
-                        data = data[data.length - 2]
-                        fields = fields[fields.length - 2] as any as FieldInfo[]
+                    // is multiple query result.
+                    if(Util.is(fields[0], 'Array')){
+                        data=data[0]
+                        fields = fields[0] as any as FieldInfo[]
                         QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total } as DataResponse });
                         return;
                     }
