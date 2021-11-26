@@ -1,13 +1,12 @@
 import { GlobalState, WorkState } from "@/common/state";
-import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
+import { TreeItemCollapsibleState } from "vscode";
 import { CacheKey, ModelType } from "../../common/constants";
 import { SchemaNode } from "../../model/database/schemaNode";
 import { Node } from "../../model/interface/node";
 
 export class DatabaseCache {
 
-    private static cache = { database: {} };
-    private static childCache = {};
+    private static cache = { database: {}, object: {} };
     private static globalCollpaseState: { key?: TreeItemCollapsibleState };
     private static workspaceCollpaseState: { key?: TreeItemCollapsibleState };
 
@@ -68,17 +67,17 @@ export class DatabaseCache {
     }
 
     public static clearCache() {
-        this.childCache = {}
+        this.cache.object = {}
         this.cache.database = {}
     }
 
 
     public static setChildCache(uid: string, tableNodeList: Node[]) {
-        this.childCache[uid] = tableNodeList;
+        this.cache.object[uid] = tableNodeList;
     }
 
     public static getChildCache<T extends Node>(uid: string): T[] {
-        return this.childCache[uid];
+        return this.cache.object[uid];
     }
 
     /**
