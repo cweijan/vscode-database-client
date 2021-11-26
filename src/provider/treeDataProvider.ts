@@ -119,15 +119,19 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         return this.instances;
     }
 
-    public async getConnectionNodes(): Promise<Node[]> {
+    public getConnectionNodes(): Node[] {
 
         const connetKey = this.connectionKey;
         let globalConnections = GlobalState.get<{ [key: string]: Node }>(connetKey, {});
         let workspaceConnections = WorkState.get<{ [key: string]: Node }>(connetKey, {});
 
-        return Object.keys(workspaceConnections).map(key => this.getNode(workspaceConnections[key], key, false, connetKey)).concat(
-            Object.keys(globalConnections).map(key => this.getNode(globalConnections[key], key, true, connetKey))
-        )
+        const connections =[
+            ...Object.keys(workspaceConnections).map(key => this.getNode(workspaceConnections[key], key, false, connetKey)),
+            ...Object.keys(globalConnections).map(key => this.getNode(globalConnections[key], key, true, connetKey))
+        ]
+
+        return connections.length>0?connections:[new InfoNode("You haven't created any connections")];
+
     }
 
     private getNode(connectInfo: Node, key: string, global: boolean, connectionKey: string) {
@@ -166,9 +170,9 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
         const dbIdList: string[] = [];
         const dbIdMap = new Map<string, Node>();
-        const connectionNodes = await this.getConnectionNodes()
+        const connectionNodes = this.getConnectionNodes()
         for (const cNode of connectionNodes) {
-            if(cNode.disable){
+            if (cNode.disable || cNode instanceof InfoNode) {
                 continue;
             }
             if (cNode.dbType == DatabaseType.SQLITE) {
@@ -188,7 +192,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
                 }
             } else {
                 schemaList = DatabaseCache.getSchemaListOfConnection(cNode.uid)
-                if(!schemaList)continue;
+                if (!schemaList) continue;
             }
 
             for (const schemaNode of schemaList) {

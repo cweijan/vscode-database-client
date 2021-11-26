@@ -22,7 +22,7 @@ export class DiffService {
                 handler.on("init", () => {
                     handler.emit('route', 'structDiff')
                 }).on("route-structDiff", async () => {
-                    const nodes = (await provider.getConnectionNodes()).filter(cNode=>!cNode.disable)
+                    const nodes = ( provider.getConnectionNodes()).filter(cNode=>(!cNode.disable && !(cNode instanceof InfoNode)))
                     let databaseList = {}
                     for (const node of nodes) {
                         try {
