@@ -103,7 +103,7 @@ export class QueryUnit {
                 if (Array.isArray(data)) {
                     // mysql procedrue call result
                     const lastEle = data[data.length - 1]
-                    if (data.length > 2 && Util.is(lastEle, 'ResultSetHeader') && Util.is(data[0], 'TextRow')) {
+                    if (data.length >= 2 && Util.is(lastEle, 'ResultSetHeader') && Util.is(data[0], 'TextRow')) {
                         data = data[data.length - 2]
                         fields = fields[fields.length - 2] as any as FieldInfo[]
                         QueryPage.send({ connection: connectionNode, type: MessageType.DATA, queryOption, res: { sql, costTime, data, fields, total } as DataResponse });
