@@ -136,7 +136,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         return `SELECT Concat('TRUNCATE TABLE "',TABLE_NAME, '";') trun FROM INFORMATION_SCHEMA.TABLES WHERE  table_schema ='${database}' AND table_type='BASE TABLE';`
     }
     createDatabase(database: string): string {
-        return `create database "${database}"`;
+        return `CREATE DATABASE [name]`;
     }
     showTableSource(database: string, table: string): string {
         return '';

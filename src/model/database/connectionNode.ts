@@ -1,6 +1,5 @@
 import { Console } from "@/common/Console";
 import { Global } from "@/common/global";
-import axios from "axios";
 import * as path from "path";
 import * as vscode from "vscode";
 import { ConfigKey, Constants, DatabaseType, ModelType } from "../../common/constants";
@@ -190,14 +189,7 @@ export class ConnectionNode extends Node implements CopyAble {
     }
 
     public createDatabase() {
-        vscode.window.showInputBox({ placeHolder: 'Input you want to create new database name.' }).then(async (inputContent) => {
-            if (!inputContent) { return; }
-            this.execute(this.dialect.createDatabase(inputContent)).then(() => {
-                DatabaseCache.clearDatabaseCache(this.uid);
-                DbTreeDataProvider.refresh(this);
-                vscode.window.showInformationMessage(`create database ${inputContent} success!`);
-            });
-        });
+        FileManager.showSQLTextDocument(this, this.dialect.createDatabase(''), 'create-db-template.sql')
     }
 
     public async deleteConnection(context: vscode.ExtensionContext) {

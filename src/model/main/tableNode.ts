@@ -27,7 +27,7 @@ export class TableNode extends Node implements CopyAble {
             // this.iconPath=new vscode.ThemeIcon("split-horizontal",new vscode.ThemeColor("problemsWarningIcon.foreground"))
         }
         this.init(parent)
-        this.tooltip = this.getToolTipe(meta)
+        this.bindToolTipe(meta)
         this.cacheSelf()
         this.command = {
             command: "mysql.table.find",
@@ -78,7 +78,7 @@ export class TableNode extends Node implements CopyAble {
             }
         } else {
             const pkList = [];
-            const colDefList=[];
+            const colDefList = [];
             const childs = await this.getChildren();
             for (let i = 0; i < childs.length; i++) {
                 const child: ColumnNode = childs[i] as ColumnNode;
@@ -86,7 +86,7 @@ export class TableNode extends Node implements CopyAble {
                 colDefList.push(`    ${child.column.name} ${child.type}`);
             }
             sql = `CREATE TABLE ${this.table}(
-${colDefList.join(",\n")}${pkList.length>0?`,\n    PRIMARY KEY(${pkList.join(",")})`:""}
+${colDefList.join(",\n")}${pkList.length > 0 ? `,\n    PRIMARY KEY(${pkList.join(",")})` : ""}
 )`
         }
         if (open) {
@@ -189,14 +189,10 @@ ${colDefList.join(",\n")}${pkList.length>0?`,\n    PRIMARY KEY(${pkList.join(","
         ConnectionManager.changeActive(this)
     }
 
-    public getToolTipe(meta: TableMeta): string {
-        if (this.dbType == DatabaseType.MYSQL && meta.data_length) {
-            return `AUTO_INCREMENT : ${meta.auto_increment || 'null'}
-ROW_FORMAT : ${meta.row_format}
-`
+    public bindToolTipe(meta: TableMeta) {
+        if (this.dbType == DatabaseType.MYSQL) {
+            this.tooltip = `AUTO_INCREMENT : ${meta.auto_increment || 'null'} \nROW_FORMAT : ${meta.row_format} `
         }
-
-        return ''
     }
 
     public insertSqlTemplate(show: boolean = true): Promise<string> {

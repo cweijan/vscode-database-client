@@ -75,7 +75,8 @@ ADD
         return `SELECT Concat('TRUNCATE TABLE \`',table_schema,'\`.\`',TABLE_NAME, '\`;') trun FROM INFORMATION_SCHEMA.TABLES where  table_schema ='${database}' and TABLE_TYPE<>'VIEW';`
     }
     createDatabase(database: string): string {
-        return `create database \`${database}\` default character set = 'utf8mb4' `;
+        return `CREATE DATABASE [name]
+    DEFAULT CHARACTER SET = 'utf8mb4';`;
     }
     showTableSource(database: string, table: string): string {
         return `SHOW CREATE TABLE \`${database}\`.\`${table}\`;`

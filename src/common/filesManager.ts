@@ -1,12 +1,19 @@
 import * as path from 'path';
 import * as vscode from "vscode";
 import * as fs from 'fs';
+import { Node } from '@/model/interface/node';
 
 export class FileManager {
 
     public static storagePath: string;
     public static init(context: vscode.ExtensionContext) {
         this.storagePath = context.globalStoragePath;
+    }
+
+    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql", fileMode: FileModel = FileModel.WRITE): Promise<vscode.TextEditor> {
+
+        const document = await vscode.workspace.openTextDocument(await FileManager.record(`${node.uid}/${template}`, sql, fileMode));
+        return await vscode.window.showTextDocument(document);
     }
 
     public static show(fileName: string): Promise<vscode.TextEditor> {
