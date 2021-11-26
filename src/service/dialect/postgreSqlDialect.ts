@@ -192,11 +192,11 @@ WHERE schemaname='${database}'
     }
     showTables(database: string): string {
         return `  SELECT t.table_name "name", pg_catalog.obj_description(pgc.oid, 'pg_class') "comment"
-        FROM information_schema.tables t
-        JOIN pg_catalog.pg_class pgc ON t.table_name = pgc.relname 
-        JOIN pg_catalog.pg_namespace pgn ON pgn.oid=pgc.relnamespace and pgn.nspname=t.table_schema
-        WHERE t.table_type='BASE TABLE'
-        AND t.table_schema='${database}' order by t.table_name;`
+FROM information_schema.tables t
+JOIN pg_catalog.pg_class pgc ON t.table_name = pgc.relname 
+JOIN pg_catalog.pg_namespace pgn ON pgn.oid=pgc.relnamespace and pgn.nspname=t.table_schema
+WHERE t.table_type='BASE TABLE'
+AND t.table_schema='${database}' order by t.table_name;`
     }
     showDatabases() {
         return `SELECT datname "Database" FROM pg_database WHERE datistemplate = false;`
@@ -206,10 +206,10 @@ WHERE schemaname='${database}'
     }
     tableTemplate(): string {
         return `CREATE TABLE [name](  
-    id SERIAL NOT NULL primary key,
+    id SERIAL NOT NULL PRIMARY KEY,
     create_time DATE,
     update_time DATE,
-    [column] varchar(255)
+    [column] VARCHAR(255)
 );
 COMMENT ON TABLE [table] IS '[comment'];
 COMMENT ON COLUMN [table].[column] IS '[comment]';`

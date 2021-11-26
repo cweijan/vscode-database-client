@@ -114,18 +114,18 @@ ADD
         return `SELECT count(*) FROM ${table};`;
     }
     showTables(database: string): string {
-        return `SELECT table_comment \`comment\`,TABLE_NAME as \`name\`,TABLE_ROWS \`rows\`,auto_increment,\`row_format\`,data_length,index_length FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' order by table_name;`
+        return `SELECT table_comment \`comment\`,TABLE_NAME as \`name\`,TABLE_ROWS \`rows\`,auto_increment,\`row_format\`,data_length,index_length FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' order by table_name COLLATE utf8_bin;`
     }
     showSchemas(): string {
         return "show databases"
     }
     tableTemplate(): string {
         return `CREATE TABLE [name](  
-    id int NOT NULL primary key AUTO_INCREMENT COMMENT 'Primary Key',
+    id int NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key',
     create_time DATETIME COMMENT 'Create Time',
     update_time DATETIME COMMENT 'Update Time',
-    [column] varchar(255) COMMENT ''
-) default charset utf8 COMMENT '';`
+    [column] VARCHAR(255) COMMENT ''
+) DEFAULT CHARSET UTF8 COMMENT '';`
     }
     viewTemplate(): string {
         return `CREATE VIEW [name]
