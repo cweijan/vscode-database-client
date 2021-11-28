@@ -240,9 +240,9 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public static nodeCache = {};
     public cacheSelf() {
         if (this.contextValue == ModelType.CONNECTION || this.contextValue == ModelType.ES_CONNECTION) {
-            Node.nodeCache[`${this.getConnectId()}`] = this;
+            Node.nodeCache[`${this.getUid()}`] = this;
         } else if (this.contextValue == ModelType.SCHEMA) {
-            Node.nodeCache[`${this.getConnectId({ withSchema: true })}`] = this;
+            Node.nodeCache[`${this.getUid({ withSchema: true })}`] = this;
         } else {
             Node.nodeCache[`${this.uid}`] = this;
         }
@@ -250,16 +250,16 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     public getCache() {
         if (this.schema) {
-            return Node.nodeCache[`${this.getConnectId({ withSchema: true })}`]
+            return Node.nodeCache[`${this.getUid({ withSchema: true })}`]
         }
-        return Node.nodeCache[`${this.getConnectId()}`]
+        return Node.nodeCache[`${this.getUid()}`]
     }
 
     public getByRegion<T extends Node>(region?: string): T {
         if (!region) {
-            return Node.nodeCache[`${this.getConnectId({ withSchema: true })}`]
+            return Node.nodeCache[`${this.getUid({ withSchema: true })}`]
         }
-        return Node.nodeCache[`${this.getConnectId({ withSchema: true })}#${region}`]
+        return Node.nodeCache[`${this.getUid({ withSchema: true })}#${region}`]
     }
 
     public getChildren(isRresh?: boolean): Node[] | Promise<Node[]> {
@@ -269,22 +269,31 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public initUid() {
         if (this.uid) return;
         if (this.contextValue == ModelType.CONNECTION || this.contextValue == ModelType.CATALOG) {
-            this.uid = this.getConnectId();
+            this.uid = this.getUid();
         } else if (this.contextValue == ModelType.SCHEMA || this.contextValue == ModelType.REDIS_CONNECTION) {
-            this.uid = `${this.getConnectId({ withSchema: true })}`;
+            this.uid = `${this.getUid({ withSchema: true })}`;
         } else {
-            this.uid = `${this.getConnectId({ withSchema: true })}#${this.label}`;
+            this.uid = `${this.getUid({ withSchema: true })}#${this.label}`;
         }
     }
 
     public isActive(cur: Node) {
-        return cur && cur.getConnectId() == this.getConnectId();
+        return cur && cur.getUid() == this.getUid();
+    }
+
+
+    public getConnectId(){
+        if(this.dbType==DatabaseType.MSSQL || this.dbType==DatabaseType.PG){
+            return `${this.key}/${this.database}`
+        }
+
+        return this.key;
     }
 
     /**
      * generate connectId to helper complection, holder delimiter, locate alive connection.
      */
-    public getConnectId(opt?: SwitchOpt): string {
+    public getUid(opt?: SwitchOpt): string {
 
 
         let uid = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName ? this.instanceName : this.port}`;

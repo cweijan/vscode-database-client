@@ -57,7 +57,7 @@ export class ColumnChain implements ComplectionChain {
 
         const tableSplit = tableName.split(".")
         if (tableSplit.length == 2) {
-            const connectcionid = lcp?.getConnectId({ schema: tableSplit[0], withSchema: true });
+            const connectcionid = lcp?.getUid({ schema: tableSplit[0], withSchema: true });
             lcp = ColumnNode.nodeCache[connectcionid]
             tableName = tableSplit[1]
         }

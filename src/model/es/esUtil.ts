@@ -19,7 +19,7 @@ export class EsUtil {
         (await node.getConnection()).query(`${em.Method.Text} ${em.Path.Text}\n${em.Body.Text}`, 'dontParse', async (err, data) => {
             const response = err?.message || JSON.stringify(data, null, 2);
             vscode.window.showTextDocument(
-                await vscode.workspace.openTextDocument(await FileManager.record(`${node.getConnectId()}#result.json`, response, FileModel.WRITE)),
+                await vscode.workspace.openTextDocument(await FileManager.record(`${node.getUid()}#result.json`, response, FileModel.WRITE)),
                 vscode.ViewColumn.Two, true
             )
         })

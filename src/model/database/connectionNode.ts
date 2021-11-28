@@ -41,7 +41,8 @@ export class ConnectionNode extends Node implements CopyAble {
             return [new TableGroup(this), new ViewGroup(this)];
         }
 
-        let dbNodes = DatabaseCache.getSchemaListOfConnection(this.key);
+        const key=this.contextValue==ModelType.CONNECTION?this.key:this.uid;
+        let dbNodes = DatabaseCache.getSchemaListOfConnection(key);
         if (dbNodes && !isRresh) {
             for (const dbNode of dbNodes) {
                 dbNode?.checkActive();
@@ -75,7 +76,7 @@ export class ConnectionNode extends Node implements CopyAble {
                 if (Global.getConfig("showUser") && !hasCatalog) {
                     databaseNodes.unshift(new UserGroup("USER", this));
                 }
-                DatabaseCache.setSchemaListOfConnection(this.key, databaseNodes);
+                DatabaseCache.setSchemaListOfConnection(key, databaseNodes);
 
                 return databaseNodes;
             })

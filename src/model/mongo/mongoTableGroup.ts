@@ -12,7 +12,7 @@ export class MongoTableGroup extends MonggoBaseNode {
     public iconPath = new ThemeIcon("list-flat")
     constructor(readonly parent: Node) {
         super("COLLECTION")
-        this.uid = `${parent.getConnectId()}_${parent.database}_${ModelType.TABLE_GROUP}`;
+        this.uid = `${parent.getUid()}_${parent.database}_${ModelType.TABLE_GROUP}`;
         this.init(parent)
     }
 

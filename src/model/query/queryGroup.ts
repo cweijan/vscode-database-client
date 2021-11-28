@@ -15,7 +15,7 @@ export class QueryGroup extends Node {
     constructor(readonly parent: Node) {
         super("Query")
         this.init(parent)
-        this.storePath = `${FileManager.storagePath}/query/${this.getConnectId({ withSchema: true })}`;
+        this.storePath = `${FileManager.storagePath}/query/${this.getUid({ withSchema: true })}`;
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
