@@ -283,7 +283,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
 
     public getConnectId(){
-        if(this.dbType==DatabaseType.MSSQL || this.dbType==DatabaseType.PG){
+        if(this.dbType==DatabaseType.MSSQL || this.dbType==DatabaseType.PG || this.dbType==DatabaseType.REDIS){
             return `${this.key}/${this.database}`
         }
 

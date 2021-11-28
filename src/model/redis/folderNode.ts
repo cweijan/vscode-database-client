@@ -4,6 +4,7 @@ import * as path from "path";
 import KeyNode from "./keyNode";
 import RedisBaseNode from "./redisBaseNode";
 import { RedisConnectionNode } from "./redisConnectionNode";
+import { RedisDbNode } from "./redisDbNode";
 
 
 export class RedisFolderNode extends RedisBaseNode {
@@ -21,7 +22,7 @@ export class RedisFolderNode extends RedisBaseNode {
         if(isRresh){
             this.cursor = '0';
             this.cursorHolder = {};
-            this.childens=await RedisConnectionNode.prototype.getKeys.apply(this);
+            this.childens=await RedisDbNode.prototype.getKeys.apply(this);
         }
         return RedisFolderNode.buildChilds(this, this.childens)
     }

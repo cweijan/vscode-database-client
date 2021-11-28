@@ -572,7 +572,7 @@
 			"view/item/context": [
 				{
 					"command": "mysql2.refresh",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|esConnection|sshConnection|folder|redisConnection|redisFolder|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table|ftpConnection|ftpFolder)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|esConnection|sshConnection|folder|redisConnection|redisDB|redisFolder|connection|tableGroup|viewGroup|systemViewGroup|triggerGroup|procedureGroup|functionGroup|table|ftpConnection|ftpFolder)$/",
 					"group": "inline@-2"
 				},
 				{

@@ -7,15 +7,12 @@ import { NodeUtil } from "@/model/nodeUtil";
 import { Cluster, Redis } from "ioredis";
 import * as path from "path";
 import * as vscode from "vscode";
-import { RedisFolderNode } from "./folderNode";
 import RedisBaseNode from "./redisBaseNode";
-import { RemainNode } from "./remainNode";
+import { RedisDbNode } from "./redisDbNode";
 var commandExistsSync = require('command-exists').sync;
 
 export class RedisConnectionNode extends RedisBaseNode {
 
-    private loadingMore = false;
-    keys: string[];
     contextValue = ModelType.REDIS_CONNECTION;
     iconPath: string | vscode.ThemeIcon = path.join(Constants.RES_PATH, `image/redis_connection.png`);
 
@@ -35,66 +32,17 @@ export class RedisConnectionNode extends RedisBaseNode {
         }
     }
 
-    async getChildren(isRresh?:boolean): Promise<RedisBaseNode[]> {
-        if(isRresh){
-            this.cursor = '0';
-            this.cursorHolder = {};
+    async getChildren(): Promise<RedisBaseNode[]> {
+        const client=await this.getClient()
+        const keyspace=await client.info('keyspace')
+        let dbs=keyspace.match(/db(\w)+/g)
+        if(!dbs){
+            return [new RedisDbNode(this.database||"0",this)]
         }
-        if (this.loadingMore) {
-            this.loadingMore = false;
-        } else {
-            this.keys = await this.getKeys()
+        if(this.database && !dbs.includes("db"+this.database)){
+            dbs.unshift(this.database)
         }
-        const childens = RedisFolderNode.buildChilds(this, this.keys);
-        if (this.hasMore()) {
-            childens.unshift(new RemainNode(this))
-        }
-        return childens;
-    }
-
-    private hasMore() {
-        if (!this.isCluster) {
-            return this.cursor != '0';
-        }
-        for (const key in this.cursorHolder) {
-            const cursor = this.cursorHolder[key];
-            if (cursor != '0') return true;
-        }
-        return false;
-    }
-
-    public async loadMore() {
-        if (!this.hasMore()) {
-            vscode.window.showErrorMessage("Has no more keys!")
-            return;
-        }
-        this.loadingMore = true;
-        this.keys.push(...(await this.getKeys()))
-        this.provider.reload(this)
-    }
-
-    public async getKeys() {
-        const client = await this.getClient()
-        if (this.isCluster) {
-            return await this.keysCluster(client as Cluster, this.pattern)
-        }
-        const scanResult = await client.scan(this.cursor, "COUNT", 3000, "MATCH", this.pattern + "*");
-        this.cursor = scanResult[0]
-        return scanResult[1];
-    }
-
-    private async keysCluster(client: Cluster, pattern: string): Promise<string[]> {
-        const masters = client.nodes("master");
-        const maxKeys=3000/masters.length | 0;
-        const mastersScan = await Promise.all(masters.map(async (master) => {
-            const mKey = master.options.host + "@" + master.options.port;
-            const cursor = this.cursorHolder[mKey] || 0;
-            if (cursor === '0') return null;
-            const scanResult = await master.scan(cursor, "COUNT", maxKeys, "MATCH", pattern + '*')
-            this.cursorHolder[mKey] = scanResult[0];
-            return scanResult[1]
-        }));
-        return mastersScan.filter(keys=>keys).flat();
+        return dbs.map(db=>new RedisDbNode(db.replace("db",""),this));
     }
 
     async openTerminal(): Promise<any> {

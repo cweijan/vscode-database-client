@@ -68,7 +68,7 @@ export enum ModelType {
     /**
      * redis
      */
-    REDIS_CONNECTION = "redisConnection", REDIS_FOLDER = "redisFolder", REDIS_KEY = "redisKey",
+    REDIS_CONNECTION = "redisConnection",REDIS_DB = "redisDB", REDIS_FOLDER = "redisFolder", REDIS_KEY = "redisKey",
     /**
      * ElasticSearch
      */
