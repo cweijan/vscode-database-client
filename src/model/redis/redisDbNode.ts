@@ -78,7 +78,7 @@ export class RedisDbNode extends RedisBaseNode {
             this.cursorHolder[mKey] = scanResult[0];
             return scanResult[1]
         }));
-        return mastersScan.filter(keys => keys).flat();
+        return [...new Set(mastersScan.filter(keys => keys).flat())];
     }
 
 
