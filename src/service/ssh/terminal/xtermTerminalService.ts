@@ -5,6 +5,7 @@ import { FileManager, FileModel } from "@/common/filesManager";
 import { Util } from "@/common/util";
 import { Hanlder, ViewManager } from "@/common/viewManager";
 import { SSHConfig } from "@/model/interface/sshConfig";
+import { readFileSync } from "fs";
 
 interface Holder {
     handler?: Hanlder,
@@ -122,6 +123,13 @@ export class XtermTerminal implements TerminalService {
             client.on('keyboard-interactive', () => {
                 end();
             })
+            if(sshConfig.type=="privateKey"){
+                delete sshConfig.password
+                if (sshConfig.privateKeyPath) {
+                    sshConfig.privateKey = readFileSync(sshConfig.privateKeyPath)
+                }
+            }
+            
             client.connect(sshConfig)
         }).on('openLog', async () => {
             const filePath = sshConfig.username + '@' + sshConfig.host
