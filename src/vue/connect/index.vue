@@ -103,12 +103,6 @@
           <input class="w-64 field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
         </div>
       </section>
-      <section class="flex items-center mb-2" v-if="connectionOption.dbType=='MySQL' || connectionOption.dbType=='PostgreSQL'">
-        <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-40">Hide System Schema</label>
-          <el-switch v-model="connectionOption.hideSystemSchema"></el-switch>
-        </div>
-      </section>
     </template>
 
     <section class="flex items-center mb-2">
@@ -127,6 +121,10 @@
       <div class="inline-block mr-10" v-if="connectionOption.dbType === 'MongoDB' || connectionOption.dbType=='PostgreSQL' || connectionOption.dbType=='MySQL'">
         <label class="inline-block mr-5 font-bold w-18">Use Connection String</label>
         <el-switch v-model="connectionOption.useConnectionString"></el-switch>
+      </div>
+      <div class="inline-block mr-10" v-if="connectionOption.dbType=='MySQL' || connectionOption.dbType=='PostgreSQL'">
+        <label class="font-bold mr-5 inline-block w-40">Hide System Schema</label>
+        <el-switch v-model="connectionOption.hideSystemSchema"></el-switch>
       </div>
     </section>
     <section class="flex items-center mb-2" v-if="connectionOption.useConnectionString">

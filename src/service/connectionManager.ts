@@ -111,7 +111,7 @@ export class ConnectionManager {
                     reject(error);
                 }
             }
-            const newConnection = this.create(connectOption);
+            const newConnection = this.createConnection(connectOption);
             this.alivedConnection[key] = { connection: newConnection, ssh };
             newConnection.connect(async (err: Error) => {
                 if (err) {
@@ -135,7 +135,7 @@ export class ConnectionManager {
 
     }
 
-    private static create(opt: Node) {
+    private static createConnection(opt: Node) {
         if (!opt.dbType) opt.dbType = DatabaseType.MYSQL
         switch (opt.dbType) {
             case DatabaseType.MSSQL:
