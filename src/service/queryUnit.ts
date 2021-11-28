@@ -81,7 +81,7 @@ export class QueryUnit {
                 }
 
                 if (sql.match(/(create|drop|alter)\s+(database|table|procedure|FUNCTION|VIEW)/i)) {
-                    vscode.commands.executeCommand(CodeCommand.Refresh,connectionNode);
+                    vscode.commands.executeCommand(CodeCommand.Refresh,connectionNode,true);
                 }
 
                 if (data?.affectedRows) {

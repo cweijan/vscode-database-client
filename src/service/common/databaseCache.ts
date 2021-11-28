@@ -4,9 +4,16 @@ import { CacheKey, ModelType } from "../../common/constants";
 import { SchemaNode } from "../../model/database/schemaNode";
 import { Node } from "../../model/interface/node";
 
+interface ConnectionCache {
+    [connectionKey: string]: {
+        [nodeKey: string]: Node[]
+    }
+}
+
 export class DatabaseCache {
 
     private static cache = { database: {}, object: {} };
+    private static newCache: ConnectionCache = {};
     private static globalCollpaseState: { key?: TreeItemCollapsibleState };
     private static workspaceCollpaseState: { key?: TreeItemCollapsibleState };
 
@@ -69,15 +76,28 @@ export class DatabaseCache {
     public static clearCache() {
         this.cache.object = {}
         this.cache.database = {}
+        this.newCache={}
     }
 
-
-    public static setChildCache(uid: string, tableNodeList: Node[]) {
-        this.cache.object[uid] = tableNodeList;
+    public static clearByConnection(connectKey:string) {
+        this.newCache[connectKey]={}
     }
 
-    public static getChildCache<T extends Node>(uid: string): T[] {
-        return this.cache.object[uid];
+    private static getCacheKey(node:Node){
+        if(!this.newCache[node.key]){
+            this.newCache[node.key]={}
+        }
+        return `${node.contextValue}_${node.uid}`
+    }
+
+    public static setChildCache(node: Node, childList: Node[]) {
+        const cacheKey=this.getCacheKey(node)
+        this.newCache[node.key][cacheKey]=childList;
+    }
+
+    public static getChildCache<T extends Node>(node: Node): T[] {
+        const cacheKey=this.getCacheKey(node)
+        return this.newCache[node.key][cacheKey] as T[]
     }
 
     /**

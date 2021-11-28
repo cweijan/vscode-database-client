@@ -214,11 +214,11 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     }
 
     public getChildCache<T extends Node>(): T[] {
-        return DatabaseCache.getChildCache(this.uid)
+        return DatabaseCache.getChildCache(this) 
     }
 
     public setChildCache(childs: Node[]) {
-        DatabaseCache.setChildCache(this.uid, childs)
+        DatabaseCache.setChildCache(this, childs)
     }
 
     public static nodeCache = {};

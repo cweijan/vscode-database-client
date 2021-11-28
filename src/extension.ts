@@ -56,9 +56,13 @@ export function activate(context: vscode.ExtensionContext) {
         ...initCommand({
             // util
             ...{
-                [CodeCommand.Refresh]: async (node: Node) => {
+                [CodeCommand.Refresh]: async (node: Node,byConnection:boolean) => {
                     if (node) {
-                        await node.getChildren(true)
+                        if(byConnection){
+                            DatabaseCache.clearByConnection(node.key)
+                        }else{
+                            await node.getChildren(true)
+                        }
                     } else {
                         DatabaseCache.clearCache()
                     }

@@ -92,9 +92,7 @@ export class SchemaNode extends Node implements CopyAble {
                     DbTreeDataProvider.refresh(this.parent);
                     vscode.window.showInformationMessage(`Drop ${target} ${this.schema} success!`)
                 })
-            } else {
-                vscode.window.showInformationMessage(`Cancel drop ${target} ${this.schema}`)
-            }
+            } 
         })
 
     }
