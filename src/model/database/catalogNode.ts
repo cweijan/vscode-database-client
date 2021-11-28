@@ -51,7 +51,7 @@ export class CatalogNode extends Node implements CopyAble {
         vscode.window.showInputBox({ prompt: `Are you want to drop database ${this.schema} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
                 this.execute(`DROP DATABASE ${this.wrap(this.database)}`).then(() => {
-                    DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`)
+                    this.parent.clearCache()
                     DbTreeDataProvider.refresh(this.parent);
                     vscode.window.showInformationMessage(`Drop database ${this.schema} success!`)
                 })

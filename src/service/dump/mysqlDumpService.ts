@@ -21,7 +21,7 @@ export class MysqlDumpService extends DumpService {
                 NodeUtil.of(node)
                 const isTable = node instanceof TableNode || node instanceof ViewNode;
                 const host = node.usingSSH ? "127.0.0.1" : node.host
-                const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
+                const port = node.usingSSH ? NodeUtil.getTunnelPort(node.key) : node.port;
                 const data = withData ? '' : ' --no-data';
                 const tables = isTable ? ` --skip-triggers ${node.label}` : '';
                 const password = node.password ? ` -p${node.password}` : '';

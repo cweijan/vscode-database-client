@@ -13,7 +13,7 @@ export class MongoImportService extends ImportService {
         if (commandExistsSync('mongoimport')) {
             NodeUtil.of(node)
             const host = node.usingSSH ? "127.0.0.1" : node.host
-            const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
+            const port = node.usingSSH ? NodeUtil.getTunnelPort(node.key) : node.port;
             const command = `mongoimport -h ${host}:${port} --db ${node.database} --jsonArray -c identitycounters --type json ${importPath}`
             Console.log(`Executing: ${command}`);
             exec(command, (err,stdout,stderr) => {

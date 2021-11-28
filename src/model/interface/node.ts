@@ -323,7 +323,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         let command: string;
 
         const host = this.usingSSH ? "127.0.0.1" : this.host
-        const port = this.usingSSH ? NodeUtil.getTunnelPort(this.getConnectId()) : this.port;
+        const port = this.usingSSH ? NodeUtil.getTunnelPort(this.key) : this.port;
         if(!port){
             vscode.window.showErrorMessage("SSH tunnel not created!")
             return;

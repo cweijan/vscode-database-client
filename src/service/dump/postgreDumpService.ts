@@ -23,7 +23,7 @@ export class PostgreDumpService extends DumpService{
                 NodeUtil.of(node)
                 const isTable = node instanceof TableNode || node instanceof ViewNode;
                 const host = node.usingSSH ? "127.0.0.1" : node.host
-                const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
+                const port = node.usingSSH ? NodeUtil.getTunnelPort(node.key) : node.port;
                 const data = withData ? '' : ' --schema-only';
                 const tables = isTable ? ` -t "\\"${node.label}\\""` : '';
                 const schema = node instanceof SchemaNode ? ` -n ${node.schema}` : '';

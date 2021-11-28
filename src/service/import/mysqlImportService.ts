@@ -12,7 +12,7 @@ export class MysqlImportService extends ImportService {
         if (commandExistsSync('mysql')) {
             NodeUtil.of(node)
             const host = node.usingSSH ? "127.0.0.1" : node.host
-            const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
+            const port = node.usingSSH ? NodeUtil.getTunnelPort(node.key) : node.port;
             const command = `mysql -h ${host} -P ${port} -u ${node.user} ${node.password ? `-p${node.password}` : ""} --default-character-set=utf8 ${node.schema || ""} < ${importPath}`
             Console.log(`Executing: ${command.replace(/-p.+? /, "-p****** ")}`);
             const cp=exec(command, (err,stdout,stderr) => {

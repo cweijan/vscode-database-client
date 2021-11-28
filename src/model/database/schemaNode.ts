@@ -94,7 +94,7 @@ export class SchemaNode extends Node implements CopyAble {
                     for (const child of await this.getChildren()) {
                         child.setChildCache(null)
                     }
-                    DatabaseCache.clearDatabaseCache(`${this.getConnectId()}`)
+                    this.parent.clearCache()
                     DbTreeDataProvider.refresh(this.parent);
                     vscode.window.showInformationMessage(`Drop ${target} ${this.schema} success!`)
                 })

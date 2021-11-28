@@ -142,7 +142,7 @@ export class ConnectionNode extends Node implements CopyAble {
      */
     private getIcon() {
         const basePath = Constants.RES_PATH + "/icon/server/";
-        const isActive = ConnectionManager.activeNode?.getConnectId().includes(this.getConnectId());
+        const isActive = ConnectionManager.activeNode?.key==this.key;
 
         switch (this.dbType) {
             case DatabaseType.MYSQL:

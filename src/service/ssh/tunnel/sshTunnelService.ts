@@ -30,7 +30,7 @@ export class SSHTunnelService {
     public createTunnel(node: Node): Promise<Node> {
         return new Promise(async (resolve, reject) => {
             const ssh = node.ssh
-            const key = node.getConnectId();
+            const key = node.key;
             const tunnelState = this.tunelMark[key];
             if (tunnelState) {
                 if (tunnelState.created) {
