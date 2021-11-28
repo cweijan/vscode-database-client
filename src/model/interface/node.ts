@@ -281,6 +281,9 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         return cur && cur.getConnectId() == this.getConnectId();
     }
 
+    /**
+     * generate connectId to helper complection, holder delimiter, locate alive connection.
+     */
     public getConnectId(opt?: SwitchOpt): string {
 
 

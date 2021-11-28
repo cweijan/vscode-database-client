@@ -175,9 +175,7 @@ export class ConnectionManager {
                     .replace(/#.+$/, '').split('@')
                 if (host != null) {
                     const node = NodeUtil.of({ key: queryName.split('@@')[0], host, port: parseInt(port), database, schema });
-                    if (node.getCache()) {
-                        return node.getCache();
-                    }
+                    return node.getCache();
                 }
             }
         }

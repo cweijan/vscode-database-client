@@ -19,8 +19,8 @@ export class NodeFinder {
         if (!lcp) return [];
 
         if (schema) {
-            const connectcionid = lcp?.getConnectId({ schema: schema, withSchema: true });
-            lcp = Node.nodeCache[connectcionid]
+            const connectId = lcp?.getConnectId({ schema: schema, withSchema: true });
+            lcp = Node.nodeCache[connectId]
             if (!lcp) return []
         } else {
             let isSchema = lcp instanceof SchemaNode || lcp instanceof CatalogNode;
