@@ -13,6 +13,7 @@ import * as vscode from "vscode";
 import { Memento } from "vscode";
 var commandExistsSync = require('command-exists').sync;
 import { DatabaseCache } from "../../service/common/databaseCache";
+import { ConnectionNode } from "../database/connectionNode";
 import { NodeUtil } from "../nodeUtil";
 import { CopyAble } from "./copyAble";
 import { SSHConfig } from "./sshConfig";
@@ -57,7 +58,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public hideSystemSchema?: boolean;
 
     /**
-     * using to distingush connectHolder, childCache, elementState
+     * using to distingush connection, UI State
      */
     public uid: string;
     public key: string;
@@ -213,12 +214,27 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     }
 
+    
+    /**
+     * child caches
+     */
+    private childenCaches:Node[];
     public getChildCache<T extends Node>(): T[] {
+        // return this.childenCaches as T[];
         return DatabaseCache.getChildCache(this) 
     }
 
-    public setChildCache(childs: Node[]) {
+    public setChildCache(childs?: Node[]) {
+        // this.childenCaches=childs;
         DatabaseCache.setChildCache(this, childs)
+    }
+
+    public clearCache(){
+        if(this instanceof ConnectionNode){
+            DatabaseCache.setSchemaListOfConnection(this.key, null);
+            return;
+        }
+        DatabaseCache.setChildCache(this,null)
     }
 
     public static nodeCache = {};
@@ -231,6 +247,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             Node.nodeCache[`${this.uid}`] = this;
         }
     }
+
     public getCache() {
         if (this.schema) {
             return Node.nodeCache[`${this.getConnectId({ withSchema: true })}`]

@@ -6,7 +6,6 @@ import { Global } from "../../common/global";
 import { Util } from "../../common/util";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ConnectionManager } from "../../service/connectionManager";
-import { MockRunner } from "../../service/mock/mockRunner";
 import { QueryUnit } from "../../service/queryUnit";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
@@ -18,14 +17,15 @@ export class TableNode extends Node implements CopyAble {
     public iconPath = new vscode.ThemeIcon("split-horizontal")
     public contextValue: string = ModelType.TABLE;
     public table: string;
+    public primaryKey: string;
 
     constructor(readonly meta: TableMeta, readonly parent: Node) {
         super(`${meta.name}`)
         this.table = meta.name
         this.description = `${meta.comment || ''} ${(meta.rows != null) ? `Rows ${meta.rows}` : ''}`
-        if (Util.supportColorIcon) {
+        // if (Util.supportColorIcon) {
             // this.iconPath=new vscode.ThemeIcon("split-horizontal",new vscode.ThemeColor("problemsWarningIcon.foreground"))
-        }
+        // }
         this.init(parent)
         this.bindToolTipe(meta)
         this.cacheSelf()
@@ -252,9 +252,9 @@ ${colDefList.join(",\n")}${pkList.length > 0 ? `,\n    PRIMARY KEY(${pkList.join
 
     public async getMaxPrimary(): Promise<number> {
 
-        const primaryKey = MockRunner.primaryKeyMap[this.uid];
+        const primaryKey = this.primaryKey;
         if (primaryKey != null) {
-            const count = await this.execute(`select max(${primaryKey}) max from ${this.wrap(this.table)}`);
+            const count = await this.execute(`SELECT max(${primaryKey}) max FROM ${this.wrap(this.table)}`);
             if (count && count[0]?.max) {
                 const max = count[0].max;
                 return Number.isInteger(max) || max.match(/^\d+$/) ? max : 0;

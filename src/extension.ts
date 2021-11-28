@@ -197,7 +197,7 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.runAllQuery": () => {
                     QueryUnit.runQuery(null, ConnectionManager.tryGetConnection(), { runAll: true });
                 },
-                "mysql.query.switch": async (node: SchemaNode | ConnectionNode | EsConnectionNode | ESIndexNode) => {
+                "mysql.query.switch": async (node: SchemaNode | EsConnectionNode | ESIndexNode) => {
                     if (node) {
                         if(node.dbType==DatabaseType.MONGO_DB){
                             QueryUnit.showSQLTextDocument(node, `db('${node.label}').collection('').find({}).limit(100).toArray()`, Template.table);

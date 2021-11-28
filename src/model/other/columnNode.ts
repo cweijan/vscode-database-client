@@ -1,5 +1,4 @@
 import { ColumnMeta } from "@/common/typeDef";
-import { MockRunner } from "@/service/mock/mockRunner";
 import * as vscode from "vscode";
 import { DatabaseType, ModelType, Template } from "../../common/constants";
 import { Util } from "../../common/util";
@@ -7,12 +6,13 @@ import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { QueryUnit } from "../../service/queryUnit";
 import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
+import { TableNode } from "../main/tableNode";
 
 export class ColumnNode extends Node implements CopyAble {
     public type: string;
     public contextValue: string = ModelType.COLUMN;
     public isPrimaryKey = false;
-    constructor(public readonly table: string, readonly column: ColumnMeta, readonly parent: Node, readonly index: number) {
+    constructor(public readonly table: string, readonly column: ColumnMeta, readonly parent: TableNode, readonly index: number) {
         super(column.name)
         this.init(parent)
         this.updateInfo(column)
@@ -46,7 +46,7 @@ export class ColumnNode extends Node implements CopyAble {
         // sqlite
         if(column.pk=='1'){
             this.isPrimaryKey=true;
-            MockRunner.primaryKeyMap[this.parent.uid] = column.name
+            this.parent.primaryKey= column.name;
             column.isPrimary=true;
         }
         if (column.extra == 'auto_increment') {
@@ -67,7 +67,7 @@ ${column.type} ${column.nullable == "YES" ? "Nullable" : "NotNull"}`
             case 'PRI':
             case 'PRIMARY KEY':
                 this.isPrimaryKey = true
-                MockRunner.primaryKeyMap[this.parent.uid] = column.name
+                this.parent.primaryKey=column.name;
                 column.isPrimary = true
                 return "PrimaryKey";
         }

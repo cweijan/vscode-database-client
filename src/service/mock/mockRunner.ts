@@ -1,15 +1,12 @@
-import { existsSync, readFileSync } from 'fs';
 import * as Mock from '@/bin/mockjs';
 import * as vscode from "vscode";
 import { MessageType } from "../../common/constants";
 import { ConnectionManager } from "../connectionManager";
-import { DatabaseCache } from "../common/databaseCache";
 import { QueryUnit } from "../queryUnit";
 import { ColumnNode } from "../../model/other/columnNode";
 import { TableNode } from '../../model/main/tableNode';
 import { QueryPage } from "../result/query";
 import { MessageResponse } from "../result/queryResponse";
-import { FileManager, FileModel } from '../../common/filesManager';
 import { MockModel } from './mockModel';
 import { Node } from '../../model/interface/node';
 import { ColumnMeta } from "@/common/typeDef";
@@ -18,13 +15,12 @@ import { TableGroup } from '@/model/main/tableGroup';
 export class MockRunner {
 
     private readonly MOCK_INDEX = "$mockIndex";
-    public static primaryKeyMap: { [key: string]: string } = {}
 
     public async create(tableNode: TableNode) {
         const columnList = (await tableNode.getChildren()) as ColumnNode[]
         const mockModel: MockModel = {
             table: tableNode.table,
-            mockStartIndex: MockRunner.primaryKeyMap[tableNode.uid] ? 'auto' : 1
+            mockStartIndex: tableNode.primaryKey ? 'auto' : 1
             , mockCount: 10, mockValueReference: "http://mockjs.com/examples.html#DPD", mock: {}
         }
         for (const columnNode of columnList) {

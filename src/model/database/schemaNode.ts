@@ -30,10 +30,15 @@ export class SchemaNode extends Node implements CopyAble {
         this.checkActive();
     }
 
-    public getChildren(): Promise<Node[]> | Node[] {
+    public getChildren(isRresh: boolean = false): Promise<Node[]> | Node[] {
 
         if (this.dbType == DatabaseType.MONGO_DB) {
             return [new MongoTableGroup(this)]
+        }
+
+        let childCache = this.getChildCache();
+        if (childCache && !isRresh) {
+            return childCache;
         }
 
         let childs: Node[] = [new TableGroup(this)];
@@ -55,6 +60,7 @@ export class SchemaNode extends Node implements CopyAble {
             childs.push(new TriggerGroup(this))
         }
 
+        this.setChildCache(childs)
         return childs;
     }
 

@@ -125,12 +125,12 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         let globalConnections = GlobalState.get<{ [key: string]: Node }>(connetKey, {});
         let workspaceConnections = WorkState.get<{ [key: string]: Node }>(connetKey, {});
 
-        const connections =[
+        const connections = [
             ...Object.keys(workspaceConnections).map(key => this.getNode(workspaceConnections[key], key, false, connetKey)),
             ...Object.keys(globalConnections).map(key => this.getNode(globalConnections[key], key, true, connetKey))
         ]
 
-        return connections.length>0?connections:[new InfoNode("You haven't created any connections")];
+        return connections.length > 0 ? connections : [new InfoNode("You haven't created any connections")];
 
     }
 
@@ -168,52 +168,43 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
             return;
         }
 
-        const dbIdList: string[] = [];
-        const dbIdMap = new Map<string, Node>();
+        const dbIdMap: { [key: string]: Node } = {};
         const connectionNodes = this.getConnectionNodes()
-        for (const cNode of connectionNodes) {
-            if (cNode.disable || cNode instanceof InfoNode) {
+        for (const connectNode of connectionNodes) {
+            if (connectNode.disable || connectNode instanceof InfoNode) {
                 continue;
             }
-            if (cNode.dbType == DatabaseType.SQLITE) {
-                const uid = cNode.label;
-                dbIdList.push(uid)
-                dbIdMap.set(uid, cNode)
+            if (connectNode.dbType == DatabaseType.SQLITE) {
+                dbIdMap[connectNode.label] = connectNode;
                 continue;
             }
 
-            let schemaList: Node[];
-            if (cNode.dbType == DatabaseType.MSSQL || cNode.dbType == DatabaseType.PG) {
-                const tempList = DatabaseCache.getSchemaListOfConnection(cNode.uid);
-                schemaList = [];
-                for (const catalogNode of tempList) {
+            if (connectNode.dbType == DatabaseType.MSSQL || connectNode.dbType == DatabaseType.PG) {
+                for (const catalogNode of (await connectNode.getChildren())) {
                     if (catalogNode instanceof UserGroup) continue;
-                    schemaList.push(...(await catalogNode.getChildren()))
+                    for (const schemaNode of (await catalogNode.getChildren())) {
+                        dbIdMap[`${connectNode.label}#${schemaNode.database}#${schemaNode.schema}`] = schemaNode;
+                    }
                 }
-            } else {
-                schemaList = DatabaseCache.getSchemaListOfConnection(cNode.uid)
-                if (!schemaList) continue;
+                continue;
             }
 
-            for (const schemaNode of schemaList) {
-                if (schemaNode instanceof UserGroup || schemaNode instanceof CatalogNode) { continue }
-                let uid = `${cNode.label}#${schemaNode.schema}`
-                if (cNode.dbType == DatabaseType.PG || cNode.dbType == DatabaseType.MSSQL) {
-                    uid = `${cNode.label}#${schemaNode.database}#${schemaNode.schema}`
-                }
-                dbIdList.push(uid)
-                dbIdMap.set(uid, schemaNode)
+            for (const schemaNode of (await connectNode.getChildren())) {
+                if (schemaNode instanceof UserGroup || schemaNode instanceof CatalogNode) continue;
+                dbIdMap[`${connectNode.label}#${schemaNode.schema}`] = schemaNode;
             }
+
 
         }
 
+        const dbIdList = Object.keys(dbIdMap)
         if (dbIdList.length == 0) {
             return;
         }
 
         vscode.window.showQuickPick(dbIdList).then(async (dbId) => {
             if (dbId) {
-                const dbNode = dbIdMap.get(dbId);
+                const dbNode = dbIdMap[dbId];
                 ConnectionManager.changeActive(dbNode)
             }
         })

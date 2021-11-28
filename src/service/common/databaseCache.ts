@@ -81,6 +81,7 @@ export class DatabaseCache {
 
     public static clearByConnection(connectKey:string) {
         this.newCache[connectKey]={}
+        this.setSchemaListOfConnection(connectKey,null)
     }
 
     private static getCacheKey(node:Node){

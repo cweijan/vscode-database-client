@@ -41,12 +41,10 @@ export class ConnectionNode extends Node implements CopyAble {
             return [new TableGroup(this), new ViewGroup(this)];
         }
 
-        let dbNodes = DatabaseCache.getSchemaListOfConnection(this.uid);
+        let dbNodes = DatabaseCache.getSchemaListOfConnection(this.key);
         if (dbNodes && !isRresh) {
             for (const dbNode of dbNodes) {
-                if (dbNode.checkActive) {
-                    dbNode.checkActive();
-                }
+                dbNode?.checkActive();
             }
             return dbNodes;
         }
@@ -77,7 +75,7 @@ export class ConnectionNode extends Node implements CopyAble {
                 if (Global.getConfig("showUser") && !hasCatalog) {
                     databaseNodes.unshift(new UserGroup("USER", this));
                 }
-                DatabaseCache.setSchemaListOfConnection(this.uid, databaseNodes);
+                DatabaseCache.setSchemaListOfConnection(this.key, databaseNodes);
 
                 return databaseNodes;
             })
@@ -90,7 +88,7 @@ export class ConnectionNode extends Node implements CopyAble {
             this.description = (this.description || '') + " closed"
             return;
         }
-        const version = ConnectionNode.versionMap[this.uid]
+        const version = ConnectionNode.versionMap[this.key]
         if (version) {
             this.description = (this.description || '') + " " + version
         }
@@ -117,12 +115,12 @@ export class ConnectionNode extends Node implements CopyAble {
 
 
     private async fetchInfo() {
-        if (ConnectionNode.versionMap[this.uid]) return;
+        if (ConnectionNode.versionMap[this.key]) return;
         const versionSql = this.dialect.showVersion()
         if (!versionSql) return;
         try {
             const version = (await this.execute(versionSql))[0]?.server_version
-            ConnectionNode.versionMap[this.uid] = version
+            ConnectionNode.versionMap[this.key] = version
             this.description = (this.description || '') + " " + version
         } catch (error) {
             Console.log(error)
@@ -167,25 +165,6 @@ export class ConnectionNode extends Node implements CopyAble {
 
     public copyName() {
         Util.copyToBoard(this.host)
-    }
-
-    public async newQuery() {
-
-        await FileManager.show(`${this.label}.sql`);
-        let childMap = {};
-        const dbNameList = (await this.getChildren()).filter((databaseNode) => (databaseNode instanceof SchemaNode || databaseNode instanceof CatalogNode)).map((databaseNode) => {
-            childMap[databaseNode.uid] = databaseNode
-            return this.dbType == DatabaseType.MYSQL ? databaseNode.schema : databaseNode.database;
-        });
-        let dbName: string;
-        if (dbNameList.length == 1) {
-            dbName = dbNameList[0]
-        }
-        if (dbNameList.length > 1) {
-            dbName = await vscode.window.showQuickPick(dbNameList, { placeHolder: "active database" })
-        }
-        ConnectionManager.changeActive(dbName ? childMap[`${this.getConnectId()}@${dbName}`] : this)
-
     }
 
     public createDatabase() {

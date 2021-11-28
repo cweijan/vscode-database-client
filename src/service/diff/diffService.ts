@@ -26,9 +26,9 @@ export class DiffService {
                     let databaseList = {}
                     for (const node of nodes) {
                         try {
-                            databaseList[node.uid] = (await node.getChildren()).filter(dbNode => !(dbNode instanceof UserGroup))
+                            databaseList[node.key] = (await node.getChildren()).filter(dbNode => !(dbNode instanceof UserGroup))
                         } catch (error) {
-                            databaseList[node.uid] = [new InfoNode("Load fail.")]
+                            databaseList[node.key] = [new InfoNode("Load fail:."+error)]
                         }
                     }
                     const data = { nodes: NodeUtil.removeParent(nodes), databaseList: NodeUtil.removeParent(databaseList) };

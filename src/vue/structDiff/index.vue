@@ -4,7 +4,7 @@
       <el-form>
         <el-form-item label-width="80px" label="Target">
           <el-select v-model="option.from.connection" @change="clearFrom" :loading="loadingConnection">
-            <el-option :label="node.label" :value="node.uid" :key="node.uid" v-for="node in initData.nodes"></el-option>
+            <el-option :label="node.label" :value="node.key" :key="node.key" v-for="node in initData.nodes"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label-width="80px" label="database">
@@ -18,7 +18,7 @@
       <el-form>
         <el-form-item label-width="90px" label="Sync From">
           <el-select v-model="option.to.connection" @change="clearTo" :loading="loadingConnection">
-            <el-option :label="node.label" :value="node.uid" :key="node.uid" v-for="node in initData.nodes" ></el-option>
+            <el-option :label="node.label" :value="node.key" :key="node.key" v-for="node in initData.nodes" ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label-width="90px" label="database" >
