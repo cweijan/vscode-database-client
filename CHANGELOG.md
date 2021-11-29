@@ -1,5 +1,16 @@
 # CHANGELOG
 
+# 4.3.0 2021-11-29
+
+- Improve tree view render performance.
+- Update active connection icon.
+- Support show redis database.
+- Better result view design.
+- Fix table columns complection fail.
+- Fix not show call procedure result.
+- Fix using ssh private key open terminal fail.
+- Fix redis cluster load key fail.
+
 # 4.2.3 2021-11-24
 
 - Upgrade ssh2 version, now support more ssh private key format.
