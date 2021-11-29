@@ -32,7 +32,7 @@ export class SSHConnectionNode extends Node {
         if (!file) {
             this.contextValue = ModelType.SSH_CONNECTION;
             this.iconPath = new vscode.ThemeIcon("remote");
-            this.label = `${sshConfig.username}@${sshConfig.host}`
+            this.label = sshConfig.host
         } else {
             this.contextValue = ModelType.FOLDER;
             this.iconPath = new vscode.ThemeIcon("folder")
