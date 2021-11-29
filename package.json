@@ -993,7 +993,7 @@
 				},
 				"database-client.preferConnectionName": {
 					"type": "boolean",
-					"default": true,
+					"default": false,
 					"description": "%config.preferConnectionName%"
 				},
 				"database-client.disableSqlCodeLen": {
