@@ -190,8 +190,12 @@ ${colDefList.join(",\n")}${pkList.length > 0 ? `,\n    PRIMARY KEY(${pkList.join
     }
 
     public bindToolTipe(meta: TableMeta) {
-        if (this.dbType == DatabaseType.MYSQL) {
-            this.tooltip = `AUTO_INCREMENT : ${meta.auto_increment || 'null'} \nROW_FORMAT : ${meta.row_format} `
+        this.tooltip = this.label;
+        if (meta.comment) {
+            this.tooltip += "-> " + meta.comment;
+        }
+        if (meta.auto_increment) {
+            this.tooltip += "\nAUTO_INCREMENT: " + meta.auto_increment;
         }
     }
 
