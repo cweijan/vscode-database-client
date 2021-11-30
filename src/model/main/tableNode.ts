@@ -22,9 +22,9 @@ export class TableNode extends Node implements CopyAble {
     constructor(readonly meta: TableMeta, readonly parent: Node) {
         super(`${meta.name}`)
         this.table = meta.name
-        this.description = `${meta.comment || ''} ${(meta.rows != null) ? `Rows ${meta.rows}` : ''}`
+        this.description = `${meta.comment || ''} ${meta.table_rows || ''}`
         // if (Util.supportColorIcon) {
-            // this.iconPath=new vscode.ThemeIcon("split-horizontal",new vscode.ThemeColor("problemsWarningIcon.foreground"))
+        //   this.iconPath=new vscode.ThemeIcon("split-horizontal",new vscode.ThemeColor("problemsWarningIcon.foreground"))
         // }
         this.init(parent)
         this.bindToolTipe(meta)

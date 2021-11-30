@@ -100,9 +100,12 @@ export interface ColumnMeta {
 export interface TableMeta{
     name:string;
     comment:string;
-    rows:string;
     /**
-     * below mysql only
+     * mysql only
+     */
+    table_rows:string;
+    /**
+     * mysql only
      */
     auto_increment?:string;
     row_format?:string;

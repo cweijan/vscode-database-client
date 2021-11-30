@@ -115,7 +115,7 @@ ADD
         return `SELECT count(*) FROM ${table};`;
     }
     showTables(database: string): string {
-        return `SELECT table_comment \`comment\`,TABLE_NAME as \`name\`,TABLE_ROWS \`rows\`,auto_increment,\`row_format\`,data_length,index_length FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' ORDER BY table_name;`
+        return `SELECT table_comment comment,TABLE_NAME name,table_rows,auto_increment,row_format,data_length,index_length FROM information_schema.TABLES  WHERE TABLE_SCHEMA = '${database}' and TABLE_TYPE<>'VIEW' ORDER BY table_name;`
     }
     showSchemas(): string {
         return "SELECT SCHEMA_NAME `Database`,DEFAULT_CHARACTER_SET_NAME `charset`,DEFAULT_COLLATION_NAME `collation` FROM information_schema.schemata;"
