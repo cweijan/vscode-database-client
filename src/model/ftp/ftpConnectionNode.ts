@@ -44,7 +44,7 @@ export class FTPConnectionNode extends FtpBaseNode {
 
     public async deleteConnection(context: vscode.ExtensionContext) {
 
-        Util.confirm(`Are you want to Delete Connection ${this.label} ? `, async () => {
+        Util.confirm(`Are you want to Remove Connection ${this.label} ? `, async () => {
             this.indent({ command: CommandKey.delete })
         })
 

@@ -16,7 +16,7 @@
 	"command.connection.disable": "Close Connection",
 	"command.struct.diff": "Database Struct Sync",
 	"command.server.info": "Server Status",
-	"command.connection.delete": "Delete Connection",
+	"command.connection.delete": "Remove Connection",
 	"command.database.add": "New Database",
 	"command.db.drop": "Drop Database",
 	"command.runQuery": "Run Selected SQL",
