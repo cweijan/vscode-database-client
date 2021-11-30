@@ -63,7 +63,7 @@
             Add New
           </el-button>
           <el-input v-model="searchInput" size="mini" placeholder="Input To Search Data" style="width:200px" :clearable="true" />
-          <el-pagination style="display:inline-block" class="pagenation-table-page-container" :total="dataCount" :page-size="pageSize" :current-page.sync="pageIndex" :page-sizes="[20,50,100, 200, 300]" layout="total, sizes, prev, pager, next, jumper" background>
+          <el-pagination style="display:inline-block" class="pagenation-table-page-container" :total="dataCount" :page-size.sync="pageSize" :current-page.sync="pageIndex" :page-sizes="[20,50,100, 200, 300]" layout="total, sizes, prev, pager, next, jumper" background>
           </el-pagination>
           <!-- edit & add dialog -->
           <el-dialog :title="dialogTitle" :visible.sync="editDialogVisiable" :closeOnClickModal="false">
