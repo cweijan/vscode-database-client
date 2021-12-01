@@ -72,6 +72,12 @@ That will open a sql editor bind of database, it provider:
 
 ![run](images/run.jpg)
 
+## Cache
+
+In order to improve performance, the database information is cached. If your database structure changes externally, you need to click the refresh button to refresh the cache。
+
+![](images/1638342622208.png)
+
 ## Generate Mock Data
 
 You can easily generate test data.
@@ -98,17 +104,18 @@ This extension contain some setting, find him in the following way.
 
 ## Filter
 
+Used to quickly filter the table, if there is an input box to simplify the search operation, but unfortunately VSCode does not support this function.
+
 ![filter](images/filter.gif)
 
 ## Credits
 
-- [vscode-mysql](https://github.com/formulahendry/vscode-mysql): The original version of this extension.
-- [mysqldump](https://github.com/bradzacher/mysqldum): Data dump lib.
 - [sql-formatter](https://github.com/zeroturnaround/sql-formatter) Sql format lib.
 - [umy-ui](https://github.com/u-leo/umy-ui): Result view render.
-- Core Lib:
-  - [node-mysql2](https://github.com/sidorares/node-mysql2) : Mysql client.
-  - [node-postgres](https://github.com/brianc/node-postgres): PostgreSql client.
+- [ssh2](https://github.com/mscdex/ssh2): SSH client.
+- Client Lib:
+  - [node-mysql2](https://github.com/sidorares/node-mysql2) : MySQL client.
+  - [node-postgres](https://github.com/brianc/node-postgres): PostgreSQL client.
   - [tedious](https://github.com/tediousjs/tedious): SqlServer client.
   - [ioredis](https://github.com/luin/ioredis): Redis client.
   - [vscode-sqlite](https://github.com/AlexCovizzi/vscode-sqlite): SQLite client code reference.

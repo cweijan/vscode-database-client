@@ -53,9 +53,15 @@
 
 ## 执行SQL
 
-* 点击数据库节点的`New Query` 按钮.![newquery](images/newquery.jpg)
+* 点击数据库节点的 `New Query` 按钮.![newquery](images/newquery.jpg)
 * 之后可在编辑器中编辑和执行SQL(快捷键 : F9).
 * ![run](images/run.jpg)
+
+## 缓存
+
+为了提高性能，缓存了数据库信息，如果你的数据库结构在外部发生了变更，需要点击以下按钮刷新缓存。
+
+![](images/1638342622208.png)
 
 ## 生成测试数据
 
@@ -77,18 +83,19 @@
 
 ## 表过滤
 
-用于快速筛选数据表.
+用于快速筛选表, 如果有输入框可简化搜索操作, 但不幸的是VSCode并不支持该功能.
 
 ![filter](images/filter.gif)
 
-# 致谢
+## 致谢
 
-- [vscode-mysql](https://github.com/formulahendry/vscode-mysql): 本插件的灵感来源
-- [mysqldump](https://github.com/bradzacher/mysqldum): 数据备份库.
 - [sql-formatter](https://github.com/zeroturnaround/sql-formatter) Sql格式化库.
 - [umy-ui](https://github.com/u-leo/umy-ui): 表数据渲染库.
+- [ssh2](https://github.com/mscdex/ssh2): SSH连接库.
 - 核心连接库:
 
-  - [node-mysql2](https://github.com/sidorares/node-mysql2) : Mysql client.
-  - [node-postgres](https://github.com/brianc/node-postgres): PostgreSql client.
-  - [tedious](https://github.com/tediousjs/tedious): SqlServer client.
+  - [node-mysql2](https://github.com/sidorares/node-mysql2) : MySQL连接库.
+  - [node-postgres](https://github.com/brianc/node-postgres): PostgreSQL连接库.
+  - [tedious](https://github.com/tediousjs/tedious): SqlServer连接库.
+  - [ioredis](https://github.com/luin/ioredis): Redis连接库.
+  - [vscode-sqlite](https://github.com/AlexCovizzi/vscode-sqlite): SQLite连接代码参考.
