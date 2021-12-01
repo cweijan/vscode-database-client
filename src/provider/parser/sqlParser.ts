@@ -1,3 +1,4 @@
+import { DatabaseType } from '@/common/constants';
 import { DelimiterHolder } from '@/service/common/delimiterHolder';
 import { ConnectionManager } from '@/service/connectionManager';
 import * as vscode from 'vscode';
@@ -13,6 +14,7 @@ export class SQLParser {
     public static parseBlocks(document: vscode.TextDocument, current?: vscode.Position): SQLBlock[] {
 
 
+        const dbType=this.getDbType()
         const delimter = this.getDelimter();
 
         const context = new SQLContext();
@@ -48,7 +50,8 @@ export class SQLParser {
                         continue;
                     }
                     // check sql end 
-                    if (ch == delimter) {
+                    const notInDDL=!context.inDDL || dbType!=DatabaseType.MYSQL;
+                    if (ch == delimter && notInDDL) {
                         const block = context.endContext(i, j)
                         if (this.hitCursor(block, current)) return [block];
                         continue;
@@ -72,6 +75,10 @@ export class SQLParser {
 
         return context.getBlocks();
 
+    }
+
+    private static getDbType(){
+        return ConnectionManager.tryGetConnection()?.dbType;
     }
 
     private static hitCursor(block: SQLBlock, current?: vscode.Position) {

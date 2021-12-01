@@ -55,6 +55,10 @@ export class TokenContext {
         this.addChar(i, j, divide)
         return this.endToken(i, j + 1)
     }
+
+    /**
+     * end one token context.
+     */
     public endToken(i: number, j: number): SQLToken {
         if (!this.wordStart) return;
         const token: SQLToken = {

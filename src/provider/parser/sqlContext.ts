@@ -10,6 +10,7 @@ export class SQLContext {
     inSingleQuoteString: boolean = false;
     inDoubleQuoteString: boolean = false;
     inComment: boolean = false;
+    inDDL: boolean = false;
     sql: string = "";
     start: Position;
 
@@ -25,11 +26,34 @@ export class SQLContext {
             if (ch.match(/^\s$/)) return this;
             this.start = new vscode.Position(i, j)
         }
+        this.checkDDLStart();
+        this.checkDDLEnd();
         this.sql = this.sql + ch
         return this;
     }
 
-    public endContext(i:number,j:number):SQLBlock{
+    /**
+     * check ddl start, only support mysql now
+     */
+    private checkDDLStart() {
+        const tokens = this.tokenContext.tokens;
+        if (this.inDDL || tokens.length != 2) return;
+        if (tokens[0].content?.match(/create/i) && tokens[1].content.match(/PROC|function|PROCEDURE/i)) {
+            this.inDDL = true;
+        }
+    }
+
+    /**
+     * check ddl end, only support mysql now
+     */
+    private checkDDLEnd() {
+        if (!this.inDDL || this.tokenContext.tokens.length <= 2) return;
+        if(this.tokenContext.word.match(/end/i)){
+            this.inDDL=false;
+        }
+    }
+
+    public endContext(i: number, j: number): SQLBlock {
         if (!this.start) return;
         this.tokenContext.endToken(i, j)
         const range = new vscode.Range(this.start, new vscode.Position(i, j + 1));
@@ -44,7 +68,7 @@ export class SQLContext {
      * @param char current char
      * @return current is or not string
      */
-    public isString(char:string){
+    public isString(char: string) {
         if (char == `'`) {
             this.inSingleQuoteString = !this.inSingleQuoteString;
         } else if (char == `"`) {
@@ -53,7 +77,7 @@ export class SQLContext {
         return this.inSingleQuoteString || this.inDoubleQuoteString;
     }
 
-    public getBlocks():SQLBlock[]{
+    public getBlocks(): SQLBlock[] {
         return this.blocks;
     }
 
@@ -61,12 +85,13 @@ export class SQLContext {
      * reset current context.
      */
     private reset() {
-        this.sql=""
-        this.start=null;
-        this.inSingleQuoteString=false;
-        this.inDoubleQuoteString=false;
-        this.inComment=false;
-        this.tokenContext=new TokenContext()
+        this.sql = ""
+        this.start = null;
+        this.inSingleQuoteString = false;
+        this.inDoubleQuoteString = false;
+        this.inDDL = false;
+        this.inComment = false;
+        this.tokenContext = new TokenContext()
     }
 
 }
