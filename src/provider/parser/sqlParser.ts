@@ -25,9 +25,7 @@ export class SQLParser {
             if (text.match(/^DELIMITER/i)) {
                 let block = context.endContext(i, 0)
                 block = context.append(i, 0, text).endContext(i, text.length)
-                if (this.hitCursor(block, current)) {
-                    return [block]
-                }
+                if (this.hitCursor(block, current)) return [block]
                 continue;
             }
 
@@ -40,14 +38,7 @@ export class SQLParser {
                     continue;
                 }
                 if (context.inComment) continue;
-                // string check
-                if (ch == `'`) {
-                    context.inSingleQuoteString = !context.inSingleQuoteString;
-                } else if (ch == `"`) {
-                    context.inDoubleQuoteString = !context.inDoubleQuoteString;
-                }
-                const inString = context.inSingleQuoteString || context.inDoubleQuoteString;
-                if (!inString) {
+                if (!context.isString(ch)) {
                     // line comment
                     if (ch == '-' && text.charAt(j + 1) == '-') break;
                     // block comment start
@@ -59,9 +50,7 @@ export class SQLParser {
                     // check sql end 
                     if (ch == delimter) {
                         const block = context.endContext(i, j)
-                        if (this.hitCursor(block, current)) {
-                            return [block];
-                        }
+                        if (this.hitCursor(block, current)) return [block];
                         continue;
                     }
                 }

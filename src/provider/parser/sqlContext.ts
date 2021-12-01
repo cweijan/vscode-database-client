@@ -39,6 +39,20 @@ export class SQLContext {
         return block;
     }
 
+    /**
+     * check current is string start.
+     * @param char current char
+     * @return current is or not string
+     */
+    public isString(char:string){
+        if (char == `'`) {
+            this.inSingleQuoteString = !this.inSingleQuoteString;
+        } else if (char == `"`) {
+            this.inDoubleQuoteString = !this.inDoubleQuoteString;
+        }
+        return this.inSingleQuoteString || this.inDoubleQuoteString;
+    }
+
     public getBlocks():SQLBlock[]{
         return this.blocks;
     }
