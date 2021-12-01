@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# 4.3.1 2021-12-1
+
+- Reduce mysql table info description.
+- Reduce ssh connection description.
+- Fix parse jsonb error #381.
+- Fix redis change page size not work.
+
 # 4.3.0 2021-11-29
 
 - Improve tree view render performance.
