@@ -5,16 +5,16 @@
       </el-input>
     </template>
     <template v-else>
-      <div class="edit-column" :contenteditable="editable"  @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" @paste="onPaste" @focus="focus" @blur="bluer">
-        <template v-if="result.dbType=='ElasticSearch'" >
+      <div class="edit-column" :contenteditable="editable" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" @paste="onPaste" @focus="focus" @blur="bluer">
+        <template v-if="result.dbType=='ElasticSearch'">
           <div v-html='dataformat(scope.row[scope.column.title])'>
           </div>
         </template>
         <template v-else-if="isNull">
-          <span class='null-column' >{{nullText}}</span>
+          <span class='null-column'>{{nullText}}</span>
         </template>
         <template v-else>
-          <span v-html='dataformat(scope.row[scope.column.title])'></span>
+          <span v-html='dataformat(scope.row[scope.column.title],scope.row.title)'></span>
         </template>
       </div>
     </template>
@@ -35,11 +35,11 @@ export default {
   },
   methods: {
     focus(e) {
-      if(!this.isNull || e.srcElement.innerText!='(NULL)')return;
-      this.nullText=""
+      if (!this.isNull || e.srcElement.innerText != '(NULL)') return;
+      this.nullText = ""
     },
     bluer(e) {
-      if(!this.isNull || e.srcElement.innerText )return;
+      if (!this.isNull || e.srcElement.innerText) return;
       this.nullText = '(NULL)';
     },
     dataformat(origin) {
@@ -47,15 +47,19 @@ export default {
         return "<span class='null-column'>(NULL)</span>";
       }
       const originType = origin.constructor.name;
+
       if (origin.hasOwnProperty("type")) {
         return String.fromCharCode.apply(null, new Uint16Array(origin.data));
       }
       if (originType == "String") {
         return origin.replace(/ /g, "&nbsp;").replace(/</g, "&lt;");
-      } else if (originType == "Array" && this.result.dbType == "PostgreSQL") {
-        const parsedArray = JSON.stringify(origin).replace(/\[/g, '{').replace(/\]/g, '}');
-        this.scope.row[this.scope.column.title] = parsedArray;
-        return parsedArray;
+      } else if (this.result.dbType == "PostgreSQL") {
+        const type = this.getTypeByColumn(this.scope.column.title);
+        if (type == 'ARRAY') {
+          const parsedArray = JSON.stringify(origin).replace(/\[/g, '{').replace(/\]/g, '}');
+          this.scope.row[this.scope.column.title] = parsedArray;
+          return parsedArray;
+        }
       }
       return origin;
     },
@@ -245,7 +249,7 @@ export default {
     },
   },
   computed: {
-    isNull(){
+    isNull() {
       return this.scope.row[this.scope.column.title] == undefined;
     },
     editable() {
@@ -262,9 +266,8 @@ export default {
 .edit-column {
   padding-left: 10px !important;
 }
-.edit-column{
+.edit-column {
   height: 100%;
   line-height: 33px;
 }
-
 </style>
