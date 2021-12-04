@@ -1,14 +1,14 @@
 <template>
   <el-dialog ref="editDialog" :title="editorTilte" :visible.sync="visible" width="60%" top="3vh" size="mini" :closeOnClickModal="false">
-    <el-form ref="infoForm" :model="editModel" :inline="true">
-      <el-form-item :prop="column.name" :key="column.name" v-for="column in columnList" size="mini">
+    <el-form ref="infoForm" :model="editModel" :inline="true" >
+      <el-form-item :prop="column.name" :key="column.name" v-for="column in columnList" size="mini" :label="column.name">
         <template>
-          <span>
+          <!-- <span>
             {{ column.name }} : {{ column.type }} &nbsp;
             <span style="color: red !important;">{{ column.key }}{{ column.nullable == 'YES' ? '' : ' NOT NULL' }}</span>&nbsp;
             <span>{{ column.defaultValue ? ` Default : ${column.defaultValue}` : "" }}</span>
             <span>{{ column.extra == "auto_increment" ? ` AUTO_INCREMENT` : "" }}</span>
-          </span>
+          </span> -->
           <CellEditor v-if="editModel" v-model="editModel[column.name]" :type="column.type"></CellEditor>
         </template>
       </el-form-item>
@@ -147,7 +147,7 @@ export default {
         ? `INSERT INTO ${this.table}(${columns.replace(
             /,$/,
             ""
-          )}) VALUES(${values.replace(/,$/, "")})`
+          )}) VALUES(${values.replace(/,$/, "")});`
         : null;
     },
     buildUpdateSql(currentNew, oldRow) {
