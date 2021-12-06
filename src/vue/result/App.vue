@@ -451,6 +451,7 @@ export default {
       }
       // loading
       this.table.loading = false;
+      this.$refs.editor.close();
     },
     // show call when change table
     reset() {
