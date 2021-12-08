@@ -169,20 +169,19 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         and tc.table_catalog=c.TABLE_CATALOG and tc.table_name=c.table_name WHERE c.TABLE_SCHEMA = '${database}' AND c.table_name = '${view ? view : table}' ORDER BY ORDINAL_POSITION;`;
     }
     showTriggers(database: string): string {
-        return `SELECT TRIGGER_NAME "TRIGGER_NAME" FROM information_schema.TRIGGERS WHERE trigger_schema = '${database}'`;
+        return `SELECT TRIGGER_NAME "TRIGGER_NAME" FROM information_schema.TRIGGERS WHERE trigger_schema = '${database}' order by TRIGGER_NAME ASC`;
     }
     showProcedures(database: string): string {
-        return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${database}' and ROUTINE_TYPE='PROCEDURE'`;
+        return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${database}' and ROUTINE_TYPE='PROCEDURE' order by ROUTINE_NAME ASC`;
     }
     showFunctions(database: string): string {
-        return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${database}' and ROUTINE_TYPE='FUNCTION'`;
+        return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${database}' and ROUTINE_TYPE='FUNCTION' order by ROUTINE_NAME ASC `;
     }
     showViews(database: string): string {
-        return `SELECT table_name "name",'simple' "type" from information_schema.tables where table_schema='${database}' and table_type='VIEW' 
+        return `SELECT * FROM (SELECT table_name "name",'simple' "type" from information_schema.tables where table_schema='${database}' and table_type='VIEW' 
 UNION ALL
 SELECT matviewname "name",'material' "type" from pg_matviews
-WHERE schemaname='${database}'
-        `
+WHERE schemaname='${database}') v order by v."name" ASC`
     }
     buildPageSql(database: string, table: string, pageSize: number): string {
         return `SELECT * FROM ${table} LIMIT ${pageSize};`;
@@ -199,10 +198,10 @@ WHERE t.table_type='BASE TABLE'
 AND t.table_schema='${database}' order by t.table_name;`
     }
     showDatabases() {
-        return `SELECT datname "Database" FROM pg_database WHERE datistemplate = false;`
+        return `SELECT datname "Database" FROM pg_database WHERE datistemplate = false order by datname ASC;`
     }
     showSchemas(): string {
-        return `select catalog_name "Database",schema_name "schema" from information_schema.schemata;`
+        return `select catalog_name "Database",schema_name "schema" from information_schema.schemata order by schema_name ASC;`
     }
     tableTemplate(): string {
         return `CREATE TABLE [name](  
