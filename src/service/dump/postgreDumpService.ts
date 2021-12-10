@@ -30,8 +30,7 @@ export class PostgreDumpService extends DumpService{
 
                 let command = `pg_dump -h ${host} -w -p ${port} -U ${node.user} ${data} ${schema} ${tables} ${node.database}>${folderPath.fsPath}`;
                 if(node.password){
-                    let prefix = platform() == 'win32' ? 'set' : 'export';
-                    command=`${prefix} "PGPASSWORD=${node.password}" && ` +command
+                    command= platform() == 'win32' ? `set "PGPASSWORD=${node.password}" && ${command}` :`export "PGPASSWORD='${node.password}'" && ${command}` ;
                 }
                 
                 // Console.log(`Executing: ${command}`);
