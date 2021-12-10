@@ -991,6 +991,11 @@
 					"default": false,
 					"description": "Highlight SQL Code block."
 				},
+				"database-client.autoGetTableCount": {
+					"type": "boolean",
+					"default": true,
+					"description": "Auto get table count when load table data."
+				},
 				"database-client.preferConnectionName": {
 					"type": "boolean",
 					"default": false,

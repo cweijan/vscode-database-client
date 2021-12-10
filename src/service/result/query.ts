@@ -86,6 +86,8 @@ export class QueryPage {
                 }).on('copy', value => {
                     Util.copyToBoard(value)
                 }).on('count', async (params) => {
+                    const autoCount=Global.getConfig('autoGetTableCount',true);
+                    if(!autoCount)return;
                     if (dbOption.dbType == DatabaseType.MONGO_DB) {
                         const sql = params.sql.replace(/(.+?find\(.+?\)).+/i, '$1').replace("find", "count");
                         dbOption.execute(sql).then((count) => {
