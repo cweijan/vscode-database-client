@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 4.3.3 2021-12-10
+
+- Support delete multi redis key.
+- Fix bugs.
+
 # 4.3.1 2021-12-1
 
 - Reduce mysql table info description.
