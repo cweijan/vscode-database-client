@@ -60,7 +60,7 @@
 	"command.delete.trigger": "Drop Trigger",
 	"command.connection.terminal": "Open Terminal",
     "command.redis.connection.status": "Server status",
-    "command.redis.key.del": "Delete Key",
+    "command.redis.key.del": "Delete",
 	"command.redis.key.detail": "View Key Detail",
 	"config.title":"Database Client",
 	"config.preferConnectionName":"Using connection name as connection node name",

@@ -2,7 +2,6 @@ import { CodeCommand, Constants, ModelType, RedisType } from "@/common/constants
 import { Util } from "@/common/util";
 import { ViewManager } from "@/common/viewManager";
 import { Node } from "@/model/interface/node";
-import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import * as path from "path";
 import { commands, ThemeIcon, TreeItemCollapsibleState, window } from "vscode";
 import RedisBaseNode from "./redisBaseNode";
@@ -34,7 +33,7 @@ export default class KeyNode extends RedisBaseNode {
         if (keyNodeList) {
             Util.confirm('Do you want to delete all the selected keys' , async () => {
                 const client = await this.getClient();
-                await Promise.all(keyNodeList.map(n => client.del(n.label)))
+                await Promise.all(keyNodeList.filter(n=>n instanceof KeyNode).map(n => client.del(n.label)))
                 this.provider.reload()
             })
         } else {

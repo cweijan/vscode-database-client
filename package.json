@@ -891,6 +891,11 @@
 					"group": "inline"
 				},
 				{
+					"command": "mysql.redis.key.del",
+					"when": "view == github.cweijan.nosql && viewItem =~ /^(redisKey|redisFolder)$/",
+					"group": "mysql"
+				},
+				{
 					"command": "mysql.connection.delete",
 					"when": "view == github.cweijan.nosql && viewItem =~ /(sshConnection|ftpConnection)/",
 					"group": "inline@0"
