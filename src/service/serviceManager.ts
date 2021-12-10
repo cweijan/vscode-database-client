@@ -105,6 +105,7 @@ export class ServiceManager {
         this.nosqlProvider = new DbTreeDataProvider(this.context, CacheKey.NOSQL_CONNECTION);
         const treeview = vscode.window.createTreeView("github.cweijan.nosql", {
             treeDataProvider: this.nosqlProvider,
+            canSelectMany: true,
         });
         treeview.onDidCollapseElement((event) => {
             DatabaseCache.storeElementState(event.element, vscode.TreeItemCollapsibleState.Collapsed);
