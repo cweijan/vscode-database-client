@@ -228,7 +228,7 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.redis.connection.status": (connectionNode: RedisConnectionNode) => connectionNode.showStatus(),
                 "mysql.connection.terminal": (node: Node) => node.openTerminal(),
                 "mysql.redis.key.detail": (keyNode: KeyNode) => keyNode.detail(),
-                "mysql.redis.key.del": (keyNode: KeyNode) => keyNode.delete(),
+                "mysql.redis.key.del": (keyNode: KeyNode, keyNodeList: KeyNode[]) => keyNode.delete(keyNodeList),
                 "mysql.redis.loadMore": (renmainNode: RemainNode) => renmainNode.click(),
             },
             // table node
