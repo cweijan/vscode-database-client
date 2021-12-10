@@ -1,10 +1,15 @@
 import * as vscode from "vscode";
 import { ComplectionChain, ComplectionContext } from "../complectionContext";
 import { Pattern } from "../../../common/constants";
+import { ConnectionManager } from "@/service/connectionManager";
 
 export class TableDetecherChain implements ComplectionChain {
 
     public getComplection(context: ComplectionContext): vscode.CompletionItem[] | Promise<vscode.CompletionItem[]> {
+
+        if(ConnectionManager.tryGetConnection()==null){
+            return null;
+        }
 
         const tableMatch = new RegExp(Pattern.TABLE_PATTERN + " *((\\w)*)?", 'ig');
         if (context.previousToken?.content?.match(/\b(select|HAVING|\(|on|where|and|,|=|<|>)\b/ig)

@@ -1,4 +1,5 @@
 import { ModelType } from "@/common/constants";
+import { ConnectionManager } from "@/service/connectionManager";
 import * as vscode from "vscode";
 import { ComplectionContext } from "../complectionContext";
 import { NodeFinder } from "../nodeFinder";
@@ -7,6 +8,11 @@ import { BaseChain } from "./baseChain";
 export class DMLChain extends BaseChain {
 
     public async getComplection(context: ComplectionContext) {
+
+        if(ConnectionManager.tryGetConnection()==null){
+            return null;
+        }
+
         const firstToken = context.tokens[0]?.content?.toLowerCase()
         if (!firstToken || ['explain','select', 'insert', 'update', 'delete', 'call'].indexOf(firstToken) == -1) {
             return null;

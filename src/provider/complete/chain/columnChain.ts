@@ -10,6 +10,10 @@ export class ColumnChain implements ComplectionChain {
     private needStop = true;
     public async getComplection(context: ComplectionContext): Promise<vscode.CompletionItem[]> {
 
+        if(ConnectionManager.tryGetConnection()==null){
+            return []
+        }
+
         if (context.currentToken?.content === ".") {
             let subComplectionItems = await this.generateColumnComplectionItem(context.previousToken?.content);
             if (subComplectionItems != null && subComplectionItems.length > 0) { this.needStop = true }

@@ -1,4 +1,5 @@
 import { ModelType } from "@/common/constants";
+import { ConnectionManager } from "@/service/connectionManager";
 import * as vscode from "vscode";
 import { CompletionItem } from "vscode";
 import { ComplectionContext } from "../complectionContext";
@@ -35,6 +36,9 @@ export class DDLChain extends BaseChain {
                         "DEFAULT", "COMMENT", "UNIQUE", "KEY", "FOREIGN", "CASCADE", "RESTRICT", "UNSIGNED", "CURRENT_TIMESTAMP"]).concat(this.typeList)
             }
         } else {
+            if(ConnectionManager.tryGetConnection()==null){
+                return null;
+            }
             let modelType: ModelType;
             switch (secondToken) {
                 case 'table':

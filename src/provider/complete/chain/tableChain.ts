@@ -11,6 +11,10 @@ export class TableChain implements ComplectionChain {
 
     public async getComplection(context: ComplectionContext): Promise<vscode.CompletionItem[]> {
         
+        if(ConnectionManager.tryGetConnection()==null){
+            return null;
+        }
+
         const current=context.currentToken?.content
         if (current == ".") {
             const previous = context.previousToken?.content;
