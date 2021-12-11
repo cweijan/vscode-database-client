@@ -45,27 +45,33 @@ export class NodeFinder {
                     break;
                 case ModelType.TABLE:
                     if (lcp instanceof ConnectionNode) break;
-                    nodeList.push(...await groupNodes.find(n => n instanceof TableGroup).getChildren())
+                    this.join(nodeList,await groupNodes.find(n => n instanceof TableGroup)?.getChildren())
                     break;
                 case ModelType.VIEW:
                     if (lcp instanceof ConnectionNode) break;
-                    nodeList.push(...await groupNodes.find(n => n instanceof ViewGroup).getChildren())
+                    this.join(nodeList,await groupNodes.find(n => n instanceof ViewGroup)?.getChildren())
                     break;
                 case ModelType.PROCEDURE:
                     if (lcp instanceof ConnectionNode) break;
-                    nodeList.push(...await groupNodes.find(n => n instanceof ProcedureGroup).getChildren())
+                    this.join(nodeList,await groupNodes.find(n => n instanceof ProcedureGroup)?.getChildren())
                     break;
                 case ModelType.TRIGGER:
                     if (lcp instanceof ConnectionNode) break;
-                    nodeList.push(...await groupNodes.find(n => n instanceof TriggerGroup).getChildren())
+                    this.join(nodeList,await groupNodes.find(n => n instanceof TriggerGroup)?.getChildren())
                     break;
                 case ModelType.FUNCTION:
                     if (lcp instanceof ConnectionNode) break;
-                    nodeList.push(...await groupNodes.find(n => n instanceof FunctionGroup).getChildren())
+                    this.join(nodeList,await groupNodes.find(n => n instanceof FunctionGroup)?.getChildren())
                     break;
             }
         }
         return nodeList;
+    }
+
+    private static join(node:Node[],newNodes:Node[]){
+        if(newNodes){
+            node.push(...newNodes)
+        }
     }
 
 }
