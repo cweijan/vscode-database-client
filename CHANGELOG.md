@@ -1,9 +1,10 @@
 # CHANGELOG
 
-# 4.3.3 2021-12-10
+# 4.3.5 2021-12-11
 
 - Support delete multi redis key.
-- Fix bugs.
+- Fix mysqldump8 dump mysql5.7 server fail.
+- Fix complection fail when hidden procedure group.
 
 # 4.3.1 2021-12-1
 
