@@ -71,10 +71,10 @@ export class SSHTunnelService {
                     pending.resolve({ ...node, host: "127.0.0.1", port } as Node)
                 }
             }).on("error", (error) => {
-                delete this.tunelMark[key]
                 for (const pending of this.tunelMark[key].pendings) {
                     pending.reject(error)
                 }
+                delete this.tunelMark[key]
             }).start()
         })
     }
