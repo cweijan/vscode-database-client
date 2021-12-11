@@ -43,7 +43,7 @@ export const util = {
             if(this.isDbNumber(type)){
                 return value;
             }
-            return `'${value}'`.replace("\\","\\\\")
+            return `'${value}'`.replace(/\\/g,"\\\\")
         }
     }
 }

@@ -108,7 +108,7 @@ export class MockRunner {
                     return value
                 }
         }
-        return `'${value}'`.replace("\\","\\\\")
+        return `'${value}'`.replace(/\\/g,"\\\\")
     }
 
     // refrence : http://mockjs.com/examples.html
