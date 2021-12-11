@@ -6,6 +6,7 @@ import { ViewNode } from "@/model/main/viewNode";
 import { NodeUtil } from "@/model/nodeUtil";
 import { DumpService } from "./dumpService";
 import * as vscode from "vscode";
+import { exec } from "child_process";
 var commandExistsSync = require('command-exists').sync;
 
 export class MysqlDumpService extends DumpService {
@@ -26,7 +27,10 @@ export class MysqlDumpService extends DumpService {
                 const tables = isTable ? ` --skip-triggers ${node.label}` : '';
                 const password = node.password ? ` -p${node.password}` : '';
 
-                const command = `mysqldump -h ${host} -P ${port} -u ${node.user} ${password}${data} --skip-add-locks ${node.schema} ${tables}>${folderPath.fsPath}`;
+                const dumpVersion = await this.getDumpVersion()
+                const cs = dumpVersion.includes("8.0") ? ' --column-statistics=0' : '';
+
+                const command = `mysqldump -h ${host} -P ${port} -u ${node.user} ${password}${data}${cs} --skip-add-locks ${node.schema} ${tables}>${folderPath.fsPath}`;
 
                 // Console.log(`Executing: ${command}`);
                 Util.execute(command).then(() => {
@@ -41,6 +45,14 @@ export class MysqlDumpService extends DumpService {
         }
 
         return super.dump(node, withData);
+    }
+
+    private getDumpVersion(): Promise<string> {
+        return new Promise((res, rej) => {
+            exec("mysqldump --version", (err, stdout, stderr) => {
+                res(stdout)
+            })
+        });
     }
 
 }
