@@ -18,7 +18,7 @@ export class HistoryRecorder {
     public recordHistory(sql: string, costTime: number) {
         if (!sql || sql==this.preSql) { return; }
         this.preSql=sql;
-        FileManager.record('history.sql', `/* ${this.getNowDate()} [${costTime} ms] */ ${sql.replace(/[\r\n]/g, " ")}\n`);
+        FileManager.record('history.sql', `/* ${this.getNowDate()} [${costTime} ms] */ ${sql}\n`);
         // HistoryProvider.recordHistory(new HistoryNode(sql,this.getNowDate(),costTime))
     }
 
