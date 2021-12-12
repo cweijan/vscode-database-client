@@ -1,5 +1,6 @@
 import { ConfigKey, Constants, ModelType } from "@/common/constants";
 import { Global } from "@/common/global";
+import { RedisDBMeta } from "@/common/typeDef";
 import { Util } from "@/common/util";
 import { ViewManager } from "@/common/viewManager";
 import { CommandKey, Node } from "@/model/interface/node";
@@ -33,16 +34,24 @@ export class RedisConnectionNode extends RedisBaseNode {
     }
 
     async getChildren(): Promise<RedisBaseNode[]> {
-        const client=await this.getClient()
-        const keyspace=await client.info('keyspace')
-        let dbs=keyspace.match(/db(\w)+/g)
-        if(!dbs){
-            return [new RedisDbNode(this.database||"0",this)]
+        const client = await this.getClient();
+        const keyspace = await client.info('keyspace');
+        let dbs: RedisDBMeta[] = keyspace.split('\n')
+            .filter(line => line.trim().startsWith('db'))
+            .map(line => {
+                const [db, infos] = line.trim().split(':', 2);
+                const infoList = infos.split(',').map(i => i.split('='));
+
+                return { name: db.replace('db', ''), ...Object.fromEntries(infoList) };
+            });
+
+        if (!dbs.length) {
+            return [new RedisDbNode({ name: this.database || "0" }, this)];
         }
-        if(this.database && !dbs.includes("db"+this.database)){
-            dbs.unshift(this.database)
+        if (this.database && !dbs.filter(db => db.name == this.database).length) {
+            dbs.unshift({ name: this.database });
         }
-        return dbs.map(db=>new RedisDbNode(db.replace("db",""),this));
+        return dbs.map(db => new RedisDbNode(db, this));
     }
 
     async openTerminal(): Promise<any> {
