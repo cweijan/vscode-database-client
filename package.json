@@ -1001,6 +1001,11 @@
 					"default": true,
 					"description": "Auto get table count when load table data."
 				},
+				"database-client.recordSelectSQL": {
+					"type": "boolean",
+					"default": true,
+					"description": "Record select sql as history."
+				},
 				"database-client.preferConnectionName": {
 					"type": "boolean",
 					"default": false,
