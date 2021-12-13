@@ -45,7 +45,7 @@ export class MysqlConnection extends IConnection {
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
     query(sql: any, values?: any, callback?: any) {
-        return this.con.query({ sql, infileStreamFactory: (path: string) => fs.createReadStream(path) } as any, values, callback)
+        return this.con.query(sql, values, callback)
     }
     connect(callback: (err: Error) => void): void {
         this.con.connect(callback)
