@@ -125,3 +125,10 @@ export interface ViewMeta extends TableMeta{
      */
     type?:string;
 }
+
+export interface RedisDBMeta {
+    name: string;
+    keys?: string;
+    expires?: string;
+    avg_ttl?: string;
+}

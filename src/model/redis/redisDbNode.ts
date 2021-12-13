@@ -1,4 +1,5 @@
 import { Constants, ModelType } from "@/common/constants";
+import { RedisDBMeta } from "@/common/typeDef";
 import { Cluster } from "ioredis";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -14,9 +15,12 @@ export class RedisDbNode extends RedisBaseNode {
     iconPath: string | vscode.ThemeIcon = new vscode.ThemeIcon("database", new vscode.ThemeColor('dropdown.foreground'));
     keys: string[];
 
-    constructor(readonly database: string, readonly parent: Node) {
-        super(database)
+    constructor(readonly meta: RedisDBMeta, readonly parent: Node) {
+        super(meta.name);
         this.init(parent)
+
+        this.database = meta.name;
+        this.description = meta.keys ? `(${meta.keys})` : '';
     }
 
     async getChildren(isRresh?: boolean): Promise<RedisBaseNode[]> {
