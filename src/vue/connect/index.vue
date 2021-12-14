@@ -401,6 +401,7 @@ export default {
     },
     "connectionOption.connectionUrl"(value) {
       let connectionUrl = this.connectionOption.connectionUrl;
+      if(!connectionUrl)return;
 
       const srvRegex = /(?<=mongodb\+).+?(?=:\/\/)/;
       const srv = connectionUrl.match(srvRegex);
