@@ -261,7 +261,7 @@ export class QueryPage {
         if (tableNode) {
             let primaryKey: string;
             let primaryKeyList = [];
-            const columnList = (await tableNode.getChildren()).map((columnNode: ColumnNode) => {
+            const columnList = (await tableNode.getChildren(true)).map((columnNode: ColumnNode) => {
                 if (columnNode.isPrimaryKey) {
                     primaryKey = columnNode.column.name;
                     primaryKeyList.push(columnNode.column)
