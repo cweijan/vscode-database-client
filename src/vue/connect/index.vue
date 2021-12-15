@@ -76,7 +76,7 @@
         </div>
         <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis'">
           <label class="font-bold mr-5 inline-block w-32">{{$t("config.showedDatabases")}}</label>
-          <input class="w-64 field__input" placeholder="Example: mysql,information_schema" v-model="connectionOption.includeDatabases" />
+          <input class="w-64 field__input" placeholder="e.g mysql,information_schema" v-model="connectionOption.includeDatabases" />
         </div>
       </section>
 
