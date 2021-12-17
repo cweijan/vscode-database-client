@@ -101,8 +101,9 @@ Move to ant DatabaseNode or TableNode. The export/import options are listed in t
 
 ## Setting
 
-This extension contain some setting, find him in the following way.
+This extension contain some setting, can be modified as follows.
 
+![image](https://user-images.githubusercontent.com/27798227/146523121-9de9c708-8a8e-4e3b-ae1d-9da36f3217e1.png)
 ![](images/1611910592756.png)
 
 ## Filter
