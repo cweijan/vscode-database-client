@@ -18,7 +18,6 @@ export class MysqlConnection extends IConnection {
             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
             connectTimeout: node.connectTimeout || 5000,
             socketPath:node.socketPath,
-            timeout:node.requestTimeout,
             typeCast: (field, next) => {
                 if (this.dumpMode) return dumpTypeCast(field as mysql.TypecastField)
                 const buf = field.buffer();
