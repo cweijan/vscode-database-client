@@ -176,7 +176,8 @@ https://www.umyui.com/
 .plx-table .plx-body--row.row--hover,
 .plx-table .plx-body--row.row--cheched,
 .plx-table .plx-body--row.row--current {
-  background: var(--vscode-tab-hoverBackground) !important;
+  background: rgba(128,128,128,0.25) !important;
+  /* background: var(--vscode-tab-hoverBackground) !important; */
   color: var(--second-color) !important;
 }
 
