@@ -41,7 +41,7 @@ export class ConnectionNode extends Node implements CopyAble {
             return [new TableGroup(this), new ViewGroup(this)];
         }
 
-        const key=this.contextValue==ModelType.CONNECTION?this.key:this.uid;
+        const key = this.contextValue == ModelType.CONNECTION ? this.key : this.uid;
         let dbNodes = DatabaseCache.getSchemaListOfConnection(key);
         if (dbNodes && !isRresh) {
             for (const dbNode of dbNodes) {
@@ -70,7 +70,7 @@ export class ConnectionNode extends Node implements CopyAble {
                 }).map<SchemaNode | CatalogNode>((database) => {
                     return hasCatalog ?
                         new CatalogNode(database.Database, this)
-                        : new SchemaNode(database.schema || database.Database,database, this);
+                        : new SchemaNode(database.schema || database.Database, database, this);
                 });
 
                 if (Global.getConfig("showUser") && !hasCatalog) {
@@ -97,20 +97,36 @@ export class ConnectionNode extends Node implements CopyAble {
     }
 
     private getLabel(parent: Node) {
-        this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName ? this.instanceName : this.port}`;
-        if (this.dbType == DatabaseType.SQLITE) {
-            this.label = this.dbPath;
-        }
         if (parent.name) {
             this.name = parent.name;
             const preferName = Global.getConfig(ConfigKey.PREFER_CONNECTION_NAME, true);
-            preferName ? this.label = parent.name : this.description = parent.name;
+            if (preferName) {
+                this.label = parent.name
+                return;
+            }
+            this.description = parent.name;
+        }
+
+
+        if (this.dbType == DatabaseType.SQLITE) {
+            const baseName=path.basename(this.dbPath);
+            let prefix=path.resolve(baseName,"..")
+            if(prefix.length>10){
+                prefix=prefix.substring(0,10)+"..."
+            }
+            this.label = prefix+path.sep+baseName;
+            return;
+        }
+
+        this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.instanceName ? this.instanceName : this.port}`;
+        if (this.label.length > 20) {
+            this.label = this.label.substring(0, 20) + "..."
         }
     }
 
     private bindToolTip() {
-        if(this.parent.name){
-            this.tooltip=`Host: ${this.host}, Port: ${this.port}`;
+        if (this.parent.name) {
+            this.tooltip = `Host: ${this.host}, Port: ${this.port}`;
         }
     }
 
@@ -143,23 +159,23 @@ export class ConnectionNode extends Node implements CopyAble {
      */
     private getIcon() {
         const basePath = Constants.RES_PATH + "/icon/server/";
-        const isActive = ConnectionManager.activeNode?.key==this.key;
+        const isActive = ConnectionManager.activeNode?.key == this.key;
 
         switch (this.dbType) {
             case DatabaseType.MYSQL:
-                this.iconPath = basePath + (isActive ? "mysql_active.svg": "mysql.svg" );
+                this.iconPath = basePath + (isActive ? "mysql_active.svg" : "mysql.svg");
                 break;
-                case DatabaseType.PG:
-                this.iconPath = basePath + (isActive ? "pgsql_active.svg": "pgsql.svg" );
+            case DatabaseType.PG:
+                this.iconPath = basePath + (isActive ? "pgsql_active.svg" : "pgsql.svg");
                 break;
-                case DatabaseType.MSSQL:
-                this.iconPath = basePath + (isActive ? "mssql.png": "mssql.png" );
+            case DatabaseType.MSSQL:
+                this.iconPath = basePath + (isActive ? "mssql.png" : "mssql.png");
                 break;
-                case DatabaseType.SQLITE:
-                this.iconPath = basePath + (isActive ? "sqlite_active.svg": "sqlite.svg" );
+            case DatabaseType.SQLITE:
+                this.iconPath = basePath + (isActive ? "sqlite_active.svg" : "sqlite.svg");
                 break;
-                case DatabaseType.MONGO_DB:
-                this.iconPath = basePath + (isActive ? "mongo_active.svg": "mongo.svg" );
+            case DatabaseType.MONGO_DB:
+                this.iconPath = basePath + (isActive ? "mongo_active.svg" : "mongo.svg");
                 break;
         }
     }
