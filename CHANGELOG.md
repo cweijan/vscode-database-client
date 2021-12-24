@@ -1,5 +1,14 @@
 # CHANGELOG
 
+# 4.3.6 2021-12-25
+
+- Update connect and result view some style.
+- Redis show key count.
+- Refresh column cache when click table.
+- Import sql support multiple files.
+- Sort mysql database name by alphabet.
+- Change mysql column position add confirm.
+
 # 4.3.5 2021-12-11
 
 - Support delete multi redis key.
