@@ -1,11 +1,25 @@
+import { Console } from "@/common/Console";
 import { Util } from "@/common/util";
 import { readFileSync } from "fs";
-import { window } from "vscode";
+import { Uri, window } from "vscode";
 import { Node } from "../../model/interface/node";
 import { DelimiterHolder } from "../common/delimiterHolder";
 import { ConnectionManager } from "../connectionManager";
 
 export abstract class ImportService {
+
+    public batchImportSql(sqlUriList: Uri[], node: Node): void {
+        if(!sqlUriList){
+            return;
+        }
+        for (const uri of sqlUriList) {
+            try {
+                this.importSql(uri.fsPath,node)            
+            } catch (error) {
+                Console.log(error)
+            }
+        }
+    }
 
     public importSql(importPath: string, node: Node): void {
 
