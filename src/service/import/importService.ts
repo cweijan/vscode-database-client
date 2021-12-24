@@ -1,6 +1,7 @@
 import { Console } from "@/common/Console";
 import { Util } from "@/common/util";
-import { readFileSync } from "fs";
+import { readdirSync, readFileSync, statSync } from "fs";
+import { extname, join } from "path";
 import { Uri, window } from "vscode";
 import { Node } from "../../model/interface/node";
 import { DelimiterHolder } from "../common/delimiterHolder";
@@ -8,13 +9,22 @@ import { ConnectionManager } from "../connectionManager";
 
 export abstract class ImportService {
 
-    public batchImportSql(sqlUriList: Uri[], node: Node): void {
-        if(!sqlUriList){
+    public batchImportSql(sqlPathList: string[], node: Node, recursion: boolean = false): void {
+        if (!sqlPathList) {
             return;
         }
-        for (const uri of sqlUriList) {
+        for (const path of sqlPathList) {
             try {
-                this.importSql(uri.fsPath,node)            
+                if (statSync(path).isDirectory()) {
+                    const childPathList = readdirSync(path).map(childPath => join(path, childPath))
+                    this.batchImportSql(childPathList, node, true);
+                    continue;
+                }
+                // recursion only import sql file.
+                if (recursion && extname(path).toLowerCase()!='.sql') {
+                    continue;
+                }
+                this.importSql(path, node)
             } catch (error) {
                 Console.log(error)
             }
@@ -39,7 +49,7 @@ export abstract class ImportService {
 
     }
 
-    public filter():any {
+    public filter(): any {
         return { Sql: ['sql'] };
     }
 
