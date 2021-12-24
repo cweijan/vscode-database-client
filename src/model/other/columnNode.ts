@@ -111,10 +111,12 @@ ${column.type} ${column.nullable == "YES" ? "Nullable" : "NotNull"}`
             vscode.window.showErrorMessage("Column is at last.")
             return;
         }
-        const sql = `ALTER TABLE ${this.wrap(this.schema)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(this.column.name)} ${this.column.type} AFTER ${this.wrap(afterColumnNode.column.name)};`
-        await this.execute(sql)
-        this.parent.setChildCache(null)
-        DbTreeDataProvider.refresh(this.parent)
+        Util.confirm("Are you want to move column position?",async ()=>{
+            const sql = `ALTER TABLE ${this.wrap(this.schema)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(this.column.name)} ${this.column.type} AFTER ${this.wrap(afterColumnNode.column.name)};`
+            await this.execute(sql)
+            this.parent.setChildCache(null)
+            DbTreeDataProvider.refresh(this.parent)
+        })
     }
     public async moveUp() {
         this.check()
@@ -124,10 +126,12 @@ ${column.type} ${column.nullable == "YES" ? "Nullable" : "NotNull"}`
             vscode.window.showErrorMessage("Column is at first.")
             return;
         }
-        const sql = `ALTER TABLE ${this.wrap(this.schema)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(beforeColumnNode.column.name)} ${beforeColumnNode.column.type} AFTER ${this.wrap(this.column.name)};`
-        await this.execute(sql)
-        this.parent.setChildCache(null)
-        DbTreeDataProvider.refresh(this.parent)
+        Util.confirm("Are you want to move column position?",async ()=>{
+            const sql = `ALTER TABLE ${this.wrap(this.schema)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(beforeColumnNode.column.name)} ${beforeColumnNode.column.type} AFTER ${this.wrap(this.column.name)};`
+            await this.execute(sql)
+            this.parent.setChildCache(null)
+            DbTreeDataProvider.refresh(this.parent)
+        })
     }
 
     check() {
