@@ -37,7 +37,7 @@ export class SchemaNode extends Node implements CopyAble {
         }
 
         let childCache = this.getChildCache();
-        if (childCache && !isRresh) {
+        if (childCache && childCache.length>0 && !isRresh) {
             return childCache;
         }
 
