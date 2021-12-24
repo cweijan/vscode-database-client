@@ -1,7 +1,7 @@
 export const messages = {
   en: {
     connect:{
-      title:"Connect To Server",
+      title:"Connect to Server",
       name:"Connection Name",
       scope:"Connection Scope",
       success:"Success!",

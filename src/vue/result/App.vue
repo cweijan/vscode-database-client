@@ -2,7 +2,7 @@
   <div id="app">
     <div class="hint" ref="hint">
       <el-image v-if="result.showUgly" style="width: 225px; height: 300px" :src="result.uglyPath"></el-image>
-      <div style="width:100%;" >
+      <div style="width:100%;">
         <el-input type="textarea" :autosize="{ minRows:2, maxRows:6}" v-model="toolbar.sql" :style="{fontFamily:result.fontFamily,fontSize:result.fontSize+'px'}" class="sql-pannel" @keypress.native="panelInput" />
       </div>
       <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :result="result" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="$refs.editor.openInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
@@ -15,7 +15,7 @@
     <ux-grid ref="dataTable" :data="filterData" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe :checkboxConfig="{ checkMethod: selectable}">
       <ux-table-column type="checkbox" width="40" fixed="left"></ux-table-column>
       <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined">
-        <template #header>  
+        <template #header>
           <el-popover placement="bottom" width="200" trigger="hover" type="primary">
             <el-checkbox-group v-model="toolbar.showColumns">
               <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
@@ -24,7 +24,7 @@
             </el-checkbox-group>
             <!-- <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference">
             </el-button> -->
-            <el-button icon="el-icon-search" title="Select columns to show."  slot="reference"/>
+            <el-button icon="el-icon-search" title="Select columns to show." slot="reference" />
           </el-popover>
         </template>
         <!-- <Controller slot="header" :result="result" :toolbar="toolbar" /> -->
@@ -69,7 +69,7 @@ export default {
       result: {
         data: [],
         dbType: "",
-        single:true,
+        single: true,
         costTime: 0,
         sql: "",
         primaryKey: null,
@@ -112,9 +112,10 @@ export default {
     };
   },
   mounted() {
-    const hint=this.$refs.hint;
-    const updateHeight=()=>{
-      this.remainHeight = window.innerHeight -10 - hint.clientHeight ;
+    this.focusHolder();
+    const hint = this.$refs.hint;
+    const updateHeight = () => {
+      this.remainHeight = window.innerHeight - 10 - hint.clientHeight;
       this.showFullBtn = window.outerWidth / window.innerWidth >= 2;
     }
     updateHeight()
@@ -154,7 +155,7 @@ export default {
 
     vscodeEvent.on("updateSuccess", () => {
       this.update.editList = [];
-      this.result.data=[]
+      this.result.data = []
       this.refresh()
       this.update.lock = false;
       this.$message({
@@ -164,10 +165,10 @@ export default {
         type: "success",
       });
     })
-    .on("isSingle",(isSingle)=>{
-      this.result.single=isSingle;
-    })
-    
+      .on("isSingle", (isSingle) => {
+        this.result.single = isSingle;
+      })
+
     window.onkeypress = (e) => {
       if (
         (e.code == "Enter" && e.target.classList.contains("edit-column")) ||
@@ -182,10 +183,10 @@ export default {
       if (!data) return;
       console.log(data);
       const response = data.content;
-      const runLoading=this.result.transId==null || (response && response.transId > this.result.transId);
-      if(response){
-        this.result.transId=response.transId; 
-        if(response.language){
+      const runLoading = this.result.transId == null || (response && response.transId > this.result.transId);
+      if (response) {
+        this.result.transId = response.transId;
+        if (response.language) {
           this.$i18n.locale = response.language
         }
       }
@@ -203,7 +204,7 @@ export default {
         case "NEXT_PAGE":
           this.table.loading = false;
           this.result.data = response.data;
-          this.result.costTime=response.costTime;
+          this.result.costTime = response.costTime;
           this.toolbar.sql = response.sql;
           this.result.data.unshift({ isFilter: true, content: "" });
           break;
@@ -248,13 +249,36 @@ export default {
     });
   },
   methods: {
-    panelInput(event){
-      if(event.code=='Enter' && event.ctrlKey){
+    focusHolder() {
+      let lastElement;
+      window.onfocus = () => {
+        setTimeout(() => {
+          if (lastElement) {
+            lastElement.focus()
+          }
+        }, 10)
+      }
+      window.onblur = () => {
+        const ae = document.activeElement;
+        if (!ae) {
+          return;
+        }
+        const tagName = ae.tagName.toLowerCase()
+        if (
+          (tagName == 'input' || tagName == 'textarea') ||
+          (tagName == 'div' && ae.contentEditable == 'true')
+        ) {
+          lastElement = ae;
+        }
+      }
+    },
+    panelInput(event) {
+      if (event.code == 'Enter' && event.ctrlKey) {
         this.execute(this.toolbar.sql)
         event.stopPropagation()
       }
     },
-    selectable({row}) {
+    selectable({ row }) {
       return this.editable && !row.isFilter;
     },
     save() {
@@ -298,11 +322,11 @@ export default {
         vscodeEvent.emit("esSort", [{ [row.prop]: { order: row.order } }]);
         return;
       }
-      
-      if(this.result.dbType == "MongoDB"){
+
+      if (this.result.dbType == "MongoDB") {
         let sortSql = this.result.sql
-        .replace(/.sort\(.+?\)/gi, "")
-        .replace(/\s?(limit.+)?$/i, `sort({"${row.prop}": ${row.order.toLowerCase()=='desc'?-1:1}}).\$1 `);
+          .replace(/.sort\(.+?\)/gi, "")
+          .replace(/\s?(limit.+)?$/i, `sort({"${row.prop}": ${row.order.toLowerCase() == 'desc' ? -1 : 1}}).\$1 `);
         this.execute(sortSql);
         return;
       }
@@ -351,19 +375,18 @@ export default {
             deleteSql =
               checkboxRecords.length > 1
                 ? `POST /_bulk\n${checkboxRecords
-                    .map(
-                      (c) =>
-                        `{ "delete" : { "_index" : "${this.result.table}", "_id" : "${c}" } }`
-                    )
-                    .join("\n")}`
+                  .map(
+                    (c) =>
+                      `{ "delete" : { "_index" : "${this.result.table}", "_id" : "${c}" } }`
+                  )
+                  .join("\n")}`
                 : `DELETE /${this.result.table}/_doc/${checkboxRecords[0]}`;
           } else if (this.result.dbType == "MongoDB") {
-            deleteSql = `db('${this.result.database}').collection("${
-              this.result.table
-            }")
+            deleteSql = `db('${this.result.database}').collection("${this.result.table
+              }")
               .deleteMany({_id:{$in:[${checkboxRecords.join(",")}]}})`;
           } else {
-            const table=wrapByDb(this.result.table,this.result.dbType);
+            const table = wrapByDb(this.result.table, this.result.dbType);
             deleteSql =
               checkboxRecords.length > 1
                 ? `DELETE FROM ${table} WHERE ${this.result.primaryKey} in (${checkboxRecords.join(",")})`
@@ -460,9 +483,9 @@ export default {
       this.table.widthItem = {};
       this.initShowColumn();
       // add filter row
-      if(!Array.isArray(this.result.data)){
+      if (!Array.isArray(this.result.data)) {
         this.$message.error("Unrecognized data!")
-      }else if (this.result.columnList) {
+      } else if (this.result.columnList) {
         this.result.data.unshift({ isFilter: true, content: "" });
       }
       // toolbar
@@ -474,7 +497,7 @@ export default {
   },
   computed: {
     filterData() {
-      if(!Array.isArray(this.result.data))return[]
+      if (!Array.isArray(this.result.data)) return []
       return this.result.data.filter(
         (data) =>
           !this.table.search ||
@@ -504,7 +527,7 @@ export default {
   margin-left: 7px;
 }
 
-.el-button:focus{
+.el-button:focus {
   color: inherit !important;
   background-color: var(--vscode-editor-background);
 }
@@ -514,5 +537,4 @@ export default {
   border-color: #c6e2ff;
   background-color: var(--vscode-editor-background);
 }
-
 </style>
