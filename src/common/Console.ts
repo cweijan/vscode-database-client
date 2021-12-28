@@ -10,7 +10,7 @@ export class Console {
         if(value instanceof Error){
             console.trace(value)
         }
-        this.outputChannel.show(true);
+        this.outputChannel.show();
         const begin = format('yyyy-MM-dd hh:mm:ss', new Date());
         this.outputChannel.appendLine(`${begin} ${value}`);
     }
