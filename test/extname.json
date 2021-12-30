@@ -1,0 +1,10 @@
+[
+  {
+    "name": "vscode-mssql-client2",
+    "displayName": "SqlServer(mssql)"
+  },
+  {
+    "name": "vscode-postgresql-client2",
+    "displayName": "PostgreSQL"
+  }
+]
