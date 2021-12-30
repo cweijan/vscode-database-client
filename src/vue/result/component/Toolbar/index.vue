@@ -6,7 +6,7 @@
     </el-button> -->
     <el-input v-model="searchInput" size="mini" :placeholder="$t('result.searchNotice')" style="width:200px" :clearable="true" />
     <el-button icon="el-icon-unlock" v-if="result.single" @click="()=>$emit('sendToVscode','removeSingle')" title="Unlock This Panel"  />
-    <el-button icon="icon-coffee" title="Buy Author a Coffee." style="color:var(--vscode-charts-orange);" @click='()=>$emit("sendToVscode", "openCoffee")'/>
+    <!-- <el-button icon="icon-coffee" title="Buy Author a Coffee." style="color:var(--vscode-charts-orange);" @click='()=>$emit("sendToVscode", "openCoffee")'/> -->
     <el-button icon="icon-github" title="Star the project to represent support." @click='()=>$emit("sendToVscode", "openGithub")'/>
     <el-button icon="el-icon-circle-plus-outline" style="color:var(--vscode-terminal-ansiCyan);"  @click="$emit('insert')" title="Insert new row"/>
     <el-button icon="el-icon-delete" style="color:#f56c6c" @click="$emit('deleteConfirm');" title="delete"></el-button>
