@@ -89,7 +89,7 @@
           </div>
           <div class="inline-block mr-10" v-if="connectionOption.dbType!='Redis' && connectionOption.dbType!='MySQL'">
             <label class="font-bold mr-5 inline-block w-32">{{$t("connect.requestTimeout")}}</label>
-            <input class="w-64 field__input" placeholder="10000" required type="number" v-model="connectionOption.requestTimeout" />
+            <input class="w-64 field__input" required type="number" v-model="connectionOption.requestTimeout" />
           </div>
         </section>
 
