@@ -1,10 +1,10 @@
 {
-	"name": "vscode-mysql-client2",
-	"displayName": "MySQL",
-	"description": "Supports manager databases for MySQL/MariaDB, PostgreSQL, SQLite, Redis and ElasticSearch.",
+	"name": "vscode-database-client",
+	"displayName": "Database Client",
+	"description": "Database manager for MySQL/MariaDB, PostgreSQL, SQLite, Redis and ElasticSearch.",
 	"version": "4.3.7",
 	"publisher": "cweijan",
-	"icon": "resources/logo.png",
+	"icon": "resources/databases.png",
 	"engines": {
 		"vscode": "^1.51.0"
 	},
@@ -81,12 +81,12 @@
 				{
 					"id": "github-cweijan-mysql",
 					"title": "Database",
-					"icon": "resources/icon/database-container.svg"
+					"icon": "resources/icon/database.svg"
 				},
 				{
 					"id": "github-cweijan-nosql",
 					"title": "NoSQL",
-					"icon": "resources/image/other-container.png"
+					"icon": "resources/icon/layer-group.svg"
 				}
 			]
 		},
