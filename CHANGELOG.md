@@ -1,5 +1,10 @@
 # CHANGELOG
 
+# 4.4.0 2021-12-30
+
+- Update extension logo.
+- Do not set the default statement timeout.
+
 # 4.3.6 2021-12-25
 
 - Update connect and result view some style.
