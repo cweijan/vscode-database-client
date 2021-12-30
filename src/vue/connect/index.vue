@@ -1,7 +1,6 @@
 <template>
   <div class="root-container flex mx-auto" @contextmenu.prevent="onContextmenu($event)">
-    <div class="connect-container">
-      <div class="connect-container-inner">
+      <div class="connect-container">
         <h1 class="py-4 text-2xl">{{$t("connect.title")}}</h1>
         <blockquote class="p-3 mb-2 panel error" v-if="connect.error">
           <section class="panel__text">
@@ -143,7 +142,7 @@
           <el-button size="mini" @click="close">{{$t("connect.close")}}</el-button>
         </div>
       </div>
-    </div>
+    
   </div>
 </template>
 
@@ -471,13 +470,8 @@ export default {
 }
 
 .connect-container {
-  width: 80%;
-  max-width: 1500px;
-}
-
-.connect-container-inner {
   width: 100%;
-  max-width: 900px;
+  max-width: 1100px;
 }
 
 .tab {
