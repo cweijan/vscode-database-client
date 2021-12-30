@@ -1,6 +1,6 @@
 {
-	"name": "vscode-database-client",
-	"displayName": "Database Client",
+	"name": "vscode-mysql-client2",
+	"displayName": "MySQL",
 	"description": "Database manager for MySQL/MariaDB, PostgreSQL, SQLite, Redis and ElasticSearch.",
 	"version": "4.3.7",
 	"publisher": "cweijan",
@@ -81,12 +81,12 @@
 				{
 					"id": "github-cweijan-mysql",
 					"title": "Database",
-					"icon": "resources/icon/database.svg"
+					"icon": "resources/icon/database-container.svg"
 				},
 				{
 					"id": "github-cweijan-nosql",
 					"title": "NoSQL",
-					"icon": "resources/icon/layer-group.svg"
+					"icon": "resources/image/other-container.png"
 				}
 			]
 		},
