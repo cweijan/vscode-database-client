@@ -70,7 +70,7 @@ That will open a SQL editor bind of database, it provider:
 3. Run selected or current cursor SQL (Shortcut : Ctrl+Enter).
 4. Run all SQL (Shortcut : Ctrl+Shift+Enter).
 
-Note: The extension is developed using nodejs. Nodejs does not allow duplicate name attributes, so you need to avoid columns with the same name in your query.
+Note: The extension is developed using Nodejs. Nodejs does not allow duplicate name attributes, so you need to avoid columns with the same name in your query, otherwise the results will not be displayed in full.
 
 ![run](images/run.jpg)
 
