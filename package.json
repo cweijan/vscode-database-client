@@ -1086,6 +1086,7 @@
 	},
 	"dependencies": {
 		"axios": "^0.21.1",
+		"clickhouse": "^2.4.2",
 		"command-exists": "^1.2.9",
 		"comment-json": "^4.1.0",
 		"compare-versions": "^3.6.0",

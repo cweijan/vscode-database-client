@@ -12,6 +12,7 @@ import { IConnection } from "./connect/connection";
 import { DatabaseType } from "@/common/constants";
 import { EsConnection } from "./connect/esConnection";
 import { MSSqlConnnection } from "./connect/mssqlConnection";
+import { ClickHouseConnnection } from "./connect/clickHouseConnection";
 import { MysqlConnection } from "./connect/mysqlConnection";
 import { PostgreSqlConnection } from "./connect/postgreSqlConnection";
 import { RedisConnection } from "./connect/redisConnection";
@@ -138,6 +139,8 @@ export class ConnectionManager {
     private static createConnection(opt: Node) {
         if (!opt.dbType) opt.dbType = DatabaseType.MYSQL
         switch (opt.dbType) {
+            case DatabaseType.CLICKHOUSE:
+                return new ClickHouseConnnection(opt)
             case DatabaseType.MSSQL:
                 return new MSSqlConnnection(opt)
             case DatabaseType.PG:
