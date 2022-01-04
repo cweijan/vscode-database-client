@@ -50,13 +50,9 @@ export class PostgreSqlConnection extends IConnection {
     if (!callback && values instanceof Function) {
       callback = values;
     }
-    console.log("PgqlLog", "a");
-    console.log("PgqlLog", sql);
 
     const event = new EventEmitter();
     this.client.query(sql, (err, res) => {
-      console.log("PgqlLog", "b");
-      console.log("PgqlLog", res);
       if (err) {
         if (callback) callback(err);
         this.end();
@@ -65,16 +61,12 @@ export class PostgreSqlConnection extends IConnection {
         if (res.rows.length == 0) {
           event.emit("end");
         }
-        console.log("PgqlLog", "c");
-        console.log(res);
         for (let i = 1; i <= res.rows.length; i++) {
           const row = res.rows[i - 1];
           event.emit("result", this.convertToDump(row), res.rows.length == i);
         }
       } else {
         if (res instanceof Array) {
-          console.log("PgqlLog", "d");
-          console.log(res);
 
           callback(
             null,
@@ -82,9 +74,6 @@ export class PostgreSqlConnection extends IConnection {
             res.map((row) => row.fields)
           );
         } else {
-          console.log("PgqlLog", "e");
-          console.log("PgqlLog", res.fields);
-          console.log("PgqlLog", this.adaptResult(res));
           callback(null, this.adaptResult(res), res.fields);
         }
       }
@@ -93,9 +82,9 @@ export class PostgreSqlConnection extends IConnection {
   }
 
   adaptResult(res: QueryArrayResult<any>) {
-    console.log("PgqlLog", res.rows);
+    
     if (
-      res.command == "DELETE" ||
+      res.  command == "DELETE" ||
       res.command == "UPDATE" ||
       res.command == "INSERT"
     ) {

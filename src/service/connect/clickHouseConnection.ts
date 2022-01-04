@@ -40,19 +40,22 @@ export class ClickHouseConnection extends IConnection {
     if (!callback && values instanceof Function) {
       callback = values;
     }
-    // console.log(sql);
 
     const event = new EventEmitter();
-    const stream = this.client.query(sql);
-
+    let totalRows = 0;
+    const stream = this.client.query(sql, (err, result) => {
+      totalRows = result.rows;
+    });
+    let filds = null;
     stream.on("metadata", (columns) => {
+      filds = columns;
       /* do something with column list */
     });
 
     let rows = [];
     stream.on("data", (row) => {
       rows.push(row);
-      event.emit("result", row, false);
+      event.emit("result", row, rows.length==totalRows);
     });
 
     stream.on("error", (err) => {
@@ -64,52 +67,18 @@ export class ClickHouseConnection extends IConnection {
     });
 
     stream.on("end", () => {
-      console.log(
-        rows.length,
-        stream.supplemental.rows,
-        stream.supplemental.rows_before_limit_at_least // how many rows in result are set without windowing
-      );
       if (rows.length == 0) {
+        callback(null, [], filds);
         event.emit("end");
       } else {
-        callback(null, this.adaptResult(rows), true);
+        callback(null, this.adaptResult(rows), filds);
       }
     });
 
-    // this.client.query(sql, (err, res) => {
-    //   console.log(sql);
-    //   console.log(err);
-    //   console.log(res);
-
-    //   if (err) {
-    //     if (callback) callback(err);
-    //     this.end();
-    //     event.emit("error", err.message);
-    //   } else if (!callback) {
-    //     if (res.rows.length == 0) {
-    //       event.emit("end");
-    //     }
-    //     for (let i = 1; i <= res.rows.length; i++) {
-    //       const row = res.rows[i - 1];
-    //       event.emit("result", row, res.rows.length == i);
-    //     }
-    //   } else {
-    //     if (res instanceof Array) {
-    //       callback(
-    //         null,
-    //         res.map((row) => this.adaptResult(row)),
-    //         res.map((row) => row.fields)
-    //       );
-    //     } else {
-    //       callback(null, this.adaptResult(res), res.fields);
-    //     }
-    //   }
-    // });
     return event;
   }
 
   adaptResult(res: any) {
-    console.log("CHLog", res);
     return res;
     // if (
     //   res.command == "DELETE" ||

@@ -20,73 +20,19 @@ export class ClickHouseDialect extends SqlDialect {
     return `DROP INDEX ${indexName}`;
   }
   showIndex(database: string, table: string): string {
-    return `SELECT indexname index_name, indexdef FROM pg_indexes WHERE schemaname = '${database}' and tablename='${table}'`;
+    return `select name index_name,is_in_sorting_key indexdef  FROM system.columns WHERE database = '${database}' and table ='${table}'`;
   }
   variableList(): string {
-    return "SHOW ALL";
+    return "select name , value as setting,description from system.settings s ";
   }
   statusList(): string {
-    return `SELECT
-        'db_numbackends' AS db,
-        pg_stat_get_db_numbackends(datid) AS status
-      FROM
-        pg_stat_database
-      WHERE
-        datname = current_database()
-      UNION ALL
-      SELECT
-        'db_xact_commit',
-        pg_stat_get_db_xact_commit(datid)
-      FROM
-        pg_stat_database
-      WHERE
-        datname = current_database()
-      UNION ALL
-      SELECT
-        'db_xact_rollback',
-        pg_stat_get_db_xact_rollback(datid)
-      FROM
-        pg_stat_database
-      WHERE
-        datname = current_database()
-      UNION ALL
-      SELECT
-        'db_blocks_fetched',
-        pg_stat_get_db_blocks_fetched(datid)
-      FROM
-        pg_stat_database
-      WHERE
-        datname = current_database()
-      UNION ALL
-      SELECT
-        'db_blocks_hit',
-        pg_stat_get_db_blocks_hit(datid)
-      FROM
-        pg_stat_database
-      WHERE
-        datname = current_database()`;
+    return `select name as db , engine as status from system.databases d `;
   }
   processList(): string {
-    return `SELECT
-        a.pid AS "Id",
-        a.usename AS "User",
-        a.client_addr AS "Host",
-        a.client_port AS "Port",
-        datname AS "db",
-        query AS "Command",
-        l.mode AS "State",
-        query_start AS "Time",
-        CASE
-          WHEN c.relname IS NOT NULL THEN 'Locked Object: ' || c.relname
-          ELSE 'Locked Transaction: ' || l.virtualtransaction
-        END AS "Info"
-      FROM
-        pg_stat_activity a
-        LEFT JOIN pg_locks l ON a.pid = l.pid
-        LEFT JOIN pg_class c ON l.relation = c.oid
-      ORDER BY
-        a.pid ASC,
-        c.relname ASC`;
+    return `
+    SELECT query_id AS "Id", user AS "User", client_hostname AS "Host", port AS "Port", current_database AS "db", query AS "Command", os_user AS "State", addSeconds(now(), elapsed) AS "Time", elapsed AS "Info"
+    FROM system.processes p 
+    ORDER BY elapsed desc`;
   }
   addColumn(table: string, column?: string): string {
     return `ALTER TABLE
@@ -143,36 +89,32 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition}`;
     return `CREATE DATABASE [name]`;
   }
   showTableSource(database: string, table: string): string {
-    return "";
-    // return `SHOW CREATE TABLE "${database}"."${table}";`
+    return `SELECT create_table_query as "Create Table",name as table_name,'definition' as view_definition from system.tables WHERE database='${database}' and table='${table}'`;
   }
   showViewSource(database: string, table: string): string {
-    return `SELECT CONCAT('CREATE VIEW ',table_name,'\nAS\n(',regexp_replace(view_definition,';$',''),')') "Create View",table_name,view_definition from information_schema.views where table_schema='${database}' and table_name='${table}'
-        UNION ALL
-        SELECT CONCAT('CREATE MATERIALIZED VIEW ',matviewname,'\nAS\n(',regexp_replace(definition,';$',''),')') "Create View",matviewname "table_name",'definition' "view_definition" from pg_matviews
-        WHERE schemaname='${database}';`;
+    return `SELECT create_table_query as "Create View",name as table_name,'definition' as view_definition from system.tables WHERE database='${database}' and table='${table}'`;
   }
   showProcedureSource(database: string, name: string): string {
-    return `select pg_get_functiondef('${database}.${name}' :: regproc) "Create Procedure",'${name}' "Procedure";`;
+    throw new Error("Method not implemented.");
   }
   showFunctionSource(database: string, name: string): string {
-    return `select pg_get_functiondef('${database}.${name}' :: regproc) "Create Function",'${name}' "Function";`;
+    throw new Error("Method not implemented.");
   }
   showTriggerSource(database: string, name: string): string {
-    return `select pg_get_triggerdef(oid) "SQL Original Statement",'${database}.${name}' "Trigger" from pg_trigger where tgname = '${name}';`;
+    throw new Error("Method not implemented.");
   }
   showColumns(database: string, table: string): string {
     const view = table.split(".")[1];
     return `select name,type, if(type like '%Nullable%',1,0) as nullable,null as maxLength,default_expression as defaultValue,comment,is_in_sorting_key as key from system.columns c where database='${database}' and table='${table}' `;
   }
   showTriggers(database: string): string {
-    return `SELECT TRIGGER_NAME "TRIGGER_NAME" FROM information_schema.TRIGGERS WHERE trigger_schema = '${database}' order by TRIGGER_NAME ASC`;
+    throw new Error("Method not implemented.");
   }
   showProcedures(database: string): string {
-    return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${database}' and ROUTINE_TYPE='PROCEDURE' order by ROUTINE_NAME ASC`;
+    throw new Error("Method not implemented.");
   }
   showFunctions(database: string): string {
-    return `SELECT ROUTINE_NAME "ROUTINE_NAME" FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${database}' and ROUTINE_TYPE='FUNCTION' order by ROUTINE_NAME ASC `;
+    throw new Error("Method not implemented.");
   }
   showViews(database: string): string {
     return `select name ,engine as type from system.tables where database='${database}' and engine ilike '%view%'`;
@@ -184,7 +126,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition}`;
     return `SELECT count(*) FROM ${database}.${table}`;
   }
   showTables(database: string): string {
-    return `select name ,engine as type , null as comment from system.tables where database='${database}' `;
+    return `select name ,engine as type , null as comment from system.tables where database='${database}' and engine not ilike '%view%' `;
   }
   showDatabases() {
     return `SELECT name as Database FROM system.databases where name not ilike '%information_schema%' order by name ASC`;
@@ -208,36 +150,15 @@ AS
 (SELECT * FROM ...)`;
   }
   procedureTemplate(): string {
-    return `CREATE PROCEDURE [name]()
-LANGUAGE SQL
-as $$
-[content]
-$$`;
+    throw new Error("Method not implemented.");
   }
   triggerTemplate(): string {
-    return `CREATE FUNCTION [tri_fun]() RETURNS TRIGGER AS 
-$body$
-BEGIN
-    RETURN [value];
-END;
-$body$ 
-LANGUAGE plpgsql;
-
-CREATE TRIGGER [name] 
-[BEFORE/AFTER/INSTEAD OF] [INSERT/UPDATE/DELETE]
-ON [table]
-FOR EACH ROW
-EXECUTE PROCEDURE [tri_fun]()`;
+    throw new Error("Method not implemented.");
   }
-  dropTriggerTemplate(name: string) {
-    return `DROP TRIGGER ${name} on [table_name]`;
+  dropTriggerTemplate(name: string): string {
+    throw new Error("Method not implemented.");
   }
   functionTemplate(): string {
-    return `CREATE FUNCTION [name]() 
-RETURNS [type] AS $$
-BEGIN
-    return [type];
-END;
-$$ LANGUAGE plpgsql`;
+    return `CREATE FUNCTION [func_name] AS (a, b, c) -> a * b * c;`;
   }
 }
