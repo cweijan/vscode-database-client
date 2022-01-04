@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { Node } from "@/model/interface/node";
-import { ClickHouse } from "clickhouse";
+import ClickHouse from "@apla/clickhouse";
 import { IConnection, queryCallback } from "./connection";
 import { EventEmitter } from "events";
 
@@ -17,25 +17,17 @@ export class ClickHouseConnection extends IConnection {
     }
 
     let chConfig = {
-      url: node.host,
+      host: node.host,
       port: node.port,
       debug: false,
-      basicAuth: {
-        username: node.user,
-        password: node.password
-      },
-      isUseGzip: false,
-      format: "json", // "json" || "csv" || "tsv"
-      raw: false,
-      config: {
-        session_id: node.connectTimeout || null,
-        session_timeout: node.connectTimeout || 5000,
-        output_format_json_quote_64bit_integers: 0,
-        enable_http_compression: 0,
+      user: node.user,
+      password: node.password,
+      format: "JSON", // "json" || "csv" || "tsv"
+      queryOptions: {
         database: node.database
-      },
-      reqParams: {}
+      }
     };
+
     this.client = new ClickHouse(chConfig);
   }
   isAlive(): boolean {
@@ -48,36 +40,77 @@ export class ClickHouseConnection extends IConnection {
     if (!callback && values instanceof Function) {
       callback = values;
     }
+    // console.log(sql);
+
     const event = new EventEmitter();
-    this.client.query(sql, (err, res) => {
+    const stream = this.client.query(sql);
+
+    stream.on("metadata", (columns) => {
+      /* do something with column list */
+    });
+
+    let rows = [];
+    stream.on("data", (row) => {
+      rows.push(row);
+      event.emit("result", row, false);
+    });
+
+    stream.on("error", (err) => {
       if (err) {
         if (callback) callback(err);
         this.end();
         event.emit("error", err.message);
-      } else if (!callback) {
-        if (res.rows.length == 0) {
-          event.emit("end");
-        }
-        for (let i = 1; i <= res.rows.length; i++) {
-          const row = res.rows[i - 1];
-          event.emit("result", this.convertToDump(row), res.rows.length == i);
-        }
-      } else {
-        if (res instanceof Array) {
-          callback(
-            null,
-            res.map((row) => this.adaptResult(row)),
-            res.map((row) => row.fields)
-          );
-        } else {
-          callback(null, this.adaptResult(res), res.fields);
-        }
       }
     });
+
+    stream.on("end", () => {
+      console.log(
+        rows.length,
+        stream.supplemental.rows,
+        stream.supplemental.rows_before_limit_at_least // how many rows in result are set without windowing
+      );
+      if (rows.length == 0) {
+        event.emit("end");
+      } else {
+        callback(null, this.adaptResult(rows), true);
+      }
+    });
+
+    // this.client.query(sql, (err, res) => {
+    //   console.log(sql);
+    //   console.log(err);
+    //   console.log(res);
+
+    //   if (err) {
+    //     if (callback) callback(err);
+    //     this.end();
+    //     event.emit("error", err.message);
+    //   } else if (!callback) {
+    //     if (res.rows.length == 0) {
+    //       event.emit("end");
+    //     }
+    //     for (let i = 1; i <= res.rows.length; i++) {
+    //       const row = res.rows[i - 1];
+    //       event.emit("result", row, res.rows.length == i);
+    //     }
+    //   } else {
+    //     if (res instanceof Array) {
+    //       callback(
+    //         null,
+    //         res.map((row) => this.adaptResult(row)),
+    //         res.map((row) => row.fields)
+    //       );
+    //     } else {
+    //       callback(null, this.adaptResult(res), res.fields);
+    //     }
+    //   }
+    // });
     return event;
   }
 
   adaptResult(res: any) {
+    console.log("CHLog", res);
+    return res;
     // if (
     //   res.command == "DELETE" ||
     //   res.command == "UPDATE" ||
@@ -94,6 +127,19 @@ export class ClickHouseConnection extends IConnection {
   }
 
   connect(callback: (err: Error) => void): void {
+    const stream = this.client.query("select 1");
+
+    stream.on("data", (row) => {
+      callback(null);
+    });
+
+    stream.on("error", (err) => {
+      if (!err) {
+        this.end();
+      }
+    });
+
+    stream.on("end", this.end);
     // this.client.connect((err) => {
     //   callback(err);
     //   if (!err) {
@@ -103,13 +149,13 @@ export class ClickHouseConnection extends IConnection {
     // });
   }
   async beginTransaction(callback: (err: Error) => void) {
-    this.client.query("BEGIN", callback);
+    // this.client.query("BEGIN", callback);
   }
   async rollback() {
-    await this.client.query("ROLLBACK");
+    // await this.client.query("ROLLBACK");
   }
   async commit() {
-    await this.client.query("COMMIT");
+    // await this.client.query("COMMIT");
   }
   end(): void {
     this.dead = true;

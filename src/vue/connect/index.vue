@@ -49,7 +49,7 @@
           <li
             class="tab__item"
             :class="{
-              'tab__item--active': supportDatabase == connectionOption.dbType,
+              'tab__item--active': supportDatabase == connectionOption.dbType
             }"
             v-for="supportDatabase in supportDatabases"
             :key="supportDatabase"
@@ -390,9 +390,9 @@ export default {
           type: "password",
           connectTimeout: 10000,
           algorithms: {
-            cipher: [],
-          },
-        },
+            cipher: []
+          }
+        }
       },
       sqliteState: false,
       type: "password",
@@ -406,16 +406,16 @@ export default {
         "Redis",
         "ElasticSearch",
         "SSH",
-        "FTP",
+        "FTP"
       ],
       connect: {
         loading: false,
         success: false,
         successMessage: "",
         error: false,
-        errorMessage: "",
+        errorMessage: ""
       },
-      editModel: false,
+      editModel: false
     };
   },
   mounted() {
@@ -497,7 +497,7 @@ export default {
       this.connect.error = false;
       this.connect.loading = true;
       vscodeEvent.emit("connecting", {
-        connectionOption: this.connectionOption,
+        connectionOption: this.connectionOption
       });
     },
     onContextmenu(event) {
@@ -512,8 +512,8 @@ export default {
             label: `Copy`,
             onClick: () => {
               vscodeEvent.emit("copy", value);
-            },
-          },
+            }
+          }
           // ,{
           //   label: `Paste`,
           //   onClick: () => {
@@ -524,7 +524,7 @@ export default {
         event,
         customClass: "class-a",
         zIndex: 3,
-        minWidth: 230,
+        minWidth: 230
       });
       return false;
     },
@@ -538,12 +538,12 @@ export default {
       filters["File"] = ["*"];
       vscodeEvent.emit("choose", {
         event,
-        filters,
+        filters
       });
     },
     close() {
       vscodeEvent.emit("close");
-    },
+    }
   },
   computed: {
     connectUrlExample() {
@@ -556,7 +556,7 @@ export default {
           return "e.g http://dbuser:secretpassword@127.0.0.1:3211/mydb";
       }
       return "e.g mongodb+srv://username:password@server-url/admin";
-    },
+    }
   },
   watch: {
     "connectionOption.dbType"(value) {
@@ -577,10 +577,12 @@ export default {
           this.connectionOption.database = "postgres";
           break;
         case "ClickHouse":
+          this.connectionOption.host = "10.0.0.138";
+          this.connectionOption.password = "tpk6210248";
           this.connectionOption.user = "default";
           this.connectionOption.encrypt = false;
           this.connectionOption.port = 8123;
-          this.connectionOption.database = "default";
+          this.connectionOption.database = "ahe";
           break;
         case "Oracle":
           this.connectionOption.user = "system";
@@ -663,8 +665,8 @@ export default {
       }
 
       this.$forceUpdate();
-    },
-  },
+    }
+  }
 };
 </script>
 
