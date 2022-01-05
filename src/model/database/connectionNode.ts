@@ -153,7 +153,7 @@ export class ConnectionNode extends Node implements CopyAble {
     }
 
     /**
-     * herlper site:
+     * helper site:
      * - https://www.iloveimg.com/zh-cn/resize-image/resize-svg
      * - https://vectorpaint.yaks.co.nz/
      */
@@ -164,6 +164,9 @@ export class ConnectionNode extends Node implements CopyAble {
         switch (this.dbType) {
             case DatabaseType.MYSQL:
                 this.iconPath = basePath + (isActive ? "mysql_active.svg" : "mysql.svg");
+                break;
+            case DatabaseType.CLICKHOUSE:
+                this.iconPath = basePath + (isActive ? "clickhouse-active.svg" : "clickhouse.svg");
                 break;
             case DatabaseType.PG:
                 this.iconPath = basePath + (isActive ? "pgsql_active.svg" : "pgsql.svg");
