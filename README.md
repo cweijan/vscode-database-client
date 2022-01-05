@@ -19,7 +19,7 @@
 </p>
 <br>
 
-The Database Client make your life easy. It supports databases MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis, and ElasticSearch.
+The Database Client make your life easy. It supports manager MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, ClickHouse, MongoDB, Redis, and ElasticSearch. Note ClickHouse and MongoDB dit not get higt support and are only recommended for browsing data.
 
 > Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
 

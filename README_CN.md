@@ -19,7 +19,7 @@
 </p>
 <br>
 
-该项目为Visual Studio Code的数据库客户端扩展, 意在让你的生活更加简单, 支持**MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis**以及**ElasticSearch**的管理.
+该项目为Visual Studio Code的数据库客户端扩展, 意在让你的生活更加简单, 支持**MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, ClickHouse, MongoDB, Redis**以及**ElasticSearch**的管理, 注意对MongoDB和ClickHouse的支持度不高, 只推荐用于浏览数据.
 
 如果这个扩展对你有帮助, 可以请作者喝杯咖啡:
 
