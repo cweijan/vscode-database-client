@@ -245,9 +245,9 @@ export default {
       supportDatabases: [
         "MySQL",
         "PostgreSQL",
-        "ClickHouse",
         "SqlServer",
         "SQLite",
+        "ClickHouse",
         "MongoDB",
         "Redis",
         "ElasticSearch",

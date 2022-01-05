@@ -47,7 +47,7 @@ ADD
     let { name, type, comment, nullable, defaultValue } = column;
     comment = comment ? ` comment '${comment}'` : "";
     return `ALTER TABLE ${table} ALTER COLUMN ${name} TYPE ${type};
-ALTER TABLE ${table} ALTER RENAME COLUMN ${name} TO [newColumnName]`;
+ALTER TABLE ${table} RENAME COLUMN ${name} TO [newColumnName]`;
   }
   updateColumnSql(updateColumnParam: UpdateColumnParam): string {
     let { columnName, columnType, newColumnName, comment, nullable, table } =
@@ -105,7 +105,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition}`;
   }
   showColumns(database: string, table: string): string {
     const view = table.split(".")[1];
-    return `select name,type, if(type like '%Nullable%',1,0) as nullable,null as maxLength,default_expression as defaultValue,comment,is_in_sorting_key as key from system.columns c where database='${database}' and table='${table}' `;
+    return `select name,type, if(type like '%Nullable%',1,0) as nullable,null as maxLength,default_expression as defaultValue,comment,is_in_primary_key as key from system.columns c where database='${database}' and table='${table}' `;
   }
   showTriggers(database: string): string {
     throw new Error("Method not implemented.");
@@ -120,7 +120,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition}`;
     return `select name ,engine as type from system.tables where database='${database}' and engine ilike '%view%'`;
   }
   buildPageSql(database: string, table: string, pageSize: number): string {
-    return `SELECT * FROM ${database}.${table} LIMIT ${pageSize}`;
+    return `SELECT * FROM ${table} LIMIT ${pageSize}`;
   }
   countSql(database: string, table: string): string {
     return `SELECT count(*) FROM ${database}.${table}`;
@@ -136,13 +136,12 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition}`;
   }
   tableTemplate(): string {
     return `CREATE TABLE [name](  
-    id SERIAL NOT NULL PRIMARY KEY,
-    create_time DATE,
-    update_time DATE,
-    [column] VARCHAR(255)
-);
-COMMENT ON TABLE [table] IS '[comment'];
-COMMENT ON COLUMN [table].[column] IS '[comment]'`;
+    CounterID UInt32,
+    id UInt64 NOT NULL,
+    [column] String 
+)
+ENGINE = MergeTree()
+ORDER BY (CounterID, id, intHash32(id));`;
   }
   viewTemplate(): string {
     return `CREATE VIEW [name]

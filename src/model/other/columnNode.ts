@@ -57,13 +57,15 @@ export class ColumnNode extends Node implements CopyAble {
         this.description = `${column.type} ${column.comment||''}`
         this.tooltip = `${this.label} ${column.comment}
 ${column.type} ${column.nullable == "YES" ? "Nullable" : "NotNull"}`
-        const columnKey: string = column.key;
+        const columnKey: string = column.key+"";
         switch (columnKey) {
             case 'UNI':
             case 'UNIQUE':
                 column.isUnique = true;
                 return "UniqueKey";
             case 'MUL': return "IndexKey";
+            // click house
+            case '1':
             case 'PRI':
             case 'PRIMARY KEY':
                 this.isPrimaryKey = true

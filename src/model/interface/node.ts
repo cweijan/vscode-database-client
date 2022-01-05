@@ -39,7 +39,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public connectTimeout?: number;
     public requestTimeout?: number;
     public includeDatabases?: string;
-    
+
     public useConnectionString?: boolean;
     public connectionUrl?: string;
     /**
@@ -152,7 +152,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.authType = source.authType
         this.disable = source.disable
         this.includeDatabases = source.includeDatabases
-        this.socketPath=source.socketPath
+        this.socketPath = source.socketPath
         if (!this.database) this.database = source.database
         if (!this.schema) this.schema = source.schema
         if (!this.provider) this.provider = source.provider
@@ -214,14 +214,14 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
     }
 
-    
+
     /**
      * child caches
      */
-    private childenCaches:Node[];
+    private childenCaches: Node[];
     public getChildCache<T extends Node>(): T[] {
         // return this.childenCaches as T[];
-        return DatabaseCache.getChildCache(this) 
+        return DatabaseCache.getChildCache(this)
     }
 
     public setChildCache(childs?: Node[]) {
@@ -229,12 +229,12 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         DatabaseCache.setChildCache(this, childs)
     }
 
-    public clearCache(){
-        if(this instanceof ConnectionNode){
+    public clearCache() {
+        if (this instanceof ConnectionNode) {
             DatabaseCache.setSchemaListOfConnection(this.key, null);
             return;
         }
-        DatabaseCache.setChildCache(this,null)
+        DatabaseCache.setChildCache(this, null)
     }
 
     public static nodeCache = {};
@@ -282,9 +282,12 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     }
 
 
-    public getConnectId(){
-        if(this.dbType==DatabaseType.MSSQL || this.dbType==DatabaseType.PG || this.dbType==DatabaseType.REDIS){
+    public getConnectId() {
+        if (this.dbType == DatabaseType.MSSQL || this.dbType == DatabaseType.PG || this.dbType == DatabaseType.REDIS) {
             return `${this.key}/${this.database}`
+        }
+        if (this.dbType == DatabaseType.CLICKHOUSE) {
+            return `${this.key}/${this.schema}`
         }
 
         return this.key;
@@ -336,7 +339,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
 
         const host = this.usingSSH ? "127.0.0.1" : this.host
         const port = this.usingSSH ? NodeUtil.getTunnelPort(this.key) : this.port;
-        if(!port){
+        if (!port) {
             vscode.window.showErrorMessage("SSH tunnel not created!")
             return;
         }
@@ -346,7 +349,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             command = `mysql -u ${this.user} -p${this.password} -h ${host} -P ${port} \n`;
         } else if (this.dbType == DatabaseType.PG) {
             this.checkCommand('psql');
-            command = platform() == 'win32'?`set "PGPASSWORD=${this.password}" && psql -U ${this.user} -h ${host} -p ${port} -d ${this.database} \n`:`export PGPASSWORD='${this.password}' && psql -U ${this.user} -h ${host} -p ${port} -d ${this.database} \n`;
+            command = platform() == 'win32' ? `set "PGPASSWORD=${this.password}" && psql -U ${this.user} -h ${host} -p ${port} -d ${this.database} \n` : `export PGPASSWORD='${this.password}' && psql -U ${this.user} -h ${host} -p ${port} -d ${this.database} \n`;
         } else if (this.dbType == DatabaseType.REDIS) {
             this.checkCommand('redis-cli');
             command = this.isCluster ? `redis-cli -h ${host} -p ${port} -c \n` : `redis-cli -h ${host} -p ${port} \n`;

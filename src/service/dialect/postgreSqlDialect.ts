@@ -101,7 +101,7 @@ ADD
     let { name, type, comment, nullable, defaultValue } = column;
     comment = comment ? ` comment '${comment}'` : "";
     return `ALTER TABLE ${table} ALTER COLUMN ${name} TYPE ${type};
-ALTER TABLE ${table} ALTER RENAME COLUMN ${name} TO [newColumnName];`;
+ALTER TABLE ${table} RENAME COLUMN ${name} TO [newColumnName];`;
   }
   updateColumnSql(updateColumnParam: UpdateColumnParam): string {
     let { columnName, columnType, newColumnName, comment, nullable, table } =
