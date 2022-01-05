@@ -577,12 +577,12 @@ export default {
           this.connectionOption.database = "postgres";
           break;
         case "ClickHouse":
-          this.connectionOption.host = "10.0.0.138";
-          this.connectionOption.password = "tpk6210248";
+          this.connectionOption.host = "127.0.0.1";
+          this.connectionOption.password = "";
           this.connectionOption.user = "default";
           this.connectionOption.encrypt = false;
           this.connectionOption.port = 8123;
-          this.connectionOption.database = "ahe";
+          this.connectionOption.database = "default";
           break;
         case "Oracle":
           this.connectionOption.user = "system";
