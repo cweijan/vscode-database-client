@@ -67,7 +67,6 @@ export class PostgreSqlConnection extends IConnection {
         }
       } else {
         if (res instanceof Array) {
-
           callback(
             null,
             res.map((row) => this.adaptResult(row)),
@@ -83,7 +82,7 @@ export class PostgreSqlConnection extends IConnection {
 
   adaptResult(res: QueryArrayResult<any>) {
     if (
-      res.  command == "DELETE" ||
+      res.command == "DELETE" ||
       res.command == "UPDATE" ||
       res.command == "INSERT"
     ) {

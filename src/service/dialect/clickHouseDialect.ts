@@ -114,7 +114,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition}`;
     throw new Error("Method not implemented.");
   }
   showFunctions(database: string): string {
-    throw new Error("Method not implemented.");
+    return `select name as "ROUTINE_NAME" from system.functions  where origin !='System'`;
   }
   showViews(database: string): string {
     return `select name ,engine as type from system.tables where database='${database}' and engine ilike '%view%'`;
