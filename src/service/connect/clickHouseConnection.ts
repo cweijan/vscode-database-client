@@ -55,7 +55,7 @@ export class ClickHouseConnection extends IConnection {
     let rows = [];
     stream.on("data", (row) => {
       rows.push(row);
-      event.emit("result", row, rows.length==totalRows);
+      event.emit("result", row, rows.length == totalRows);
     });
 
     stream.on("error", (err) => {
@@ -98,17 +98,24 @@ export class ClickHouseConnection extends IConnection {
   connect(callback: (err: Error) => void): void {
     const stream = this.client.query("select 1");
 
-    stream.on("data", (row) => {
-      callback(null);
-    });
-
-    stream.on("error", (err) => {
-      if (!err) {
+    this.client.ping((error, result) => {
+      if (!error) {
         this.end();
+        callback(null);
       }
     });
 
-    stream.on("end", this.end);
+    // stream.on("data", (row) => {
+    //   callback(null);
+    // });
+
+    // stream.on("error", (err) => {
+    //   if (!err) {
+    //     this.end();
+    //   }
+    // });
+
+    // stream.on("end", this.end);
     // this.client.connect((err) => {
     //   callback(err);
     //   if (!err) {
