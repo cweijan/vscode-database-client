@@ -206,6 +206,10 @@ export class ConnectionNode extends Node implements CopyAble {
         this.iconPath =
           basePath + (isActive ? "pgsql_active.svg" : "pgsql.svg");
         break;
+      case DatabaseType.CLICKHOUSE:
+        this.iconPath =
+          basePath + (isActive ? "ch_active.svg" : "ch.svg");
+        break;
       case DatabaseType.MSSQL:
         this.iconPath = basePath + (isActive ? "mssql.png" : "mssql.png");
         break;
