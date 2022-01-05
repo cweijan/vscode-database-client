@@ -82,7 +82,6 @@ export class PostgreSqlConnection extends IConnection {
   }
 
   adaptResult(res: QueryArrayResult<any>) {
-    
     if (
       res.  command == "DELETE" ||
       res.command == "UPDATE" ||
