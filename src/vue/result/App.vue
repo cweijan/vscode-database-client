@@ -345,6 +345,10 @@ export default {
       }
     },
     deleteConfirm() {
+      if(this.result.dbType=='ClickHouse'){
+        this.$message.error(this.$t("result.deleteClickHouseNotice"));
+        return;
+      }
       const datas = this.$refs.dataTable.getCheckboxRecords();
       if (!datas || datas.length == 0) {
         this.$message({

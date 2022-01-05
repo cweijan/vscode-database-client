@@ -2,7 +2,8 @@ export const util = {
   methods: {
     isDbNumber(type) {
       if (!type) return false;
-      switch (type.toLowerCase()) {
+      const lowerType=type.toLowerCase();
+      switch (lowerType) {
         case "int":
         case "bit":
         case "real":
@@ -14,7 +15,7 @@ export const util = {
         case "boolean":
           return true;
         default:
-          if (type.includes("int") || type.includes("serial")) {
+          if (lowerType.includes("int") || lowerType.includes("serial")) {
             return true;
           }
       }
