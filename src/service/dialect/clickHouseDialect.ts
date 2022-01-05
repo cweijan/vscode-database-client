@@ -95,23 +95,23 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition}`;
     return `SELECT create_table_query as "Create View",name as table_name,'definition' as view_definition from system.tables WHERE database='${database}' and table='${table}'`;
   }
   showProcedureSource(database: string, name: string): string {
-    throw new Error("Method not implemented.");
+    return 'select number from system.numbers where 1=0';
   }
   showFunctionSource(database: string, name: string): string {
-    throw new Error("Method not implemented.");
+    return 'select number from system.numbers where 1=0';
   }
   showTriggerSource(database: string, name: string): string {
-    throw new Error("Method not implemented.");
+    return 'select number from system.numbers where 1=0';
   }
   showColumns(database: string, table: string): string {
     const view = table.split(".")[1];
     return `select name,type, if(type like '%Nullable%',1,0) as nullable,null as maxLength,default_expression as defaultValue,comment,is_in_sorting_key as key from system.columns c where database='${database}' and table='${table}' `;
   }
   showTriggers(database: string): string {
-    throw new Error("Method not implemented.");
+    return 'select number from system.numbers where 1=0';
   }
   showProcedures(database: string): string {
-    throw new Error("Method not implemented.");
+    return 'select number from system.numbers where 1=0';
   }
   showFunctions(database: string): string {
     return `select name as "ROUTINE_NAME" from system.functions  where origin !='System'`;
@@ -150,13 +150,13 @@ AS
 (SELECT * FROM ...)`;
   }
   procedureTemplate(): string {
-    throw new Error("Method not implemented.");
+    return 'select number from system.numbers where 1=0';
   }
   triggerTemplate(): string {
-    throw new Error("Method not implemented.");
+    return 'select number from system.numbers where 1=0';
   }
   dropTriggerTemplate(name: string): string {
-    throw new Error("Method not implemented.");
+    return 'select number from system.numbers where 1=0';
   }
   functionTemplate(): string {
     return `CREATE FUNCTION [func_name] AS (a, b, c) -> a * b * c;`;
