@@ -19,7 +19,7 @@
 </p>
 <br>
 
-该项目为Visual Studio Code的数据库客户端扩展, 意在让你的生活更加简单, 支持**MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis**以及**ElasticSearch**的管理.
+该项目为Visual Studio Code的数据库客户端扩展, 意在让你的生活更加简单, 支持**MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, ClickHouse, MongoDB, Redis**以及**ElasticSearch**的管理, 注意对MongoDB和ClickHouse的支持度不高, 只推荐用于浏览数据.
 
 如果这个扩展对你有帮助, 可以请作者喝杯咖啡:
 
@@ -61,6 +61,8 @@
 2. snippets:`sel、del、ins、upd、joi.`
 3. 执行已选择或当前光标SQL (快捷键: Ctrl+Enter).
 4. 执行全部SQL (快捷键: Ctrl+Shift+Enter).
+
+注意: 扩展由Nodejs开发, Nodejs不支持同名属性, 所以你需要避免在你的查询中出现同名列, 否则结果无法显示完整.
 
 ![run](images/run.jpg)
 

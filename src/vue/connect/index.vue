@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="root-container flex mx-auto"
-    @contextmenu.prevent="onContextmenu($event)"
-  >
+  <div class="root-container flex mx-auto" @contextmenu.prevent="onContextmenu($event)">
     <div class="connect-container">
       <h1 class="py-4 text-2xl">{{ $t("connect.title") }}</h1>
       <blockquote class="p-3 mb-2 panel error" v-if="connect.error">
@@ -27,11 +24,7 @@
         <label class="font-bold mr-5 inline-block">{{
           $t("connect.name")
         }}</label>
-        <input
-          class="w-1/4 field__input"
-          placeholder="Connection name"
-          v-model="connectionOption.name"
-        />
+        <input class="w-1/4 field__input" placeholder="Connection name" v-model="connectionOption.name" />
         <label class="font-bold ml-4 mr-5 inline-block">{{
           $t("connect.scope")
         }}</label>
@@ -46,289 +39,142 @@
       <section class="mb-2">
         <label class="block font-bold">{{ $t("config.serverType") }}</label>
         <ul class="tab">
-          <li
-            class="tab__item"
-            :class="{
+          <li class="tab__item" :class="{
               'tab__item--active': supportDatabase == connectionOption.dbType
-            }"
-            v-for="supportDatabase in supportDatabases"
-            :key="supportDatabase"
-            @click="connectionOption.dbType = supportDatabase"
-          >
+            }" v-for="supportDatabase in supportDatabases" :key="supportDatabase" @click="connectionOption.dbType = supportDatabase">
             {{ supportDatabase }}
           </li>
         </ul>
       </section>
 
-      <ElasticSearch
-        v-if="connectionOption.dbType == 'ElasticSearch'"
-        :connectionOption="connectionOption"
-      />
-      <SQLite
-        v-else-if="connectionOption.dbType == 'SQLite'"
-        :connectionOption="connectionOption"
-        :sqliteState="sqliteState"
-        @installSqlite="installSqlite"
-        @choose="choose"
-      />
-      <SSH
-        v-else-if="connectionOption.dbType == 'SSH'"
-        :connectionOption="connectionOption"
-        @choose="choose"
-      />
+      <ElasticSearch v-if="connectionOption.dbType == 'ElasticSearch'" :connectionOption="connectionOption" />
+      <SQLite v-else-if="connectionOption.dbType == 'SQLite'" :connectionOption="connectionOption" :sqliteState="sqliteState" @installSqlite="installSqlite" @choose="choose" />
+      <SSH v-else-if="connectionOption.dbType == 'SSH'" :connectionOption="connectionOption" @choose="choose" />
 
       <template v-else>
         <section class="mb-2">
           <div class="inline-block mr-10">
-            <label class="font-bold mr-5 inline-block w-32"
-              ><span class="text-red-600 mr-1">*</span>
+            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>
               <span>{{ $t("config.host") }}</span>
             </label>
-            <input
-              class="w-64 field__input"
-              placeholder="The host of connection"
-              required
-              v-model="connectionOption.host"
-            />
+            <input class="w-64 field__input" placeholder="The host of connection" required v-model="connectionOption.host" />
           </div>
           <div class="inline-block mr-10">
-            <label class="font-bold mr-5 inline-block w-32"
-              ><span class="text-red-600 mr-1">*</span
-              >{{ $t("config.port") }}</label
-            >
-            <input
-              class="w-64 field__input"
-              placeholder="The port of connection"
-              required
-              type="number"
-              v-model="connectionOption.port"
-            />
+            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>{{ $t("config.port") }}</label>
+            <input class="w-64 field__input" placeholder="The port of connection" required type="number" v-model="connectionOption.port" />
           </div>
         </section>
 
-        <SQLServer
-          :connectionOption="connectionOption"
-          v-if="connectionOption.dbType == 'SqlServer'"
-        />
+        <SQLServer :connectionOption="connectionOption" v-if="connectionOption.dbType == 'SqlServer'" />
 
         <section class="mb-2">
-          <div
-            class="inline-block mr-10"
-            v-if="connectionOption.dbType != 'Redis'"
-          >
-            <label class="font-bold mr-5 inline-block w-32"
-              ><span class="text-red-600 mr-1">*</span
-              >{{ $t("config.username") }}</label
-            >
-            <input
-              class="w-64 field__input"
-              placeholder="Username"
-              required
-              v-model="connectionOption.user"
-            />
+          <div class="inline-block mr-10" v-if="connectionOption.dbType != 'Redis'">
+            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>{{ $t("config.username") }}</label>
+            <input class="w-64 field__input" placeholder="Username" required v-model="connectionOption.user" />
           </div>
           <div class="inline-block mr-10">
-            <label class="font-bold mr-5 inline-block w-32"
-              ><span class="text-red-600 mr-1">*</span
-              >{{ $t("config.password") }}</label
-            >
-            <input
-              class="w-64 field__input"
-              placeholder="Password"
-              type="password"
-              v-model="connectionOption.password"
-            />
+            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>{{ $t("config.password") }}</label>
+            <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
           </div>
-          <div
-            class="inline-block mr-10"
-            v-if="connectionOption.dbType == 'Redis'"
-          >
-            <label class="font-bold mr-5 inline-block w-32"
-              ><span class="text-red-600 mr-1"></span>IsCluster</label
-            >
+          <div class="inline-block mr-10" v-if="connectionOption.dbType == 'Redis'">
+            <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1"></span>IsCluster</label>
             <el-switch v-model="connectionOption.isCluster"></el-switch>
           </div>
         </section>
 
-        <section
-          class="mb-2"
-          v-if="
-            connectionOption.dbType != 'FTP' &&
-            connectionOption.dbType != 'MongoDB'
-          "
-        >
+        <section class="mb-2" v-if=" connectionOption.dbType != 'FTP' && connectionOption.dbType != 'MongoDB' ">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">{{
               $t("config.database")
             }}</label>
-            <input
-              class="w-64 field__input"
-              placeholder="Connection database"
-              v-model="connectionOption.database"
-            />
+            <input class="w-64 field__input" placeholder="Connection database" v-model="connectionOption.database" />
           </div>
-          <div
-            class="inline-block mr-10"
-            v-if="connectionOption.dbType != 'Redis'"
-          >
+          <div class="inline-block mr-10" v-if="connectionOption.dbType != 'Redis'">
             <label class="font-bold mr-5 inline-block w-32">{{
               $t("config.showedDatabases")
             }}</label>
-            <input
-              class="w-64 field__input"
-              placeholder="e.g mysql,information_schema"
-              v-model="connectionOption.includeDatabases"
-            />
+            <input class="w-64 field__input" placeholder="e.g mysql,information_schema" v-model="connectionOption.includeDatabases" />
           </div>
         </section>
 
-        <FTP
-          v-if="connectionOption.dbType == 'FTP'"
-          :connectionOption="connectionOption"
-        />
+        <FTP v-if="connectionOption.dbType == 'FTP'" :connectionOption="connectionOption" />
 
         <section class="mb-2">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">{{
               $t("connect.connectTimeout")
             }}</label>
-            <input
-              class="w-64 field__input"
-              placeholder="5000"
-              required
-              v-model="connectionOption.connectTimeout"
-            />
+            <input class="w-64 field__input" placeholder="5000" required v-model="connectionOption.connectTimeout" />
           </div>
-          <div
-            class="inline-block mr-10"
-            v-if="
+          <div class="inline-block mr-10" v-if="
               connectionOption.dbType != 'Redis' &&
               connectionOption.dbType != 'MySQL'
-            "
-          >
+            ">
             <label class="font-bold mr-5 inline-block w-32">{{
               $t("connect.requestTimeout")
             }}</label>
-            <input
-              class="w-64 field__input"
-              required
-              type="number"
-              v-model="connectionOption.requestTimeout"
-            />
+            <input class="w-64 field__input" required type="number" v-model="connectionOption.requestTimeout" />
           </div>
         </section>
 
-        <section
-          class="flex items-center mb-2"
-          v-if="connectionOption.dbType == 'MySQL'"
-        >
+        <section class="flex items-center mb-2" v-if="connectionOption.dbType == 'MySQL'">
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">Socket Path</label>
-            <input
-              class="w-64 field__input"
-              placeholder="Unix Socket Path"
-              v-model="connectionOption.socketPath"
-            />
+            <input class="w-64 field__input" placeholder="Unix Socket Path" v-model="connectionOption.socketPath" />
           </div>
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32">{{
               $t("config.timeZone")
             }}</label>
-            <input
-              class="w-64 field__input"
-              placeholder="+HH:MM"
-              v-model="connectionOption.timezone"
-            />
+            <input class="w-64 field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
           </div>
         </section>
       </template>
 
       <section class="flex items-center mb-2">
-        <div
-          class="inline-block mr-10"
-          v-if="
-            connectionOption.dbType != 'SSH' &&
-            connectionOption.dbType != 'SQLite'
-          "
-        >
+        <div class="inline-block mr-10" v-if=" connectionOption.dbType != 'SSH' && connectionOption.dbType != 'SQLite' ">
           <label class="mr-2 font-bold">{{ $t("connect.sshTunnel") }}</label>
           <el-switch v-model="connectionOption.usingSSH"></el-switch>
         </div>
-        <div
-          class="inline-block mr-10"
-          v-if="
+        <div class="inline-block mr-10" v-if="
             connectionOption.dbType == 'MySQL' ||
             connectionOption.dbType == 'PostgreSQL' ||
             connectionOption.dbType == 'ClickHouse' ||
             connectionOption.dbType == 'MongoDB' ||
             connectionOption.dbType == 'Redis'
-          "
-        >
+          ">
           <label class="font-bold mr-5 inline-block w-18">{{
             $t("connect.useSSL")
           }}</label>
           <el-switch v-model="connectionOption.useSSL"></el-switch>
         </div>
-        <div
-          class="inline-block mr-10"
-          v-if="connectionOption.dbType === 'MongoDB'"
-        >
+        <div class="inline-block mr-10" v-if="connectionOption.dbType === 'MongoDB'">
           <label class="inline-block mr-5 font-bold w-18">SRV Record</label>
           <el-switch v-model="connectionOption.srv"></el-switch>
         </div>
-        <div
-          class="inline-block mr-10"
-          v-if="
+        <div class="inline-block mr-10" v-if="
             connectionOption.dbType === 'MongoDB' ||
             connectionOption.dbType == 'PostgreSQL' ||
             connectionOption.dbType == 'ClickHouse' ||
             connectionOption.dbType == 'MySQL'
-          "
-        >
-          <label class="inline-block mr-5 font-bold w-18"
-            >Use Connection String</label
-          >
+          ">
+          <label class="inline-block mr-5 font-bold w-18">Use Connection String</label>
           <el-switch v-model="connectionOption.useConnectionString"></el-switch>
         </div>
-        <div
-          class="inline-block mr-10"
-          v-if="
-            connectionOption.dbType == 'MySQL' ||
-            connectionOption.dbType == 'PostgreSQL'
-          "
-        >
-          <label class="font-bold mr-5 inline-block w-40"
-            >Hide System Schema</label
-          >
+        <div class="inline-block mr-10" v-if=" connectionOption.dbType == 'MySQL' || connectionOption.dbType == 'PostgreSQL' ">
+          <label class="font-bold mr-5 inline-block w-40">Hide System Schema</label>
           <el-switch v-model="connectionOption.hideSystemSchema"></el-switch>
         </div>
       </section>
-      <section
-        class="flex items-center mb-2"
-        v-if="connectionOption.useConnectionString"
-      >
+      <section class="flex items-center mb-2" v-if="connectionOption.useConnectionString">
         <div class="flex w-full mr-10">
-          <label class="inline-block w-32 mr-5 font-bold"
-            >Connection String</label
-          >
-          <input
-            class="w-4/5 field__input"
-            :placeholder="connectUrlExample"
-            v-model="connectionOption.connectionUrl"
-          />
+          <label class="inline-block w-32 mr-5 font-bold">Connection String</label>
+          <input class="w-4/5 field__input" :placeholder="connectUrlExample" v-model="connectionOption.connectionUrl" />
         </div>
       </section>
 
-      <SSL
-        :connectionOption="connectionOption"
-        v-if="connectionOption.useSSL"
-        @choose="choose"
-      />
-      <SSH
-        :connectionOption="connectionOption"
-        v-if="connectionOption.usingSSH"
-        @choose="choose"
-      />
+      <SSL :connectionOption="connectionOption" v-if="connectionOption.useSSL" @choose="choose" />
+      <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH" @choose="choose" />
 
       <div class="connect-bar">
         <el-button size="mini" :loading="connect.loading" @click="tryConnect">{{
@@ -399,9 +245,9 @@ export default {
       supportDatabases: [
         "MySQL",
         "PostgreSQL",
-        "ClickHouse",
         "SqlServer",
         "SQLite",
+        "ClickHouse",
         "MongoDB",
         "Redis",
         "ElasticSearch",
@@ -727,6 +573,7 @@ input::-webkit-inner-spin-button {
 }
 
 .connect-bar {
+  width: 70%;
   display: flex;
   justify-content: center;
 }

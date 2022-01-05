@@ -253,7 +253,7 @@ export default {
       return this.scope.row[this.scope.column.title] == undefined;
     },
     editable() {
-      return this.result.primaryKey && this.result.tableCount == 1;
+      return this.result.primaryKey && this.result.tableCount == 1 && this.result.dbType!='ClickHouse';
     },
   },
 };

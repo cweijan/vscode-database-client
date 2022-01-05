@@ -19,7 +19,7 @@
 </p>
 <br>
 
-The Database Client make your life easy. It supports databases MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis, and ElasticSearch.
+The Database Client make your life easy. It supports manager MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, ClickHouse, MongoDB, Redis, and ElasticSearch. Note ClickHouse and MongoDB dit not get higt support and are only recommended for browsing data.
 
 > Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
 
@@ -69,6 +69,8 @@ That will open a SQL editor bind of database, it provider:
 2. snippets:`sel、del、ins、upd、joi`...
 3. Run selected or current cursor SQL (Shortcut : Ctrl+Enter).
 4. Run all SQL (Shortcut : Ctrl+Shift+Enter).
+
+Note: The extension is developed using Nodejs. Nodejs does not allow duplicate name attributes, so you need to avoid columns with the same name in your query, otherwise the results will not be displayed in full.
 
 ![run](images/run.jpg)
 
