@@ -573,6 +573,7 @@ input::-webkit-inner-spin-button {
 }
 
 .connect-bar {
+  width: 70%;
   display: flex;
   justify-content: center;
 }
