@@ -116,7 +116,7 @@ export default {
     const hint = this.$refs.hint;
     const updateHeight = () => {
       this.remainHeight = window.innerHeight - 10 - hint.clientHeight;
-      this.showFullBtn = window.outerWidth / window.innerWidth >= 2;
+      this.showFullBtn = (window.outerWidth / window.innerWidth >= 2) || (window.outerHeight -window.innerHeight>100);
     }
     updateHeight()
     new ResizeObserver(updateHeight).observe(hint)

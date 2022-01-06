@@ -35,9 +35,11 @@ export class QueryPage {
         const fontSize = workspace.getConfiguration("terminal.integrated").get("fontSize", 16)
         const fontFamily = workspace.getConfiguration("editor").get("fontFamily")
 
+        const isActive=this.isActiveSql(queryParam.queryOption);
         ViewManager.createWebviewPanel({
             singlePage: true,
-            splitView: this.isActiveSql(queryParam.queryOption),
+            vertical: isActive,
+            splitView: isActive,
             path: 'result', title: 'Query', type,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
             handleHtml: this.handleHtml,

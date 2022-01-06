@@ -13,6 +13,7 @@ export class ViewOption {
     public type?: string;
     public preserveFocus?:boolean;
     public splitView: boolean = false;
+    public vertical?: boolean;
     /**
      * keep single page by viewType
      */
@@ -95,6 +96,9 @@ export class ViewManager {
                 { viewColumn, preserveFocus: viewOption.preserveFocus },
                 { enableScripts: true, retainContextWhenHidden: true },
             );
+            if(viewOption.vertical){
+                vscode.commands.executeCommand("workbench.action.toggleEditorGroupLayout")
+            }
             const newStatus = { creating: true, instance: webviewPanel, eventEmitter: new EventEmitter() }
             this.viewStatus[viewOption.type] = newStatus
             const targetPath = `${this.webviewPath}/${viewOption.path}.html`;
