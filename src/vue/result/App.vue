@@ -5,7 +5,7 @@
       <div style="width:100%;">
         <el-input type="textarea" :autosize="{ minRows:2, maxRows:6}" v-model="toolbar.sql" :style="{fontFamily:result.fontFamily,fontSize:result.fontSize+'px'}" class="sql-pannel" @keypress.native="panelInput" />
       </div>
-      <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :result="result" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="$refs.editor.openInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
+      <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :result="result" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="reqInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
       <div v-if="info.message ">
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
         <div v-if="!info.error" class="info-panel" style="color: green !important;" v-html="info.message"></div>
@@ -49,6 +49,8 @@ import Toolbar from "./component/Toolbar";
 import EditDialog from "./component/EditDialog";
 import { util } from "./mixin/util";
 import { wrapByDb } from "@/common/wrapper";
+import { buildDeleteSQL } from './util/sqlGenerator';
+import { rejects } from 'assert';
 let vscodeEvent;
 
 export default {
@@ -116,7 +118,7 @@ export default {
     const hint = this.$refs.hint;
     const updateHeight = () => {
       this.remainHeight = window.innerHeight - 10 - hint.clientHeight;
-      this.showFullBtn = (window.outerWidth / window.innerWidth >= 2) || (window.outerHeight -window.innerHeight>100);
+      this.showFullBtn = (window.outerWidth / window.innerWidth >= 2) || (window.outerHeight - window.innerHeight > 100);
     }
     updateHeight()
     new ResizeObserver(updateHeight).observe(hint)
@@ -249,6 +251,9 @@ export default {
     });
   },
   methods: {
+    reqInsert() {
+      this.result.data.push({})
+    },
     focusHolder() {
       let lastElement;
       window.onfocus = () => {
@@ -264,10 +269,7 @@ export default {
           return;
         }
         const tagName = ae.tagName.toLowerCase()
-        if (
-          (tagName == 'input' || tagName == 'textarea') ||
-          (tagName == 'div' && ae.contentEditable == 'true')
-        ) {
+        if ((tagName == 'input' || tagName == 'textarea') || (tagName == 'div' && ae.contentEditable == 'true')) {
           lastElement = ae;
         }
       }
@@ -289,10 +291,11 @@ export default {
       let sql = "";
       for (const index in this.update.editList) {
         const element = this.update.editList[index];
-        sql += this.$refs.editor.buildUpdateSql(
-          element,
-          this.result.data[index]
-        );
+        if (element[this.result.primaryKey]) {
+          sql += this.$refs.editor.buildUpdateSql(element, this.result.data[index]);
+        } else {
+          sql += this.$refs.editor.buildInsertSQL(element);
+        }
       }
       if (sql) {
         vscodeEvent.emit("saveModify", sql);
@@ -345,7 +348,7 @@ export default {
       }
     },
     deleteConfirm() {
-      if(this.result.dbType=='ClickHouse'){
+      if (this.result.dbType == 'ClickHouse') {
         this.$message.error(this.$t("result.deleteClickHouseNotice"));
         return;
       }
@@ -357,54 +360,24 @@ export default {
         });
         return;
       }
-      this.$confirm("Are you sure you want to delete this data?", "Warning", {
-        confirmButtonText: "OK",
-        cancelButtonText: "Cancel",
-        type: "warning",
-      })
+      this.$confirm("Are you sure you want to delete this data?", "Warning", { confirmButtonText: "OK", cancelButtonText: "Cancel", type: "warning", })
         .then(() => {
-          let checkboxRecords = datas
-            .filter(
-              (checkboxRecord) => checkboxRecord[this.result.primaryKey] != null
-            )
-            .map((checkboxRecord) =>
-              this.wrapQuote(
-                this.result.dbType,
-                this.getTypeByColumn(this.result.primaryKey),
-                checkboxRecord[this.result.primaryKey]
-              )
-            );
-          let deleteSql = null;
-          if (this.result.dbType == "ElasticSearch") {
-            deleteSql =
-              checkboxRecords.length > 1
-                ? `POST /_bulk\n${checkboxRecords
-                  .map(
-                    (c) =>
-                      `{ "delete" : { "_index" : "${this.result.table}", "_id" : "${c}" } }`
-                  )
-                  .join("\n")}`
-                : `DELETE /${this.result.table}/_doc/${checkboxRecords[0]}`;
-          } else if (this.result.dbType == "MongoDB") {
-            deleteSql = `db('${this.result.database}').collection("${this.result.table
-              }")
-              .deleteMany({_id:{$in:[${checkboxRecords.join(",")}]}})`;
-          } else {
-            const table = wrapByDb(this.result.table, this.result.dbType);
-            deleteSql =
-              checkboxRecords.length > 1
-                ? `DELETE FROM ${table} WHERE ${this.result.primaryKey} in (${checkboxRecords.join(",")})`
-                : `DELETE FROM ${table} WHERE ${this.result.primaryKey}=${checkboxRecords[0]}`;
+          const unAddData = [];
+          for (let i = this.result.data.length - 1; i > 0; i--) {
+            const r = this.result.data[i];
+            if (r[this.result.primaryKey]) break;
+            if (datas.filter(c => c._XID == r._XID).length > 0) {
+              unAddData.push(r._XID);
+              this.result.data.splice(i, 1)
+            }
           }
+          const records = datas.filter((r) => !unAddData.includes(r._XID)).map((checkboxRecord) =>
+            this.wrapQuote(this.result.dbType, this.getTypeByColumn(this.result.primaryKey), checkboxRecord[this.result.primaryKey])
+          );
+          if (records.length == 0) return;
+          const deleteSql = buildDeleteSQL(this.result, records);
           this.execute(deleteSql);
         })
-        .catch((e) => {
-          if (e) {
-            this.$message.error(e);
-          } else {
-            this.$message({ type: "warning", message: "Delete canceled" });
-          }
-        });
     },
     /**
      * compute column row width, get maxium of fieldName or value or fieldType by top 10 row.
@@ -441,9 +414,7 @@ export default {
     },
     execute(sql) {
       if (!sql) return;
-      vscodeEvent.emit("execute", {
-        sql,
-      });
+      vscodeEvent.emit("execute", { sql });
       this.table.loading = true;
     },
     changePage(pageNum, jump) {
