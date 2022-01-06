@@ -6,12 +6,12 @@
     </template>
     <template v-else>
       <div class="edit-column" :contenteditable="editable" @input="editListen($event,scope)" @contextmenu.prevent="onContextmenu($event,scope)" @paste="onPaste" @focus="focus" @blur="bluer">
-        <template v-if="result.dbType=='ElasticSearch'">
+        <template v-if="isNull">
+          <span class='null-column'>{{nullText}}</span>
+        </template>
+        <template v-else-if="result.dbType=='ElasticSearch'">
           <div v-html='dataformat(scope.row[scope.column.title])'>
           </div>
-        </template>
-        <template v-else-if="isNull">
-          <span class='null-column'>{{nullText}}</span>
         </template>
         <template v-else>
           <span v-html='dataformat(scope.row[scope.column.title],scope.row.title)'></span>
@@ -43,9 +43,6 @@ export default {
       this.nullText = '(NULL)';
     },
     dataformat(origin) {
-      if (origin == undefined || origin == null) {
-        return "<span class='null-column'>(NULL)</span>";
-      }
       const originType = origin.constructor.name;
 
       if (origin.hasOwnProperty("type")) {

@@ -157,8 +157,15 @@ export default {
 
     vscodeEvent.on("updateSuccess", () => {
       this.update.editList = [];
-      this.result.data = []
-      this.refresh()
+      if (this.result.dbType == 'ElasticSearch') {
+        setTimeout(() => {
+          this.result.data = []
+          this.refresh()
+        }, 1000);
+      } else {
+        this.result.data = []
+        this.refresh()
+      }
       this.update.lock = false;
       this.$message({
         showClose: true,
