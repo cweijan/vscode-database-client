@@ -25,7 +25,7 @@ export class EsConnectionNode extends Node {
         super(key)
         this.init(parent)
         if(compareVersions(extPackage.version,'3.6.6')===1){
-            this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}`;
+            this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host.replace(/(http:\/\/|https:\/\/)/,'')}`;
         }else{
             this.label = (this.usingSSH) ? `${this.ssh.host}@${this.ssh.port}` : `${this.host}@${this.port}`;
         }

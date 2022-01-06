@@ -442,7 +442,7 @@ export default {
           this.connectionOption.useSSL = false;
           break;
         case "ElasticSearch":
-          this.connectionOption.host = "127.0.0.1:9200";
+          this.connectionOption.host = "http://127.0.0.1:9200";
           this.connectionOption.user = null;
           this.connectionOption.port = null;
           this.connectionOption.database = null;
