@@ -265,7 +265,7 @@ export default {
       if (this.isEs() || this.result.dbType == 'MongoDB') {
         this.$refs.editor.openInsert()
       } else {
-        this.result.data.push({})
+        this.result.data.push({_isNewPush:1})
       }
     },
     focusHolder() {
@@ -305,10 +305,10 @@ export default {
       let sql = "";
       for (const index in this.update.editList) {
         const element = this.update.editList[index];
-        if (element[this.result.primaryKey]) {
-          sql += this.$refs.editor.buildUpdateSql(element, this.result.data[index]);
-        } else {
+        if (element._isNewPush) {
           sql += this.$refs.editor.buildInsertSQL(element);
+        } else {
+          sql += this.$refs.editor.buildUpdateSql(element, this.result.data[index]);
         }
       }
       if (sql) {
