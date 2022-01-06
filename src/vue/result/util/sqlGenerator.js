@@ -26,10 +26,6 @@ export function wrapQuote(dbType, type, value) {
     if (value === "") {
         return "null";
     }
-    // method call
-    if (/.+?\(.*?\)/.exec(value)) {
-        return value;
-    }
     if (typeof value == "string") {
         switch (dbType) {
             case "PostgreSQL":
