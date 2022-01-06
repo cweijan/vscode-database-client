@@ -3,7 +3,7 @@ import { Util } from "@/common/util";
 import { EsRequest } from "@/model/es/esRequest";
 import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
-import { env, Uri, ViewColumn, WebviewPanel, window, workspace } from "vscode";
+import { commands, env, Uri, ViewColumn, WebviewPanel, window, workspace } from "vscode";
 import { Trans } from "@/common/trans";
 import { ConfigKey, Constants, DatabaseType, MessageType } from "../../common/constants";
 import { Global } from "../../common/global";
@@ -72,7 +72,8 @@ export class QueryPage {
                     queryParam.queryOption.viewId = 'query';
                     handler.emit("isSingle", true)
                 }).on("full", () => {
-                    handler.panel.reveal(ViewColumn.One)
+                    handler.panel.reveal()
+                    commands.executeCommand("workbench.action.joinAllGroups")
                 }).on('esFilter', (query) => {
                     const esQuery = EsRequest.build(queryParam.res.sql, obj => {
                         obj.query = query;
