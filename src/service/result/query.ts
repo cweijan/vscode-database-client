@@ -223,7 +223,7 @@ export class QueryPage {
         queryParam.res.primaryKey = '_id'
         queryParam.res.tableCount = 1
 
-        queryParam.res.columnList = queryParam.res.fields.slice(4) as any[]
+        queryParam.res.columnList = queryParam.res.fields.slice(2) as any[]
     }
 
     private static async loadMongoColumnList(queryParam: QueryParam<DataResponse>) {

@@ -157,7 +157,7 @@ export default {
 
     vscodeEvent.on("updateSuccess", () => {
       this.update.editList = [];
-      if (this.result.dbType == 'ElasticSearch') {
+      if (this.isEs()) {
         setTimeout(() => {
           this.result.data = []
           this.refresh()
@@ -258,8 +258,15 @@ export default {
     });
   },
   methods: {
+    isEs() {
+      return this.result.dbType == 'ElasticSearch';
+    },
     reqInsert() {
-      this.result.data.push({})
+      if (this.isEs() || this.result.dbType == 'MongoDB') {
+        this.$refs.editor.openInsert()
+      } else {
+        this.result.data.push({})
+      }
     },
     focusHolder() {
       let lastElement;
@@ -328,7 +335,7 @@ export default {
       });
     },
     sort(row) {
-      if (this.result.dbType == "ElasticSearch") {
+      if (this.isEs()) {
         vscodeEvent.emit("esSort", [{ [row.prop]: { order: row.order } }]);
         return;
       }
