@@ -4,7 +4,7 @@ import { UpdateColumnParam } from "./param/updateColumnParam";
 import { UpdateTableParam } from "./param/updateTableParam";
 import { SqlDialect } from "./sqlDialect";
 
-export class MongoDialect implements SqlDialect{
+export class MongoDialect implements SqlDialect {
     showVersion(): string {
         return 'show version';
     }
@@ -41,7 +41,7 @@ export class MongoDialect implements SqlDialect{
     showTables(database: string): string {
         throw new Error("Method not implemented.");
     }
-    addColumn(table: string,column?:string): string {
+    addColumn(table: string, column?: string): string {
         throw new Error("Method not implemented.");
     }
     showColumns(database: string, table: string): string {
@@ -72,7 +72,7 @@ export class MongoDialect implements SqlDialect{
         throw new Error("Method not implemented.");
     }
     createDatabase(database: string): string {
-        throw new Error("Method not implemented.");
+        return `db("db").createCollection("cc")`;
     }
     truncateDatabase(database: string): string {
         throw new Error("Method not implemented.");
