@@ -3,7 +3,7 @@
     <div class="hint" ref="hint">
       <el-image v-if="result.showUgly" style="width: 225px; height: 300px" :src="result.uglyPath"></el-image>
       <div style="width:100%;">
-        <el-input type="textarea" :autosize="{ minRows:2, maxRows:6}" v-model="toolbar.sql" :style="{fontFamily:result.fontFamily,fontSize:result.fontSize+'px'}" class="sql-pannel" @keypress.native="panelInput" />
+        <el-input type="textarea" :autosize="{ minRows:1, maxRows:6}" v-model="toolbar.sql" :style="{fontFamily:result.fontFamily,fontSize:result.fontSize+'px'}" class="sql-pannel" @keypress.native="panelInput" />
       </div>
       <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :result="result" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="reqInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
       <div v-if="info.message ">
