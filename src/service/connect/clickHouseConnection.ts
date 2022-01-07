@@ -24,7 +24,7 @@ export class ClickHouseConnection extends IConnection {
       password: node.password,
       format: "JSON", // "json" || "csv" || "tsv"
       queryOptions: {
-        database: node.database
+        database: node.schema || node.database
       }
     };
 
@@ -36,11 +36,12 @@ export class ClickHouseConnection extends IConnection {
   }
   query(sql: string, callback?: queryCallback): void;
   query(sql: string, values: any, callback?: queryCallback): void;
-  query(sql: any, values?: any, callback?: any) {
+  query(sql: string, values?: any, callback?: any) {
     if (!callback && values instanceof Function) {
       callback = values;
     }
 
+    sql=sql.replace(/;\s*$/,'')
     const event = new EventEmitter();
     let totalRows = 0;
     const stream = this.client.query(sql, (err, result) => {

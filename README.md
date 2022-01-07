@@ -19,7 +19,7 @@
 </p>
 <br>
 
-The Database Client make your life easy. It supports databases MySQL/MariaDB, Microsoft SQL Server, PostgreSQL, SQLite, MongoDB, Redis, and ElasticSearch.
+The Database Client make your life easy. It supports manager MySQL/MariaDB, PostgreSQL, SQLite, Redis, and ElasticSearch.
 
 > Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
 
@@ -33,11 +33,11 @@ If this extension is helpful to you, please consider buy author a cup of coffee:
   - [Connect](#connect)
   - [Table](#table)
   - [Execute SQL Query](#execute-sql-query)
-  - [Generate Mock Data](#generate-mock-data)
-  - [History](#history)
   - [Backup/Import](#backupimport)
   - [Setting](#setting)
   - [Filter](#filter)
+  - [Generate Mock Data](#generate-mock-data)
+  - [History](#history)
 
 ## Installation
 
@@ -70,6 +70,8 @@ That will open a SQL editor bind of database, it provider:
 3. Run selected or current cursor SQL (Shortcut : Ctrl+Enter).
 4. Run all SQL (Shortcut : Ctrl+Shift+Enter).
 
+Note: The extension is developed using Nodejs. Nodejs does not allow duplicate name attributes, so you need to avoid columns with the same name in your query, otherwise the results will not be displayed in full.
+
 ![run](images/run.jpg)
 
 This extension supports codelen, but does not support stored procedures and functions. If you use them frequently, it is recommended to disable codelen
@@ -80,18 +82,6 @@ This extension supports codelen, but does not support stored procedures and func
 In order to improve performance, the database information is cached. If your database structure changes externally, you need to click the refresh button to refresh the cache。
 
 ![](images/1638342622208.png)
-
-## Generate Mock Data
-
-You can easily generate test data.
-
-![mockData](images/mockData.jpg)
-
-## History
-
-Click the history button to open the list of recently executed query history records.
-
-![history](images/history.jpg)
 
 ## Backup/Import
 
@@ -106,11 +96,28 @@ This extension contain some setting, can be modified as follows.
 ![image](https://user-images.githubusercontent.com/27798227/146523121-9de9c708-8a8e-4e3b-ae1d-9da36f3217e1.png)
 ![](images/1611910592756.png)
 
+## Note
+
+1. MSSQL, ClickHouse and MongoDB dit not get higt support and are only recommended for browsing data.
+2. SQL formatter stop maintenance, do not report related issue.
+
 ## Filter
 
 Used to quickly filter the table, if there is an input box to simplify the search operation, but unfortunately VSCode does not support this function.
 
 ![filter](images/filter.gif)
+
+## Generate Mock Data
+
+You can easily generate test data.
+
+![mockData](images/mockData.jpg)
+
+## History
+
+Click the history button to open the list of recently executed query history records.
+
+![history](images/history.jpg)
 
 ## Credits
 

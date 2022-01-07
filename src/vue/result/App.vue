@@ -1,153 +1,41 @@
 <template>
   <div id="app">
     <div class="hint" ref="hint">
-      <el-image
-        v-if="result.showUgly"
-        style="width: 225px; height: 300px"
-        :src="result.uglyPath"
-      ></el-image>
-      <div style="width: 100%">
-        <el-input
-          type="textarea"
-          :autosize="{ minRows: 2, maxRows: 6 }"
-          v-model="toolbar.sql"
-          :style="{
-            fontFamily: result.fontFamily,
-            fontSize: result.fontSize + 'px'
-          }"
-          class="sql-pannel"
-          @keypress.native="panelInput"
-        />
+      <el-image v-if="result.showUgly" style="width: 225px; height: 300px" :src="result.uglyPath"></el-image>
+      <div style="width:100%;">
+        <el-input type="textarea" :autosize="{ minRows:1, maxRows:6}" v-model="toolbar.sql" :style="{fontFamily:result.fontFamily,fontSize:result.fontSize+'px'}" class="sql-pannel" @keypress.native="panelInput" />
       </div>
-      <Toolbar
-        :page="page"
-        :showFullBtn="showFullBtn"
-        :search.sync="table.search"
-        :result="result"
-        @changePage="changePage"
-        @sendToVscode="sendToVscode"
-        @export="exportOption.visible = true"
-        @insert="$refs.editor.openInsert()"
-        @deleteConfirm="deleteConfirm"
-        @run="
-          info.message = false;
-          execute(toolbar.sql);
-        "
-      />
-      <div v-if="info.message">
-        <div
-          v-if="info.error"
-          class="info-panel"
-          style="color: red !important"
-          v-html="info.message"
-        ></div>
-        <div
-          v-if="!info.error"
-          class="info-panel"
-          style="color: green !important"
-          v-html="info.message"
-        ></div>
+      <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :result="result" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="reqInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
+      <div v-if="info.message ">
+        <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
+        <div v-if="!info.error" class="info-panel" style="color: green !important;" v-html="info.message"></div>
       </div>
     </div>
     <!-- trigger when click -->
-    <ux-grid
-      ref="dataTable"
-      :data="filterData"
-      v-loading="table.loading"
-      size="small"
-      :cell-style="{ height: '35px' }"
-      @sort-change="sort"
-      :height="remainHeight"
-      width="100vh"
-      stripe
-      :checkboxConfig="{ checkMethod: selectable }"
-    >
-      <ux-table-column
-        type="checkbox"
-        width="40"
-        fixed="left"
-      ></ux-table-column>
-      <ux-table-column
-        type="index"
-        width="40"
-        :seq-method="
-          ({ row, rowIndex }) =>
-            rowIndex || !row.isFilter ? rowIndex : undefined
-        "
-      >
+    <ux-grid ref="dataTable" :data="filterData" v-loading='table.loading' size='small' :cell-style="{height: '35px'}" @sort-change="sort" :height="remainHeight" width="100vh" stripe :checkboxConfig="{ checkMethod: selectable}">
+      <ux-table-column type="checkbox" width="40" fixed="left"></ux-table-column>
+      <ux-table-column type="index" width="40" :seq-method="({row,rowIndex})=>(rowIndex||!row.isFilter)?rowIndex:undefined">
         <template #header>
-          <el-popover
-            placement="bottom"
-            width="200"
-            trigger="hover"
-            type="primary"
-          >
+          <el-popover placement="bottom" width="200" trigger="hover" type="primary">
             <el-checkbox-group v-model="toolbar.showColumns">
-              <el-checkbox
-                v-for="(column, index) in result.fields"
-                :label="column.name"
-                :key="index"
-              >
+              <el-checkbox v-for="(column,index) in result.fields" :label="column.name" :key="index">
                 {{ column.name }}
               </el-checkbox>
             </el-checkbox-group>
             <!-- <el-button icon="el-icon-search" circle title="Select columns to show" size="mini" slot="reference">
             </el-button> -->
-            <el-button
-              icon="el-icon-search"
-              title="Select columns to show."
-              slot="reference"
-            />
+            <el-button icon="el-icon-search" title="Select columns to show." slot="reference" />
           </el-popover>
         </template>
         <!-- <Controller slot="header" :result="result" :toolbar="toolbar" /> -->
       </ux-table-column>
-      <ux-table-column
-        v-for="(field, index) in (result.fields || []).filter((field) =>
-          toolbar.showColumns.includes(field.name)
-        )"
-        :key="index"
-        :resizable="true"
-        :field="field.name"
-        :title="field.name"
-        :sortable="true"
-        :width="computeWidth(field, 0)"
-        edit-render
-      >
-        <Header
-          slot="header"
-          slot-scope="scope"
-          :result="result"
-          :scope="scope"
-          :index="index"
-        />
-        <Row
-          slot-scope="scope"
-          :scope="scope"
-          :result="result"
-          :filterObj="toolbar.filter"
-          :editList.sync="update.editList"
-          @execute="execute"
-          @sendToVscode="sendToVscode"
-          @openEditor="openEditor"
-        />
+      <ux-table-column v-for="(field,index) in (result.fields||[]).filter(field=>toolbar.showColumns.includes(field.name))" :key="index" :resizable="true" :field="field.name" :title="field.name" :sortable="true" :width="computeWidth(field,0)" edit-render>
+        <Header slot="header" slot-scope="scope" :result="result" :scope="scope" :index="index" />
+        <Row slot-scope="scope" :scope="scope" :result="result" :filterObj="toolbar.filter" :editList.sync="update.editList" @execute="execute" @sendToVscode="sendToVscode" @openEditor="openEditor" />
       </ux-table-column>
     </ux-grid>
-    <EditDialog
-      ref="editor"
-      :dbType="result.dbType"
-      :result="result"
-      :database="result.database"
-      :table="result.table"
-      :primaryKey="result.primaryKey"
-      :primaryKeyList="result.primaryKeyList"
-      :columnList="result.columnList"
-      @execute="execute"
-    />
-    <ExportDialog
-      :visible.sync="exportOption.visible"
-      @exportHandle="confirmExport"
-    />
+    <EditDialog ref="editor" :dbType="result.dbType" :result="result" :database="result.database" :table="result.table" :primaryKey="result.primaryKey" :primaryKeyList="result.primaryKeyList" :columnList="result.columnList" @execute="execute" />
+    <ExportDialog :visible.sync="exportOption.visible" @exportHandle="confirmExport" />
   </div>
 </template>
 
@@ -161,7 +49,8 @@ import Toolbar from "./component/Toolbar";
 import EditDialog from "./component/EditDialog";
 import { util } from "./mixin/util";
 import { wrapByDb } from "@/common/wrapper";
-
+import { buildDeleteSQL } from './util/sqlGenerator';
+import { rejects } from 'assert';
 let vscodeEvent;
 
 export default {
@@ -172,7 +61,7 @@ export default {
     Toolbar,
     Controller,
     Row,
-    Header
+    Header,
   },
   data() {
     return {
@@ -191,37 +80,37 @@ export default {
         primaryKeyList: null,
         database: null,
         table: null,
-        tableCount: null
+        tableCount: null,
       },
       page: {
         pageNum: 1,
         pageSize: -1,
-        total: null
+        total: null,
       },
       table: {
         search: "",
         loading: true,
-        widthItem: {}
+        widthItem: {},
       },
       toolbar: {
         sql: null,
         // using to clear filter input value
         filter: {},
-        showColumns: []
+        showColumns: [],
       },
       exportOption: {
-        visible: false
+        visible: false,
       },
       info: {
         sql: null,
         message: null,
         error: false,
-        needRefresh: true
+        needRefresh: true,
       },
       update: {
         editList: {},
-        lock: false
-      }
+        lock: false,
+      },
     };
   },
   mounted() {
@@ -229,10 +118,10 @@ export default {
     const hint = this.$refs.hint;
     const updateHeight = () => {
       this.remainHeight = window.innerHeight - 10 - hint.clientHeight;
-      this.showFullBtn = window.outerWidth / window.innerWidth >= 2;
-    };
-    updateHeight();
-    new ResizeObserver(updateHeight).observe(hint);
+      this.showFullBtn = (window.outerWidth / window.innerWidth >= 2) || (window.outerHeight - window.innerHeight > 100);
+    }
+    updateHeight()
+    new ResizeObserver(updateHeight).observe(hint)
     window.addEventListener("resize", updateHeight);
     const handlerData = (data, sameTable) => {
       this.result = data;
@@ -266,22 +155,28 @@ export default {
     };
     vscodeEvent = getVscodeEvent();
 
-    vscodeEvent
-      .on("updateSuccess", () => {
-        this.update.editList = [];
-        this.result.data = [];
-        this.refresh();
-        this.update.lock = false;
-        this.$message({
-          showClose: true,
-          duration: 500,
-          message: "Update Success",
-          type: "success"
-        });
-      })
+    vscodeEvent.on("updateSuccess", () => {
+      this.update.editList = [];
+      if (this.isEs()) {
+        setTimeout(() => {
+          this.result.data = []
+          this.refresh()
+        }, 1000);
+      } else {
+        this.result.data = []
+        this.refresh()
+      }
+      this.update.lock = false;
+      this.$message({
+        showClose: true,
+        duration: 500,
+        message: "Update Success",
+        type: "success",
+      });
+    })
       .on("isSingle", (isSingle) => {
         this.result.single = isSingle;
-      });
+      })
 
     window.onkeypress = (e) => {
       if (
@@ -295,14 +190,13 @@ export default {
     };
     window.addEventListener("message", ({ data }) => {
       if (!data) return;
+      console.log(data);
       const response = data.content;
-      const runLoading =
-        this.result.transId == null ||
-        (response && response.transId > this.result.transId);
+      const runLoading = this.result.transId == null || (response && response.transId > this.result.transId);
       if (response) {
         this.result.transId = response.transId;
         if (response.language) {
-          this.$i18n.locale = response.language;
+          this.$i18n.locale = response.language
         }
       }
       switch (data.type) {
@@ -349,7 +243,7 @@ export default {
               showClose: true,
               duration: 1000,
               message: response.message,
-              type: response.success ? "success" : "error"
+              type: response.success ? "success" : "error",
             });
           }
           this.refresh();
@@ -364,34 +258,40 @@ export default {
     });
   },
   methods: {
+    isEs() {
+      return this.result.dbType == 'ElasticSearch';
+    },
+    reqInsert() {
+      if (this.isEs() || this.result.dbType == 'MongoDB') {
+        this.$refs.editor.openInsert()
+      } else {
+        this.result.data.push({_isNewPush:1})
+      }
+    },
     focusHolder() {
       let lastElement;
       window.onfocus = () => {
         setTimeout(() => {
           if (lastElement) {
-            lastElement.focus();
+            lastElement.focus()
           }
-        }, 10);
-      };
+        }, 10)
+      }
       window.onblur = () => {
         const ae = document.activeElement;
         if (!ae) {
           return;
         }
-        const tagName = ae.tagName.toLowerCase();
-        if (
-          tagName == "input" ||
-          tagName == "textarea" ||
-          (tagName == "div" && ae.contentEditable == "true")
-        ) {
+        const tagName = ae.tagName.toLowerCase()
+        if ((tagName == 'input' || tagName == 'textarea') || (tagName == 'div' && ae.contentEditable == 'true')) {
           lastElement = ae;
         }
-      };
+      }
     },
     panelInput(event) {
-      if (event.code == "Enter" && event.ctrlKey) {
-        this.execute(this.toolbar.sql);
-        event.stopPropagation();
+      if (event.code == 'Enter' && event.ctrlKey) {
+        this.execute(this.toolbar.sql)
+        event.stopPropagation()
       }
     },
     selectable({ row }) {
@@ -405,10 +305,11 @@ export default {
       let sql = "";
       for (const index in this.update.editList) {
         const element = this.update.editList[index];
-        sql += this.$refs.editor.buildUpdateSql(
-          element,
-          this.result.data[index]
-        );
+        if (element._isNewPush) {
+          sql += this.$refs.editor.buildInsertSQL(element);
+        } else {
+          sql += this.$refs.editor.buildUpdateSql(element, this.result.data[index]);
+        }
       }
       if (sql) {
         vscodeEvent.emit("saveModify", sql);
@@ -429,12 +330,12 @@ export default {
         option: {
           ...exportOption,
           sql: this.result.sql,
-          table: this.result.table
-        }
+          table: this.result.table,
+        },
       });
     },
     sort(row) {
-      if (this.result.dbType == "ElasticSearch") {
+      if (this.isEs()) {
         vscodeEvent.emit("esSort", [{ [row.prop]: { order: row.order } }]);
         return;
       }
@@ -442,12 +343,7 @@ export default {
       if (this.result.dbType == "MongoDB") {
         let sortSql = this.result.sql
           .replace(/.sort\(.+?\)/gi, "")
-          .replace(
-            /\s?(limit.+)?$/i,
-            `sort({"${row.prop}": ${
-              row.order.toLowerCase() == "desc" ? -1 : 1
-            }}).\$1 `
-          );
+          .replace(/\s?(limit.+)?$/i, `sort({"${row.prop}": ${row.order.toLowerCase() == 'desc' ? -1 : 1}}).\$1 `);
         this.execute(sortSql);
         return;
       }
@@ -466,65 +362,36 @@ export default {
       }
     },
     deleteConfirm() {
+      if (this.result.dbType == 'ClickHouse') {
+        this.$message.error(this.$t("result.deleteClickHouseNotice"));
+        return;
+      }
       const datas = this.$refs.dataTable.getCheckboxRecords();
       if (!datas || datas.length == 0) {
         this.$message({
           type: "warning",
-          message: this.$t("result.deleteNotice")
+          message: this.$t("result.deleteNotice"),
         });
         return;
       }
-      this.$confirm("Are you sure you want to delete this data?", "Warning", {
-        confirmButtonText: "OK",
-        cancelButtonText: "Cancel",
-        type: "warning"
-      })
+      this.$confirm("Are you sure you want to delete this data?", "Warning", { confirmButtonText: "OK", cancelButtonText: "Cancel", type: "warning", })
         .then(() => {
-          let checkboxRecords = datas
-            .filter(
-              (checkboxRecord) => checkboxRecord[this.result.primaryKey] != null
-            )
-            .map((checkboxRecord) =>
-              this.wrapQuote(
-                this.result.dbType,
-                this.getTypeByColumn(this.result.primaryKey),
-                checkboxRecord[this.result.primaryKey]
-              )
-            );
-          let deleteSql = null;
-          if (this.result.dbType == "ElasticSearch") {
-            deleteSql =
-              checkboxRecords.length > 1
-                ? `POST /_bulk\n${checkboxRecords
-                    .map(
-                      (c) =>
-                        `{ "delete" : { "_index" : "${this.result.table}", "_id" : "${c}" } }`
-                    )
-                    .join("\n")}`
-                : `DELETE /${this.result.table}/_doc/${checkboxRecords[0]}`;
-          } else if (this.result.dbType == "MongoDB") {
-            deleteSql = `db('${this.result.database}').collection("${
-              this.result.table
-            }")
-              .deleteMany({_id:{$in:[${checkboxRecords.join(",")}]}})`;
-          } else {
-            const table = wrapByDb(this.result.table, this.result.dbType);
-            deleteSql =
-              checkboxRecords.length > 1
-                ? `DELETE FROM ${table} WHERE ${
-                    this.result.primaryKey
-                  } in (${checkboxRecords.join(",")})`
-                : `DELETE FROM ${table} WHERE ${this.result.primaryKey}=${checkboxRecords[0]}`;
+          const unAddData = [];
+          for (let i = this.result.data.length - 1; i > 0; i--) {
+            const r = this.result.data[i];
+            if (r[this.result.primaryKey]) break;
+            if (datas.filter(c => c._XID == r._XID).length > 0) {
+              unAddData.push(r._XID);
+              this.result.data.splice(i, 1)
+            }
           }
+          const records = datas.filter((r) => !unAddData.includes(r._XID)).map((checkboxRecord) =>
+            this.wrapQuote(this.result.dbType, this.getTypeByColumn(this.result.primaryKey), checkboxRecord[this.result.primaryKey])
+          );
+          if (records.length == 0) return;
+          const deleteSql = buildDeleteSQL(this.result, records);
           this.execute(deleteSql);
         })
-        .catch((e) => {
-          if (e) {
-            this.$message.error(e);
-          } else {
-            this.$message({ type: "warning", message: "Delete canceled" });
-          }
-        });
     },
     /**
      * compute column row width, get maxium of fieldName or value or fieldType by top 10 row.
@@ -561,23 +428,14 @@ export default {
     },
     execute(sql) {
       if (!sql) return;
-      // let limit_query = sql;
-      // if (limit_query.match(/(?<=SELECT)(\s.*?)+(?=FROM)/gim)) {
-      //   if (!limit_query.match(/\blimit\b/i)) {
-      //     const pageSize = 100;
-      //     limit_query = limit_query + ` LIMIT ${pageSize}`;
-      //   }
-      // }
-      vscodeEvent.emit("execute", {
-        sql
-      });
+      vscodeEvent.emit("execute", { sql });
       this.table.loading = true;
     },
     changePage(pageNum, jump) {
       vscodeEvent.emit("next", {
         sql: this.result.sql,
         pageNum: jump ? pageNum : this.page.pageNum + pageNum,
-        pageSize: this.page.pageSize
+        pageSize: this.page.pageSize,
       });
       this.table.loading = true;
     },
@@ -615,7 +473,7 @@ export default {
       this.initShowColumn();
       // add filter row
       if (!Array.isArray(this.result.data)) {
-        this.$message.error("Unrecognized data!");
+        this.$message.error("Unrecognized data!")
       } else if (this.result.columnList) {
         this.result.data.unshift({ isFilter: true, content: "" });
       }
@@ -624,11 +482,11 @@ export default {
         this.toolbar.filter = {};
         this.$refs.dataTable.clearSort();
       }
-    }
+    },
   },
   computed: {
     filterData() {
-      if (!Array.isArray(this.result.data)) return [];
+      if (!Array.isArray(this.result.data)) return []
       return this.result.data.filter(
         (data) =>
           !this.table.search ||
@@ -644,10 +502,11 @@ export default {
       if (this.result.data == undefined || this.result.data[0] == undefined)
         return 0;
       return Object.keys(this.result.data[0]).length;
-    }
-  }
+    },
+  },
 };
 </script>
+
 
 <style scoped>
 .el-button--default {

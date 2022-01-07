@@ -21,7 +21,7 @@ export class SchemaNode extends Node implements CopyAble {
 
 
     public contextValue: string = ModelType.SCHEMA;
-    constructor(public schema: string,readonly meta:any, readonly parent: Node) {
+    constructor(public schema: string, readonly meta: any, readonly parent: Node) {
         super(schema)
         this.init(this.parent)
         this.cacheSelf()
@@ -34,10 +34,12 @@ export class SchemaNode extends Node implements CopyAble {
 
         if (this.dbType == DatabaseType.MONGO_DB) {
             return [new MongoTableGroup(this)]
+        } else if (this.dbType == DatabaseType.CLICKHOUSE) {
+            return [new TableGroup(this), new ViewGroup(this), new FunctionGroup(this)]
         }
 
         let childCache = this.getChildCache();
-        if (childCache && childCache.length>0 && !isRresh) {
+        if (childCache && childCache.length > 0 && !isRresh) {
             return childCache;
         }
 
@@ -72,7 +74,7 @@ export class SchemaNode extends Node implements CopyAble {
 
     private getIcon(active?: boolean): vscode.ThemeIcon {
 
-        const iconId = this.dbType == DatabaseType.MYSQL ? "database" : "symbol-struct"
+        const iconId = (this.dbType == DatabaseType.MYSQL || this.dbType == DatabaseType.CLICKHOUSE) ? "database" : "symbol-struct"
         if (Util.supportColorIcon()) {
             return new vscode.ThemeIcon(iconId, new vscode.ThemeColor(active ? 'charts.blue' : 'dropdown.foreground'));
         }
@@ -80,8 +82,8 @@ export class SchemaNode extends Node implements CopyAble {
     }
 
     private bindTooTip() {
-        if(this.dbType==DatabaseType.MYSQL && this.meta){
-            this.tooltip=`Charset: ${this.meta.charset}\nCollation: ${this.meta.collation}`
+        if (this.dbType == DatabaseType.MYSQL && this.meta) {
+            this.tooltip = `Charset: ${this.meta.charset}\nCollation: ${this.meta.collation}`
         }
     }
 
@@ -98,7 +100,7 @@ export class SchemaNode extends Node implements CopyAble {
                     DbTreeDataProvider.refresh(this.parent);
                     vscode.window.showInformationMessage(`Drop ${target} ${this.schema} success!`)
                 })
-            } 
+            }
         })
 
     }

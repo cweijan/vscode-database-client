@@ -8,27 +8,6 @@ var commandExistsSync = require("command-exists").sync;
 
 export class ClickHouseImortService extends ImportService {
   public importSql(importPath: string, node: Node): void {
-    if (commandExistsSync("psql")) {
-      NodeUtil.of(node);
-      const host = node.usingSSH ? "127.0.0.1" : node.host;
-      const port = node.usingSSH ? NodeUtil.getTunnelPort(node.key) : node.port;
-      const command = `psql -h ${host} -p ${port} -U ${node.user} -d ${node.database} < ${importPath}`;
-      Console.log(`Executing: ${command}`);
-      let prefix = platform() == "win32" ? "set" : "export";
-      exec(
-        `${prefix} "PGPASSWORD=${node.password}" && ${command}`,
-        (err, stdout, stderr) => {
-          if (err) {
-            Console.log(err);
-          } else if (stderr) {
-            Console.log(stderr);
-          } else {
-            Console.log(`Import Success!`);
-          }
-        }
-      );
-    } else {
-      super.importSql(importPath, node);
-    }
+    super.importSql(importPath, node);
   }
 }
