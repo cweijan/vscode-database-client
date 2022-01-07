@@ -191,12 +191,11 @@ export class ConnectionNode extends Node implements CopyAble {
         FileManager.showSQLTextDocument(this, this.dialect.createDatabase(''), 'create-db-template.sql')
     }
 
-    public async deleteConnection(context: vscode.ExtensionContext) {
 
+    public async deleteConnection(context: vscode.ExtensionContext) {
         Util.confirm(`Are you want to delete Connection ${this.label} ? `, async () => {
             this.indent({ command: CommandKey.delete })
         })
-
     }
 
     public static init() {
