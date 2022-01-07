@@ -90,6 +90,7 @@ export class ViewManager {
                     return Promise.resolve(currentStatus.instance);
                 }
             }
+            const ace=vscode.window.activeTextEditor;
             const webviewPanel = vscode.window.createWebviewPanel(
                 viewOption.type,
                 Util.limitTitle(viewOption.title),
@@ -98,6 +99,7 @@ export class ViewManager {
             );
             if(viewOption.vertical){
                 vscode.commands.executeCommand("workbench.action.toggleEditorGroupLayout")
+                if(ace) vscode.window.showTextDocument(ace.document)
             }
             const newStatus = { creating: true, instance: webviewPanel, eventEmitter: new EventEmitter() }
             this.viewStatus[viewOption.type] = newStatus
