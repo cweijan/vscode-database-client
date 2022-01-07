@@ -1,5 +1,13 @@
 # CHANGELOG
 
+# 4.5.0 2021-1-7
+
+- Support connect to clickhouse.
+- Show results in vertical direction.
+- Using new empty row instead of dialog for insert data.
+- Fix join result view and editor fail.
+- Fix complection fail when has as keyword.
+
 # 4.4.0 2021-12-30
 
 - Update extension logo.
