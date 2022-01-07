@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="150" height="150" version="1.1" style="">
+	<rect id="backgroundrect" width="100%" height="100%" x="0" y="0" fill="none" stroke="none" />
+
+
+	<g class="currentLayer" style="">
+		<title>Layer 1</title>
+		<g transform="matrix(17 0 0 17 0.1250248 -0)">
+			<path d="M0 7L1 7L1 8L0 8L0 7z" stroke="none" fill="#FF0000" fill-rule="nonzero" />
+			<path d="M0 0L1 0L1 7L0 7L0 0zM2 0L3 0L3 8L2 8zM4 0L5 0L5 8L4 8zM6 0L7 0L7 8L6 8zM8 3.25L9 3.25L9 4.75L8 4.75z" stroke="none" fill="#FFCC00" fill-rule="nonzero" />
+		</g>
+		<path fill="#0bd50b" fill-opacity="1" stroke="#222222" stroke-opacity="1" stroke-width="2" stroke-dasharray="none" stroke-linejoin="round" stroke-linecap="butt" stroke-dashoffset="" fill-rule="nonzero" opacity="1" marker-start="" marker-mid="" marker-end="" d="M108.58201086521149,127.43121719360352 C108.58201086521149,118.315195094156 116.18974567184132,110.93121719360352 125.58201086521149,110.93121719360352 C134.97427605858167,110.93121719360352 142.5820108652115,118.315195094156 142.5820108652115,127.43121719360352 C142.5820108652115,136.54723929305104 134.97427605858167,143.93121719360352 125.58201086521149,143.93121719360352 C116.18974567184132,143.93121719360352 108.58201086521149,136.54723929305104 108.58201086521149,127.43121719360352 z" id="svg_5" class="" />
+	</g>
+</svg>
