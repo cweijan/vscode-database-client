@@ -17,7 +17,7 @@ export class ColumnChain implements ComplectionChain {
         if (context.currentToken?.content === ".") {
             let subComplectionItems = await this.generateColumnComplectionItem(context.previousToken?.content);
             if (subComplectionItems != null && subComplectionItems.length > 0) { this.needStop = true }
-            const tableReg = new RegExp(Pattern.TABLE_PATTERN + "(?=\\s*\\b" + context.previousToken?.content + "\\b)", "ig");
+            const tableReg = new RegExp(`${Pattern.TABLE_PATTERN}(?=${Pattern.ALIAS_PATTERN}\\b${context.previousToken?.content}\\b)`, "ig");
             let result = tableReg.exec(context.sqlBlock.sql);
             while (result != null && subComplectionItems.length === 0) {
                 subComplectionItems = await this.generateColumnComplectionItem(

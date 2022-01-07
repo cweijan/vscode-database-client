@@ -11,14 +11,14 @@ export class TableDetecherChain implements ComplectionChain {
             return null;
         }
 
-        const tableMatch = new RegExp(Pattern.TABLE_PATTERN + " *((\\w)*)?", 'ig');
+        const tableMatch = new RegExp(Pattern.TABLE_PATTERN + Pattern.ALIAS_PATTERN + "((\\w)*)?", 'ig');
         if (context.previousToken?.content?.match(/\b(select|HAVING|\(|on|where|and|,|=|<|>)\b/ig)
             || context.currentToken?.content?.match(/(<|>|,|=)$/)
         ) {
             const completionItem = [];
             let result = tableMatch.exec(context.sqlBlock.sql);
             while (result != null) {
-                const alias = result[4];
+                const alias = result[5];
                 if (alias) {
                     completionItem.push(new vscode.CompletionItem(alias, vscode.CompletionItemKind.Interface));
                 } else {
