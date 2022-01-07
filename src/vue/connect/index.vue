@@ -290,7 +290,13 @@ export default {
         }
         this.$forceUpdate();
       })
-      .on("sqliteState", (sqliteState) => {
+      .on("option", (option) => {
+        console.log(option)
+        const { sqliteState, hasPk, pkPath } = option;
+        if (hasPk) {
+          this.connectionOption.ssh.type = 'privateKey'
+        }
+        this.connectionOption.ssh.privateKeyPath = pkPath;
         this.sqliteState = sqliteState;
       })
       .on("error", (err) => {

@@ -1,7 +1,7 @@
 import { CacheKey, CodeCommand, DatabaseType } from "@/common/constants";
 import { FileManager, FileModel } from "@/common/filesManager";
 import { ConnectionManager } from "@/service/connectionManager";
-import { resolve } from "path";
+import { join, resolve } from "path";
 import { homedir, platform } from "os";
 import * as vscode from 'vscode'
 import { commands, Disposable, window, workspace } from "vscode";
@@ -14,7 +14,7 @@ import { NodeUtil } from "../../model/nodeUtil";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
 import { ClientManager } from "../ssh/clientManager";
 import { ConnnetionConfig } from "./config/connnetionConfig";
-import { existsSync, fstatSync, readFileSync, unlinkSync } from "fs";
+import { exists, existsSync, fstatSync, readFileSync, unlinkSync } from "fs";
 import { GlobalState, WorkState } from "@/common/state";
 var commandExistsSync = require('command-exists').sync;
 
@@ -45,8 +45,11 @@ export class ConnectService {
                     } else {
                         handler.emit("connect")
                     }
-                    const exists = plat == 'win32' ? true : commandExistsSync("sqlite") || commandExistsSync("sqlite3");
-                    handler.emit("sqliteState", exists)
+                    const pkPath = join(homedir(), '.ssh', 'id_rsa')
+                    handler.emit("option", {
+                        sqliteState: plat == 'win32' ? true : commandExistsSync("sqlite") || commandExistsSync("sqlite3"),
+                        hasPk: existsSync(pkPath), pkPath
+                    })
                 }).on("installSqlite", () => {
                     let command: string;
                     switch (plat) {
@@ -71,7 +74,7 @@ export class ConnectService {
                     terminal.show()
                 }).on("connecting", async (data) => {
                     const connectionOption = data.connectionOption
-                    const node:Node = Util.trim(NodeUtil.of(connectionOption))
+                    const node: Node = Util.trim(NodeUtil.of(connectionOption))
                     try {
                         node.initKey();
                         await this.connect(node)
@@ -90,11 +93,11 @@ export class ConnectService {
                 }).on("close", () => {
                     handler.panel.dispose()
                 }).on("choose", ({ event, filters }) => {
-                    let defaultUri:vscode.Uri;
-                    if(event=="privateKey"){
-                        defaultUri=vscode.Uri.file(homedir()+"/.ssh")
+                    let defaultUri: vscode.Uri;
+                    if (event == "privateKey") {
+                        defaultUri = vscode.Uri.file(homedir() + "/.ssh")
                     }
-                    window.showOpenDialog({ filters,defaultUri }).then((uris) => {
+                    window.showOpenDialog({ filters, defaultUri }).then((uris) => {
                         if (uris && uris[0]) {
                             const uri = uris[0]
                             handler.emit("choose", { event, path: uri.fsPath })
@@ -107,8 +110,8 @@ export class ConnectService {
 
     public async connect(connectionNode: Node): Promise<void> {
         if (connectionNode.dbType == DatabaseType.SSH) {
-            connectionNode.ssh.key=connectionNode.key;
-            await ClientManager.getSSH(connectionNode.ssh, {withSftp:false})
+            connectionNode.ssh.key = connectionNode.key;
+            await ClientManager.getSSH(connectionNode.ssh, { withSftp: false })
             return;
         }
         ConnectionManager.removeConnection(connectionNode.getConnectId())

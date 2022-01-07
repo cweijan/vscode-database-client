@@ -22,7 +22,7 @@ export class ClientManager {
         if (this.activeClient[key]) {
             return Promise.resolve(this.activeClient[key]);
         }
-        if (sshConfig.privateKeyPath) {
+        if (sshConfig.type=='privateKey' && sshConfig.privateKeyPath) {
             sshConfig.privateKey = readFileSync(sshConfig.privateKeyPath)
         }
 
