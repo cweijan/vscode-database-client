@@ -48,9 +48,7 @@ import ExportDialog from "./component/ExportDialog.vue";
 import Toolbar from "./component/Toolbar";
 import EditDialog from "./component/EditDialog";
 import { util } from "./mixin/util";
-import { wrapByDb } from "@/common/wrapper";
 import { buildDeleteSQL } from './util/sqlGenerator';
-import { rejects } from 'assert';
 let vscodeEvent;
 
 export default {
@@ -265,7 +263,11 @@ export default {
       if (this.isEs() || this.result.dbType == 'MongoDB') {
         this.$refs.editor.openInsert()
       } else {
-        this.result.data.push({_isNewPush:1})
+        this.result.data.push({ _isNewPush: 1 })
+        setTimeout(() => {
+          const el = document.querySelector('.plx-table--body-wrapper');
+          el.scrollTo({ top: el.scrollHeight })
+        }, 1);
       }
     },
     focusHolder() {
