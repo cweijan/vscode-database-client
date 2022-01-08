@@ -10,11 +10,9 @@ export class ClickHouseDialect extends SqlDialect {
   }
   createIndex(createIndexParam: CreateIndexParam): string {
     const indexType = createIndexParam.indexType || "btree";
-    return `CREATE INDEX ${
-      createIndexParam.column
-    }_${new Date().getTime()}_index ON ${
-      createIndexParam.table
-    } USING ${indexType} (${createIndexParam.column})`;
+    return `CREATE INDEX ${createIndexParam.column
+      }_${new Date().getTime()}_index ON ${createIndexParam.table
+      } USING ${indexType} (${createIndexParam.column})`;
   }
   dropIndex(table: string, indexName: string): string {
     return `DROP INDEX ${indexName}`;
@@ -126,7 +124,7 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition}`;
     return `SELECT count(*) FROM ${database}.${table}`;
   }
   showTables(database: string): string {
-    return `select name ,engine as type , null as comment from system.tables where database='${database}' and engine not ilike '%view%' `;
+    return `select name ,engine as type , null as comment from system.tables where database='${database}' and engine not ilike '%view%' and name not like '.%'`;
   }
   showDatabases() {
     return `SELECT name as Database FROM system.databases where name not ilike '%information_schema%' order by name ASC`;
