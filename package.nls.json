@@ -62,6 +62,7 @@
     "command.redis.connection.status": "Server status",
     "command.redis.key.del": "Delete",
 	"command.redis.key.detail": "View Key Detail",
+	"ext.connect.success": "Connect Success!",
 	"config.title":"Database Client",
 	"config.preferConnectionName":"Using connection name as connection node name",
 	"config.defaultSelectLimit":"Default limit of query sql."

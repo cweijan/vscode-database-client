@@ -14,6 +14,8 @@ export const messages = {
       connectTimeout:"Connect Timeout",
       requestTimeout:"Request Timeout",
       useSSL:"Use SSL",
+      hideSystemSchema:"Hide System Schema",
+      usingConnectString:"Use Connection String",
     },
     config:{
       serverType:"Server Type",
@@ -55,6 +57,8 @@ export const messages = {
       connectTimeout:"连接超时",
       requestTimeout:"请求超时",
       useSSL:"使用SSL",
+      hideSystemSchema:"隐藏系统数据库",
+      usingConnectString:"使用连接字符串",
     },
     config:{
       serverType:"服务器类型",

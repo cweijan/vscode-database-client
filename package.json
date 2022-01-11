@@ -1113,6 +1113,7 @@
 		"ssh2": "^1.5.0",
 		"supports-color": "^9.0.1",
 		"umy-table": "1.0.8",
+		"vscode-nls-i18n": "^0.2.4",
 		"vue": "^2.6.11",
 		"vue-i18n": "^8.26.5",
 		"vue-router": "^3.4.1",

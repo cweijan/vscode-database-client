@@ -16,6 +16,7 @@ import { ClientManager } from "../ssh/clientManager";
 import { ConnnetionConfig } from "./config/connnetionConfig";
 import { exists, existsSync, fstatSync, readFileSync, unlinkSync } from "fs";
 import { GlobalState, WorkState } from "@/common/state";
+import { localize } from "vscode-nls-i18n";
 var commandExistsSync = require('command-exists').sync;
 
 export class ConnectService {
@@ -80,7 +81,7 @@ export class ConnectService {
                         await this.connect(node)
                         await provider.addConnection(node)
                         const { key, connectionKey } = node
-                        handler.emit("success", { message: 'connect success!', key, connectionKey })
+                        handler.emit("success", { message: localize('ext.connect.success'), key, connectionKey })
                     } catch (err) {
                         if (err?.message) {
                             handler.emit("error", err.message)

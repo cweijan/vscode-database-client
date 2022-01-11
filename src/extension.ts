@@ -41,9 +41,11 @@ import { FTPFileNode } from "./model/ftp/ftpFileNode";
 import { HistoryNode } from "./provider/history/historyNode";
 import { ConnectService } from "./service/connect/connectService";
 import { RemainNode } from "./model/redis/remainNode";
+import { init} from "vscode-nls-i18n";
 
 export function activate(context: vscode.ExtensionContext) {
 
+    init(context.extensionPath);
     const serviceManager = new ServiceManager(context)
 
     activeEs(context)
@@ -56,11 +58,11 @@ export function activate(context: vscode.ExtensionContext) {
         ...initCommand({
             // util
             ...{
-                [CodeCommand.Refresh]: async (node: Node,byConnection:boolean) => {
+                [CodeCommand.Refresh]: async (node: Node, byConnection: boolean) => {
                     if (node) {
-                        if(byConnection){
+                        if (byConnection) {
                             DatabaseCache.clearByConnection(node.key)
-                        }else{
+                        } else {
                             await node.getChildren(true)
                         }
                     } else {
@@ -124,10 +126,10 @@ export function activate(context: vscode.ExtensionContext) {
                     ServiceManager.getDumpService(node.dbType).generateDocument(node)
                 },
                 "mysql.data.import": (node: SchemaNode | ConnectionNode) => {
-                    const importService=ServiceManager.getImportService(node.dbType);
+                    const importService = ServiceManager.getImportService(node.dbType);
                     vscode.window.showOpenDialog({ filters: importService.filter(), canSelectMany: true, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((uriList) => {
-                        if(uriList)
-                            importService.batchImportSql(uriList.map(uri=>uri.fsPath),node)
+                        if (uriList)
+                            importService.batchImportSql(uriList.map(uri => uri.fsPath), node)
                     });
                 },
             },
@@ -189,7 +191,7 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // query node
             ...{
-                "mysql.runSQL": (sql:string) => {
+                "mysql.runSQL": (sql: string) => {
                     if (typeof sql != 'string') { sql = null; }
                     QueryUnit.runQuery(sql, ConnectionManager.tryGetConnection());
                 },
@@ -198,9 +200,9 @@ export function activate(context: vscode.ExtensionContext) {
                 },
                 "mysql.query.switch": async (node: SchemaNode | EsConnectionNode | ESIndexNode) => {
                     if (node) {
-                        if(node.dbType==DatabaseType.MONGO_DB){
+                        if (node.dbType == DatabaseType.MONGO_DB) {
                             QueryUnit.showSQLTextDocument(node, `db('${node.label}').collection('').find({}).limit(100).toArray()`, Template.table);
-                        }else{
+                        } else {
                             await node.newQuery();
                         }
                     } else {
@@ -259,7 +261,7 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.column.down": (columnNode: ColumnNode) => {
                     columnNode.moveDown();
                 },
-                "mysql.column.add": (tableNode: (TableNode|ColumnNode)) => {
+                "mysql.column.add": (tableNode: (TableNode | ColumnNode)) => {
                     tableNode.addColumnTemplate();
                 },
                 "mysql.column.update": (columnNode: ColumnNode) => {
@@ -357,7 +359,7 @@ function commandWrapper(commandDefinition: any, command: string): (...args: any[
     return (...args: any[]) => {
         try {
             commandDefinition[command](...args);
-        }catch (err) {
+        } catch (err) {
             Console.log(err);
         }
     };

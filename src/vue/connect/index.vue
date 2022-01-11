@@ -74,7 +74,7 @@
           </div>
           <div class="inline-block mr-10">
             <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>{{ $t("config.password") }}</label>
-            <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
+            <input class="w-64 field__input" :placeholder='$t("config.password")' type="password" v-model="connectionOption.password" />
           </div>
           <div class="inline-block mr-10" v-if="connectionOption.dbType == 'Redis'">
             <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1"></span>IsCluster</label>
@@ -158,11 +158,11 @@
             connectionOption.dbType == 'ClickHouse' ||
             connectionOption.dbType == 'MySQL'
           ">
-          <label class="inline-block mr-5 font-bold w-18">Use Connection String</label>
+          <label class="inline-block mr-5 font-bold w-18">{{$t("connect.usingConnectString")}}</label>
           <el-switch v-model="connectionOption.useConnectionString"></el-switch>
         </div>
         <div class="inline-block mr-10" v-if=" connectionOption.dbType == 'MySQL' || connectionOption.dbType == 'PostgreSQL' ">
-          <label class="font-bold mr-5 inline-block w-40">Hide System Schema</label>
+          <label class="font-bold mr-5 inline-block w-40">{{$t("connect.hideSystemSchema")}}</label>
           <el-switch v-model="connectionOption.hideSystemSchema"></el-switch>
         </div>
       </section>
