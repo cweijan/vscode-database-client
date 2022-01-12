@@ -32,10 +32,10 @@ module.exports = [
             }
         },
         plugins: [
-            new webpack.IgnorePlugin(/^(pg-native|cardinal|encoding|aws4|cpu-features)$/)
+            new webpack.IgnorePlugin(/^(pg-native|cardinal|encoding|aws4|cpu-features|buffer-indexof-polyfill)$/)
         ],
         stats: {
-            warningsFilter: [/critical dependency:/i],
+            warningsFilter: [/critical dependency:/i,/sshcrypto/],
         },
         module: { rules: [{ test: /\.ts$/, exclude: /(node_modules|bin)/, use: ['ts-loader'] }] },
         optimization: { minimize: isProd },
