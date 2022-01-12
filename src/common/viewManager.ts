@@ -99,7 +99,12 @@ export class ViewManager {
             );
             if(viewOption.vertical){
                 vscode.commands.executeCommand("workbench.action.toggleEditorGroupLayout")
-                if(ace) vscode.window.showTextDocument(ace.document)
+                if(ace) {
+                    // fix editor
+                    vscode.commands.executeCommand("workbench.action.keepEditor",ace.document.uri)
+                    // fix editor focu gone.
+                    vscode.window.showTextDocument(ace.document)
+                }
             }
             const newStatus = { creating: true, instance: webviewPanel, eventEmitter: new EventEmitter() }
             this.viewStatus[viewOption.type] = newStatus
