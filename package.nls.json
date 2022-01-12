@@ -63,6 +63,9 @@
     "command.redis.key.del": "Delete",
 	"command.redis.key.detail": "View Key Detail",
 	"ext.connect.success": "Connect Success!",
+	"ext.view.connect": "Connect",
+	"ext.view.edit": "Edit",
+	"ext.view.data": "Data",
 	"config.title":"Database Client",
 	"config.preferConnectionName":"Using connection name as connection node name",
 	"config.defaultSelectLimit":"Default limit of query sql."

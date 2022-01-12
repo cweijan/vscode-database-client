@@ -14,6 +14,7 @@ import { ExportService } from "../export/exportService";
 import { QueryOption, QueryUnit } from "../queryUnit";
 import { DataResponse, ErrorResponse } from "./queryResponse";
 import { ResourceServer } from "../resourceServer";
+import { localize } from "vscode-nls-i18n";
 
 export class QueryParam<T> {
     public connection: Node;
@@ -40,7 +41,7 @@ export class QueryPage {
             singlePage: true,
             vertical: isActive,
             splitView: isActive,
-            path: 'result', title: 'Query', type,
+            path: 'result', title: localize('ext.view.data'), type,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),
             handleHtml: this.handleHtml,
             eventHandler: async (handler) => {

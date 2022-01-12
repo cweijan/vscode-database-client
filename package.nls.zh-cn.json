@@ -63,6 +63,9 @@
     "command.redis.key.del": "删除",
 	"command.redis.key.detail": "查看键详情",
 	"ext.connect.success": "连接成功!",
+	"ext.view.connect": "连接",
+	"ext.view.edit": "编辑",
+	"ext.view.data": "数据",
 	"config.title":"_数据库配置",
 	"config.preferConnectionName":"使用连接名称作为连接的显示名",
 	"config.defaultSelectLimit":"默认的分页大小."

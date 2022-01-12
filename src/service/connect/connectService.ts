@@ -34,7 +34,7 @@ export class ConnectService {
         }
         let plat: string = platform();
         ViewManager.createWebviewPanel({
-            path: "app", title: connectionNode ? "edit" : "connect",
+            path: "app", title: connectionNode ? localize('ext.view.edit') : localize('ext.view.connect'),
             splitView: false, iconPath: Global.getExtPath("resources", "icon", "connection.svg"),
             eventHandler: (handler) => {
                 handler.on("init", () => {
