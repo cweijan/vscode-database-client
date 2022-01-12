@@ -60,7 +60,7 @@
         </div>
         <div class="inline-block mr-10">
           <label class="font-bold mr-5 inline-block w-28">Passphrase</label>
-          <input class="w-64 field__input" placeholder="Passphrase" type="passphrase" v-model="connectionOption.ssh.passphrase" />
+          <input class="w-64 field__input" placeholder="Passphrase" type="password" v-model="connectionOption.ssh.passphrase" />
         </div>
       </section>
     </div>
