@@ -225,13 +225,14 @@ export class SSHConnectionNode extends Node {
         return new Promise(async (resolve) => {
             try {
                 const ssh = await ClientManager.getSSH(this.sshConfig)
-                ssh.sftp.readdir(this.file ? this.parentName + this.name : '/', (err, fileList) => {
+                const ftpRoot=this.sshConfig.ftpRoot?this.sshConfig.ftpRoot+"/":"/";
+                ssh.sftp.readdir(this.file ? this.parentName + this.name : ftpRoot, (err, fileList) => {
                     if (err) {
                         resolve([new InfoNode(err.message)]);
                     } else if (fileList.length == 0) {
                         resolve([new InfoNode("There are no files in this folder.")]);
                     } else {
-                        const parent = this.file ? `${this.parentName + this.name}/` : '/';
+                        const parent = this.file ? `${this.parentName + this.name}/` : ftpRoot;
                         resolve(this.build(fileList, parent))
                     }
                 })

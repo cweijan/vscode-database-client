@@ -31,7 +31,11 @@
       </div>
     </section>
 
-    <section class="mb-2" v-if="connectionOption.dbType=='SSH'">
+    <section class="mb-2">
+       <div class="inline-block mr-10">
+          <label class="font-bold mr-5 inline-block w-28">SFtp Root</label>
+          <input class="w-64 field__input" placeholder="SFtp root path, default is /" v-model="connectionOption.ssh.ftpRoot" />
+        </div>
       <div class="inline-block mr-10">
         <label class="font-bold mr-5 inline-block w-32">Show Hidden File</label>
         <el-switch v-model="connectionOption.showHidden"></el-switch>

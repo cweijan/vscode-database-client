@@ -7,6 +7,7 @@ export interface SSHConfig {
     port: number;
     username: string;
     password?: string;
+    ftpRoot?: string;
     /**
      * password privateKey native
      */
