@@ -75,6 +75,9 @@ export class QueryPage {
                     queryParam.queryOption.viewId = 'query';
                     handler.emit("isSingle", true)
                 }).on("full", () => {
+                    // fix editor disappear
+                    const ace=window.activeTextEditor;
+                    if(ace) commands.executeCommand("workbench.action.keepEditor",ace.document.uri)
                     handler.panel.reveal()
                     commands.executeCommand("workbench.action.joinAllGroups")
                 }).on('esFilter', (query) => {
