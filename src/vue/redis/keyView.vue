@@ -41,16 +41,15 @@
       <el-form class='key-content-string' v-if="key.type=='string'">
         <!-- key content textarea -->
         <el-form-item>
-
           <span v-if='binary' class='formater-binary'>Hex</span>
-          <div class="value-panel" :style="'height:'+ dynamicHeight">
+          <div class="value-panel">
             <!-- 字符串 -->
             <div v-if="selectedView=='ViewerText'">
-              <el-input type='textarea' :autosize="{ minRows:6}" v-model='edit.content'></el-input>
+              <el-input type='textarea' :autosize="{ minRows:6}" v-model='edit.content' :style="'height:'+ remainHeight+'px'"></el-input>
             </div>
             <!-- Json -->
             <div v-if="selectedView=='ViewerJson'">
-              <pre v-html="editTemp" contenteditable="true" class="json-panel" @input="changeByJson"></pre>
+              <pre v-html="editTemp" contenteditable="true" class="json-panel" @input="changeByJson" :style="'height:'+ remainHeight+'px'"></pre>
             </div>
           </div>
         </el-form-item>
@@ -158,10 +157,11 @@ export default {
   mounted() {
     const infoForm=this.$refs.infoForm.$el;
     const updateHeight=()=>{
-      this.remainHeight = window.innerHeight -55 - infoForm.clientHeight ;
+      this.remainHeight = window.innerHeight -35 - infoForm.clientHeight ;
     }
     updateHeight()
     new ResizeObserver(updateHeight).observe(document.body)
+    window.addEventListener("resize", updateHeight);
     vscodeEvent = getVscodeEvent();
     vscodeEvent
       .on("detail", (data) => {
@@ -327,6 +327,7 @@ export default {
 </script>
 <style scoped>
 .json-panel {
+  overflow: scroll;
   line-height: 1.3;
   font-family: var(--vscode-editor-font-family);
   font-weight: var(--vscode-editor-font-weight);
