@@ -531,6 +531,7 @@ export default {
 .connect-container {
   width: 100%;
   max-width: 1100px;
+  flex-shrink: 0;
 }
 
 @media screen and (min-width: 1860px) {
@@ -538,6 +539,21 @@ export default {
     width: 100%;
     max-width: 1500px;
   }
+}
+
+@media screen and (max-width: 1500px) {
+  .connect-container {
+    width: 900px;
+  }
+  .connect-bar {
+    width: unset;
+  }
+}
+
+.connect-bar {
+  width: 70%;
+  display: flex;
+  justify-content: center;
 }
 
 .tab {
@@ -576,12 +592,6 @@ input::-webkit-inner-spin-button {
   display: inline-block;
   outline: none;
   cursor: pointer;
-}
-
-.connect-bar {
-  width: 70%;
-  display: flex;
-  justify-content: center;
 }
 
 .button--primary {
