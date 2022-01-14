@@ -98,7 +98,9 @@ export class ViewManager {
                 { enableScripts: true, retainContextWhenHidden: true },
             );
             if(viewOption.vertical){
-                vscode.commands.executeCommand("workbench.action.toggleEditorGroupLayout")
+                // if(ace && ace.viewColumn>1){
+                    vscode.commands.executeCommand("workbench.action.toggleEditorGroupLayout")
+                // }
                 if(ace) {
                     // fix editor focu gone.
                     vscode.window.showTextDocument(ace.document)
