@@ -106,7 +106,7 @@ export default {
         needRefresh: true,
       },
       update: {
-        editList: {},
+        editList: [],
         lock: false,
       },
     };
@@ -392,6 +392,7 @@ export default {
       if (records.length == 0) {
         for (const i of removeIndexes) {
           this.result.data.splice(i, 1)
+          delete this.update.editList[i]
         }
         return;
       };
