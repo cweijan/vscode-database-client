@@ -376,21 +376,27 @@ export default {
         });
         return;
       }
+      const unAddData = [];
+      const removeIndexes = [];
+      for (let i = this.result.data.length - 1; i > 0; i--) {
+        const r = this.result.data[i];
+        if (r[this.result.primaryKey]) break;
+        if (datas.filter(c => c._XID == r._XID).length > 0) {
+          unAddData.push(r._XID);
+          removeIndexes.push(i)
+        }
+      }
+      const records = datas.filter((r) => !unAddData.includes(r._XID)).map((checkboxRecord) =>
+        this.wrapQuote(this.result.dbType, this.getTypeByColumn(this.result.primaryKey), checkboxRecord[this.result.primaryKey])
+      );
+      if (records.length == 0) {
+        for (const i of removeIndexes) {
+          this.result.data.splice(i, 1)
+        }
+        return;
+      };
       this.$confirm("Are you sure you want to delete this data?", "Warning", { confirmButtonText: "OK", cancelButtonText: "Cancel", type: "warning", })
         .then(() => {
-          const unAddData = [];
-          for (let i = this.result.data.length - 1; i > 0; i--) {
-            const r = this.result.data[i];
-            if (r[this.result.primaryKey]) break;
-            if (datas.filter(c => c._XID == r._XID).length > 0) {
-              unAddData.push(r._XID);
-              this.result.data.splice(i, 1)
-            }
-          }
-          const records = datas.filter((r) => !unAddData.includes(r._XID)).map((checkboxRecord) =>
-            this.wrapQuote(this.result.dbType, this.getTypeByColumn(this.result.primaryKey), checkboxRecord[this.result.primaryKey])
-          );
-          if (records.length == 0) return;
           const deleteSql = buildDeleteSQL(this.result, records);
           this.execute(deleteSql);
         })
