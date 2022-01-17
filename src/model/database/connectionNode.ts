@@ -109,7 +109,7 @@ export class ConnectionNode extends Node implements CopyAble {
 
         if (this.dbType == DatabaseType.SQLITE) {
             const baseName = path.basename(this.dbPath);
-            let prefix = path.resolve(baseName, "..")
+            let prefix = path.resolve(this.dbPath, "..")
             if (prefix.length > 10) {
                 prefix = prefix.substring(0, 10) + "..."
             }
