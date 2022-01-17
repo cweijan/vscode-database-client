@@ -1,7 +1,7 @@
 import { CodeCommand, Constants, ModelType } from '@/common/constants';
 import { FileManager, FileModel } from '@/common/filesManager';
 import { Util } from '@/common/util';
-import { ClientManager } from '@/service/ssh/clientManager';
+import { SSHClientManager } from '@/service/ssh/clientManager';
 import { createWriteStream } from 'fs';
 import * as path from 'path';
 import { extname } from 'path';
@@ -36,7 +36,7 @@ export class FileNode extends Node {
     }
     delete(): any {
         Util.confirm("Are you wang to delete this file?", async () => {
-            const { sftp } = await ClientManager.getSSH(this.sshConfig)
+            const { sftp } = await SSHClientManager.getSSH(this.sshConfig)
             sftp.unlink(this.fullPath, (err) => {
                 if (err) {
                     vscode.window.showErrorMessage(err.message)
@@ -56,7 +56,7 @@ export class FileNode extends Node {
             vscode.window.showErrorMessage(`Not support open ${extName} file!`)
             return;
         }
-        const { sftp } = await ClientManager.getSSH(this.sshConfig)
+        const { sftp } = await SSHClientManager.getSSH(this.sshConfig)
         const tempPath = await FileManager.record(`temp/${this.file.filename}`, null, FileModel.WRITE);
         sftp.fastGet(this.fullPath, tempPath, async (err) => {
             if (err) {
@@ -81,7 +81,7 @@ export class FileNode extends Node {
 
     public async downloadByPath(path:string,showDialog?:boolean){
         
-        const { sftp } = await ClientManager.getSSH(this.sshConfig)
+        const { sftp } = await SSHClientManager.getSSH(this.sshConfig)
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Start downloading ${this.fullPath}`,

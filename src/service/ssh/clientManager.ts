@@ -12,7 +12,7 @@ class SSHOption {
     withSftp: boolean = false;
 }
 
-export class ClientManager {
+export class SSHClientManager {
 
     private static activeClient: { [key: string]: SSH } = {};
 
@@ -46,7 +46,7 @@ export class ClientManager {
 
             }).on('error', (err) => {
                 this.activeClient[key] = null
-                vscode.window.showErrorMessage(err.message)
+                // vscode.window.showErrorMessage(err.message)
                 reject(err)
             }).on('end', () => {
                 this.activeClient[key] = null

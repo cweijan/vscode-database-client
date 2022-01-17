@@ -6,7 +6,7 @@ import IORedis from "ioredis";
 
 export class RedisConnection extends IConnection {
     private conneted: boolean;
-    private client: IoRedis.Redis|IORedis.Cluster;
+    private client: IoRedis.Redis | IORedis.Cluster;
     constructor(private node: Node) {
         super()
         let config = {
@@ -35,32 +35,34 @@ export class RedisConnection extends IConnection {
     query(sql: any, values?: any, callback?: any) {
         const param: string[] = sql.replace(/ +/g, " ").split(' ')
         const command = param.shift()
-        if(this.client instanceof IoRedis){
+        if (this.client instanceof IoRedis) {
             this.client.send_command(command, param, callback)
-        }else{
+        } else {
             throw new Error("Redis cluster not support send command!")
         }
     }
-    run(callback: (client: IoRedis.Redis|IORedis.Cluster) => void) {
+    run(callback: (client: IoRedis.Redis | IORedis.Cluster) => void) {
 
         callback(this.client)
     }
 
     connect(callback: (err: Error) => void): void {
-        let timeout = true;
-        setTimeout(() => {
-            if (timeout) {
-                timeout = false;
-                callback(new Error("Connect to redis server time out."))
-            }
-        }, this.node.connectTimeout || 5000);
-        this.client.ping((err) => {
-            if (timeout) {
-                this.conneted = true;
-                timeout = false;
-                callback(err)
-            }
+        let occurError = false;
+        this.client.on('error', err => {
+            if (occurError) return;
+            occurError=true;
+            callback(err)
         })
+        setTimeout(() => {
+            if (occurError) return;
+            occurError=true;
+            callback(new Error("Connect to redis server time out."))
+        }, this.node.connectTimeout || 5000);
+        this.client.ping().then((err) => {
+            if (occurError) return;
+            occurError=true;
+            callback(err ? new Error(err) : null)
+        }).catch(callback)
     }
     beginTransaction(callback: (err: Error) => void): void {
     }

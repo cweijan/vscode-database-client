@@ -12,7 +12,7 @@ import { ConnectionNode } from "../../model/database/connectionNode";
 import { Node } from "../../model/interface/node";
 import { NodeUtil } from "../../model/nodeUtil";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { ClientManager } from "../ssh/clientManager";
+import { SSHClientManager } from "../ssh/clientManager";
 import { ConnnetionConfig } from "./config/connnetionConfig";
 import { exists, existsSync, fstatSync, readFileSync, unlinkSync } from "fs";
 import { GlobalState, WorkState } from "@/common/state";
@@ -112,7 +112,7 @@ export class ConnectService {
     public async connect(connectionNode: Node): Promise<void> {
         if (connectionNode.dbType == DatabaseType.SSH) {
             connectionNode.ssh.key = connectionNode.key;
-            await ClientManager.getSSH(connectionNode.ssh, { withSftp: false })
+            await SSHClientManager.getSSH(connectionNode.ssh, { withSftp: false })
             return;
         }
         ConnectionManager.removeConnection(connectionNode.getConnectId())

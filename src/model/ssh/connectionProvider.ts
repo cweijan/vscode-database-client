@@ -1,5 +1,5 @@
 import { CodeCommand } from '@/common/constants';
-import { ClientManager } from '@/service/ssh/clientManager';
+import { SSHClientManager } from '@/service/ssh/clientManager';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { SSHConfig } from '../interface/sshConfig';
@@ -19,7 +19,7 @@ export default class ConnectionProvider  {
     }
 
     async saveFile(tempPath: string, remotePath: string, sshConfig: SSHConfig) {
-        const { sftp } = await ClientManager.getSSH(sshConfig)
+        const { sftp } = await SSHClientManager.getSSH(sshConfig)
         sftp.fastPut(tempPath, remotePath, async (err) => {
             if (err) {
                 vscode.window.showErrorMessage(err.message)

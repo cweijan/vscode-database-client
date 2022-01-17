@@ -1,7 +1,7 @@
 import { CodeCommand, ConfigKey, Constants, ModelType } from "@/common/constants";
 import { FileManager, FileModel } from "@/common/filesManager";
 import { Util } from "@/common/util";
-import { ClientManager } from "@/service/ssh/clientManager";
+import { SSHClientManager } from "@/service/ssh/clientManager";
 import { ForwardService } from "@/service/ssh/forward/forwardService";
 import { TerminalService } from "@/service/ssh/terminal/terminalService";
 import { XtermTerminal } from "@/service/ssh/terminal/xtermTerminalService";
@@ -86,7 +86,7 @@ export class SSHConnectionNode extends Node {
     public newFile(): any {
         vscode.window.showInputBox().then(async input => {
             if (input) {
-                const { sftp } = await ClientManager.getSSH(this.sshConfig)
+                const { sftp } = await SSHClientManager.getSSH(this.sshConfig)
                 const tempPath = await FileManager.record("temp/" + input, "", FileModel.WRITE);
                 const targetPath = this.fullPath + "/" + input;
                 sftp.fastPut(tempPath, targetPath, err => {
@@ -105,7 +105,7 @@ export class SSHConnectionNode extends Node {
     public newFolder(): any {
         vscode.window.showInputBox().then(async input => {
             if (input) {
-                const { sftp } = await ClientManager.getSSH(this.sshConfig)
+                const { sftp } = await SSHClientManager.getSSH(this.sshConfig)
                 sftp.mkdir(this.fullPath + "/" + input, err => {
                     if (err) {
                         vscode.window.showErrorMessage(err.message)
@@ -123,7 +123,7 @@ export class SSHConnectionNode extends Node {
         vscode.window.showOpenDialog({ canSelectFiles: true, canSelectMany: false, canSelectFolders: false, openLabel: "Select Upload Path" })
             .then(async uri => {
                 if (uri) {
-                    const { sftp } = await ClientManager.getSSH(this.sshConfig)
+                    const { sftp } = await SSHClientManager.getSSH(this.sshConfig)
                     const targetPath = uri[0].fsPath;
 
                     vscode.window.withProgress({
@@ -201,7 +201,7 @@ export class SSHConnectionNode extends Node {
 
     delete(): any {
         Util.confirm("Are you wang to delete this folder?", async () => {
-            const { sftp } = await ClientManager.getSSH(this.sshConfig)
+            const { sftp } = await SSHClientManager.getSSH(this.sshConfig)
             sftp.rmdir(this.fullPath, (err) => {
                 if (err) {
                     vscode.window.showErrorMessage(err.message)
@@ -224,7 +224,7 @@ export class SSHConnectionNode extends Node {
 
         return new Promise(async (resolve) => {
             try {
-                const ssh = await ClientManager.getSSH(this.sshConfig)
+                const ssh = await SSHClientManager.getSSH(this.sshConfig)
                 const ftpRoot=this.sshConfig.ftpRoot?this.sshConfig.ftpRoot+"/":"/";
                 ssh.sftp.readdir(this.file ? this.parentName + this.name : ftpRoot, (err, fileList) => {
                     if (err) {

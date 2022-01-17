@@ -41,7 +41,7 @@ export class ClickHouseConnection extends IConnection {
       callback = values;
     }
 
-    sql=sql.replace(/;\s*$/,'')
+    sql = sql.replace(/;\s*$/, '')
     const event = new EventEmitter();
     let totalRows = 0;
     const stream = this.client.query(sql, (err, result) => {
@@ -102,8 +102,8 @@ export class ClickHouseConnection extends IConnection {
     this.client.ping((error, result) => {
       if (!error) {
         this.end();
-        callback(null);
       }
+      callback(error);
     });
 
     // stream.on("data", (row) => {
