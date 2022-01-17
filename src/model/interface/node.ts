@@ -26,6 +26,8 @@ export interface SwitchOpt {
 
 export abstract class Node extends vscode.TreeItem implements CopyAble {
 
+    protected static versionMap = {}
+
     public host: string;
     public port: number;
     public user: string;

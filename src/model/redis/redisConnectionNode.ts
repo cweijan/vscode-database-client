@@ -1,3 +1,4 @@
+import { Console } from "@/common/Console";
 import { ConfigKey, Constants, ModelType } from "@/common/constants";
 import { Global } from "@/common/global";
 import { RedisDBMeta } from "@/common/typeDef";
@@ -5,6 +6,7 @@ import { Util } from "@/common/util";
 import { ViewManager } from "@/common/viewManager";
 import { CommandKey, Node } from "@/model/interface/node";
 import { NodeUtil } from "@/model/nodeUtil";
+import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { Cluster, Redis } from "ioredis";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -31,6 +33,11 @@ export class RedisConnectionNode extends RedisBaseNode {
             this.description = (this.description || '') + " closed"
             return;
         }
+        const version = RedisConnectionNode.versionMap[this.key]
+        if (version) {
+            this.description = (this.description || '') + " " + version
+        }
+        this.getVerison()
     }
 
     async getChildren(): Promise<RedisBaseNode[]> {
@@ -87,6 +94,17 @@ export class RedisConnectionNode extends RedisBaseNode {
                     handler.panel.dispose()
                 })
             }
+        })
+    }
+
+    async getVerison() {
+        if (RedisConnectionNode.versionMap[this.key]) return;
+        const client = await this.getClient()
+        client.info('Server').then(info => {
+            const version = info.match(/redis_version:(.+)/)[1]
+            this.description = " " + version;
+            RedisConnectionNode.versionMap[this.key] = version
+            DbTreeDataProvider.refresh(this)
         })
     }
 

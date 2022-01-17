@@ -111,6 +111,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
      */
     public static refresh(element?: Node): void {
         for (const instance of this.instances) {
+            if (element && element.connectionKey != instance.connectionKey) continue;
             instance._onDidChangeTreeData.fire(element);
         }
     }

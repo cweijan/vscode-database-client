@@ -16,6 +16,9 @@ export class RedisConnection extends IConnection {
             connectTimeout: node.connectTimeout || 5000,
             db: node.database as any as number,
             family: 4,
+            reconnectOnError() {
+                return false;
+            },
         } as IoRedis.RedisOptions;
         if (node.useSSL) {
             config.tls = {
@@ -50,19 +53,19 @@ export class RedisConnection extends IConnection {
         let occurError = false;
         this.client.on('error', err => {
             if (occurError) return;
-            occurError=true;
+            occurError = true;
             callback(err)
         })
         setTimeout(() => {
             if (occurError) return;
-            occurError=true;
+            occurError = true;
             callback(new Error("Connect to redis server time out."))
         }, this.node.connectTimeout || 5000);
-        this.client.ping().then((err) => {
+        this.client.ping((err) => {
             if (occurError) return;
-            occurError=true;
-            callback(err ? new Error(err) : null)
-        }).catch(callback)
+            occurError = true;
+            callback(err)
+        })
     }
     beginTransaction(callback: (err: Error) => void): void {
     }

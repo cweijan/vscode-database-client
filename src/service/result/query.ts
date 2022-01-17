@@ -200,9 +200,6 @@ export class QueryPage {
         switch (resourceRoot) {
             case "file":
                 return html;
-            case "backup":
-                return html.replace("../webview/js/query.js", `https://cdn.jsdelivr.net/npm/vscode-mysql-client2@${Constants.CDN_VERSION}/out/webview/js/query.js`)
-                    .replace("../webview/js/vendor.js", `https://cdn.jsdelivr.net/npm/vscode-mysql-client2@${Constants.CDN_VERSION}/out/webview/js/vendor.js`);
             case "internalServer":
             default:
                 //  remote can not access.

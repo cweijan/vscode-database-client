@@ -27,7 +27,7 @@ export class ResourceServer {
                     const path = this.resPath + req.url;
                     res.end((fs.existsSync(path) && fs.statSync(path).isFile()) ? fs.readFileSync(path) : "404")
                 }).listen(port, "127.0.0.1",()=>{
-                    console.debug(`Start Internal Server, port is ${port}`)
+                    // console.debug(`Start Internal Server, port is ${port}`)
                     this.port = port;
                     res(port)
                 })

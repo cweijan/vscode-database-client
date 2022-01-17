@@ -18,7 +18,6 @@ const extPackage=require("@/../package.json")
  */
 export class EsConnectionNode extends Node {
 
-    private static versionMap = {}
     public iconPath: string|ThemeIcon = path.join(Constants.RES_PATH, "icon/elasticsearch.svg");
     public contextValue: string = ModelType.ES_CONNECTION;
     constructor(readonly key: string, readonly parent: Node) {
@@ -45,12 +44,12 @@ export class EsConnectionNode extends Node {
             return;
         }
 
-        if (EsConnectionNode.versionMap[this.label]) {
-            this.description = EsConnectionNode.versionMap[this.label]
+        if (EsConnectionNode.versionMap[this.key]) {
+            this.description = EsConnectionNode.versionMap[this.key]
         } else {
             this.execute<any>('get /').then(res => {
                 this.description=res.version.number
-                EsConnectionNode.versionMap[this.label]=this.description
+                EsConnectionNode.versionMap[this.key]=this.description
                 DbTreeDataProvider.refresh(this)
             }).catch(err=>{
                 console.log(err)

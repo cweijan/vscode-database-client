@@ -981,7 +981,6 @@
 					"default": "internalServer",
 					"enum": [
 						"file",
-						"backup",
 						"internalServer"
 					],
 					"description": "Webview resource root, using file will create a lot of cache."
