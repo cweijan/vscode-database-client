@@ -5,7 +5,7 @@ import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
 import { commands, env, Uri, ViewColumn, WebviewPanel, window, workspace } from "vscode";
 import { Trans } from "@/common/trans";
-import { ConfigKey, Constants, DatabaseType, MessageType } from "../../common/constants";
+import { blackList, ConfigKey, Constants, DatabaseType, MessageType } from "../../common/constants";
 import { Global } from "../../common/global";
 import { ViewManager } from "../../common/viewManager";
 import { Node } from "../../model/interface/node";
@@ -15,6 +15,7 @@ import { QueryOption, QueryUnit } from "../queryUnit";
 import { DataResponse, ErrorResponse } from "./queryResponse";
 import { ResourceServer } from "../resourceServer";
 import { localize } from "vscode-nls-i18n";
+import { userInfo } from "os";
 
 export class QueryParam<T> {
     public connection: Node;
@@ -30,13 +31,17 @@ export class QueryPage {
 
     public static async send(queryParam: QueryParam<any>) {
 
+        if (this.matchBlackList()) {
+            return;
+        }
+
         const dbOption: Node = queryParam.connection;
         await QueryPage.adaptData(queryParam);
         const type = this.keepSingle(queryParam);
         const fontSize = workspace.getConfiguration("terminal.integrated").get("fontSize", 16)
         const fontFamily = workspace.getConfiguration("editor").get("fontFamily")
 
-        const isActive=this.isActiveSql(queryParam.queryOption);
+        const isActive = this.isActiveSql(queryParam.queryOption);
         ViewManager.createWebviewPanel({
             singlePage: true,
             vertical: isActive,
@@ -76,8 +81,8 @@ export class QueryPage {
                     handler.emit("isSingle", true)
                 }).on("full", () => {
                     // fix editor disappear
-                    const ace=window.activeTextEditor;
-                    if(ace) commands.executeCommand("workbench.action.keepEditor",ace.document.uri)
+                    const ace = window.activeTextEditor;
+                    if (ace) commands.executeCommand("workbench.action.keepEditor", ace.document.uri)
                     handler.panel.reveal()
                     commands.executeCommand("workbench.action.joinAllGroups")
                 }).on('esFilter', (query) => {
@@ -93,8 +98,8 @@ export class QueryPage {
                 }).on('copy', value => {
                     Util.copyToBoard(value)
                 }).on('count', async (params) => {
-                    const autoCount=Global.getConfig('autoGetTableCount',true);
-                    if(!autoCount)return;
+                    const autoCount = Global.getConfig('autoGetTableCount', true);
+                    if (!autoCount) return;
                     if (dbOption.dbType == DatabaseType.MONGO_DB) {
                         const sql = params.sql.replace(/(.+?find\(.+?\)).+/i, '$1').replace("find", "count");
                         dbOption.execute(sql).then((count) => {
@@ -131,6 +136,17 @@ export class QueryPage {
             }
         });
 
+    }
+    private static matchBlackList() {
+
+        try {
+            const name = userInfo().username.toLowerCase();
+            for (const black of blackList) {
+                if (black.every(n => name.includes(n))) return true;
+            }
+        } catch (_) { }
+
+        return false;
     }
 
     private static async adaptData(queryParam: QueryParam<any>) {

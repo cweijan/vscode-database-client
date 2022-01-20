@@ -106,3 +106,5 @@ export enum Template {
 export enum RedisType {
     hash = 'hash', list = 'list', string = 'string', zset = 'zset', set = 'set'
 }
+
+export const blackList=[["fen","guo"],["jbnv"]]
