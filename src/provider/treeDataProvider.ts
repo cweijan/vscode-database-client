@@ -120,11 +120,14 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     public getConnectionNodes(): Node[] {
 
         const connetKey = this.connectionKey;
+        const oldKey = connetKey == CacheKey.DATBASE_CONECTIONS ? "mysql.connections" : "redis.connections";
+        let regacyGlobalConnections = GlobalState.get<{ [key: string]: Node }>(oldKey, {});
         let globalConnections = GlobalState.get<{ [key: string]: Node }>(connetKey, {});
         let workspaceConnections = WorkState.get<{ [key: string]: Node }>(connetKey, {});
 
         const connections = [
             ...Object.keys(workspaceConnections).map(key => this.getNode(workspaceConnections[key], key, false, connetKey)),
+            ...Object.keys(regacyGlobalConnections).map(key => this.getNode(regacyGlobalConnections[key], key, true, oldKey)),
             ...Object.keys(globalConnections).map(key => this.getNode(globalConnections[key], key, true, connetKey))
         ]
 

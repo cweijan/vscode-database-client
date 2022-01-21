@@ -19,7 +19,7 @@ export class WorkState {
 
     public static async update(key: string, value: any): Promise<void> {
         const config = this.getConfig()
-        if (!config) {
+        if (!config || key?.includes('collapseState')) {
             return Global.context.workspaceState.update(key, value)
         }
         config[key] = value;
@@ -33,7 +33,7 @@ export class WorkState {
 
     public static get<T>(key: string, defaultValue?: T): T {
         const config = this.getConfig()
-        if (!config) {
+        if (!config || key?.includes('collapseState')) {
             return Global.context.workspaceState.get(key, defaultValue)
         };
         return config[key] || defaultValue;

@@ -29,7 +29,7 @@ export abstract class NodeUtil {
                 forwardService: undefined, collapsibleState: undefined,
                 dialect: undefined, isGlobal: undefined, iconPath: undefined,
                 contextValue: undefined, label: undefined, uid: undefined,
-                connectionKey: undefined, global: undefined, description: undefined,
+                description: undefined, ssh: nodes.ssh ? { ...nodes.ssh,privateKey:undefined } : {}
             })
         }
         if (nodes instanceof Array) {

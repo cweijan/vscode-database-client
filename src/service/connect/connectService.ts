@@ -120,6 +120,7 @@ export class ConnectService {
     }
 
     static listenConfig(): Disposable {
+        const workConfigPath = join(vscode.workspace.rootPath, '.vscode', 'datbase-client.json')
         const configPath = resolve(FileManager.getPath("config.json"))
         workspace.onDidCloseTextDocument(e => {
             const changePath = resolve(e.uri.fsPath);
@@ -131,18 +132,25 @@ export class ConnectService {
             const changePath = resolve(e.uri.fsPath);
             if (changePath == configPath) {
                 this.saveConfig(configPath)
+            } else if (changePath == workConfigPath) {
+                this.saveConfig(workConfigPath, true)
             }
         });
     }
 
-    private static async saveConfig(path: string) {
+    private static async saveConfig(path: string, isWork?: boolean) {
         const configContent = readFileSync(path, { encoding: 'utf8' })
         try {
             const connectonConfig: ConnnetionConfig = JSON.parse(configContent)
-            await GlobalState.update(CacheKey.DATBASE_CONECTIONS, connectonConfig.database);
-            await GlobalState.update(CacheKey.NOSQL_CONNECTION, connectonConfig.nosql);
+            if (isWork) {
+                await WorkState.update(CacheKey.DATBASE_CONECTIONS, connectonConfig[CacheKey.DATBASE_CONECTIONS]);
+                await WorkState.update(CacheKey.NOSQL_CONNECTION, connectonConfig[CacheKey.NOSQL_CONNECTION]);
+            } else {
+                await GlobalState.update(CacheKey.DATBASE_CONECTIONS, connectonConfig.database);
+                await GlobalState.update(CacheKey.NOSQL_CONNECTION, connectonConfig.nosql);
+                unlinkSync(path)
+            }
             DbTreeDataProvider.refresh();
-            unlinkSync(path)
         } catch (error) {
             window.showErrorMessage("Parse connect config fail!")
         }
