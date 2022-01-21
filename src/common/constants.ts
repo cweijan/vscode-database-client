@@ -1,11 +1,12 @@
 import * as vscode from "vscode";
 import * as path from "path";
 
-const extName=require("@/../package.json")
+import extName from "@/../package.json";
 
 export class Constants {
     public static CONFIG_PREFIX = "database-client"
     public static CDN_VERSION = "4.2.1"
+    public static EXT_VERSION = extName.version
     public static RES_PATH = path.join(vscode.extensions.getExtension(`${extName.publisher}.${extName.name}`).extensionPath, "resources");
 }
 
