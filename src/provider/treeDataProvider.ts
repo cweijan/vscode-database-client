@@ -72,7 +72,6 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
     public async addConnection(node: Node) {
 
         const newKey = this.getKeyByNode(node)
-        node.context = node.global ? this.context.globalState : this.context.workspaceState
 
         const isGlobal = (node as any).isGlobal;
         const configNotChange = newKey == node.connectionKey && isGlobal == node.global
@@ -83,9 +82,7 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
 
         // config has change, remove old connection.
         if (isGlobal != null) {
-            node.context = isGlobal ? this.context.globalState : this.context.workspaceState
-            await node.indent({ command: CommandKey.delete, connectionKey: node.connectionKey, refresh: false })
-            node.context = node.global ? this.context.globalState : this.context.workspaceState
+            await node.indent({ command: CommandKey.delete, connectionKey: node.connectionKey, refresh: false }, isGlobal)
         }
 
         node.connectionKey = newKey
@@ -154,7 +151,6 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
         node.connectionKey = connectionKey;
         node.provider = this
         node.global = global;
-        node.context = node.global ? this.context.globalState : this.context.workspaceState;
         if (!node.global) {
             node.description = `${node.description || ''} workspace`
         }

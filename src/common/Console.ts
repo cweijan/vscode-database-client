@@ -1,4 +1,4 @@
-"user strict";
+    "user strict";
 import * as vscode from "vscode";
 import format = require('date-format');
 

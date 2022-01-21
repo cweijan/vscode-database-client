@@ -8,8 +8,8 @@ export abstract class NodeUtil {
         if (!node) {
             return null;
         }
-        if(isNaN(node.port)){
-            node.port=null;
+        if (isNaN(node.port)) {
+            node.port = null;
         }
         if (node && !(node instanceof Node)) {
             node.__proto__ = Node.prototype
@@ -24,7 +24,13 @@ export abstract class NodeUtil {
         if (!nodes) return null;
         // if is node instance
         if (nodes instanceof Node || nodes.uid) {
-            return NodeUtil.of( { ...nodes, parent: null, provider: null, context: null, command: null,forwardService:null })
+            return NodeUtil.of({
+                ...nodes, parent: undefined, provider: undefined, command: undefined,
+                forwardService: undefined, collapsibleState: undefined,
+                dialect: undefined, isGlobal: undefined, iconPath: undefined,
+                contextValue: undefined, label: undefined, uid: undefined,
+                connectionKey: undefined, global: undefined, description: undefined,
+            })
         }
         if (nodes instanceof Array) {
             return nodes.map(this.removeParent)

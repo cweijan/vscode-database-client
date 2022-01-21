@@ -1,6 +1,6 @@
 import { Console } from "@/common/Console";
 import { DatabaseType, ModelType } from "@/common/constants";
-import { getKey } from "@/common/state";
+import { getKey, GlobalState, WorkState } from "@/common/state";
 import { Util } from "@/common/util";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { getSqliteBinariesPath } from "@/service/connect/sqlite/sqliteCommandValidation";
@@ -65,7 +65,6 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public uid: string;
     public key: string;
     public provider?: DbTreeDataProvider;
-    public context?: Memento;
     public parent?: Node;
 
     public useSSL?: boolean;
@@ -158,7 +157,6 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         if (!this.database) this.database = source.database
         if (!this.schema) this.schema = source.schema
         if (!this.provider) this.provider = source.provider
-        if (!this.context) this.context = source.context
         // init dialect
         if (!this.dialect && this.dbType != DatabaseType.REDIS) {
             this.dialect = ServiceManager.getDialect(this.dbType)
@@ -182,11 +180,13 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.provider.reload(this)
     }
 
-    public async indent(command: IndentCommand) {
+    public async indent(command: IndentCommand, isGlobal?: Boolean) {
 
         try {
+            if (isGlobal == undefined) isGlobal = this.global;
             const connectionKey = getKey(command.connectionKey || this.connectionKey);
-            const connections = this.context.get<{ [key: string]: Node }>(connectionKey, {});
+            const connections = isGlobal ? GlobalState.get<{ [key: string]: Node }>(connectionKey, {})
+                : WorkState.get<{ [key: string]: Node }>(connectionKey, {});
             const key = this.key
 
             switch (command.command) {
@@ -204,8 +204,11 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
                     break;
             }
 
-
-            await this.context.update(connectionKey, connections);
+            if (isGlobal) {
+                await GlobalState.update(connectionKey, connections)
+            }else{
+                await WorkState.update(connectionKey, connections)
+            }
 
             if (command.refresh !== false) {
                 DbTreeDataProvider.refresh();
