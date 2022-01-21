@@ -3,7 +3,7 @@
     <template v-if="type=='date'">
       <el-date-picker value-format="yyyy-MM-dd" :value="value" @input="sync"></el-date-picker>
     </template>
-    <template v-else-if="type=='jsonb'">
+    <template v-else-if="value && type=='jsonb'">
       <el-input :value="JSON.stringify(value)" @input="sync"></el-input>
     </template>
     <template v-else-if="type=='time'">
