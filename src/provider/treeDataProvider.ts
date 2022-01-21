@@ -5,6 +5,7 @@ import { FTPConnectionNode } from "@/model/ftp/ftpConnectionNode";
 import { InfoNode } from "@/model/other/infoNode";
 import { RedisConnectionNode } from "@/model/redis/redisConnectionNode";
 import { SSHConnectionNode } from "@/model/ssh/sshConnectionNode";
+import SQLite from "@/service/connect/sqlite";
 import * as vscode from "vscode";
 import { CacheKey, DatabaseType } from "../common/constants";
 import { ConnectionNode } from "../model/database/connectionNode";
@@ -168,47 +169,60 @@ export class DbTreeDataProvider implements vscode.TreeDataProvider<Node> {
             return;
         }
 
-        const dbIdMap: { [key: string]: Node } = {};
-        const connectionNodes = this.getConnectionNodes()
-        for (const connectNode of connectionNodes) {
-            if (connectNode.disable || connectNode instanceof InfoNode) {
-                continue;
-            }
-            if (connectNode.dbType == DatabaseType.SQLITE) {
-                dbIdMap[connectNode.label] = connectNode;
-                continue;
-            }
-
-            if (connectNode.dbType == DatabaseType.MSSQL || connectNode.dbType == DatabaseType.PG) {
-                for (const catalogNode of (await connectNode.getChildren())) {
-                    if (catalogNode instanceof UserGroup) continue;
-                    for (const schemaNode of (await catalogNode.getChildren())) {
-                        dbIdMap[`${connectNode.label}#${schemaNode.database}#${schemaNode.schema}`] = schemaNode;
-                    }
-                }
-                continue;
-            }
-
-            for (const schemaNode of (await connectNode.getChildren())) {
-                if (schemaNode instanceof UserGroup || schemaNode instanceof CatalogNode) continue;
-                dbIdMap[`${connectNode.label}#${schemaNode.schema}`] = schemaNode;
-            }
-
-
-        }
-
-        const dbIdList = Object.keys(dbIdMap)
-        if (dbIdList.length == 0) {
+        const connectNode = await this.pickConnectNode(node);
+        if (!connectNode) return;
+        if (connectNode instanceof SQLite) {
+            ConnectionManager.changeActive(connectNode)
             return;
         }
 
-        vscode.window.showQuickPick(dbIdList).then(async (dbId) => {
-            if (dbId) {
-                const dbNode = dbIdMap[dbId];
-                ConnectionManager.changeActive(dbNode)
-            }
-        })
+        const dbMap = await this.getDbMap(connectNode);
+        const dbList = Object.keys(dbMap)
+        if (dbList.length == 0) {
+            ConnectionManager.changeActive(node)
+        } else {
+            vscode.window.showQuickPick(dbList).then(async (dbName) => {
+                if (dbName) {
+                    const dbNode = dbMap[dbName];
+                    ConnectionManager.changeActive(dbNode)
+                }
+            })
+        }
 
+    }
+
+    private async pickConnectNode(node: Node): Promise<Node> {
+        const connectionMap: { [key: string]: Node } = {};
+        const connectionLabels: vscode.QuickPickItem[] = this.getConnectionNodes().filter(connectNode => !connectNode.disable && !(connectNode instanceof InfoNode)).map(node => {
+            connectionMap[node.label] = node;
+            return { label: node.label, description: node.dbType };
+        })
+        if (connectionLabels.length == 0) {
+            vscode.window.showErrorMessage("You need to create the connection first!")
+            return;
+        }
+
+        const connectId = await vscode.window.showQuickPick(connectionLabels)
+        if (!connectId) return;
+        return connectionMap[connectId.label];
+    }
+
+    private async getDbMap(node: Node): Promise<{ [key: string]: Node }> {
+        const dbMap: { [key: string]: Node } = {};
+        if (node.dbType == DatabaseType.MSSQL || node.dbType == DatabaseType.PG) {
+            for (const catalogNode of (await node.getChildren())) {
+                if (catalogNode instanceof UserGroup) continue;
+                for (const schemaNode of (await catalogNode.getChildren())) {
+                    dbMap[`${schemaNode.database}#${schemaNode.schema}`] = schemaNode;
+                }
+            }
+        }
+
+        for (const schemaNode of (await node.getChildren())) {
+            if (schemaNode instanceof UserGroup || schemaNode instanceof CatalogNode) continue;
+            dbMap[`${schemaNode.schema}`] = schemaNode;
+        }
+        return dbMap;
     }
 
 }
