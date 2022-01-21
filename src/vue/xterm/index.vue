@@ -184,8 +184,8 @@ html {
   display: block;
   width: calc(100% - 1 px);
   margin: 0 auto;
-  /* padding-top: 2px;
-    padding-left: 3px; */
+  padding-top: 5px;
+  padding-left: 10px;
   height: 95vh;
 }
 
