@@ -139,10 +139,8 @@ export class ConnectService {
         const configContent = readFileSync(path, { encoding: 'utf8' })
         try {
             const connectonConfig: ConnnetionConfig = JSON.parse(configContent)
-            await GlobalState.update(CacheKey.DATBASE_CONECTIONS, connectonConfig.database.global);
-            await WorkState.update(CacheKey.DATBASE_CONECTIONS, connectonConfig.database.workspace);
-            await GlobalState.update(CacheKey.NOSQL_CONNECTION, connectonConfig.nosql.global);
-            await WorkState.update(CacheKey.NOSQL_CONNECTION, connectonConfig.nosql.workspace);
+            await GlobalState.update(CacheKey.DATBASE_CONECTIONS, connectonConfig.database);
+            await GlobalState.update(CacheKey.NOSQL_CONNECTION, connectonConfig.nosql);
             DbTreeDataProvider.refresh();
             unlinkSync(path)
         } catch (error) {
@@ -153,14 +151,8 @@ export class ConnectService {
     public openConfig() {
 
         const connectonConfig: ConnnetionConfig = {
-            database: {
-                global: GlobalState.get(CacheKey.DATBASE_CONECTIONS),
-                workspace: WorkState.get(CacheKey.DATBASE_CONECTIONS),
-            },
-            nosql: {
-                global: GlobalState.get(CacheKey.NOSQL_CONNECTION),
-                workspace: WorkState.get(CacheKey.NOSQL_CONNECTION),
-            }
+            database: GlobalState.get(CacheKey.DATBASE_CONECTIONS),
+            nosql: GlobalState.get(CacheKey.NOSQL_CONNECTION)
         };
 
         FileManager.record("config.json", JSON.stringify(connectonConfig, this.trim, 2), FileModel.WRITE).then(filePath => {

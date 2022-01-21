@@ -1,11 +1,6 @@
 import { Node } from "@/model/interface/node";
 
 export class ConnnetionConfig {
-    database: ConnectionTarget;
-    nosql: ConnectionTarget;
-}
-
-export class ConnectionTarget {
-    global: { [key: string]: Node };
-    workspace: { [key: string]: Node };
+    database: { [key: string]: Node };
+    nosql: { [key: string]: Node };
 }
