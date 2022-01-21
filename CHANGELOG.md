@@ -1,5 +1,19 @@
 # CHANGELOG
 
+# 4.5.2 2021-1-21
+
+- Add more error tolerance when connecting.
+- Support show redis server version.
+- Redis string key view support responsive.
+- Fix join result causing the editor to disappear.
+- Support special sftp root path.
+- Remove ftp support.
+- Hide ssh passphrase.
+- SSH terminal add padding.
+- Fix sqlite show name error.
+- Fix sqlite complection fail.
+- Other bugs fix.
+
 # 4.5.0 2021-1-7
 
 - Support connect to clickhouse.
