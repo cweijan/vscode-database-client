@@ -252,7 +252,7 @@ export default {
         "Redis",
         "ElasticSearch",
         "SSH",
-        "FTP"
+        // "FTP"
       ],
       connect: {
         loading: false,
