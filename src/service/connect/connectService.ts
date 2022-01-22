@@ -120,7 +120,7 @@ export class ConnectService {
     }
 
     static listenConfig(): Disposable {
-        const workConfigPath = join(vscode.workspace.rootPath, '.vscode', 'datbase-client.json')
+        const workConfigPath = vscode.workspace.rootPath ? join(vscode.workspace.rootPath, '.vscode', 'datbase-client.json') : null
         const configPath = resolve(FileManager.getPath("config.json"))
         workspace.onDidCloseTextDocument(e => {
             const changePath = resolve(e.uri.fsPath);
