@@ -177,16 +177,17 @@ ${colDefList.join(",\n")}${pkList.length > 0 ? `,\n    PRIMARY KEY(${pkList.join
     }
 
     public async openInNew() {
-        const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
-        const sql = this.dialect.buildPageSql(this.wrap(this.schema), this.wrap(this.table), pageSize);
-        QueryUnit.runQuery(sql, this, { viewId: new Date().getTime() });
-        ConnectionManager.changeActive(this)
+        this.openTable(new Date().getTime())
     }
 
-    public async openTable() {
+    public async openTable(viewId?: any) {
         const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
-        const sql = this.dialect.buildPageSql(this.wrap(this.schema), this.wrap(this.table), pageSize);
-        QueryUnit.runQuery(sql, this);
+        let sql = this.dialect.buildPageSql(this.wrap(this.schema), this.wrap(this.table), pageSize);
+        if (sql.includes("*")) {
+            const columns = (await this.getChildren()).map(c => c.label)
+            sql = sql.replace('*', columns.join(","))
+        }
+        QueryUnit.runQuery(sql, this, { viewId });
         ConnectionManager.changeActive(this)
     }
 
@@ -220,7 +221,8 @@ ${colDefList.join(",\n")}${pkList.length > 0 ? `,\n    PRIMARY KEY(${pkList.join
     }
 
     public async selectSqlTemplate() {
-        const sql = `SELECT * FROM ${Util.wrap(this.table)};`;
+        const columns = (await this.getChildren()).map(c => c.label)
+        const sql = `SELECT ${columns.join(",")} FROM ${Util.wrap(this.table)};`;
         QueryUnit.showSQLTextDocument(this, sql, `${this.schema}.sql`, FileModel.APPEND)
     }
 
