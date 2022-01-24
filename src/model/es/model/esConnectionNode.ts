@@ -73,7 +73,7 @@ export class EsConnectionNode extends Node {
     }
 
     public copyName() {
-        Util.copyToBoard(this.host)
+        Util.copyToBoard(this.usingSSH ? this.ssh.host : this.host)
     }
 
     public async deleteConnection(context: ExtensionContext) {
