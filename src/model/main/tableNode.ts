@@ -1,3 +1,4 @@
+import { FileModel } from "@/common/filesManager";
 import { ColumnMeta, TableMeta } from "@/common/typeDef";
 import { Hanlder, ViewManager } from "@/common/viewManager";
 import * as vscode from "vscode";
@@ -219,9 +220,8 @@ ${colDefList.join(",\n")}${pkList.length > 0 ? `,\n    PRIMARY KEY(${pkList.join
     }
 
     public async selectSqlTemplate() {
-        const sql = `SELECT * FROM ${Util.wrap(this.table)}`;
-        QueryUnit.showSQLTextDocument(this, sql, Template.table);
-
+        const sql = `SELECT * FROM ${Util.wrap(this.table)};`;
+        QueryUnit.showSQLTextDocument(this, sql, `${this.schema}.sql`, FileModel.APPEND)
     }
 
     public deleteSqlTemplate(): any {

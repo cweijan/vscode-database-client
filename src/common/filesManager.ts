@@ -12,7 +12,7 @@ export class FileManager {
 
     public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql", fileMode: FileModel = FileModel.WRITE): Promise<vscode.TextEditor> {
 
-        const document = await vscode.workspace.openTextDocument(await FileManager.record(`${node.uid}/${template}`, sql, fileMode));
+        const document = await vscode.workspace.openTextDocument(await FileManager.record(`${node.getUid({ withSchema: true })}/${template}`, sql, fileMode));
         return await vscode.window.showTextDocument(document);
     }
 
@@ -36,7 +36,7 @@ export class FileManager {
     public static record(fileName: string, content: string, model?: FileModel): Promise<string> {
         if (!this.storagePath) { vscode.window.showErrorMessage("FileManager is not init!") }
         if (!fileName) { return; }
-        fileName=fileName.replace(/[\:\*\?"\<\>]*/g,"")
+        fileName = fileName.replace(/[\:\*\?"\<\>]*/g, "")
         return new Promise((resolve) => {
             const recordPath = `${this.storagePath}/${fileName}`;
             this.check(path.resolve(recordPath, '..'))
@@ -46,13 +46,16 @@ export class FileManager {
             if (model == FileModel.WRITE) {
                 fs.writeFileSync(recordPath, `${content}`, { encoding: 'utf8' });
             } else {
-                fs.appendFileSync(recordPath, `${content}`, { encoding: 'utf8' });
+                if (fs.existsSync(recordPath) && fs.statSync(recordPath).size > 0) {
+                    content = `\n\n${content}`;
+                }
+                fs.appendFileSync(recordPath, content, { encoding: 'utf8' });
             }
             resolve(recordPath)
         });
     }
 
-    public static getPath(fileName:string){
+    public static getPath(fileName: string) {
         return `${this.storagePath}/${fileName}`;
     }
 
