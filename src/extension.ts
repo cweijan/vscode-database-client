@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CodeCommand, DatabaseType, Template } from "./common/constants";
+import { CodeCommand, DatabaseType, ModelType, Template } from "./common/constants";
 import { ConnectionNode } from "./model/database/connectionNode";
 import { SchemaNode } from "./model/database/schemaNode";
 import { UserGroup } from "./model/database/userGroup";
@@ -21,7 +21,7 @@ import { Console } from "./common/Console";
 // Don't change last order, it will occur circular reference
 import { ServiceManager } from "./service/serviceManager";
 import { QueryUnit } from "./service/queryUnit";
-import { FileManager } from "./common/filesManager";
+import { FileManager, FileModel } from "./common/filesManager";
 import { ConnectionManager } from "./service/connectionManager";
 import { QueryNode } from "./model/query/queryNode";
 import { QueryGroup } from "./model/query/queryGroup";
@@ -41,7 +41,7 @@ import { FTPFileNode } from "./model/ftp/ftpFileNode";
 import { HistoryNode } from "./provider/history/historyNode";
 import { ConnectService } from "./service/connect/connectService";
 import { RemainNode } from "./model/redis/remainNode";
-import { init} from "vscode-nls-i18n";
+import { init } from "vscode-nls-i18n";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -201,7 +201,11 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.query.switch": async (node: SchemaNode | EsConnectionNode | ESIndexNode) => {
                     if (node) {
                         if (node.dbType == DatabaseType.MONGO_DB) {
-                            QueryUnit.showSQLTextDocument(node, `db('${node.label}').collection('').find({}).limit(100).toArray()`, Template.table);
+                            if (node.contextValue == ModelType.MONGO_TABLE) {
+                                QueryUnit.showSQLTextDocument(node, `db('${node.schema}').collection('${node.label}').find({}).limit(100).toArray();`, Template.table, FileModel.APPEND);
+                            } else {
+                                QueryUnit.showSQLTextDocument(node, `db('${node.label}').collection('').find({}).limit(100).toArray();`, Template.table, FileModel.APPEND);
+                            }
                         } else {
                             await node.newQuery();
                         }

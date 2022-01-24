@@ -647,7 +647,7 @@
 				},
 				{
 					"command": "mysql.query.switch",
-					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|database|esConnection|esIndex)$/",
+					"when": "view =~ /cweijan.+?ql/ && viewItem =~ /^(catalog|database|esConnection|esIndex|mongoTable)$/",
 					"group": "inline@5"
 				},
 				{

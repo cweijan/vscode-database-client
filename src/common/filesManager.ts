@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as vscode from "vscode";
 import * as fs from 'fs';
 import { Node } from '@/model/interface/node';
+import { DatabaseType } from './constants';
 
 export class FileManager {
 
@@ -12,7 +13,8 @@ export class FileManager {
 
     public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql", fileMode: FileModel = FileModel.WRITE): Promise<vscode.TextEditor> {
 
-        const document = await vscode.workspace.openTextDocument(await FileManager.record(`${node.getUid({ withSchema: true })}/${template}`, sql, fileMode));
+        const withSchema = node.dbType == DatabaseType.MSSQL || node.dbType == DatabaseType.PG;
+        const document = await vscode.workspace.openTextDocument(await FileManager.record(`${node.getUid({ withSchema })}/${template}`, sql, fileMode));
         return await vscode.window.showTextDocument(document);
     }
 
