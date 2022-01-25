@@ -1,6 +1,6 @@
 # CHANGELOG
 
-# 4.5.2 2021-1-21
+# 4.5.2 2022-1-21
 
 - Add more error tolerance when connecting.
 - Support show redis server version.
@@ -14,7 +14,7 @@
 - Fix sqlite complection fail.
 - Other bugs fix.
 
-# 4.5.0 2021-1-7
+# 4.5.0 2022-1-7
 
 - Support connect to clickhouse.
 - Show results in vertical direction.
