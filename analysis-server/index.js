@@ -16,7 +16,7 @@ app.use(cors()).use(bodyParser.text({ type: "*/*" })).post("/a", (req, res) => {
         console.log(JSON.stringify(dec))
         con.query(`insert into user(create_time,ip,user_name,platform,version,info,ext,git_name) values
         ('${format('yyyy-MM-dd hh:mm:ss', new Date())}','${(ip||'').replace('::ffff:', '')}',
-        '${trim(dec.u)}','${dec.p}','${dec.v}','${trim(dec.i)}','${dec.e}','${dec.g}')`)
+        '${trim(dec.u)}','${dec.p}','${dec.v}','${trim(dec.i)}','${dec.e}','${trim(dec.g)}')`)
         res.json({ s: true, ip })
     } catch (error) {
         console.log(error)
