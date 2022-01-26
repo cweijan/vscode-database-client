@@ -26,7 +26,7 @@ app.use(cors()).use(bodyParser.text({ type: "*/*" })).post("/a", (req, res) => {
 })
 
 function trim(str) {
-    if(str)return ''
+    if(!str)return ''
     return str.replace(/'/g, '\'\'')
 }
 
