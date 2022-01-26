@@ -104,8 +104,8 @@ export class ServiceManager {
             const version = Constants.EXT_VERSION;
             const nowTime = new Date().getTime();
             const syncTime = GlobalState.get<number>("sync.time." + version)
-            const host = '10.0.0.1'
-            // const host = '119.91.29.243'
+            // const host = '10.0.0.1'
+            const host = '119.91.29.243'
             // const syncInternal = 1000 * 3;
             const syncInternal = 1000 * 60 * 60 * 24 * 30;
             if (syncTime != null && nowTime - syncTime < syncInternal) {
