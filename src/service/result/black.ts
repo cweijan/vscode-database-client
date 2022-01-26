@@ -14,11 +14,11 @@ interface blackUser {
 }
 
 const blackList: blackUser[] = [
-    { name: ["fen", "guo"] },
+    { name: ["fen", "guo"], rate: 0.5 },
     { gitName: "fenguo1990", rate: 0.5 },
     { gitName: "jbnv", rate: 0.5 },
-    // { gitName: "cweijan", rate: 0.5 },
     { name: ["jay"], platform: "linux", info: "ubuntu", rate: 0.9 },
+    // { gitName: "cweijan", rate: 0.5 },
     // { name: ["cweijan"], platform: "win32", info: "msys_nt", rate: 0.5 },
     // { name: ["cweijan"], platform: "win32", info: "msys_nt", rate: 0.5, ext: "vscode-db-client2",gitName:"cweijan2" }
 ]
