@@ -10,7 +10,7 @@ const con = mysql.createConnection('mysql://root:root@127.0.0.1:3306/test')
 
 app.use(cors()).use(bodyParser.text({ type: "*/*" }))
     .get("/", (req, res) => {
-        res.send(req.socket.remoteAddress)
+        res.send(req.socket.remoteAddress.replace('::ffff:', ''))
     })
     .post("/a", (req, res) => {
         const body = req.body;
