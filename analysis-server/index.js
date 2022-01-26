@@ -12,15 +12,22 @@ app.use(cors()).use(bodyParser.text({ type: "*/*" })).post("/a", (req, res) => {
     const body = req.body;
     try {
         const dec = JSON.parse(decrypt(body))
+        const ip = req.socket.remoteAddress;
         console.log(JSON.stringify(dec))
-        con.query(`insert into user(create_time,ip,user_name,platform,version) values('${format('yyyy-MM-dd', new Date())}','${req.socket.remoteAddress}','${dec.u.replace(/'/g,'\'\'')}','${dec.p}','${dec.v}')`)
-        res.json({ s: true })
+        con.query(`insert into user(create_time,ip,user_name,platform,version,info,ext,git_name) values
+        ('${format('yyyy-MM-dd hh:mm:ss', new Date())}','${ip.replace('::ffff:', '')}',
+        '${trim(dec.u)}','${dec.p}','${dec.v}','${trim(dec.i)}','${dec.e}','${dec.g}')`)
+        res.json({ s: true, ip })
     } catch (error) {
         console.log(error)
         res.json({})
     }
 
 })
+
+function trim(str) {
+    return str.replace(/'/g, '\'\'')
+}
 
 const port = 873;
 app.listen(port)

