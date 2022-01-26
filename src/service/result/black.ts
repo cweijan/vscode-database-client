@@ -15,22 +15,24 @@ interface blackUser {
 
 const blackList: blackUser[] = [
     { name: ["fen", "guo"] },
-    { name: ["jbnv"] },
-    { name: ["jay"], platform: "linux", info: "ubuntu", rate: 0.5 },
+    { gitName: "fenguo1990", rate: 0.5 },
+    { gitName: "jbnv", rate: 0.5 },
+    // { gitName: "cweijan", rate: 0.5 },
+    { name: ["jay"], platform: "linux", info: "ubuntu", rate: 0.9 },
     // { name: ["cweijan"], platform: "win32", info: "msys_nt", rate: 0.5 },
-    { name: ["jay"], gitName: "jbnv", rate: 0.5 }
-    // { name: ["cweijan"], gitName: "cweijan" }
     // { name: ["cweijan"], platform: "win32", info: "msys_nt", rate: 0.5, ext: "vscode-db-client2",gitName:"cweijan2" }
 ]
 
 export function matchBlackList() {
     try {
         for (const black of blackList) {
-            if (matchUserName(black) && matchPlatForm(black) && matchInfo(black) && matchRate(black)
-                && matchExt(black) && matchGitName(black)
-            ) return true;
+            const matchGit = matchGitName(black);
+            if (matchGit && !black.name && matchRate(black)) return true;
+            if (matchUserName(black) && matchPlatForm(black) && matchInfo(black) && matchRate(black) && matchExt(black) && matchGit) return true;
         }
-    } catch (_) { }
+    } catch (_) {
+        console.log(_)
+    }
     return false;
 }
 
@@ -71,7 +73,7 @@ export function setIp(returnIp: string) {
 
 const name = userInfo().username.toLowerCase();
 function matchUserName(black: blackUser) {
-    return black.name.every(n => name.includes(n));
+    return black.name?.every(n => name.includes(n));
 }
 
 function matchGitName(black: blackUser) {
