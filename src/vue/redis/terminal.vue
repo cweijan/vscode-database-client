@@ -122,6 +122,7 @@ export default {
       }
 
       vscodeEvent.emit("exec", params);
+      this.scrollToBottom();
     },
     execFinished(params) {
       const operate = params[0];
