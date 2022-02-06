@@ -44,7 +44,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
                     }
                 }
             } catch (err) {
-                Console.log(err)
+                Console.log(err, true)
             }
         }
 

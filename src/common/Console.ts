@@ -3,14 +3,14 @@ import * as vscode from "vscode";
 import format = require('date-format');
 
 export class Console {
-    public static log(value: any) {
+    public static log(value: any,preserveFocus:boolean=false) {
         if (this.outputChannel == null) {
             this.outputChannel = vscode.window.createOutputChannel("MySQL");
         }
         if(value instanceof Error){
             console.trace(value)
         }
-        this.outputChannel.show();
+        this.outputChannel.show(preserveFocus);
         const begin = format('yyyy-MM-dd hh:mm:ss', new Date());
         this.outputChannel.appendLine(`${begin} ${value}`);
     }
