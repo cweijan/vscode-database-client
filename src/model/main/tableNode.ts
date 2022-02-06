@@ -184,7 +184,7 @@ ${colDefList.join(",\n")}${pkList.length > 0 ? `,\n    PRIMARY KEY(${pkList.join
         const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
         let sql = this.dialect.buildPageSql(this.wrap(this.schema), this.wrap(this.table), pageSize);
         if (sql.includes("*")) {
-            const columns = (await this.getChildren()).map(c => c.label)
+            const columns = await this.getColumns()
             sql = sql.replace('*', columns.join(","))
         }
         QueryUnit.runQuery(sql, this, { viewId });
@@ -221,9 +221,17 @@ ${colDefList.join(",\n")}${pkList.length > 0 ? `,\n    PRIMARY KEY(${pkList.join
     }
 
     public async selectSqlTemplate() {
-        const columns = (await this.getChildren()).map(c => c.label)
-        const sql = `SELECT ${columns.join(",")} FROM ${Util.wrap(this.table)};`;
+        const columns = await this.getColumns()
+        const sql = `SELECT ${columns.join(",")} FROM ${this.wrap(this.table)};`;
         QueryUnit.showSQLTextDocument(this, sql, `${this.schema}.sql`, FileModel.APPEND)
+    }
+
+    private async getColumns() {
+        return (await this.getChildren()).map(c => {
+            if (this.dbType == DatabaseType.PG)
+                return `"${c.label}"`;
+            return c.label;
+        });
     }
 
     public deleteSqlTemplate(): any {
