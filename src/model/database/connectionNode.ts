@@ -183,7 +183,7 @@ export class ConnectionNode extends Node implements CopyAble {
     }
 
     public copyName() {
-        Util.copyToBoard(this.host)
+        Util.copyToBoard(this.usingSSH ? this.ssh.host : this.host)
     }
 
     public createDatabase() {

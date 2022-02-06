@@ -26,6 +26,10 @@ export function wrapQuote(dbType, type, value) {
     if (value === "") {
         return "null";
     }
+    // mongo method call
+    if (dbType=='MongoDB' && /.+?\(.*?\)/.exec(value)) {
+        return value;
+    }
     if (typeof value == "string") {
         switch (dbType) {
             case "PostgreSQL":

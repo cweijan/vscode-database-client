@@ -74,8 +74,8 @@ export class RedisConnectionNode extends RedisBaseNode {
         ViewManager.createWebviewPanel({
             splitView: true, title: `${this.host}@${this.port}`, preserveFocus: false,
             iconPath: {
-                light: Util.getExtPath("image", "terminal_light.png"),
-                dark: Util.getExtPath("image", "terminal_dark.svg"),
+                light: Util.getExtPath("image", "redis_connection.png"),
+                dark: Util.getExtPath("image", "redis_connection.png"),
             }, path: "app",
             eventHandler: (handler) => {
                 handler.on("init", () => {

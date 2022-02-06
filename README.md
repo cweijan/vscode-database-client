@@ -87,6 +87,8 @@ In order to improve performance, the database information is cached. If your dat
 
 Move to ant DatabaseNode or TableNode. The export/import options are listed in the context menu (right click to open).
 
+The extension implements the backup function, but it is not stable enough. You can add mysql_dump or pg_dump to the environment variable, and the extension will use these tools for backup.
+
 ![bakcup](images/Backup.jpg)
 
 ## Setting

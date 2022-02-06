@@ -12,6 +12,7 @@ export class RedisConnection extends IConnection {
         let config = {
             port: node.port,
             host: node.host,
+            username: node.user || undefined,
             password: node.password,
             connectTimeout: node.connectTimeout || 5000,
             db: node.database as any as number,
