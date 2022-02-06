@@ -1,5 +1,13 @@
 # CHANGELOG
 
+# 4.5.7 2022-2-6
+
+- Support connect to redis with username.
+- Auto scroll redis terminal.
+- Copy ssh host if using ssh.
+- Fix open es query not active connection #450.
+- Better query file for table.
+
 # 4.5.2 2022-1-21
 
 - Add more error tolerance when connecting.

@@ -2,7 +2,7 @@
 	"name": "vscode-mysql-client2",
 	"displayName": "MySQL",
 	"description": "Database manager for MySQL/MariaDB, PostgreSQL, SQLite, Redis and ElasticSearch.",
-	"version": "4.5.3",
+	"version": "4.5.7",
 	"publisher": "cweijan",
 	"icon": "resources/databases.png",
 	"engines": {
