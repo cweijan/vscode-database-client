@@ -12,7 +12,7 @@ export class FileManager {
 
     public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql", fileMode?: FileModel): Promise<vscode.TextEditor> {
 
-        const uid = node.uid.includes("#") ? node.uid.replace(/#.*/,'') : node.uid;
+        const uid = node.uid.includes("#") ? node.uid.replace(/#.*/, '') : node.uid;
         const document = await vscode.workspace.openTextDocument(await FileManager.record(`${uid}/${template}`, sql, fileMode));
         return await vscode.window.showTextDocument(document);
     }
@@ -44,6 +44,7 @@ export class FileManager {
             if (!fs.existsSync(this.storagePath)) {
                 fs.mkdirSync(this.storagePath, { recursive: true });
             }
+            if (!model && content) model = FileModel.WRITE;
             switch (model) {
                 case FileModel.WRITE:
                     fs.writeFileSync(recordPath, `${content}`, { encoding: 'utf8' });
@@ -55,7 +56,7 @@ export class FileManager {
                     fs.appendFileSync(recordPath, content, { encoding: 'utf8' });
                     break;
                 default:
-                    if(!fs.existsSync(recordPath)){
+                    if (!fs.existsSync(recordPath)) {
                         fs.writeFileSync(recordPath, ``, { encoding: 'utf8' });
                     }
                     break;
