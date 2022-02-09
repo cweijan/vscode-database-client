@@ -42,7 +42,7 @@ export class CatalogNode extends Node implements CopyAble {
 
     public async newQuery() {
 
-        QueryUnit.showSQLTextDocument(this,'',`${this.database}.sql`,FileModel.APPEND)
+        QueryUnit.showSQLTextDocument(this,'',`${this.database}.sql`)
 
     }
 

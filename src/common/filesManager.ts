@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as vscode from "vscode";
 import * as fs from 'fs';
 import { Node } from '@/model/interface/node';
-import { DatabaseType } from './constants';
 
 export class FileManager {
 
@@ -11,10 +10,10 @@ export class FileManager {
         this.storagePath = context.globalStoragePath;
     }
 
-    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql", fileMode: FileModel = FileModel.WRITE): Promise<vscode.TextEditor> {
+    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql", fileMode?: FileModel): Promise<vscode.TextEditor> {
 
-        const withSchema = node.dbType == DatabaseType.MSSQL || node.dbType == DatabaseType.PG;
-        const document = await vscode.workspace.openTextDocument(await FileManager.record(`${node.getUid({ withSchema })}/${template}`, sql, fileMode));
+        const uid = node.uid.includes("#") ? node.uid.replace(/#.*/,'') : node.uid;
+        const document = await vscode.workspace.openTextDocument(await FileManager.record(`${uid}/${template}`, sql, fileMode));
         return await vscode.window.showTextDocument(document);
     }
 
@@ -45,13 +44,21 @@ export class FileManager {
             if (!fs.existsSync(this.storagePath)) {
                 fs.mkdirSync(this.storagePath, { recursive: true });
             }
-            if (model == FileModel.WRITE) {
-                fs.writeFileSync(recordPath, `${content}`, { encoding: 'utf8' });
-            } else {
-                if (fs.existsSync(recordPath) && fs.statSync(recordPath).size > 0) {
-                    content = `\n\n${content}`;
-                }
-                fs.appendFileSync(recordPath, content, { encoding: 'utf8' });
+            switch (model) {
+                case FileModel.WRITE:
+                    fs.writeFileSync(recordPath, `${content}`, { encoding: 'utf8' });
+                    break;
+                case FileModel.APPEND:
+                    if (fs.existsSync(recordPath) && fs.statSync(recordPath).size > 0) {
+                        content = `\n\n${content}`;
+                    }
+                    fs.appendFileSync(recordPath, content, { encoding: 'utf8' });
+                    break;
+                default:
+                    if(!fs.existsSync(recordPath)){
+                        fs.writeFileSync(recordPath, ``, { encoding: 'utf8' });
+                    }
+                    break;
             }
             resolve(recordPath)
         });
