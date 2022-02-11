@@ -183,10 +183,10 @@ ${colDefList.join(",\n")}${pkList.length > 0 ? `,\n    PRIMARY KEY(${pkList.join
     public async openTable(viewId?: any) {
         const pageSize = Global.getConfig<number>(ConfigKey.DEFAULT_LIMIT);
         let sql = this.dialect.buildPageSql(this.wrap(this.schema), this.wrap(this.table), pageSize);
-        if (sql.includes("*")) {
-            const columns = await this.getColumns()
-            sql = sql.replace('*', columns.join(","))
-        }
+        // if (sql.includes("*")) {
+        //     const columns = await this.getColumns()
+        //     sql = sql.replace('*', columns.join(","))
+        // }
         QueryUnit.runQuery(sql, this, { viewId });
         ConnectionManager.changeActive(this)
     }
