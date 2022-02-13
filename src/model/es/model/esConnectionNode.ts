@@ -64,6 +64,7 @@ export class EsConnectionNode extends Node {
 
     newQuery() {
         QueryUnit.showSQLTextDocument(this,EsTemplate.query,`${this.host.replace(/^(http|https):/,'').replace(/\//g,'')}.es`)
+        ConnectionManager.changeActive(this)
     }
 
     async getChildren(): Promise<Node[]> {

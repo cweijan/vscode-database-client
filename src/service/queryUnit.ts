@@ -152,7 +152,7 @@ export class QueryUnit {
         return SQLParser.parseBlockSingle(editor.document, editor.selection.active)?.sql
     }
 
-    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql", fileMode: FileModel = FileModel.WRITE): Promise<vscode.TextEditor> {
+    public static async showSQLTextDocument(node: Node, sql: string, template = "template.sql", fileMode?: FileModel): Promise<vscode.TextEditor> {
 
         return FileManager.showSQLTextDocument(node,sql,template,fileMode)
     }

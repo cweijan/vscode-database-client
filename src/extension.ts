@@ -359,26 +359,24 @@ function detectActive(): void {
     }
 }
 
-function commandWrapper(commandDefinition: any, command: string): (...args: any[]) => any {
-    return (...args: any[]) => {
-        try {
-            commandDefinition[command](...args);
-        } catch (err) {
-            Console.log(err);
-        }
-    };
-}
-
 function initCommand(commandDefinition: any): vscode.Disposable[] {
 
     const dispose = []
 
     for (const command in commandDefinition) {
-        if (commandDefinition.hasOwnProperty(command)) {
-            dispose.push(vscode.commands.registerCommand(command, commandWrapper(commandDefinition, command)))
-        }
+        dispose.push(vscode.commands.registerCommand(command, (...args: any[]) => {
+            try {
+                const result = commandDefinition[command](...args);
+                if(result instanceof Promise){
+                    result.catch(err=>{
+                        Console.log(err)
+                    })
+                }
+            } catch (error) {
+                Console.log(error)
+            }
+        }))
     }
-
     return dispose;
 }
 

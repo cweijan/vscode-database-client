@@ -49,6 +49,7 @@ import Toolbar from "./component/Toolbar";
 import EditDialog from "./component/EditDialog";
 import { util } from "./mixin/util";
 import { buildDeleteSQL } from './util/sqlGenerator';
+import { wrapByDb } from '@/common/wrapper';
 let vscodeEvent;
 
 export default {
@@ -352,7 +353,7 @@ export default {
 
       let sortSql = this.result.sql
         .replace(/order by .+? (desc|asc)?/gi, "")
-        .replace(/\s?(limit.+)?$/i, ` ORDER BY ${row.prop} ${row.order} \$1 `);
+        .replace(/\s?(limit.+)?$/i, ` ORDER BY ${wrapByDb(row.prop, this.result.dbType)} ${row.order} \$1 `);
       this.execute(sortSql);
     },
     getTypeByColumn(key) {
