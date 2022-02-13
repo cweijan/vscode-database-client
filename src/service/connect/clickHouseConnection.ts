@@ -11,10 +11,7 @@ export class ClickHouseConnection extends IConnection {
   private client: ClickHouse;
   constructor(node: Node) {
     super();
-    if (node.useConnectionString) {
-      this.client = new ClickHouse(node.connectionUrl);
-      return;
-    }
+
 
     let chConfig = {
       host: node.host,
@@ -27,6 +24,18 @@ export class ClickHouseConnection extends IConnection {
         database: node.schema || node.database
       }
     };
+
+    if (node.useConnectionString) {
+      let connection_setting = node.connectionUrl;
+
+      let options = connection_setting.split(';');
+      for (let index = 0; index < options.length; index++) {
+        const opt_name = options[index].split('=')[0];
+        const opt_value = options[index].split('=')[1];
+
+        chConfig.queryOptions[opt_name] = opt_value;
+      }
+    }
 
     this.client = new ClickHouse(chConfig);
   }
