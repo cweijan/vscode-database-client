@@ -1,4 +1,3 @@
-import { TypecastField } from 'mysql2/promise';
 import * as sqlstring from 'sqlstring';
 import { bitTypes, geometryTypes, hexTypes, numberTypes } from './resolveType';
 
@@ -123,6 +122,19 @@ function parseGeometryValue(buffer: Buffer): string {
     }
 
     return `GeomFromText('${parseGeometry()}')`;
+}
+
+type FieldTypes = | 'DECIMAL' | 'TINY' | 'SHORT' | 'LONG' | 'FLOAT' | 'DOUBLE' | 'NULL' | 'TIMESTAMP' | 'LONGLONG' | 'INT24' | 'DATE' | 'TIME' | 'DATETIME' | 'YEAR' | 'NEWDATE' | 'VARCHAR' | 'BIT' | 'JSON' | 'NEWDECIMAL' | 'ENUM' | 'SET' | 'TINY_BLOB' | 'MEDIUM_BLOB' | 'LONG_BLOB' | 'BLOB' | 'VAR_STRING' | 'STRING' | 'GEOMETRY';
+
+interface TypecastField {
+    buffer(): Buffer;
+    string(): string;
+    geometry(): any;
+    db: string;
+    length: number;
+    name: string;
+    table: string;
+    type: FieldTypes;
 }
 
 export function dumpTypeCast(field: TypecastField): string {

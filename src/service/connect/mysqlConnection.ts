@@ -1,6 +1,7 @@
 import { Node } from "@/model/interface/node";
 import * as fs from "fs";
 import * as mysql from "mysql2";
+import { SslOptions } from "mysql2";
 import { IConnection, queryCallback } from "./connection";
 import { dumpTypeCast } from './convert/mysqlTypeCast';
 
@@ -8,38 +9,41 @@ export class MysqlConnection extends IConnection {
     private con: mysql.Connection;
     constructor(node: Node) {
         super()
-        if(node.useConnectionString){
-            this.con=mysql.createConnection(node.connectionUrl);
+        if (node.useConnectionString) {
+            this.con = mysql.createConnection(node.connectionUrl);
             return;
         }
-        let config = {
+        this.con = mysql.createConnection({
             host: node.host, port: node.port, user: node.user, password: node.password, database: node.database,
             timezone: node.timezone,
             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
             connectTimeout: node.connectTimeout || 5000,
-            socketPath:node.socketPath,
+            socketPath: node.socketPath,
+            insecureAuth: true,
+            authPlugins: {
+                mysql_clear_password: () => () => {
+                    return Buffer.from(node.password + '\0')
+                }
+            },
             typeCast: (field, next) => {
-                if (this.dumpMode) return dumpTypeCast(field as mysql.TypecastField)
+                if (this.dumpMode) return dumpTypeCast(field)
                 const buf = field.buffer();
                 if (field.type == 'BIT') {
                     return this.bitToBoolean(buf)
                 }
                 return buf?.toString();
-            }
-        } as mysql.ConnectionConfig;
-        if (node.useSSL) {
-            config.ssl = {
+            },
+            ssl: node.useSSL ? {
                 rejectUnauthorized: false,
-                ca: (node.caPath) ? fs.readFileSync(node.caPath) : null,
-                cert: (node.clientCertPath) ? fs.readFileSync(node.clientCertPath) : null,
-                key: (node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath) : null,
+                ca: (node.caPath) ? fs.readFileSync(node.caPath, 'utf8') : null,
+                cert: (node.clientCertPath) ? fs.readFileSync(node.clientCertPath, 'utf8') : null,
+                key: (node.clientKeyPath) ? fs.readFileSync(node.clientKeyPath, 'utf8') : null,
                 minVersion: 'TLSv1'
-            }
-        }
-        this.con = mysql.createConnection(config);
+            } as SslOptions as any : undefined
+        });
     }
     isAlive(): boolean {
-        return !this.dead && (this.con.state == 'authenticated' || this.con.authorized)
+        return !this.dead && this.con.authorized
     }
     query(sql: string, callback?: queryCallback): void;
     query(sql: string, values: any, callback?: queryCallback): void;
@@ -59,7 +63,7 @@ export class MysqlConnection extends IConnection {
         this.con.beginTransaction(callback)
     }
     rollback(): void {
-        this.con.rollback()
+        this.con.rollback(() => { })
     }
     commit(): void {
         this.con.commit()

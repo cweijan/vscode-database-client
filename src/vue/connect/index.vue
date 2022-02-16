@@ -21,19 +21,11 @@
       </blockquote>
 
       <section class="mb-2">
-        <label class="font-bold mr-5 inline-block">{{
-          $t("connect.name")
-        }}</label>
+        <label class="font-bold mr-5 inline-block">{{ $t("connect.name") }}</label>
         <input class="w-1/4 field__input" placeholder="Connection name" v-model="connectionOption.name" />
-        <label class="font-bold ml-4 mr-5 inline-block">{{
-          $t("connect.scope")
-        }}</label>
-        <el-radio v-model="connectionOption.global" :label="true">{{
-          $t("connect.global")
-        }}</el-radio>
-        <el-radio v-model="connectionOption.global" :label="false">{{
-          $t("connect.current")
-        }}</el-radio>
+        <label class="font-bold ml-4 mr-5 inline-block">{{ $t("connect.scope") }}</label>
+        <el-radio v-model="connectionOption.global" :label="true">{{ $t("connect.global") }}</el-radio>
+        <el-radio v-model="connectionOption.global" :label="false">{{ $t("connect.current") }}</el-radio>
       </section>
 
       <section class="mb-2">
@@ -84,15 +76,11 @@
 
         <section class="mb-2" v-if=" connectionOption.dbType != 'FTP' && connectionOption.dbType != 'MongoDB' ">
           <div class="inline-block mr-10">
-            <label class="font-bold mr-5 inline-block w-32">{{
-              $t("config.database")
-            }}</label>
+            <label class="font-bold mr-5 inline-block w-32">{{ $t("config.database") }}</label>
             <input class="w-64 field__input" placeholder="Connection database" v-model="connectionOption.database" />
           </div>
           <div class="inline-block mr-10" v-if="connectionOption.dbType != 'Redis'">
-            <label class="font-bold mr-5 inline-block w-32">{{
-              $t("config.showedDatabases")
-            }}</label>
+            <label class="font-bold mr-5 inline-block w-32">{{ $t("config.showedDatabases") }}</label>
             <input class="w-64 field__input" placeholder="e.g mysql,information_schema" v-model="connectionOption.includeDatabases" />
           </div>
         </section>
@@ -101,18 +89,11 @@
 
         <section class="mb-2">
           <div class="inline-block mr-10">
-            <label class="font-bold mr-5 inline-block w-32">{{
-              $t("connect.connectTimeout")
-            }}</label>
+            <label class="font-bold mr-5 inline-block w-32">{{ $t("connect.connectTimeout") }}</label>
             <input class="w-64 field__input" placeholder="5000" required v-model="connectionOption.connectTimeout" />
           </div>
-          <div class="inline-block mr-10" v-if="
-              connectionOption.dbType != 'Redis' &&
-              connectionOption.dbType != 'MySQL'
-            ">
-            <label class="font-bold mr-5 inline-block w-32">{{
-              $t("connect.requestTimeout")
-            }}</label>
+          <div class="inline-block mr-10" v-if=" connectionOption.dbType != 'Redis' && connectionOption.dbType != 'MySQL' ">
+            <label class="font-bold mr-5 inline-block w-32">{{ $t("connect.requestTimeout") }}</label>
             <input class="w-64 field__input" required type="number" v-model="connectionOption.requestTimeout" />
           </div>
         </section>
@@ -123,9 +104,7 @@
             <input class="w-64 field__input" placeholder="Unix Socket Path" v-model="connectionOption.socketPath" />
           </div>
           <div class="inline-block mr-10">
-            <label class="font-bold mr-5 inline-block w-32">{{
-              $t("config.timeZone")
-            }}</label>
+            <label class="font-bold mr-5 inline-block w-32">{{ $t("config.timeZone") }}</label>
             <input class="w-64 field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
           </div>
         </section>
@@ -215,6 +194,7 @@ export default {
         caPath: null,
         database: null,
         useSSL: false,
+        useClearText: false,
         usingSSH: false,
         showHidden: false,
         includeDatabases: null,
