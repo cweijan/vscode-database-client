@@ -50,7 +50,11 @@ export class CatalogNode extends Node implements CopyAble {
 
         vscode.window.showInputBox({ prompt: `Are you want to drop database ${this.schema} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
-                this.execute(`DROP DATABASE ${this.wrap(this.database)}`).then(() => {
+                let sql=`DROP DATABASE ${this.wrap(this.database)}`;
+                if(this.dbType==DatabaseType.MONGO_DB){
+                    sql=`db("${this.database}").dropDatabase()`
+                }
+                this.execute(sql).then(() => {
                     this.parent.clearCache()
                     DbTreeDataProvider.refresh(this.parent);
                     vscode.window.showInformationMessage(`Drop database ${this.schema} success!`)
