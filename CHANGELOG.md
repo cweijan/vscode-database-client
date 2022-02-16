@@ -1,5 +1,14 @@
 # CHANGELOG
 
+# 4.6.0 2022-2-16
+
+- Better complection for columns.
+- Support lock and unlock result view.
+- Fix sql message not hidden corretly.
+- Support connect to clickhouse by connection url.
+- Fix mongo delete db fail.
+- Add more keyword detect for auto wrapper quote.
+
 # 4.5.7 2022-2-6
 
 - Support connect to redis with username.
