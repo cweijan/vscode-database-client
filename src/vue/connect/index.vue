@@ -60,7 +60,7 @@
         <SQLServer :connectionOption="connectionOption" v-if="connectionOption.dbType == 'SqlServer'" />
 
         <section class="mb-2">
-          <div class="inline-block mr-10">
+          <div class="inline-block mr-10"  v-if="connectionOption.dbType != 'Redis'"> 
             <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>{{ $t("config.username") }}</label>
             <input class="w-64 field__input" placeholder="Username" required v-model="connectionOption.user" />
           </div>

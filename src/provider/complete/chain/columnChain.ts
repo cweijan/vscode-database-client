@@ -10,7 +10,7 @@ export class ColumnChain implements ComplectionChain {
     private needStop = true;
     public async getComplection(context: ComplectionContext): Promise<vscode.CompletionItem[]> {
 
-        if(ConnectionManager.tryGetConnection()==null){
+        if (ConnectionManager.tryGetConnection() == null) {
             return []
         }
 
@@ -32,16 +32,10 @@ export class ColumnChain implements ComplectionChain {
             return subComplectionItems;
         }
 
-        const condtionTokens = context.sqlBlock.tokens.filter(token => token.content.match(/\b(on|where)\b/i) ||
-            (token.content == 'set' && context.position.isAfter(token.range.end)))
-        for (const token of condtionTokens) {
-            if (context.position.isAfter(token.range.end)) {
-                const updateTableName = Util.getTableName(context.currentSql, Pattern.TABLE_PATTERN)
-                if (updateTableName) {
-                    this.needStop = false;
-                    return await this.generateColumnComplectionItem(updateTableName);
-                }
-            }
+        const updateTableName = Util.getTableName(context.sqlBlock.sql, Pattern.TABLE_PATTERN)
+        if (updateTableName) {
+            this.needStop = false;
+            return await this.generateColumnComplectionItem(updateTableName);
         }
 
         return null;
