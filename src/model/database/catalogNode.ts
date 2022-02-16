@@ -1,3 +1,4 @@
+import { Console } from "@/common/Console";
 import { FileModel } from "@/common/filesManager";
 import { DbTreeDataProvider } from "@/provider/treeDataProvider";
 import { DatabaseCache } from "@/service/common/databaseCache";
@@ -14,7 +15,7 @@ export class CatalogNode extends Node implements CopyAble {
 
 
     public contextValue: string = ModelType.CATALOG;
-    public iconPath: string|vscode.ThemeIcon = new vscode.ThemeIcon("database");
+    public iconPath: string | vscode.ThemeIcon = new vscode.ThemeIcon("database");
     constructor(public database: string, readonly parent: Node) {
         super(database)
         this.init(this.parent)
@@ -27,32 +28,37 @@ export class CatalogNode extends Node implements CopyAble {
         if (this.isActive(lcp) && (lcp.database == this.database)) {
             if (Util.supportColorIcon()) {
                 this.iconPath = new vscode.ThemeIcon("database", new vscode.ThemeColor('charts.blue'));
-            } 
-        }else{
+            }
+        } else {
             this.iconPath = new vscode.ThemeIcon("database");
         }
     }
 
     public getChildren(): Promise<Node[]> | Node[] {
-          if(this.dbType==DatabaseType.MONGO_DB){
-              return new MongoTableGroup(this).getChildren()
+        if (this.dbType == DatabaseType.MONGO_DB) {
+            return new MongoTableGroup(this).getChildren()
         }
-        return this.parent.getChildren.call(this,true)
+        return this.parent.getChildren.call(this, true)
     }
 
     public async newQuery() {
 
-        QueryUnit.showSQLTextDocument(this,'',`${this.database}.sql`)
+        QueryUnit.showSQLTextDocument(this, '', `${this.database}.sql`)
 
     }
 
     public dropDatatabase() {
 
+        if (this.dbType == DatabaseType.PG) {
+            Console.log("PostgreSQL can't not drop database by itSelf database connection.")
+            return;
+        }
+
         vscode.window.showInputBox({ prompt: `Are you want to drop database ${this.schema} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.database.toLowerCase()) {
-                let sql=`DROP DATABASE ${this.wrap(this.database)}`;
-                if(this.dbType==DatabaseType.MONGO_DB){
-                    sql=`db("${this.database}").dropDatabase()`
+                let sql = `DROP DATABASE ${this.wrap(this.database)}`;
+                if (this.dbType == DatabaseType.MONGO_DB) {
+                    sql = `db("${this.database}").dropDatabase()`
                 }
                 this.execute(sql).then(() => {
                     this.parent.clearCache()
