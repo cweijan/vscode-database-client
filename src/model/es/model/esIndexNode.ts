@@ -56,6 +56,7 @@ export class ESIndexNode extends Node {
                     editBuilder.replace(new Range(0, 0, 0, 0), EsTemplate.query.replace(/myIndex/g, this.label).replace("$fields", columns))
                 });
             }
+            ConnectionManager.changeActive(this)
         })
     }
     public async countSql() {
