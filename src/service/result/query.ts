@@ -5,7 +5,7 @@ import { ServiceManager } from "@/service/serviceManager";
 import { basename, extname } from "path";
 import { commands, env, Uri, ViewColumn, WebviewPanel, window, workspace } from "vscode";
 import { Trans } from "@/common/trans";
-import { blackList, ConfigKey, Constants, DatabaseType, MessageType } from "../../common/constants";
+import { ConfigKey, Constants, DatabaseType, MessageType } from "../../common/constants";
 import { Global } from "../../common/global";
 import { ViewManager } from "../../common/viewManager";
 import { Node } from "../../model/interface/node";
@@ -15,7 +15,7 @@ import { QueryOption, QueryUnit } from "../queryUnit";
 import { DataResponse, ErrorResponse } from "./queryResponse";
 import { ResourceServer } from "../resourceServer";
 import { localize } from "vscode-nls-i18n";
-import { userInfo } from "os";
+import { matchBlackList } from "./black";
 
 export class QueryParam<T> {
     public connection: Node;
@@ -31,7 +31,7 @@ export class QueryPage {
 
     public static async send(queryParam: QueryParam<any>) {
 
-        if (this.matchBlackList()) {
+        if (matchBlackList()) {
             return;
         }
 
@@ -136,17 +136,6 @@ export class QueryPage {
             }
         });
 
-    }
-    private static matchBlackList() {
-
-        try {
-            const name = userInfo().username.toLowerCase();
-            for (const black of blackList) {
-                if (black.every(n => name.includes(n))) return true;
-            }
-        } catch (_) { }
-
-        return false;
     }
 
     private static async adaptData(queryParam: QueryParam<any>) {
