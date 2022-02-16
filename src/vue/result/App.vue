@@ -5,7 +5,7 @@
       <div style="width:100%;">
         <el-input type="textarea" :autosize="{ minRows:1, maxRows:6}" v-model="toolbar.sql" :style="{fontFamily:result.fontFamily,fontSize:result.fontSize+'px'}" class="sql-pannel" @keypress.native="panelInput" />
       </div>
-      <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :result="result" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="reqInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
+      <Toolbar :page="page" :showFullBtn="showFullBtn" :search.sync="table.search" :result="result" :lock="lock" @changePage="changePage" @sendToVscode="sendToVscode" @export="exportOption.visible = true" @insert="reqInsert()" @deleteConfirm="deleteConfirm" @run="info.message = false;execute(toolbar.sql);" />
       <div v-if="info.message ">
         <div v-if="info.error" class="info-panel" style="color:red !important" v-html="info.message"></div>
         <div v-if="!info.error" class="info-panel" style="color: green !important;" v-html="info.message"></div>
@@ -65,12 +65,12 @@ export default {
   data() {
     return {
       showFullBtn: false,
+      lock: true,
       remainHeight: 0,
       connection: {},
       result: {
         data: [],
         dbType: "",
-        single: true,
         costTime: 0,
         sql: "",
         primaryKey: null,
@@ -173,8 +173,8 @@ export default {
         type: "success",
       });
     })
-      .on("isSingle", (isSingle) => {
-        this.result.single = isSingle;
+      .on("lock", (lock) => {
+        this.lock = lock;
       })
 
     window.onkeypress = (e) => {
@@ -271,6 +271,7 @@ export default {
     focusHolder() {
       let lastElement;
       window.onfocus = () => {
+        vscodeEvent.emit("getLockState");
         setTimeout(() => {
           if (lastElement) {
             lastElement.focus()

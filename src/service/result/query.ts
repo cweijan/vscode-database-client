@@ -28,6 +28,7 @@ export class QueryParam<T> {
 export class QueryPage {
 
     private static exportService: ExportService = new ExportService()
+    private static activeViewId: any = "-1";
 
     public static async send(queryParam: QueryParam<any>) {
 
@@ -70,21 +71,23 @@ export class QueryPage {
                         const costTime = new Date().getTime() - executeTime;
                         handler.emit(MessageType.NEXT_PAGE, { sql, data: rows, costTime })
                     })
-                }).on("removeSingle", () => {
-                    const newKey = new Date().getTime() + "";
-                    ViewManager.bindStatus(handler.panel.viewType, newKey)
-                    queryParam.queryOption.viewId = newKey;
-                    handler.emit("isSingle", false)
-                }).on("toSingle", () => {
-                    ViewManager.bindStatus(handler.panel.viewType, "query")
-                    queryParam.queryOption.viewId = 'query';
-                    handler.emit("isSingle", true)
+                }).on("lock", () => {
+                    const viewId = queryParam.queryOption.viewId;
+                    QueryPage.activeViewId = viewId;
+                    handler.emit("lock", true)
+                }).on("unLock", () => {
+                    if (QueryPage.activeViewId == queryParam.queryOption.viewId) {
+                        QueryPage.activeViewId = undefined;
+                    }
+                    handler.emit("lock", false)
                 }).on("full", () => {
                     // fix editor disappear
                     const ace = window.activeTextEditor;
                     if (ace) commands.executeCommand("workbench.action.keepEditor", ace.document.uri)
                     handler.panel.reveal()
                     commands.executeCommand("workbench.action.joinAllGroups")
+                }).on("getLockState", () => {
+                    handler.emit("lock", QueryPage.activeViewId == queryParam.queryOption.viewId)
                 }).on('esFilter', (query) => {
                     const esQuery = EsRequest.build(queryParam.res.sql, obj => {
                         obj.query = query;
@@ -179,10 +182,14 @@ export class QueryPage {
         if (typeof queryParam.singlePage == 'undefined') {
             queryParam.singlePage = true;
         }
-        if (!queryParam.queryOption) {
-            queryParam.queryOption = {
-                viewId: "Query"
-            }
+        if (!queryParam.queryOption) queryParam.queryOption = {}
+
+        if (!QueryPage.activeViewId) {
+            QueryPage.activeViewId = queryParam.queryOption.viewId || new Date().getTime() + "";
+        }
+
+        if (!queryParam.queryOption.viewId) {
+            queryParam.queryOption.viewId = QueryPage.activeViewId
         }
         return queryParam.queryOption.viewId;
     }

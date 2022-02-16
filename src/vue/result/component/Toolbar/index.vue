@@ -2,10 +2,9 @@
   <div class="toolbar">
     <el-button v-if="showFullBtn" @click="()=>$emit('sendToVscode','full')" type="primary" title="Full Result View" icon="el-icon-rank" size="mini" circle>
     </el-button>
-    <!-- <el-button v-if="!result.single" @click="()=>$emit('sendToVscode','toSingle')" type="success" title="Lock This Panel" icon="el-icon-lock" size="mini" circle>
-    </el-button> -->
     <el-input v-model="searchInput" size="mini" :placeholder="$t('result.searchNotice')" style="width:200px" :clearable="true" />
-    <el-button icon="el-icon-unlock" v-if="result.single" @click="()=>$emit('sendToVscode','removeSingle')" title="Unlock This Panel"  />
+    <el-button v-if="!lock" @click="()=>$emit('sendToVscode','lock')" title="Lock This Panel" icon="el-icon-unlock"> </el-button>
+    <el-button v-if="lock" icon="el-icon-lock" @click="()=>$emit('sendToVscode','unLock')" title="Unlock This Panel"  />
     <el-button icon="icon-coffee" title="Buy author a cup of coffee." style="color:var(--vscode-charts-orange);" @click='()=>$emit("sendToVscode", "openCoffee")'/>
     <el-button icon="icon-github" title="Star the project to represent support." @click='()=>$emit("sendToVscode", "openGithub")'/>
     <el-button icon="el-icon-circle-plus-outline" style="color:var(--vscode-terminal-ansiCyan);"  @click="$emit('insert')" title="Insert new row"/>
@@ -24,7 +23,7 @@
 
 <script>
 export default {
-  props: ["search", "showFullBtn", "page","result"],
+  props: ["search", "showFullBtn", "page","result","lock"],
   data() {
     return {
       searchInput: null,
