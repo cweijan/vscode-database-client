@@ -45,7 +45,7 @@ export class QueryPage {
         const isActive = this.isActiveSql(queryParam.queryOption);
         ViewManager.createWebviewPanel({
             singlePage: true,
-            vertical: isActive,
+            vertical: Global.getConfig("verticalEditor"),
             splitView: isActive,
             path: 'result', title: localize('ext.view.data'), type,
             iconPath: Global.getExtPath("resources", "icon", "query.svg"),

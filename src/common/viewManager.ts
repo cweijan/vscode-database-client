@@ -97,7 +97,7 @@ export class ViewManager {
                 { viewColumn, preserveFocus: viewOption.preserveFocus },
                 { enableScripts: true, retainContextWhenHidden: true },
             );
-            if(viewOption.vertical){
+            if(!viewOption.vertical){
                 // if(ace && ace.viewColumn>1){
                     vscode.commands.executeCommand("workbench.action.toggleEditorGroupLayout")
                 // }

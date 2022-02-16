@@ -1049,6 +1049,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Show trigger on tree view."
+				},
+				"database-client.verticalEditor": {
+					"type": "boolean",
+					"default": false,
+					"description": "Open the results window to the side."
 				}
 			}
 		}
