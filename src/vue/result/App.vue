@@ -224,11 +224,8 @@ export default {
         case "MESSAGE_BLOCK":
           handlerCommon(response);
           this.info.error = false;
-          this.info.needRefresh = false;
-          if (
-            response.message.indexOf("AffectedRows") != -1 ||
-            response.isInsert
-          ) {
+          if ( response.message.indexOf("AffectedRows") != -1 || response.isInsert ) {
+            this.info.needRefresh = false;
             this.refresh();
           }
           break;
