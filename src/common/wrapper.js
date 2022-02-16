@@ -11,7 +11,7 @@ export function wrapByDb(origin, databaseType) {
         return origin;
     }
 
-    if (origin.match(/\b[-\s]+\b/ig) || origin.match(/^( |if|key|desc|length|group|order|index|condition)$/i)) {
+    if (origin.match(/\b[-\s]+\b/ig) || origin.match(/^( |if|key|desc|length|group|order|index|condition|system|table|type|VALUE|BACKUP|begin|ACCOUNT|action|all|any|current|data|grant)$/i)) {
         if (databaseType == 'SqlServer') {
             return origin.split(".").map(text => `[${text}]`).join(".")
         }
