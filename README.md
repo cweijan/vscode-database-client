@@ -23,7 +23,7 @@ The Database Client make your life easy. It supports manager MySQL/MariaDB, Post
 
 > Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
 
-In order to keep the software maintained, the latest version has been closed source, you can still use the software for free, but you cannot use all the functions.
+In order to keep the software maintained, the latest version has been closed source, you can still use the software for free, but you cannot use all the features.
 
 <a href="https://database-client.com" target="_blank"><img src="./public/icon.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
 
