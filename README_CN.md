@@ -21,7 +21,7 @@
 
 该项目为Visual Studio Code的数据库客户端扩展, 意在让你的生命更加简单, 支持**MySQL/MariaDB, PostgreSQL, SQLite, Redis**以及**ElasticSearch**的管理.
 
-为了让软件得以继续维护, 现在最新版本已经闭源且免费账户无法使用全部功能, 中国区高级版价格为68元1年.
+为了让软件得以继续维护, 现在最新版本已经闭源, 你任然可以免费使用该软件, 但无法使用全部功能, 中国区高级版价格为68元1年.
 
 <a href="https://database-client.com" target="_blank"><img src="./public/icon.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
 
