@@ -19,7 +19,7 @@
 </p>
 <br>
 
-The Database Client make your life easy. It supports manager MySQL/MariaDB, PostgreSQL, SQLite, Redis, and ElasticSearch.
+该项目为Visual Studio Code的数据库客户端扩展, 意在让你的生命更加简单, 支持**MySQL/MariaDB, PostgreSQL, SQLite, Redis**以及**ElasticSearch**的管理, 且可以作为一个SSH客户端.
 
 <a href="https://database-client.com" target="_blank"><img src="./public/logo_dark.png" alt="Logo" style="height: auto !important;width: auto !important;" ></a>
 
