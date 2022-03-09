@@ -1,7 +1,7 @@
 * 文档
 
   * [简介](zh/README.md)
-  * [连接数据库](zh/connect.md)
+  * [连接](zh/connect.md)
   * [数据库](zh/database.md)
   * [表](zh/table.md.md)
   * [SQL](zh/sql.md)

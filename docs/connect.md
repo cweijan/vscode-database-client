@@ -1,5 +1,3 @@
-# Connection
-
 ## Connect
 
 1. Open Database Explorer panel, then click the `+` button.

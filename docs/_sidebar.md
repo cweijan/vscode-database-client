@@ -1,10 +1,10 @@
 * Document
 
   * [introduce](README.md)
-  * [Connect Server](connect.md)
+  * [Connection](connect.md)
   * [Database](database.md)
   * [Table](table.md.md)
-  * [Edit SQL](sql.md)
+  * [SQL](sql.md)
   * [SSH](ssh.md)
   * [Console](console.md)
   * [Mock Data](mockData.md)
