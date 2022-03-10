@@ -19,7 +19,7 @@
 </p>
 <br>
 
-The Database Client make your life easy. It supports manager MySQL/MariaDB, PostgreSQL, SQLite, Redis, and ElasticSearch.
+This project is a database client for VSCode, supports manager **MySQL/MariaDB, PostgreSQL, SQLite, Redis**, and **ElasticSearch**, and works as an **SSH** client, boost your maximum productivity!
 
 > Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
 
