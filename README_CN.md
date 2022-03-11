@@ -19,13 +19,15 @@
 </p>
 <br>
 
-该项目为Visual Studio Code的数据库客户端扩展, 意在让你的生命更加简单, 支持**MySQL/MariaDB, PostgreSQL, SQLite, Redis**以及**ElasticSearch**的管理.
-
-为了让软件得以继续维护, 现在最新版本已经闭源, 你仍然可以免费使用该软件, 但无法使用全部功能, 使用支付宝购买为68元1年.
+该项目为Visual Studio Code的数据库客户端扩展, 支持**MySQL/MariaDB, PostgreSQL, SQLite, Redis**以及**ElasticSearch**的管理, 且可以作为一个SSH客户端, 最大程度地提高你的生产力!
 
 <a href="https://database-client.com" target="_blank"><img src="./public/icon.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
 
-- 功能
+开发这个扩展我花了大量的精力, 然而时常收到不友好评价, 仅仅是因为这些人对某个功能不满意.
+
+对于一个免费软件, 这严重降低了作者的积极性, 所以我决定将其转为付费软件,  你可以继续免费使用, 但无法使用全部功能, 中国区高级版价格为68元1年.
+
+## 功能
   - [连接](#连接)
   - [数据表](#数据表)
   - [执行SQL](#执行SQL)
