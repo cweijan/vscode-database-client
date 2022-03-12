@@ -25,9 +25,9 @@ This project is a database client for VSCode, supports manager **MySQL/MariaDB, 
 
 <a href="https://database-client.com" target="_blank"><img src="./public/icon.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
 
-I put a lot of effort into developing this extension, but often receives unfriendly reviews, just because they are not satisfied with a certain feature.
+I put a lot of effort into developing this extension, but often receives unfriendly reviews, just because they are not satisfied with a certain feature. 
 
-For a free software, this seriously demotivated the author, so I convert it to paid software, you can still using for free, but you cannot use all the features.
+For a free software, this seriously demotivated the author, so I convert it to paid software, now users need to pay to use all the features.
 
 ## Features
 
