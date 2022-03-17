@@ -1,28 +1,30 @@
 export class DelimiterHolder {
 
-    private delimiterPattern = /\bdelimiter\b\s*(\S+)/ig;
-    private delimiteMap = new Map<string, string>();
+    private static delimiterPattern = /\bdelimiter\b\s*(\S+)/ig;
+    private static delimiteMap = new Map<string, string>();
 
-    public get(key: string) {
+    public static get(key: string) {
         const delimiter = this.delimiteMap.get(key);
         if (!delimiter) { return ";" }
         return delimiter
     }
 
 
-    public parseBatch(sql: string, key?: string): { sql: string, replace: boolean } {
+    public static parseBatch(sql: string, key?: string): { sql: string, replace: boolean } {
         let replace = false;
         if (!sql) { return { sql, replace }; }
 
         const delimiterArray = []
-        if (key) {
-            const delimiter = this.delimiteMap.get(key)
+        let delimiter = this.delimiteMap.get(key)
+        if (delimiter) {
             delimiterArray.push(delimiter)
+        }else{
+            delimiter=";"
         }
 
         let delimiterMatch: RegExpExecArray
         while ((delimiterMatch = this.delimiterPattern.exec(sql)) != null) {
-            const target = delimiterMatch[1].split("").map((c) => c.match(/\w/) ? c : "\\" + c).join("")
+            const target = delimiterMatch[1].replace(new RegExp(`${delimiter}\\s*$`, 'gm'), "").split("").map((c) => c.match(/\w/) ? c : "\\" + c).join("")
             delimiterArray.push(target)
             if (key) {
                 this.delimiteMap.set(key, target)
@@ -40,7 +42,7 @@ export class DelimiterHolder {
         return { sql, replace };
     }
 
-    private buildDelimiter(sql: string, delimiter: string) {
+    private static buildDelimiter(sql: string, delimiter: string) {
         if (!sql || !delimiter) { return sql; }
         return sql.replace(new RegExp(`${delimiter}\\s*$`, 'gm'), ";")
     }

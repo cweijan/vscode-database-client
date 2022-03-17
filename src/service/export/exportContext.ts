@@ -1,8 +1,15 @@
+import { Node } from "@/model/interface/node";
+
 export class ExportContext {
+    dbOption: Node;
     type: ExportType;
     withOutLimit: boolean;
     table:string;
     sql: string;
+    /**
+     * es only
+     */
+    request?: any;
     exportPath: string;
     /**
      * intenel: fields 

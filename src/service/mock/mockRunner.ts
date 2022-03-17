@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'fs';
-import * as Mock from 'mockjs';
+import * as Mock from '@/bin/mockjs';
 import * as vscode from "vscode";
 import { MessageType } from "../../common/constants";
 import { ConnectionManager } from "../connectionManager";
@@ -7,12 +7,13 @@ import { DatabaseCache } from "../common/databaseCache";
 import { QueryUnit } from "../queryUnit";
 import { ColumnNode } from "../../model/other/columnNode";
 import { TableNode } from '../../model/main/tableNode';
-import { QueryPage } from "../../view/result/query";
-import { MessageResponse } from "../../view/result/queryResponse";
+import { QueryPage } from "../result/query";
+import { MessageResponse } from "../result/queryResponse";
 import { FileManager, FileModel } from '../../common/filesManager';
 import { MockModel } from './mockModel';
 import { Node } from '../../model/interface/node';
-import { ColumnMeta } from '../../model/other/columnMeta';
+import { ColumnMeta } from "@/common/typeDef";
+import { TableGroup } from '@/model/main/tableGroup';
 
 export class MockRunner {
 
@@ -22,10 +23,9 @@ export class MockRunner {
     public async create(tableNode: TableNode) {
         const columnList = (await tableNode.getChildren()) as ColumnNode[]
         const mockModel: MockModel = {
-            mode: tableNode.global === false ? 'workspace' : 'global',
-            host: tableNode.getHost(), port: tableNode.getPort(), user: tableNode.getUser(), database: tableNode.database, table: tableNode.table,
-            mockStartIndex: MockRunner.primaryKeyMap[tableNode.getConnectId()] ? 'auto' : 1
-            , mockCount: 50, examples: "http://mockjs.com/examples.html#DPD", mock: {}
+            schema: tableNode.schema,table: tableNode.table,
+            mockStartIndex: MockRunner.primaryKeyMap[tableNode.uid] ? 'auto' : 1
+            , mockCount: 10, mockValueReference: "http://mockjs.com/examples.html#DPD", mock: {}
         }
         for (const columnNode of columnList) {
             mockModel.mock[columnNode.column.name] = {
@@ -34,40 +34,22 @@ export class MockRunner {
             }
         }
 
-        const mockPath = `mock/${tableNode.database}/${tableNode.table}/mock.json`;
-        const mockFullPath = `${FileManager.storagePath}/${mockPath}`;
-        let targetModel = mockModel;
-
-        try {
-            if (existsSync(mockFullPath)) {
-                const existsMockModel = JSON.parse(readFileSync(mockFullPath, 'utf8')) as MockModel;
-                if (Object.keys(existsMockModel.mock).length != columnList.length) {
-                    existsMockModel.mock = mockModel.mock
-                }
-                targetModel = existsMockModel
-            }
-        } catch (err) { }
-
-        await FileManager.record(mockPath, JSON.stringify(targetModel, null, 4), FileModel.WRITE);
-        await vscode.window.showTextDocument(
-            await vscode.workspace.openTextDocument(mockFullPath)
-        );
+        QueryUnit.showSQLTextDocument(tableNode, JSON.stringify(mockModel, null, 4), 'mock.json')
     }
 
     public async runMock() {
 
         const content = vscode.window.activeTextEditor.document.getText()
-
         const mockModel = JSON.parse(content) as MockModel;
-        if(!mockModel.mode){
-            mockModel.mode='global'
-        }
-        const databaseid = `${mockModel.mode}_${mockModel.host}_${mockModel.port}_${mockModel.user}_${mockModel.database}`;
-        const tableList = DatabaseCache.getChildListOfDatabase(databaseid) as TableNode[]
-        if (!tableList) {
-            vscode.window.showErrorMessage(`Database ${mockModel.database} not found!`)
+
+
+        const node = ConnectionManager.getByActiveFile();
+        if (!node) {
+            vscode.window.showErrorMessage(`This mock target not valid!`)
             return;
         }
+
+        const tableList = await new TableGroup(node).getChildren() as TableNode[]
         let tableNode: TableNode;
         for (const table of tableList) {
             if (table.table == mockModel.table) {
@@ -91,7 +73,8 @@ export class MockRunner {
                 startIndex = (await tableNode.getMaxPrimary()) + 1;
             }
 
-            for (let i = startIndex; i < (startIndex + mockCount); i++) {
+            const count = parseInt(startIndex + "") + mockCount;
+            for (let i = startIndex; i < count; i++) {
                 let tempInsertSql = insertSqlTemplate;
                 for (const column in mockData) {
                     let value = mockData[column].value;
@@ -105,8 +88,8 @@ export class MockRunner {
             const connection = await ConnectionManager.getConnection({ ...tableNode } as any as Node)
 
             const success = await QueryUnit.runBatch(connection, sqlList)
-            vscode.commands.executeCommand("mysql.template.sql", tableNode, true)
-            QueryPage.send({ type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
+            vscode.commands.executeCommand("mysql.table.find", tableNode, true)
+            QueryPage.send({ queryOption: { split: true }, connection: tableNode, type: MessageType.MESSAGE, res: { message: `Generate mock data for ${tableNode.table} ${success ? 'success' : 'fail'}!`, success } as MessageResponse });
 
         }
     }
@@ -157,7 +140,7 @@ export class MockRunner {
         if (numericMatch) {
             length = 1 << (parseInt(numericMatch[1]) - 1)
         }
-        if (column.key == "PRI") {
+        if (column.isPrimary) {
             return this.MOCK_INDEX;
         }
         switch (type) {

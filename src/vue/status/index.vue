@@ -1,7 +1,7 @@
 <template>
   <div class='status-container'>
     <el-tabs v-model="activePanel" @tab-click="changePannel">
-      <el-tab-pane label="dashBoard" name="dashBoard">
+      <el-tab-pane label="dashBoard" name="dashBoard" v-if="info.dbType=='MySQL'">
         <el-row style="height:45vh">
           <el-col :span="24">
             Queries:
@@ -18,61 +18,56 @@
             <div id="sessions"></div>
           </el-col>
         </el-row>
-
       </el-tab-pane>
       <el-tab-pane label="processList" name="processList">
-        <el-table :data="process.list" style="width: 100%">
-          <el-table-column :label="field" v-for="(field,index) in process.fields" :key="index" align="center">
-            <template slot-scope="scope">
-              <span v-text='scope.row[field]'></span>
-            </template>
-          </el-table-column>
-        </el-table>
+        <ux-grid :data="process.rows" size='small' :cell-style="{height: '35px'}" style="width: 100%" :height="remainHeight()">
+          <ux-table-column :field="field.name" :title="field.name" v-for="(field,index) in process.fields" :key="index" align="center" show-overflow-tooltip="true" />
+        </ux-grid>
+      </el-tab-pane>
+      <el-tab-pane label="variableList" name="variableList" v-if="info.dbType!='SqlServer'">
+        <ux-grid :data="variableList.rows" size='small' :cell-style="{height: '35px'}" style="width: 100%" :height="remainHeight()">
+          <ux-table-column :field="field.name" :title="field.name" v-for="(field,index) in variableList.fields" :key="index" align="center" show-overflow-tooltip="true" />
+        </ux-grid>
+      </el-tab-pane>
+      <el-tab-pane label="statusList" name="statusList" v-if="info.dbType!='SqlServer'">
+        <ux-grid :data="statusList.rows" size='small' :cell-style="{height: '35px'}" style="width: 100%" :height="remainHeight()">
+          <ux-table-column :field="field.name" :title="field.name" v-for="(field,index) in statusList.fields" :key="index" align="center" show-overflow-tooltip="true" />
+        </ux-grid>
       </el-tab-pane>
     </el-tabs>
   </div>
 </template>
 
 <script>
-import { Chart } from "@antv/g2";
-
-import { getVscodeEvent } from "../util/vscode";
-let vscodeEvent;
+import { Chart } from "g2";
+import { inject } from "../mixin/vscodeInject";
 
 export default {
   name: "status",
+  mixins: [inject],
   data() {
     return {
-      activePanel: "dashBoard",
-      process: {
-        fields: [],
-        list: [],
-        lock: false
-      },
+      info: {},
+      activePanel: "processList",
+      process: { fields: [], rows: [] },
+      variableList: { fields: [], rows: [] },
+      statusList: { fields: [], rows: [] },
       dashBoard: {
         sessions: { data: [], lock: false, chart: null, previous: null },
         queries: { data: [], lock: false, chart: null, previous: null },
-        traffic: { data: [], lock: false, chart: null, previous: null }
-      }
+        traffic: { data: [], lock: false, chart: null, previous: null },
+      },
     };
   },
-  destroyed(){
-      vscodeEvent.destroy()
-  },
   mounted() {
-    vscodeEvent = getVscodeEvent();
     function createChart(id, data) {
       const chart = new Chart({
         container: id,
         autoFit: true,
-        height: 300
+        height: 300,
       });
       chart.data(data);
-      chart
-        .line()
-        .position("now*value")
-        .color("type")
-        .size(2);
+      chart.line().position("now*value").color("type").size(2);
       chart.render();
       return chart;
     }
@@ -100,12 +95,21 @@ export default {
       chartOption.lock = false;
     }
 
-    vscodeEvent
-      .on("processList", data => {
-        this.process.fields = data.fields;
-        this.process.list = data.list;
+    this.on("info", (info) => {
+      this.info = info;
+      this.activePanel =
+        this.info.dbType == "MySQL" ? "dashBoard" : "processList";
+    })
+      .on("processList", (data) => {
+        this.process = data;
       })
-      .on("dashBoard", data => {
+      .on("variableList", (data) => {
+        this.variableList = data;
+      })
+      .on("statusList", (data) => {
+        this.statusList = data;
+      })
+      .on("dashBoard", (data) => {
         loadChart("sessions", this.dashBoard.sessions, data.sessions);
         loadChart(
           "queries",
@@ -128,45 +132,49 @@ export default {
             }
           }
         );
-      });
-
-    vscodeEvent.emit("init");
-    this.sendLoadProcessList();
+      })
+      .init();
+    this.emit("processList").emit("variableList").emit("statusList");
     this.sendLoadDashBoard();
     setInterval(() => {
-      this.sendLoadProcessList();
       this.sendLoadDashBoard();
     }, 1000);
   },
   methods: {
-    sendLoadProcessList() {
-      vscodeEvent.emit("processList");
+    remainHeight() {
+      return window.outerHeight - 150;
     },
     sendLoadDashBoard() {
       if (this.dashBoard.sessions.lock) return;
       this.dashBoard.sessions.lock = true;
-      vscodeEvent.emit("dashBoard");
+      this.emit("dashBoard");
     },
     changePannel() {
       switch (this.activePanel) {
         case "processList":
-          this.sendLoadProcessList();
+          this.emit("processList");
+          break;
+        case "variableList":
+          this.emit("variableList");
+          break;
+        case "statusList":
+          this.emit("statusList");
           break;
         case "dashBoard":
           this.sendLoadDashBoard();
           break;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style scoped>
+<style >
 .status-container {
-  padding: 20px;
-  /* background-color: var(--vscode-editor-background); */
-  background-color: #f7f7f7 !important;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", Arial, sans-serif;
+}
+.el-tabs__header {
+  margin: 0 !important;
 }
 </style>

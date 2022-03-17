@@ -1,38 +1,34 @@
-import * as path from "path";
-import { Constants, ModelType, Template } from "../../common/constants";
-import { ConnectionManager } from "../../service/connectionManager";
-import { DatabaseCache } from "../../service/common/databaseCache";
+import { ThemeIcon } from "vscode";
+import { ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
-import { InfoNode } from "../other/infoNode";
 import { Node } from "../interface/node";
+import { InfoNode } from "../other/infoNode";
 import { FunctionNode } from "./function";
-import { FileManager, FileModel } from "@/common/filesManager";
 
 export class FunctionGroup extends Node {
 
     public contextValue = ModelType.FUNCTION_GROUP;
-    public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
+    public iconPath = new ThemeIcon("symbol-function")
     constructor(readonly parent: Node) {
-        super("FUNCTION")
-        this.id = `${parent.getConnectId()}_${parent.database}_${ModelType.FUNCTION_GROUP}`;
+        super("Function")
         this.init(parent)
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
 
-        let tableNodes = DatabaseCache.getChildListOfDatabase(this.id);
+        let tableNodes = this.getChildCache();
         if (tableNodes && !isRresh) {
             return tableNodes;
         }
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT ROUTINE_NAME FROM information_schema.routines WHERE ROUTINE_SCHEMA = '${this.database}' and ROUTINE_TYPE='FUNCTION'`)
+        return this.execute<any[]>(this.dialect.showFunctions(this.schema))
             .then((tables) => {
                 tableNodes = tables.map<FunctionNode>((table) => {
                     return new FunctionNode(table.ROUTINE_NAME, this);
                 });
-                DatabaseCache.setTableListOfDatabase(this.id, tableNodes);
                 if (tableNodes.length == 0) {
-                    return [new InfoNode("This database has no function")];
+                    tableNodes = [new InfoNode("This schema has no function")];
                 }
+                this.setChildCache(tableNodes);
                 return tableNodes;
             })
             .catch((err) => {
@@ -42,14 +38,7 @@ export class FunctionGroup extends Node {
 
     public async createTemplate() {
 
-        ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.id}#create-function-template.sql`, `CREATE
-/*[DEFINER = { user | CURRENT_USER }]*/
-FUNCTION [name]() RETURNS [TYPE]
-BEGIN
-    return [value];
-END;`, FileModel.WRITE)
-        FileManager.show(filePath)
+        QueryUnit.showSQLTextDocument(this, this.dialect.functionTemplate(), 'create-function-template.sql')
 
     }
 

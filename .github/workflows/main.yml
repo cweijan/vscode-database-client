@@ -12,8 +12,8 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: 14.x
-    - run: npm i && npm i -g vsce 
+    - run: npm i
     - run: |
         echo ">>> Start compile vscode-mysql."
-        vsce package
+        npm run build
         echo ">>> Compile vscode-mysql sucess!"

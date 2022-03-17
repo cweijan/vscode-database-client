@@ -1,3 +1,5 @@
+import { ConfigKey } from "@/common/constants";
+import { Global } from "@/common/global";
 
 export interface PageService {
     /**
@@ -8,6 +10,9 @@ export interface PageService {
      * @return paginationSql
      */
     build(sql: string, page: number, pageSize: number): string;
+
+    getPageSize(sql: string): number;
+
 }
 
 export abstract class AbstractPageSerivce implements PageService {
@@ -28,6 +33,20 @@ export abstract class AbstractPageSerivce implements PageService {
         }
 
         return this.buildPageSql(sql, start, pageSize)
+    }
+
+    public getPageSize(sql: string): number {
+
+        const limitBlock = sql.match(this.pageMatch())
+        if (limitBlock) {
+            return parseInt(limitBlock[1])
+        }
+
+        return Global.getConfig(ConfigKey.DEFAULT_LIMIT);
+    }
+
+    protected pageMatch() {
+        return /limit\s*(\d+)/i;
     }
 
     protected abstract buildPageSql(sql: string, start: number, limit: number): string;

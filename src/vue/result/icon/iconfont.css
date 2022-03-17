@@ -1,0 +1,23 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 2598912 */
+  src: url('iconfont.woff?t=1623116621438') format('woff');
+}
+
+[class*=" icon-"], [class^=icon-] {
+  font-family: "iconfont" !important;
+  speak: none;
+  font-style: normal;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: baseline;
+  display: inline-block;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale
+}
+
+.icon-github:before {
+  content: "\e601";
+}
+

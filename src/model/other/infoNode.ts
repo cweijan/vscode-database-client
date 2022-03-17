@@ -6,6 +6,9 @@ export class InfoNode extends Node {
     public contextValue: string = ModelType.INFO;
     constructor(readonly label: string) {
         super(label)
+        if((label as any) instanceof Error){
+            this.label=(label as any).message
+        }
     }
 
     public async getChildren(): Promise<Node[]> {

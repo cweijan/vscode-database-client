@@ -1,5 +1,5 @@
 import { FunctionDumpOptions } from './interfaces/Options';
-import { DB } from './DB';
+import { Node } from '@/model/interface/node';
 
 interface ShowFunctions {
     Name: string;
@@ -18,65 +18,28 @@ interface ShowCreateFunction {
     'Database Collation': string;
 }
 
-async function getFunctionDump(
-    connection: DB,
-    dbName: string,
-    options: Required<FunctionDumpOptions>,
-): Promise<Array<string>> {
-    const output: Array<string> = [];
-    const Functions = await connection.query<ShowFunctions>(
-        `SHOW Function STATUS WHERE Db = '${dbName}'`,
-    );
-
-    // we create a multi query here so we can query all at once rather than in individual connections
-    const getSchemaMultiQuery: Array<string> = [];
-    Functions.forEach(proc => {
-        getSchemaMultiQuery.push(`SHOW CREATE Function \`${proc.Name}\`;`);
-    });
-
-    if(getSchemaMultiQuery.length==0){
-        return [];
+async function getFunctionDump(node: Node, sessionId: string, options: Required<FunctionDumpOptions>, functions: Array<string>): Promise<string> {
+    if (functions.length == 0) {
+        return "";
     }
-
-    const result = await connection.multiQuery<ShowCreateFunction>(
-        getSchemaMultiQuery.join('\n'),
-    );
-    // mysql2 returns an array of arrays which will all have our one row
-    result
-        .map(r => r[0])
-        .forEach(res => {
-            // clean up the generated SQL
+    const output = functions.map(async fun => {
+        try {
+            const r = await node.execute(node.dialect.showFunctionSource(node.schema, fun), sessionId)
+            const res = r[0]
             let sql = `${res['Create Function']}`;
-
             if (!options || !options.definer) {
                 sql = sql.replace(/CREATE DEFINER=.+?@.+? /, 'CREATE ');
             }
-
-            // add the delimiter
-            if (options && options.delimiter) {
-                sql = `DELIMITER ${options.delimiter}\n${sql}${
-                    options.delimiter
-                }\nDELIMITER ;`;
-            } else {
-                sql = `DELIMITER ;;\n${sql};;\nDELIMITER ;`;
-            }
-
-            // drop stored Function should go outside the delimiter mods
             if (!options || options.dropIfExist) {
                 sql = `DROP Function IF EXISTS ${res.Function};\n${sql}`;
             }
+            return `${sql};`;
+        } catch (error) {
+            return false
+        }
+    });
 
-            // add a header to the stored Function
-            sql = [
-                '',
-                sql,
-                '',
-            ].join('\n');
-
-            return output.push(sql);
-        });
-
-    return output;
+    return (await Promise.all(output)).filter(s => s).join("\n\n");
 }
 
 export { ShowFunctions, ShowCreateFunction, getFunctionDump };

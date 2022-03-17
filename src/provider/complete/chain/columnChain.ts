@@ -1,21 +1,20 @@
 import * as vscode from "vscode";
-import { DatabaseCache } from "../../../service/common/databaseCache";
-import { ColumnNode } from "../../../model/other/columnNode";
-import { ComplectionChain, ComplectionContext } from "../complectionContext";
-import { Util } from "../../../common/util";
 import { Pattern } from "../../../common/constants";
+import { Util } from "../../../common/util";
+import { ColumnNode } from "../../../model/other/columnNode";
 import { ConnectionManager } from "../../../service/connectionManager";
+import { ComplectionChain, ComplectionContext } from "../complectionContext";
 
 export class ColumnChain implements ComplectionChain {
 
     private needStop = true;
-    public async getComplection(complectionContext: ComplectionContext): Promise<vscode.CompletionItem[]> {
+    public async getComplection(context: ComplectionContext): Promise<vscode.CompletionItem[]> {
 
-        if (complectionContext.preChart === ".") {
-            let subComplectionItems = await this.generateColumnComplectionItem(complectionContext.preWord);
+        if (context.currentToken?.content === ".") {
+            let subComplectionItems = await this.generateColumnComplectionItem(context.previousToken?.content);
             if (subComplectionItems != null && subComplectionItems.length > 0) { this.needStop = true }
-            const tableReg = new RegExp(Pattern.TABLE_PATTERN + "(?=\\s*\\b" + complectionContext.preWord + "\\b)", "ig");
-            let result = tableReg.exec(complectionContext.currentSqlFull);
+            const tableReg = new RegExp(Pattern.TABLE_PATTERN + "(?=\\s*\\b" + context.previousToken?.content + "\\b)", "ig");
+            let result = tableReg.exec(context.sqlBlock.sql);
             while (result != null && subComplectionItems.length === 0) {
                 subComplectionItems = await this.generateColumnComplectionItem(
                     Util.getTableName(result[0], Pattern.TABLE_PATTERN)
@@ -24,25 +23,22 @@ export class ColumnChain implements ComplectionChain {
                 if (subComplectionItems.length > 0) {
                     break;
                 }
-                result = tableReg.exec(complectionContext.currentSqlFull);
+                result = tableReg.exec(context.sqlBlock.sql);
             }
             return subComplectionItems;
         }
 
-        if (complectionContext.currentSqlFull.match(/\bwhere\b/ig)) {
-            const updateTableName = Util.getTableName(complectionContext.currentSql, Pattern.TABLE_PATTERN)
-            if (updateTableName) {
-                this.needStop = false;
-                return await this.generateColumnComplectionItem(updateTableName);
+        const condtionTokens = context.sqlBlock.tokens.filter(token => token.content.match(/\b(on|where)\b/i) ||
+            (token.content == 'set' && context.position.isAfter(token.range.end)))
+        for (const token of condtionTokens) {
+            if (context.position.isAfter(token.range.end)) {
+                const updateTableName = Util.getTableName(context.currentSql, Pattern.TABLE_PATTERN)
+                if (updateTableName) {
+                    this.needStop = false;
+                    return await this.generateColumnComplectionItem(updateTableName);
+                }
             }
         }
-
-        const dmlTableName = Util.getTableName(complectionContext.currentSql, Pattern.DML_PATTERN)
-        if (dmlTableName) {
-            this.needStop = complectionContext.currentSql.match(/\binsert\b/ig) != null;
-            return await this.generateColumnComplectionItem(dmlTableName);
-        }
-
 
         return null;
     }
@@ -56,23 +52,24 @@ export class ColumnChain implements ComplectionChain {
         if (!tableName) {
             return [];
         }
-        let columnNodes: ColumnNode[] = [];
 
+        let lcp = ConnectionManager.tryGetConnection()
 
-        const lcp = ConnectionManager.getLastConnectionOption()
-        if (!lcp) { return []; }
-        const id = `${lcp.getConnectId()}_${lcp.database}_${tableName}`;
+        const tableSplit = tableName.split(".")
+        if (tableSplit.length == 2) {
+            const connectcionid = lcp?.getConnectId({ schema: tableSplit[0], withSchema: true });
+            lcp = ColumnNode.nodeCache[connectcionid]
+            tableName = tableSplit[1]
+        }
 
-        for (const tableNode of DatabaseCache.getTableNodeList()) {
-            if ((tableNode.table == tableName) ||
-                (tableNode.id === id)) {
-                columnNodes = (await tableNode.getChildren()) as ColumnNode[];
-                break;
-            }
+        let columnNodes = (await lcp?.getByRegion(tableName)?.getChildren()) as ColumnNode[];
+        if (!columnNodes) {
+            return []
         }
 
         return columnNodes.map<vscode.CompletionItem>((columnNode) => {
-            const completionItem = new vscode.CompletionItem(columnNode.description ? `${columnNode.label}  ${columnNode.description}` : columnNode.label);
+            const completionItem = new vscode.CompletionItem(columnNode.label);
+            completionItem.detail = columnNode.description as string
             completionItem.insertText = columnNode.column.name
             completionItem.kind = vscode.CompletionItemKind.Field;
             return completionItem;

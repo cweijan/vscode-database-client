@@ -1,10 +1,6 @@
 export interface MockModel {
-    mode: string;
-    host: string;
-    port: number;
-    user: string;
-    database: string;
-    examples: string;
+    schema: string;
+    mockValueReference: string;
     table: string;
     mockStartIndex: number|string;
     mockCount: number;

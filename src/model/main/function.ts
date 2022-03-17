@@ -1,20 +1,16 @@
-import * as path from "path";
 import * as vscode from "vscode";
-import { Constants, ModelType } from "../../common/constants";
+import { ModelType } from "../../common/constants";
 import { Util } from "../../common/util";
-import { ConnectionManager } from "../../service/connectionManager";
-import { DatabaseCache } from "../../service/common/databaseCache";
-import { QueryUnit } from "../../service/queryUnit";
 import { DbTreeDataProvider } from "../../provider/treeDataProvider";
+import { QueryUnit } from "../../service/queryUnit";
 import { Node } from "../interface/node";
 
 export class FunctionNode extends Node {
 
     public contextValue: string = ModelType.FUNCTION;
-    public iconPath = path.join(Constants.RES_PATH, "icon/function.svg")
+    public iconPath = new vscode.ThemeIcon("symbol-function")
     constructor(readonly name: string, readonly parent: Node) {
         super(name)
-        this.id = `${parent.getConnectId()}_${parent.database}_${name}`
         this.init(parent)
         this.command = {
             command: "mysql.show.function",
@@ -24,10 +20,10 @@ export class FunctionNode extends Node {
     }
 
     public async showSource() {
-        QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this, true), `SHOW CREATE FUNCTION \`${this.database}\`.\`${this.name}\``)
+        this.execute<any[]>( this.dialect.showFunctionSource(this.schema,this.name))
             .then((procedDtails) => {
                 const procedDtail = procedDtails[0];
-                QueryUnit.showSQLTextDocument(`DROP FUNCTION IF EXISTS ${procedDtail.Function}; \n\n${procedDtail['Create Function']}`);
+                QueryUnit.showSQLTextDocument(this,`DROP FUNCTION IF EXISTS ${this.name};\n${procedDtail['Create Function']}`);
             });
     }
 
@@ -39,8 +35,8 @@ export class FunctionNode extends Node {
     public drop() {
 
         Util.confirm(`Are you want to drop function ${this.name} ?`, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP function \`${this.database}\`.\`${this.name}\``).then(() => {
-                DatabaseCache.clearTableCache(`${this.getConnectId()}_${this.name}_${ModelType.FUNCTION_GROUP}`);
+            this.execute( `DROP function ${this.wrap(this.name)}`).then(() => {
+                this.parent.setChildCache(null)
                 DbTreeDataProvider.refresh(this.parent);
                 vscode.window.showInformationMessage(`Drop function ${this.name} success!`);
             });

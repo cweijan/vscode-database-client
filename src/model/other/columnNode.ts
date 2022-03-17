@@ -1,29 +1,30 @@
-import * as path from "path";
+import { ColumnMeta } from "@/common/typeDef";
+import { MockRunner } from "@/service/mock/mockRunner";
 import * as vscode from "vscode";
-import { Node } from "../interface/node";
-import { ModelType, Constants, Template } from "../../common/constants";
-import { QueryUnit } from "../../service/queryUnit";
-import { DatabaseCache } from "../../service/common/databaseCache";
-import { ConnectionManager } from "../../service/connectionManager";
-import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { CopyAble } from "../interface/copyAble";
+import { DatabaseType, ModelType, Template } from "../../common/constants";
 import { Util } from "../../common/util";
-import { ColumnMeta } from "./columnMeta";
-const wrap = Util.wrap;
-
+import { DbTreeDataProvider } from "../../provider/treeDataProvider";
+import { QueryUnit } from "../../service/queryUnit";
+import { CopyAble } from "../interface/copyAble";
+import { Node } from "../interface/node";
 
 export class ColumnNode extends Node implements CopyAble {
     public type: string;
     public contextValue: string = ModelType.COLUMN;
     public isPrimaryKey = false;
-    constructor(private readonly table: string, readonly column: ColumnMeta, readonly parent: Node, readonly index: number) {
+    constructor(public readonly table: string, readonly column: ColumnMeta, readonly parent: Node, readonly index: number) {
         super(column.name)
         this.init(parent)
-        this.type = `${this.column.type}`
-        this.description = `${this.column.comment}`
-        this.label = `${this.column.name} : ${this.column.type}  ${this.getIndex(this.column.key)}`
-        this.collapsibleState = vscode.TreeItemCollapsibleState.None
-        this.iconPath = path.join(Constants.RES_PATH, this.column.key === "PRI" ? "icon/b_primary.png" : "icon/b_props.png");
+        this.buildInfo()
+        if (this.isPrimaryKey) {
+            if(Util.supportColorIcon()){
+                this.iconPath = new vscode.ThemeIcon("key", new vscode.ThemeColor('charts.yellow'));
+            }else{
+                this.iconPath = new vscode.ThemeIcon("key");
+            }
+        } else {
+            this.iconPath = new vscode.ThemeIcon("symbol-field");
+        }
         this.command = {
             command: "mysql.column.update",
             title: "Update Column Statement",
@@ -34,12 +35,36 @@ export class ColumnNode extends Node implements CopyAble {
         Util.copyToBoard(this.column.name)
     }
 
-    private getIndex(columnKey: string) {
+    private buildInfo() {
+        if(!this.column.simpleType){
+            this.column.simpleType=this.column.type
+        }
+        // sqlite
+        if(this.column.pk=='1'){
+            this.isPrimaryKey=true;
+            MockRunner.primaryKeyMap[this.parent.uid] = this.column.name
+            this.column.isPrimary=true;
+        }
+        if (this.column.extra == 'auto_increment') {
+            this.column.isAutoIncrement = true;
+        }
+        this.column.isNotNull = this.column.nullable != 'YES'
+        this.type = `${this.column.type}`
+        this.description = `${this.column.type} ${this.column.comment||''}`
+        this.tooltip = `${this.label} ${this.column.comment}
+${this.column.type} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"}`
+        const columnKey: string = this.column.key;
         switch (columnKey) {
-            case 'UNI': return "UniqueKey";
+            case 'UNI':
+            case 'UNIQUE':
+                this.column.isUnique = true;
+                return "UniqueKey";
             case 'MUL': return "IndexKey";
             case 'PRI':
+            case 'PRIMARY KEY':
                 this.isPrimaryKey = true
+                MockRunner.primaryKeyMap[this.parent.uid] = this.column.name
+                this.column.isPrimary = true
                 return "PrimaryKey";
         }
         return '';
@@ -50,63 +75,57 @@ export class ColumnNode extends Node implements CopyAble {
         return [];
     }
 
-    public async changeColumnName() {
-
-        const columnName = this.column.name;
-        vscode.window.showInputBox({ value: columnName, placeHolder: 'newColumnName', prompt: `You will changed ${this.table}.${columnName} to new column name!` }).then(async (newColumnName) => {
-            if (!newColumnName) { return; }
-            const sql = `alter table ${wrap(this.database)}.${wrap(this.table)} change column ${wrap(columnName)} ${wrap(newColumnName)} ${this.column.type} comment '${this.column.comment}'`;
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql).then((rows) => {
-                DatabaseCache.clearColumnCache(`${this.getConnectId()}_${this.database}_${this.table}`);
-                DbTreeDataProvider.refresh(this.parent);
-            });
-
-        });
-    }
-
     public updateColumnTemplate() {
-
-        ConnectionManager.getConnection(this, true);
-
-        const comment = this.column.comment ? ` comment '${this.column.comment}'` : "";
-        const defaultDefinition = this.column.nullable == "YES" ? "" : " NOT NULL";
-
-        QueryUnit.showSQLTextDocument(`ALTER TABLE 
-    ${wrap(this.database)}.${wrap(this.table)} CHANGE ${wrap(this.column.name)} ${wrap(this.column.name)} ${this.column.type}${defaultDefinition}${comment};`, Template.alter);
+        QueryUnit.showSQLTextDocument(this, this.dialect.updateColumn(this.table, this.column.name, this.column.type, this.column.comment, this.column.nullable), Template.alter);
 
     }
     public async dropColumnTemplate() {
 
-        ConnectionManager.getConnection(this, true);
-        await QueryUnit.showSQLTextDocument(`ALTER TABLE \n\t${wrap(this.database)}.${wrap(this.table)} DROP COLUMN ${wrap(this.column.name)};`, Template.alter);
+        const dropSql = `ALTER TABLE \n\t${this.wrap(this.table)} DROP COLUMN ${this.wrap(this.column.name)};`;
+        await QueryUnit.showSQLTextDocument(this, dropSql, Template.alter);
         Util.confirm(`Are you want to drop column ${this.column.name} ? `, async () => {
-            QueryUnit.runQuery(null,this)
+            this.execute(dropSql).then(() => {
+                this.parent.setChildCache(null)
+                DbTreeDataProvider.refresh(this.parent);
+            })
         })
 
     }
 
 
     public async moveDown() {
+        this.check()
         const columns = (await this.parent.getChildren()) as ColumnNode[]
         const afterColumnNode = columns[this.index + 1];
         if (!afterColumnNode) {
             vscode.window.showErrorMessage("Column is at last.")
             return;
         }
-        const sql = `ALTER TABLE \`${this.database}\`.\`${this.table}\` MODIFY COLUMN ${this.column.name} ${this.column.type} AFTER ${afterColumnNode.column.name};`
-        await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
+        const sql = `ALTER TABLE ${this.wrap(this.schema)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(this.column.name)} ${this.column.type} AFTER ${this.wrap(afterColumnNode.column.name)};`
+        await this.execute(sql)
+        this.parent.setChildCache(null)
         DbTreeDataProvider.refresh(this.parent)
     }
     public async moveUp() {
+        this.check()
         const columns = (await this.parent.getChildren()) as ColumnNode[]
         const beforeColumnNode = columns[this.index - 1];
         if (!beforeColumnNode) {
             vscode.window.showErrorMessage("Column is at first.")
             return;
         }
-        const sql = `ALTER TABLE \`${this.database}\`.\`${this.table}\` MODIFY COLUMN ${beforeColumnNode.column.name} ${beforeColumnNode.column.type} AFTER ${this.column.name};`
-        await QueryUnit.queryPromise(await ConnectionManager.getConnection(this), sql)
+        const sql = `ALTER TABLE ${this.wrap(this.schema)}.${this.wrap(this.table)} MODIFY COLUMN ${this.wrap(beforeColumnNode.column.name)} ${beforeColumnNode.column.type} AFTER ${this.wrap(this.column.name)};`
+        await this.execute(sql)
+        this.parent.setChildCache(null)
         DbTreeDataProvider.refresh(this.parent)
+    }
+
+    check() {
+        if (this.dbType == DatabaseType.MYSQL || !this.dbType) {
+            return;
+        }
+        vscode.window.showErrorMessage("Only mysql support change column position.")
+        throw new Error("Only mysql support change column position.");
     }
 
 }

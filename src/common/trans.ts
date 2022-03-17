@@ -4,6 +4,6 @@
 export class Trans {
     public static transId: string;
     public static begin() {
-        this.transId=new Date().getTime()+"_query";
+        this.transId=new Date().getTime()+"query";
     }
 }

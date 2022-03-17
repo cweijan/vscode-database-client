@@ -1,60 +1,43 @@
-import mysqldump, { Options } from './mysql/main';
+import { Console } from "@/common/Console";
+import { Util } from "@/common/util";
+import { Node } from "@/model/interface/node";
+import { TableNode } from "@/model/main/tableNode";
+import { ViewNode } from "@/model/main/viewNode";
+import { NodeUtil } from "@/model/nodeUtil";
+import { DumpService } from "./dumpService";
 import * as vscode from "vscode";
-import { Console } from "../../common/Console";
-import { Node } from "../../model/interface/node";
-import { NodeUtil } from "../../model/nodeUtil";
-import { AbstractDumpService } from "./abstractDumpService";
+var commandExistsSync = require('command-exists').sync;
 
-export class MysqlDumpService extends AbstractDumpService {
-    protected dumpData(node: Node, dumpFilePath: string, withData: boolean,tables:string[]): void {
+export class MysqlDumpService extends DumpService {
 
-        const host = node.usingSSH ? "127.0.0.1" : node.host
-        const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
+    public async dump(node: Node, withData: boolean) {
 
-        Console.log(`Doing backup ${host}_${node.database}...
-Origin command : \`mysqldump -h ${host} -P ${port} -u ${node.user} -p --database ${node.database} > ${dumpFilePath}\`.`);
-
-        const option: Options = {
-            connection: {
-                host: host,
-                user: node.user,
-                password: node.password,
-                database: node.database,
-                port: port,
-            },
-            dump: {
-                withDatabase: true,
-                tables,
-                schema: {
-                    format: false,
-                    table: {
-                        ifNotExist: false,
-                        dropIfExist: true,
-                        charset: true,
-                    }
-                },
-            },
-            dumpToFile: dumpFilePath,
-        };
-        if (!withData) {
-            option.dump.data = false;
-        } else {
-            option.dump.data = {
-                format: false,
-                maxRowsPerInsertStatement: 5000
+        /**
+         * https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html
+         */
+        if (commandExistsSync('mysqldump')) {
+            const folderPath = await this.triggerSave(node);
+            if (folderPath) {
+                NodeUtil.of(node)
+                const isTable = node instanceof TableNode || node instanceof ViewNode;
+                const host = node.usingSSH ? "127.0.0.1" : node.host
+                const port = node.usingSSH ? NodeUtil.getTunnelPort(node.getConnectId()) : node.port;
+                const data = withData ? '' : ' --no-data';
+                const tables = isTable ? ` --skip-triggers ${node.label}` : '';
+                const command = `mysqldump -h ${host} -P ${port} -u ${node.user} -p${node.password}${data} --skip-add-locks ${node.schema} ${tables}>${folderPath.fsPath}`
+                // Console.log(`Executing: ${command}`);
+                Util.execute(command).then(() => {
+                    vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.schema} success!`, 'open').then(action => {
+                        if (action == 'open') {
+                            vscode.commands.executeCommand('vscode.open', vscode.Uri.file(folderPath.fsPath));
+                        }
+                    })
+                }).catch(err => Console.log(err.message))
             }
+            return Promise.reject("Dump canceled.");
         }
-        mysqldump(option).then(() => {
-            vscode.window.showInformationMessage(`Backup ${node.getHost()}_${node.database} success!`,'open').then(action=>{
-                if(action=='open'){
-                    vscode.commands.executeCommand('vscode.open', vscode.Uri.file(dumpFilePath));
-                }
-            })
-        }).catch((err) => {
-            vscode.window.showErrorMessage(`Backup ${node.getHost()}_${node.database} fail!\n${err}`);
-        }).then(() => {
-            Console.log(`backup end.`);
-        })
+
+        return super.dump(node, withData);
     }
 
 }

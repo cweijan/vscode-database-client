@@ -25,15 +25,15 @@ export class Global {
     }
 
     private static getStatusBarItemText(activeConnection: Node): string {
-        return `$(server) ${activeConnection.getHost()}` + (activeConnection.database ? ` $(database) ${activeConnection.database}` : "");
+        return `$(server) ${activeConnection.getHost()}` + (activeConnection.schema ? ` $(schema) ${activeConnection.schema}` : "");
     }
 
     /**
      * get configuration from vscode setting.
      * @param key config key
      */
-    public static getConfig<T>(key: string): T {
-        return vscode.workspace.getConfiguration(Constants.CONFIG_PREFIX).get<T>(key);
+    public static getConfig<T>(key: string,defaultValue?:any): T {
+        return vscode.workspace.getConfiguration(Constants.CONFIG_PREFIX).get<T>(key,defaultValue);
     }
 
     /**

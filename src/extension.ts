@@ -1,10 +1,10 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CommandKey } from "./common/constants";
+import { CodeCommand } from "./common/constants";
 import { ConnectionNode } from "./model/database/connectionNode";
-import { DatabaseNode } from "./model/database/databaseNode";
-import { UserGroup, UserNode } from "./model/database/userGroup";
+import { SchemaNode } from "./model/database/schemaNode";
+import { UserGroup } from "./model/database/userGroup";
 import { CopyAble } from "./model/interface/copyAble";
 import { FunctionNode } from "./model/main/function";
 import { FunctionGroup } from "./model/main/functionGroup";
@@ -23,31 +23,50 @@ import { ServiceManager } from "./service/serviceManager";
 import { QueryUnit } from "./service/queryUnit";
 import { FileManager } from "./common/filesManager";
 import { ConnectionManager } from "./service/connectionManager";
-import { DiagramNode } from "./model/diagram/diagramNode";
-import { DiagramGroup } from "./model/diagram/diagramGroup";
 import { QueryNode } from "./model/query/queryNode";
 import { QueryGroup } from "./model/query/queryGroup";
+import { Node } from "./model/interface/node";
+import { DbTreeDataProvider } from "./provider/treeDataProvider";
+import { UserNode } from "./model/database/userNode";
+import { EsConnectionNode } from "./model/es/model/esConnectionNode";
+import { ESIndexNode } from "./model/es/model/esIndexNode";
+import { activeEs } from "./model/es/provider/main";
+import { RedisConnectionNode } from "./model/redis/redisConnectionNode";
+import KeyNode from "./model/redis/keyNode";
+import { DiffService } from "./service/diff/diffService";
+import { DatabaseCache } from "./service/common/databaseCache";
+import { FileNode } from "./model/ssh/fileNode";
+import { SSHConnectionNode } from "./model/ssh/sshConnectionNode";
+import { FTPFileNode } from "./model/ftp/ftpFileNode";
+import { HistoryNode } from "./provider/history/historyNode";
+import { ConnectService } from "./service/connect/connectService";
 
 export function activate(context: vscode.ExtensionContext) {
 
     const serviceManager = new ServiceManager(context)
+
+    activeEs(context)
+
     ConnectionNode.init()
     context.subscriptions.push(
         ...serviceManager.init(),
-        vscode.window.onDidChangeActiveTextEditor((e) => {
-            const fileNode = ConnectionManager.getByActiveFile()
-            if (fileNode) {
-                ConnectionManager.getConnection(fileNode, this)
-            }
-        }),
+        vscode.window.onDidChangeActiveTextEditor(detectActive),
+        ConnectService.listenConfig(),
         ...initCommand({
             // util
             ...{
-                "mysql.history.open": () => serviceManager.historyService.showHistory(),
-                [CommandKey.Refresh]: () => { serviceManager.provider.init(); },
-                [CommandKey.RecordHistory]: (sql: string, costTime: number) => {
+                [CodeCommand.Refresh]: async (node: Node) => {
+                    if (node) {
+                        await node.getChildren(true)
+                    } else {
+                        DatabaseCache.clearCache()
+                    }
+                    DbTreeDataProvider.refresh(node)
+                },
+                [CodeCommand.RecordHistory]: (sql: string, costTime: number) => {
                     serviceManager.historyService.recordHistory(sql, costTime);
                 },
+                "mysql.history.open": () => serviceManager.historyService.showHistory(),
                 "mysql.setting.open": () => {
                     serviceManager.settingService.open();
                 },
@@ -64,7 +83,16 @@ export function activate(context: vscode.ExtensionContext) {
                     serviceManager.connectService.openConnect(serviceManager.provider)
                 },
                 "mysql.connection.edit": (connectionNode: ConnectionNode) => {
-                    serviceManager.connectService.openConnect(serviceManager.provider, connectionNode)
+                    serviceManager.connectService.openConnect(connectionNode.provider, connectionNode)
+                },
+                "mysql.connection.config": () => {
+                    serviceManager.connectService.openConfig()
+                },
+                "mysql.connection.open": (connectionNode: ConnectionNode) => {
+                    connectionNode.provider.openConnection(connectionNode)
+                },
+                "mysql.connection.disable": (connectionNode: ConnectionNode) => {
+                    connectionNode.provider.disableConnection(connectionNode)
                 },
                 "mysql.connection.delete": (connectionNode: ConnectionNode) => {
                     connectionNode.deleteConnection(context);
@@ -75,37 +103,58 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // externel data
             ...{
-                "mysql.data.export": (node: DatabaseNode | TableNode) => {
-                    serviceManager.dumpService.dump(node, true)
+                "mysql.util.github": () => {
+                    vscode.env.openExternal(vscode.Uri.parse('https://github.com/cweijan/vscode-database-client'));
                 },
-                "mysql.struct.export": (node: DatabaseNode | TableNode) => {
-                    serviceManager.dumpService.dump(node, false)
+                "mysql.struct.diff": () => {
+                    new DiffService().startDiff(serviceManager.provider);
                 },
-                "mysql.data.import": (node: DatabaseNode | ConnectionNode) => {
-                    vscode.window.showOpenDialog({ filters: { Sql: ['sql'] }, canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
+                "mysql.data.export": (node: SchemaNode | TableNode) => {
+                    ServiceManager.getDumpService(node.dbType).dump(node, true)
+                },
+                "mysql.struct.export": (node: SchemaNode | TableNode) => {
+                    ServiceManager.getDumpService(node.dbType).dump(node, false)
+                },
+                "mysql.document.generate": (node: SchemaNode | TableNode) => {
+                    ServiceManager.getDumpService(node.dbType).generateDocument(node)
+                },
+                "mysql.data.import": (node: SchemaNode | ConnectionNode) => {
+                    const importService=ServiceManager.getImportService(node.dbType);
+                    vscode.window.showOpenDialog({ filters: importService.filter(), canSelectMany: false, openLabel: "Select sql file to import", canSelectFiles: true, canSelectFolders: false }).then((filePath) => {
                         if (filePath) {
-                            serviceManager.importService.import(filePath[0].fsPath, node)
+                            importService.importSql(filePath[0].fsPath, node)
                         }
                     });
                 },
+            },
+            // ssh
+            ...{
+                'mysql.ssh.folder.new': (parentNode: SSHConnectionNode) => parentNode.newFolder(),
+                'mysql.ssh.file.new': (parentNode: SSHConnectionNode) => parentNode.newFile(),
+                'mysql.ssh.host.copy': (parentNode: SSHConnectionNode) => parentNode.copyIP(),
+                'mysql.ssh.forward.port': (parentNode: SSHConnectionNode) => parentNode.fowardPort(),
+                'mysql.ssh.file.upload': (parentNode: SSHConnectionNode) => parentNode.upload(),
+                'mysql.ssh.folder.open': (parentNode: SSHConnectionNode) => parentNode.openInTeriminal(),
+                'mysql.ssh.path.copy': (node: Node) => node.copyName(),
+                'mysql.ssh.socks.port': (parentNode: SSHConnectionNode) => parentNode.startSocksProxy(),
+                'mysql.ssh.file.delete': (fileNode: FileNode | SSHConnectionNode) => fileNode.delete(),
+                'mysql.ssh.file.open': (fileNode: FileNode | FTPFileNode) => fileNode.open(),
+                'mysql.ssh.file.download': (fileNode: FileNode) => fileNode.download(),
             },
             // database
             ...{
                 "mysql.db.active": () => {
                     serviceManager.provider.activeDb();
                 },
-                "mysql.db.truncate": (databaseNode: DatabaseNode) => {
+                "mysql.db.truncate": (databaseNode: SchemaNode) => {
                     databaseNode.truncateDb();
                 },
                 "mysql.database.add": (connectionNode: ConnectionNode) => {
                     connectionNode.createDatabase();
                 },
-                "mysql.db.drop": (databaseNode: DatabaseNode) => {
+                "mysql.db.drop": (databaseNode: SchemaNode) => {
                     databaseNode.dropDatatabase();
-                },
-                "mysql.db.overview": (databaseNode: DatabaseNode) => {
-                    databaseNode.openOverview();
-                },
+                }
             },
             // mock
             ...{
@@ -128,30 +177,32 @@ export function activate(context: vscode.ExtensionContext) {
                     userNode.selectSqlTemplate();
                 },
             },
-            // diagram node
+            // history
             ...{
-                "mysql.diagram.add": (diagramNode: DiagramGroup) => {
-                    diagramNode.openAdd()
-                },
-                "mysql.diagram.open": (node: DiagramNode) => {
-                    node.open()
-                },
-                "mysql.diagram.drop": (node: DiagramNode) => {
-                    node.drop()
-                },
+                "mysql.history.view": (historyNode: HistoryNode) => {
+                    historyNode.view()
+                }
             },
             // query node
             ...{
-                "mysql.runQuery": (sql) => {
+                "mysql.runQuery": (sql:string) => {
                     if (typeof sql != 'string') { sql = null; }
-                    QueryUnit.runQuery(sql);
+                    QueryUnit.runQuery(sql, ConnectionManager.tryGetConnection());
                 },
-                "mysql.query.switch": async (databaseOrConnectionNode: DatabaseNode | ConnectionNode) => {
+                "mysql.runAllQuery": () => {
+                    QueryUnit.runQuery(null, ConnectionManager.tryGetConnection(), { runAll: true });
+                },
+                "mysql.query.switch": async (databaseOrConnectionNode: SchemaNode | ConnectionNode | EsConnectionNode | ESIndexNode) => {
                     if (databaseOrConnectionNode) {
                         await databaseOrConnectionNode.newQuery();
                     } else {
-                        FileManager.show(`sql/${new Date().getTime()}.sql`)
+                        vscode.workspace.openTextDocument({ language: 'sql' }).then(async (doc) => {
+                            vscode.window.showTextDocument(doc)
+                        });
                     }
+                },
+                "mysql.query.run": (queryNode: QueryNode) => {
+                    queryNode.run()
                 },
                 "mysql.query.open": (queryNode: QueryNode) => {
                     queryNode.open()
@@ -161,13 +212,20 @@ export function activate(context: vscode.ExtensionContext) {
                 },
                 "mysql.query.rename": (queryNode: QueryNode) => {
                     queryNode.rename()
-                },
-                "mysql.count.sql": (tableNode: TableNode) => {
-                    tableNode.countSql()
-                },
+                }
+            },
+            // redis
+            ...{
+                "mysql.redis.connection.status": (connectionNode: RedisConnectionNode) => connectionNode.showStatus(),
+                "mysql.connection.terminal": (node: Node) => node.openTerminal(),
+                "mysql.redis.key.detail": (keyNode: KeyNode) => keyNode.detail(),
+                "mysql.redis.key.del": (keyNode: KeyNode) => keyNode.delete(),
             },
             // table node
             ...{
+                "mysql.show.esIndex": (indexNode: ESIndexNode) => {
+                    indexNode.viewData()
+                },
                 "mysql.table.truncate": (tableNode: TableNode) => {
                     tableNode.truncateTable();
                 },
@@ -177,8 +235,8 @@ export function activate(context: vscode.ExtensionContext) {
                 "mysql.table.source": (tableNode: TableNode) => {
                     if (tableNode) { tableNode.showSource(); }
                 },
-                "mysql.changeTableName": (tableNode: TableNode) => {
-                    tableNode.changeTableName();
+                "mysql.view.source": (tableNode: TableNode) => {
+                    if (tableNode) { tableNode.showSource(); }
                 },
                 "mysql.table.show": (tableNode: TableNode) => {
                     if (tableNode) { tableNode.openInNew(); }
@@ -186,9 +244,6 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // column node
             ...{
-                "mysql.column.changeName": (columnNode: ColumnNode) => {
-                    columnNode.changeColumnName();
-                },
                 "mysql.column.up": (columnNode: ColumnNode) => {
                     columnNode.moveUp();
                 },
@@ -207,20 +262,14 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // template
             ...{
-                "mysql.template.sql": (tableNode: TableNode, run: boolean) => {
-                    tableNode.selectSqlTemplate(run);
+                "mysql.table.find": (tableNode: TableNode) => {
+                    tableNode.openTable();
                 },
-                "mysql.index.template": (tableNode: TableNode) => {
-                    tableNode.indexTemplate();
+                "mysql.codeLens.run": (sql: string) => {
+                    QueryUnit.runQuery(sql, ConnectionManager.tryGetConnection(), { split: true, recordHistory: true })
                 },
-                "mysql.template.delete": (tableNode: TableNode) => {
-                    tableNode.deleteSqlTemplate();
-                },
-                "mysql.copy.insert": (tableNode: TableNode) => {
-                    tableNode.insertSqlTemplate();
-                },
-                "mysql.copy.update": (tableNode: TableNode) => {
-                    tableNode.updateSqlTemplate();
+                "mysql.table.design": (tableNode: TableNode) => {
+                    tableNode.designTable();
                 },
             },
             // show source
@@ -237,6 +286,9 @@ export function activate(context: vscode.ExtensionContext) {
             },
             // create template
             ...{
+                "mysql.template.sql": (tableNode: TableNode) => {
+                    tableNode.selectSqlTemplate();
+                },
                 "mysql.template.table": (tableGroup: TableGroup) => {
                     tableGroup.createTemplate();
                 },
@@ -275,7 +327,6 @@ export function activate(context: vscode.ExtensionContext) {
                 },
             },
         }),
-
     );
 
 }
@@ -283,12 +334,18 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 }
 
+function detectActive(): void {
+    const fileNode = ConnectionManager.getByActiveFile();
+    if (fileNode) {
+        ConnectionManager.changeActive(fileNode);
+    }
+}
+
 function commandWrapper(commandDefinition: any, command: string): (...args: any[]) => any {
     return (...args: any[]) => {
         try {
             commandDefinition[command](...args);
-        }
-        catch (err) {
+        }catch (err) {
             Console.log(err);
         }
     };

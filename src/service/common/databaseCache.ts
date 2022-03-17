@@ -1,56 +1,15 @@
+import { GlobalState, WorkState } from "@/common/state";
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
 import { CacheKey, ModelType } from "../../common/constants";
-import { ColumnNode } from "../../model/other/columnNode";
-import { DatabaseNode } from "../../model/database/databaseNode";
+import { SchemaNode } from "../../model/database/schemaNode";
 import { Node } from "../../model/interface/node";
-import { TableNode } from "../../model/main/tableNode";
 
 export class DatabaseCache {
 
-    private static context: ExtensionContext;
-    private static connectionNodeMapDatabaseNode = {};
-    private static databaseNodeMapTableNode = {};
-    private static tableNodeMapColumnNode = {};
-    private static collpaseState: { key?: TreeItemCollapsibleState };
-
-    public static evictAllCache(): any {
-        if (this.context == null) { throw new Error("DatabaseCache is not init!"); }
-        this.connectionNodeMapDatabaseNode = [];
-        this.databaseNodeMapTableNode = {};
-        this.tableNodeMapColumnNode = {};
-    }
-
-    /**
-     * support to complection manager
-     */
-    public static getDatabaseNodeList(): DatabaseNode[] {
-        let databaseNodeList = [];
-
-        Object.keys(this.connectionNodeMapDatabaseNode).forEach((key) => {
-            const tempList = this.connectionNodeMapDatabaseNode[key];
-            if (tempList) {
-                databaseNodeList = databaseNodeList.concat(tempList);
-            }
-        });
-
-        return databaseNodeList;
-    }
-
-    /**
-     * support to complection manager
-     */
-    public static getTableNodeList(): TableNode[] {
-        let tableNodeList = [];
-
-        Object.keys(this.databaseNodeMapTableNode).forEach((key) => {
-            const tempList = this.databaseNodeMapTableNode[key];
-            if (tempList && (tempList[0] instanceof TableNode)) {
-                tableNodeList = tableNodeList.concat(tempList);
-            }
-        });
-
-        return tableNodeList;
-    }
+    private static cache = { database: {} };
+    private static childCache = {};
+    private static globalCollpaseState: { key?: TreeItemCollapsibleState };
+    private static workspaceCollpaseState: { key?: TreeItemCollapsibleState };
 
     /**
      * get element current collapseState or default collapseState
@@ -58,29 +17,19 @@ export class DatabaseCache {
      */
     public static getElementState(element?: Node) {
 
-        if (!element.contextValue) {
-            return TreeItemCollapsibleState.None
-        }
-
-        if (element.contextValue == ModelType.COLUMN || element.contextValue == ModelType.INFO || element.contextValue == ModelType.FUNCTION
-            || element.contextValue == ModelType.TRIGGER || element.contextValue == ModelType.PROCEDURE || element.contextValue == ModelType.USER) {
+        const contextValue = element.contextValue;
+        if (!contextValue || contextValue == ModelType.COLUMN || contextValue == ModelType.INFO || contextValue == ModelType.FUNCTION
+            || contextValue == ModelType.TRIGGER || contextValue == ModelType.PROCEDURE || contextValue == ModelType.USER
+            || contextValue == ModelType.DIAGRAM || contextValue == ModelType.ES_COLUMN || contextValue == ModelType.COLUMN
+        ) {
             return TreeItemCollapsibleState.None;
         }
 
-        if (!this.collpaseState || Object.keys(this.collpaseState).length == 0) {
-            this.collpaseState =
-                (element.global === false) ?
-                    this.context.workspaceState.get(CacheKey.CollapseSate) : this.context.globalState.get(CacheKey.CollapseSate)
-                ;
-        }
+        const collpaseState = element.global === false ? this.workspaceCollpaseState : this.globalCollpaseState;
 
-        if (!this.collpaseState) {
-            this.collpaseState = {};
-        }
-
-        if (element.id && this.collpaseState[element.id]) {
-            return this.collpaseState[element.id];
-        } else if (element.contextValue == ModelType.CONNECTION || element.contextValue == ModelType.TABLE_GROUP) {
+        if (element.uid && collpaseState[element.uid]) {
+            return collpaseState[element.uid];
+        } else if (contextValue == ModelType.CONNECTION || contextValue == ModelType.TABLE_GROUP) {
             return TreeItemCollapsibleState.Expanded;
         } else {
             return TreeItemCollapsibleState.Collapsed;
@@ -100,138 +49,76 @@ export class DatabaseCache {
             return;
         }
 
-        this.collpaseState[element.id] = collapseState;
         if (element.global === false) {
-            this.context.workspaceState.update(CacheKey.CollapseSate, this.collpaseState);
+            this.workspaceCollpaseState[element.uid] = collapseState;
+            WorkState.update(CacheKey.DATABASE_SATE, this.globalCollpaseState);
         } else {
-            this.context.globalState.update(CacheKey.CollapseSate, this.collpaseState);
+            this.globalCollpaseState[element.uid] = collapseState;
+            GlobalState.update(CacheKey.DATABASE_SATE, this.globalCollpaseState);
         }
 
     }
 
     /**
      * cache init, Mainly initializing context object
-     * @param context 
      */
-    public static initCache(context: ExtensionContext) {
-        this.context = context;
+    public static initCache() {
+        this.globalCollpaseState = GlobalState.get(CacheKey.DATABASE_SATE, {});
+        this.workspaceCollpaseState = WorkState.get(CacheKey.DATABASE_SATE, {});
+    }
+
+    public static clearCache() {
+        this.childCache = {}
+        this.cache.database = {}
+    }
+
+
+    public static setChildCache(uid: string, tableNodeList: Node[]) {
+        this.childCache[uid] = tableNodeList;
+    }
+
+    public static getChildCache<T extends Node>(uid: string): T[] {
+        return this.childCache[uid];
     }
 
     /**
      * clear database data for connection
      * @param connectionid 
      */
-    public static clearDatabaseCache(connectionid?: string) {
+    public static clearDatabaseCache(connectionid: string) {
         if (connectionid) {
-            delete this.connectionNodeMapDatabaseNode[connectionid];
-        } else {
-            this.connectionNodeMapDatabaseNode = {};
+            delete this.cache.database[connectionid];
         }
     }
 
     /**
-     * clear table data for database
-     * @param databaseid 
+     * support to complection manager
      */
-    public static clearTableCache(databaseid?: string) {
-        if (databaseid) {
-            delete this.databaseNodeMapTableNode[databaseid];
-        } else {
-            this.databaseNodeMapTableNode = {};
-        }
-    }
+    public static getDatabaseNodeList(): SchemaNode[] {
+        let databaseNodeList = [];
 
-    /**
-     * claer column data for table
-     * @param tableid 
-     */
-    public static clearColumnCache(tableid?: string) {
-        if (tableid) {
-            delete this.tableNodeMapColumnNode[tableid];
-        } else {
-            this.tableNodeMapColumnNode = {};
-        }
-    }
-
-    /**
-     * get connectino tree data
-     * @param connectcionid 
-     */
-    public static getDatabaseListOfConnection(connectcionid: string): DatabaseNode[] {
-        if (this.connectionNodeMapDatabaseNode[connectcionid]) {
-            return this.connectionNodeMapDatabaseNode[connectcionid];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * get database tree data
-     * @param databaseid 
-     */
-    private static tableTypeList = [ModelType.TABLE_GROUP, ModelType.VIEW_GROUP, ModelType.FUNCTION_GROUP, ModelType.TRIGGER_GROUP, ModelType.PROCEDURE_GROUP];
-    public static getChildListOfDatabase(databaseid: string): Node[] {
-        let result = [];
-        this.tableTypeList.forEach((tableType) => {
-            const tableList = this.databaseNodeMapTableNode[databaseid + "_" + tableType];
-            if (tableList) { result = result.concat(tableList); }
+        Object.keys(this.cache.database).forEach((key) => {
+            const tempList = this.cache.database[key];
+            if (tempList) {
+                databaseNodeList = databaseNodeList.concat(tempList);
+            }
         });
-        if (result.length == 0) { return null; }
-        return result;
+
+        return databaseNodeList;
     }
 
-
-    public static getTableListOfDatabase(databaseid: string): Node[] {
-        const tableList = this.databaseNodeMapTableNode[databaseid + "_" + ModelType.TABLE_GROUP];
-        return tableList;
+    public static setSchemaListOfConnection(connectionid: string, DatabaseNodeList: Node[]) {
+        this.cache.database[connectionid] = DatabaseNodeList;
     }
 
-    public static getViewListOfDatabase(databaseid: string): Node[] {
-        const viewList = this.databaseNodeMapTableNode[databaseid + "_" + ModelType.VIEW_GROUP];
-        return viewList;
-    }
-
-    public static getDatabase(connectId: string, dbName: string): DatabaseNode {
-        const dbList = this.connectionNodeMapDatabaseNode[connectId];
-        if (!dbList) { return null; }
-        for (const dbNode of dbList) {
-            if (dbNode.database == dbName) { return dbNode; }
-        }
-        return null;
-    }
-
-    public static getTable(databaseid: string, tableName: string): TableNode {
-        const tableList = this.databaseNodeMapTableNode[databaseid + "_" + ModelType.TABLE_GROUP];
-        if (!tableList) { return null; }
-        for (const tableNode of tableList) {
-            if (tableNode.table == tableName) { return tableNode; }
-        }
-        return null;
-    }
-
-    /**
-     * get table tree data
-     * @param tableid 
-     */
-    public static getColumnListOfTable(tableid: string): ColumnNode[] {
-        if (this.tableNodeMapColumnNode[tableid]) {
-            return this.tableNodeMapColumnNode[tableid];
+    public static getSchemaListOfConnection(connectcionid: string): SchemaNode[] {
+        if (this.cache.database[connectcionid]) {
+            return this.cache.database[connectcionid];
         } else {
             return null;
         }
     }
 
-    public static setDataBaseListOfConnection(connectionid: string, DatabaseNodeList: DatabaseNode[]) {
-        this.connectionNodeMapDatabaseNode[connectionid] = DatabaseNodeList;
-    }
-
-    public static setTableListOfDatabase(databaseid: string, tableNodeList: Node[]) {
-        this.databaseNodeMapTableNode[databaseid] = tableNodeList;
-    }
-
-    public static setColumnListOfTable(tableid: string, columnList: ColumnNode[]) {
-        this.tableNodeMapColumnNode[tableid] = columnList;
-    }
 
 
 }

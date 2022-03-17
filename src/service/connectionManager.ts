@@ -1,5 +1,3 @@
-import * as fs from "fs";
-import * as mysql from "mysql2";
 import * as path from "path";
 import * as vscode from "vscode";
 import { Global } from "../common/global";
@@ -8,81 +6,98 @@ import { QueryUnit } from "./queryUnit";
 import { SSHConfig } from "../model/interface/sshConfig";
 import { DatabaseCache } from "./common/databaseCache";
 import { NodeUtil } from "../model/nodeUtil";
-import { SSHTunnelService } from "./common/sshTunnelService";
+import { SSHTunnelService } from "./tunnel/sshTunnelService";
 import { DbTreeDataProvider } from "../provider/treeDataProvider";
+import { IConnection } from "./connect/connection";
+import { DatabaseType } from "@/common/constants";
+import { EsConnection } from "./connect/esConnection";
+import { MSSqlConnnection } from "./connect/mssqlConnection";
+import { MysqlConnection } from "./connect/mysqlConnection";
+import { PostgreSqlConnection } from "./connect/postgreSqlConnection";
+import { RedisConnection } from "./connect/redisConnection";
+import { FTPConnection } from "./connect/ftpConnection";
+import { SqliteConnection } from "./connect/sqliteConnection";
+import { Console } from "@/common/Console";
+import { MongoConnection } from "./connect/mongoConnection";
 
 interface ConnectionWrapper {
-    connection: mysql.Connection;
+    connection: IConnection;
     ssh: SSHConfig;
-    createTime: Date
+    schema?: string
+}
+
+export interface GetRequest {
+    retryCount?: number;
+    sessionId?: string;
 }
 
 export class ConnectionManager {
 
-    private static lastConnectionNode: Node;
-    private static activeConnection: { [key: string]: ConnectionWrapper } = {};
+    public static activeNode: Node;
+    private static alivedConnection: { [key: string]: ConnectionWrapper } = {};
     private static tunnelService = new SSHTunnelService();
 
-    public static getLastConnectionOption(checkActiveFile = true): Node {
+    public static tryGetConnection(): Node {
 
-        if (checkActiveFile) {
-            const fileNode = this.getByActiveFile()
-            if (fileNode) { return fileNode }
-        }
-
-        const node = this.lastConnectionNode;
-        if (node == null) {
-            // ConnectionManager.checkConnection();
-        }
-
-        return node;
+        return this.getByActiveFile() || this.activeNode;
     }
 
     public static getActiveConnectByKey(key: string): ConnectionWrapper {
-        return this.activeConnection[key]
+        return this.alivedConnection[key]
     }
 
-    public static removeConnection(id: string) {
+    public static removeConnection(uid: string) {
 
-        const lcp = this.lastConnectionNode;
-        if (lcp && lcp.getConnectId() == id) {
-            delete this.lastConnectionNode
+        try {
+            const lcp = this.activeNode;
+            if (lcp?.getConnectId() == uid) {
+                delete this.activeNode
+            }
+            const activeConnect = this.alivedConnection[uid];
+            if (activeConnect) {
+                this.end(uid, activeConnect)
+            }
+            DatabaseCache.clearDatabaseCache(uid)
+        } catch (error) {
+            Console.log(error)
         }
-        const activeConnect = this.activeConnection[id];
-        if (activeConnect) {
-            this.activeConnection[id] = null
-            this.tunnelService.closeTunnel(lcp.getConnectId())
-            activeConnect.connection.end()
-        }
-        DatabaseCache.clearDatabaseCache(id)
 
     }
 
-    public static getConnection(connectionNode: Node, changeActive: boolean = false): Promise<mysql.Connection> {
+    public static changeActive(connectionNode: Node) {
+        this.activeNode = connectionNode;
+        Global.updateStatusBarItems(connectionNode);
+        DbTreeDataProvider.refresh()
+    }
+
+    public static getConnection(connectionNode: Node, getRequest: GetRequest = { retryCount: 1 }): Promise<IConnection> {
         if (!connectionNode) {
-            this.checkConnection()
-            throw new Error("No MySQL Server or Database selected!")
+            throw new Error("Connection is dead!")
         }
         return new Promise(async (resolve, reject) => {
 
             NodeUtil.of(connectionNode)
-            if (changeActive) {
-                this.lastConnectionNode = connectionNode;
-                Global.updateStatusBarItems(connectionNode);
-                setTimeout(() => {
-                    DbTreeDataProvider.refresh()
-                }, 100);
-            }
-            const key = connectionNode.getConnectId();
-            const connection = this.activeConnection[key];
-            if (connection && (connection.connection.state == 'authenticated' || connection.connection.authorized)) {
-                const sql = connectionNode.database ? `use \`${connectionNode.database}\`` : `SHOW STATUS WHERE variable_name = 'Max_used_connections';`;
-                try {
-                    await QueryUnit.queryPromise(connection.connection, sql, false)
-                    resolve(connection.connection);
-                    return;
-                } catch (err) {
-                    this.activeConnection[key] = null
+            if (!getRequest.retryCount) getRequest.retryCount = 1;
+            const key = getRequest.sessionId || connectionNode.getConnectId();
+            const connection = this.alivedConnection[key];
+            if (connection) {
+                if (connection.connection.isAlive()) {
+                    if (connection.schema != connectionNode.schema) {
+                        const sql = connectionNode?.dialect?.pingDataBase(connectionNode.schema);
+                        try {
+                            if (sql) {
+                                await QueryUnit.queryPromise(connection.connection, sql, false)
+                            }
+                            connection.schema = connectionNode.schema
+                            resolve(connection.connection);
+                            return;
+                        } catch (err) {
+                            ConnectionManager.end(key, connection);
+                        }
+                    } else {
+                        resolve(connection.connection);
+                        return;
+                    }
                 }
             }
 
@@ -90,24 +105,32 @@ export class ConnectionManager {
             let connectOption = connectionNode;
             if (connectOption.usingSSH) {
                 connectOption = await this.tunnelService.createTunnel(connectOption, (err) => {
+                    reject(err?.message || err?.errno);
                     if (err.errno == 'EADDRINUSE') { return; }
-                    this.activeConnection[key] = null
+                    this.alivedConnection[key] = null
                 })
                 if (!connectOption) {
                     reject("create ssh tunnel fail!");
                     return;
                 }
             }
-            this.activeConnection[key] = { connection: this.createConnection(connectOption), ssh, createTime: new Date() };
-            this.activeConnection[key].connection.connect((err: Error) => {
-                if (!err) {
-                    this.lastConnectionNode = NodeUtil.of(connectionNode);
-                    resolve(this.activeConnection[key].connection);
+            const newConnection = this.create(connectOption);
+            this.alivedConnection[key] = { connection: newConnection, ssh };
+            newConnection.connect(async (err: Error) => {
+                if (err) {
+                    this.end(key, this.alivedConnection[key])
+                    reject(err)
                 } else {
-                    this.activeConnection[key] = null;
-                    this.tunnelService.closeTunnel(key)
-                    console.error(err.stack)
-                    reject(err.message);
+                    try {
+                        const sql = connectionNode?.dialect?.pingDataBase(connectionNode.schema);
+                        if (connectionNode.schema && sql) {
+                            await QueryUnit.queryPromise(newConnection, sql, false)
+                        }
+                    } catch (error) {
+                        console.log(err)
+                    }
+
+                    resolve(newConnection);
                 }
             });
 
@@ -115,58 +138,53 @@ export class ConnectionManager {
 
     }
 
-    public static createConnection(opt: Node): mysql.Connection {
-
-        const newConnectionOptions = {
-            host: opt.host, port: opt.port, user: opt.user, password: opt.password, database: opt.database,
-            timezone:opt.timezone,
-             multipleStatements: true, dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
-
-        } as mysql.ConnectionConfig;
-        if (opt.certPath && fs.existsSync(opt.certPath)) {
-            newConnectionOptions.ssl = {
-                ca: fs.readFileSync(opt.certPath),
-            };
+    private static create(opt: Node) {
+        if (!opt.dbType) opt.dbType = DatabaseType.MYSQL
+        switch (opt.dbType) {
+            case DatabaseType.MSSQL:
+                return new MSSqlConnnection(opt)
+            case DatabaseType.PG:
+                return new PostgreSqlConnection(opt)
+            case DatabaseType.SQLITE:
+                return new SqliteConnection(opt);
+            case DatabaseType.ES:
+                return new EsConnection(opt);
+            case DatabaseType.MONGO_DB:
+                return new MongoConnection(opt);
+            case DatabaseType.REDIS:
+                return new RedisConnection(opt);
+            case DatabaseType.FTP:
+                return new FTPConnection(opt);
         }
-        return mysql.createConnection(newConnectionOptions);
+        return new MysqlConnection(opt)
+    }
 
+    private static end(key: string, connection: ConnectionWrapper) {
+        this.alivedConnection[key] = null
+        try {
+            this.tunnelService.closeTunnel(key)
+            connection.connection.end();
+        } catch (error) {
+        }
     }
 
     public static getByActiveFile(): Node {
         if (vscode.window.activeTextEditor) {
             const fileName = vscode.window.activeTextEditor.document.fileName;
-            if (fileName.includes('cweijan.vscode-mysql-client2')) {
-                const queryName = path.basename(fileName, path.extname(fileName))
-                const filePattern = queryName.replace(/#.+$/,'').split('_');
-                const [mode, host, port, user] = filePattern
-                let database: string;
-                if (filePattern.length >= 5) {
-                    database = filePattern[4]
-                    // fix if database name has _, loop append
-                    if (filePattern.length >= 5) {
-                        for (let index = 5; index < filePattern.length; index++) {
-                            database = `${database}_${filePattern[index]}`
-                        }
-                    }
-                }
-                if (host != null && port != null && user != null) {
-                    const node = NodeUtil.of({ host, port: parseInt(port), user, database });
-                    if (this.getActiveConnectByKey(node.getConnectId())) {
-                        return node;
+            if (fileName.includes('cweijan')) {
+                const queryName = path.basename(path.resolve(fileName, '..'))
+                const [host, port, database, schema] = queryName
+                    .replace(/^.*@@/, '') // new connection id
+                    .replace(/#.+$/, '').split('@')
+                if (host != null) {
+                    const node = NodeUtil.of({ key: queryName.split('@@')[0], host, port: parseInt(port), database, schema });
+                    if (node.getCache()) {
+                        return node.getCache();
                     }
                 }
             }
         }
         return null;
     }
-
-    private static checkConnection() {
-        vscode.window.showErrorMessage("Please create database connection.", "Config").then(action => {
-            if (action == "Config") {
-                vscode.commands.executeCommand('mysql.connection.add');
-            }
-        });
-    }
-
 
 }

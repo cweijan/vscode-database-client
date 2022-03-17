@@ -1,7 +1,12 @@
 
+import { join } from "path";
 import * as vscode from "vscode";
 import { Position, TextDocument } from "vscode";
-import { Confirm } from "./constants";
+import { Confirm, Constants, DatabaseType } from "./constants";
+import { exec } from "child_process";
+import { wrapByDb } from "./wrapper.js";
+import { GlobalState } from "./state";
+import { Console } from "./Console";
 
 export class Util {
 
@@ -10,8 +15,8 @@ export class Util {
         const tableMatch = new RegExp(tablePattern, 'img').exec(sql)
         if (tableMatch) {
             return tableMatch[0].replace(/\bfrom|join|update|into\b/i, "") // remove keyword
-                .replace(/(\w|\s|-|`)*\./, "")// remove databasename
-                .replace(/`/g, "")// trim tableName
+                .replace(/`|"|'/g, "")// trim tableName
+                .replace(/^\s*\[(.+)\]$/, "$1") // trim tableName again
                 .trim()
         }
 
@@ -22,15 +27,8 @@ export class Util {
      * wrap origin with ` if is unusual identifier
      * @param origin any string
      */
-    public static wrap(origin: string) {
-        if (origin == null) { return origin; }
-
-        if (origin.match(/\b[-\.]\b/ig)
-            || origin.match(/^(if|key|desc|length)$/i)) {
-            return `\`${origin}\``;
-        }
-
-        return origin;
+    public static wrap(origin: string, databaseType?: DatabaseType) {
+        return wrapByDb(origin, databaseType)
     }
 
     public static trim(origin: any): any {
@@ -77,6 +75,80 @@ export class Util {
             if (res == Confirm.YES) {
                 callback()
             }
+        })
+    }
+
+    public static async(callback: (res, rej) => void): Promise<any> {
+        return new Promise((resolve, reject) => callback(resolve, reject))
+    }
+
+    public static process(title: string, task: (done) => void) {
+        vscode.window.withProgress({ title, location: vscode.ProgressLocation.Notification }, () => {
+            return new Promise(async (resolve) => {
+                try {
+                    task(resolve)
+                } catch (error) {
+                    vscode.window.showErrorMessage(error.message)
+                }
+            })
+        })
+    }
+
+    public static getExtPath(...paths: string[]) {
+
+        return vscode.Uri.file(join(Constants.RES_PATH, ...paths))
+    }
+
+    public static getStore(key: string): any {
+        return GlobalState.get(key);
+    }
+    public static store(key: string, object: any) {
+        GlobalState.update(key, object)
+    }
+
+    public static is(object: any, type: string): boolean {
+        if (!object) return false;
+        return object.__proto__.constructor.name == type;
+    }
+
+
+    private static supportColor: boolean = null;
+    /**
+     * Check current vscode treeitem support ref theme icon with color.
+     */
+    public static supportColorIcon(): boolean {
+
+        if (this.supportColor === null) {
+            try {
+                new vscode.ThemeIcon("key", new vscode.ThemeColor('charts.yellow'));
+                this.supportColor = true;
+            } catch (error) {
+                this.supportColor = false;
+            }
+        }
+
+        return this.supportColor;
+    }
+
+    public static execute(command: string): Promise<void> {
+        return new Promise((res, rej) => {
+            let hasTrigger = false;
+            exec(command, (err, stdout, stderr) => {
+                if (hasTrigger) return;
+                if (err) {
+                    rej(err)
+                } else if (stderr) {
+                    rej(stderr)
+                } else if(!hasTrigger){
+                    hasTrigger = true;
+                    res(null)
+                }
+            }).on("exit", (code) => {
+                if (!hasTrigger && code===0){
+                    hasTrigger = true;
+                    res(null)
+                };
+            })
         })
     }
 

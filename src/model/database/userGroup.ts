@@ -1,33 +1,35 @@
 import * as path from "path";
-import * as vscode from "vscode";
-import { Constants, ModelType, Template } from "../../common/constants";
-import { Util } from "../../common/util";
-import { ConnectionManager } from "../../service/connectionManager";
+import { ThemeIcon } from "vscode";
+import { Constants, ModelType } from "../../common/constants";
 import { QueryUnit } from "../../service/queryUnit";
-import { DbTreeDataProvider } from "../../provider/treeDataProvider";
-import { InfoNode } from "../other/infoNode";
-import { CopyAble } from "../interface/copyAble";
 import { Node } from "../interface/node";
-import { DatabaseNode } from "./databaseNode";
-import { FileManager, FileModel } from "@/common/filesManager";
+import { InfoNode } from "../other/infoNode";
+import { SchemaNode } from "./schemaNode";
+import { UserNode } from "./userNode";
 
-export class UserGroup extends DatabaseNode {
+export class UserGroup extends SchemaNode {
 
     public contextValue: string = ModelType.USER_GROUP;
-    public iconPath = path.join(Constants.RES_PATH, "icon/userGroup.svg")
+    public iconPath =new ThemeIcon("account")
     constructor(readonly name: string, readonly parent: Node) {
-        super(name, parent)
-        this.id = `${this.getConnectId()}_${ModelType.USER_GROUP}`;
+        super(name,parent)
+        this.init(parent)
+        // fix switch database fail.
+        this.schema = null
         this.database = null
     }
 
     public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        let userNodes = [];
-        return QueryUnit.queryPromise<any[]>(await ConnectionManager.getConnection(this), `SELECT host,user FROM mysql.user;`)
+        let userNodes = this.getChildCache();
+        if (userNodes && !isRresh) {
+            return userNodes;
+        }
+        return this.execute<any[]>(this.dialect.showUsers())
             .then((tables) => {
                 userNodes = tables.map<UserNode>((table) => {
-                    return new UserNode(table.user,table.host, this.parent);
+                    return new UserNode(table.user, table.host, this);
                 });
+                this.setChildCache(userNodes)
                 return userNodes;
             })
             .catch((err) => {
@@ -37,69 +39,10 @@ export class UserGroup extends DatabaseNode {
 
     public async createTemplate() {
 
-        ConnectionManager.getConnection(this, true);
-        const filePath = await FileManager.record(`${this.parent.id}#create-view-template.sql`,`CREATE USER 'username'@'%' IDENTIFIED BY 'password';`, FileModel.WRITE)
-        FileManager.show(filePath)
+        QueryUnit.showSQLTextDocument(this, this.dialect.createUser(), 'create-user-template.sql')
+
     }
 
 }
 
 
-export class UserNode extends Node implements CopyAble {
-
-    public contextValue = ModelType.USER;
-    public iconPath = path.join(Constants.RES_PATH, "icon/user.svg")
-    constructor(readonly username: string,readonly host:string, readonly info: Node) {
-        super(`${username}@${host}`)
-        this.init(info)
-        this.command = {
-            command: "mysql.user.sql",
-            title: "Run User Detail Statement",
-            arguments: [this, true],
-        }
-    }
-
-    public copyName(): void {
-        Util.copyToBoard(this.username)
-    }
-
-    public async getChildren(isRresh: boolean = false): Promise<Node[]> {
-        return [];
-    }
-
-    public async selectSqlTemplate() {
-        const sql = `SELECT USER 0USER,HOST 1HOST,Super_priv,Select_priv,Insert_priv,Update_priv,Delete_priv,Create_priv,Drop_priv,Index_priv,Alter_priv FROM mysql.user where user='${this.username}';`;
-        QueryUnit.runQuery(sql, this);
-    }
-
-    public drop() {
-
-        Util.confirm(`Are you want to drop user ${this.username} ?`, async () => {
-            QueryUnit.queryPromise(await ConnectionManager.getConnection(this), `DROP user ${this.username}`).then(() => {
-                DbTreeDataProvider.refresh(this.info);
-                vscode.window.showInformationMessage(`Drop user ${this.username} success!`);
-            });
-        })
-    }
-
-    public grandTemplate() {
-        QueryUnit.showSQLTextDocument(`
-GRANT ALL PRIVILEGES ON *.* to '${this.username}'@'%'
-`.replace(/^\s/, ""));
-    }
-
-    public changePasswordTemplate() {
-        ConnectionManager.getConnection(this, true);
-        QueryUnit.showSQLTextDocument(`
-update
-    mysql.user
-set
-    password = PASSWORD("newPassword")
-where
-    User = '${this.username}';
-FLUSH PRIVILEGES;
--- since mysql version 5.7, password column need change to authentication_string=PASSWORD("test")`
-            .replace(/^\s/, ""));
-    }
-
-}

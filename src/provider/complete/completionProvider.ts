@@ -1,31 +1,25 @@
 import * as vscode from "vscode";
+import { Console } from "../../common/Console";
 import { ColumnChain } from "./chain/columnChain";
-import { DatabaseChain } from "./chain/databaseChain";
+import { DDLChain } from "./chain/ddlChain";
+import { DMLChain } from "./chain/dmlChain";
 import { KeywordChain } from "./chain/keywordChain";
 import { TableChain } from "./chain/tableChain";
-import { TableCreateChain } from "./chain/tableCreatingChain";
-import { TypeKeywordChain } from "./chain/typeKeywordChain";
-import { ComplectionChain, ComplectionContext } from "./complectionContext";
 import { TableDetecherChain } from "./chain/tableDetecherChain";
-import { FunctionChain } from "./chain/functionChain";
-import { Console } from "../../common/Console";
+import { ComplectionContext } from "./complectionContext";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
-    constructor() {
-        this.initDefaultComplectionItem();
-    }
 
-    private fullChain: ComplectionChain[];
-
-    private initDefaultComplectionItem() {
-        // The chain is orderly
-        this.fullChain = [
-            new TableCreateChain(),
-            new TypeKeywordChain(),
-            new DatabaseChain(),
+    /**
+     * The chain is orderly
+     * @returns 
+     */
+    private completeChain() {
+        return [
+            new DDLChain(),
+            new DMLChain(),
             new TableChain(),
             new ColumnChain(),
-            new FunctionChain(),
             new TableDetecherChain(),
             new KeywordChain(),
         ];
@@ -40,7 +34,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
         const context = ComplectionContext.build(document, position);
         let completionItemList = [];
-        for (const chain of this.fullChain) {
+        for (const chain of this.completeChain()) {
             try {
                 const tempComplection = await chain.getComplection(context);
                 if (tempComplection != null) {
