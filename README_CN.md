@@ -1,5 +1,11 @@
 # Database Client for Visual Studio Code
 
+我现在不再免费维护这个项目, 用户需要付费才可使用全部功能, 同时我会投入更多的精力开发这个项目, 中国区高级版价格为68元1年, 需反馈问题可加Q群706495803.
+
+在线文档已迁移至 [doc.database-client.com](https://doc.database-client.com/#/zh/).
+
+---
+
 <p align="center">
 <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
     <img src="https://img.shields.io/vscode-marketplace/v/cweijan.vscode-mysql-client2.svg?label=vscode%20marketplace">
@@ -22,10 +28,6 @@
 该项目为Visual Studio Code的数据库客户端扩展, 支持**MySQL/MariaDB, PostgreSQL, SQLite, Redis, ClickHouse, 达梦**以及**ElasticSearch**的管理, 且可以作为一个SSH客户端, 最大程度地提高你的生产力!
 
 <a href="https://database-client.com" target="_blank"><img src="./public/logo_dark.png" alt="Logo" style="height: auto !important;width: auto !important;" ></a>
-
-开发这个扩展我花了大量的精力, 然而时常收到不友好评价, 仅仅是因为这些人对某个功能不满意.
-
-对于一个免费软件, 这严重降低了作者的积极性, 所以我决定将其转为付费软件, 现在用户需要付费才可以使用全部功能, 中国区高级版价格为68元1年, 需反馈问题可加Q群706495803.
 
 ## 功能
 
