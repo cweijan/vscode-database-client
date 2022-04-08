@@ -1,5 +1,11 @@
 # Database Client for Visual Studio Code
 
+I no longer maintain for free, now users need to pay to use all the features. At the same time I will put more effort into developing this project.
+
+The online document is migrate to https://doc.database-client.com.
+
+---
+
 <p align="center">
 <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
     <img src="https://img.shields.io/vscode-marketplace/v/cweijan.vscode-mysql-client2.svg?label=vscode%20marketplace">
@@ -24,10 +30,6 @@ This project is a database client for VSCode, supports manager **MySQL/MariaDB, 
 > Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
 
 [![Logo](./public/logo_dark.png)](https://database-client.com)
-
-I put a lot of effort into developing this extension, but often receives unfriendly reviews, just because they are not satisfied with a certain feature.
-
-For a free software, this seriously demotivated the author, so I convert it to paid software, you can still using for free, but you cannot use all the features.
 
 ## Features
 
