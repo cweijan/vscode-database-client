@@ -1,7 +1,5 @@
 # Database Client for Visual Studio Code
 
-I no longer maintain for free, now users need to pay to use all the features. At the same time I will put more effort into developing this project.
-
 The online document is migrate to https://doc.database-client.com.
 
 ---
