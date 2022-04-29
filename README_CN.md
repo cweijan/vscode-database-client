@@ -1,7 +1,5 @@
 # Database Client for Visual Studio Code
 
-我现在不再免费维护这个项目, 用户需要付费才可使用全部功能, 同时我会投入更多的精力开发这个项目, 中国区高级版价格为68元1年, 需反馈问题可加Q群706495803.
-
 在线文档已迁移至 [doc.database-client.com](https://doc.database-client.com/#/zh/).
 
 ---
