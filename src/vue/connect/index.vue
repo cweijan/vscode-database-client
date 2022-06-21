@@ -60,7 +60,7 @@
           <input class="w-64 field__input" placeholder="Username" required v-model="connectionOption.user" />
         </div>
         <div class="inline-block mr-10">
-          <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Password</label>
+          <label class="font-bold mr-5 inline-block w-32">Password</label>
           <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
         </div>
       </section>
