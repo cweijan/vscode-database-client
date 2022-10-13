@@ -79,7 +79,7 @@
         </div>
       </section>
 
-      <SQLServer :connectionOption="connectionOption" v-if="connectionOption.dbType == 'SqlServer'" />
+      <SQLServer :connectionOption="connectionOption" v-if="connectionOption.dbType == 'SQL Server'" />
 
       <section class="mb-2">
         <div class="inline-block mr-10" v-if="connectionOption.dbType != 'Redis'">
@@ -239,7 +239,7 @@ export default {
       supportDatabases: [
         "MySQL",
         "PostgreSQL",
-        "SqlServer",
+        "SQL Server",
         "SQLite",
         "MongoDB",
         "Redis",
@@ -298,11 +298,6 @@ export default {
         this.connectionOption.isGlobal = this.connectionOption.global;
       });
     vscodeEvent.emit("route-" + this.$route.name);
-    window.onkeydown = (e) => {
-      if (e.key == "Enter" && e.target.tagName == "INPUT") {
-        this.tryConnect();
-      }
-    };
   },
   destroyed() {
     vscodeEvent.destroy();
@@ -360,7 +355,7 @@ export default {
           this.connectionOption.user = "system";
           this.connectionOption.port = 1521;
           break;
-        case "SqlServer":
+        case "SQL Server":
           this.connectionOption.user = "sa";
           this.connectionOption.encrypt = true;
           this.connectionOption.port = 1433;
