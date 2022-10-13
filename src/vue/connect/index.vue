@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col mx-auto connect-container">
+  <form @submit.prevent="tryConnect" class="flex flex-col mx-auto connect-container">
     <h1 class="py-4 text-2xl">Connect to Database Server</h1>
 
     <blockquote class="p-3 mb-2 panel error" v-if="connect.error">
@@ -90,10 +90,7 @@
           <input class="w-64 field__input" placeholder="Username" required v-model="connectionOption.user" />
         </div>
         <div class="inline-block mr-10">
-          <label class="inline-block w-32 mr-5 font-bold">
-            Password
-            <span class="mr-1 text-red-600" title="required">*</span>
-          </label>
+          <label class="inline-block w-32 mr-5 font-bold">Password</label>
           <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
         </div>
       </section>
@@ -121,15 +118,14 @@
 
       <section class="mb-2">
         <div class="inline-block mr-10">
-          <label class="inline-block w-32 mr-5 font-bold">ConnectTimeout</label>
-          <input class="w-64 field__input" placeholder="5000" required v-model="connectionOption.connectTimeout" />
+          <label class="inline-block w-32 mr-5 font-bold">Connection Timeout</label>
+          <input class="w-64 field__input" placeholder="5000" v-model="connectionOption.connectTimeout" />
         </div>
         <div class="inline-block mr-10">
-          <label class="inline-block w-32 mr-5 font-bold">RequestTimeout</label>
+          <label class="inline-block w-32 mr-5 font-bold">Request Timeout</label>
           <input
             class="w-64 field__input"
             placeholder="10000"
-            required
             type="number"
             v-model="connectionOption.requestTimeout"
           />
@@ -185,12 +181,10 @@
     <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH" />
 
     <div>
-      <button class="inline mr-4 button button--primary w-28" @click="tryConnect" v-loading="connect.loading">
-        Connect
-      </button>
+      <button class="inline mr-4 button button--primary w-28" type="submit" v-loading="connect.loading">Connect</button>
       <button class="inline button button--primary w-28" @click="close">Close</button>
     </div>
-  </div>
+  </form>
 </template>
 
 <script>
