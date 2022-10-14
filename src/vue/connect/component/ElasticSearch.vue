@@ -4,7 +4,7 @@
       <div class="inline-block mr-10">
         <label class="inline-block w-32 mr-5 font-bold">
           <span>URL</span>
-          <span class="mr-1 text-red-600">*</span>
+          <span class="mr-1 text-red-600" title="required">*</span>
         </label>
         <input
           class="field__input"

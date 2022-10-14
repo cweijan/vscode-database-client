@@ -4,14 +4,14 @@
       <div class="inline-block mr-10">
         <label class="inline-block mr-5 font-bold w-28">
           SSH Host
-          <span class="mr-1 text-red-600">*</span>
+          <span class="mr-1 text-red-600" title="required">*</span>
         </label>
         <input class="w-64 field__input" placeholder="SSH Host" required v-model="connectionOption.ssh.host" />
       </div>
       <div class="inline-block mr-10">
         <label class="inline-block mr-5 font-bold w-28">
           SSH Port
-          <span class="mr-1 text-red-600">*</span>
+          <span class="mr-1 text-red-600" title="required">*</span>
         </label>
         <input
           class="w-64 field__input"
@@ -27,7 +27,7 @@
       <div class="inline-block mr-10">
         <label class="inline-block mr-5 font-bold w-28">
           SSH Username
-          <span class="mr-1 text-red-600">*</span>
+          <span class="mr-1 text-red-600" title="required">*</span>
         </label>
         <input class="w-64 field__input" placeholder="SSH Username" required v-model="connectionOption.ssh.username" />
       </div>
@@ -62,7 +62,10 @@
 
     <div v-if="connectionOption.ssh.type == 'password'">
       <section class="mb-2">
-        <label class="inline-block mr-5 font-bold w-28">Password</label>
+        <label class="inline-block mr-5 font-bold w-28">
+          Password
+          <span class="mr-1 text-red-600" title="required">*</span>
+        </label>
         <input
           class="w-64 field__input"
           placeholder="Password"
