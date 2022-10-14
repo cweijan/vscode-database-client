@@ -18,7 +18,7 @@
       </section>
     </blockquote>
 
-    <section class="mb-2">
+    <section>
       <label class="inline-block mr-5 font-bold">Connection Name</label>
       <input class="w-1/4 field__input" placeholder="Connection name" v-model="connectionOption.name" />
       <label class="inline-block ml-4 mr-5 font-bold">Connection Target</label>
@@ -26,7 +26,7 @@
       <el-radio v-model="connectionOption.global" :label="false"> Current Workspace </el-radio>
     </section>
 
-    <section class="mb-2">
+    <section>
       <label class="block font-bold">Database Type</label>
       <ul class="tab">
         <li
@@ -51,8 +51,8 @@
     <SSH v-else-if="connectionOption.dbType == 'SSH'" :connectionOption="connectionOption" />
 
     <template v-else>
-      <section class="mb-2">
-        <div class="inline-block mr-10">
+      <section class="mt-5">
+        <div class="inline-block mb-2 mr-10">
           <label class="inline-block w-32 mr-5 font-bold">
             <span>Host</span>
             <span class="mr-1 text-red-600" title="required">*</span>
@@ -64,7 +64,7 @@
             v-model="connectionOption.host"
           />
         </div>
-        <div class="inline-block mr-10">
+        <div class="inline-block mb-2 mr-10">
           <label class="inline-block w-32 mr-5 font-bold">
             Port
             <span class="mr-1 text-red-600" title="required">*</span>
@@ -81,22 +81,22 @@
 
       <SQLServer :connectionOption="connectionOption" v-if="connectionOption.dbType == 'SQL Server'" />
 
-      <section class="mb-2">
-        <div class="inline-block mr-10" v-if="connectionOption.dbType != 'Redis'">
+      <section>
+        <div class="inline-block mb-2 mr-10" v-if="connectionOption.dbType != 'Redis'">
           <label class="inline-block w-32 mr-5 font-bold">
             Username
             <span class="mr-1 text-red-600" title="required">*</span>
           </label>
           <input class="w-64 field__input" placeholder="Username" required v-model="connectionOption.user" />
         </div>
-        <div class="inline-block mr-10">
+        <div class="inline-block mb-2 mr-10">
           <label class="inline-block w-32 mr-5 font-bold">Password</label>
           <input class="w-64 field__input" placeholder="Password" type="password" v-model="connectionOption.password" />
         </div>
       </section>
 
-      <section class="mb-2" v-if="connectionOption.dbType != 'FTP' && connectionOption.dbType != 'MongoDB'">
-        <div class="inline-block mr-10">
+      <section v-if="connectionOption.dbType != 'FTP' && connectionOption.dbType != 'MongoDB'">
+        <div class="inline-block mb-2 mr-10">
           <label class="inline-block w-32 mr-5 font-bold">Databases</label>
           <input
             class="w-64 field__input"
@@ -104,7 +104,7 @@
             v-model="connectionOption.database"
           />
         </div>
-        <div class="inline-block mr-10" v-if="connectionOption.dbType != 'Redis'">
+        <div class="inline-block mb-2 mr-10" v-if="connectionOption.dbType != 'Redis'">
           <label class="inline-block w-32 mr-5 font-bold">Include Databases</label>
           <input
             class="w-64 field__input"
@@ -116,12 +116,12 @@
 
       <FTP v-if="connectionOption.dbType == 'FTP'" :connectionOption="connectionOption" />
 
-      <section class="mb-2">
-        <div class="inline-block mr-10">
+      <section>
+        <div class="inline-block mb-2 mr-10">
           <label class="inline-block w-32 mr-5 font-bold">Connection Timeout</label>
           <input class="w-64 field__input" placeholder="5000" v-model="connectionOption.connectTimeout" />
         </div>
-        <div class="inline-block mr-10">
+        <div class="inline-block mb-2 mr-10">
           <label class="inline-block w-32 mr-5 font-bold">Request Timeout</label>
           <input
             class="w-64 field__input"
@@ -133,7 +133,7 @@
       </section>
 
       <section class="flex items-center mb-2" v-if="connectionOption.dbType == 'MySQL'">
-        <div class="inline-block mr-10">
+        <div class="inline-block mb-2 mr-10">
           <label class="inline-block w-32 mr-5 font-bold">Timezone</label>
           <input class="w-64 field__input" placeholder="+HH:MM" v-model="connectionOption.timezone" />
         </div>
@@ -180,7 +180,7 @@
     <SSL :connectionOption="connectionOption" v-if="connectionOption.useSSL" />
     <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH" />
 
-    <div>
+    <div class="mt-2">
       <button class="inline mr-4 button button--primary w-28" type="submit" v-loading="connect.loading">Connect</button>
       <button class="inline button button--primary w-28" @click="close">Close</button>
     </div>

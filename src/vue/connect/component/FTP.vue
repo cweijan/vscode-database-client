@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="inline-block mr-10">
-      <label class="font-bold mr-5 inline-block w-32">Encoding</label>
+    <div class="inline-block mb-2 mr-10">
+      <label class="inline-block w-32 mr-5 font-bold">Encoding</label>
       <input class="w-64 field__input" placeholder="UTF8" required v-model="connectionOption.encoding" />
     </div>
-    <div class="inline-block mr-10">
-      <label class="font-bold mr-5 inline-block w-32">Show Hidden File</label>
+    <div class="block mb-2 mr-10">
+      <label class="inline-block w-32 mr-5 font-bold">Show Hidden File</label>
       <el-switch v-model="connectionOption.showHidden"></el-switch>
     </div>
   </div>
@@ -17,5 +17,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
