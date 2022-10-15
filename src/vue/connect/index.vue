@@ -191,7 +191,13 @@
       </div>
     </section>
 
-    <SSL :connectionOption="connectionOption" v-if="connectionOption.useSSL" />
+    <SSL
+      :connectionOption="connectionOption"
+      v-if="
+        connectionOption.useSSL &&
+        ['MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'ElasticSearch'].includes(connectionOption.dbType)
+      "
+    />
     <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH && connectionOption.dbType != 'SSH'" />
 
     <div class="mt-2">
