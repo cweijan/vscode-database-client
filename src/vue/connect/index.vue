@@ -192,7 +192,7 @@
     </section>
 
     <SSL :connectionOption="connectionOption" v-if="connectionOption.useSSL" />
-    <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH" />
+    <SSH :connectionOption="connectionOption" v-if="connectionOption.usingSSH && connectionOption.dbType != 'SSH'" />
 
     <div class="mt-2">
       <button class="inline mr-4 button button--primary w-28" type="submit" v-loading="connect.loading">Connect</button>
