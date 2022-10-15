@@ -264,7 +264,7 @@ export default {
       supportDatabases: [
         "MySQL",
         "PostgreSQL",
-        "SQL Server",
+        "SqlServer",
         "SQLite",
         "MongoDB",
         "Redis",
@@ -380,7 +380,7 @@ export default {
           this.connectionOption.user = "system";
           this.connectionOption.port = 1521;
           break;
-        case "SQL Server":
+        case "SqlServer":
           this.connectionOption.user = "sa";
           this.connectionOption.encrypt = true;
           this.connectionOption.port = 1433;
