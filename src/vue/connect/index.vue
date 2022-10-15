@@ -39,7 +39,7 @@
 
     <section class="mt-5">
       <label class="block font-bold">Database Type</label>
-      <ul class="tab">
+      <ul class="flex-wrap tab">
         <li
           class="tab__item"
           :class="{ 'tab__item--active': supportDatabase == connectionOption.dbType }"
@@ -151,13 +151,16 @@
       </section>
     </template>
 
-    <section class="flex items-center mb-2">
-      <div class="inline-block mr-10" v-if="connectionOption.dbType != 'SSH' && connectionOption.dbType != 'SQLite'">
+    <section class="flex items-center">
+      <div
+        class="inline-block mb-2 mr-10"
+        v-if="connectionOption.dbType != 'SSH' && connectionOption.dbType != 'SQLite'"
+      >
         <label class="mr-2 font-bold">SSH Tunnel</label>
         <el-switch v-model="connectionOption.usingSSH"></el-switch>
       </div>
       <div
-        class="inline-block mr-10"
+        class="inline-block mb-2 mr-10"
         v-if="
           connectionOption.dbType == 'MySQL' ||
           connectionOption.dbType == 'PostgreSQL' ||
@@ -168,17 +171,17 @@
         <label class="inline-block mr-5 font-bold w-18">Use SSL</label>
         <el-switch v-model="connectionOption.useSSL"></el-switch>
       </div>
-      <div class="inline-block mr-10" v-if="connectionOption.dbType === 'MongoDB'">
+      <div class="inline-block mb-2 mr-10" v-if="connectionOption.dbType === 'MongoDB'">
         <label class="inline-block mr-5 font-bold w-18">SRV Record</label>
         <el-switch v-model="connectionOption.srv"></el-switch>
       </div>
-      <div class="inline-block mr-10" v-if="connectionOption.dbType === 'MongoDB'">
+      <div class="inline-block mb-2 mr-10" v-if="connectionOption.dbType === 'MongoDB'">
         <label class="inline-block mr-5 font-bold w-18">Use Connection String</label>
         <el-switch v-model="connectionOption.useConnectionString"></el-switch>
       </div>
     </section>
-    <section class="flex items-center mb-2" v-if="connectionOption.useConnectionString">
-      <div class="flex w-full mr-10">
+    <section class="flex items-center" v-if="connectionOption.useConnectionString">
+      <div class="flex w-full mb-2 mr-10">
         <label class="inline-block w-32 mr-5 font-bold">Connection String</label>
         <input
           class="w-4/5 field__input"
