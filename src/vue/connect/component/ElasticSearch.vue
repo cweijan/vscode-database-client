@@ -17,9 +17,11 @@
     </section>
     <section class="mb-2">
       <label class="inline-block mr-5 font-bold w-36">Basic Auth(Optional)</label>
-      <el-radio v-model="connectionOption.esAuth" label="none">Not Auth</el-radio>
-      <el-radio v-model="connectionOption.esAuth" label="account">Account</el-radio>
-      <el-radio v-model="connectionOption.esAuth" label="token">Token</el-radio>
+      <div class="inline-flex items-center">
+        <el-radio v-model="connectionOption.esAuth" label="none">Not Auth</el-radio>
+        <el-radio v-model="connectionOption.esAuth" label="account">Account</el-radio>
+        <el-radio v-model="connectionOption.esAuth" label="token">Token</el-radio>
+      </div>
     </section>
     <section v-if="connectionOption.esAuth == 'account'">
       <div class="inline-block mb-2 mr-10">
