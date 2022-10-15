@@ -57,9 +57,14 @@
       v-else-if="connectionOption.dbType == 'SQLite'"
       :connectionOption="connectionOption"
       :sqliteState="sqliteState"
+      @choose="choose('sqlite')"
       @install="installSqlite"
     />
-    <SSH v-else-if="connectionOption.dbType == 'SSH'" :connectionOption="connectionOption" />
+    <SSH
+      v-else-if="connectionOption.dbType == 'SSH'"
+      :connectionOption="connectionOption"
+      @choose="choose('privateKey')"
+    />
 
     <template v-else>
       <section class="mt-5">

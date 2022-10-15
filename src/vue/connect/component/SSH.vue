@@ -84,7 +84,7 @@
             placeholder="Private Key Path"
             v-model="connectionOption.ssh.privateKeyPath"
           />
-          <button @click="choose('privateKey')" class="w-12 ml-1">Choose</button>
+          <button @click="() => $emit('choose')" type="button" class="w-12 ml-1">Choose</button>
         </div>
         <div class="inline-block mb-2 mr-10">
           <label class="inline-block font-bold mr-9 w-28">Passphrase</label>
