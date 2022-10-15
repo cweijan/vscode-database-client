@@ -1,15 +1,21 @@
 <template>
-  <div class="ml-4 ">
+  <div class="ml-4">
     <div class="mb-3">
       <div class="inline-block mr-10">
-        <label class="font-bold mr-5 inline-block w-14"><span class="text-red-600 mr-1">*</span>Table</label>
+        <label class="inline-block mr-5 font-bold w-14">
+          Table
+          <span class="mr-1 text-red-600">*</span>
+        </label>
         <input class="w-64 field__input" required v-model="table.name" />
       </div>
       <div class="inline-block mr-10">
-        <label class="font-bold mr-5 inline-block w-32"><span class="text-red-600 mr-1">*</span>Comment</label>
+        <label class="inline-block w-32 mr-5 font-bold">
+          Comment
+          <span class="mr-1 text-red-600">*</span>
+        </label>
         <input class="w-64 field__input" v-model="table.comment" />
       </div>
-    <el-button @click="rename" type="success">Update</el-button>
+      <el-button @click="rename" type="success">Update</el-button>
     </div>
   </div>
 </template>
@@ -57,10 +63,7 @@ export default {
     createIndex() {
       this.index.loading = true;
       this.execute(
-        `ALTER TABLE ${wrapByDb(
-          this.designData.table,
-          this.designData.dbType
-        )} ADD ${this.index.type} (${wrapByDb(
+        `ALTER TABLE ${wrapByDb(this.designData.table, this.designData.dbType)} ADD ${this.index.type} (${wrapByDb(
           this.index.column,
           this.designData.dbType
         )})`
