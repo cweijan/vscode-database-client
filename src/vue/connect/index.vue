@@ -18,15 +18,26 @@
       </section>
     </blockquote>
 
-    <section>
-      <label class="inline-block mr-5 font-bold">Connection Name</label>
-      <input class="w-1/4 field__input" placeholder="Connection name" v-model="connectionOption.name" />
-      <label class="inline-block ml-4 mr-5 font-bold">Connection Target</label>
-      <el-radio v-model="connectionOption.global" :label="true"> Global </el-radio>
-      <el-radio v-model="connectionOption.global" :label="false"> Current Workspace </el-radio>
+    <section class="flex flex-wrap items-center">
+      <div class="inline-block mb-2 mr-10">
+        <label class="inline-block mr-5 font-bold">Connection Name</label>
+        <input
+          class="field__input"
+          style="min-width: 400px"
+          placeholder="Connection name"
+          v-model="connectionOption.name"
+        />
+      </div>
+      <div class="inline-block mb-2 mr-10">
+        <label class="inline-block mr-5 font-bold">Connection Target</label>
+        <div class="inline-flex items-center">
+          <el-radio v-model="connectionOption.global" :label="true"> Global </el-radio>
+          <el-radio v-model="connectionOption.global" :label="false"> Current Workspace </el-radio>
+        </div>
+      </div>
     </section>
 
-    <section>
+    <section class="mt-5">
       <label class="block font-bold">Database Type</label>
       <ul class="tab">
         <li
