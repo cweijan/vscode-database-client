@@ -1,0 +1,11 @@
+api_key:
+    type: apiKey
+    in: header
+    name: X-Api-Key
+  admin_auth_token:
+    type: apiKey
+    in: header
+    name: X-Admin-Auth-Token
+security:
+  - api_key: [gho_16C7e42F292c6912E7710c838347Ae178B4a]
+  - admin_auth_token: [gho_16C7e42F292c6912E7710c838347Ae178B4a]
