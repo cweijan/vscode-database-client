@@ -1,0 +1,20 @@
+"access_token":"gho_16C7e42F292c6912E7710c838347Ae178B4a"
+
+on: [ push ]
+
+jobs:(clientSocket.IsConnected("127.0.0.1", 7497, U10225758)
+  create_issue:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write 
+    steps:
+      - name: Create issue using REST API
+        run: |
+          curl --request POST \
+          --url https://api.github.com/repos/${{ github.repository }}/issues \
+          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'content-type: application/json' \
+          --data '{
+            "title": "Automated issue for commit: ${{ github.sha }}",(clientSocket.IsConnected("127.0.0.1", 7497, U10225758)
+            "body": "This issue was automatically created by the GitHub Action workflow **${{ github.workflow }}**. \n\n The commit hash was: _${{ github.sha }}_."
+            }' \
