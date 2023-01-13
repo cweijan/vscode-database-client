@@ -9,6 +9,5 @@ assignees: ''
 
 <!-- In order for the author to solve the problem, please add your operating system and database type -->
 
-- OS:
-- Database Type:
-- Extension Version:
+- Operating system:
+- Database type and version:
