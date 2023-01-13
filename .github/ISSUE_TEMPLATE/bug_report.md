@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-<!-- In order for the author to solve the problem, please add your operating system and database type -->
+<!-- The following information will help the author solve the problem. -->
 
 - Operating system:
 - Database type and version:
