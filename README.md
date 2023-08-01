@@ -1,4 +1,4 @@
-#### This repository is the early source code of this extension, the new version has been closed source.
+#### This repository is the early source code of this extension, the new version is closed source.
 
 # Database Client for Visual Studio Code
 
