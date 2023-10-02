@@ -34,7 +34,7 @@ export class FunctionNode extends Node {
 
     public drop() {
 
-        Util.confirm(`Are you want to drop function ${this.name} ?`, async () => {
+        Util.confirm(`Are you sure you want to drop the function ${this.name} ?`, async () => {
             this.execute( `DROP function ${this.wrap(this.name)}`).then(() => {
                 this.parent.setChildCache(null)
                 DbTreeDataProvider.refresh(this.parent);

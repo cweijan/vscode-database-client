@@ -35,7 +35,7 @@ export class ProcedureNode extends Node {
 
     public drop() {
 
-        Util.confirm(`Are you want to drop procedure ${this.name} ? `, async () => {
+        Util.confirm(`Are you sure you want to drop the procedure ${this.name} ? `, async () => {
             this.execute(`DROP procedure ${this.wrap(this.name)}`).then(() => {
                 this.parent.setChildCache(null)
                 DbTreeDataProvider.refresh(this.parent)

@@ -83,7 +83,7 @@ ${this.column.type} ${this.column.nullable == "YES" ? "Nullable" : "NotNull"}`
 
         const dropSql = `ALTER TABLE \n\t${this.wrap(this.table)} DROP COLUMN ${this.wrap(this.column.name)};`;
         await QueryUnit.showSQLTextDocument(this, dropSql, Template.alter);
-        Util.confirm(`Are you want to drop column ${this.column.name} ? `, async () => {
+        Util.confirm(`Are you sure you want to drop the column ${this.column.name} ? `, async () => {
             this.execute(dropSql).then(() => {
                 this.parent.setChildCache(null)
                 DbTreeDataProvider.refresh(this.parent);

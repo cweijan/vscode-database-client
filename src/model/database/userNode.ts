@@ -36,7 +36,7 @@ export class UserNode extends Node implements CopyAble {
 
     public drop() {
 
-        Util.confirm(`Are you want to drop user ${this.username} ?`, async () => {
+        Util.confirm(`Are you sure you want to drop the user ${this.username} ?`, async () => {
             this.execute(`DROP user ${this.username}`).then(() => {
                 vscode.window.showInformationMessage(`Drop user ${this.username} success!`);
                 this.parent.setChildCache(null)

@@ -73,7 +73,7 @@ export class SchemaNode extends Node implements CopyAble {
     public dropDatatabase() {
 
         const target = this.dbType == DatabaseType.MSSQL || this.dbType == DatabaseType.PG ? 'schema' : 'database';
-        vscode.window.showInputBox({ prompt: `Are you want to drop ${target} ${this.schema} ?     `, placeHolder: `Input ${target} name to confirm.` }).then(async (inputContent) => {
+        vscode.window.showInputBox({ prompt: `Are you sure you want to drop ${target} ${this.schema} ?     `, placeHolder: `Input ${target} name to confirm.` }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.schema.toLowerCase()) {
                 this.execute(`DROP ${target} ${this.wrap(this.schema)}`).then(async () => {
                     for (const child of await this.getChildren()) {
@@ -94,7 +94,7 @@ export class SchemaNode extends Node implements CopyAble {
     public async truncateDb() {
 
 
-        vscode.window.showInputBox({ prompt: `Dangerous: Are you want to truncate database ${this.schema} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
+        vscode.window.showInputBox({ prompt: `Dangerous: Are you sure you want to truncate the database ${this.schema} ?     `, placeHolder: 'Input database name to confirm.' }).then(async (inputContent) => {
             if (inputContent && inputContent.toLowerCase() == this.schema.toLowerCase()) {
                 const connection = await ConnectionManager.getConnection(this);
                 QueryUnit.queryPromise(connection, this.dialect.truncateDatabase(this.schema)).then(async (res: any) => {
