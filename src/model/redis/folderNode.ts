@@ -40,7 +40,7 @@ export class RedisFolderNode extends RedisBaseNode {
     }
 
     public async delete() {
-        Util.confirm(`Are you want delete folder ${this.label} ? `, async () => {
+        Util.confirm(`Are you sure you want to delete folder ${this.label} ? `, async () => {
             const client = await this.getClient();
             for (const child of this.childens) {
                 await client.del(child) 
