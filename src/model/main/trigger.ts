@@ -37,7 +37,7 @@ export class TriggerNode extends Node {
             vscode.window.showErrorMessage("This extension not support drop postgresql trigger.")
             return;
         }
-        Util.confirm(`Are you want to drop trigger ${this.name} ?`, async () => {
+        Util.confirm(`Are you sure you want to drop trigger ${this.name} ?`, async () => {
             this.execute(this.dialect.dropTriggerTemplate(this.wrap(this.name))).then(() => {
                 this.parent.setChildCache(null)
                 DbTreeDataProvider.refresh(this.parent)

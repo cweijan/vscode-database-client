@@ -30,7 +30,7 @@ export default class KeyNode extends RedisBaseNode {
     }
 
     public async delete() {
-        Util.confirm(`Are you want delete key ${this.label} ? `, async () => {
+        Util.confirm(`Are you sure you want to delete key ${this.label} ? `, async () => {
             const client = await this.getClient();
             await client.del(this.label)
             this.provider.reload()

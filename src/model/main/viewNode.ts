@@ -21,7 +21,7 @@ export class ViewNode extends TableNode {
 
     public drop() {
 
-        Util.confirm(`Are you want to drop view ${this.table} ? `, async () => {
+        Util.confirm(`Are you sure you want to drop view ${this.table} ? `, async () => {
             this.execute(`DROP view ${this.wrap(this.table)}`).then(() => {
                 this.parent.setChildCache(null)
                 DbTreeDataProvider.refresh(this.parent);
