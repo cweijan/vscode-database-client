@@ -10,4 +10,5 @@ assignees: ''
 <!-- The following information will help the author solve the problem. -->
 
 - Operating system:
+- Extension version:
 - Database type and version:
