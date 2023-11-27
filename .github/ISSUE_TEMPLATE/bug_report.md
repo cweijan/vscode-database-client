@@ -9,5 +9,4 @@ assignees: ''
 
 <!-- The following information will help the author solve the problem. -->
 
-- Operating system:
 - Database type and version:
