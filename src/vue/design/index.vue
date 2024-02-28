@@ -45,7 +45,7 @@ export default {
 .tab__item {
   list-style: none;
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--vscode-font-size);
   padding: 7px 10px;
   color: var(--vscode-foreground);
   border-bottom: 1px solid transparent;
