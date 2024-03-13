@@ -285,15 +285,12 @@ export default {
 .json-panel {
   line-height: 1.3;
   background: #292a2b;
-  font-size: 20px;
-  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier,
-    monospace, "Avenir", Helvetica, Arial, sans-serif;
+  font-family: var(--vscode-editor-font-family);
 }
 
 body {
   background-color: #ffffff;
-  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", Arial, sans-serif;
+  font-family: var(--vscode-font-family);
 }
 
 .value-panel {

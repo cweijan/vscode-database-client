@@ -1,12 +1,12 @@
 body {
-  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+  font-family: var(--vscode-font-family);
   padding: 0;
 }
 
 .hint {
   box-sizing: border-box;
   padding-left: 5px;
-  font-size: 17px;
+  font-size: 1.1em;
   color: #444;
   width: 95vw;
   display: inline-block;
@@ -19,10 +19,10 @@ overflow: unset;
 
 .sql-pannel{
   width:100%;
-  font-size: 14px;
+  font-size: var(--vscode-font-size);
 }
 .sql-pannel textarea{
-  font-family: "Segoe UI"; 
+  font-family: var(--vscode-editor-font-family);
   padding-top: 0;
   padding-left: 10px;
 }
@@ -33,7 +33,7 @@ overflow: unset;
 
 .info-panel {
   color: #444;
-  font-size: 14px;
+  font-size: var(--vscode-font-size);
   border: 1px solid #dcdfe6;
   border-radius: 5px;
   padding: 10px;

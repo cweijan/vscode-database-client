@@ -244,7 +244,7 @@ export default {
   line-height: 32px;
   padding: 0 16px;
   margin: 0;
-  font-size: 12px;
+  font-size: var(--vscode-font-size);
   outline: 0;
   display: flex;
   align-items: center;
