@@ -1,60 +1,32 @@
-#### This repository is the early source code of Database Client, the new version is closed source.
 
-# Database Client for Visual Studio Code
+# Database Client
 
-The online document is migrate to https://doc.database-client.com.
+#### This repository contains the early source code. The new version is closed source.
 
 ---
 
-<p align="center">
-<a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
-    <img src="https://img.shields.io/vscode-marketplace/v/cweijan.vscode-mysql-client2.svg?label=vscode%20marketplace">
-  </a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
-    <img src="https://vsmarketplacebadge.apphb.com/installs-short/cweijan.vscode-mysql-client2.svg">
-  </a>
-  <a href="https://github.com/cweijan/vscode-database-client">
-    <img src="https://img.shields.io/github/stars/cweijan/vscode-database-client?logo=github&style=flat">
-  </a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
-    <img src="https://img.shields.io/vscode-marketplace/r/cweijan.vscode-mysql-client2.svg">
-  </a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
-  <img alt="GitHub" src="https://img.shields.io/github/license/cweijan/vscode-database-client">
-  </a>
-</p>
-<br>
-
-This project is a database client for VSCode, supports manager **MySQL/MariaDB, PostgreSQL, SQLite, Redis, ClickHouse, 达梦**, and **ElasticSearch**, and works as an **SSH** client, boost your maximum productivity!
+This project is a database client for Visual Studio Code, supporting the management **MySQL/MariaDB, PostgreSQL, SQLite, Redis, ClickHouse, 达梦**, and **ElasticSearch**, and works as an **SSH** client, boost your maximum productivity!
 
 > Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
 
 [![Logo](./public/logo_dark.png)](https://database-client.com)
 
-## Features
-
-- [Database Client](#database-client)
-  - [Connect](#connect)
-  - [Table](#table)
-  - [Execute SQL Query](#execute-sql-query)
-  - [Backup/Import](#backupimport)
-  - [Setting](#setting)
-  - [Filter](#filter)
-  - [Generate Mock Data](#generate-mock-data)
-  - [History](#history)
-
 ## Installation
 
-Install from vscode marketplace [vscode-database-client](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2).
+Install from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) or [Open VSX](https://open-vsx.org/extension/cweijan/vscode-mysql-client2).
+
+## Telemetry Reporting
+
+The Database Client extension will collects and sends anonymous usage data to the Database Client server to help improve our products and services. Read our [Privacy Statement](https://database-client.com/#/privacyPolicy) to learn more.
+
+Telemetry reporting follows the telemetry settings of VS Code. Additionally, you can independently disable it by setting `"database-client.telemetry.usesOnlineServices": false`.
 
 ## Connect
 
 1. Open Database Explorer panel, then click the `+` button.
 2. Select your database type, input connection config then click the connect button.
 
-![connection](images/connection.jpg)
-
-Two panels are created because in some cases you need to view both SQL and NoSQL data at the same time, you can drag the panel to the other by long-pressing.
+![connection](https://doc.database-client.com/images/connection.jpg)
 
 ## Table
 
@@ -62,33 +34,32 @@ Two panels are created because in some cases you need to view both SQL and NoSQL
 2. Click button beside table to open new table view.
 3. Then you can do data modification on the table view.
 
-![query](images/QueryTable.jpg)
+![query](https://doc.database-client.com/images/view.png)
 
 ## Execute SQL Query
 
 In the Database Explorer panel, click the `Open Query` button.
 
-![newquery](images/newquery.jpg)
+![newquery](https://doc.database-client.com/images/newquery.jpg)
 
 That will open a SQL editor bind of database, it provider:
 
 1. IntelliSense SQL edit.
 2. snippets:`sel、del、ins、upd、joi`...
 3. Run selected or current cursor SQL (Shortcut : Ctrl+Enter).
-4. Run all SQL (Shortcut : Ctrl+Shift+Enter).
+4. Run all SQL (Shortcut : Ctrl+Shift+Enter, Command ID: `mysql.runSQL`).
 
-Note: The extension is developed using Nodejs. Nodejs does not allow duplicate name attributes, so you need to avoid columns with the same name in your query, otherwise the results will not be displayed in full.
+![run](https://doc.database-client.com/images/run.jpg)
 
-![run](images/run.jpg)
+The database can be searched by clicking the search button to the right of "Tables".
 
-This extension supports codelen, but does not support stored procedures and functions. If you use them frequently, it is recommended to disable codelen
-![image](https://user-images.githubusercontent.com/27798227/144196926-e581872e-5392-4744-a646-a644749c548c.png)
+![1708594027208](image/README/1708594027208.png)
 
 ## Cache
 
 In order to improve performance, the database information is cached. If your database structure changes externally, you need to click the refresh button to refresh the cache。
 
-![](images/1638342622208.png)
+![](https://doc.database-client.com/image/connection/1638342622208.png)
 
 ## Backup/Import
 
@@ -96,28 +67,19 @@ Move to ant DatabaseNode or TableNode. The export/import options are listed in t
 
 The extension implements the backup function, but it is not stable enough. You can add mysql_dump or pg_dump to the environment variable, and the extension will use these tools for backup.
 
-![bakcup](images/Backup.jpg)
+![bakcup](https://doc.database-client.com/images/Backup.jpg)
 
 ## Setting
 
-This extension contain some setting, can be modified as follows.
+The extension provides some settings, you can refer to the following operations to go to the console settings.
 
-The default settings can get the best experience, don't worry
-
-![image](https://user-images.githubusercontent.com/27798227/146523121-9de9c708-8a8e-4e3b-ae1d-9da36f3217e1.png)
-![](images/1611910592756.png)
-
-## Filter
-
-Used to quickly filter the table, if there is an input box to simplify the search operation, but unfortunately VSCode does not support this function.
-
-![filter](images/filter.gif)
+![1708593458624](image/README_CN/1708593458624.png)
 
 ## Generate Mock Data
 
 You can easily generate test data.
 
-![mockData](images/mockData.jpg)
+![mockData](https://doc.database-client.com/image/minor/mockData.jpg)
 
 ## History
 
@@ -127,9 +89,8 @@ Click the history button to open the list of recently executed query history rec
 
 ## Credits
 
-- [sql-formatter](https://github.com/zeroturnaround/sql-formatter) Sql format lib.
-- [umy-ui](https://github.com/u-leo/umy-ui): Result view render.
 - [ssh2](https://github.com/mscdex/ssh2): SSH client.
+- [sql-formatter](https://github.com/zeroturnaround/sql-formatter) SQL format lib.
 - Client Lib:
   - [node-mysql2](https://github.com/sidorares/node-mysql2) : MySQL client.
   - [node-postgres](https://github.com/brianc/node-postgres): PostgreSQL client.
