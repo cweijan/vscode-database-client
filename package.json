@@ -1077,10 +1077,5 @@
 		"xterm-addon-fit": "^0.5.0",
 		"xterm-addon-search": "^0.8.0",
 		"xterm-addon-web-links": "^0.4.0"
-	},
-	"__metadata": {
-		"id": "38c08d09-caa0-4988-8ffb-bcbd51f86e55",
-		"publisherDisplayName": "cweijan",
-		"publisherId": "3f28829b-0cc9-47bb-90db-7c05baa399ec"
 	}
 }
