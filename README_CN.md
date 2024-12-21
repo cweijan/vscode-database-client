@@ -14,7 +14,7 @@
 
 Database Client扩展会收集匿名使用数据并将其发送到Database Client服务器以帮助改进我们的产品和服务。阅读我们的[隐私声明](https://database-client.com/#/privacyPolicy)以了解更多信息。
 
-遥测报告遵循 VS Code 的遥测设置。此外，您可以通过设置 `"database-client.telemetry.usesOnlineServices": false` 单独禁用它。
+遥测报告遵循 VS Code 的[遥测设置](https://code.visualstudio.com/docs/getstarted/telemetry)。此外，您可以通过设置 `"database-client.telemetry.usesOnlineServices": false` 单独禁用它。
 
 ## 连接
 
