@@ -19,7 +19,7 @@ Install from the [Visual Studio Code Marketplace](https://marketplace.visualstud
 
 The Database Client extension will collects and sends anonymous usage data to the Database Client server to help improve our products and services. Read our [Privacy Statement](https://database-client.com/#/privacyPolicy) to learn more.
 
-Telemetry reporting follows the telemetry settings of VS Code. Additionally, you can independently disable it by setting `"database-client.telemetry.usesOnlineServices": false`.
+Telemetry reporting follows the [telemetry settings](https://code.visualstudio.com/docs/getstarted/telemetry) of VS Code. Additionally, you can independently disable it by setting `"database-client.telemetry.usesOnlineServices": false`.
 
 ## Connect
 
