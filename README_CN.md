@@ -2,8 +2,6 @@
 
 该项目是一个用于 Visual Studio Code 的数据库客户端扩展，支持 **MySQL/MariaDB、PostgreSQL、SQLite、Redis、ClickHouse、达梦** 和 **ElasticSearch** 等数据库的管理，并可用作 SSH 客户端，极大地提升您的生产力！
 
-> 相关链接：[最新文档](https://doc.database-client.com/#/zh/)，[Database Client电报群](https://t.me/dbclient)
-
 [![Logo](./public/logo_dark.png)](https://database-client.com)
 
 ## 安装
