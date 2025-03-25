@@ -38,6 +38,7 @@ import { MongoPageService } from "./page/mongoPageService";
 import { HighlightCreator } from "@/provider/codelen/highlightCreator";
 import { SQLSymbolProvide } from "@/provider/sqlSymbolProvide";
 import { MysqlDumpService } from "./dump/mysqlDumpService";
+import { ExasolDialect } from './dialect/exasolDialect';
 
 export class ServiceManager {
 
@@ -151,6 +152,8 @@ export class ServiceManager {
                 return new EsDialect();
             case DatabaseType.MONGO_DB:
                 return new MongoDialect();
+            case DatabaseType.EXASOL:
+                return new ExasolDialect();
         }
         return new MysqlDialect()
     }
@@ -166,6 +169,8 @@ export class ServiceManager {
                 return new MongoPageService();
             case DatabaseType.ES:
                 return new EsPageService();
+            case DatabaseType.EXASOL:
+                return new MysqlPageSerivce();
         }
 
         return new MysqlPageSerivce();

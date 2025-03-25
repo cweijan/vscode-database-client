@@ -19,6 +19,7 @@ import { FTPConnection } from "./connect/ftpConnection";
 import { SqliteConnection } from "./connect/sqliteConnection";
 import { Console } from "@/common/Console";
 import { MongoConnection } from "./connect/mongoConnection";
+import { ExasolConnection } from './connect/exasolConnection';
 
 interface ConnectionWrapper {
     connection: IConnection;
@@ -155,6 +156,8 @@ export class ConnectionManager {
                 return new RedisConnection(opt);
             case DatabaseType.FTP:
                 return new FTPConnection(opt);
+            case DatabaseType.EXASOL:
+                return new ExasolConnection(opt);
         }
         return new MysqlConnection(opt)
     }

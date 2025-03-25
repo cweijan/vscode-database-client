@@ -271,6 +271,7 @@ export default {
         "ElasticSearch",
         "SSH",
         "FTP",
+        "Exasol"
       ],
       connect: {
         loading: false,
@@ -407,6 +408,11 @@ export default {
           this.connectionOption.user = null;
           break;
         case "SSH":
+          break;
+        case "Exasol":
+          this.connectionOption.user = "sys";
+          this.connectionOption.port = 8563;
+          this.connectionOption.database = null;
           break;
       }
       this.$forceUpdate();

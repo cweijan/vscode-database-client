@@ -49,9 +49,10 @@ export enum Confirm {
 }
 
 export enum DatabaseType {
-    MYSQL = "MySQL", PG = "PostgreSQL",SQLITE = "SQLite",
-    MSSQL = "SqlServer", MONGO_DB="MongoDB",
-    ES = "ElasticSearch", REDIS = "Redis",SSH="SSH",FTP="FTP"
+    MYSQL = "MySQL", PG = "PostgreSQL", SQLITE = "SQLite",
+    MSSQL = "SqlServer", MONGO_DB = "MongoDB",
+    ES = "ElasticSearch", REDIS = "Redis", SSH = "SSH", FTP = "FTP",
+    EXASOL = "Exasol"
 }
 
 export enum ModelType {
