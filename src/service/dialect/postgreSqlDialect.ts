@@ -138,7 +138,8 @@ ALTER TABLE ${table} ALTER COLUMN ${columnName} ${defaultDefinition};`;
         // return `SHOW CREATE TABLE "${database}"."${table}";`
     }
     showViewSource(database: string, table: string): string {
-        return `SELECT CONCAT('CREATE VIEW ',table_name,'\nAS\n(',regexp_replace(view_definition,';$',''),')') "Create View",table_name,view_definition from information_schema.views where table_schema='${database}' and table_name='${table}';`
+        // Use pg_get_viewdef for accurate DDL extraction
+        return `select pg_get_viewdef('${database}.${table}' :: regclass) "Create View",'${table}' "View";`;
     }
     showProcedureSource(database: string, name: string): string {
         return `select pg_get_functiondef('${database}.${name}' :: regproc) "Create Procedure",'${name}' "Procedure";`;
