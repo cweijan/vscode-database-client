@@ -73,6 +73,11 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
     public dbPath?: string;
 
     /**
+     * Redis Unix socket path
+     */
+    public socketPath?: string;
+
+    /**
       * mssql only
       */
     public encrypt?: boolean;
@@ -124,6 +129,7 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
         this.global = source.global
         this.dbType = source.dbType
         this.connectionUrl = source.connectionUrl
+        this.socketPath = source.socketPath
         if (source.connectTimeout) {
             this.connectTimeout = parseInt(source.connectTimeout as any)
             source.connectTimeout = parseInt(source.connectTimeout as any)
@@ -300,7 +306,11 @@ export abstract class Node extends vscode.TreeItem implements CopyAble {
             command = `${prefix} "PGPASSWORD=${this.password}" && psql -U ${this.user} -h ${this.host} -p ${this.port} -d ${this.database} \n`;
         } else if (this.dbType == DatabaseType.REDIS) {
             this.checkCommand('redis-cli');
-            command = `redis-cli -h ${this.host} -p ${this.port} \n`;
+            if (this.socketPath) {
+                command = `redis-cli -s ${this.socketPath} \n`;
+            } else {
+                command = `redis-cli -h ${this.host} -p ${this.port} \n`;
+            }
         } else if (this.dbType == DatabaseType.MONGO_DB) {
             this.checkCommand('mongo');
             command = `mongo --host ${this.host} --port ${this.port} ${this.user && this.password ? ` -u ${this.user} -p ${this.password}` : ''} \n`;

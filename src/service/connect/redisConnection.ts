@@ -8,14 +8,24 @@ export class RedisConnection extends IConnection {
     private client: IoRedis.Redis;
     constructor(node: Node) {
         super()
-        let config = {
-            port: node.port,
-            host: node.host,
-            password: node.password,
-            connectTimeout: node.connectTimeout || 5000,
-            db: node.database as any as number,
-            family: 4,
-        }as IoRedis.RedisOptions;
+        let config: IoRedis.RedisOptions;
+        if (node.socketPath) {
+            config = {
+                path: node.socketPath,
+                password: node.password,
+                connectTimeout: node.connectTimeout || 5000,
+                db: node.database as any as number,
+            };
+        } else {
+            config = {
+                port: node.port,
+                host: node.host,
+                password: node.password,
+                connectTimeout: node.connectTimeout || 5000,
+                db: node.database as any as number,
+                family: 4,
+            };
+        }
         if(node.useSSL){
             config.tls={
                 rejectUnauthorized: false,

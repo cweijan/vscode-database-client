@@ -68,29 +68,37 @@
 
     <template v-else>
       <section class="mt-5">
-        <div class="inline-block mb-2 mr-10">
+        <div class="inline-block mb-2 mr-10" v-if="connectionOption.dbType != 'Redis' || !connectionOption.socketPath">
           <label class="inline-block w-32 mr-5 font-bold">
             <span>Host</span>
-            <span class="mr-1 text-red-600" title="required">*</span>
+            <span class="mr-1 text-red-600" title="required" v-if="connectionOption.dbType != 'Redis'">*</span>
           </label>
           <input
             class="w-64 field__input"
             placeholder="The host of connection"
-            required
+            :required="connectionOption.dbType != 'Redis'"
             v-model="connectionOption.host"
           />
         </div>
-        <div class="inline-block mb-2 mr-10">
+        <div class="inline-block mb-2 mr-10" v-if="connectionOption.dbType != 'Redis' || !connectionOption.socketPath">
           <label class="inline-block w-32 mr-5 font-bold">
             Port
-            <span class="mr-1 text-red-600" title="required">*</span>
+            <span class="mr-1 text-red-600" title="required" v-if="connectionOption.dbType != 'Redis'">*</span>
           </label>
           <input
             class="w-64 field__input"
             placeholder="The port of connection"
-            required
+            :required="connectionOption.dbType != 'Redis'"
             type="number"
             v-model="connectionOption.port"
+          />
+        </div>
+        <div class="inline-block mb-2 mr-10" v-if="connectionOption.dbType == 'Redis'">
+          <label class="inline-block w-32 mr-5 font-bold">Socket Path</label>
+          <input
+            class="w-64 field__input"
+            placeholder="/tmp/redis.sock (optional)"
+            v-model="connectionOption.socketPath"
           />
         </div>
       </section>
@@ -241,6 +249,7 @@ export default {
         dbType: "MySQL",
         encrypt: true,
         connectionUrl: "",
+        socketPath: "",
         srv: false,
         esAuth: "none",
         global: true,
