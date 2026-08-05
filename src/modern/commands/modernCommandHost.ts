@@ -4,7 +4,10 @@ import { readFile, writeFile } from "node:fs/promises";
 import type { ExtensionServices } from "../core/extensionServices";
 import type { ConnectionOptions, QueryResult } from "../database/types";
 import { parseSqlBlocks } from "../providers/sqlDocumentModel";
-import { registerWebviewUtilityProtocols } from "./webviewUtilityProtocols";
+import {
+  openErDiagramPanel,
+  registerWebviewUtilityProtocols,
+} from "./webviewUtilityProtocols";
 
 export interface ModernCommandHost {
   refresh(target?: unknown): Promise<void> | void;
@@ -230,6 +233,11 @@ export function createModernCommandHost(
     sql: string,
     result: QueryResult<Row>,
     connection?: ConnectionOptions,
+    tableContext?: {
+      readonly table?: string;
+      readonly schema?: string | null;
+      readonly database?: string | null;
+    },
   ): Promise<vscode.WebviewPanel> => {
     const state = {
       title,
@@ -238,6 +246,8 @@ export function createModernCommandHost(
       fields: result.fields,
       affectedRows: result.affectedRows,
       dirty: false,
+      connection,
+      ...tableContext,
     };
     return openRoute(
       "SQL Result",
@@ -348,6 +358,18 @@ export function createModernCommandHost(
         handler.on("viewHistory", async () => {
           await openRoute("SQL History", "history", "center/console", {
             history: services.state.get("sql.history", []),
+          });
+        });
+        handler.on("openErDiagram", async () => {
+          if (!tableContext?.table) {
+            await handler.send("error", "Select a single table before opening the ER diagram");
+            return;
+          }
+          await openErDiagramPanel(services, {
+            connection: connection || services.activeConnection.get(),
+            table: tableContext.table,
+            schema: tableContext.schema,
+            database: tableContext.database,
           });
         });
         handler.on("exportFile", async (content) => {

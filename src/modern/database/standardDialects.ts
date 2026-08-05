@@ -119,6 +119,13 @@ abstract class InformationSchemaDialect implements Dialect {
     return `SELECT * FROM information_schema.statistics WHERE TABLE_SCHEMA = ${this.escapeLiteral(normalized(schema))} AND TABLE_NAME = ${this.escapeLiteral(table)} ORDER BY INDEX_NAME;`;
   }
 
+  public showForeignKeys(schema: string | null, table?: string): string {
+    const tableFilter = table
+      ? ` AND TABLE_NAME = ${this.escapeLiteral(table)}`
+      : "";
+    return `SELECT TABLE_NAME "table_name", COLUMN_NAME "column_name", REFERENCED_TABLE_NAME "referenced_table", REFERENCED_COLUMN_NAME "referenced_column", CONSTRAINT_NAME "constraint_name", ORDINAL_POSITION "ordinal_position" FROM information_schema.KEY_COLUMN_USAGE WHERE ${schemaFilter(schema)} AND REFERENCED_TABLE_NAME IS NOT NULL${tableFilter} ORDER BY TABLE_NAME, CONSTRAINT_NAME, ORDINAL_POSITION;`;
+  }
+
   public pingDatabase(): string | null {
     return "SELECT 1;";
   }
@@ -269,6 +276,14 @@ export class PostgresDialect extends InformationSchemaDialect {
     return `SELECT indexname "index_name", indexdef FROM pg_indexes WHERE schemaname = ${this.escapeLiteral(normalized(schema))} AND tablename = ${this.escapeLiteral(table)} ORDER BY indexname;`;
   }
 
+  public override showForeignKeys(schema: string | null, table?: string): string {
+    const tableFilter = table
+      ? ` AND kcu.table_name = ${this.escapeLiteral(table)}`
+      : "";
+    const schemaLiteral = this.escapeLiteral(normalized(schema));
+    return `SELECT kcu.table_name "table_name", kcu.column_name "column_name", ccu.table_name "referenced_table", ccu.column_name "referenced_column", tc.constraint_name "constraint_name", kcu.ordinal_position "ordinal_position" FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_catalog = kcu.constraint_catalog AND tc.constraint_schema = kcu.constraint_schema AND tc.constraint_name = kcu.constraint_name AND tc.table_name = kcu.table_name JOIN information_schema.constraint_column_usage ccu ON ccu.constraint_catalog = tc.constraint_catalog AND ccu.constraint_schema = tc.constraint_schema AND ccu.constraint_name = tc.constraint_name WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_schema = ${schemaLiteral}${tableFilter} ORDER BY kcu.table_name, tc.constraint_name, kcu.ordinal_position;`;
+  }
+
   public override showVersion(): string {
     return "SELECT version() AS server_version;";
   }
@@ -313,6 +328,14 @@ export class SqlServerDialect extends InformationSchemaDialect {
     return `SELECT COLUMN_NAME "name", DATA_TYPE "type", IS_NULLABLE "nullable", CHARACTER_MAXIMUM_LENGTH "maxLength", COLUMN_DEFAULT "defaultValue" FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ${this.escapeLiteral(normalized(schema) || "dbo")} AND TABLE_NAME = ${this.escapeLiteral(table)} ORDER BY ORDINAL_POSITION;`;
   }
 
+  public override showForeignKeys(schema: string | null, table?: string): string {
+    const schemaLiteral = this.escapeLiteral(normalized(schema) || "dbo");
+    const tableFilter = table
+      ? ` AND kcu.TABLE_NAME = ${this.escapeLiteral(table)}`
+      : "";
+    return `SELECT kcu.TABLE_NAME "table_name", kcu.COLUMN_NAME "column_name", ccu.TABLE_NAME "referenced_table", ccu.COLUMN_NAME "referenced_column", tc.CONSTRAINT_NAME "constraint_name", kcu.ORDINAL_POSITION "ordinal_position" FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_NAME = kcu.TABLE_NAME JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS rc ON rc.CONSTRAINT_SCHEMA = tc.CONSTRAINT_SCHEMA AND rc.CONSTRAINT_NAME = tc.CONSTRAINT_NAME JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE ccu ON ccu.CONSTRAINT_SCHEMA = rc.UNIQUE_CONSTRAINT_SCHEMA AND ccu.CONSTRAINT_NAME = rc.UNIQUE_CONSTRAINT_NAME WHERE tc.CONSTRAINT_TYPE = 'FOREIGN KEY' AND tc.TABLE_SCHEMA = ${schemaLiteral}${tableFilter} ORDER BY kcu.TABLE_NAME, tc.CONSTRAINT_NAME, kcu.ORDINAL_POSITION;`;
+  }
+
   public override showVersion(): string {
     return "SELECT @@VERSION AS server_version;";
   }
@@ -339,6 +362,10 @@ export class SqliteDialect extends InformationSchemaDialect {
 
   public override showColumns(_schema: string | null, table: string): string {
     return `PRAGMA table_info(${this.quoteIdentifier(table)});`;
+  }
+
+  public override showForeignKeys(_schema: string | null, table?: string): string {
+    return table ? `PRAGMA foreign_key_list(${this.quoteIdentifier(table)});` : "";
   }
 
   public override showViews(): string {
@@ -381,6 +408,10 @@ export class ClickHouseDialect extends InformationSchemaDialect {
     return `SELECT name, type, default_expression AS defaultValue, comment, is_in_primary_key AS \"key\" FROM system.columns WHERE database = ${this.escapeLiteral(normalized(schema))} AND table = ${this.escapeLiteral(table)} ORDER BY position;`;
   }
 
+  public override showForeignKeys(): string {
+    return "";
+  }
+
   public override showDatabases(): string {
     return "SELECT name AS \"Database\" FROM system.databases ORDER BY name;";
   }
@@ -403,6 +434,10 @@ export class CommonSqlDialect extends InformationSchemaDialect {
 
   public override supports(type: DatabaseType): boolean {
     return !noSqlTypes.has(type);
+  }
+
+  public override showForeignKeys(): string {
+    return "";
   }
 }
 

@@ -124,7 +124,7 @@ export interface Dialect {
     name: string,
   ): string;
   showIndex?(schema: string | null, table: string): string;
-  showForeignKeys?(schema: string | null, table: string): string;
+  showForeignKeys?(schema: string | null, table?: string): string;
   showChecks?(schema: string | null, table: string): string;
   showMaterialViews?(schema?: string | null): string;
   showVersion?(): string;

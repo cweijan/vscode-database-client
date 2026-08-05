@@ -5,7 +5,13 @@ import * as vscode from "vscode";
 
 import type { ExtensionServices } from "../core/extensionServices";
 import type { TypedWebviewHandler } from "../core/webviewHandler";
-import type { ConnectionOptions, QueryResult } from "../database/types";
+import type {
+  ConnectionOptions,
+  MetadataQueryExecutor,
+  QueryOptions,
+  QueryResult,
+} from "../database/types";
+import { loadErDiagram, type ErDiagramData } from "../database/erDiagramService";
 import type { RemoteEntry, SshConnectionOptions, SshSession } from "../remote/sshService";
 import type { SshForwardType } from "../remote/sshForwardingService";
 import { fetchSshMonitorSnapshot } from "../remote/sshMonitorService";
@@ -91,8 +97,12 @@ function asConnection(value: unknown): ConnectionOptions | undefined {
   return candidate.id && candidate.type ? candidate as ConnectionOptions : undefined;
 }
 
-function targetConnection(state: Record<string, unknown>): ConnectionOptions | undefined {
-  return asConnection(state.connection) || asConnection(state.target) || asConnection(state.options);
+function targetConnection(value: unknown): ConnectionOptions | undefined {
+  const candidate = record(value);
+  return asConnection(value)
+    || asConnection(candidate.connection)
+    || asConnection(candidate.target)
+    || asConnection(candidate.options);
 }
 
 function targetRecord(state: Record<string, unknown>): Record<string, unknown> {
@@ -101,6 +111,16 @@ function targetRecord(state: Record<string, unknown>): Record<string, unknown> {
 
 function errorText(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function firstText(...values: unknown[]): string | undefined {
+  for (const value of values) {
+    const text = stringValue(value).trim();
+    if (text) {
+      return text;
+    }
+  }
+  return undefined;
 }
 
 function normalizedRemotePath(value: unknown, fallback = "/"): string {
@@ -2037,6 +2057,127 @@ function registerStructureDiff(context: UtilityProtocolContext): void {
   });
 }
 
+function registerErDiagram(context: UtilityProtocolContext): void {
+  const { handler, services } = context;
+  const target = targetRecord(context.state);
+  const connection = (): ConnectionOptions | undefined =>
+    targetConnection(context.state) || services.activeConnection.get();
+  const table = (): string | undefined => firstText(
+    context.state.table,
+    context.state.tableName,
+    target.table,
+    target.tableName,
+    target.label,
+  );
+  const schema = (): string | null => firstText(
+    context.state.schema,
+    target.schema,
+    connection()?.schema,
+  ) || null;
+  const database = (): string | null => firstText(
+    context.state.database,
+    target.database,
+    connection()?.database,
+  ) || null;
+
+  const load = async (): Promise<void> => {
+    try {
+      const selected = connection();
+      const selectedTable = table();
+      if (!selected) {
+        throw new Error("No database connection selected for the ER diagram");
+      }
+      if (!selectedTable) {
+        throw new Error("Select a single table before opening the ER diagram");
+      }
+      const dialect = services.dialects.resolve(selected.type);
+      const executor: MetadataQueryExecutor = {
+        query<Row = Record<string, unknown>>(sql: string, options?: QueryOptions) {
+          return services.connections.query<Row>(selected, sql, options);
+        },
+      };
+      const data: ErDiagramData = await loadErDiagram(executor, dialect, {
+        table: selectedTable,
+        schema: schema(),
+        database: database(),
+      });
+      await handler.setWebviewState({
+        ...context.webviewState,
+        connection: selected,
+        table: selectedTable,
+        schema: schema(),
+        database: database(),
+        erData: data,
+      });
+      await handler.send("erData", data);
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  };
+
+  handler.onInit("erDiagram", load);
+  handler.on("erData", load);
+  handler.on("single_table", load);
+  handler.on("refreshCache", load);
+  handler.on("refresh", load);
+  handler.on("exportImg", async (content) => {
+    try {
+      const payload = record(content);
+      const requestedType = stringValue(payload.type, "svg").toLowerCase();
+      const type = requestedType === "json" ? "json" : "svg";
+      const raw = payload.data;
+      const data = typeof raw === "string" ? raw : JSON.stringify(raw ?? {});
+      const file = await vscode.window.showSaveDialog({
+        saveLabel: "Export ER diagram",
+        filters: { [type.toUpperCase()]: [type] },
+      });
+      if (!file) {
+        return;
+      }
+      await writeFile(file.fsPath, data, "utf8");
+      await handler.send("exportSuccess", { path: file.fsPath, type });
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+}
+
+export async function openErDiagramPanel(
+  services: ExtensionServices,
+  target: unknown,
+  title = "ER Diagram",
+): Promise<vscode.WebviewPanel> {
+  const candidate = record(target);
+  const connection = targetConnection(target);
+  const table = firstText(candidate.table, candidate.tableName, candidate.label);
+  const schema = firstText(candidate.schema, connection?.schema);
+  const database = firstText(candidate.database, connection?.database);
+  const normalizedTarget = { connection, table, schema, database };
+  const state = {
+    target: normalizedTarget,
+    connection,
+    table,
+    schema,
+    database,
+  };
+  return services.webviews.createWebviewPanel({
+    title,
+    type: "erDiagram",
+    route: "erDiagram",
+    state,
+    eventHandler: (handler) => {
+      registerWebviewUtilityProtocols({
+        route: "erDiagram",
+        target: normalizedTarget,
+        state,
+        webviewState: state,
+        services,
+        handler,
+      });
+    },
+  });
+}
+
 export function registerWebviewUtilityProtocols(context: UtilityProtocolContext): void {
   if (context.route === "fileManager" || context.route === "sshTerminal") {
     registerRemoteFileManager(context);
@@ -2054,4 +2195,5 @@ export function registerWebviewUtilityProtocols(context: UtilityProtocolContext)
     registerSshTerminal(context);
   }
   if (context.route === "structDiff") registerStructureDiff(context);
+  if (context.route === "erDiagram") registerErDiagram(context);
 }

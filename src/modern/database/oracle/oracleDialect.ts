@@ -147,6 +147,28 @@ export class OracleDialect implements Dialect {
     ].join("\n");
   }
 
+  public showForeignKeys(schema: string | null, table?: string): string {
+    const owner = schema ? this.escapeLiteral(normalizeOwner(schema)) : "USER";
+    const tableFilter = table
+      ? " and a.table_name = " + this.escapeLiteral(table.trim().toUpperCase())
+      : "";
+    return [
+      "select",
+      "  a.table_name \"table_name\",",
+      "  acc.column_name \"column_name\",",
+      "  c_pk.table_name \"referenced_table\",",
+      "  acc_pk.column_name \"referenced_column\",",
+      "  a.constraint_name \"constraint_name\",",
+      "  acc.position \"ordinal_position\"",
+      "from all_constraints a",
+      "join all_cons_columns acc on acc.owner = a.owner and acc.constraint_name = a.constraint_name",
+      "join all_constraints c_pk on c_pk.owner = a.r_owner and c_pk.constraint_name = a.r_constraint_name",
+      "join all_cons_columns acc_pk on acc_pk.owner = c_pk.owner and acc_pk.constraint_name = c_pk.constraint_name and acc_pk.position = acc.position",
+      "where a.owner = " + owner + " and a.constraint_type = 'R'" + tableFilter,
+      "order by a.table_name, a.constraint_name, acc.position",
+    ].join("\n");
+  }
+
   public showSynonyms(owner: string): string {
     const escapedOwner = this.escapeLiteral(normalizeOwner(owner));
     const excludedOwners = publicSynonymExcludedOwners

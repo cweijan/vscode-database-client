@@ -10,6 +10,7 @@ import {
   OperationCancelledError,
 } from "../../src/modern/core/errors";
 import { ConnectionManager } from "../../src/modern/database/connectionManager";
+import { loadErDiagram } from "../../src/modern/database/erDiagramService";
 import { OracleDialect } from "../../src/modern/database/oracle/oracleDialect";
 import {
   OracleSynonymGroup,
@@ -19,6 +20,10 @@ import { normalizeDriverResult } from "../../src/modern/database/resultConverter
 import { elasticSearchRows } from "../../src/modern/database/nosqlFactories";
 import { createStandardConnectionFactories } from "../../src/modern/database/standardFactories";
 import { SqlTableGroup } from "../../src/modern/database/sqlTree";
+import {
+  MySqlDialect,
+  SqliteDialect,
+} from "../../src/modern/database/standardDialects";
 import type {
   ConnectionFactory,
   DatabaseConnection,
@@ -154,6 +159,85 @@ test("SQL table groups apply filtering, ordering, pagination, and stable context
   assert.equal(children[0].label, "alpha_orders");
   assert.equal(children[0].contextValue, "table");
   assert.equal(children[0].tableWithSchema, '"APP"."alpha_orders"');
+});
+
+test("ER diagram service expands foreign-key neighbors with normalized columns", async () => {
+  const query: MetadataQueryExecutor = {
+    async query<Row>(sql: string): Promise<QueryResult<Row>> {
+      if (sql.includes("KEY_COLUMN_USAGE")) {
+        return {
+          rows: [
+            {
+              table_name: "orders",
+              column_name: "customer_id",
+              referenced_table: "customers",
+              referenced_column: "id",
+              constraint_name: "fk_orders_customer",
+            },
+            {
+              table_name: "customers",
+              column_name: "region_id",
+              referenced_table: "regions",
+              referenced_column: "id",
+              constraint_name: "fk_customers_region",
+            },
+          ] as Row[],
+          fields: [],
+        };
+      }
+      const table = /TABLE_NAME = '([^']+)'/.exec(sql)?.[1] || "orders";
+      const rows = table === "orders"
+        ? [{ name: "id", type: "bigint", key: "PRI" }, { name: "customer_id", type: "bigint" }]
+        : table === "customers"
+          ? [{ name: "id", type: "bigint", key: "PRI" }, { name: "region_id", type: "bigint" }]
+          : [{ name: "id", type: "bigint", key: "PRI" }];
+      return { rows: rows as Row[], fields: [] };
+    },
+  };
+
+  const data = await loadErDiagram(query, new MySqlDialect(), {
+    table: "orders",
+    schema: "app",
+  });
+
+  assert.deepEqual(data.nodes.map((node) => node.name), ["orders", "customers", "regions"]);
+  assert.equal(data.nodes[0].main, true);
+  assert.equal(data.nodes[1].columns[1].key, "FK");
+  assert.deepEqual(data.edges.map((edge) => edge.constraintName), [
+    "fk_orders_customer",
+    "fk_customers_region",
+  ]);
+});
+
+test("ER diagram service uses per-table foreign-key metadata for SQLite", async () => {
+  const query: MetadataQueryExecutor = {
+    async query<Row>(sql: string): Promise<QueryResult<Row>> {
+      if (sql.includes("sqlite_master")) {
+        return {
+          rows: [{ name: "child" }, { name: "parent" }] as Row[],
+          fields: [],
+        };
+      }
+      if (sql.includes("foreign_key_list")) {
+        return {
+          rows: sql.includes('"child"')
+            ? [{ table: "parent", from: "parent_id", to: "id" } as Row]
+            : [],
+          fields: [],
+        };
+      }
+      return {
+        rows: [{ name: sql.includes('"child"') ? "parent_id" : "id", type: "INTEGER" }] as Row[],
+        fields: [],
+      };
+    },
+  };
+
+  const data = await loadErDiagram(query, new SqliteDialect(), { table: "child" });
+
+  assert.deepEqual(data.nodes.map((node) => node.name), ["child", "parent"]);
+  assert.equal(data.edges[0].fromColumns, "parent_id");
+  assert.equal(data.edges[0].targetColumns, "id");
 });
 
 test("driver results normalize rows, fields, and affected counts at the adapter boundary", () => {

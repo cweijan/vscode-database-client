@@ -59,7 +59,11 @@ export function createWebviewRouter() {
         surfaceRoute("manager", "manager"),
         { path: "es-status", name: "esStatus", component: ElasticsearchStatusView },
         { path: "design", name: "design", component: DesignView },
-        surfaceRoute("erDiagram", "erDiagram"),
+        {
+          path: "erDiagram",
+          name: "erDiagram",
+          component: () => import("./components/ErDiagramView.vue"),
+        },
         surfaceRoute("mock", "mock"),
       ],
     },

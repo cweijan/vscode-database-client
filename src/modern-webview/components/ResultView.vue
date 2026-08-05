@@ -14,6 +14,9 @@ interface ResultPayload {
   dirty?: boolean;
   readonly?: boolean;
   readOnly?: boolean;
+  table?: string;
+  schema?: string | null;
+  database?: string | null;
   error?: string;
 }
 
@@ -56,6 +59,7 @@ function cell(row: Record<string, unknown>, column: string): string {
 }
 
 const readonly = computed(() => payload.readonly === true || payload.readOnly === true);
+const canOpenErDiagram = computed(() => Boolean(payload.table));
 
 function startEdit(rowIndex: number, column: string): void {
   if (readonly.value) return;
@@ -190,6 +194,14 @@ onBeforeUnmount(() => {
           @click="bridge?.emit('viewHistory')"
         >
           History
+        </UiButton>
+        <UiButton
+          type="button"
+          variant="default"
+          :disabled="!canOpenErDiagram"
+          @click="bridge?.emit('openErDiagram')"
+        >
+          ER Diagram
         </UiButton>
       </div>
     </header>

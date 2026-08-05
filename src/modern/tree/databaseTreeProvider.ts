@@ -2,7 +2,10 @@ import * as vscode from "vscode";
 
 import type { ExtensionServices } from "../core/extensionServices";
 import { SourceRecoveryPendingError } from "../core/errors";
-import { registerWebviewUtilityProtocols } from "../commands/webviewUtilityProtocols";
+import {
+  openErDiagramPanel,
+  registerWebviewUtilityProtocols,
+} from "../commands/webviewUtilityProtocols";
 import type {
   ConnectionOptions,
   Dialect,
@@ -303,19 +306,20 @@ export class ModernTableNode extends DatabaseTreeItem {
       this.connection,
       sql,
     );
-    await this.services.webviews.createWebviewPanel({
-      title: this.label,
-      type: "result",
-      id: viewId ? `result:${viewId}` : "result",
-      route: "result",
-      singlePage: !viewId,
-      state: {
-        sql,
-        rows: result.rows,
-        fields: result.fields,
-        affectedRows: result.affectedRows,
+    await openResultView(
+      this.services,
+      this.label,
+      sql,
+      result,
+      {
+        connection: this.connection,
+        table: this.label,
+        schema: this.schema,
+        database: this.connection.database,
+        id: viewId ? `result:${viewId}` : "result",
+        singlePage: !viewId,
       },
-    });
+    );
     return viewId ? `${sql}\n-- view ${viewId}` : sql;
   }
 
@@ -1002,18 +1006,43 @@ async function openResultView(
   title: string,
   sql: string,
   result: QueryResult<Record<string, unknown>>,
+  context: {
+    readonly connection?: StoredConnection;
+    readonly table?: string;
+    readonly schema?: string | null;
+    readonly database?: string;
+    readonly id?: string;
+    readonly singlePage?: boolean;
+  } = {},
 ): Promise<void> {
   await services.webviews.createWebviewPanel({
     title,
     type: "result",
-    id: `result:${title}`,
+    id: context.id || `result:${title}`,
     route: "result",
+    singlePage: context.singlePage,
     state: {
       sql,
       rows: result.rows,
       fields: result.fields,
       affectedRows: result.affectedRows,
+      connection: context.connection,
+      table: context.table,
+      schema: context.schema,
+      database: context.database,
     },
+    eventHandler: context.table
+      ? (handler) => {
+        handler.on("openErDiagram", async () => {
+          await openErDiagramPanel(services, {
+            connection: context.connection,
+            table: context.table,
+            schema: context.schema,
+            database: context.database,
+          });
+        });
+      }
+      : undefined,
   });
 }
 

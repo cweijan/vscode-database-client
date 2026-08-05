@@ -317,7 +317,11 @@ const modernSlices = [
       "src/modern-webview/components/ConnectionView.vue",
       "src/modern-webview/components/ConsoleView.vue",
       "src/modern-webview/components/ResultView.vue",
+      "src/modern-webview/components/ErDiagramView.vue",
+      "src/modern/database/erDiagramService.ts",
       "src/modern/commands/modernCommandHost.ts",
+      "src/modern/commands/webviewUtilityProtocols.ts",
+      "test/modern/database.test.ts",
       "test/modern/webview.test.ts",
     ],
     validation: [
@@ -325,7 +329,7 @@ const modernSlices = [
       "npm run test:modern",
       "npm run build:modern:webview",
     ],
-    coverage: "connection form persistence, console execution messages, result table state, row synchronization, update execution, JSON/CSV export, copy/edit/history entry points, and route wiring",
+    coverage: "connection form persistence, console execution messages, result table state, row synchronization, update execution, JSON/CSV export, copy/edit/history entry points, ER diagram foreign-key loading/export, and route wiring",
   },
   {
     id: "4.4",
