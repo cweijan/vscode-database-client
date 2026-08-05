@@ -6,7 +6,7 @@ import * as vscode from "vscode";
 import type { ExtensionServices } from "../core/extensionServices";
 import type { TypedWebviewHandler } from "../core/webviewHandler";
 import type { ConnectionOptions, QueryResult } from "../database/types";
-import type { RemoteEntry, SshConnectionOptions } from "../remote/sshService";
+import type { RemoteEntry, SshConnectionOptions, SshSession } from "../remote/sshService";
 
 interface UtilityProtocolContext {
   readonly route: string;
@@ -359,6 +359,69 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
     } catch (error) {
       await sendError(handler, error);
     }
+  });
+}
+
+function registerSshTerminal(context: UtilityProtocolContext): void {
+  const { handler, services, state } = context;
+  let channel: Awaited<ReturnType<SshSession["shell"]>> | undefined;
+  let opening: Promise<void> | undefined;
+  const selected = (): SshConnectionOptions | undefined => {
+    const connection = targetConnection(state) || services.activeConnection.get();
+    return connection && (connection.type === "SSH" || connection.type === "SFTP")
+      ? connection as SshConnectionOptions
+      : undefined;
+  };
+  const output = async (value: unknown): Promise<void> => {
+    const text = Buffer.isBuffer(value) ? value.toString("utf8") : String(value ?? "");
+    if (text) await handler.send("data", text);
+  };
+  const open = async (): Promise<void> => {
+    if (channel) return;
+    if (opening) return opening;
+    opening = (async () => {
+      const connection = selected();
+      if (!connection) throw new Error("No SSH connection selected");
+      const session = await services.ssh.open(connection);
+      const shell = await session.shell();
+      channel = shell;
+      shell.on("data", (value: Buffer | string) => { void output(value); });
+      shell.stderr.on("data", (value: Buffer | string) => { void output(value); });
+      shell.once("close", () => {
+        channel = undefined;
+        void handler.send("close");
+      });
+      await handler.send("ready", { connection: connection.name || connection.id });
+    })();
+    try {
+      await opening;
+    } finally {
+      opening = undefined;
+    }
+  };
+  handler.on("initTerminal", async () => {
+    try { await open(); } catch (error) { await sendError(handler, error); }
+  });
+  handler.on("input", async (content) => {
+    try {
+      await open();
+      const value = typeof content === "string" ? content : stringValue(record(content).data || content);
+      channel?.write(value);
+    } catch (error) { await sendError(handler, error); }
+  });
+  handler.on("resize", async (content) => {
+    try {
+      await open();
+      const payload = record(content);
+      const rows = Math.max(1, Number(payload.rows) || 24);
+      const cols = Math.max(1, Number(payload.cols) || 80);
+      const candidate = channel as unknown as { setWindow?: (rows: number, cols: number, height: number, width: number) => void } | undefined;
+      candidate?.setWindow?.(rows, cols, 0, 0);
+    } catch (error) { await sendError(handler, error); }
+  });
+  handler.on("closeTerminal", () => {
+    channel?.end();
+    channel = undefined;
   });
 }
 
@@ -1137,6 +1200,7 @@ export function registerWebviewUtilityProtocols(context: UtilityProtocolContext)
   if (context.route === "fileManager" || context.route === "sshTerminal") {
     registerRemoteFileManager(context);
   }
+  if (context.route === "sshTerminal") registerSshTerminal(context);
   if (context.route === "mock") registerMock(context);
   if (context.route === "rabbitQueueView") registerRabbitQueue(context);
   if (context.route === "keyView") registerRedisKey(context);

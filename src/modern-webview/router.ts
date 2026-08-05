@@ -7,7 +7,9 @@ import {
 import RouteLayout from "./components/RouteLayout.vue";
 import ConnectionView from "./components/ConnectionView.vue";
 import ConsoleView from "./components/ConsoleView.vue";
+import DatabaseFileView from "./components/DatabaseFileView.vue";
 import DesignView from "./components/DesignView.vue";
+import ParquetView from "./components/ParquetView.vue";
 import ResultView from "./components/ResultView.vue";
 import RouteWorkbench from "./components/RouteWorkbench.vue";
 import type { WebviewRouteName } from "./routeRegistry";
@@ -36,8 +38,8 @@ function surfaceRoute(
 export function createWebviewRouter() {
   const routes: RouteRecordRaw[] = [
     { path: "/connect", name: "connect", component: ConnectionView },
-    surfaceRoute("/dbFileConnect", "dbFileConnect"),
-    surfaceRoute("/parquet", "parquet"),
+    { path: "/dbFileConnect", name: "dbFileConnect", component: DatabaseFileView },
+    { path: "/parquet", name: "parquet", component: ParquetView },
     surfaceRoute("/sqlite", "sqlite"),
     {
       path: "/",

@@ -77,6 +77,7 @@ function initializeProtocol(): void {
     case "sshTerminal":
       bridge?.emit("initSftpConfig");
       bridge?.emit("initSftp");
+      bridge?.emit("initTerminal");
       return;
     case "dbFileConnect":
     case "parquet":

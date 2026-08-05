@@ -203,7 +203,9 @@ export function createModernCommandHost(
           });
         };
         handler.on("execute", execute);
-        handler.on("input", execute);
+        if (route !== "sshTerminal") {
+          handler.on("input", execute);
+        }
         handler.on("refresh", async () => {
           await handler.send("setState", webviewState);
         });

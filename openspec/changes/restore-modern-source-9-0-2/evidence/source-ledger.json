@@ -254,7 +254,9 @@
       "id": "4.4",
       "name": "webview-design-and-route-workbench",
       "sourceFiles": [
+        "src/modern-webview/components/DatabaseFileView.vue",
         "src/modern-webview/components/DesignView.vue",
+        "src/modern-webview/components/ParquetView.vue",
         "src/modern-webview/components/RouteWorkbench.vue",
         "src/modern-webview/components/UiInput.vue",
         "src/modern-webview/components/UiSelect.vue",
