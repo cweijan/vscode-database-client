@@ -1,4 +1,4 @@
-import { BigQuery } from "@google-cloud/bigquery";
+import type { BigQuery as BigQueryClient } from "@google-cloud/bigquery";
 
 import { OperationCancelledError } from "../core/errors";
 import {
@@ -121,7 +121,8 @@ function bigQueryConnector(): DriverConnector {
     type: "BigQuery",
     async connect(options, signal) {
       ensureActive(signal, "Opening BigQuery connection");
-      const client = new BigQuery({
+      const { BigQuery } = await import("@google-cloud/bigquery");
+      const client: BigQueryClient = new BigQuery({
         projectId:
           requiredString(nestedOption(options, "bigQuery", "projectId")) ||
           requiredString(option(options, "projectId")) ||

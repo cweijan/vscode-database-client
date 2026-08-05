@@ -1,17 +1,7 @@
 import { Readable, Writable } from "node:stream";
 
-import {
-  CreateBucketCommand,
-  DeleteObjectCommand,
-  GetObjectCommand,
-  ListBucketsCommand,
-  ListObjectsV2Command,
-  PutObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
-import { Client as FtpClient } from "basic-ftp";
-import { Etcd3 } from "etcd3";
-import { createClient, type FileStat, type WebDAVClient } from "webdav";
+import type { Client as FtpClient } from "basic-ftp";
+import type { FileStat, WebDAVClient } from "webdav";
 
 import {
   OperationCancelledError,
@@ -108,7 +98,8 @@ function ftpConnector(): DriverConnector {
     type: "FTP",
     async connect(options, signal) {
       ensureActive(signal, "Opening FTP connection");
-      const client = new FtpClient(numberOption(options, "requestTimeout", 30_000));
+      const { Client: FtpClientConstructor } = await import("basic-ftp");
+      const client = new FtpClientConstructor(numberOption(options, "requestTimeout", 30_000));
       await client.access({
         host: options.host || "localhost",
         port: options.port || 21,
@@ -191,6 +182,7 @@ function webDavConnector(): DriverConnector {
             username: options.user,
             password: options.password,
           };
+      const { createClient } = await import("webdav");
       const client: WebDAVClient = createClient(webDavUrl(options), clientOptions);
       await client.getDirectoryContents("/");
       const execute = async (source: string, querySignal?: AbortSignal) => {
@@ -258,6 +250,15 @@ function s3Connector(): DriverConnector {
     type: "S3",
     async connect(options, signal) {
       ensureActive(signal, "Opening S3 connection");
+      const {
+        CreateBucketCommand,
+        DeleteObjectCommand,
+        GetObjectCommand,
+        ListBucketsCommand,
+        ListObjectsV2Command,
+        PutObjectCommand,
+        S3Client,
+      } = await import("@aws-sdk/client-s3");
       const accessKey = String(nestedOption(options, "s3", "accessKey") || options.user || "");
       const secretKey = String(nestedOption(options, "s3", "accessSecret") || options.password || "");
       const useSSL = Boolean(nestedOption(options, "s3", "useSSL") ?? option(options, "ssl") ?? true);
@@ -380,6 +381,7 @@ function etcdConnector(): DriverConnector {
     type: "etcd",
     async connect(options, signal) {
       ensureActive(signal, "Opening etcd connection");
+      const { Etcd3 } = await import("etcd3");
       const hosts = (options.connectionUrl || `http://${options.host || "localhost"}:${options.port || 2379}`)
         .split(",")
         .map((host) => host.trim())
