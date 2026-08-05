@@ -90,6 +90,10 @@ function initializeProtocol(): void {
     case "rabbitQueueView":
       bridge?.init("rabbitQueueView");
       return;
+    case "keyView":
+    case "esStatus":
+      bridge?.init(props.routeName);
+      return;
     case "forward":
       bridge?.init("forward");
       return;
@@ -281,6 +285,35 @@ onBeforeUnmount(() => {
           @click="sendPayload('loadConsumers')"
         >
           Consumers
+        </UiButton>
+      </template>
+      <template v-else-if="routeName === 'keyView'">
+        <UiButton
+          type="button"
+          @click="sendPayload('refresh')"
+        >
+          Refresh key
+        </UiButton>
+        <UiButton
+          type="button"
+          @click="sendPayload('update', { value: input })"
+        >
+          Save value
+        </UiButton>
+        <UiButton
+          type="button"
+          variant="default"
+          @click="sendPayload('del')"
+        >
+          Delete key
+        </UiButton>
+      </template>
+      <template v-else-if="routeName === 'esStatus'">
+        <UiButton
+          type="button"
+          @click="sendPayload('refresh_es_status')"
+        >
+          Refresh status
         </UiButton>
       </template>
       <template v-else-if="routeName === 'forward'">

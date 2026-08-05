@@ -637,6 +637,87 @@ function registerRabbitQueue(context: UtilityProtocolContext): void {
   });
 }
 
+function registerRedisKey(context: UtilityProtocolContext): void {
+  const { handler, services, state } = context;
+  const target = targetRecord(state);
+  const key = stringValue(target.key || target.label || target.name, "key");
+  const connection = (): ConnectionOptions | undefined => targetConnection(state) || services.activeConnection.get();
+  const execute = async (command: string): Promise<Record<string, unknown>[]> => {
+    const selected = connection();
+    if (!selected) throw new Error("No Redis connection selected");
+    return rowsOf(await services.connections.query<Record<string, unknown>>(selected, command));
+  };
+  const load = async (): Promise<void> => {
+    try {
+      const [valueResult, typeResult, ttlResult] = await Promise.all([
+        execute(`GET ${JSON.stringify(key)}`),
+        execute(`TYPE ${JSON.stringify(key)}`),
+        execute(`TTL ${JSON.stringify(key)}`),
+      ]);
+      await handler.send("detail", {
+        key,
+        value: valueResult[0]?.value,
+        type: typeResult[0]?.value || "string",
+        ttl: ttlResult[0]?.value,
+      });
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  };
+  const update = async (content: unknown): Promise<void> => {
+    try {
+      const payload = record(content);
+      const value = payload.value ?? content;
+      await execute(`SET ${JSON.stringify(key)} ${JSON.stringify(typeof value === "string" ? value : JSON.stringify(value))}`);
+      await handler.send("success", "Redis key updated.");
+      await load();
+    } catch (error) { await sendError(handler, error); }
+  };
+  handler.on("init", load);
+  handler.on("refresh", load);
+  handler.on("detail", load);
+  handler.on("update", update);
+  handler.on("saveItem", update);
+  handler.on("ttl", async (content) => {
+    try {
+      const seconds = Number(record(content).ttl ?? content);
+      if (!Number.isFinite(seconds)) throw new Error("Redis TTL must be a number");
+      await execute(`EXPIRE ${JSON.stringify(key)} ${Math.max(0, Math.trunc(seconds))}`);
+      await handler.send("success", "Redis TTL updated.");
+      await load();
+    } catch (error) { await sendError(handler, error); }
+  });
+  handler.on("del", async () => {
+    try {
+      await execute(`DEL ${JSON.stringify(key)}`);
+      await handler.send("success", "Redis key deleted.");
+    } catch (error) { await sendError(handler, error); }
+  });
+  handler.on("rename", async (content) => {
+    try {
+      const nextKey = stringValue(record(content).name || record(content).key || content).trim();
+      if (!nextKey) throw new Error("Redis key name is empty");
+      await execute(`RENAME ${JSON.stringify(key)} ${JSON.stringify(nextKey)}`);
+      await handler.send("success", `Redis key renamed to ${nextKey}.`);
+    } catch (error) { await sendError(handler, error); }
+  });
+}
+
+function registerElasticsearchStatus(context: UtilityProtocolContext): void {
+  const { handler, services, state } = context;
+  const load = async (): Promise<void> => {
+    try {
+      const selected = targetConnection(state) || services.activeConnection.get();
+      if (!selected) throw new Error("No Elasticsearch connection selected");
+      const result = await services.connections.query<Record<string, unknown>>(selected, "GET /_cluster/health");
+      await handler.send("esStatus", rowsOf(result)[0] || {});
+    } catch (error) { await sendError(handler, error); }
+  };
+  handler.on("esStatus", load);
+  handler.on("refresh_es_status", load);
+  handler.on("init", load);
+}
+
 function registerForwarding(context: UtilityProtocolContext): void {
   const { handler, services, state } = context;
   let selectedServer = stringValue(targetConnection(state)?.id, "");
@@ -770,6 +851,8 @@ export function registerWebviewUtilityProtocols(context: UtilityProtocolContext)
   }
   if (context.route === "mock") registerMock(context);
   if (context.route === "rabbitQueueView") registerRabbitQueue(context);
+  if (context.route === "keyView") registerRedisKey(context);
+  if (context.route === "esStatus") registerElasticsearchStatus(context);
   if (context.route === "forward") registerForwarding(context);
   if (context.route === "sshStatus" || context.route === "sshMonitor") registerSshStatus(context);
   if (context.route === "structDiff") registerStructureDiff(context);
