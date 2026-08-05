@@ -81,6 +81,9 @@
         "src/modern/database/driverConnectionFactory.ts",
         "src/modern/database/standardFactories.ts",
         "src/modern/database/extendedFactories.ts",
+        "src/modern/database/cloudFactories.ts",
+        "src/modern/database/httpFactories.ts",
+        "src/modern/database/resourceFactories.ts",
         "src/modern/database/sqljs.d.ts",
         "src/modern/database/standardDialects.ts",
         "src/modern/database/additionalFactories.ts"
@@ -89,7 +92,7 @@
         "npm run typecheck:modern",
         "npm run test:modern"
       ],
-      "coverage": "connection lifecycle, cancellation boundary, result conversion, driver adapter, SQL.js, Dameng, Snowflake, Databricks, and dialect selection",
+      "coverage": "connection lifecycle, cancellation boundary, result conversion, driver adapter, SQL.js, Dameng, Snowflake, Databricks, BigQuery, Trino, PrestoDB, TDengine, FTP, WebDAV, S3, etcd, and dialect selection",
       "status": "implemented-foundation",
       "missingFiles": []
     },
@@ -162,6 +165,7 @@
         "src/modern/remote/sshService.ts",
         "src/modern/remote/sshTreeProvider.ts",
         "src/modern/remote/dockerTree.ts",
+        "src/modern/remote/resourceTreeProvider.ts",
         "test/modern/database.test.ts",
         "test/modern/remote.test.ts"
       ],
@@ -170,7 +174,7 @@
         "npm run test:modern",
         "npm run verify:modern:activation"
       ],
-      "coverage": "Redis, MongoDB, Elasticsearch, Neo4j, RabbitMQ, Loki, Kafka, and Docker adapters plus typed NoSQL, SSH/SFTP, and Docker tree nodes",
+      "coverage": "Redis, MongoDB, Elasticsearch, Neo4j, RabbitMQ, Loki, Kafka, Docker, FTP, WebDAV, S3, and etcd adapters plus typed NoSQL, SSH/SFTP, resource, and Docker tree nodes",
       "status": "implemented-foundation",
       "missingFiles": []
     },
@@ -1316,7 +1320,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/database/connectionNode.ts",
-      "legacySha256": "5d94d6c21717ba8e2e401d2ddf8a6b652f36765c8b192db64d8711762f1fa99e"
+      "legacySha256": "fce0161d9ba005d1a5397553d2ce721b9071242a74571802b8d221c30311914a"
     },
     {
       "sourcePath": "src/model/database/databaseNode.ts",
@@ -1384,7 +1388,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/database/schemaNode.ts",
-      "legacySha256": "4ae68fc3e4c9051eb87ededdde163aa2bb418eeac428ad8968ab710532001d76"
+      "legacySha256": "0828268d45fab980992cc82c07a1d58e204a9931cb501df35f7268b6c259e892"
     },
     {
       "sourcePath": "src/model/database/table/columnGroup.ts",
@@ -1474,7 +1478,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/interface/node.ts",
-      "legacySha256": "f3fa19db2684e0888fc5fc6c838825384dec11d9caf27d6d3a9e0865720fb686"
+      "legacySha256": "6a039498f4328900f994089ebb74875a17c237b54cb48bb4f32d5bc43025c9de"
     },
     {
       "sourcePath": "src/model/interface/nodeFieldType.ts",

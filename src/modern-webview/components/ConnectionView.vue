@@ -17,6 +17,10 @@ interface ConnectionForm {
   password: string;
   database: string;
   schema: string;
+  connectionUrl: string;
+  dbPath: string;
+  optionsText: string;
+  options?: Record<string, unknown>;
 }
 
 const bridge = inject(WEBVIEW_BRIDGE_KEY);
@@ -32,6 +36,9 @@ const form = reactive<ConnectionForm>({
   password: initial.password ?? "",
   database: initial.database ?? "",
   schema: initial.schema ?? "",
+  connectionUrl: initial.connectionUrl ?? "",
+  dbPath: initial.dbPath ?? "",
+  optionsText: initial.options ? JSON.stringify(initial.options, null, 2) : "",
 });
 const message = ref("");
 let resultSubscription: BridgeDisposable | undefined;
@@ -40,17 +47,72 @@ let errorSubscription: BridgeDisposable | undefined;
 const databaseTypes = [
   "MySQL",
   "MariaDB",
+  "Doris",
   "PostgreSQL",
+  "Redshift",
+  "GaussDB",
+  "Cassandra",
   "Oracle",
   "SqlServer",
+  "AzureSQLServer",
+  "Db2",
+  "Db2 for i",
+  "MySQLCompatible",
+  "PostgreCompatible",
   "SQLite",
+  "DuckDB",
+  "Databricks",
+  "D1",
+  "libSQL",
+  "Kingbase",
+  "Cockroach",
+  "达梦",
+  "TDengine",
+  "Trino",
+  "PrestoDB",
+  "Hive",
   "ClickHouse",
+  "Snowflake",
+  "Athena",
+  "BigQuery",
+  "JDBC",
+  "MongoDB",
+  "ElasticSearch",
+  "Redis",
+  "Kafka",
+  "RabbitMQ",
+  "SSH",
+  "FTP",
+  "S3",
+  "Docker",
+  "WebDAV",
+  "Neo4j",
+  "RDP",
+  "Loki",
+  "etcd",
+  "Zookeeper",
+  "Exasol",
 ];
 
 function save(): void {
+  let options: Record<string, unknown> | undefined;
+  if (form.optionsText.trim()) {
+    try {
+      const parsed: unknown = JSON.parse(form.optionsText);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        throw new Error("Options must be a JSON object");
+      }
+      options = parsed as Record<string, unknown>;
+    } catch (error) {
+      message.value = error instanceof Error ? error.message : "Options JSON is invalid.";
+      return;
+    }
+  }
+  const { optionsText: _optionsText, ...connectionFields } = form;
   const connection = {
-    ...form,
+    ...connectionFields,
     port: form.port ? Number(form.port) : undefined,
+    options,
   };
   bridge?.emit("saveConnection", connection);
   bridge?.emit("save", connection);
@@ -155,6 +217,29 @@ onBeforeUnmount(() => {
       <label class="vsc-field">
         <span class="vsc-field__label">Schema</span>
         <UiInput v-model="form.schema" />
+      </label>
+      <label class="vsc-field">
+        <span class="vsc-field__label">Connection URL</span>
+        <UiInput
+          v-model="form.connectionUrl"
+          placeholder="Optional driver URL"
+        />
+      </label>
+      <label class="vsc-field">
+        <span class="vsc-field__label">Database file</span>
+        <UiInput
+          v-model="form.dbPath"
+          placeholder="SQLite / DuckDB path"
+        />
+      </label>
+      <label class="vsc-field vsc-field--wide">
+        <span class="vsc-field__label">Driver options (JSON)</span>
+        <textarea
+          v-model="form.optionsText"
+          class="vsc-input connection-view__options"
+          spellcheck="false"
+          placeholder="{&quot;ssl&quot;: true}"
+        />
       </label>
     </div>
     <p

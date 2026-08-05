@@ -19,6 +19,7 @@ const input = ref("");
 const status = ref("");
 let stateSubscription: BridgeDisposable | undefined;
 let resultSubscription: BridgeDisposable | undefined;
+let errorSubscription: BridgeDisposable | undefined;
 
 const title = computed(() => {
   const titles: Partial<Record<WebviewRouteName, string>> = {
@@ -65,12 +66,16 @@ onMounted(() => {
     applyState(content);
     status.value = "Host response received.";
   });
+  errorSubscription = bridge?.on("error", (content) => {
+    status.value = String(content ?? "Host action failed.");
+  });
   bridge?.emit(`route-${props.routeName}`);
 });
 
 onBeforeUnmount(() => {
   stateSubscription?.dispose();
   resultSubscription?.dispose();
+  errorSubscription?.dispose();
 });
 </script>
 

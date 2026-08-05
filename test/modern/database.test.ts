@@ -270,6 +270,14 @@ test("standard connection factories expose every recovered driver family", () =>
     "达梦",
     "Snowflake",
     "Databricks",
+    "BigQuery",
+    "Trino",
+    "PrestoDB",
+    "TDengine",
+    "FTP",
+    "WebDAV",
+    "S3",
+    "etcd",
   ]) {
     assert.equal(supported(type), true, `missing factory for ${type}`);
   }

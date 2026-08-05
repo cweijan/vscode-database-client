@@ -14,6 +14,7 @@ import {
 } from "../database/oracle/synonyms";
 import { DockerConnectionNode } from "../remote/dockerTree";
 import { SshConnectionNode } from "../remote/sshTreeProvider";
+import { ResourceConnectionNode } from "../remote/resourceTreeProvider";
 
 export interface StoredConnection extends ConnectionOptions {
   readonly name?: string;
@@ -1516,7 +1517,7 @@ export class ModernNoSqlConnectionNode extends DatabaseTreeItem {
     if (this.connection.type === "Neo4j") {
       return [new Neo4jLabelGroupNode(this.connection, this.services, this.actions, this)];
     }
-    if (["RabbitMQ", "Kafka", "Loki"].includes(this.connection.type)) {
+    if (["RabbitMQ", "Kafka", "Loki", "etcd"].includes(this.connection.type)) {
       return [new GenericServiceRootNode(this.connection, this.services, this.actions, this)];
     }
     return [new InfoTreeItem(`NoSQL tree support for ${this.connection.type} is not configured.`)];
@@ -1681,6 +1682,9 @@ export class ModernNoSqlTreeProvider
           onDelete,
           () => this.refresh(),
         );
+      }
+      if (["FTP", "S3", "WebDAV"].includes(connection.type)) {
+        return new ResourceConnectionNode(connection, this.services, onDelete, () => this.refresh());
       }
       return new ModernNoSqlConnectionNode(
         connection,

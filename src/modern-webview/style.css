@@ -123,6 +123,10 @@ body {
   color: var(--vscode-descriptionForeground, #9d9d9d);
 }
 
+.vsc-field--wide {
+  grid-column: 1 / -1;
+}
+
 .vsc-input {
   min-height: 26px;
   padding: 0.25rem 0.5rem;
@@ -180,6 +184,12 @@ body {
 
 .connection-view__grid > .vsc-field {
   min-width: 0;
+}
+
+.connection-view__options {
+  min-height: 7rem;
+  resize: vertical;
+  font-family: var(--vscode-editor-font-family, monospace);
 }
 
 .console-view__editor,

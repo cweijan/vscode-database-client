@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 
 import type { ExtensionServices } from "../core/extensionServices";
 import type { ConnectionOptions, QueryResult } from "../database/types";
@@ -114,7 +114,49 @@ export function createModernCommandHost(
     title: string,
     target?: unknown,
   ): Promise<vscode.WebviewPanel> => {
-    return openRoute(title, route, route, { target });
+    const state = { target, connection: targetConnection(target) };
+    return openRoute(
+      title,
+      route,
+      route,
+      state,
+      (handler) => {
+        const execute = async (content: unknown): Promise<void> => {
+          const connection = targetConnection(state) || services.activeConnection.get();
+          const source = typeof content === "string" ? content.trim() : "";
+          if ((route === "xterm" || route === "sshTerminal") && connection?.type === "SSH" && source) {
+            const session = await services.ssh.open(connection as import("../remote/sshService").SshConnectionOptions);
+            const result = await session.exec(source);
+            await handler.send("result", result);
+            return;
+          }
+          if (connection && source && /^(SELECT|SHOW|DESCRIBE|EXPLAIN|GET|POST|PUT|PATCH|DELETE|LIST|PRODUCE|CREATE|DROP|ALTER|INSERT|UPDATE|USE|MATCH|SET|RESET)\b/i.test(source)) {
+            try {
+              const result = await services.connections.query(connection, source);
+              await handler.setWebviewState({ ...state, sql: source, ...result });
+              await handler.send("result", { sql: source, ...result });
+            } catch (error) {
+              await handler.send("error", error instanceof Error ? error.message : String(error));
+            }
+            return;
+          }
+          await handler.send("result", {
+            route,
+            action: "execute",
+            content,
+            state,
+          });
+        };
+        handler.on("execute", execute);
+        handler.on("input", execute);
+        handler.on("refresh", async () => {
+          await handler.send("setState", state);
+        });
+        handler.on("close", async () => {
+          await handler.send("result", { route, action: "close" });
+        });
+      },
+    );
   };
 
   const openResult = async <Row>(
@@ -122,13 +164,47 @@ export function createModernCommandHost(
     sql: string,
     result: QueryResult<Row>,
   ): Promise<vscode.WebviewPanel> => {
-    return openRoute("SQL Result", "result", "result", {
+    const state = {
       title,
       sql,
       rows: result.rows,
       fields: result.fields,
       affectedRows: result.affectedRows,
-    });
+    };
+    return openRoute(
+      "SQL Result",
+      "result",
+      "result",
+      state,
+      (handler) => {
+        handler.on("copyResult", async (content) => {
+          const payload = content && typeof content === "object"
+            ? content as { columns?: unknown[]; rows?: unknown[] }
+            : {};
+          const columns = Array.isArray(payload.columns) ? payload.columns.map(String) : [];
+          const rows = Array.isArray(payload.rows) ? payload.rows : [];
+          const text = rows.map((row) => {
+            const record = row && typeof row === "object" ? row as Record<string, unknown> : {};
+            return (columns.length > 0 ? columns : Object.keys(record))
+              .map((column) => String(record[column] ?? ""))
+              .join("\t");
+          }).join("\n");
+          await vscode.env.clipboard.writeText(text);
+        });
+        handler.on("exportResult", async (content) => {
+          const payload = content && typeof content === "object"
+            ? content as { columns?: unknown[]; rows?: unknown[] }
+            : {};
+          const rows = Array.isArray(payload.rows) ? payload.rows : [];
+          const file = await vscode.window.showSaveDialog({
+            saveLabel: "Export result",
+            filters: { JSON: ["json"], CSV: ["csv"] },
+          });
+          if (!file) return;
+          await writeFile(file.fsPath, JSON.stringify(rows, null, 2), "utf8");
+        });
+      },
+    );
   };
 
   const runTargetSql = async (
@@ -162,6 +238,20 @@ export function createModernCommandHost(
         (handler) => {
           handler.on("saveConnection", (value) => saveConnection(value));
           handler.on("save", (value) => saveConnection(value));
+          handler.on("connect", async (value) => {
+            try {
+              const connection = asConnection(value);
+              if (!connection) {
+                throw new Error("Connection id and type are required");
+              }
+              await saveConnection(connection);
+              await services.connections.getConnection(connection);
+              services.activeConnection.set(connection);
+              await handler.send("connectResult", `Connected to ${connection.name || connection.id}.`);
+            } catch (error) {
+              await handler.send("error", error instanceof Error ? error.message : String(error));
+            }
+          });
         },
       );
     },
@@ -211,12 +301,7 @@ export function createModernCommandHost(
       if (options.json) {
         return openText(JSON.stringify(result.rows, null, 2), "json");
       }
-      return openRoute(
-        "SQL Result",
-        "result",
-        "result",
-        resultState(source, result),
-      );
+      return openResult("SQL Result", source, result);
     },
 
     async openQuery(target) {

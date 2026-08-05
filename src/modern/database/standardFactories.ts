@@ -16,6 +16,9 @@ import { createAdditionalConnectionFactories } from "./additionalFactories";
 import { createMessageConnectionFactories } from "./messageFactories";
 import { createDockerConnectionFactories } from "./dockerFactory";
 import { createExtendedConnectionFactories } from "./extendedFactories";
+import { createCloudConnectionFactories } from "./cloudFactories";
+import { createHttpConnectionFactories } from "./httpFactories";
+import { createResourceConnectionFactories } from "./resourceFactories";
 
 function optionValue(
   options: ConnectionOptions,
@@ -160,5 +163,8 @@ export function createStandardConnectionFactories(): DriverConnectionFactory[] {
     ...createMessageConnectionFactories(),
     ...createDockerConnectionFactories(),
     ...createExtendedConnectionFactories(),
+    ...createCloudConnectionFactories(),
+    ...createHttpConnectionFactories(),
+    ...createResourceConnectionFactories(),
   ];
 }
