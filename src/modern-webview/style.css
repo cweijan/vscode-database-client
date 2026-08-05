@@ -385,3 +385,260 @@ body {
     min-width: 11rem;
   }
 }
+
+.structure-diff-view__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+}
+
+.structure-diff-view__side {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--vscode-panel-border, #454545);
+  background: var(--vscode-sideBar-background, transparent);
+}
+
+.structure-diff-view__side--source {
+  border-top: 2px solid var(--vscode-terminal-ansiBlue, #3794ff);
+}
+
+.structure-diff-view__side--target {
+  border-top: 2px solid var(--vscode-terminal-ansiYellow, #e2c08d);
+}
+
+.structure-diff-view__side-header,
+.structure-diff-view__result-header,
+.structure-diff-view__group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.structure-diff-view__side-header,
+.structure-diff-view__result-header {
+  justify-content: space-between;
+}
+
+.structure-diff-view__side-header h2,
+.structure-diff-view__result-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.structure-diff-view__side-marker {
+  padding: 0.1rem 0.35rem;
+  border-radius: 2px;
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+  background: var(--vscode-textCodeBlock-background, #1e1e1e);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.structure-diff-view__arrow {
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+  font-size: 1.5rem;
+}
+
+.structure-diff-view__actions {
+  align-items: center;
+}
+
+.structure-diff-view__result {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--vscode-panel-border, #454545);
+}
+
+.structure-diff-view__select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.structure-diff-view__tree {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.structure-diff-view__group {
+  border: 1px solid var(--vscode-panel-border, #454545);
+}
+
+.structure-diff-view__group-header {
+  min-height: 2.1rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--vscode-sideBar-background, transparent);
+}
+
+.structure-diff-view__group-header .vsc-button {
+  min-width: 1.8rem;
+  padding: 0.1rem 0.35rem;
+}
+
+.structure-diff-view__items {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem 0.65rem 2.5rem;
+}
+
+.structure-diff-view__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.structure-diff-view__item-title {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.structure-diff-view__item-detail,
+.structure-diff-view__children span {
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+  font-size: 0.9em;
+}
+
+.structure-diff-view__item code {
+  display: block;
+  overflow: auto;
+  margin-top: 0.2rem;
+  color: var(--vscode-textPreformat-foreground, var(--vscode-editor-foreground, #cccccc));
+  white-space: pre-wrap;
+}
+
+.structure-diff-view__children {
+  margin: 0.35rem 0 0;
+  padding-left: 1rem;
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.structure-diff-view__preview textarea {
+  min-height: 12rem;
+}
+
+@media (max-width: 760px) {
+  .structure-diff-view__columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .structure-diff-view__arrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+}
+
+.ssh-monitor-view__setup,
+.ssh-monitor-view__dashboard {
+  display: grid;
+  gap: 1rem;
+}
+
+.ssh-monitor-view__server-list {
+  display: grid;
+  gap: 0.35rem;
+  max-width: 52rem;
+  padding: 0.75rem;
+  border: 1px solid var(--vscode-panel-border, #454545);
+}
+
+.ssh-monitor-view__server-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+}
+
+.ssh-monitor-view__server-row:hover {
+  background: var(--vscode-list-hoverBackground, rgba(255, 255, 255, 0.06));
+}
+
+.ssh-monitor-view__server-row span {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.ssh-monitor-view__server-row small {
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.ssh-monitor-view__table {
+  min-width: 60rem;
+}
+
+.ssh-monitor-view__metric-row {
+  cursor: pointer;
+}
+
+.ssh-monitor-view__system {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.ssh-monitor-view__status-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.ssh-monitor-view__status-dot--online {
+  background: var(--vscode-testing-iconPassed, #89d185);
+}
+
+.ssh-monitor-view__status-dot--offline {
+  background: var(--vscode-errorForeground, #f14c4c);
+}
+
+.ssh-monitor-view__metric-bar {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(4rem, 1fr);
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 8rem;
+}
+
+.ssh-monitor-view__bar-track {
+  display: block;
+  height: 0.35rem;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--vscode-textCodeBlock-background, #1e1e1e);
+}
+
+.ssh-monitor-view__bar-fill {
+  display: block;
+  height: 100%;
+  transition: width 160ms ease;
+}
+
+.ssh-monitor-view__row-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+  .ssh-monitor-view__table {
+    min-width: 48rem;
+  }
+
+  .ssh-monitor-view__metric-bar {
+    min-width: 6.5rem;
+  }
+}

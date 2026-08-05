@@ -219,6 +219,7 @@ export function createModernCommandHost(
           webviewState,
           services,
           handler,
+          openUtility,
         });
       },
     );

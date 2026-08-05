@@ -8,14 +8,16 @@ import type { TypedWebviewHandler } from "../core/webviewHandler";
 import type { ConnectionOptions, QueryResult } from "../database/types";
 import type { RemoteEntry, SshConnectionOptions, SshSession } from "../remote/sshService";
 import type { SshForwardType } from "../remote/sshForwardingService";
+import { fetchSshMonitorSnapshot } from "../remote/sshMonitorService";
 
-interface UtilityProtocolContext {
+export interface UtilityProtocolContext {
   readonly route: string;
   readonly target?: unknown;
   readonly state: Record<string, unknown>;
   readonly webviewState: Record<string, unknown>;
   readonly services: ExtensionServices;
   readonly handler: TypedWebviewHandler;
+  readonly openUtility?: (route: string, title: string, target?: unknown) => Promise<unknown>;
 }
 
 interface FileManagerEntry {
@@ -1396,6 +1398,288 @@ function registerSshStatus(context: UtilityProtocolContext): void {
   handler.on("processes", async (content) => { try { await handler.send("processes", { output: await run(`ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -${Math.max(2, Number(record(content).limit) || 20)}`) }); } catch (error) { await sendError(handler, error); } });
 }
 
+interface SshMonitorServer {
+  readonly key: string;
+  readonly name: string;
+  readonly host: string;
+  readonly monitored?: boolean;
+}
+
+interface SshMonitorMetric extends SshMonitorServer {
+  readonly online: boolean;
+  readonly metricsLoading: boolean;
+  readonly cpu?: number;
+  readonly memory?: number;
+  readonly memoryUsed?: number;
+  readonly memoryTotal?: number;
+  readonly disk?: number;
+  readonly diskUsed?: string;
+  readonly diskTotal?: string;
+  readonly netRx?: number;
+  readonly netTx?: number;
+  readonly error?: string;
+}
+
+interface SshMonitorNetworkCache {
+  readonly received: number;
+  readonly sent: number;
+  readonly timestamp: number;
+}
+
+function registerSshMonitor(context: UtilityProtocolContext): void {
+  const { handler, services, state } = context;
+  const monitorStateKey = "ssh_monitor_keys";
+  const pollInterval = 5_000;
+  let pollTimer: ReturnType<typeof setInterval> | undefined;
+  let refreshInFlight: Promise<void> | undefined;
+  const networkCache = new Map<string, SshMonitorNetworkCache>();
+
+  const connections = (): SshConnectionOptions[] => {
+    const stored = connectionRecords(
+      services.state.get("ssh.connections", services.state.get("mysql.connections", {})),
+    )
+      .filter((item) => item.type === "SSH" || item.type === "SFTP")
+      .filter((item) => stringValue(item.options?.type).toLowerCase() !== "native")
+      .map((item) => item as SshConnectionOptions);
+    const selected = targetConnection(state);
+    if (selected && (selected.type === "SSH" || selected.type === "SFTP") && !stored.some((item) => item.id === selected.id)) {
+      stored.push(selected as SshConnectionOptions);
+    }
+    return stored;
+  };
+
+  const servers = (): SshMonitorServer[] => connections().map((connection) => ({
+    key: connection.id,
+    name: connection.name || connection.host || connection.id,
+    host: `${connection.host || "localhost"}@${connection.port || 22}`,
+  }));
+
+  const connectionFor = (key: string): SshConnectionOptions | undefined =>
+    connections().find((connection) => connection.id === key);
+
+  const storedKeys = (): string[] => {
+    const value = services.state.get<unknown>(monitorStateKey, []);
+    return Array.isArray(value)
+      ? value.filter((item): item is string => typeof item === "string" && item.length > 0)
+      : [];
+  };
+
+  const syncKeys = async (): Promise<string[]> => {
+    const validKeys = new Set(servers().map((server) => server.key));
+    const current = storedKeys();
+    const next = current.filter((key) => validKeys.has(key));
+    if (next.length !== current.length || next.some((key, index) => key !== current[index])) {
+      await services.state.update(monitorStateKey, next);
+    }
+    return next;
+  };
+
+  const emitServerState = async (): Promise<string[]> => {
+    const keys = await syncKeys();
+    const monitored = new Set(keys);
+    await handler.send("serverList", servers().map((server) => ({
+      ...server,
+      monitored: monitored.has(server.key),
+    })));
+    await handler.send("monitoredKeys", keys);
+    return keys;
+  };
+
+  const stopPolling = (): void => {
+    if (pollTimer) {
+      clearInterval(pollTimer);
+      pollTimer = undefined;
+    }
+  };
+
+  const startPolling = (): void => {
+    stopPolling();
+    pollTimer = setInterval(() => {
+      void refreshDynamicMetrics();
+    }, pollInterval);
+  };
+
+  const openUtility = async (
+    route: string,
+    title: string,
+    connection: SshConnectionOptions,
+  ): Promise<void> => {
+    if (context.openUtility) {
+      await context.openUtility(route, title, connection);
+      return;
+    }
+    const childState = { target: connection, connection };
+    const childWebviewState = { route, connection };
+    await services.webviews.createWebviewPanel({
+      title: `${connection.name || connection.host || connection.id} · ${title}`,
+      type: route,
+      id: route,
+      route,
+      state: childWebviewState,
+      eventHandler: (childHandler) => {
+        registerWebviewUtilityProtocols({
+          route,
+          target: connection,
+          state: childState,
+          webviewState: childWebviewState,
+          services,
+          handler: childHandler,
+        });
+      },
+    });
+  };
+
+  const refreshDynamicMetrics = async (): Promise<void> => {
+    if (refreshInFlight) return refreshInFlight;
+    const task = (async () => {
+      const keys = await syncKeys();
+      for (const key of keys) {
+        const connection = connectionFor(key);
+        if (!connection) continue;
+        try {
+          const snapshot = await fetchSshMonitorSnapshot(await services.ssh.open(connection));
+          const previous = networkCache.get(key);
+          const timestamp = Date.now();
+          networkCache.set(key, {
+            received: snapshot.network.received,
+            sent: snapshot.network.sent,
+            timestamp,
+          });
+          const seconds = previous ? Math.max(1, (timestamp - previous.timestamp) / 1_000) : 1;
+          await handler.send("metricUpdate", {
+            key,
+            name: connection.name || connection.host || connection.id,
+            host: `${connection.host || "localhost"}@${connection.port || 22}`,
+            online: true,
+            metricsLoading: false,
+            cpu: snapshot.cpu,
+            memory: snapshot.memory,
+            memoryUsed: snapshot.memoryUsed,
+            memoryTotal: snapshot.memoryTotal,
+            disk: snapshot.disk,
+            diskUsed: snapshot.diskUsed,
+            diskTotal: snapshot.diskTotal,
+            netRx: previous ? Math.max(0, snapshot.network.received - previous.received) / seconds : 0,
+            netTx: previous ? Math.max(0, snapshot.network.sent - previous.sent) / seconds : 0,
+          } satisfies SshMonitorMetric);
+        } catch (error) {
+          await handler.send("metricUpdate", {
+            key,
+            name: connection.name || connection.host || connection.id,
+            host: `${connection.host || "localhost"}@${connection.port || 22}`,
+            online: false,
+            metricsLoading: false,
+            error: errorText(error),
+          } satisfies SshMonitorMetric);
+        }
+      }
+    })();
+    refreshInFlight = task;
+    try {
+      await task;
+    } finally {
+      if (refreshInFlight === task) refreshInFlight = undefined;
+    }
+  };
+
+  const refreshMetrics = async (): Promise<void> => {
+    const keys = await syncKeys();
+    if (!keys.length) {
+      await handler.send("metrics", []);
+      return;
+    }
+    const monitored = new Set(keys);
+    const rows: SshMonitorMetric[] = servers()
+      .filter((server) => monitored.has(server.key))
+      .map((server) => ({
+        ...server,
+        online: false,
+        metricsLoading: true,
+      }))
+      .sort((left, right) => left.name.localeCompare(right.name));
+    await handler.send("metrics", rows);
+    await refreshDynamicMetrics();
+  };
+
+  const saveKeys = async (content: unknown): Promise<void> => {
+    const requested = Array.isArray(content)
+      ? content
+      : record(content).keys;
+    const validKeys = new Set(servers().map((server) => server.key));
+    const next = Array.isArray(requested)
+      ? requested.filter((key): key is string => typeof key === "string" && validKeys.has(key))
+      : [];
+    await services.state.update(monitorStateKey, [...new Set(next)]);
+    const keys = await emitServerState();
+    if (keys.length) {
+      await refreshMetrics();
+      startPolling();
+    } else {
+      stopPolling();
+      await handler.send("metrics", []);
+    }
+  };
+
+  handler.on("init", async () => {
+    const keys = await emitServerState();
+    if (keys.length) {
+      await refreshMetrics();
+      startPolling();
+    } else {
+      await handler.send("metrics", []);
+    }
+  });
+  handler.on("load", async () => {
+    await emitServerState();
+  });
+  handler.on("saveMonitored", saveKeys);
+  handler.on("refresh", async () => {
+    networkCache.clear();
+    await refreshMetrics();
+  });
+  handler.on("openStatus", async (content) => {
+    try {
+      const key = stringValue(record(content).key || content);
+      const connection = connectionFor(key);
+      if (!connection) throw new Error("SSH server was not found");
+      await openUtility("sshStatus", "SSH Status", connection);
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("openTerminal", async (content) => {
+    try {
+      const key = stringValue(record(content).key || content);
+      const connection = connectionFor(key);
+      if (!connection) throw new Error("SSH server was not found");
+      await openUtility("sshTerminal", "SSH Terminal", connection);
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("remove", async (content) => {
+    try {
+      const key = stringValue(record(content).key || content);
+      const next = storedKeys().filter((item) => item !== key);
+      await services.state.update(monitorStateKey, next);
+      networkCache.delete(key);
+      const keys = await emitServerState();
+      if (keys.length) {
+        await refreshMetrics();
+        startPolling();
+      } else {
+        stopPolling();
+        await handler.send("metrics", []);
+      }
+      await handler.send("removed", { message: "Removed from monitor" });
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.onDidReset(stopPolling);
+  handler.onDidDispose(stopPolling);
+}
+
 function registerStructureDiff(context: UtilityProtocolContext): void {
   const { handler, services } = context;
   type DiffReference = {
@@ -1702,6 +1986,7 @@ export function registerWebviewUtilityProtocols(context: UtilityProtocolContext)
   if (context.route === "keyView") registerRedisKey(context);
   if (context.route === "esStatus") registerElasticsearchStatus(context);
   if (context.route === "forward") registerForwarding(context);
-  if (context.route === "sshStatus" || context.route === "sshMonitor") registerSshStatus(context);
+  if (context.route === "sshStatus") registerSshStatus(context);
+  if (context.route === "sshMonitor") registerSshMonitor(context);
   if (context.route === "structDiff") registerStructureDiff(context);
 }

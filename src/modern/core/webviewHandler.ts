@@ -15,6 +15,8 @@ type MessageHandler = (content: unknown, message: WebviewMessage) => void | Prom
 
 export class TypedWebviewHandler implements Disposable {
   private readonly handlers = new Map<string, Set<MessageHandler>>();
+  private readonly resetListeners = new Set<() => void>();
+  private readonly disposeListeners = new Set<() => void>();
   private disposed = false;
   private state: unknown;
   private readonly messageRegistration: Disposable;
@@ -41,6 +43,20 @@ export class TypedWebviewHandler implements Disposable {
           this.handlers.delete(type);
         }
       },
+    };
+  }
+
+  public onDidReset(listener: () => void): Disposable {
+    this.resetListeners.add(listener);
+    return {
+      dispose: () => this.resetListeners.delete(listener),
+    };
+  }
+
+  public onDidDispose(listener: () => void): Disposable {
+    this.disposeListeners.add(listener);
+    return {
+      dispose: () => this.disposeListeners.delete(listener),
     };
   }
 
@@ -77,6 +93,10 @@ export class TypedWebviewHandler implements Disposable {
   }
 
   public reset(): void {
+    for (const listener of this.resetListeners) {
+      listener();
+    }
+    this.resetListeners.clear();
     this.handlers.clear();
   }
 
@@ -85,6 +105,11 @@ export class TypedWebviewHandler implements Disposable {
       return;
     }
     this.disposed = true;
+    for (const listener of this.disposeListeners) {
+      listener();
+    }
+    this.disposeListeners.clear();
+    this.resetListeners.clear();
     this.messageRegistration.dispose();
     this.disposeRegistration.dispose();
     this.handlers.clear();

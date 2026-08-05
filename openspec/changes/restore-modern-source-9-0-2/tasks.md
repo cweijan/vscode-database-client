@@ -1,9 +1,11 @@
 ## Current execution checkpoints
 
 - `fd3df67`：已完成扩展入口、公共核心、SQL 树、Oracle 同义词、目标专属数据库文件/Parquet/远程文件/SSH 状态与终端页面，以及命令和 Provider 的第一轮源码恢复；现代构建与激活 smoke 已通过。
-- 当前仍未把大领域任务提前标记完成：命令审计仍有 33 个需要继续确认的能力，结构差异、端口转发、SSH 监控和若干目标专属页面仍需独立闭环验证。
+- 当前仍未把大领域任务提前标记完成：命令审计仍有 33 个需要继续确认的能力，若干目标专属页面仍需独立闭环验证。
 - 本检查点已完成：`ForwardView.vue` 已替代 `forward` 路由的通用工作台，接通服务器选择、转发配置增改删、启动/停止、状态展示、导入/导出和目标消息协议；Local 转发可用，Remote/Dynamic 已保留为显式待补适配器。
-- 下一切片：恢复 `structDiff` 专属 Vue 页面，先闭合连接/数据库/Schema 选择、比较结果树、SQL 预览、打开查询和同步协议。
+- 本检查点已完成：`StructureDiffView.vue` 已替代 `structDiff` 路由的通用工作台，接通连接/数据库/Schema 选择、比较结果树、SQL 预览、打开查询和同步协议。
+- 本检查点已完成：`SshMonitorView.vue` 已替代 `sshMonitor` 路由的通用工作台，接通服务器选择、`ssh_monitor_keys` 持久化、指标轮询、单行更新、状态/终端跳转和移除监控协议；Linux/macOS/Windows 指标采集位于独立的强类型服务。
+- 下一切片：继续审计命令注册剩余能力，并补齐目标中仍由通用工作台承载的页面。
 - 每个切片完成后必须更新源码 ledger、补充协议测试并运行现代类型检查、lint、测试、构建、激活 smoke、源码契约和打包验证。
 
 ## 1. Baseline and recovery ledger

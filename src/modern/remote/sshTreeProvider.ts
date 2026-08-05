@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 
 import type { ExtensionServices } from "../core/extensionServices";
 import type { ConnectionOptions } from "../database/types";
+import { registerWebviewUtilityProtocols } from "../commands/webviewUtilityProtocols";
 import type { RemoteEntry, SshConnectionOptions } from "./sshService";
 
 export interface SshStoredConnection extends ConnectionOptions {
@@ -411,11 +412,26 @@ export class SshConnectionNode extends vscode.TreeItem {
   }
 
   private async openRoute(route: string, remotePath: string): Promise<void> {
+    const state = {
+      target: this.connection,
+      connection: this.connection,
+      path: remotePath,
+    };
     await this.services.webviews.createWebviewPanel({
       title: `${displayName(this.connection)} · ${route}`,
       type: route,
       route,
-      state: { connection: this.connection, path: remotePath },
+      state,
+      eventHandler: (handler) => {
+        registerWebviewUtilityProtocols({
+          route,
+          target: this.connection,
+          state,
+          webviewState: state,
+          services: this.services,
+          handler,
+        });
+      },
     });
   }
 
