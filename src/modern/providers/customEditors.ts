@@ -86,6 +86,7 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
     context: vscode.CustomDocumentBackupContext,
     _cancellation: vscode.CancellationToken,
   ): Promise<vscode.CustomDocumentBackup> {
+    document.content = await this.requestContent(document);
     await vscode.workspace.fs.writeFile(context.destination, document.content);
     const backup: BinaryDocumentBackup = {
       id: context.destination.toString(),
@@ -107,7 +108,7 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
       singlePage: false,
       webviewPanel: panel,
       state: this.openPayload(document),
-      eventHandler: (handler) => this.bindEvents(document, handler),
+      eventHandler: (handler) => this.bindEvents(document, panel, handler),
     });
   }
 
@@ -130,6 +131,7 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
 
   private bindEvents(
     document: ModernBinaryDocument,
+    panel: vscode.WebviewPanel,
     handler: TypedWebviewHandler,
   ): void {
     const key = document.uri.toString();
@@ -189,6 +191,16 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
       document.content = await vscode.workspace.fs.readFile(document.uri);
       await handler.send("open", this.openPayload(document));
     });
+    panel.onDidDispose(() => {
+      if (this.handlers.get(key) === handler) {
+        this.handlers.delete(key);
+      }
+      const pending = this.pendingSaves.get(key);
+      if (pending) {
+        this.pendingSaves.delete(key);
+        pending.reject(new Error("Custom editor panel disposed"));
+      }
+    });
   }
 
   private async connectDatabaseFile(
@@ -222,7 +234,7 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
     connected: boolean,
     connection?: ConnectionOptions,
   ): Promise<void> {
-    const selected = connection || this.services.activeConnection.get();
+    const selected = connection || (connected ? this.services.activeConnection.get() : undefined);
     const groups: Array<Record<string, unknown>> = [];
     if (connected && selected) {
       const dialect = this.services.dialects.resolve(selected.type);
