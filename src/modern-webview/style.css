@@ -1,0 +1,239 @@
+:root {
+  font-family: var(--vscode-font-family, system-ui, sans-serif);
+  color: var(--vscode-foreground, var(--vscode-editor-foreground, #cccccc));
+  background: var(--vscode-editor-background, #1e1e1e);
+  color-scheme: normal;
+}
+
+body {
+  margin: 0;
+  min-width: 280px;
+  background: var(--vscode-editor-background, #1e1e1e);
+  color: var(--vscode-editor-foreground, #cccccc);
+  font-size: var(--vscode-font-size, 13px);
+  line-height: 1.4;
+}
+
+#app-container {
+  min-height: 100vh;
+}
+
+.modern-shell {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 1rem;
+}
+
+.modern-shell h1,
+.modern-shell p {
+  margin: 0;
+}
+
+.modern-shell__diagnostics {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.status-banner {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--vscode-panel-border, #454545);
+  background: var(--vscode-textBlockQuote-background, transparent);
+}
+
+.status-banner--error {
+  color: var(--vscode-errorForeground, #f48771);
+}
+
+.route-layout,
+.route-surface {
+  min-height: 8rem;
+}
+
+.route-surface {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.route-surface__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.route-surface__header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.route-surface__message,
+.route-layout__empty {
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.vsc-button,
+.vsc-input {
+  box-sizing: border-box;
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: 2px;
+  font: inherit;
+}
+
+.vsc-button {
+  min-height: 26px;
+  padding: 0.25rem 0.75rem;
+  color: var(--vscode-button-foreground, #ffffff);
+  background: var(--vscode-button-background, #0e639c);
+  cursor: pointer;
+}
+
+.vsc-button:hover:not(:disabled) {
+  background: var(--vscode-button-hoverBackground, #1177bb);
+}
+
+.vsc-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.vsc-button--default {
+  color: var(--vscode-button-secondaryForeground, var(--vscode-foreground, #cccccc));
+  background: var(--vscode-button-secondaryBackground, #3a3d41);
+}
+
+.vsc-button--default:hover:not(:disabled) {
+  background: var(--vscode-button-secondaryHoverBackground, #45494e);
+}
+
+.vsc-button--danger {
+  color: var(--vscode-errorForeground, #f48771);
+}
+
+.vsc-field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.vsc-field__label {
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.vsc-input {
+  min-height: 26px;
+  padding: 0.25rem 0.5rem;
+  color: var(--vscode-input-foreground, #cccccc);
+  background: var(--vscode-input-background, #313131);
+  border-color: var(--vscode-input-border, transparent);
+}
+
+.vsc-input:focus,
+.vsc-button:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder, #007fd4);
+  outline-offset: 1px;
+}
+
+.route-workspace {
+  display: grid;
+  gap: 1rem;
+  min-height: 8rem;
+  padding: 1rem 0;
+}
+
+.route-workspace__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.route-workspace__header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.route-workspace__subline,
+.route-workspace__empty,
+.route-workspace__status {
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.route-workspace__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.route-workspace__error {
+  color: var(--vscode-errorForeground, #f48771);
+}
+
+.connection-view__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.connection-view__grid > .vsc-field {
+  min-width: 0;
+}
+
+.console-view__editor,
+.design-view__editor {
+  width: 100%;
+  min-height: 16rem;
+  resize: vertical;
+  font-family: var(--vscode-editor-font-family, monospace);
+  line-height: 1.5;
+}
+
+.result-view__table-wrap {
+  overflow: auto;
+  border: 1px solid var(--vscode-panel-border, #454545);
+}
+
+.result-view__table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.result-view__table th,
+.result-view__table td {
+  padding: 0.35rem 0.6rem;
+  border-right: 1px solid var(--vscode-panel-border, #454545);
+  border-bottom: 1px solid var(--vscode-panel-border, #454545);
+  text-align: left;
+  vertical-align: top;
+}
+
+.result-view__table th {
+  position: sticky;
+  top: 0;
+  color: var(--vscode-editor-foreground, #cccccc);
+  background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+}
+
+.route-workbench__toolbar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.route-workbench__toolbar .vsc-input {
+  flex: 1;
+}
+
+.route-workbench__state {
+  max-height: 24rem;
+  overflow: auto;
+  padding: 0.75rem;
+  border: 1px solid var(--vscode-panel-border, #454545);
+  color: var(--vscode-editor-foreground, #cccccc);
+  background: var(--vscode-textCodeBlock-background, #1e1e1e);
+  font-family: var(--vscode-editor-font-family, monospace);
+  white-space: pre-wrap;
+}

@@ -6,3 +6,6 @@ node_modules
 package-lock.json
 .prettierrc
 yarn.lock
+openspec/
+.codex/
+dist-modern/

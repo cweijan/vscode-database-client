@@ -17,7 +17,7 @@ export class EsRequest {
         if (path?.charAt(0) != "/") {
             path = "/" + path
         }
-        const body = splitIndex == -1 ? null : request.substring(splitIndex + 1) + "\n"
+        const body = splitIndex == -1 ? '{}' : request.substring(splitIndex + 1) + "\n"
 
         return new EsRequest(type, path, body)
     }

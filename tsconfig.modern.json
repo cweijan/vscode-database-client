@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@modern/*": ["src/modern/*"],
+      "@webview/*": ["src/modern-webview/*"]
+    },
+    "types": ["node", "vscode"]
+  },
+  "include": [
+    "src/modern/**/*.ts",
+    "src/modern-webview/**/*.ts",
+    "src/modern-webview/**/*.vue",
+    "src/modern/core/**/*.ts",
+    "vite.*.config.mts",
+    "test/modern/**/*.ts"
+  ],
+  "vueCompilerOptions": {
+    "target": 3,
+    "strictTemplates": true
+  }
+}

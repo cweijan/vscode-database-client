@@ -2,47 +2,119 @@
     "events": {
         "Active": {},
         "View": {
-            "page": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Event target page." }
+            "page": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Event target page."
+            }
         },
         "Connection": {
-            "operation": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Scope of connection (global or workspace)." }
+            "operation": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Scope of connection (global or workspace)."
+            }
         },
         "NetworkTool": {
-            "operation": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Network utility action (getInfo, ping, checkPort, dnsResolve)." }
+            "operation": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Network utility action (getInfo, ping, checkPort, dnsResolve)."
+            }
         },
         "ImageTool": {
-            "operation": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Image utility action (crop, resize, tinypng, base64, svg, svgDesigner)." }
+            "operation": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Image utility action (crop, resize, tinypng, base64, svg, svgDesigner)."
+            }
         },
         "StructDiff": {
-            "operation": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Structure sync operation type." }
+            "operation": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Structure sync operation type."
+            }
         },
         "ExecuteQuery": {
-            "db_type": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Database type for query execution." },
-            "from": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Query trigger source (editor, codelen, etc.)." }
+            "db_type": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Database type for query execution."
+            },
+            "from": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Query trigger source (editor, codelen, etc.)."
+            }
         },
         "ExecuteQueryError": {
-            "db_type": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Database type for failed query." },
-            "from": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Query trigger source." },
-            "category": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Error category without sensitive details." }
+            "db_type": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Database type for failed query."
+            },
+            "from": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Query trigger source."
+            },
+            "category": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Error category without sensitive details."
+            }
         },
         "ConnectTest": {
-            "db_type": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Database type for connection test." },
-            "operation": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Connection test result (success or failed)." },
-            "category": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Error category for failed connection test." }
+            "db_type": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Database type for connection test."
+            },
+            "operation": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Connection test result (success or failed)."
+            },
+            "category": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Error category for failed connection test."
+            }
         },
         "AIChat": {
-            "command": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Chat participant command invoked." }
+            "command": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Chat participant command invoked."
+            }
         },
         "AIToolInvoke": {
-            "tool": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Language model tool name invoked." }
+            "tool": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Language model tool name invoked."
+            }
         },
         "NotebookOpen": {
-            "operation": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Notebook open action (new or show)." }
+            "operation": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Notebook open action (new or show)."
+            }
         },
         "ParquetOpen": {},
         "DesignExecute": {
-            "db_type": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Database type for design change." },
-            "operation": { "classification": "PublicNonPersonalData", "purpose": "FeatureInsight", "comment": "Design change type (table, column, fk, index)." }
+            "db_type": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Database type for design change."
+            },
+            "operation": {
+                "classification": "PublicNonPersonalData",
+                "purpose": "FeatureInsight",
+                "comment": "Design change type (table, column, fk, index)."
+            }
         }
     },
     "commonProperties": {

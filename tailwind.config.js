@@ -1,6 +1,9 @@
 module.exports = {
-  purge: ["./src/vue/**/*.vue", "./src/vue/**/*.js"],
-  darkMode: false, // or 'media' or 'class'
+  content: [
+    "./src/vue/**/*.{vue,js}",
+    "./src/modern-webview/**/*.{vue,ts,html}",
+  ],
+  darkMode: "media",
   theme: {
     extend: {},
   },
