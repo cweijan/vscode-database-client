@@ -2,47 +2,71 @@
     "SelectTemplate": {
         "prefix": "sel",
         "body": [
-            "SELECT * FROM "
+            "SELECT * FROM"
+        ]
+    },
+    "CaseTemplate": {
+        "prefix": "case",
+        "body": [
+            "CASE \n\tWHEN $1 THEN $2 \n\tELSE $3 \nEND"
         ]
     },
     "SelectWhereTemplate": {
         "prefix": "selw",
         "body": [
-            "SELECT * FROM $1 WHERE $2"
+            "SELECT * FROM$1 WHERE$2"
+        ]
+    },
+    "CreateForiengKeyTemplate": {
+        "prefix": "foreignKey",
+        "body": [
+            "Foreign Key ($1) REFERENCES $2($3)"
+        ]
+    },
+    "SelectCountTemplate": {
+        "prefix": "selc",
+        "body": [
+            "SELECT count(*) FROM"
+        ]
+    },
+    "SelectCountWhereTemplate": {
+        "prefix": "selcw",
+        "body": [
+            "SELECT count(*) FROM$1 where$2"
         ]
     },
     "DeleteTemplate": {
         "prefix": "del",
         "body": [
-            "DELETE FROM "
+            "DELETE FROM"
         ]
     },
     "DeleteWhereTemplate": {
         "prefix": "delw",
         "body": [
-            "DELETE FROM $1 WHERE $2"
+            "DELETE FROM$1 WHERE$2"
         ]
     },
     "InsertTemplate": {
         "prefix": "ins",
         "body": [
-            "INSERT INTO $1 VALUES ($2)"
+            "INSERT INTO$1($2) VALUES($3)"
         ]
     },
     "UpdateTemplate": {
         "prefix": "upd",
         "body": [
-            "UPDATE $1 SET $2 WHERE $3"
+            "UPDATE$1 SET$2 WHERE$3"
         ]
     },"JoinTemplate": {
         "prefix": "joi",
         "body": [
-            "JOIN $1 ON $2"
+            "JOIN$1 ON$2"
         ]
     },"BetweenTemplate": {
         "prefix": "bet",
         "body": [
-            "BETWEEN $1 AND $2"
+            "BETWEEN$1 AND$2"
         ]
     }
 }

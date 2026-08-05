@@ -1,99 +1,150 @@
-
 # Database Client
 
-#### This repository contains the early source code. The new version is closed source.
+<p align="center">
+  <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
+    <img src="https://img.shields.io/vscode-marketplace/v/cweijan.vscode-mysql-client2.svg?label=vscode%20marketplace">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2">
+    <img src="https://img.shields.io/vscode-marketplace/r/cweijan.vscode-mysql-client2.svg">
+  </a>
+  <a href="https://github.com/cweijan/vscode-database-client">
+    <img src="https://img.shields.io/github/stars/cweijan/vscode-database-client?logo=github&style=flat">
+  </a>
+</p>
 
----
+<br>
 
-This project is a database client for Visual Studio Code, supporting the management **MySQL/MariaDB, PostgreSQL, SQLite, Redis, ClickHouse, 达梦**, and **ElasticSearch**, and works as an **SSH** client, boost your maximum productivity!
+All-in-one database management extension for Visual Studio Code. Connect to SQL and NoSQL databases, browse and edit data, run queries with IntelliSense, manage SSH servers, Docker, and remote files — without leaving the editor.
 
-> Project site: [vscode-database-client](https://github.com/cweijan/vscode-database-client), [中文文档](README_CN.md)
+> Website: [database-client.com](https://database-client.com/) · Docs: [https://database-client.com/docs](https://database-client.com/docs)
 
-[![Logo](./public/logo_dark.png)](https://database-client.com)
+[![Logo](https://doc.database-client.com/public/logo.png)](https://database-client.com)
 
-## Installation
+## Telemetry
 
-Install from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2) or [Open VSX](https://open-vsx.org/extension/cweijan/vscode-mysql-client2).
+The extension collects anonymous usage data to help improve the product. Read the [Privacy Policy](https://database-client.com/#/privacyPolicy) for details.
 
-## Telemetry Reporting
+Telemetry follows VS Code's [telemetry settings](https://code.visualstudio.com/docs/getstarted/telemetry). You can also disable it independently:
 
-The Database Client extension will collects and sends anonymous usage data to the Database Client server to help improve our products and services. Read our [Privacy Statement](https://database-client.com/#/privacyPolicy) to learn more.
+```json
+"database-client.telemetry.usesOnlineServices": false
+```
 
-Telemetry reporting follows the [telemetry settings](https://code.visualstudio.com/docs/getstarted/telemetry) of VS Code. Additionally, you can independently disable it by setting `"database-client.telemetry.usesOnlineServices": false`.
+## Getting Started
 
-## Connect
+### Connect
 
-1. Open Database Explorer panel, then click the `+` button.
-2. Select your database type, input connection config then click the connect button.
+1. Open the **Database** panel in the sidebar.
+2. Click the `+` button.
+3. Select a service type, fill in the connection details, and click **Connect**.
 
 ![connection](https://doc.database-client.com/images/connection.jpg)
 
-## Table
+Connections support SSH tunnel, SSL/TLS, SOCKS proxy, and HTTP auth where applicable.
 
-1. Click table to open table view.
-2. Click button beside table to open new table view.
-3. Then you can do data modification on the table view.
+### Browse Tables
+
+1. Click a table to open the table view.
+2. Click the button beside a table to open it in a new tab.
+3. Edit data directly in the grid.
 
 ![query](https://doc.database-client.com/images/view.png)
 
-## Execute SQL Query
+Use the search box next to **Tables** to filter objects in the explorer.
 
-In the Database Explorer panel, click the `Open Query` button.
+### Execute SQL
+
+Click **Open Query** on a connection to open a SQL editor bound to that database.
 
 ![newquery](https://doc.database-client.com/images/newquery.jpg)
 
-That will open a SQL editor bind of database, it provider:
+The editor provides:
 
-1. IntelliSense SQL edit.
-2. snippets:`sel、del、ins、upd、joi`...
-3. Run selected or current cursor SQL (Shortcut : Ctrl+Enter).
-4. Run all SQL (Shortcut : Ctrl+Shift+Enter, Command ID: `mysql.runSQL`).
+- SQL IntelliSense and auto-completion
+- Snippets: `sel`, `del`, `ins`, `upd`, `joi`, etc.
+- **Run current/selected SQL** — `Ctrl+Enter` / `Cmd+Enter`
+- **Run all SQL** — `Ctrl+Shift+Enter` / `Cmd+Shift+Enter`
+- **Run in new panel** — `Ctrl+Alt+Enter` / `Cmd+Ctrl+Enter`
 
 ![run](https://doc.database-client.com/images/run.jpg)
 
-The database can be searched by clicking the search button to the right of "Tables".
+### Cache
 
-![1708594027208](image/README/1708594027208.png)
-
-## Cache
-
-In order to improve performance, the database information is cached. If your database structure changes externally, you need to click the refresh button to refresh the cache。
+Database metadata is cached for performance. If the schema changes externally, click the **Refresh** button on the connection to update.
 
 ![](https://doc.database-client.com/image/connection/1638342622208.png)
 
-## Backup/Import
+### Backup & Import
 
-Move to ant DatabaseNode or TableNode. The export/import options are listed in the context menu (right click to open).
+Right-click any database or table node to access **Export** and **Import** options.
 
-The extension implements the backup function, but it is not stable enough. You can add mysql_dump or pg_dump to the environment variable, and the extension will use these tools for backup.
+For MySQL and PostgreSQL, adding `mysqldump` or `pg_dump` to your `PATH` enables native backup tools.
 
-![bakcup](https://doc.database-client.com/images/Backup.jpg)
+![backup](https://doc.database-client.com/images/Backup.jpg)
 
-## Setting
+### SSH & Port Forwarding
 
-The extension provides some settings, you can refer to the following operations to go to the console settings.
+Connect to an SSH server to access the terminal, browse remote files, and set up port forwarding for tunneling database connections.
 
-![1708593458624](image/README_CN/1708593458624.png)
+### Mock Data
 
-## Generate Mock Data
-
-You can easily generate test data.
+Generate test data from table templates or `mock.json` files. Press `Ctrl+Enter` / `Cmd+Enter` in a mock file to run.
 
 ![mockData](https://doc.database-client.com/image/minor/mockData.jpg)
 
-## History
+### Query History
 
-Click the history button to open the list of recently executed query history records.
+Click the history button in the SQL editor toolbar to view recently executed queries.
 
-![history](images/history.jpg)
+## Settings
+
+Open VS Code Settings and search for `database-client` to configure SQL behavior, result layout, telemetry, and more.
+
+Common options:
+
+| Setting                                           | Description                               |
+| ------------------------------------------------- | ----------------------------------------- |
+| `database-client.defaultSelectLimit`            | Default row limit for SELECT queries      |
+| `database-client.confirmWhenUpdateWithoutWhere` | Warn before UPDATE/DELETE without WHERE   |
+| `database-client.autoPagingSQL`                 | Auto-paginate large result sets           |
+| `database-client.enableSQLVariable`             | Enable`${variable}` substitution in SQL |
+| `database-client.splitEditorWhenQuery`          | Open results in a split editor            |
+
+## Development
+
+### Prerequisites
+
+- Node.js 20+
+- [Yarn](https://yarnpkg.com/)
+
+### Build
+
+```bash
+yarn install
+yarn dev      # watch mode for development
+yarn build    # production build to out/
+yarn lint     # type check
+```
+
+Press `F5` in VS Code to launch the Extension Development Host.
+
+### Package
+
+```bash
+yarn repackage  # build and create .vsix
+```
 
 ## Credits
 
-- [ssh2](https://github.com/mscdex/ssh2): SSH client.
-- [sql-formatter](https://github.com/zeroturnaround/sql-formatter) SQL format lib.
-- Client Lib:
-  - [node-mysql2](https://github.com/sidorares/node-mysql2) : MySQL client.
-  - [node-postgres](https://github.com/brianc/node-postgres): PostgreSQL client.
-  - [tedious](https://github.com/tediousjs/tedious): SqlServer client.
-  - [ioredis](https://github.com/luin/ioredis): Redis client.
-  - [vscode-sqlite](https://github.com/AlexCovizzi/vscode-sqlite): SQLite client code reference.
+- [ssh2](https://github.com/mscdex/ssh2) — SSH client
+- [sql-formatter](https://github.com/zeroturnaround/sql-formatter) — SQL formatting
+- Client libraries:
+  - [@cweijan/mysql2](https://github.com/sidorares/node-mysql2) — MySQL
+  - [pg](https://github.com/brianc/node-postgres) — PostgreSQL
+  - [tedious](https://github.com/tediousjs/tedious) — SQL Server
+  - [ioredis](https://github.com/luin/ioredis) — Redis
+  - [mongodb](https://github.com/mongodb/node-mongodb-native) — MongoDB
+  - [kafkajs](https://github.com/tulios/kafkajs) — Kafka
+  - [neo4j-driver](https://github.com/neo4j/neo4j-javascript-driver) — Neo4j
+  - [snowflake-sdk](https://github.com/snowflakedb/snowflake-connector-nodejs) — Snowflake
+  - [vscode-sqlite](https://github.com/AlexCovizzi/vscode-sqlite) — SQLite client code reference
