@@ -207,6 +207,36 @@ onBeforeUnmount(() => {
           Reload adapter
         </UiButton>
       </template>
+      <template v-else-if="routeName === 'dbFileConnect'">
+        <UiButton
+          type="button"
+          @click="sendPayload('connecting', { connectionOption: { dbPath: input || state.fileName, dbType: 'SQLite', name: state.fileName } })"
+        >
+          Connect SQLite
+        </UiButton>
+        <UiButton
+          type="button"
+          variant="default"
+          @click="sendPayload('reveal')"
+        >
+          Reveal file
+        </UiButton>
+      </template>
+      <template v-else-if="routeName === 'parquet'">
+        <UiButton
+          type="button"
+          @click="sendPayload('save')"
+        >
+          Save file
+        </UiButton>
+        <UiButton
+          type="button"
+          variant="default"
+          @click="sendPayload('revert')"
+        >
+          Revert file
+        </UiButton>
+      </template>
       <template v-else-if="routeName === 'mock'">
         <UiButton
           type="button"
