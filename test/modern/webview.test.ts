@@ -168,6 +168,11 @@ test("Webview route registry preserves target names and nested paths", () => {
     ],
   );
   assert.deepEqual(routeLocation("/connect"), { name: "connect" });
+  assert.equal(routePath("sqlite"), "/sqlite");
+  assert.equal(routeFromPath("/keyView")?.name, "keyView");
+  assert.equal(routeFromPath("/rabbitQueueView")?.name, "rabbitQueueView");
+  assert.equal(routeFromPath("/fileManager")?.name, "fileManager");
+  assert.equal(routeFromPath("/es-status")?.name, "esStatus");
   assert.equal(routePath("document"), "/center/document");
   assert.equal(routeFromPath("/center/document")?.name, "document");
 });

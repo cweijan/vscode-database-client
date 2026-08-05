@@ -4,7 +4,7 @@
 
 ## What Changes
 
-- 建立基于 Vite、Vue 3、TypeScript 5 和现代静态检查工具的可重复构建链。
+- 建立基于 Vite、Vue 3、TypeScript 6 和现代静态检查工具的可重复构建链，并保留向 TypeScript 7 迁移的边界。
 - 按领域恢复扩展入口、公共基础设施、连接与方言、数据库树模型、命令/Provider 以及 Webview 源码。
 - 保留 9.0.2 的命令、视图、配置、语言、编辑器入口、数据库能力和当前 Oracle 同义词修改。
 - 用编译 bundle 作为行为证据和回归基线，不把压缩后的 `out` 文件伪装为最终源码。

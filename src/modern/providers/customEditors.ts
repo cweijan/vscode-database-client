@@ -22,6 +22,8 @@ class ModernBinaryDocument implements vscode.CustomDocument {
 
 type CustomDocumentChange = vscode.CustomDocumentContentChangeEvent<ModernBinaryDocument>;
 
+type BinaryEditorRoute = "dbFileConnect" | "sqlite" | "parquet";
+
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" ? value as Record<string, unknown> : {};
 }
@@ -42,7 +44,7 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
 
   public constructor(
     private readonly services: ExtensionServices,
-    private readonly route: "dbFileConnect" | "parquet",
+    private readonly route: "database" | "parquet",
   ) {}
 
   public async openCustomDocument(
@@ -100,11 +102,12 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
     panel: vscode.WebviewPanel,
     _token: vscode.CancellationToken,
   ): Promise<void> {
+    const route = this.routeFor(document.uri);
     await this.services.webviews.createWebviewPanel({
       title: path.basename(document.uri.fsPath),
-      type: this.route,
-      id: `${this.route}:${document.uri.toString()}`,
-      route: this.route,
+      type: route,
+      id: `${route}:${document.uri.toString()}`,
+      route,
       singlePage: false,
       webviewPanel: panel,
       state: this.openPayload(document),
@@ -125,8 +128,16 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
     return {
       fileName: path.basename(document.uri.fsPath),
       data: Array.from(document.content),
-      route: this.route,
+      route: this.routeFor(document.uri),
     };
+  }
+
+  private routeFor(uri: vscode.Uri): BinaryEditorRoute {
+    if (this.route === "parquet") return "parquet";
+    const extension = path.extname(uri.fsPath).toLowerCase();
+    return extension === ".ddb" || extension === ".duckdb"
+      ? "dbFileConnect"
+      : "sqlite";
   }
 
   private bindEvents(
@@ -137,14 +148,14 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
     const key = document.uri.toString();
     this.handlers.set(key, handler);
     handler.on("init", async () => {
-      if (this.route === "dbFileConnect") {
+      if (this.routeFor(document.uri) !== "parquet") {
         await this.sendDatabaseFileInfo(document, handler, false);
       } else {
         await handler.send("open", this.openPayload(document));
       }
     });
     handler.on("connecting", async (content) => {
-      if (this.route !== "dbFileConnect") return;
+      if (this.routeFor(document.uri) === "parquet") return;
       try {
         await this.connectDatabaseFile(document, handler, content);
       } catch (error) {
@@ -279,7 +290,7 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
 export function registerModernCustomEditors(
   services: ExtensionServices,
 ): vscode.Disposable[] {
-  const dbFileProvider = new BinaryDocumentProvider(services, "dbFileConnect");
+  const dbFileProvider = new BinaryDocumentProvider(services, "database");
   const parquetProvider = new BinaryDocumentProvider(services, "parquet");
   const options = {
     supportsMultipleEditorsPerDocument: true,

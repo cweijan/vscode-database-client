@@ -9,7 +9,11 @@ import ConnectionView from "./components/ConnectionView.vue";
 import ConsoleView from "./components/ConsoleView.vue";
 import DatabaseFileView from "./components/DatabaseFileView.vue";
 import DesignView from "./components/DesignView.vue";
+import ElasticsearchStatusView from "./components/ElasticsearchStatusView.vue";
 import ParquetView from "./components/ParquetView.vue";
+import RabbitQueueView from "./components/RabbitQueueView.vue";
+import RedisView from "./components/RedisView.vue";
+import RemoteFileManagerView from "./components/RemoteFileManagerView.vue";
 import ResultView from "./components/ResultView.vue";
 import RouteWorkbench from "./components/RouteWorkbench.vue";
 import type { WebviewRouteName } from "./routeRegistry";
@@ -40,7 +44,7 @@ export function createWebviewRouter() {
     { path: "/connect", name: "connect", component: ConnectionView },
     { path: "/dbFileConnect", name: "dbFileConnect", component: DatabaseFileView },
     { path: "/parquet", name: "parquet", component: ParquetView },
-    surfaceRoute("/sqlite", "sqlite"),
+    { path: "/sqlite", name: "sqlite", component: DatabaseFileView },
     {
       path: "/",
       name: "main",
@@ -48,19 +52,19 @@ export function createWebviewRouter() {
       children: [
         { path: "result", name: "result", component: ResultView },
         surfaceRoute("manager", "manager"),
-        surfaceRoute("es-status", "esStatus"),
+        { path: "es-status", name: "esStatus", component: ElasticsearchStatusView },
         { path: "design", name: "design", component: DesignView },
         surfaceRoute("erDiagram", "erDiagram"),
         surfaceRoute("mock", "mock"),
       ],
     },
     surfaceRoute("/structDiff", "structDiff"),
-    surfaceRoute("/keyView", "keyView"),
-    surfaceRoute("/rabbitQueueView", "rabbitQueueView"),
+    { path: "/keyView", name: "keyView", component: RedisView },
+    { path: "/rabbitQueueView", name: "rabbitQueueView", component: RabbitQueueView },
     surfaceRoute("/forward", "forward"),
     surfaceRoute("/xterm", "xterm"),
     surfaceRoute("/sshTerminal", "sshTerminal"),
-    surfaceRoute("/fileManager", "fileManager"),
+    { path: "/fileManager", name: "fileManager", component: RemoteFileManagerView },
     surfaceRoute("/sshStatus", "sshStatus"),
     surfaceRoute("/sshMonitor", "sshMonitor"),
     {

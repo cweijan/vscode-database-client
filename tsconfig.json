@@ -1,20 +1,23 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "target": "es6",
+        "module": "Node16",
+        "moduleResolution": "Node16",
+        "target": "ES2024",
         "outDir": "out",
         "rootDir": ".",
         "lib": [
             "es6",
             "es2017",
             "es2019",
-            "ES2025"
+            "ES2024"
         ],
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
+        "allowJs": true,
+        "checkJs": false,
+        "strict": false,
+        "skipLibCheck": true,
         "sourceMap": true,
-        "ignoreDeprecations": "6.0",
-        "baseUrl": ".",
         "paths": {
             "@/*": [
                 "./src/*"
@@ -23,6 +26,15 @@
     },
     "exclude": [
         "node_modules",
-        ".vscode-test"
+        ".vscode-test",
+        "dist-modern",
+        "src/modern",
+        "src/modern-webview",
+        "test",
+        "vite.*.mts"
+    ],
+    "include": [
+        "src/**/*.ts",
+        "types/**/*.d.ts"
     ]
 }

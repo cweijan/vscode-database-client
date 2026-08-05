@@ -35,7 +35,7 @@
 
 ### 2. 采用现代 Vite + TypeScript + Vue 3 工具链
 
-使用目标 package manifest 已体现的 Vite、TypeScript 5、Vue 3、Vue-tsc 和 ESLint 生态，补齐缺失的 Vite 配置、源码入口、类型配置和锁定文件。扩展后端和 Webview 采用清晰的入口与别名，不让旧 Webpack 配置继续承担新源码构建职责。
+使用目标 package manifest 已体现的 Vite、TypeScript 6、Vue 3、Vue-tsc 和 ESLint 生态，补齐缺失的 Vite 配置、源码入口、类型配置和锁定文件。TypeScript 6 作为 Vue/嵌入式语言工具链仍兼容的过渡版本，暂不把 TypeScript 7 作为迁移前提。扩展后端和 Webview 采用清晰的入口与别名，不让旧 Webpack 配置继续承担新源码构建职责。
 
 替代方案是继续修补旧 Webpack/Vue 2 链。它能较快复用旧文件，但不能承接目标 Webview 和新模块的现代依赖，也会把迁移债务继续隐藏在构建配置中。
 

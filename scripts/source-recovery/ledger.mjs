@@ -344,6 +344,27 @@ const modernSlices = [
     ],
     coverage: "DDL design execution boundary, remote-file/SSH, Mock, RabbitMQ, live SSH forwarding, SSH status, metadata-backed structure-diff, database-file, and Parquet protocol boundaries",
   },
+  {
+    id: "4.5",
+    name: "target-database-and-remote-pages",
+    sourceFiles: [
+      "src/modern-webview/components/RedisView.vue",
+      "src/modern-webview/components/RabbitQueueView.vue",
+      "src/modern-webview/components/ElasticsearchStatusView.vue",
+      "src/modern-webview/components/RemoteFileManagerView.vue",
+      "src/modern-webview/router.ts",
+      "src/modern/commands/webviewUtilityProtocols.ts",
+      "src/modern/database/nosqlFactories.ts",
+      "test/modern/webview.test.ts",
+    ],
+    validation: [
+      "npm run typecheck:modern",
+      "npm run test:modern",
+      "npm run build:modern:webview",
+      "npm run verify:modern:activation",
+    ],
+    coverage: "readable Redis key, RabbitMQ queue, Elasticsearch status, and remote file manager pages with typed host message protocols",
+  },
 ];
 
 async function buildModernSliceRecords(projectRoot) {

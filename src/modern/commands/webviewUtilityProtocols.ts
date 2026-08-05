@@ -167,7 +167,7 @@ function connectionRecords(value: unknown): ConnectionOptions[] {
 
 function registerRemoteFileManager(context: UtilityProtocolContext): void {
   const { handler, services, state, webviewState } = context;
-  let currentPath = normalizedRemotePath(state.path, "/");
+  let currentPath = normalizedRemotePath(webviewState.path || state.path, "/");
 
   const connection = (): ConnectionOptions | undefined =>
     targetConnection(state) || services.activeConnection.get();
@@ -577,6 +577,37 @@ function registerRabbitQueue(context: UtilityProtocolContext): void {
     return rowsOf(await services.connections.query<Record<string, unknown>>(selected, source));
   };
   const queueUrl = rabbitPath(vhost, queue);
+  const getMessages = async (
+    count: number,
+    ackmode: "ack_requeue_true" | "ack_requeue_false",
+  ): Promise<Record<string, unknown>[]> => execute(`POST /api/queues/${queueUrl}/get\n${JSON.stringify({
+    vhost,
+    name: queue,
+    truncate: "50000",
+    ackmode,
+    encoding: "auto",
+    count: String(count),
+  }, null, 2)}`);
+
+  const publishToQueue = async (
+    targetQueue: string,
+    message: Record<string, unknown>,
+  ): Promise<void> => {
+    const properties = record(message.properties);
+    const headers = record(message.headers || properties.headers);
+    await execute(`POST /api/exchanges/${rabbitPath(vhost, "amq.default")}/publish\n${JSON.stringify({
+      vhost,
+      name: "amq.default",
+      properties: { ...properties, delivery_mode: properties.delivery_mode || 2, headers },
+      routing_key: targetQueue,
+      delivery_mode: String(properties.delivery_mode || message.delivery_mode || 2),
+      payload: stringValue(message.payload || message.body),
+      payload_encoding: stringValue(message.payload_encoding, "string"),
+      headers,
+      props: {},
+    }, null, 2)}`);
+  };
+
   const emitDetail = async (): Promise<void> => {
     const detail = (await execute(`GET /api/queues/${queueUrl}`))[0] || {};
     const queues = (await execute(`GET /api/queues/${encodeURIComponent(vhost)}`))
@@ -591,15 +622,12 @@ function registerRabbitQueue(context: UtilityProtocolContext): void {
   };
   const loadMessages = async (content?: unknown): Promise<void> => {
     const count = Math.max(1, Number(record(content).count) || 30);
-    const rows = await execute(`POST /api/queues/${queueUrl}/get\n${JSON.stringify({
-      vhost,
-      name: queue,
-      truncate: "50000",
-      ackmode: "ack_requeue_true",
-      encoding: "auto",
-      count: String(count),
-    }, null, 2)}`);
-    await handler.send("messages", { messages: rows, messagesReady: rows.length });
+    const rows = await getMessages(count, "ack_requeue_true");
+    const detail = (await execute(`GET /api/queues/${queueUrl}`))[0] || {};
+    await handler.send("messages", {
+      messages: rows,
+      messagesReady: detail.messages_ready || 0,
+    });
   };
   const loadBindings = async (): Promise<void> => {
     await handler.send("bindings", { bindings: await execute(`GET /api/queues/${queueUrl}/bindings`) });
@@ -639,19 +667,47 @@ function registerRabbitQueue(context: UtilityProtocolContext): void {
       const messages = Array.isArray(payload.messages) ? payload.messages : [];
       const targetQueue = stringValue(payload.targetQueue, queue);
       for (const message of messages) {
-        await execute(`POST /api/exchanges/${rabbitPath(vhost, "amq.default")}/publish\n${JSON.stringify({
-          vhost,
-          name: "amq.default",
-          properties: { delivery_mode: 2, headers: {} },
-          routing_key: targetQueue,
-          delivery_mode: "2",
-          payload: typeof message === "object" ? JSON.stringify(message) : String(message),
-          payload_encoding: "string",
-          headers: {},
-          props: {},
-        }, null, 2)}`);
+        await publishToQueue(targetQueue, typeof message === "object" ? record(message) : { payload: String(message) });
       }
       await handler.send("success", `Sent ${messages.length} message(s) to ${targetQueue}`);
+      await initialize();
+    } catch (error) { await sendError(handler, error); }
+  });
+  handler.on("moveMessage", async (content) => {
+    try {
+      const payload = record(content);
+      const indices = (Array.isArray(payload.indices) ? payload.indices : [])
+        .map(Number)
+        .filter((index) => Number.isInteger(index) && index >= 0)
+        .sort((left, right) => right - left);
+      const targetQueue = stringValue(payload.targetQueue).trim();
+      if (!targetQueue) throw new Error("Target queue is required");
+      for (const index of indices) {
+        for (let current = 0; current <= index; current += 1) {
+          const message = (await getMessages(1, "ack_requeue_false"))[0];
+          if (!message) throw new Error("Message not found");
+          await publishToQueue(current === index ? targetQueue : queue, message);
+        }
+      }
+      await handler.send("success", `Moved ${indices.length} message(s) to ${targetQueue}`);
+      await initialize();
+    } catch (error) { await sendError(handler, error); }
+  });
+  handler.on("deleteMessage", async (content) => {
+    try {
+      const rawIndices = record(content).indices;
+      const indices = (Array.isArray(rawIndices) ? rawIndices : [])
+        .map((value: unknown) => Number(value))
+        .filter((index) => Number.isInteger(index) && index >= 0)
+        .sort((left, right) => right - left);
+      for (const index of indices) {
+        for (let current = 0; current <= index; current += 1) {
+          const message = (await getMessages(1, "ack_requeue_false"))[0];
+          if (!message) throw new Error("Message not found");
+          if (current < index) await publishToQueue(queue, message);
+        }
+      }
+      await handler.send("success", `Deleted ${indices.length} message(s).`);
       await initialize();
     } catch (error) { await sendError(handler, error); }
   });
@@ -703,25 +759,67 @@ function registerRabbitQueue(context: UtilityProtocolContext): void {
 function registerRedisKey(context: UtilityProtocolContext): void {
   const { handler, services, state } = context;
   const target = targetRecord(state);
-  const key = stringValue(target.key || target.label || target.name, "key");
+  let key = stringValue(target.key || target.label || target.name, "key");
+  let redisType = stringValue(target.type, "string");
   const connection = (): ConnectionOptions | undefined => targetConnection(state) || services.activeConnection.get();
   const execute = async (command: string): Promise<Record<string, unknown>[]> => {
     const selected = connection();
     if (!selected) throw new Error("No Redis connection selected");
     return rowsOf(await services.connections.query<Record<string, unknown>>(selected, command));
   };
+  const valueOf = async (command: string): Promise<unknown> => (await execute(command))[0]?.value;
+  const collectionCount = (value: unknown): number | undefined => {
+    if (Array.isArray(value)) return value.length;
+    if (value && typeof value === "object") return Object.keys(value).length;
+    return undefined;
+  };
+  const loadStatus = async (): Promise<void> => {
+    try {
+      await handler.send("status", await valueOf("INFO"));
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  };
   const load = async (): Promise<void> => {
     try {
-      const [valueResult, typeResult, ttlResult] = await Promise.all([
-        execute(`GET ${JSON.stringify(key)}`),
-        execute(`TYPE ${JSON.stringify(key)}`),
-        execute(`TTL ${JSON.stringify(key)}`),
-      ]);
+      redisType = stringValue(await valueOf(`TYPE ${JSON.stringify(key)}`), "string");
+      let value: unknown;
+      switch (redisType) {
+        case "hash":
+          value = await valueOf(`HGETALL ${JSON.stringify(key)}`);
+          break;
+        case "list":
+          value = await valueOf(`LRANGE ${JSON.stringify(key)} 0 -1`);
+          break;
+        case "set":
+          value = await valueOf(`SMEMBERS ${JSON.stringify(key)}`);
+          break;
+        case "zset": {
+          const raw = await valueOf(`ZRANGE ${JSON.stringify(key)} 0 -1 WITHSCORES`);
+          const values = Array.isArray(raw) ? raw : [];
+          value = [];
+          for (let index = 0; index + 1 < values.length; index += 2) {
+            (value as Array<Record<string, unknown>>).push({ value: values[index], score: values[index + 1] });
+          }
+          break;
+        }
+        case "stream":
+          value = await valueOf(`XRANGE ${JSON.stringify(key)} - +`);
+          break;
+        case "ReJSON-RL":
+          value = await valueOf(`JSON.GET ${JSON.stringify(key)} $`);
+          break;
+        default:
+          value = await valueOf(`GET ${JSON.stringify(key)}`);
+          break;
+      }
+      const ttl = await valueOf(`TTL ${JSON.stringify(key)}`);
       await handler.send("detail", {
         key,
-        value: valueResult[0]?.value,
-        type: typeResult[0]?.value || "string",
-        ttl: ttlResult[0]?.value,
+        value,
+        type: redisType,
+        ttl,
+        count: collectionCount(value),
       });
     } catch (error) {
       await sendError(handler, error);
@@ -731,7 +829,65 @@ function registerRedisKey(context: UtilityProtocolContext): void {
     try {
       const payload = record(content);
       const value = payload.value ?? content;
-      await execute(`SET ${JSON.stringify(key)} ${JSON.stringify(typeof value === "string" ? value : JSON.stringify(value))}`);
+      const type = stringValue(payload.type, redisType);
+      const serialized = typeof value === "string" ? value : JSON.stringify(value);
+      switch (type) {
+        case "hash": {
+          await execute(`DEL ${JSON.stringify(key)}`);
+          const items = Array.isArray(value) ? value : Object.entries(record(value)).map(([field, item]) => ({ field, value: item }));
+          for (const item of items) {
+            const row = record(item);
+            const field = stringValue(row.field || row.key);
+            if (field) await execute(`HSET ${JSON.stringify(key)} ${JSON.stringify(field)} ${JSON.stringify(stringValue(row.value))}`);
+          }
+          break;
+        }
+        case "list":
+        case "set": {
+          await execute(`DEL ${JSON.stringify(key)}`);
+          const values = Array.isArray(value) ? value : [];
+          for (const item of values) {
+            const command = type === "list" ? "RPUSH" : "SADD";
+            await execute(`${command} ${JSON.stringify(key)} ${JSON.stringify(stringValue(record(item).value ?? item))}`);
+          }
+          break;
+        }
+        case "zset": {
+          await execute(`DEL ${JSON.stringify(key)}`);
+          for (const item of Array.isArray(value) ? value : []) {
+            const row = record(item);
+            await execute(`ZADD ${JSON.stringify(key)} ${Number(row.score) || 0} ${JSON.stringify(stringValue(row.value))}`);
+          }
+          break;
+        }
+        case "ReJSON-RL": {
+          let jsonValue: unknown = value;
+          if (typeof value === "string") {
+            try {
+              jsonValue = JSON.parse(value);
+            } catch {
+              jsonValue = value;
+            }
+          }
+          const jsonText = JSON.stringify(jsonValue);
+          if (jsonText === undefined) throw new Error("RedisJSON value is not serializable");
+          await execute(`JSON.SET ${JSON.stringify(key)} $ ${jsonText}`);
+          break;
+        }
+        case "stream":
+          await execute(`DEL ${JSON.stringify(key)}`);
+          for (const item of Array.isArray(value) ? value : []) {
+            const row = record(item);
+            const fields = record(row.value);
+            for (const [field, fieldValue] of Object.entries(fields)) {
+              await execute(`XADD ${JSON.stringify(key)} * ${JSON.stringify(field)} ${JSON.stringify(stringValue(fieldValue))}`);
+            }
+          }
+          break;
+        default:
+          await execute(`SET ${JSON.stringify(key)} ${JSON.stringify(serialized)}`);
+          break;
+      }
       await handler.send("success", "Redis key updated.");
       await load();
     } catch (error) { await sendError(handler, error); }
@@ -739,6 +895,8 @@ function registerRedisKey(context: UtilityProtocolContext): void {
   handler.on("init", load);
   handler.on("refresh", load);
   handler.on("detail", load);
+  handler.on("initStatus", loadStatus);
+  handler.on("refreshStatus", loadStatus);
   handler.on("update", update);
   handler.on("saveItem", update);
   handler.on("ttl", async (content) => {
@@ -761,7 +919,9 @@ function registerRedisKey(context: UtilityProtocolContext): void {
       const nextKey = stringValue(record(content).name || record(content).key || content).trim();
       if (!nextKey) throw new Error("Redis key name is empty");
       await execute(`RENAME ${JSON.stringify(key)} ${JSON.stringify(nextKey)}`);
+      key = nextKey;
       await handler.send("success", `Redis key renamed to ${nextKey}.`);
+      await load();
     } catch (error) { await sendError(handler, error); }
   });
 }

@@ -30,12 +30,43 @@ function requireNotAborted(signal: AbortSignal | undefined, operation: string): 
 }
 
 function redisArguments(source: string): [string, string[]] {
-  const parts = source.trim().match(/(?:[^\s"]+|"(?:\\.|[^"])*")+/g) ?? [];
+  const parts: string[] = [];
+  let current = "";
+  let quote: '"' | "'" | undefined;
+  let escaped = false;
+  for (const character of source.trim()) {
+    if (escaped) {
+      current += character;
+      escaped = false;
+      continue;
+    }
+    if (character === "\\") {
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      if (character === quote) quote = undefined;
+      else current += character;
+      continue;
+    }
+    if (character === '"' || character === "'") {
+      quote = character;
+    } else if (/\s/.test(character)) {
+      if (current) {
+        parts.push(current);
+        current = "";
+      }
+    } else {
+      current += character;
+    }
+  }
+  if (escaped) current += "\\";
+  if (current) parts.push(current);
   const command = parts.shift()?.toUpperCase();
   if (!command) {
     throw new Error("Redis command is empty");
   }
-  return [command, parts.map((part) => part.replace(/^"|"$/g, ""))];
+  return [command, parts];
 }
 
 function redisConnector(): DriverConnector {

@@ -12,11 +12,10 @@
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@modern/*": ["src/modern/*"],
-      "@webview/*": ["src/modern-webview/*"]
+      "@/*": ["./src/*"],
+      "@modern/*": ["./src/modern/*"],
+      "@webview/*": ["./src/modern-webview/*"]
     },
     "types": ["node", "vscode"]
   },

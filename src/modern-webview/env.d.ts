@@ -21,3 +21,5 @@ interface WebviewBootstrapConfig {
 interface Window {
   acquireVsCodeApi?: () => VsCodeApi;
 }
+
+declare module "*.css";

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { inject, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { computed, inject, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { useRoute } from "vue-router";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
@@ -23,6 +24,7 @@ interface FileInfo {
 }
 
 const bridge = inject(WEBVIEW_BRIDGE_KEY);
+const route = useRoute();
 const bootstrap = readWebviewBootstrap();
 const initial = bootstrap.state as FileInfo;
 const form = reactive({
@@ -44,6 +46,9 @@ let infoSubscription: BridgeDisposable | undefined;
 let optionSubscription: BridgeDisposable | undefined;
 let errorSubscription: BridgeDisposable | undefined;
 let successSubscription: BridgeDisposable | undefined;
+
+const routeName = computed(() => route.name === "sqlite" ? "sqlite" : "dbFileConnect");
+const title = computed(() => routeName.value === "sqlite" ? "SQLite database" : "Database file");
 
 function applyInfo(content: unknown): void {
   if (!content || typeof content !== "object") return;
@@ -100,11 +105,11 @@ onBeforeUnmount(() => {
 <template>
   <section
     class="route-workspace database-file-view"
-    data-route="dbFileConnect"
+    :data-route="routeName"
   >
     <header class="route-workspace__header">
       <div>
-        <h1>Database File</h1>
+        <h1>{{ title }}</h1>
         <p class="route-workspace__subline">
           Connect a local SQLite or DuckDB file.
         </p>
