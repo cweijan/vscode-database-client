@@ -222,6 +222,7 @@ const modernSlices = [
       "src/modern/commands/modernCommandHost.ts",
       "src/modern/providers/sqlDocumentModel.ts",
       "src/modern/providers/sqlDocumentFeatures.ts",
+      "src/modern/providers/customEditors.ts",
       "test/modern/commands.test.ts",
     ],
     validation: ["npm run typecheck:modern", "npm run lint:modern"],
@@ -329,12 +330,16 @@ const modernSlices = [
       "src/modern-webview/components/RouteWorkbench.vue",
       "src/modern-webview/components/UiInput.vue",
       "src/modern-webview/components/UiSelect.vue",
+      "src/modern/commands/webviewUtilityProtocols.ts",
+      "src/modern/providers/customEditors.ts",
+      "src/modern/extension.ts",
     ],
     validation: [
       "npm run typecheck:modern",
       "npm run build:modern:webview",
+      "npm run verify:modern:activation",
     ],
-    coverage: "DDL design execution boundary and typed fallback workbench for remaining target routes",
+    coverage: "DDL design execution boundary, remote-file/SSH, Mock, RabbitMQ, forwarding, SSH status, structure-diff, database-file, and Parquet protocol boundaries",
   },
 ];
 

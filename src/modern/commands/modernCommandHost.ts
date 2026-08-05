@@ -4,6 +4,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import type { ExtensionServices } from "../core/extensionServices";
 import type { ConnectionOptions, QueryResult } from "../database/types";
 import { parseSqlBlocks } from "../providers/sqlDocumentModel";
+import { registerWebviewUtilityProtocols } from "./webviewUtilityProtocols";
 
 export interface ModernCommandHost {
   refresh(target?: unknown): Promise<void> | void;
@@ -115,14 +116,21 @@ export function createModernCommandHost(
     target?: unknown,
   ): Promise<vscode.WebviewPanel> => {
     const state = { target, connection: targetConnection(target) };
+    const webviewState = {
+      route,
+      connection: state.connection,
+      path: typeof (target as { path?: unknown } | undefined)?.path === "string"
+        ? (target as { path: string }).path
+        : undefined,
+    };
     return openRoute(
       title,
       route,
       route,
-      state,
+      webviewState,
       (handler) => {
         const execute = async (content: unknown): Promise<void> => {
-          const connection = targetConnection(state) || services.activeConnection.get();
+          const connection = state.connection || services.activeConnection.get();
           const source = typeof content === "string" ? content.trim() : "";
           if ((route === "xterm" || route === "sshTerminal") && connection?.type === "SSH" && source) {
             const session = await services.ssh.open(connection as import("../remote/sshService").SshConnectionOptions);
@@ -133,7 +141,7 @@ export function createModernCommandHost(
           if (connection && source && /^(SELECT|SHOW|DESCRIBE|EXPLAIN|GET|POST|PUT|PATCH|DELETE|LIST|PRODUCE|CREATE|DROP|ALTER|INSERT|UPDATE|USE|MATCH|SET|RESET)\b/i.test(source)) {
             try {
               const result = await services.connections.query(connection, source);
-              await handler.setWebviewState({ ...state, sql: source, ...result });
+              await handler.setWebviewState({ ...webviewState, sql: source, ...result });
               await handler.send("result", { sql: source, ...result });
             } catch (error) {
               await handler.send("error", error instanceof Error ? error.message : String(error));
@@ -144,16 +152,24 @@ export function createModernCommandHost(
             route,
             action: "execute",
             content,
-            state,
+            state: webviewState,
           });
         };
         handler.on("execute", execute);
         handler.on("input", execute);
         handler.on("refresh", async () => {
-          await handler.send("setState", state);
+          await handler.send("setState", webviewState);
         });
         handler.on("close", async () => {
           await handler.send("result", { route, action: "close" });
+        });
+        registerWebviewUtilityProtocols({
+          route,
+          target,
+          state,
+          webviewState,
+          services,
+          handler,
         });
       },
     );
@@ -411,8 +427,8 @@ export function createModernCommandHost(
       return openText(JSON.stringify(mock, null, 2), "json");
     },
 
-    async runMock() {
-      return openUtility("mock", "Data Mock");
+    async runMock(target) {
+      return openUtility("mock", "Data Mock", target);
     },
 
     async changeTableName(target) {

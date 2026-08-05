@@ -237,6 +237,12 @@ body {
   flex: 1;
 }
 
+.route-workbench__protocol-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .route-workbench__state {
   max-height: 24rem;
   overflow: auto;

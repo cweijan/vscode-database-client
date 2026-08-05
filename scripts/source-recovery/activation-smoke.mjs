@@ -24,6 +24,7 @@ const expectedCommands = packageJson.contributes.commands.map(
 const registeredCommands = [];
 const registeredProviders = [];
 const registeredTreeViews = [];
+const registeredCustomEditors = [];
 const outputLines = [];
 
 function disposable(onDispose = () => {}) {
@@ -76,6 +77,10 @@ const vscodeStub = {
     },
     showTextDocument: async () => undefined,
     showErrorMessage: async () => undefined,
+    registerCustomEditorProvider: (viewType, provider, options) => {
+      registeredCustomEditors.push({ viewType, provider, options });
+      return disposable();
+    },
   },
   workspace: {
     getConfiguration: () => ({
@@ -173,6 +178,10 @@ try {
     [...expectedCommands].sort(),
   );
   assert.equal(registeredProviders.length, 10);
+  assert.deepEqual(
+    registeredCustomEditors.map(({ viewType }) => viewType).sort(),
+    ["dbclient.dbFile", "dbclient.parquet"],
+  );
   assert.deepEqual(
     registeredTreeViews.map(({ id }) => id).sort(),
     ["github.cweijan.mysql", "github.cweijan.nosql"],

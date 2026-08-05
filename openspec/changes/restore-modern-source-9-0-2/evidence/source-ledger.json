@@ -128,6 +128,7 @@
         "src/modern/commands/modernCommandHost.ts",
         "src/modern/providers/sqlDocumentModel.ts",
         "src/modern/providers/sqlDocumentFeatures.ts",
+        "src/modern/providers/customEditors.ts",
         "test/modern/commands.test.ts"
       ],
       "validation": [
@@ -255,13 +256,17 @@
         "src/modern-webview/components/DesignView.vue",
         "src/modern-webview/components/RouteWorkbench.vue",
         "src/modern-webview/components/UiInput.vue",
-        "src/modern-webview/components/UiSelect.vue"
+        "src/modern-webview/components/UiSelect.vue",
+        "src/modern/commands/webviewUtilityProtocols.ts",
+        "src/modern/providers/customEditors.ts",
+        "src/modern/extension.ts"
       ],
       "validation": [
         "npm run typecheck:modern",
-        "npm run build:modern:webview"
+        "npm run build:modern:webview",
+        "npm run verify:modern:activation"
       ],
-      "coverage": "DDL design execution boundary and typed fallback workbench for remaining target routes",
+      "coverage": "DDL design execution boundary, remote-file/SSH, Mock, RabbitMQ, forwarding, SSH status, structure-diff, database-file, and Parquet protocol boundaries",
       "status": "implemented-foundation",
       "missingFiles": []
     }
@@ -476,7 +481,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/common/constants.ts",
-      "legacySha256": "a4a8116d11d25d569b548ccb226a7999f1ab129f470dcbc6384930ac2b433ddc"
+      "legacySha256": "a6e6c7b745380d786caa690860d5ad45e29766e555214ff335b7cda4d67c6ff9"
     },
     {
       "sourcePath": "src/common/convert/main/binaryConvert.ts",
@@ -1388,7 +1393,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/database/schemaNode.ts",
-      "legacySha256": "0828268d45fab980992cc82c07a1d58e204a9931cb501df35f7268b6c259e892"
+      "legacySha256": "688f746f062d086946bf22318db8d717eb58c6811b0cd5111f9f70388017f2f9"
     },
     {
       "sourcePath": "src/model/database/table/columnGroup.ts",
@@ -1478,7 +1483,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/interface/node.ts",
-      "legacySha256": "6a039498f4328900f994089ebb74875a17c237b54cb48bb4f32d5bc43025c9de"
+      "legacySha256": "e2e817a9964735499c4eabf91f253fed1c40ada58308bef9faa71e18bee783e1"
     },
     {
       "sourcePath": "src/model/interface/nodeFieldType.ts",
@@ -1656,7 +1661,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/function.ts",
-      "legacySha256": "39686cfb2c55ca2563671e8afd47bb871b8b7e3d5a19c8251046bd07dfb41222"
+      "legacySha256": "543c1dd9df650be28378a867ea7811e1f3e02cfaf24bc591333986d9a6730ef4"
     },
     {
       "sourcePath": "src/model/main/functionGroup.ts",
@@ -1669,7 +1674,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/functionGroup.ts",
-      "legacySha256": "66c11f8a8d6d6758b16e97f0c2dd7c91787df4ddd671f926ff9dc645fdfd19b7"
+      "legacySha256": "ab8c65525bc1ea8a32b16c388a1f51a85911412834667464185b755129c976b8"
     },
     {
       "sourcePath": "src/model/main/other/customType.ts",
@@ -1825,7 +1830,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/procedure.ts",
-      "legacySha256": "8b70a82d9bc708f80753f35744d233c1e880f5f57af537a52a28e5012599e877"
+      "legacySha256": "4588908c1b9104c6a7a7e1bd957dd9015b5b319c0bff71ab4ae17bdef75cd438"
     },
     {
       "sourcePath": "src/model/main/procedureGroup.ts",
@@ -1838,7 +1843,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/procedureGroup.ts",
-      "legacySha256": "6576705b5cbe75496b467a7d1a56f7e1372106ad6674ea7f40afc8cc8e3cfd81"
+      "legacySha256": "4e8d9519dde4efbf1ec23a49e40e728d72933406e536939f30c2aef5672c23af"
     },
     {
       "sourcePath": "src/model/main/synonymGroup.ts",
@@ -1862,7 +1867,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/tableGroup.ts",
-      "legacySha256": "1baac2b14cc693fa578065f19b4abe565b650fba61a940314582d88830ace0a5"
+      "legacySha256": "53ec55ec20a0486298b7a4a589eb5aa0ced41a4974cfbb9a5502ab95adf70f1f"
     },
     {
       "sourcePath": "src/model/main/tableNode.ts",
@@ -1875,7 +1880,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/tableNode.ts",
-      "legacySha256": "09304ac066966e940e50b49853c6105050918d31a9ff73fee677415707fc9a3d"
+      "legacySha256": "d6a13b5db734ca068663a23916e0797c755459cb1c00888b0edc2c4b02f2dc03"
     },
     {
       "sourcePath": "src/model/main/trigger.ts",
@@ -1888,7 +1893,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/trigger.ts",
-      "legacySha256": "65465cc5c3cd83d94876328c59347c26b71f9c30852fe4e310786173fe50044c"
+      "legacySha256": "034bfe1b903bec0daaa139cf8e274f750a34c541f5a9ea0b28bc56458e90ebc8"
     },
     {
       "sourcePath": "src/model/main/triggerGroup.ts",
@@ -1901,7 +1906,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/triggerGroup.ts",
-      "legacySha256": "a3b0ac184c88d325bb9b4f9f2e95698aead369ab1a41abfdaa430bac828cd825"
+      "legacySha256": "b7cdd1ae3b3f75cb311928c667071d51385f4c363378a2358460cd7c6442dcf7"
     },
     {
       "sourcePath": "src/model/main/viewGroup.ts",
@@ -1914,7 +1919,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/viewGroup.ts",
-      "legacySha256": "8282c9a38d3ff7f0151ef5fb2e5f1d3c2e1b8fbfdd3162c2c9143969093cff54"
+      "legacySha256": "107ca4c924999825119bebe206ae7c5487c149b9b4f02509e044de38b852472d"
     },
     {
       "sourcePath": "src/model/main/viewNode.ts",
@@ -1927,7 +1932,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/viewNode.ts",
-      "legacySha256": "91fb665e5d20d4787ae38ae987071a4e005e9a323f97a9eb0c8b4015b80d8c40"
+      "legacySha256": "971938bf930bd16a4e30a77ad640cb8383ca70a127b3d2ac14ecbc8d3978d721"
     },
     {
       "sourcePath": "src/model/mq/kafka/consumer/kafkaConsumerGroupGroupNode.ts",
@@ -3482,7 +3487,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/other/infoNode.ts",
-      "legacySha256": "9fbfa720258b6ea77a8a826e662faf74badf2c829b8bab402b6256e1ce1d1b5d"
+      "legacySha256": "37839f6ee0df1ff22f8f4e94e5bcdbe5181e660485b2ac44188549a4ba2dc769"
     },
     {
       "sourcePath": "src/model/other/query/queryGroup.ts",

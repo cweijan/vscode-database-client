@@ -5,6 +5,7 @@ import { registerTargetCommands } from "./commands/targetCommandDispatcher";
 import { createExtensionServices } from "./core/extensionServices";
 import { registerModernTreeViews } from "./tree/databaseTreeProvider";
 import { registerModernLanguageProviders } from "./providers/vscodeLanguageProviders";
+import { registerModernCustomEditors } from "./providers/customEditors";
 
 const outputChannelName = "Database Client (modern source)";
 
@@ -21,6 +22,7 @@ export function activate(context: vscode.ExtensionContext): void {
     ...registerTargetCommands(undefined, undefined, createModernCommandHost(services)),
   );
   context.subscriptions.push(...registerModernLanguageProviders());
+  context.subscriptions.push(...registerModernCustomEditors(services));
 }
 
 export function deactivate(): void {
