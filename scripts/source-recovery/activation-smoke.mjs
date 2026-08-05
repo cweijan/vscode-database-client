@@ -108,6 +108,10 @@ const vscodeStub = {
       registeredProviders.push(args);
       return disposable();
     },
+    registerDocumentFormattingEditProvider: (...args) => {
+      registeredProviders.push(args);
+      return disposable();
+    },
     registerDocumentSymbolProvider: (...args) => {
       registeredProviders.push(args);
       return disposable();
@@ -177,7 +181,7 @@ try {
     registeredCommands.map(({ id }) => id).sort(),
     [...expectedCommands].sort(),
   );
-  assert.equal(registeredProviders.length, 10);
+  assert.equal(registeredProviders.length, 21);
   assert.deepEqual(
     registeredCustomEditors.map(({ viewType }) => viewType).sort(),
     ["dbclient.dbFile", "dbclient.parquet"],

@@ -123,6 +123,10 @@
         "src/modern/providers/providerRegistrar.ts",
         "src/modern/providers/sqlCompletionProvider.ts",
         "src/modern/providers/vscodeLanguageProviders.ts",
+        "src/modern/providers/elasticsearchDocumentModel.ts",
+        "src/modern/providers/elasticsearchDocumentFeatures.ts",
+        "src/modern/providers/mongoJavaScriptProviders.ts",
+        "src/modern/providers/supplementalLanguageProviders.ts",
         "src/modern/commands/manifestCommands.ts",
         "src/modern/commands/targetCommandDispatcher.ts",
         "src/modern/commands/modernCommandHost.ts",
@@ -135,7 +139,7 @@
         "npm run typecheck:modern",
         "npm run lint:modern"
       ],
-      "coverage": "explicit command and Provider registration boundaries; target handlers remain in the recovery queue",
+      "coverage": "typed command capability audit, SQL/Elasticsearch/Mongo JavaScript/Mock/MQ/Docker Compose Provider registration, and explicit target-specific recovery boundaries",
       "status": "implemented-foundation",
       "missingFiles": []
     },

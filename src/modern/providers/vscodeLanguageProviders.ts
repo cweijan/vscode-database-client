@@ -1,7 +1,10 @@
 import * as vscode from "vscode";
 
+import { registerElasticsearchProviders } from "./elasticsearchDocumentFeatures";
+import { registerMongoJavaScriptProviders } from "./mongoJavaScriptProviders";
 import { SqlCompletionProvider } from "./sqlCompletionProvider";
 import { registerSqlDocumentFeatures } from "./sqlDocumentFeatures";
+import { registerSupplementalLanguageProviders } from "./supplementalLanguageProviders";
 
 export function registerModernLanguageProviders(): vscode.Disposable[] {
   const provider = new SqlCompletionProvider();
@@ -32,5 +35,11 @@ export function registerModernLanguageProviders(): vscode.Disposable[] {
     },
     ".",
   );
-  return [registration, ...registerSqlDocumentFeatures()];
+  return [
+    registration,
+    ...registerSqlDocumentFeatures(),
+    ...registerSupplementalLanguageProviders(),
+    ...registerElasticsearchProviders(),
+    ...registerMongoJavaScriptProviders(),
+  ];
 }

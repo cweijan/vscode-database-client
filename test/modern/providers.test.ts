@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { formatSql, parseSqlBlocks } from "../../src/modern/providers/sqlDocumentModel";
+import {
+  formatElasticBody,
+  parseElasticRequests,
+} from "../../src/modern/providers/elasticsearchDocumentModel";
 import { createStandardDialects } from "../../src/modern/database/standardDialects";
 
 test("SQL block parser keeps quoted semicolons and comments inside one statement", () => {
@@ -18,6 +22,32 @@ test("SQL formatter applies stable keyword casing without changing literals", ()
   assert.equal(
     formatSql("select 'from value' from users where id = 1"),
     "SELECT 'from value' FROM users WHERE id = 1",
+  );
+});
+
+test("Elasticsearch request parser keeps multiline JSON bodies and reports invalid JSON", () => {
+  const requests = parseElasticRequests(`GET /_search
+{
+  // comment-json is accepted by the target editor
+  "query": { "match_all": {} }
+}
+
+POST /orders/_search
+{
+  "query": { "match": []
+}`);
+
+  assert.equal(requests.length, 2);
+  assert.equal(requests[0].method, "GET");
+  assert.equal(requests[0].path, "/_search");
+  assert.deepEqual(requests[0].body, { query: { match_all: {} } });
+  assert.match(requests[1].error ?? "", /Unexpected|expect|invalid/i);
+});
+
+test("Elasticsearch body formatter produces stable readable JSON", () => {
+  assert.equal(
+    formatElasticBody({ query: { term: { status: "open" } } }),
+    '{\n  "query": {\n    "term": {\n      "status": "open"\n    }\n  }\n}',
   );
 });
 

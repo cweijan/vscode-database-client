@@ -279,10 +279,95 @@ function createDirectCommandHandlers(
   };
 }
 
+const commandSummaryHost: ModernCommandHost = {
+  refresh: () => undefined,
+  refreshAll: () => undefined,
+  openConnection: async () => undefined,
+  openConsole: async () => undefined,
+  runSql: async () => undefined,
+  openQuery: async () => undefined,
+  createNode: async () => undefined,
+  openHistory: async () => undefined,
+  clearHistory: () => undefined,
+};
+
+const directCommandIds = new Set(
+  Object.keys(createDirectCommandHandlers(commandSummaryHost)),
+);
+
+const TABLE_COMMAND_IDS = new Set([
+  "mysql.name.copy",
+  "mysql.table.source",
+  "mysql.template.table.select",
+]);
+
+const GENERIC_ROUTE_COMMAND_IDS = new Set([
+  "mysql.struct.diff",
+  "mysql.mock.run",
+  "mysql.user.grant",
+  "mysql.change.user",
+  "mysql.template.user",
+  "mysql.delete.user",
+  "mysql.s3.selectBuckets",
+  "mysql.s3.url.temp",
+  "mysql.s3.url.public",
+  "mysql.s3.openSite",
+  "mysql.file.manager",
+  "mysql.mongo.dump",
+  "mysql.mongo.restore",
+  "mysql.package.source",
+  "mysql.package.drop",
+  "mysql.query.link",
+  "mysql.query.rename",
+  "mysql.query.delete",
+  "mysql.template.new",
+  "mysql.delete.event",
+  "mysql.data.dump",
+  "mysql.struct.dump",
+  "mysql.table.sort",
+  "mysql.ftp.connect",
+]);
+
+const SEMANTIC_REVIEW_COMMAND_IDS = new Set([
+  "mysql.query.switch",
+  "mysql.notebook.sql",
+  "mysql.notebook.new",
+  "mysql.notebook.open",
+  "mysql.query.add",
+  "mysql.query.book.add",
+  "mysql.table.fullTextSearch",
+]);
+
+const CONDITIONAL_COMMAND_IDS = new Set([
+  "mysql.db.truncate",
+  "mysql.db.drop",
+]);
+
+type TargetCommandCapabilityKind =
+  | "table-host"
+  | "direct-host"
+  | "generic-route"
+  | "semantic-review"
+  | "conditional"
+  | "recovered-node"
+  | "unverified-node"
+  | "pending";
+
+export interface TargetCommandCapability {
+  readonly command: string;
+  readonly kind: TargetCommandCapabilityKind;
+  readonly reason: string;
+}
+
 export interface TargetCommandRegistrationSummary {
   readonly commandIds: readonly string[];
   readonly nodeMethodIds: readonly string[];
   readonly pendingIds: readonly string[];
+  readonly genericRouteIds: readonly string[];
+  readonly semanticReviewIds: readonly string[];
+  readonly conditionalIds: readonly string[];
+  readonly unverifiedNodeMethodIds: readonly string[];
+  readonly capabilities: readonly TargetCommandCapability[];
 }
 
 type RegisterCommand = typeof vscode.commands.registerCommand;
@@ -508,10 +593,94 @@ export function summarizeTargetCommands(): TargetCommandRegistrationSummary {
     "mysql.table.sort",
     "mysql.ftp.connect",
   ]);
+  for (const command of directCommandIds) {
+    implementedIds.add(command);
+  }
+  for (const command of TABLE_COMMAND_IDS) {
+    implementedIds.add(command);
+  }
+
+  const capabilities = TARGET_COMMAND_IDS.map<TargetCommandCapability>((command) => {
+    if (TABLE_COMMAND_IDS.has(command)) {
+      return {
+        command,
+        kind: "table-host",
+        reason: "Registered through the typed table command host.",
+      };
+    }
+    if (GENERIC_ROUTE_COMMAND_IDS.has(command)) {
+      return {
+        command,
+        kind: "generic-route",
+        reason: "Currently routed through a generic utility Webview boundary.",
+      };
+    }
+    if (SEMANTIC_REVIEW_COMMAND_IDS.has(command)) {
+      return {
+        command,
+        kind: "semantic-review",
+        reason: "A handler exists, but its target-specific input or behavior still needs a vertical proof.",
+      };
+    }
+    if (CONDITIONAL_COMMAND_IDS.has(command)) {
+      return {
+        command,
+        kind: "conditional",
+        reason: "The modern dialect must expose the corresponding DDL operation or the handler reports explicit unsupported behavior.",
+      };
+    }
+    if (directCommandIds.has(command)) {
+      return {
+        command,
+        kind: "direct-host",
+        reason: "Registered through the modern command host boundary.",
+      };
+    }
+    if (recoveredNodeMethodIds.has(command)) {
+      return {
+        command,
+        kind: "recovered-node",
+        reason: "Delegated to a recovered typed tree-node method.",
+      };
+    }
+    if (!implementedIds.has(command) && command in targetNodeMethods) {
+      return {
+        command,
+        kind: "unverified-node",
+        reason: "A target node method mapping exists, but the modern tree boundary has not been verified for this command.",
+      };
+    }
+    return {
+      command,
+      kind: "pending",
+      reason: "No modern direct handler, table host, or recovered node boundary is registered.",
+    };
+  });
+
   return {
     commandIds: TARGET_COMMAND_IDS,
     nodeMethodIds,
-    pendingIds: TARGET_COMMAND_IDS.filter((command) => !implementedIds.has(command)),
+    pendingIds: capabilities
+      .filter(
+        (capability) =>
+          capability.kind !== "table-host" &&
+          capability.kind !== "direct-host" &&
+          capability.kind !== "recovered-node",
+      )
+      .map((capability) => capability.command),
+    genericRouteIds: capabilities
+      .filter((capability) => capability.kind === "generic-route")
+      .map((capability) => capability.command),
+    semanticReviewIds: capabilities
+      .filter((capability) => capability.kind === "semantic-review")
+      .map((capability) => capability.command),
+    conditionalIds: capabilities
+      .filter((capability) => capability.kind === "conditional")
+      .map((capability) => capability.command),
+    unverifiedNodeMethodIds: capabilities
+      .filter((capability) => capability.kind === "unverified-node")
+      .map((capability) => capability.command),
+    capabilities,
   };
 }
 

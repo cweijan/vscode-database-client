@@ -85,5 +85,11 @@ test("unrecovered node capabilities fail explicitly at the dispatch boundary", a
       error instanceof SourceRecoveryPendingError &&
       error.code === "source-recovery-pending",
   );
-  assert.equal(summarizeTargetCommands().commandIds.length, TARGET_COMMAND_IDS.length);
+  const summary = summarizeTargetCommands();
+  assert.equal(summary.commandIds.length, TARGET_COMMAND_IDS.length);
+  assert.ok(summary.genericRouteIds.includes("mysql.struct.diff"));
+  assert.ok(summary.semanticReviewIds.includes("mysql.table.fullTextSearch"));
+  assert.ok(summary.conditionalIds.includes("mysql.db.drop"));
+  assert.ok(summary.pendingIds.includes("mysql.table.fullTextSearch"));
+  assert.equal(summary.capabilities.length, TARGET_COMMAND_IDS.length);
 });

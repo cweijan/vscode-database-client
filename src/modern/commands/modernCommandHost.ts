@@ -466,6 +466,16 @@ export function createModernCommandHost(
     },
 
     async openQuery(target) {
+      const candidate = target as {
+        newQuery?: () => Promise<unknown> | unknown;
+        getPaginationSql?: () => string;
+      } | undefined;
+      if (typeof candidate?.newQuery === "function") {
+        return candidate.newQuery();
+      }
+      if (typeof candidate?.getPaginationSql === "function") {
+        return openText(candidate.getPaginationSql());
+      }
       const connection = asConnection(target) || services.activeConnection.get();
       const name = connection?.id || "query";
       return openText(`-- ${name}\nSELECT 1;`);
@@ -593,14 +603,62 @@ export function createModernCommandHost(
 
     async fullTextSearch(target) {
       const candidate = target as { tableWithSchema?: unknown; label?: unknown } | undefined;
-      const table = String(candidate?.tableWithSchema || candidate?.label || "");
+      const table = String(candidate?.tableWithSchema || candidate?.label || "tables");
       const term = await vscode.window.showInputBox({ prompt: `Search ${table}` });
       if (!term) {
         return undefined;
       }
       const connection = targetConnection(target) || services.activeConnection.get();
-      const result = await runTargetSql(target, `SELECT * FROM ${table} LIMIT 100;`);
-      return openResult(`Search ${term}`, `SELECT * FROM ${table}`, result, connection);
+      const searchTarget = target as {
+        tableWithSchema?: unknown;
+        label?: unknown;
+        fullTextSQL?: (value: string) => Promise<string | null> | string | null;
+        getChildren?: () => Promise<unknown[]>;
+      } | undefined;
+      if (typeof searchTarget?.fullTextSQL === "function") {
+        const sql = await searchTarget.fullTextSQL(term);
+        if (!sql) {
+          return openResult(`Search ${term}`, "", {
+            rows: [],
+            fields: [{ name: "message" }],
+          }, connection);
+        }
+        const result = await runTargetSql(target, sql);
+        return openResult(`Search ${term}`, sql, result, connection);
+      }
+      if (typeof searchTarget?.getChildren === "function") {
+        const matches: Record<string, unknown>[] = [];
+        for (const child of await searchTarget.getChildren()) {
+          const table = child as {
+            label?: unknown;
+            fullTextSQL?: (value: string) => Promise<string | null> | string | null;
+          };
+          if (typeof table.fullTextSQL !== "function") {
+            continue;
+          }
+          const sql = await table.fullTextSQL(term);
+          if (!sql) {
+            continue;
+          }
+          try {
+            const result = await runTargetSql(child, sql);
+            if (result.rows.length > 0) {
+              matches.push({
+                table: String(table.label || ""),
+                count: result.rows.length,
+                sql,
+              });
+            }
+          } catch {
+            // A single table failing must not hide matches from other tables.
+          }
+        }
+        return openResult(`Search ${term}`, `-- Full text search: ${term}`, {
+          rows: matches,
+          fields: [{ name: "table" }, { name: "count" }, { name: "sql" }],
+        }, connection);
+      }
+      throw new Error("Full-text search requires a table or table-group target");
     },
 
     async userAction(operation, target) {
@@ -617,6 +675,12 @@ export function createModernCommandHost(
     openUtility,
 
     async runDockerCompose(target) {
+      const candidate = target as {
+        newComposeTemplate?: () => Promise<unknown> | unknown;
+      } | undefined;
+      if (typeof candidate?.newComposeTemplate === "function") {
+        return candidate.newComposeTemplate();
+      }
       return openUtility("xterm", "Docker Compose", target);
     },
 

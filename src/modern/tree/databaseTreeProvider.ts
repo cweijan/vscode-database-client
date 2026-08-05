@@ -233,6 +233,34 @@ export class ModernTableNode extends DatabaseTreeItem {
     );
   }
 
+  public async fullTextSQL(term: string): Promise<string | null> {
+    const normalizedTerm = term.trim();
+    if (!normalizedTerm) {
+      return null;
+    }
+    const numericSearch = /^\d+$/.test(normalizedTerm);
+    const conditions = (await this.getChildren())
+      .filter((column) => {
+        const type = String(column.description || "");
+        return Boolean(type) && (numericSearch || !/binary|blob|json|geometry/i.test(type));
+      })
+      .map((column) => {
+        const name = this.dialect.quoteIdentifier(String(column.label));
+        const type = String(column.description || "");
+        return numericSearch && /bigint|bool|decimal|double|float|int|numeric|number|real|serial|smallint/i.test(type)
+          ? `${name} = ${normalizedTerm}`
+          : `${name} LIKE ${this.dialect.escapeLiteral(`%${normalizedTerm}%`)}`;
+      });
+    if (conditions.length === 0) {
+      return null;
+    }
+    const pageSql = this.dialect.buildPageSql(this.schema, this.tableWithSchema, 10);
+    return pageSql.replace(
+      this.tableWithSchema,
+      `${this.tableWithSchema} WHERE ${conditions.join(" OR ")}`,
+    );
+  }
+
   public async getChildren(): Promise<ModernTableColumnNode[]> {
     const sql = this.dialect.showColumns(this.schema, this.label);
     const result = await this.actions.query<Record<string, unknown>>(
