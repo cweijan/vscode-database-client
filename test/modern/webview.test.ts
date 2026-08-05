@@ -97,6 +97,29 @@ test("host Webview handler routes messages and releases listeners", async () => 
   assert.deepEqual(sent, [{ type: "setState", content: { rows: [] } }]);
 });
 
+test("host Webview handler exposes reset and dispose lifecycle hooks", () => {
+  let disposed: (() => void) | undefined;
+  const webview = {
+    postMessage: async () => true,
+    onDidReceiveMessage: () => ({ dispose: () => {} }),
+    onDidDispose: (listener: () => void) => {
+      disposed = listener;
+      return { dispose: () => { disposed = undefined; } };
+    },
+  };
+  const handler = new TypedWebviewHandler(webview, new NoopLogger());
+  let resets = 0;
+  let disposals = 0;
+  handler.onDidReset(() => { resets += 1; });
+  handler.onDidDispose(() => { disposals += 1; });
+
+  handler.reset();
+  disposed?.();
+
+  assert.equal(resets, 1);
+  assert.equal(disposals, 1);
+});
+
 test("Webview HTML renderer closes local asset and CSP references", () => {
   const html = renderWebviewHtml(
     '<html><head></head><body><script type="module" src="./assets/app.js"></script><div data-config="{{configs}}"></div></body></html>',

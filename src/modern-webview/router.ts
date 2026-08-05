@@ -67,7 +67,11 @@ export function createWebviewRouter() {
     { path: "/keyView", name: "keyView", component: RedisView },
     { path: "/rabbitQueueView", name: "rabbitQueueView", component: RabbitQueueView },
     { path: "/forward", name: "forward", component: ForwardView },
-    surfaceRoute("/xterm", "xterm"),
+    {
+      path: "/xterm",
+      name: "xterm",
+      component: () => import("./components/XtermView.vue"),
+    },
     { path: "/sshTerminal", name: "sshTerminal", component: SshTerminalView },
     { path: "/fileManager", name: "fileManager", component: RemoteFileManagerView },
     { path: "/sshStatus", name: "sshStatus", component: SshStatusView },

@@ -362,10 +362,14 @@ const modernSlices = [
       "src/modern-webview/components/SshStatusView.vue",
       "src/modern-webview/components/SshMonitorView.vue",
       "src/modern-webview/components/SshTerminalView.vue",
+      "src/modern-webview/components/XtermView.vue",
       "src/modern-webview/style.css",
       "src/modern-webview/router.ts",
       "src/modern/commands/webviewUtilityProtocols.ts",
       "src/modern/remote/sshMonitorService.ts",
+      "src/modern/remote/sshTreeProvider.ts",
+      "src/modern/remote/dockerTree.ts",
+      "src/modern/tree/databaseTreeProvider.ts",
       "src/modern/database/nosqlFactories.ts",
       "test/modern/webview.test.ts",
     ],
@@ -375,7 +379,7 @@ const modernSlices = [
       "npm run build:modern:webview",
       "npm run verify:modern:activation",
     ],
-    coverage: "readable Redis key, RabbitMQ queue, Elasticsearch node status, remote file manager, SSH status, SSH monitor, and SSH terminal pages with typed host message protocols",
+    coverage: "readable Redis key, RabbitMQ queue, Elasticsearch node status, remote file manager, SSH status, SSH monitor, SSH terminal, and xterm pages with typed host message protocols",
   },
 ];
 

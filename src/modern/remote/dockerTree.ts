@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 
+import { registerWebviewUtilityProtocols } from "../commands/webviewUtilityProtocols";
 import type { ExtensionServices } from "../core/extensionServices";
 import type { ConnectionOptions, QueryResult } from "../database/types";
 
@@ -115,11 +116,22 @@ export class DockerConnectionNode extends DockerTreeItem {
   }
 
   public async openTerminal(): Promise<void> {
+    const state = { target: this.connection, connection: this.connection };
     await this.services.webviews.createWebviewPanel({
       title: `${nameOf(this.connection)} · terminal`,
       type: "xterm",
       route: "xterm",
-      state: { connection: this.connection },
+      state,
+      eventHandler: (handler) => {
+        registerWebviewUtilityProtocols({
+          route: "xterm",
+          target: this.connection,
+          state,
+          webviewState: state,
+          services: this.services,
+          handler,
+        });
+      },
     });
   }
 

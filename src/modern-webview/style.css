@@ -642,3 +642,25 @@ body {
     min-width: 6.5rem;
   }
 }
+
+.xterm-view {
+  min-height: 0;
+}
+
+.xterm-view__container {
+  min-height: 18rem;
+  height: min(72vh, 48rem);
+  overflow: hidden;
+  padding: 0.5rem;
+  border: 1px solid var(--vscode-panel-border, #454545);
+  background: var(--vscode-terminal-background, #1e1e1e);
+}
+
+.xterm-view__container:focus {
+  outline: 1px solid var(--vscode-focusBorder, #007fd4);
+  outline-offset: -1px;
+}
+
+.xterm-view .xterm {
+  height: 100%;
+}

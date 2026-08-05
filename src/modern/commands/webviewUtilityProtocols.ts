@@ -543,6 +543,13 @@ function registerSshTerminal(context: UtilityProtocolContext): void {
       channel?.write(value);
     } catch (error) { await sendError(handler, error); }
   });
+  handler.on("data", async (content) => {
+    try {
+      await open();
+      const value = typeof content === "string" ? content : stringValue(record(content).data || content);
+      channel?.write(value);
+    } catch (error) { await sendError(handler, error); }
+  });
   handler.on("resize", async (content) => {
     try {
       await open();
@@ -553,9 +560,63 @@ function registerSshTerminal(context: UtilityProtocolContext): void {
       candidate?.setWindow?.(rows, cols, 0, 0);
     } catch (error) { await sendError(handler, error); }
   });
-  handler.on("closeTerminal", () => {
+  const closeChannel = (): void => {
     channel?.end();
     channel = undefined;
+  };
+  handler.on("closeTerminal", closeChannel);
+  handler.onDidReset(closeChannel);
+  handler.onDidDispose(closeChannel);
+}
+
+function registerXterm(context: UtilityProtocolContext): void {
+  const { handler, state, services } = context;
+  const connection = (): ConnectionOptions | undefined =>
+    targetConnection(state) || services.activeConnection.get();
+
+  handler.on("terminalConfig", async () => {
+    const selected = connection();
+    await handler.send("terminalConfig", {
+      dbType: selected?.type || "SSH",
+    });
+  });
+  handler.on("openLink", async (content) => {
+    try {
+      const value = stringValue(content).trim();
+      if (!/^https?:\/\//i.test(value)) {
+        throw new Error("Only HTTP and HTTPS terminal links can be opened");
+      }
+      await vscode.env.openExternal(vscode.Uri.parse(value));
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("editInVSCode", async (content) => {
+    try {
+      const remotePath = stringValue(content).trim();
+      const selected = connection();
+      if (!remotePath || !selected || (selected.type !== "SSH" && selected.type !== "SFTP")) {
+        throw new Error("Editing a terminal path requires an SSH or SFTP connection");
+      }
+      const session = await services.ssh.open(selected as SshConnectionOptions);
+      const document = await vscode.workspace.openTextDocument({
+        content: (await session.readFile(remotePath)).toString("utf8"),
+        language: languageForFile(path.posix.basename(remotePath)),
+      });
+      const saveSubscription = vscode.workspace.onDidSaveTextDocument((saved) => {
+        if (saved.uri.toString() !== document.uri.toString()) return;
+        void session.writeFile(remotePath, Buffer.from(saved.getText(), "utf8"))
+          .catch((error) => sendError(handler, error));
+      });
+      const closeSubscription = vscode.workspace.onDidCloseTextDocument((closed) => {
+        if (closed.uri.toString() !== document.uri.toString()) return;
+        saveSubscription.dispose();
+        closeSubscription.dispose();
+      });
+      await vscode.window.showTextDocument(document);
+    } catch (error) {
+      await sendError(handler, error);
+    }
   });
 }
 
@@ -1988,5 +2049,9 @@ export function registerWebviewUtilityProtocols(context: UtilityProtocolContext)
   if (context.route === "forward") registerForwarding(context);
   if (context.route === "sshStatus") registerSshStatus(context);
   if (context.route === "sshMonitor") registerSshMonitor(context);
+  if (context.route === "xterm") {
+    registerXterm(context);
+    registerSshTerminal(context);
+  }
   if (context.route === "structDiff") registerStructureDiff(context);
 }

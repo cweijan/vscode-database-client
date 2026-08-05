@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 
 import type { ExtensionServices } from "../core/extensionServices";
 import { SourceRecoveryPendingError } from "../core/errors";
+import { registerWebviewUtilityProtocols } from "../commands/webviewUtilityProtocols";
 import type {
   ConnectionOptions,
   Dialect,
@@ -962,11 +963,22 @@ export class ModernConnectionNode extends DatabaseTreeItem {
   }
 
   public async openTerminal(): Promise<void> {
+    const state = { target: this.connection, connection: this.connection };
     await this.services.webviews.createWebviewPanel({
       title: `${displayName(this.connection)} · terminal`,
       type: "xterm",
       route: "xterm",
-      state: { connection: this.connection },
+      state,
+      eventHandler: (handler) => {
+        registerWebviewUtilityProtocols({
+          route: "xterm",
+          target: this.connection,
+          state,
+          webviewState: state,
+          services: this.services,
+          handler,
+        });
+      },
     });
   }
 
