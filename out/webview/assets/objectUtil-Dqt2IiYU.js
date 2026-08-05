@@ -1,0 +1,1 @@
+function e(t){if(t==null)return null;if(Array.isArray(t))return t.map(t=>e(t));if(typeof t==`object`){let n={};for(let r in t)typeof t[r]==`object`?n[r]=e(t[r]):n[r]=t[r];return n}return t}export{e as t};

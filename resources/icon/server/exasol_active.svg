@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" width="256" height="239.3" style=""><rect id="backgroundrect" width="100%" height="100%" x="0" y="0" fill="none" stroke="none"/>
+    <style>
+        .a {
+            fill: #0a3d51
+        }
+
+        .b {
+            fill: #5fc33b
+        }
+    </style>
+    
+    
+<g class="currentLayer" style=""><title>Layer 1</title><path fill-rule="evenodd" class="a" d="m256 0.2l-80.7 105.8-35.3-45.9 45.4-60zm0 238.9l-70.5 0.1-45.4-59.9 35.2-45.9z" id="svg_1"/><path class="b" d="m0.2 239.2l91.9-119.8-91.4-119.2 70.6 0.1 91.4 119.1-91.9 119.8z" id="svg_2"/><path fill="#1aeb1a" fill-opacity="1" stroke="#222222" stroke-opacity="1" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" stroke-linecap="butt" stroke-dashoffset="" fill-rule="nonzero" opacity="1" marker-start="" marker-mid="" marker-end="" d="M155.44445538520813,188.8470802307129 C155.44445538520813,161.4452376961708 177.42235040664673,139.2497242987156 204.5555635690689,139.2497242987156 C231.6887767314911,139.2497242987156 253.6666717529297,161.4452376961708 253.6666717529297,188.8470802307129 C253.6666717529297,216.24893593788147 231.6887767314911,238.44444274902344 204.5555635690689,238.44444274902344 C177.42235040664673,238.44444274902344 155.44445538520813,216.24893593788147 155.44445538520813,188.8470802307129 z" id="svg_3" class="selected"/></g></svg>

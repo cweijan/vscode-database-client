@@ -1,0 +1,29 @@
+syntax = "proto3";
+package authpb;
+
+message UserAddOptions {
+  bool no_password = 1;
+};
+// User is a single entry in the bucket authUsers
+message User {
+  bytes name = 1;
+  bytes password = 2;
+  repeated string roles = 3;
+  UserAddOptions options = 4;
+}
+// Permission is a single entity
+message Permission {
+  enum Type {
+    Read = 0;
+    Write = 1;
+    Readwrite = 2;
+  }
+  Type permType = 1;
+  bytes key = 2;
+  bytes range_end = 3;
+}
+// Role is a single entry in the bucket authRoles
+message Role {
+  bytes name = 1;
+  repeated Permission keyPermission = 2;
+}

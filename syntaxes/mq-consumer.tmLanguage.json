@@ -1,0 +1,30 @@
+{
+    "name": "MQ Consumer",
+    "fileTypes": [
+        ".consumer"
+    ],
+    "scopeName": "source.dbclient-mq.consumer",
+    "patterns": [
+        {
+            "include": "#dbclient-mq-consumer.headerdefinitionline"
+        },
+        {
+            "include": "source.json"
+        }
+    ],
+    "repository": {
+        "dbclient-mq-consumer.headerdefinitionline": {
+            "patterns": [
+                {
+                    "name": "meta.header.dbclient-mq.consumer",
+                    "match": "(?i)(^|,\\s*)(?:(Consumer Info|Log)(:)\\s*)",
+                    "captures": {
+                        "2": {
+                            "name": "keyword.other.dbclient-mq-consumer"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

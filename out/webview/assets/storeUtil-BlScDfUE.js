@@ -1,0 +1,1 @@
+import{t as e}from"./objectUtil-Dqt2IiYU.js";var t=/^(\$|_|vm)/i;function n(n,r,...i){let a=e(r);for(let e of Object.keys(n))e.startsWith(`$`)||e.startsWith(`_`)||e.match(t)||(a[e]===void 0&&(a[e]=null),i.includes(e)&&(a[e]=n[e]));n.$patch(a)}function r(e){return JSON.parse(JSON.stringify(e,(e,n)=>e.match(t)?null:n))}export{n,r as t};

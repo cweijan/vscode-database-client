@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+		<Metadata>
+			<Identity Language="en-US" Id="vscode-database-client2" Version="9.0.2" Publisher="cweijan" />
+			<DisplayName>Database Client</DisplayName>
+			<Description xml:space="preserve">Database Management for MariaDB/SQLite, supports executing SQL.</Description>
+			<Tags>SQL,db,Database,MySQL,MariaDB,sqlplus,sqltools,数据库,oracle,db2,doris,singlestore,tidb,turso,sqlite,libSQL,trino,cassandra,cockroach,clickhouse,athena,tdengine,rabbitmq,mongo,mongodb,gauss,datagrip,navicat,dbeaver,通义,tongyi,trae,豆包,sql server,mssql,azure,SqlServer,duckdb,presto,etcd,hive,Databricks,kafka,ibm,cockroachdb,snowflake,bigquery,webdav,elasticsearch,redshift,kingbase,金仓,人大金仓,电科金仓,达梦,dmdb,snippet,keybindings,chat-participant,tools,language-model-tools,dbclient-log,DatabaseClientLog,__ext_dbclient-log,es,ElasticSearch,__ext_es,cql,CQL,cypher,__ext_cql,sql,__ext_sql,__ext_sqlbook,dbclient-mq-consumer,MQConsumerDatabaseClient,__ext_consumer,json,__ext_producer</Tags>
+			<Categories>Programming Languages,Keymaps</Categories>
+			<GalleryFlags>Public</GalleryFlags>
+			
+			<Properties>
+				<Property Id="Microsoft.VisualStudio.Code.Engine" Value="^1.68.0" />
+				<Property Id="Microsoft.VisualStudio.Code.ExtensionDependencies" Value="" />
+				<Property Id="Microsoft.VisualStudio.Code.ExtensionPack" Value="cweijan.dbclient-jdbc" />
+				<Property Id="Microsoft.VisualStudio.Code.ExtensionKind" Value="workspace" />
+				<Property Id="Microsoft.VisualStudio.Code.LocalizedLanguages" Value="" />
+				<Property Id="Microsoft.VisualStudio.Code.EnabledApiProposals" Value="" />
+				
+				<Property Id="Microsoft.VisualStudio.Code.ExecutesCode" Value="true" />
+				
+				<Property Id="Microsoft.VisualStudio.Services.Links.Source" Value="https://github.com/cweijan/vscode-database-client.git" />
+				<Property Id="Microsoft.VisualStudio.Services.Links.Getstarted" Value="https://github.com/cweijan/vscode-database-client.git" />
+				<Property Id="Microsoft.VisualStudio.Services.Links.GitHub" Value="https://github.com/cweijan/vscode-database-client.git" />
+				<Property Id="Microsoft.VisualStudio.Services.Links.Support" Value="https://github.com/cweijan/vscode-database-client/issues" />
+				<Property Id="Microsoft.VisualStudio.Services.Links.Learn" Value="https://database-client.com" />
+				
+				
+				<Property Id="Microsoft.VisualStudio.Services.GitHubFlavoredMarkdown" Value="true" />
+				<Property Id="Microsoft.VisualStudio.Services.Content.Pricing" Value="Trial"/>
+
+				
+				
+			</Properties>
+			<License>extension/LICENSE.txt</License>
+			<Icon>extension/resources/databases.png</Icon>
+		</Metadata>
+		<Installation>
+			<InstallationTarget Id="Microsoft.VisualStudio.Code"/>
+		</Installation>
+		<Dependencies/>
+		<Assets>
+			<Asset Type="Microsoft.VisualStudio.Code.Manifest" Path="extension/package.json" Addressable="true" />
+			<Asset Type="Microsoft.VisualStudio.Services.Content.Details" Path="extension/readme.md" Addressable="true" />
+<Asset Type="Microsoft.VisualStudio.Services.Content.Changelog" Path="extension/changelog.md" Addressable="true" />
+<Asset Type="Microsoft.VisualStudio.Services.Content.License" Path="extension/LICENSE.txt" Addressable="true" />
+<Asset Type="Microsoft.VisualStudio.Services.Icons.Default" Path="extension/resources/databases.png" Addressable="true" />
+		</Assets>
+	</PackageManifest>

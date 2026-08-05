@@ -1,0 +1,17 @@
+Database Client License
+
+Copyright (c) 2019-present, Weijan Chen
+
+This license agreement was established and is effective as of 2025-03-18.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to use the Software, subject to the following conditions:
+
+1. The basic functionality of the Software is available for free.
+2. Users can unlock all features by subscribing to the Premium version.
+
+Permission is NOT GRANTED to publish, distribute, sublicense, and/or sell 
+derivative works of the Software.
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.

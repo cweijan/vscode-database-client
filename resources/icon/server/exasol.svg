@@ -1,0 +1,14 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 239.3" width="256" height="239.3">
+    <style>
+        .a {
+            fill: #0a3d51
+        }
+
+        .b {
+            fill: #5fc33b
+        }
+    </style>
+    <path fill-rule="evenodd" class="a"
+        d="m256 0.2l-80.7 105.8-35.3-45.9 45.4-60zm0 238.9l-70.5 0.1-45.4-59.9 35.2-45.9z" />
+    <path class="b" d="m0.2 239.2l91.9-119.8-91.4-119.2 70.6 0.1 91.4 119.1-91.9 119.8z" />
+</svg>

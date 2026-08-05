@@ -1,0 +1,62 @@
+{
+  "name": "Database Client Log",
+  "scopeName": "source.dbclient-log",
+  "patterns": [
+    {
+      "name": "meta.dbclient-log.line",
+      "match": "(\\S+ \\S+) (\\[[^\\]]+\\].+)",
+      "captures": {
+        "1": {
+          "name": "token.info-token"
+        },
+        "2": {
+          "patterns": [
+            {
+              "include": "#type"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "token.error-token",
+      "match": "^(?!2).+"
+    }
+  ],
+  "repository": {
+    "type": {
+      "patterns": [
+        {
+          "match": "(\\[DEBUG\\])(.+)",
+          "captures": {
+            "1": {
+              "name": "string"
+            }
+          }
+        },
+        {
+          "match": "(\\[ INFO\\])(.+)",
+          "captures": {
+            "1": {
+              "name": "string"
+            },
+            "2": {
+              "name": "constant.numeric.decimal.ts"
+            }
+          }
+        },
+        {
+          "match": "(\\[ERROR\\])(.+)",
+          "captures": {
+            "1": {
+              "name": "string"
+            },
+            "2": {
+              "name": "token.error-token"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

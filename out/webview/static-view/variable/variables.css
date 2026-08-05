@@ -1,0 +1,133 @@
+:root {
+    --border-radius: 4px;
+}
+
+.variables-container {
+    padding: 8px 12px;
+    font-family: var(--vscode-font-family);
+}
+
+.variables-header {
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--vscode-widget-border);
+}
+
+.variables-header h3 {
+    margin: 0;
+    font-size: var(--vscode-font-size);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.variables-header h3::before {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: var(--vscode-symbolIcon-variableForeground);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7.5 1a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zm0 12a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E") no-repeat 50% 50%;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7.5 1a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zm0 12a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E") no-repeat 50% 50%;
+}
+
+.variable-item {
+    margin-bottom: 6px;
+    background: var(--vscode-editor-background);
+    border: 1px solid var(--vscode-widget-border);
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+}
+
+.variable-item:hover {
+    border-color: var(--vscode-focusBorder);
+}
+
+.variable-content {
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.variable-name {
+    font-size: 12px;
+    color: var(--vscode-foreground);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.variable-name::before {
+    content: "@";
+    color: var(--vscode-symbolIcon-variableForeground);
+    font-weight: bold;
+}
+
+.variable-value {
+    flex: 1;
+    max-width: 500px;
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+    color: var(--vscode-input-foreground);
+    background: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-border);
+    border-radius: var(--border-radius);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.variable-value:hover {
+    border-color: var(--vscode-inputOption-activeBorder);
+}
+
+.variable-value:focus {
+    border-color: var(--vscode-focusBorder);
+    box-shadow: 0 0 0 1px var(--vscode-focusBorder);
+}
+
+.variable-value::placeholder {
+    color: var(--vscode-input-placeholderForeground);
+    opacity: 0.6;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    max-width: 660px;
+    gap: 8px;
+    padding: 12px 0 4px;
+    margin-top: 8px;
+    border-top: 1px solid var(--vscode-widget-border);
+}
+
+.action-button {
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--vscode-button-foreground);
+    background: var(--vscode-button-background);
+    border: 1px solid transparent;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-button:hover {
+    background: var(--vscode-button-hoverBackground);
+}
+
+.action-button.secondary {
+    color: var(--vscode-button-secondaryForeground);
+    background: var(--vscode-button-secondaryBackground);
+}
+
+.action-button.secondary:hover {
+    background: var(--vscode-button-secondaryHoverBackground);
+} 

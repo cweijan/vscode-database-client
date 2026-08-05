@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect id="backgroundrect" width="100%" height="100%" x="0" y="0" fill="none" stroke="none"/>
+    <defs>
+        <linearGradient id="e399c19f-b68f-429d-b176-18c2117ff73c" x1="0.7011514341288101" x2="0.2128041612827934" y1="0.07411478010324601" y2="1.0376182396573397">
+            <stop offset="0" stop-color="#114a8b"/>
+            <stop offset="1" stop-color="#0669bc"/>
+        </linearGradient>
+        <linearGradient id="ac2a6fc2-ca48-4327-9a3c-d4dcc3256e15" x1="0.6120095488928068" x2="0.5310189107829228" y1="0.5231272700520285" y2="0.5486365102812405">
+            <stop offset="0" stop-opacity=".3"/>
+            <stop offset=".071" stop-opacity=".2"/>
+            <stop offset=".321" stop-opacity=".1"/>
+            <stop offset=".623" stop-opacity=".05"/>
+            <stop offset="1" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="a7fee970-a784-4bb1-af8d-63d18e5f7db9" x1="0.24314061120228728" x2="0.751857946243629" y1="0.04600059057135985" y2="0.9997949609484919">
+            <stop offset="0" stop-color="#3ccbf4"/>
+            <stop offset="1" stop-color="#2892df"/>
+        </linearGradient>
+    </defs>
+    
+    
+    
+    
+<g class="currentLayer" style=""><title>Layer 1</title><path fill="url(#e399c19f-b68f-429d-b176-18c2117ff73c)" d="M33.338 6.544h26.038l-27.03 80.087a4.152 4.152 0 0 1-3.933 2.824H8.149a4.145 4.145 0 0 1-3.928-5.47L29.404 9.368a4.152 4.152 0 0 1 3.934-2.825z" id="svg_1"/><path fill="#0078d4" d="M71.175 60.261h-41.29a1.911 1.911 0 0 0-1.305 3.309l26.532 24.764a4.171 4.171 0 0 0 2.846 1.121h23.38z" id="svg_2"/><path fill="url(#ac2a6fc2-ca48-4327-9a3c-d4dcc3256e15)" d="M33.338 6.544a4.118 4.118 0 0 0-3.943 2.879L4.252 83.917a4.14 4.14 0 0 0 3.908 5.538h20.787a4.443 4.443 0 0 0 3.41-2.9l5.014-14.777 17.91 16.705a4.237 4.237 0 0 0 2.666.972H81.24L71.024 60.261l-29.781.007L59.47 6.544z" id="svg_3"/><path fill="url(#a7fee970-a784-4bb1-af8d-63d18e5f7db9)" d="M66.595 9.364a4.145 4.145 0 0 0-3.928-2.82H33.648a4.146 4.146 0 0 1 3.928 2.82l25.184 74.62a4.146 4.146 0 0 1-3.928 5.472h29.02a4.146 4.146 0 0 0 3.927-5.472z" id="svg_4"/><path fill="#1aeb1a" fill-opacity="1" stroke="#222222" stroke-opacity="1" stroke-width="2" stroke-dasharray="none" stroke-linejoin="round" stroke-linecap="butt" stroke-dashoffset="" fill-rule="nonzero" opacity="1" marker-start="" marker-mid="" marker-end="" d="M51.78016948699951,74.14364397525787 C51.78016948699951,63.188543918988216 61.12082838151582,54.3149139881134 72.65251684188843,54.3149139881134 C84.1841973400924,54.3149139881134 93.52486419677734,63.188543918988216 93.52486419677734,74.14364397525787 C93.52486419677734,85.09874403152753 84.1841973400924,93.97237396240234 72.65251684188843,93.97237396240234 C61.12082838151582,93.97237396240234 51.78016948699951,85.09874403152753 51.78016948699951,74.14364397525787 z" id="svg_5" class=""/></g></svg>
