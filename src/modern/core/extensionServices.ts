@@ -12,6 +12,7 @@ import { ConnectionManager } from "../database/connectionManager";
 import { DialectRegistry } from "../database/dialectRegistry";
 import { createStandardConnectionFactories } from "../database/standardFactories";
 import { createStandardDialects } from "../database/standardDialects";
+import { SshService } from "../remote/sshService";
 
 export interface ExtensionEventMap {
   connectionOpened: { id: string; type: string };
@@ -27,6 +28,7 @@ export interface ExtensionServices extends Disposable {
   readonly resources: VscodeResourceResolver;
   readonly dialects: DialectRegistry;
   readonly connections: ConnectionManager;
+  readonly ssh: SshService;
   readonly webviews: VscodeWebviewManager;
 }
 
@@ -49,6 +51,7 @@ export function createExtensionServices(
   for (const factory of createStandardConnectionFactories()) {
     connections.registerFactory(factory);
   }
+  const ssh = new SshService();
   const webviews = new VscodeWebviewManager(context.extensionUri, logger);
 
   return {
@@ -60,11 +63,13 @@ export function createExtensionServices(
     resources,
     dialects,
     connections,
+    ssh,
     webviews,
     dispose: () => {
       events.clear();
       webviews.dispose();
       void connections.dispose();
+      void ssh.dispose();
     },
   };
 }

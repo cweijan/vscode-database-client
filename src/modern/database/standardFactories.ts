@@ -13,6 +13,9 @@ import type {
 } from "./types";
 import { createNoSqlConnectionFactories } from "./nosqlFactories";
 import { createAdditionalConnectionFactories } from "./additionalFactories";
+import { createMessageConnectionFactories } from "./messageFactories";
+import { createDockerConnectionFactories } from "./dockerFactory";
+import { createExtendedConnectionFactories } from "./extendedFactories";
 
 function optionValue(
   options: ConnectionOptions,
@@ -154,5 +157,8 @@ export function createStandardConnectionFactories(): DriverConnectionFactory[] {
     ),
     ...createNoSqlConnectionFactories(),
     ...createAdditionalConnectionFactories(),
+    ...createMessageConnectionFactories(),
+    ...createDockerConnectionFactories(),
+    ...createExtendedConnectionFactories(),
   ];
 }

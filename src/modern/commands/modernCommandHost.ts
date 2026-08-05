@@ -1,7 +1,9 @@
 import * as vscode from "vscode";
+import { readFile } from "node:fs/promises";
 
 import type { ExtensionServices } from "../core/extensionServices";
 import type { ConnectionOptions, QueryResult } from "../database/types";
+import { parseSqlBlocks } from "../providers/sqlDocumentModel";
 
 export interface ModernCommandHost {
   refresh(target?: unknown): Promise<void> | void;
@@ -13,6 +15,19 @@ export interface ModernCommandHost {
   createNode(target?: unknown): Promise<unknown>;
   openHistory(target?: unknown): Promise<unknown>;
   clearHistory(): Promise<void> | void;
+  serverInfo?(target?: unknown): Promise<unknown>;
+  filterChildren?(target?: unknown): Promise<unknown> | unknown;
+  activateDatabase?(target?: unknown): Promise<unknown> | unknown;
+  generateDocument?(target?: unknown): Promise<unknown>;
+  importSql?(target?: unknown): Promise<unknown>;
+  createMock?(target?: unknown): Promise<unknown>;
+  runMock?(target?: unknown): Promise<unknown>;
+  changeTableName?(target?: unknown): Promise<unknown>;
+  fullTextSearch?(target?: unknown): Promise<unknown>;
+  userAction?(operation: "grant" | "change" | "template" | "delete", target?: unknown): Promise<unknown>;
+  openUtility?(route: string, title: string, target?: unknown): Promise<unknown>;
+  runDockerCompose?(target?: unknown): Promise<unknown>;
+  collapseTrees?(noSql?: boolean): Promise<unknown> | unknown;
 }
 
 function asConnection(value: unknown): ConnectionOptions | undefined {
@@ -21,6 +36,18 @@ function asConnection(value: unknown): ConnectionOptions | undefined {
   }
   const item = value as Partial<ConnectionOptions>;
   return item.id && item.type ? (item as ConnectionOptions) : undefined;
+}
+
+function targetConnection(value: unknown): ConnectionOptions | undefined {
+  const direct = asConnection(value);
+  if (direct) {
+    return direct;
+  }
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+  const candidate = value as { connection?: unknown; options?: unknown };
+  return asConnection(candidate.connection) || asConnection(candidate.options);
 }
 
 function connectionRecords(value: unknown): Record<string, ConnectionOptions> {
@@ -80,6 +107,39 @@ export function createModernCommandHost(
     const current = connectionRecords(services.state.get("mysql.connections", {}));
     current[connection.id] = connection;
     await services.state.update("mysql.connections", current);
+  };
+
+  const openUtility = async (
+    route: string,
+    title: string,
+    target?: unknown,
+  ): Promise<vscode.WebviewPanel> => {
+    return openRoute(title, route, route, { target });
+  };
+
+  const openResult = async <Row>(
+    title: string,
+    sql: string,
+    result: QueryResult<Row>,
+  ): Promise<vscode.WebviewPanel> => {
+    return openRoute("SQL Result", "result", "result", {
+      title,
+      sql,
+      rows: result.rows,
+      fields: result.fields,
+      affectedRows: result.affectedRows,
+    });
+  };
+
+  const runTargetSql = async (
+    target: unknown,
+    sql: string,
+  ): Promise<QueryResult<Record<string, unknown>>> => {
+    const connection = targetConnection(target) || services.activeConnection.get();
+    if (!connection) {
+      throw new Error("No active database connection");
+    }
+    return services.connections.query(connection, sql);
   };
 
   return {
@@ -179,6 +239,141 @@ export function createModernCommandHost(
 
     clearHistory() {
       return services.state.update("sql.history", []);
+    },
+
+    async serverInfo(target) {
+      const connection = targetConnection(target) || services.activeConnection.get();
+      if (!connection) {
+        throw new Error("No database connection selected");
+      }
+      const dialect = services.dialects.resolve(connection.type);
+      const sql = dialect.showVersion?.() || "SELECT 1 AS server_version;";
+      const result = await services.connections.query(connection, sql);
+      return openResult(`${connection.name || connection.id} · server info`, sql, result);
+    },
+
+    filterChildren(target) {
+      const candidate = target as { setFilter?: (value: string) => void; filter?: string } | undefined;
+      if (candidate && typeof candidate.setFilter === "function") {
+        candidate.setFilter("");
+      }
+      return target;
+    },
+
+    activateDatabase(target) {
+      const connection = targetConnection(target);
+      if (!connection) {
+        return services.activeConnection.get();
+      }
+      const value = target as { database?: unknown; schema?: unknown } | undefined;
+      const active = {
+        ...connection,
+        database: typeof value?.database === "string" ? value.database : connection.database,
+        schema: typeof value?.schema === "string" ? value.schema : connection.schema,
+      };
+      services.activeConnection.set(active);
+      return active;
+    },
+
+    async generateDocument(target) {
+      const candidate = target as { showDdl?: () => Promise<string> | string } | undefined;
+      const source = typeof candidate?.showDdl === "function"
+        ? await candidate.showDdl()
+        : "# Database document\n\nSelect a database object to generate its DDL.";
+      return openText(source, "markdown");
+    },
+
+    async importSql(target) {
+      const files = await vscode.window.showOpenDialog({
+        canSelectFiles: true,
+        canSelectFolders: false,
+        canSelectMany: false,
+        openLabel: "Import SQL",
+        filters: { SQL: ["sql", "ddl"], "All files": ["*"] },
+      });
+      const file = files?.[0];
+      if (!file) {
+        return undefined;
+      }
+      const source = await readFile(file.fsPath, "utf8");
+      const connection = targetConnection(target) || services.activeConnection.get();
+      if (!connection) {
+        throw new Error("No database connection selected");
+      }
+      const blocks = parseSqlBlocks(source);
+      const results: QueryResult<Record<string, unknown>>[] = [];
+      for (const block of blocks) {
+        results.push(await services.connections.query(connection, block.text));
+      }
+      const last = results.at(-1) || { rows: [], fields: [] };
+      return openResult(`Imported ${file.fsPath}`, source, {
+        ...last,
+        rows: [{ statements: blocks.length, affectedRows: results.reduce((sum, item) => sum + (item.affectedRows || 0), 0) }],
+        fields: [{ name: "statements" }, { name: "affectedRows" }],
+      });
+    },
+
+    async createMock(target) {
+      const candidate = target as { label?: unknown; getChildren?: () => Promise<unknown[]> } | undefined;
+      const children = typeof candidate?.getChildren === "function" ? await candidate.getChildren() : [];
+      const mock = {
+        table: String(candidate?.label || "table_name"),
+        mockStartIndex: "auto",
+        mockCount: 10,
+        mockValueReference: "https://mockjs.com/examples.html",
+        mock: Object.fromEntries(children.map((column) => [String((column as { label?: unknown }).label || "column"), { type: "varchar", value: "@string('lower',5)" }])),
+      };
+      return openText(JSON.stringify(mock, null, 2), "json");
+    },
+
+    async runMock() {
+      return openUtility("mock", "Data Mock");
+    },
+
+    async changeTableName(target) {
+      const candidate = target as { tableWithSchema?: unknown; label?: unknown } | undefined;
+      const oldName = String(candidate?.tableWithSchema || candidate?.label || "");
+      if (!oldName) {
+        throw new Error("A table must be selected");
+      }
+      const newName = await vscode.window.showInputBox({ prompt: "New table name", value: String(candidate?.label || "") });
+      if (!newName || newName === String(candidate?.label || "")) {
+        return undefined;
+      }
+      const result = await runTargetSql(target, `ALTER TABLE ${oldName} RENAME TO ${services.dialects.resolve((targetConnection(target) || services.activeConnection.get())?.type || "MySQL").quoteIdentifier(newName)};`);
+      return openResult(`Rename ${newName}`, "ALTER TABLE", result);
+    },
+
+    async fullTextSearch(target) {
+      const candidate = target as { tableWithSchema?: unknown; label?: unknown } | undefined;
+      const table = String(candidate?.tableWithSchema || candidate?.label || "");
+      const term = await vscode.window.showInputBox({ prompt: `Search ${table}` });
+      if (!term) {
+        return undefined;
+      }
+      const result = await runTargetSql(target, `SELECT * FROM ${table} LIMIT 100;`);
+      return openResult(`Search ${term}`, `SELECT * FROM ${table}`, result);
+    },
+
+    async userAction(operation, target) {
+      const candidate = target as { showSource?: () => Promise<string> | string } | undefined;
+      if (operation === "template") {
+        return openText("CREATE USER user_name IDENTIFIED BY 'password';\nGRANT ALL PRIVILEGES ON *.* TO user_name;", "sql");
+      }
+      if (typeof candidate?.showSource === "function") {
+        return openText(await candidate.showSource(), "sql");
+      }
+      return openUtility("manager", `User ${operation}`, target);
+    },
+
+    openUtility,
+
+    async runDockerCompose(target) {
+      return openUtility("xterm", "Docker Compose", target);
+    },
+
+    collapseTrees(noSql = false) {
+      return vscode.commands.executeCommand("workbench.action.collapseAll").then(() => noSql);
     },
   };
 }

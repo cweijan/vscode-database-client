@@ -37,7 +37,7 @@ export class FTPFileNode extends FtpBaseNode {
         vscode.window.showQuickPick(["YES", "NO"], { canPickMany: false }).then(async str => {
             if (str == "YES") {
                 const client = await this.getClient()
-                client.delete(this.fullPath, (err) => {
+                client.delete(this.fullPath, (err: Client.FTPError | null) => {
                     if (err) {
                         vscode.window.showErrorMessage(err.message)
                     } else {
@@ -102,8 +102,8 @@ export class FTPFileNode extends FtpBaseNode {
                                     progress.report({ increment: progressData.percentage - before, message: `remaining : ${prettyBytes(progressData.remaining)}` });
                                     before = progressData.percentage
                                 })
-                                str.on("error", err => {
-                                    vscode.window.showErrorMessage(err.message)
+                                str.on("error", (err: Client.FTPError | null) => {
+                                    vscode.window.showErrorMessage(err?.message || "An unknown error occurred")
                                 })
                                 const outStream = createWriteStream(uri.fsPath);
                                 fileReadStream.pipe(str).pipe(outStream);

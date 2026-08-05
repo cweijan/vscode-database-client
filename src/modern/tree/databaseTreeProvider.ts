@@ -12,6 +12,8 @@ import {
   OracleSynonymGroup,
   OracleSynonymNode,
 } from "../database/oracle/synonyms";
+import { DockerConnectionNode } from "../remote/dockerTree";
+import { SshConnectionNode } from "../remote/sshTreeProvider";
 
 export interface StoredConnection extends ConnectionOptions {
   readonly name?: string;
@@ -930,8 +932,27 @@ export class ModernConnectionNode extends DatabaseTreeItem {
     await this.openConnection();
   }
 
-  public openTerminal(): void {
-    throw new SourceRecoveryPendingError("mysql.connection.terminal");
+  public async openTerminal(): Promise<void> {
+    await this.services.webviews.createWebviewPanel({
+      title: `${displayName(this.connection)} · terminal`,
+      type: "xterm",
+      route: "xterm",
+      state: { connection: this.connection },
+    });
+  }
+
+  public async copyKey(): Promise<void> {
+    const key = this.connection.connectionUrl || this.connection.host || displayName(this.connection);
+    await this.actions.writeClipboard(key);
+  }
+
+  public async startRdp(): Promise<void> {
+    await this.services.webviews.createWebviewPanel({
+      title: `${displayName(this.connection)} · remote desktop`,
+      type: "sshStatus",
+      route: "sshStatus",
+      state: { connection: this.connection, mode: "rdp" },
+    });
   }
 }
 
@@ -1295,6 +1316,143 @@ class Neo4jLabelNode extends DatabaseTreeItem {
   }
 }
 
+class GenericServiceRootNode extends DatabaseTreeItem {
+  public constructor(
+    private readonly connection: StoredConnection,
+    private readonly services: ExtensionServices,
+    private readonly actions: TreeActionHost,
+    public readonly parent: DatabaseTreeItem,
+  ) {
+    super("Service", "serviceRoot", vscode.TreeItemCollapsibleState.Collapsed);
+    this.iconPath = new vscode.ThemeIcon("server-process");
+  }
+
+  public async getChildren(): Promise<GenericServiceActionNode[]> {
+    return [
+      new GenericServiceActionNode(
+        this.connection,
+        this.services,
+        this.actions,
+        this,
+      ),
+    ];
+  }
+}
+
+class GenericServiceActionNode extends DatabaseTreeItem {
+  public constructor(
+    private readonly connection: StoredConnection,
+    private readonly services: ExtensionServices,
+    private readonly actions: TreeActionHost,
+    public readonly parent: GenericServiceRootNode,
+  ) {
+    super("Overview", "serviceAction");
+    this.iconPath = new vscode.ThemeIcon("info");
+  }
+
+  private queryText(): string {
+    if (this.connection.type === "Kafka") return "LIST TOPICS";
+    if (this.connection.type === "Loki") return "/loki/api/v1/labels";
+    return "/api/overview";
+  }
+
+  public async viewData(): Promise<void> {
+    const sql = this.queryText();
+    const result = await this.actions.query<Record<string, unknown>>(
+      this.connection,
+      sql,
+    );
+    await openResultView(this.services, `${this.connection.type} overview`, sql, result);
+  }
+
+  public async createTemplate(): Promise<string> {
+    const sql = this.connection.type === "Kafka"
+      ? "PRODUCE topic message"
+      : "GET /api/overview";
+    const document = await this.actions.openSqlDocument(sql);
+    await this.actions.showTextDocument(document);
+    return sql;
+  }
+
+  public async reqCreate(): Promise<string> {
+    return this.messageTemplate(
+      this.connection.type === "Kafka"
+        ? "CREATE TOPIC topic_name"
+        : "PUT /api/queues/%2F/queue_name\n{\n  \"durable\": true\n}",
+    );
+  }
+
+  public async reqCreateBinding(): Promise<string> {
+    return this.messageTemplate(
+      "POST /api/bindings/%2F/e/exchange_name/q/queue_name\n{\n  \"routing_key\": \"\"\n}",
+    );
+  }
+
+  public async inspectMessages(): Promise<void> {
+    await this.viewData();
+  }
+
+  public async reqDelete(): Promise<void> {
+    const name = await vscode.window.showInputBox({ prompt: "Resource name to delete" });
+    if (!name) return;
+    const sql = this.connection.type === "Kafka"
+      ? `DELETE TOPIC ${name}`
+      : `DELETE /api/queues/%2F/${encodeURIComponent(name)}`;
+    const result = await this.actions.query<Record<string, unknown>>(this.connection, sql);
+    await openResultView(this.services, `${this.connection.type} delete`, sql, result);
+  }
+
+  public async createVhost(): Promise<string> {
+    return this.messageTemplate("PUT /api/vhosts/vhost_name");
+  }
+
+  public async deleteVhost(): Promise<void> {
+    await this.reqDelete();
+  }
+
+  public async createUser(): Promise<string> {
+    return this.messageTemplate("PUT /api/users/user_name\n{\n  \"password\": \"password\",\n  \"tags\": \"management\"\n}");
+  }
+
+  public async deleteUser(): Promise<void> {
+    await this.reqDelete();
+  }
+
+  public async updatePassword(): Promise<string> {
+    return this.messageTemplate("PUT /api/users/user_name\n{\n  \"password\": \"new-password\",\n  \"tags\": \"\"\n}");
+  }
+
+  public async addRole(): Promise<string> {
+    return this.messageTemplate("PUT /api/permissions/%2F/user_name\n{\n  \"configure\": \".*\",\n  \"write\": \".*\",\n  \"read\": \".*\"\n}");
+  }
+
+  public async removeRole(): Promise<void> {
+    await this.reqDelete();
+  }
+
+  public async prepareConsume(): Promise<string> {
+    return this.messageTemplate("GET /api/queues/%2F/queue_name/get\n{\n  \"count\": 10,\n  \"ackmode\": \"ack_requeue_true\",\n  \"encoding\": \"auto\"\n}");
+  }
+
+  public async prepareProduce(): Promise<string> {
+    return this.messageTemplate("POST /api/exchanges/%2F/amq.default/publish\n{\n  \"properties\": {},\n  \"routing_key\": \"queue_name\",\n  \"payload\": \"message\",\n  \"payload_encoding\": \"string\"\n}");
+  }
+
+  public async setOffset(): Promise<string> {
+    return this.messageTemplate("SET OFFSET group_name topic_name partition 0");
+  }
+
+  public async resetOffset(): Promise<string> {
+    return this.messageTemplate("RESET OFFSET group_name topic_name");
+  }
+
+  private async messageTemplate(sql: string): Promise<string> {
+    const document = await this.actions.openSqlDocument(sql);
+    await this.actions.showTextDocument(document);
+    return sql;
+  }
+}
+
 export class ModernNoSqlConnectionNode extends DatabaseTreeItem {
   public constructor(
     public readonly connection: StoredConnection,
@@ -1357,6 +1515,9 @@ export class ModernNoSqlConnectionNode extends DatabaseTreeItem {
     }
     if (this.connection.type === "Neo4j") {
       return [new Neo4jLabelGroupNode(this.connection, this.services, this.actions, this)];
+    }
+    if (["RabbitMQ", "Kafka", "Loki"].includes(this.connection.type)) {
+      return [new GenericServiceRootNode(this.connection, this.services, this.actions, this)];
     }
     return [new InfoTreeItem(`NoSQL tree support for ${this.connection.type} is not configured.`)];
   }
@@ -1478,9 +1639,9 @@ export class ModernDatabaseTreeProvider
 }
 
 export class ModernNoSqlTreeProvider
-  implements vscode.TreeDataProvider<DatabaseTreeItem>
+  implements vscode.TreeDataProvider<vscode.TreeItem>
 {
-  private readonly changes = new vscode.EventEmitter<DatabaseTreeItem | undefined>();
+  private readonly changes = new vscode.EventEmitter<vscode.TreeItem | undefined>();
   public readonly onDidChangeTreeData = this.changes.event;
   private readonly actions: TreeActionHost;
 
@@ -1488,17 +1649,17 @@ export class ModernNoSqlTreeProvider
     this.actions = createActionHost(services);
   }
 
-  public getTreeItem(element: DatabaseTreeItem): vscode.TreeItem {
+  public getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
     return element;
   }
 
-  public getParent(element: DatabaseTreeItem): DatabaseTreeItem | undefined {
+  public getParent(element: vscode.TreeItem): vscode.TreeItem | undefined {
     return "parent" in element
-      ? (element as DatabaseTreeItem & { parent?: DatabaseTreeItem }).parent
+      ? (element as vscode.TreeItem & { parent?: vscode.TreeItem }).parent
       : undefined;
   }
 
-  public async getChildren(element?: DatabaseTreeItem): Promise<DatabaseTreeItem[]> {
+  public async getChildren(element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
     if (element && "getChildren" in element && typeof element.getChildren === "function") {
       try {
         return await element.getChildren();
@@ -1508,18 +1669,29 @@ export class ModernNoSqlTreeProvider
       }
     }
     const raw = this.services.state.get<unknown>("redis.connections", {});
-    return recordsFromState(raw).map(
-      (connection) =>
-        new ModernNoSqlConnectionNode(
+    return recordsFromState(raw).map((connection) => {
+      const onDelete = async (id: string) => this.removeConnection(id);
+      if (connection.type === "SSH" || connection.type === "SFTP") {
+        return new SshConnectionNode(connection, this.services, onDelete);
+      }
+      if (connection.type === "Docker") {
+        return new DockerConnectionNode(
           connection,
           this.services,
-          this.actions,
-          async (id) => this.removeConnection(id),
-        ),
-    );
+          onDelete,
+          () => this.refresh(),
+        );
+      }
+      return new ModernNoSqlConnectionNode(
+        connection,
+        this.services,
+        this.actions,
+        onDelete,
+      );
+    });
   }
 
-  public refresh(element?: DatabaseTreeItem): void {
+  public refresh(element?: vscode.TreeItem): void {
     this.changes.fire(element);
   }
 

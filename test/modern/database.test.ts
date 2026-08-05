@@ -258,6 +258,18 @@ test("standard connection factories expose every recovered driver family", () =>
     "ElasticSearch",
     "SqlServer",
     "ClickHouse",
+    "RabbitMQ",
+    "Loki",
+    "Kafka",
+    "Docker",
+    "SQLite",
+    "libSQL",
+    "D1",
+    "DuckDB",
+    "DM",
+    "达梦",
+    "Snowflake",
+    "Databricks",
   ]) {
     assert.equal(supported(type), true, `missing factory for ${type}`);
   }

@@ -28,8 +28,8 @@
     "productModuleCount": 659,
     "bundledRuntimeModuleCount": 330,
     "classificationCounts": {
-      "legacy-source-reusable": 35,
-      "new-source-to-recover": 624,
+      "legacy-source-reusable": 36,
+      "new-source-to-recover": 623,
       "intentional-replacement": 0,
       "deferred": 0
     },
@@ -80,6 +80,8 @@
         "src/modern/database/resultConverter.ts",
         "src/modern/database/driverConnectionFactory.ts",
         "src/modern/database/standardFactories.ts",
+        "src/modern/database/extendedFactories.ts",
+        "src/modern/database/sqljs.d.ts",
         "src/modern/database/standardDialects.ts",
         "src/modern/database/additionalFactories.ts"
       ],
@@ -87,7 +89,7 @@
         "npm run typecheck:modern",
         "npm run test:modern"
       ],
-      "coverage": "connection lifecycle, cancellation boundary, result conversion, driver adapter, and dialect selection",
+      "coverage": "connection lifecycle, cancellation boundary, result conversion, driver adapter, SQL.js, Dameng, Snowflake, Databricks, and dialect selection",
       "status": "implemented-foundation",
       "missingFiles": []
     },
@@ -154,15 +156,21 @@
       "name": "nosql-adapter-and-tree-boundaries",
       "sourceFiles": [
         "src/modern/database/nosqlFactories.ts",
+        "src/modern/database/messageFactories.ts",
+        "src/modern/database/dockerFactory.ts",
         "src/modern/tree/databaseTreeProvider.ts",
-        "test/modern/database.test.ts"
+        "src/modern/remote/sshService.ts",
+        "src/modern/remote/sshTreeProvider.ts",
+        "src/modern/remote/dockerTree.ts",
+        "test/modern/database.test.ts",
+        "test/modern/remote.test.ts"
       ],
       "validation": [
         "npm run typecheck:modern",
         "npm run test:modern",
         "npm run verify:modern:activation"
       ],
-      "coverage": "Redis, MongoDB, Elasticsearch, and Neo4j driver adapters plus typed NoSQL tree nodes and command targets",
+      "coverage": "Redis, MongoDB, Elasticsearch, Neo4j, RabbitMQ, Loki, Kafka, and Docker adapters plus typed NoSQL, SSH/SFTP, and Docker tree nodes",
       "status": "implemented-foundation",
       "missingFiles": []
     },
@@ -1108,14 +1116,16 @@
     },
     {
       "sourcePath": "src/common/wrapper.ts",
-      "classification": "new-source-to-recover",
+      "classification": "legacy-source-reusable",
       "owner": "common-runtime",
       "validationPlan": "module-typecheck-and-target-marker-review",
       "targetBundleFiles": [
         "out/extension.js"
       ],
-      "legacySourcePresent": false,
-      "recoveryAction": "recover-from-bundle-markers-legacy-patterns-and-behavior-fixtures"
+      "legacySourcePresent": true,
+      "recoveryAction": "review-existing-source-and-modernize-in-place",
+      "legacyPath": "src/common/wrapper.ts",
+      "legacySha256": "129296b1e6009f2b190e4f70a4c7f3d1ee2ecc6eeaa2fe9d00f9919b0c0cc468"
     },
     {
       "sourcePath": "src/extension.ts",

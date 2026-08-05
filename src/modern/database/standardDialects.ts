@@ -202,12 +202,10 @@ export class MySqlDialect extends InformationSchemaDialect {
     schema: string | null,
     name: string,
   ): string {
-    const schemaLiteral = this.escapeLiteral(normalized(schema) || "public");
-    const nameLiteral = this.escapeLiteral(name);
-    if (kind === "trigger") {
-      return `SELECT pg_get_triggerdef(t.oid) "definition" FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = ${schemaLiteral} AND t.tgname = ${nameLiteral};`;
-    }
-    return `SELECT pg_get_functiondef(p.oid) "definition" FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = ${schemaLiteral} AND p.proname = ${nameLiteral};`;
+    const qualifiedName = schema
+      ? `${this.quoteIdentifier(schema)}.${this.quoteIdentifier(name)}`
+      : this.quoteIdentifier(name);
+    return `SHOW CREATE ${kind.toUpperCase()} ${qualifiedName};`;
   }
 
   public override pingDatabase(schema?: string | null): string | null {
@@ -254,6 +252,19 @@ export class PostgresDialect extends InformationSchemaDialect {
     return `SELECT TABLE_NAME "name", VIEW_DEFINITION "definition" FROM information_schema.views WHERE TABLE_SCHEMA = ${this.escapeLiteral(normalized(schema))} AND TABLE_NAME = ${this.escapeLiteral(view)};`;
   }
 
+  public override showRoutineSource(
+    kind: "procedure" | "function" | "trigger",
+    schema: string | null,
+    name: string,
+  ): string {
+    const schemaLiteral = this.escapeLiteral(normalized(schema) || "public");
+    const nameLiteral = this.escapeLiteral(name);
+    if (kind === "trigger") {
+      return `SELECT pg_get_triggerdef(t.oid) "definition" FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = ${schemaLiteral} AND t.tgname = ${nameLiteral};`;
+    }
+    return `SELECT pg_get_functiondef(p.oid) "definition" FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = ${schemaLiteral} AND p.proname = ${nameLiteral};`;
+  }
+
   public override showIndex(schema: string | null, table: string): string {
     return `SELECT indexname "index_name", indexdef FROM pg_indexes WHERE schemaname = ${this.escapeLiteral(normalized(schema))} AND tablename = ${this.escapeLiteral(table)} ORDER BY indexname;`;
   }
@@ -283,7 +294,7 @@ export class SqlServerDialect extends InformationSchemaDialect {
     if (!value) {
       throw new Error("SQL Server identifier cannot be empty");
     }
-    return "[" + value.replaceAll("]", "]]" ) + "]";
+    return "[" + value.replaceAll("]", "]]") + "]";
   }
 
   public override buildPageSql(

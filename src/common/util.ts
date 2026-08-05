@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { Position, TextDocument } from "vscode";
 import { Confirm, Constants, DatabaseType } from "./constants";
 import { exec } from "child_process";
-import { wrapByDb } from "./wrapper.js";
+import { wrapByDb } from "./wrapper";
 import { GlobalState } from "./state";
 import { Console } from "./Console";
 

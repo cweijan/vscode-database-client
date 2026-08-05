@@ -73,19 +73,17 @@ test("target command dispatcher routes editor commands through the modern host",
   ]);
 });
 
-test("unrecovered target commands fail explicitly and expose the remaining queue", async () => {
+test("unrecovered node capabilities fail explicitly at the dispatch boundary", async () => {
   const handlers = new Map<string, (...args: unknown[]) => unknown>();
   registerTargetCommands((id, handler) => {
     handlers.set(id, handler as (...args: unknown[]) => unknown);
     return { dispose: () => {} };
   });
-  const summary = summarizeTargetCommands();
-  const pending = summary.pendingIds[0];
-  assert.ok(pending);
   await assert.rejects(
-    Promise.resolve().then(() => handlers.get(pending)?.()),
+    Promise.resolve().then(() => handlers.get("mysql.package.source")?.({})),
     (error: unknown) =>
       error instanceof SourceRecoveryPendingError &&
       error.code === "source-recovery-pending",
   );
+  assert.equal(summarizeTargetCommands().commandIds.length, TARGET_COMMAND_IDS.length);
 });

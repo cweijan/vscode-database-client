@@ -10,8 +10,13 @@ export class FileManager {
     }
 
     public static show(fileName: string): Promise<vscode.TextEditor> {
-        if (!this.storagePath) { vscode.window.showErrorMessage("FileManager is not init!") }
-        if (!fileName) { return; }
+        if (!this.storagePath) {
+            vscode.window.showErrorMessage("FileManager is not init!");
+            return Promise.reject(new Error("FileManager is not init"));
+        }
+        if (!fileName) {
+            return Promise.reject(new Error("fileName is empty"));
+        }
         const recordPath = path.isAbsolute(fileName) ? fileName : `${this.storagePath}/${fileName}`;
         this.check(path.resolve(recordPath, '..'))
         if (!fs.existsSync(recordPath)) {
@@ -26,10 +31,15 @@ export class FileManager {
 
     }
 
-    public static record(fileName: string, content: string, model?: FileModel): Promise<string> {
-        if (!this.storagePath) { vscode.window.showErrorMessage("FileManager is not init!") }
-        if (!fileName) { return; }
-        fileName=fileName.replace(/[\:\*\?"\<\>]*/g,"")
+    public static record(fileName: string, content: string | null, model?: FileModel): Promise<string> {
+        if (!this.storagePath) {
+            vscode.window.showErrorMessage("FileManager is not init!");
+            return Promise.reject(new Error("FileManager is not init"));
+        }
+        if (!fileName) {
+            return Promise.reject(new Error("fileName is empty"));
+        }
+        fileName = fileName.replace(/[\:\*\?"\<\>]*/g, "")
         return new Promise((resolve) => {
             const recordPath = `${this.storagePath}/${fileName}`;
             this.check(path.resolve(recordPath, '..'))
@@ -45,7 +55,7 @@ export class FileManager {
         });
     }
 
-    public static getPath(fileName:string){
+    public static getPath(fileName: string) {
         return `${this.storagePath}/${fileName}`;
     }
 

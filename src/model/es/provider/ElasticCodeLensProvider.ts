@@ -7,24 +7,26 @@ export class ElasticCodeLensProvider implements vscode.CodeLensProvider {
     }
 
     public provideCodeLenses(document: vscode.TextDocument, _token: vscode.CancellationToken) {
-
-        var esMatches = new ElasticMatches(vscode.window.activeTextEditor)
-
-        var ret = [];
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return [];
+        }
+        var esMatches = new ElasticMatches(editor);
+        const ret: vscode.CodeLens[] = [];
 
         esMatches.Matches.forEach(em => {
             if (em.Error.Text == null) {
                 ret.push(new vscode.CodeLens(em.Method.Range, {
                     title: "▶ Run Query",
                     command: "mysql.elastic.execute",
-                    arguments: [em,false]
+                    arguments: [em, false]
                 }))
                 ret.push(new vscode.CodeLens(em.Method.Range, {
                     title: "▶ Run Query And Parse",
                     command: "mysql.elastic.execute",
-                    arguments: [em,true]
+                    arguments: [em, true]
                 }))
-                if(DocumentFinder.find(em.Path.Text)){
+                if (DocumentFinder.find(em.Path.Text)) {
                     ret.push(new vscode.CodeLens(em.Method.Range, {
                         title: "📃 Api Document",
                         command: "mysql.elastic.document",

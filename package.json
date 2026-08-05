@@ -3911,7 +3911,7 @@
 		"lint": "vue-tsc --noEmit",
 		"typecheck:modern": "vue-tsc --noEmit -p tsconfig.modern.json",
 		"lint:modern": "eslint \"src/modern/**/*.{ts,vue}\" \"src/modern-webview/**/*.{ts,vue}\" \"vite.*.config.mts\"",
-		"test:modern": "tsx --test test/modern/database.test.ts test/modern/webview.test.ts test/modern/commands.test.ts test/modern/providers.test.ts",
+		"test:modern": "tsx --test test/modern/database.test.ts test/modern/remote.test.ts test/modern/webview.test.ts test/modern/commands.test.ts test/modern/providers.test.ts",
 		"build:modern:extension": "vite build --config vite.extension.config.mts",
 		"build:modern:webview": "vite build --config vite.webview.config.mts",
 		"build:modern": "npm run build:modern:extension && npm run build:modern:webview",
