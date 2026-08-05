@@ -314,6 +314,8 @@ export function summarizeTargetCommands(): TargetCommandRegistrationSummary {
     "mysql.connection.disable",
     "mysql.connection.delete",
     "mysql.connection.terminal",
+    "mysql.connection.startRdp",
+    "mysql.connection.copyKey",
     "mysql.connection.selectDb",
     "mysql.host.copy",
     "mysql.db.truncate",

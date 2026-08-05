@@ -29,6 +29,9 @@ test("standard dialect registry covers the target SQL families", () => {
   assert.equal(resolve("SqlServer")?.id, "sqlserver");
   assert.equal(resolve("SQLite")?.id, "sqlite");
   assert.equal(resolve("Oracle")?.id, "oracle");
+  assert.equal(resolve("AzureSQLServer")?.id, "sqlserver");
+  assert.equal(resolve("PostgreCompatible")?.id, "postgresql");
+  assert.equal(resolve("Doris")?.id, "clickhouse");
   assert.equal(resolve("MongoDB"), undefined);
 });
 

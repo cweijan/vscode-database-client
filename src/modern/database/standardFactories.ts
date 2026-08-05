@@ -141,13 +141,14 @@ function createPostgresConnector(type: DatabaseType): DriverConnector {
   };
 }
 
-const mysqlTypes: readonly DatabaseType[] = ["MySQL", "MariaDB"];
+const mysqlTypes: readonly DatabaseType[] = ["MySQL", "MariaDB", "MySQLCompatible"];
 const postgresTypes: readonly DatabaseType[] = [
   "PostgreSQL",
   "Redshift",
   "Kingbase",
   "GaussDB",
   "Cockroach",
+  "PostgreCompatible",
 ];
 
 export function createStandardConnectionFactories(): DriverConnectionFactory[] {

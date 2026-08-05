@@ -229,7 +229,7 @@ export class PostgresDialect extends InformationSchemaDialect {
   public readonly id = "postgresql";
 
   public constructor() {
-    super(["PostgreSQL", "Redshift", "Kingbase", "GaussDB", "Cockroach"]);
+    super(["PostgreSQL", "Redshift", "Kingbase", "GaussDB", "Cockroach", "PostgreCompatible"]);
   }
 
   public override showTables(schema?: string | null): string {
@@ -286,7 +286,7 @@ export class SqlServerDialect extends InformationSchemaDialect {
   public readonly id = "sqlserver";
 
   public constructor() {
-    super(["SqlServer", "MSSQL"]);
+    super(["SqlServer", "AzureSQLServer", "MSSQL"]);
   }
 
   public override quoteIdentifier(identifier: string): string {

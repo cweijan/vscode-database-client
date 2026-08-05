@@ -2,17 +2,17 @@ import { promises as fs } from "node:fs";
 import { spawn } from "node:child_process";
 import * as path from "node:path";
 
+import axios from "axios";
 import { DBSQLClient } from "@databricks/sql";
 import dmdb from "@database-client/dmdb";
 import initSqlJs, { type SqlJsDatabase } from "sql.js";
-import snowflake from "snowflake-sdk";
 
 import { OperationCancelledError } from "../core/errors";
 import {
   DriverConnectionFactory,
   type DriverConnector,
 } from "./driverConnectionFactory";
-import type { ConnectionOptions } from "./types";
+import type { ConnectionOptions, QueryField } from "./types";
 
 function option(options: ConnectionOptions, key: string): unknown {
   return options.options?.[key];
@@ -44,10 +44,14 @@ function active(signal: AbortSignal | undefined, operation: string): void {
   }
 }
 
-function resultFromRows(rows: Record<string, unknown>[], affectedRows?: number) {
+function resultFromRows(
+  rows: Record<string, unknown>[],
+  affectedRows?: number,
+  fields?: QueryField[],
+) {
   return {
     rows,
-    fields: Object.keys(rows[0] ?? {}).map((name) => ({ name })),
+    fields: fields ?? Object.keys(rows[0] ?? {}).map((name) => ({ name })),
     affectedRows,
   };
 }
@@ -56,6 +60,137 @@ function rowsFromSqlJs(result: { columns: string[]; values: unknown[][] }): Reco
   return result.values.map((values) => Object.fromEntries(
     result.columns.map((column, index) => [column, values[index]]),
   ));
+}
+
+function bearerToken(value: unknown): string | undefined {
+  if (typeof value !== "string" || !value) return undefined;
+  return value.startsWith("Bearer ") ? value : `Bearer ${value}`;
+}
+
+function libSqlConnector(): DriverConnector {
+  return {
+    type: "libSQL",
+    async connect(options, signal) {
+      active(signal, "Opening libSQL connection");
+      let endpoint = options.connectionUrl || String(option(options, "url") || "");
+      if (!endpoint) {
+        const configured = nestedOption(options, "httpAuth", "url");
+        endpoint = typeof configured === "string" ? configured : "";
+      }
+      endpoint = endpoint.replace(/^libsql:\/\//, "https://").replace(/\/$/, "");
+      if (!endpoint) throw new Error("libSQL connection URL is required");
+      const token = bearerToken(
+        option(options, "authToken") ||
+        nestedOption(options, "httpAuth", "basicToken") ||
+        options.password,
+      );
+      const client = axios.create({
+        baseURL: endpoint,
+        timeout: numberOption(options, "requestTimeout", 30_000),
+        headers: token ? { Authorization: token } : undefined,
+      });
+      const execute = async (sql: string, querySignal?: AbortSignal) => {
+        active(querySignal, "libSQL query");
+        const response = await client.post("/v2/pipeline", {
+          requests: [
+            { type: "execute", stmt: { sql } },
+            { type: "close" },
+          ],
+        }, { signal: querySignal });
+        const payload = response.data as { results?: Array<Record<string, unknown>> };
+        const first = payload.results?.[0];
+        if (!first || first.type !== "ok") {
+          throw new Error(String(first?.error || "libSQL pipeline request failed"));
+        }
+        const result = (first.response as { result?: Record<string, unknown> } | undefined)?.result || {};
+        const columns = Array.isArray(result.cols)
+          ? result.cols as QueryField[]
+          : [];
+        const rawRows = Array.isArray(result.rows) ? result.rows as unknown[][] : [];
+        const rows = rawRows.map((row) => Object.fromEntries(
+          columns.map((column, index) => {
+            const value = row[index];
+            return [column.name, value && typeof value === "object" && "value" in value
+              ? (value as { value: unknown }).value
+              : value];
+          }),
+        ));
+        const affected = (result as { affected_row_count?: number }).affected_row_count;
+        return resultFromRows(rows, affected, columns);
+      };
+      await execute("select 1", signal);
+      return {
+        async query(sql, queryOptions) {
+          return execute(sql, queryOptions?.signal);
+        },
+        async ping(querySignal) {
+          await execute("select 1", querySignal);
+        },
+        async close() {},
+      };
+    },
+  };
+}
+
+function d1Connector(): DriverConnector {
+  return {
+    type: "D1",
+    async connect(options, signal) {
+      active(signal, "Opening D1 connection");
+      const accountId = String(
+        nestedOption(options, "d1", "accountId") || option(options, "accountId") || "",
+      );
+      if (!accountId) throw new Error("D1 accountId is required");
+      const client = axios.create({
+        baseURL: `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database`,
+        timeout: numberOption(options, "requestTimeout", 30_000),
+        headers: {
+          "X-Auth-Email": String(nestedOption(options, "d1", "authEmail") || ""),
+          "X-Auth-Key": String(nestedOption(options, "d1", "authKey") || ""),
+        },
+      });
+      const listDatabases = async (querySignal?: AbortSignal) => {
+        active(querySignal, "D1 database list");
+        const response = await client.get("", { signal: querySignal });
+        const payload = response.data as { result?: Array<Record<string, unknown>>; success?: boolean; errors?: Array<{ message?: string }> };
+        if (payload.success === false) throw new Error(payload.errors?.[0]?.message || "D1 request failed");
+        return payload.result || [];
+      };
+      const databases = await listDatabases(signal);
+      const execute = async (sql: string, querySignal?: AbortSignal) => {
+        active(querySignal, "D1 query");
+        if (sql.trim().toLowerCase() === "list") {
+          return resultFromRows(databases);
+        }
+        const selected = databases.find((database) => database.name === options.database);
+        const databaseId = String(selected?.uuid || "");
+        if (!databaseId) throw new Error(`D1 database ${options.database || ""} was not found`);
+        const response = await client.post(`${databaseId}/query`, { sql }, { signal: querySignal });
+        const payload = response.data as {
+          success?: boolean;
+          result?: Array<{ results?: Record<string, unknown>[]; meta?: { changed_db?: boolean; changes?: number } }>;
+          errors?: Array<{ message?: string }>;
+        };
+        if (payload.success === false) throw new Error(payload.errors?.[0]?.message || "D1 query failed");
+        const rows: Record<string, unknown>[] = [];
+        let affectedRows: number | undefined;
+        for (const item of payload.result || []) {
+          rows.push(...(item.results || []));
+          if (item.meta?.changed_db) affectedRows = item.meta.changes;
+        }
+        return resultFromRows(rows, affectedRows);
+      };
+      return {
+        async query(sql, queryOptions) {
+          return execute(sql, queryOptions?.signal);
+        },
+        async ping(querySignal) {
+          await listDatabases(querySignal);
+        },
+        async close() {},
+      };
+    },
+  };
 }
 
 function duckDbConnector(): DriverConnector {
@@ -111,6 +246,28 @@ function duckDbConnector(): DriverConnector {
 function sqliteConnector(type: "SQLite" | "DuckDB" | "libSQL" | "D1"): DriverConnector {
   if (type === "DuckDB") {
     return duckDbConnector();
+  }
+  if (type === "libSQL") {
+    return {
+      type,
+      async connect(options, signal) {
+        if (options.connectionUrl || option(options, "url") || nestedOption(options, "httpAuth", "url")) {
+          return libSqlConnector().connect(options, signal);
+        }
+        return sqliteConnector("SQLite").connect(options, signal);
+      },
+    };
+  }
+  if (type === "D1") {
+    return {
+      type,
+      async connect(options, signal) {
+        if (nestedOption(options, "d1", "accountId") || option(options, "accountId")) {
+          return d1Connector().connect(options, signal);
+        }
+        return sqliteConnector("SQLite").connect(options, signal);
+      },
+    };
   }
   return {
     type,
@@ -207,6 +364,7 @@ function snowflakeConnector(): DriverConnector {
     type: "Snowflake",
     async connect(options, signal) {
       active(signal, "Opening Snowflake connection");
+      const { default: snowflake } = await import("snowflake-sdk");
       const connection = snowflake.createConnection(snowflakeConnectionOptions(options));
       await connection.connectAsync();
       const execute = (sql: string): Promise<Record<string, unknown>[]> => new Promise((resolve, reject) => {

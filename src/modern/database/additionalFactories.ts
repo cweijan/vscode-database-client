@@ -68,9 +68,9 @@ function connectSqlServer(config: ConnectionConfiguration): Promise<Connection> 
   });
 }
 
-function sqlServerConnector(): DriverConnector {
+function sqlServerConnector(type: "SqlServer" | "AzureSQLServer" = "SqlServer"): DriverConnector {
   return {
-    type: "SqlServer",
+    type,
     async connect(options, signal) {
       ensureActive(signal, "Opening SQL Server connection");
       const connection = await connectSqlServer(sqlServerConfig(options));
@@ -116,9 +116,9 @@ function sqlServerConnector(): DriverConnector {
   };
 }
 
-function clickHouseConnector(): DriverConnector {
+function clickHouseConnector(type: "ClickHouse" | "Doris" = "ClickHouse"): DriverConnector {
   return {
-    type: "ClickHouse",
+    type,
     async connect(options, signal) {
       ensureActive(signal, "Opening ClickHouse connection");
       const client = axios.create({
@@ -153,7 +153,9 @@ function clickHouseConnector(): DriverConnector {
 
 export function createAdditionalConnectionFactories(): DriverConnectionFactory[] {
   return [
-    new DriverConnectionFactory(sqlServerConnector()),
-    new DriverConnectionFactory(clickHouseConnector()),
+    new DriverConnectionFactory(sqlServerConnector("SqlServer")),
+    new DriverConnectionFactory(sqlServerConnector("AzureSQLServer")),
+    new DriverConnectionFactory(clickHouseConnector("ClickHouse")),
+    new DriverConnectionFactory(clickHouseConnector("Doris")),
   ];
 }
