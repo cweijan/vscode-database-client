@@ -7,6 +7,7 @@ import type { ExtensionServices } from "../core/extensionServices";
 import type { TypedWebviewHandler } from "../core/webviewHandler";
 import type { ConnectionOptions, QueryResult } from "../database/types";
 import type { RemoteEntry, SshConnectionOptions, SshSession } from "../remote/sshService";
+import type { SshForwardType } from "../remote/sshForwardingService";
 
 interface UtilityProtocolContext {
   readonly route: string;
@@ -46,8 +47,9 @@ interface MockModel {
 interface ForwardEntry {
   readonly id?: string | number | null;
   readonly name?: string;
-  readonly type?: string;
+  readonly type?: SshForwardType;
   readonly autoStartUp?: boolean;
+  readonly keepAlive?: boolean;
   readonly localHost?: string;
   readonly localPort?: number | string;
   readonly remoteHost?: string;
@@ -62,6 +64,10 @@ function record(value: unknown): Record<string, unknown> {
 
 function stringValue(value: unknown, fallback = ""): string {
   return value == null ? fallback : String(value);
+}
+
+function forwardType(value: unknown): SshForwardType {
+  return value === "Remote" || value === "Dynamic" ? value : "Local";
 }
 
 function parseRedisInfo(value: unknown): Record<string, string> {
@@ -1210,6 +1216,12 @@ function registerForwarding(context: UtilityProtocolContext): void {
   let selectedServer = stringValue(targetConnection(state)?.id, "");
   const forwardingKey = (serverKey: string): string => `ssh.forwardings.${serverKey || "default"}`;
   const readList = (serverKey: string): ForwardEntry[] => services.state.get<ForwardEntry[]>(forwardingKey(serverKey), []);
+  const forwardMap = (): Record<string, ForwardEntry[]> => Object.fromEntries(
+    services.state
+      .keys()
+      .filter((key) => key.startsWith("ssh.forwardings."))
+      .map((key) => [key.slice("ssh.forwardings.".length), readList(key.slice("ssh.forwardings.".length))]),
+  );
   const emit = async (): Promise<void> => {
     const connections = connectionRecords(services.state.get("ssh.connections", services.state.get("mysql.connections", {})))
       .filter((item) => item.type === "SSH" || item.type === "SFTP")
@@ -1218,25 +1230,35 @@ function registerForwarding(context: UtilityProtocolContext): void {
     await handler.send("serverList", connections);
     await handler.send("forwardList", readList(selectedServer).map((item) => ({
       ...item,
-      status: services.forwarding.isActive(item.id) ? "running" : "stopped",
+      type: forwardType(item.type),
+      keepAlive: item.keepAlive ?? true,
+      state: services.forwarding.isActive(item.id) ? 1 : 0,
     })));
     await handler.send("name", connections.find((item) => item.key === selectedServer)?.name || selectedServer);
   };
   const save = async (content: unknown): Promise<void> => {
     const payload = record(content);
-    const info = record(payload.info) as unknown as ForwardEntry;
+    const info = record(payload.info);
     const current = readList(stringValue(payload.serverKey, selectedServer));
-    const index = current.findIndex((item) => String(item.id ?? "") === String(info.id ?? ""));
+    const id = info.id as string | number | null | undefined;
+    const index = current.findIndex((item) => String(item.id ?? "") === String(id ?? ""));
     const next = [...current];
+    const type = forwardType(info.type);
+    const remoteHost = String(info.remoteHost || "").trim();
+    if (type !== "Dynamic" && !remoteHost) {
+      throw new Error("Remote host is required for local and remote forwarding");
+    }
     const normalized: ForwardEntry = {
       ...info,
-      id: info.id || `${Date.now()}`,
-      localHost: info.localHost || "127.0.0.1",
+      id: id || `${Date.now()}`,
+      name: stringValue(info.name),
+      type,
+      keepAlive: info.keepAlive !== false,
+      localHost: stringValue(info.localHost, "127.0.0.1"),
       localPort: Number(info.localPort),
-      remoteHost: String(info.remoteHost || "").trim(),
+      remoteHost,
       remotePort: Number(info.remotePort),
     };
-    if (!normalized.remoteHost) throw new Error("Remote host is required");
     if (index >= 0) next[index] = normalized;
     else next.push(normalized);
     await services.state.update(forwardingKey(stringValue(payload.serverKey, selectedServer)), next);
@@ -1250,19 +1272,30 @@ function registerForwarding(context: UtilityProtocolContext): void {
     selectedServer = stringValue(content, selectedServer);
     await emit();
   });
-  handler.on("add", save);
-  handler.on("save", save);
-  handler.on("patch", save);
+  const safeSave = async (content: unknown): Promise<void> => {
+    try {
+      await save(content);
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  };
+  handler.on("add", safeSave);
+  handler.on("save", safeSave);
+  handler.on("patch", safeSave);
   handler.on("remove", async (content) => {
-    const id = stringValue(record(content).id, stringValue(content));
-    await services.forwarding.stop(id);
-    const next = readList(selectedServer).filter((item) => String(item.id ?? "") !== id);
-    await services.state.update(forwardingKey(selectedServer), next);
-    await emit();
-  });
-  handler.on("start", async (content) => {
     try {
       const id = stringValue(record(content).id, stringValue(content));
+      await services.forwarding.stop(id);
+      const next = readList(selectedServer).filter((item) => String(item.id ?? "") !== id);
+      await services.state.update(forwardingKey(selectedServer), next);
+      await emit();
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("start", async (content) => {
+    const id = stringValue(record(content).id, stringValue(content));
+    try {
       const info = readList(selectedServer).find((item) => String(item.id ?? "") === id);
       const server = connectionRecords(services.state.get("ssh.connections", services.state.get("mysql.connections", {})))
         .find((item) => item.id === selectedServer);
@@ -1271,6 +1304,7 @@ function registerForwarding(context: UtilityProtocolContext): void {
       }
       await services.forwarding.start(server as SshConnectionOptions, {
         id,
+        type: forwardType(info.type),
         localHost: info.localHost,
         localPort: Number(info.localPort),
         remoteHost: String(info.remoteHost || ""),
@@ -1279,14 +1313,52 @@ function registerForwarding(context: UtilityProtocolContext): void {
       await handler.send("success", { action: "start", id });
       await emit();
     } catch (error) {
-      await sendError(handler, error);
+      await handler.send("error", { id, message: errorText(error) });
     }
   });
   handler.on("stop", async (content) => {
+    const id = stringValue(record(content).id, stringValue(content));
     try {
-      const id = stringValue(record(content).id, stringValue(content));
       await services.forwarding.stop(id);
       await handler.send("success", { action: "stop", id });
+      await emit();
+    } catch (error) {
+      await handler.send("error", { id, message: errorText(error) });
+    }
+  });
+  handler.on("exportConfig", async () => {
+    try {
+      const target = await vscode.window.showSaveDialog({
+        filters: { JSON: ["json"] },
+        saveLabel: "Export forwarding configuration",
+      });
+      if (!target) return;
+      await writeFile(target.fsPath, JSON.stringify(forwardMap(), null, 2), "utf8");
+      await handler.send("success", "Forwarding configuration exported.");
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("importConfig", async () => {
+    try {
+      const targets = await vscode.window.showOpenDialog({
+        canSelectMany: false,
+        filters: { JSON: ["json"] },
+        openLabel: "Import forwarding configuration",
+      });
+      const target = targets?.[0];
+      if (!target) return;
+      const parsed = JSON.parse(await readFile(target.fsPath, "utf8")) as unknown;
+      const imported = record(record(parsed).forward_map || parsed);
+      for (const [serverKey, value] of Object.entries(imported)) {
+        if (Array.isArray(value)) {
+          await services.state.update(forwardingKey(serverKey), value as ForwardEntry[]);
+        }
+      }
+      await handler.send("importResult", {
+        success: true,
+        message: "Forwarding configuration imported.",
+      });
       await emit();
     } catch (error) {
       await sendError(handler, error);

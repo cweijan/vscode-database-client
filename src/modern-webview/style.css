@@ -303,3 +303,85 @@ body {
   font-family: var(--vscode-editor-font-family, monospace);
   white-space: pre-wrap;
 }
+
+.forward-view__server-panel,
+.forward-view__editor,
+.forward-view__rules {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.forward-view__server-panel,
+.forward-view__editor {
+  padding: 0.75rem;
+  border: 1px solid var(--vscode-panel-border, #454545);
+  background: var(--vscode-sideBar-background, transparent);
+}
+
+.forward-view__section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.forward-view__section-title h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.forward-view__selected-row {
+  background: color-mix(in srgb, var(--vscode-list-activeSelectionBackground, #094771) 35%, transparent);
+}
+
+.forward-view__editor-options {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.forward-view__checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.forward-view__checkbox input,
+.forward-view__rules input[type="checkbox"] {
+  accent-color: var(--vscode-focusBorder, #007fd4);
+}
+
+.forward-view__state {
+  white-space: nowrap;
+}
+
+.forward-view__state--1 {
+  color: var(--vscode-testing-iconPassed, var(--vscode-terminal-ansiGreen, #89d185));
+}
+
+.forward-view__state--2 {
+  color: var(--vscode-editorWarning-foreground, var(--vscode-terminal-ansiYellow, #e2c08d));
+}
+
+.forward-view__state--0 {
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.forward-view__row-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.forward-view code {
+  font-family: var(--vscode-editor-font-family, ui-monospace, monospace);
+}
+
+@media (max-width: 760px) {
+  .forward-view__row-actions {
+    min-width: 11rem;
+  }
+}

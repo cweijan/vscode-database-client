@@ -5,11 +5,14 @@ import type { SshConnectionOptions, SshService, SshSession } from "./sshService"
 
 export interface SshForwardDefinition {
   readonly id: string | number;
+  readonly type?: SshForwardType;
   readonly localHost?: string;
   readonly localPort: number | string;
   readonly remoteHost: string;
   readonly remotePort: number | string;
 }
+
+export type SshForwardType = "Local" | "Remote" | "Dynamic";
 
 interface ActiveForward {
   readonly definition: SshForwardDefinition;
@@ -57,6 +60,10 @@ export class SshForwardingService implements Disposable {
   ): Promise<void> {
     const id = String(definition.id);
     if (this.forwards.has(id)) return;
+    const type = definition.type ?? "Local";
+    if (type !== "Local") {
+      throw new Error(`${type} SSH forwarding is not implemented by the active source adapter`);
+    }
     const localHost = host(definition.localHost, "127.0.0.1");
     const localPort = port(definition.localPort, "Local port");
     const remoteHost = definition.remoteHost.trim();

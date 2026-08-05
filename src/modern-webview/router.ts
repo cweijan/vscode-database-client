@@ -10,6 +10,7 @@ import ConsoleView from "./components/ConsoleView.vue";
 import DatabaseFileView from "./components/DatabaseFileView.vue";
 import DesignView from "./components/DesignView.vue";
 import ElasticsearchStatusView from "./components/ElasticsearchStatusView.vue";
+import ForwardView from "./components/ForwardView.vue";
 import ParquetView from "./components/ParquetView.vue";
 import RabbitQueueView from "./components/RabbitQueueView.vue";
 import RedisView from "./components/RedisView.vue";
@@ -63,7 +64,7 @@ export function createWebviewRouter() {
     surfaceRoute("/structDiff", "structDiff"),
     { path: "/keyView", name: "keyView", component: RedisView },
     { path: "/rabbitQueueView", name: "rabbitQueueView", component: RabbitQueueView },
-    surfaceRoute("/forward", "forward"),
+    { path: "/forward", name: "forward", component: ForwardView },
     surfaceRoute("/xterm", "xterm"),
     { path: "/sshTerminal", name: "sshTerminal", component: SshTerminalView },
     { path: "/fileManager", name: "fileManager", component: RemoteFileManagerView },

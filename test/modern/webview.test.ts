@@ -171,6 +171,7 @@ test("Webview route registry preserves target names and nested paths", () => {
   assert.equal(routePath("sqlite"), "/sqlite");
   assert.equal(routeFromPath("/keyView")?.name, "keyView");
   assert.equal(routeFromPath("/rabbitQueueView")?.name, "rabbitQueueView");
+  assert.equal(routeFromPath("/forward")?.name, "forward");
   assert.equal(routeFromPath("/fileManager")?.name, "fileManager");
   assert.equal(routeFromPath("/es-status")?.name, "esStatus");
   assert.equal(routePath("document"), "/center/document");

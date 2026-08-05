@@ -261,10 +261,12 @@
         "src/modern-webview/components/DatabaseFileView.vue",
         "src/modern-webview/components/DesignView.vue",
         "src/modern-webview/components/ParquetView.vue",
+        "src/modern-webview/components/ForwardView.vue",
         "src/modern-webview/components/RouteWorkbench.vue",
         "src/modern-webview/components/UiInput.vue",
         "src/modern-webview/components/UiSelect.vue",
         "src/modern/commands/webviewUtilityProtocols.ts",
+        "src/modern/remote/sshForwardingService.ts",
         "src/modern/providers/customEditors.ts",
         "src/modern/extension.ts"
       ],
@@ -273,7 +275,7 @@
         "npm run build:modern:webview",
         "npm run verify:modern:activation"
       ],
-      "coverage": "DDL design execution boundary, remote-file/SSH, Mock, RabbitMQ, live SSH forwarding, SSH status, metadata-backed structure-diff, database-file, and Parquet protocol boundaries",
+      "coverage": "DDL design execution boundary, remote-file/SSH, Mock, RabbitMQ, Local SSH forwarding, explicit Remote/Dynamic forwarding adapter boundary, SSH status, metadata-backed structure-diff, database-file, and Parquet protocol boundaries",
       "status": "implemented-foundation",
       "missingFiles": []
     },

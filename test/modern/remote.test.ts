@@ -81,3 +81,24 @@ test("SSH forwarding validates definitions and owns active listeners", async () 
   await forwarding.stop("active");
   assert.equal(forwarding.isActive("active"), false);
 });
+
+test("SSH forwarding does not silently downgrade unsupported forwarding types", async () => {
+  const fakeSsh = {
+    open: async () => ({
+      forwardOut: async () => new PassThrough(),
+    }),
+  } as unknown as SshService;
+  const forwarding = new SshForwardingService(fakeSsh);
+
+  await assert.rejects(
+    forwarding.start({ id: "ssh-forward", type: "SSH" }, {
+      id: "remote",
+      type: "Remote",
+      localPort: 5432,
+      remoteHost: "database",
+      remotePort: 5432,
+    }),
+    /Remote SSH forwarding is not implemented/,
+  );
+  assert.equal(forwarding.activeIds().length, 0);
+});
