@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { PassThrough } from "node:stream";
 
 import { OperationCancelledError } from "../../src/modern/core/errors";
-import { buildSshConnectConfig } from "../../src/modern/remote/sshService";
+import { buildSshConnectConfig, type SshService } from "../../src/modern/remote/sshService";
+import { SshForwardingService } from "../../src/modern/remote/sshForwardingService";
 
 test("SSH connection options map to the modern driver configuration", () => {
   const config = buildSshConnectConfig({
@@ -46,4 +48,36 @@ test("SSH connection configuration uses safe defaults and preserves cancellation
     },
     OperationCancelledError,
   );
+});
+
+test("SSH forwarding validates definitions and owns active listeners", async () => {
+  const fakeSsh = {
+    open: async () => ({
+      forwardOut: async () => new PassThrough(),
+    }),
+  } as unknown as SshService;
+  const forwarding = new SshForwardingService(fakeSsh);
+  const options = { id: "ssh-forward", type: "SSH" as const };
+
+  await assert.rejects(
+    forwarding.start(options, {
+      id: "invalid",
+      localPort: "not-a-port",
+      remoteHost: "database",
+      remotePort: 5432,
+    }),
+    /Local port/,
+  );
+
+  await forwarding.start(options, {
+    id: "active",
+    localHost: "127.0.0.1",
+    localPort: 0,
+    remoteHost: "database",
+    remotePort: 5432,
+  });
+  assert.equal(forwarding.isActive("active"), true);
+  assert.deepEqual(forwarding.activeIds(), ["active"]);
+  await forwarding.stop("active");
+  assert.equal(forwarding.isActive("active"), false);
 });

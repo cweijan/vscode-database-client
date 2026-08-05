@@ -333,6 +333,18 @@ onBeforeUnmount(() => {
       <template v-else-if="routeName === 'structDiff'">
         <UiButton
           type="button"
+          @click="sendPayload('loadDB', { key: input || (state.connection as Record<string, unknown> | undefined)?.id })"
+        >
+          Load source DB
+        </UiButton>
+        <UiButton
+          type="button"
+          @click="sendPayload('loadDB', { key: input || (state.connection as Record<string, unknown> | undefined)?.id, isTarget: true })"
+        >
+          Load target DB
+        </UiButton>
+        <UiButton
+          type="button"
           @click="sendPayload('getUser')"
         >
           Load user
@@ -345,7 +357,7 @@ onBeforeUnmount(() => {
         </UiButton>
         <UiButton
           type="button"
-          @click="sendPayload('sync', state.compareResult || [])"
+          @click="sendPayload('sync', { sqlList: Array.isArray(state.sqlList) ? state.sqlList : [], option: state.option || {} })"
         >
           Sync
         </UiButton>

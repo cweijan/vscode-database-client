@@ -75,6 +75,53 @@ function resultState<Row>(sql: string, result: QueryResult<Row>): Record<string,
   };
 }
 
+function asResultRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object"
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function resultFieldNames(
+  fields: unknown,
+  rows: readonly unknown[],
+): string[] {
+  const names = Array.isArray(fields)
+    ? fields
+      .map((field) => String(asResultRecord(field).name || asResultRecord(field).columnName || ""))
+      .filter(Boolean)
+    : [];
+  if (names.length > 0) return names;
+  const first = rows[0];
+  return first && typeof first === "object" ? Object.keys(first) : [];
+}
+
+function resultCellText(value: unknown): string {
+  if (value == null) return "";
+  return typeof value === "object" ? JSON.stringify(value) : String(value);
+}
+
+function csvCell(value: unknown): string {
+  const text = resultCellText(value);
+  return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+function serializeResult(
+  rows: readonly unknown[],
+  fields: unknown,
+  format: "json" | "csv",
+): string {
+  if (format === "json") return JSON.stringify(rows, null, 2);
+  const columns = resultFieldNames(fields, rows);
+  const lines = [
+    columns.map(csvCell).join(","),
+    ...rows.map((row) => {
+      const source = asResultRecord(row);
+      return columns.map((column) => csvCell(source[column])).join(",");
+    }),
+  ];
+  return lines.join("\n") + "\n";
+}
+
 export function createModernCommandHost(
   services: ExtensionServices,
 ): ModernCommandHost {
@@ -179,13 +226,15 @@ export function createModernCommandHost(
     title: string,
     sql: string,
     result: QueryResult<Row>,
+    connection?: ConnectionOptions,
   ): Promise<vscode.WebviewPanel> => {
     const state = {
       title,
       sql,
-      rows: result.rows,
+      rows: result.rows as unknown[],
       fields: result.fields,
       affectedRows: result.affectedRows,
+      dirty: false,
     };
     return openRoute(
       "SQL Result",
@@ -193,31 +242,125 @@ export function createModernCommandHost(
       "result",
       state,
       (handler) => {
+        const publishState = async (): Promise<void> => {
+          await handler.setWebviewState({ ...state });
+        };
         handler.on("copyResult", async (content) => {
-          const payload = content && typeof content === "object"
-            ? content as { columns?: unknown[]; rows?: unknown[] }
-            : {};
-          const columns = Array.isArray(payload.columns) ? payload.columns.map(String) : [];
-          const rows = Array.isArray(payload.rows) ? payload.rows : [];
+          const payload = asResultRecord(content);
+          const rows = Array.isArray(payload.rows) ? payload.rows : state.rows;
+          const columns = Array.isArray(payload.columns)
+            ? payload.columns.map(String)
+            : resultFieldNames(state.fields, rows);
           const text = rows.map((row) => {
-            const record = row && typeof row === "object" ? row as Record<string, unknown> : {};
+            const record = asResultRecord(row);
             return (columns.length > 0 ? columns : Object.keys(record))
-              .map((column) => String(record[column] ?? ""))
+              .map((column) => resultCellText(record[column]))
               .join("\t");
           }).join("\n");
           await vscode.env.clipboard.writeText(text);
         });
-        handler.on("exportResult", async (content) => {
-          const payload = content && typeof content === "object"
-            ? content as { columns?: unknown[]; rows?: unknown[] }
-            : {};
-          const rows = Array.isArray(payload.rows) ? payload.rows : [];
+        const exportResult = async (content: unknown): Promise<void> => {
+          const payload = asResultRecord(content);
+          const rows = Array.isArray(payload.rows) ? payload.rows : state.rows;
+          const fields = payload.fields || state.fields;
           const file = await vscode.window.showSaveDialog({
             saveLabel: "Export result",
             filters: { JSON: ["json"], CSV: ["csv"] },
           });
           if (!file) return;
-          await writeFile(file.fsPath, JSON.stringify(rows, null, 2), "utf8");
+          const format = file.fsPath.toLowerCase().endsWith(".csv") ? "csv" : "json";
+          await writeFile(file.fsPath, serializeResult(rows, fields, format), "utf8");
+        };
+        handler.on("exportResult", exportResult);
+        handler.on("export", async (content) => {
+          const payload = asResultRecord(content);
+          const rows = Array.isArray(payload.rows) ? payload.rows : state.rows;
+          const fields = payload.fields || state.fields;
+          if (payload.exportToEditor === true) {
+            await openText(serializeResult(rows, fields, "json"), "json");
+            await handler.send("export_done", { exportToEditor: true, success: true });
+            return;
+          }
+          await exportResult({ ...payload, rows, fields });
+          await handler.send("export_done", { exportToEditor: false, success: true });
+        });
+        handler.on("saveModify", async (content) => {
+          try {
+            const payload = asResultRecord(content);
+            const statements = Array.isArray(payload.sqlList)
+              ? payload.sqlList.map(String).filter(Boolean)
+              : payload.sql ? [String(payload.sql)] : [];
+            if (statements.length === 0) throw new Error("No update SQL was provided");
+            const selected = connection || services.activeConnection.get();
+            if (!selected) throw new Error("No active database connection");
+            let affectedRows = 0;
+            for (const statement of statements) {
+              const update = await services.connections.query(selected, statement);
+              affectedRows += update.affectedRows || 0;
+            }
+            state.affectedRows = affectedRows;
+            state.dirty = false;
+            await publishState();
+            await handler.send("updateSuccess", {
+              message: `Update completed; affected ${affectedRows} row(s).`,
+              affectedRows,
+            });
+            await handler.send("clearSaveState");
+          } catch (error) {
+            await handler.send("ERROR", {
+              sql: asResultRecord(content).sql,
+              message: error instanceof Error ? error.message : String(error),
+            });
+          }
+        });
+        handler.on("syncRow", async (content) => {
+          const payload = asResultRecord(content);
+          const index = Number(payload.index);
+          const field = String(payload.field || "");
+          if (payload.isNew === true && payload.newRow && typeof payload.newRow === "object") {
+            state.rows.push(payload.newRow);
+          } else if (Number.isInteger(index) && index >= 0 && index < state.rows.length && field) {
+            const row = asResultRecord(state.rows[index]);
+            row[field] = payload.value;
+            state.rows[index] = row;
+          }
+          state.dirty = true;
+          await publishState();
+        });
+        handler.on("dataModify", async () => {
+          state.dirty = true;
+          await publishState();
+        });
+        handler.on("clearSaveState", async () => {
+          state.dirty = false;
+          await publishState();
+        });
+        handler.on("viewJSON", async () => {
+          await openText(JSON.stringify(state.rows, null, 2), "json");
+        });
+        handler.on("editInVSCode", async (content) => {
+          const source = typeof content === "string" ? content : state.sql;
+          await openText(source || "", "sql");
+        });
+        handler.on("viewHistory", async () => {
+          await openRoute("SQL History", "history", "center/console", {
+            history: services.state.get("sql.history", []),
+          });
+        });
+        handler.on("exportFile", async (content) => {
+          const payload = asResultRecord(content);
+          const column = asResultRecord(payload.column);
+          const raw = payload.content;
+          const file = await vscode.window.showSaveDialog({
+            saveLabel: "Export cell",
+            filters: { File: ["*"] },
+            defaultUri: vscode.Uri.file(`${String(column.name || "value")}.txt`),
+          });
+          if (!file) return;
+          const bytes = payload.isBinary === true && typeof raw === "string"
+            ? Buffer.from(raw.replace(/^0x/i, ""), "hex")
+            : Buffer.from(resultCellText(raw), "utf8");
+          await writeFile(file.fsPath, bytes);
         });
       },
     );
@@ -317,7 +460,7 @@ export function createModernCommandHost(
       if (options.json) {
         return openText(JSON.stringify(result.rows, null, 2), "json");
       }
-      return openResult("SQL Result", source, result);
+      return openResult("SQL Result", source, result, connection);
     },
 
     async openQuery(target) {
@@ -350,7 +493,7 @@ export function createModernCommandHost(
       const dialect = services.dialects.resolve(connection.type);
       const sql = dialect.showVersion?.() || "SELECT 1 AS server_version;";
       const result = await services.connections.query(connection, sql);
-      return openResult(`${connection.name || connection.id} · server info`, sql, result);
+      return openResult(`${connection.name || connection.id} · server info`, sql, result, connection);
     },
 
     filterChildren(target) {
@@ -411,7 +554,7 @@ export function createModernCommandHost(
         ...last,
         rows: [{ statements: blocks.length, affectedRows: results.reduce((sum, item) => sum + (item.affectedRows || 0), 0) }],
         fields: [{ name: "statements" }, { name: "affectedRows" }],
-      });
+      }, connection);
     },
 
     async createMock(target) {
@@ -441,8 +584,9 @@ export function createModernCommandHost(
       if (!newName || newName === String(candidate?.label || "")) {
         return undefined;
       }
-      const result = await runTargetSql(target, `ALTER TABLE ${oldName} RENAME TO ${services.dialects.resolve((targetConnection(target) || services.activeConnection.get())?.type || "MySQL").quoteIdentifier(newName)};`);
-      return openResult(`Rename ${newName}`, "ALTER TABLE", result);
+      const connection = targetConnection(target) || services.activeConnection.get();
+      const result = await runTargetSql(target, `ALTER TABLE ${oldName} RENAME TO ${services.dialects.resolve(connection?.type || "MySQL").quoteIdentifier(newName)};`);
+      return openResult(`Rename ${newName}`, "ALTER TABLE", result, connection);
     },
 
     async fullTextSearch(target) {
@@ -452,8 +596,9 @@ export function createModernCommandHost(
       if (!term) {
         return undefined;
       }
+      const connection = targetConnection(target) || services.activeConnection.get();
       const result = await runTargetSql(target, `SELECT * FROM ${table} LIMIT 100;`);
-      return openResult(`Search ${term}`, `SELECT * FROM ${table}`, result);
+      return openResult(`Search ${term}`, `SELECT * FROM ${table}`, result, connection);
     },
 
     async userAction(operation, target) {

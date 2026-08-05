@@ -248,6 +248,7 @@ const modernSlices = [
       "src/modern/database/dockerFactory.ts",
       "src/modern/tree/databaseTreeProvider.ts",
       "src/modern/remote/sshService.ts",
+      "src/modern/remote/sshForwardingService.ts",
       "src/modern/remote/sshTreeProvider.ts",
       "src/modern/remote/dockerTree.ts",
       "src/modern/remote/resourceTreeProvider.ts",
@@ -320,7 +321,7 @@ const modernSlices = [
       "npm run test:modern",
       "npm run build:modern:webview",
     ],
-    coverage: "connection form persistence, console execution messages, result table state, copy/export entry points, and route wiring",
+    coverage: "connection form persistence, console execution messages, result table state, row synchronization, update execution, JSON/CSV export, copy/edit/history entry points, and route wiring",
   },
   {
     id: "4.4",
@@ -339,7 +340,7 @@ const modernSlices = [
       "npm run build:modern:webview",
       "npm run verify:modern:activation",
     ],
-    coverage: "DDL design execution boundary, remote-file/SSH, Mock, RabbitMQ, forwarding, SSH status, structure-diff, database-file, and Parquet protocol boundaries",
+    coverage: "DDL design execution boundary, remote-file/SSH, Mock, RabbitMQ, live SSH forwarding, SSH status, metadata-backed structure-diff, database-file, and Parquet protocol boundaries",
   },
 ];
 
