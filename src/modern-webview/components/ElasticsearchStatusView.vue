@@ -1,43 +1,40 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { computed, inject, onBeforeUnmount, onMounted, ref } from "vue";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
 import UiButton from "./UiButton.vue";
 
-interface ElasticsearchStatus {
-  readonly cluster_name?: unknown;
-  readonly status?: unknown;
-  readonly number_of_nodes?: unknown;
-  readonly number_of_data_nodes?: unknown;
-  readonly active_shards?: unknown;
-  readonly active_primary_shards?: unknown;
-  readonly relocating_shards?: unknown;
-  readonly initializing_shards?: unknown;
-  readonly unassigned_shards?: unknown;
+interface ElasticsearchNodeStatus {
+  readonly ip?: unknown;
+  readonly name?: unknown;
+  readonly isMain?: unknown;
+  readonly master?: unknown;
+  readonly heapPercent?: unknown;
+  readonly diskUsage?: unknown;
+  readonly cpuUsage?: unknown;
+  readonly load_5m?: unknown;
+  readonly "segments.count"?: unknown;
+  readonly "segments.memory"?: unknown;
   readonly [key: string]: unknown;
 }
 
 const bridge = inject(WEBVIEW_BRIDGE_KEY);
 const bootstrap = readWebviewBootstrap();
-const initial = bootstrap.state as ElasticsearchStatus;
-const status = reactive<ElasticsearchStatus>({ ...initial });
+const initial = bootstrap.state.esStatus;
+const nodes = ref<ElasticsearchNodeStatus[]>(Array.isArray(initial) ? initial as ElasticsearchNodeStatus[] : []);
 const message = ref("");
 let statusSubscription: BridgeDisposable | undefined;
 let errorSubscription: BridgeDisposable | undefined;
-
-function record(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? value as Record<string, unknown>
-    : {};
-}
 
 function text(value: unknown, fallback = "-"): string {
   return value == null ? fallback : String(value);
 }
 
 function applyStatus(content: unknown): void {
-  Object.assign(status, record(content));
+  nodes.value = Array.isArray(content)
+    ? content.filter((item): item is ElasticsearchNodeStatus => Boolean(item && typeof item === "object"))
+    : [];
   message.value = "";
 }
 
@@ -45,23 +42,21 @@ function emit(type: string): void {
   bridge?.emit(type);
 }
 
-const healthClass = computed(() => {
-  const value = text(status.status, "unknown").toLowerCase();
-  return `es-status--${value}`;
-});
-
 const rawStatus = computed(() => {
   try {
-    return JSON.stringify(status, null, 2);
+    return JSON.stringify(nodes.value, null, 2);
   } catch {
-    return String(status);
+    return String(nodes.value);
   }
 });
 
 onMounted(() => {
   statusSubscription = bridge?.on("esStatus", applyStatus);
   errorSubscription = bridge?.on("error", (content) => {
-    message.value = text(record(content).message || content, "Elasticsearch status request failed.");
+    const error = content && typeof content === "object" && !Array.isArray(content)
+      ? (content as Record<string, unknown>).message
+      : content;
+    message.value = text(error, "Elasticsearch status request failed.");
   });
   bridge?.init("esStatus");
 });
@@ -79,9 +74,9 @@ onBeforeUnmount(() => {
   >
     <header class="route-workspace__header">
       <div>
-        <h1>Elasticsearch cluster</h1>
+        <h1>Elasticsearch nodes</h1>
         <p class="route-workspace__subline">
-          {{ text(status.cluster_name, "Unnamed cluster") }}
+          {{ nodes.length }} node(s) reported by _cat/nodes
         </p>
       </div>
       <UiButton
@@ -92,25 +87,57 @@ onBeforeUnmount(() => {
       </UiButton>
     </header>
 
-    <div class="route-workbench__protocol-actions">
-      <span
-        class="status-banner"
-        :class="healthClass"
-      >
-        Health: {{ text(status.status, "unknown") }}
-      </span>
-      <span class="route-workspace__subline">
-        Nodes: {{ text(status.number_of_nodes) }} · Data nodes: {{ text(status.number_of_data_nodes) }} ·
-        Unassigned: {{ text(status.unassigned_shards) }}
-      </span>
-    </div>
-
     <p
       v-if="message"
       class="route-workspace__error"
     >
       {{ message }}
     </p>
-    <pre class="route-workbench__state">{{ rawStatus }}</pre>
+    <div
+      v-if="nodes.length > 0"
+      class="result-view__table-wrap"
+    >
+      <table class="result-view__table">
+        <thead>
+          <tr>
+            <th>IP</th>
+            <th>Name</th>
+            <th>Master</th>
+            <th>Heap</th>
+            <th>Disk</th>
+            <th>CPU</th>
+            <th>Load (5m)</th>
+            <th>Segments</th>
+            <th>Segment memory</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(node, index) in nodes"
+            :key="`${text(node.ip)}-${text(node.name)}-${index}`"
+          >
+            <td>{{ text(node.ip) }}</td>
+            <td>{{ text(node.name) }}</td>
+            <td>{{ node.isMain || node.master === "*" ? "Yes" : "No" }}</td>
+            <td>{{ text(node.heapPercent) }}</td>
+            <td>{{ text(node.diskUsage) }}</td>
+            <td>{{ text(node.cpuUsage) }}</td>
+            <td>{{ text(node.load_5m) }}</td>
+            <td>{{ text(node["segments.count"]) }}</td>
+            <td>{{ text(node["segments.memory"]) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p
+      v-else-if="!message"
+      class="route-workspace__empty"
+    >
+      No Elasticsearch node status returned.
+    </p>
+    <details>
+      <summary>Raw response</summary>
+      <pre class="route-workbench__state">{{ rawStatus }}</pre>
+    </details>
   </section>
 </template>

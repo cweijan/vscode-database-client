@@ -1,5 +1,5 @@
 import * as path from "node:path";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 
 import * as vscode from "vscode";
 
@@ -20,9 +20,10 @@ interface UtilityProtocolContext {
 interface FileManagerEntry {
   readonly name: string;
   readonly path: string;
-  readonly type: "file" | "directory";
+  readonly type: "file" | "directory" | "link" | "other";
   readonly size?: number | string;
   readonly modified?: unknown;
+  readonly owner?: unknown;
   readonly kind?: string;
 }
 
@@ -61,6 +62,20 @@ function record(value: unknown): Record<string, unknown> {
 
 function stringValue(value: unknown, fallback = ""): string {
   return value == null ? fallback : String(value);
+}
+
+function parseRedisInfo(value: unknown): Record<string, string> {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return Object.fromEntries(Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, stringValue(item)]));
+  }
+  return String(value ?? "")
+    .split(/\r?\n/)
+    .filter((line) => line && !line.startsWith("#") && line.includes(":"))
+    .map((line) => line.split(/:(.*)/s))
+    .reduce<Record<string, string>>((result, [key, item]) => {
+      if (key) result[key] = item ?? "";
+      return result;
+    }, {});
 }
 
 function asConnection(value: unknown): ConnectionOptions | undefined {
@@ -108,9 +123,12 @@ function fileEntryFromRow(row: Record<string, unknown>, parent: string): FileMan
   return {
     name,
     path: filePath.startsWith("/") ? filePath : `/${filePath}`,
-    type: kind === "directory" || kind === "dir" ? "directory" : "file",
+    type: kind === "directory" || kind === "dir"
+      ? "directory"
+      : kind === "link" ? "link" : kind === "other" ? "other" : "file",
     size: typeof row.size === "number" || typeof row.size === "string" ? row.size : undefined,
     modified: row.modified || row.lastmod,
+    owner: row.owner || row.uid || row.user,
     kind,
   };
 }
@@ -119,11 +137,33 @@ function fileEntryFromSsh(entry: RemoteEntry): FileManagerEntry {
   return {
     name: entry.name,
     path: entry.path,
-    type: entry.kind === "directory" ? "directory" : "file",
+    type: entry.kind,
     size: entry.size,
     modified: entry.modifiedAt?.toISOString(),
+    owner: entry.owner,
     kind: entry.kind,
   };
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, "'\\''")}'`;
+}
+
+function elasticSearchStatusRows(rows: Record<string, unknown>[]): Record<string, unknown>[] {
+  return rows.map((row) => {
+    const diskUsed = Number.parseFloat(stringValue(row["disk.used"], "0"));
+    const diskTotal = Number.parseFloat(stringValue(row["disk.total"], "0"));
+    const diskUsage = Number.isFinite(diskUsed) && Number.isFinite(diskTotal) && diskTotal > 0
+      ? `${Math.round((diskUsed / diskTotal) * 100)}%`
+      : "0%";
+    return {
+      ...row,
+      isMain: stringValue(row.master) === "*",
+      cpuUsage: `${stringValue(row.cpu, "0")}%`,
+      diskUsage,
+      heapPercent: `${stringValue(row["heap.percent"], "0")}%`,
+    };
+  });
 }
 
 function resourceConnectionType(connection: ConnectionOptions): boolean {
@@ -230,6 +270,14 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
     await list(currentPath);
   };
 
+  const safeRemoteMutation = async (operation: (selected: ConnectionOptions) => Promise<void>): Promise<void> => {
+    try {
+      await withRemoteMutation(operation);
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  };
+
   const readRemote = async (selected: ConnectionOptions, remotePath: string): Promise<Buffer> => {
     if (selected.type === "SSH" || selected.type === "SFTP") {
       const session = await services.ssh.open(selected as SshConnectionOptions);
@@ -249,6 +297,30 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
     await queryResource(`WRITE ${remotePath}\n${content.toString("base64")}`);
   };
 
+  const downloadDirectory = async (
+    selected: ConnectionOptions,
+    remotePath: string,
+    localPath: string,
+  ): Promise<void> => {
+    await mkdir(localPath, { recursive: true });
+    const entries: FileManagerEntry[] = selected.type === "SSH" || selected.type === "SFTP"
+      ? (await (await services.ssh.open(selected as SshConnectionOptions)).list(remotePath)).map(fileEntryFromSsh)
+      : rowsOf(await queryResource(`LIST ${remotePath}`)).map((row) => fileEntryFromRow(row, remotePath));
+    for (const remoteEntry of await entries) {
+      const name = stringValue(remoteEntry.name);
+      if (!name || name === "." || name === "..") continue;
+      const remoteChild = stringValue(remoteEntry.path, childRemotePath(remotePath, name));
+      const localChild = path.join(localPath, name);
+      if (remoteEntry.type === "directory") {
+        await downloadDirectory(selected, remoteChild, localChild);
+      } else if (selected.type === "SSH" || selected.type === "SFTP") {
+        await (await services.ssh.open(selected as SshConnectionOptions)).download(remoteChild, localChild);
+      } else {
+        await writeFile(localChild, await readRemote(selected, remoteChild));
+      }
+    }
+  };
+
   const onInit = async (): Promise<void> => {
     await emitConfig();
     await list(currentPath);
@@ -259,7 +331,7 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
   handler.on("init", onInit);
   handler.on("load", (content) => list(record(content).path));
   handler.on("refreshAdapter", onInit);
-  handler.on("createFolder", (content) => withRemoteMutation(async (selected) => {
+  handler.on("createFolder", (content) => safeRemoteMutation(async (selected) => {
     const item = record(content);
     const name = stringValue(item.name).trim();
     if (!name) return;
@@ -271,17 +343,23 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
       await queryResource(`MKDIR ${childRemotePath(parent, name)}`);
     }
   }));
-  handler.on("createFile", (content) => withRemoteMutation(async (selected) => {
+  handler.on("createFile", (content) => safeRemoteMutation(async (selected) => {
     const item = record(content);
     const name = stringValue(item.name).trim();
     if (!name) return;
     const parent = normalizedRemotePath(item.path, currentPath);
     await writeRemote(selected, childRemotePath(parent, name), Buffer.alloc(0));
   }));
-  handler.on("delete", (content) => withRemoteMutation(async (selected) => {
+  handler.on("delete", (content) => safeRemoteMutation(async (selected) => {
     const item = record(record(content).item);
     const remotePath = stringValue(item.path);
     if (!remotePath) return;
+    const confirmed = await vscode.window.showWarningMessage(
+      `Delete remote ${item.type === "directory" ? "directory" : "file"} ${remotePath}?`,
+      { modal: true },
+      "Delete",
+    );
+    if (confirmed !== "Delete") return;
     if (selected.type === "SSH" || selected.type === "SFTP") {
       const session = await services.ssh.open(selected as SshConnectionOptions);
       await session.remove(remotePath, item.type === "directory");
@@ -289,7 +367,7 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
       await queryResource(`DELETE ${remotePath}`);
     }
   }));
-  handler.on("rename", (content) => withRemoteMutation(async (selected) => {
+  handler.on("rename", (content) => safeRemoteMutation(async (selected) => {
     const payload = record(content);
     const item = record(payload.item);
     const remotePath = stringValue(item.path);
@@ -303,7 +381,7 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
       await queryResource(`RENAME ${remotePath}\n${newPath}`);
     }
   }));
-  handler.on("upload", (content) => withRemoteMutation(async (selected) => {
+  handler.on("upload", (content) => safeRemoteMutation(async (selected) => {
     const parent = normalizedRemotePath(record(content).path, currentPath);
     const files = await vscode.window.showOpenDialog({ canSelectFiles: true, canSelectFolders: false, canSelectMany: true });
     for (const file of files || []) {
@@ -320,21 +398,62 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
     try {
       const item = record(record(content).item);
       const remotePath = stringValue(item.path);
-      if (!remotePath || item.type === "directory") return;
-      const target = await vscode.window.showSaveDialog({
-        defaultUri: vscode.Uri.file(stringValue(item.name, path.posix.basename(remotePath))),
-        saveLabel: "Download",
-      });
-      if (!target) return;
+      const isDirectory = item.type === "directory" || item.kind === "directory";
+      if (!remotePath) return;
       const selected = connection();
       if (!selected) throw new Error("No remote connection selected");
-      if (selected.type === "SSH" || selected.type === "SFTP") {
-        const session = await services.ssh.open(selected as SshConnectionOptions);
-        await session.download(remotePath, target.fsPath);
+      if (isDirectory) {
+        const folders = await vscode.window.showOpenDialog({
+          canSelectFiles: false,
+          canSelectFolders: true,
+          canSelectMany: false,
+          openLabel: "Download here",
+        });
+        const folder = folders?.[0];
+        if (!folder) return;
+        await downloadDirectory(selected, remotePath, path.join(folder.fsPath, stringValue(item.name, "download")));
+        await handler.send("result", { action: "download-directory", path: remotePath, localPath: folder.fsPath });
       } else {
-        await writeFile(target.fsPath, await readRemote(selected, remotePath));
+        const target = await vscode.window.showSaveDialog({
+          defaultUri: vscode.Uri.file(stringValue(item.name, path.posix.basename(remotePath))),
+          saveLabel: "Download",
+        });
+        if (!target) return;
+        if (selected.type === "SSH" || selected.type === "SFTP") {
+          const session = await services.ssh.open(selected as SshConnectionOptions);
+          await session.download(remotePath, target.fsPath);
+        } else {
+          await writeFile(target.fsPath, await readRemote(selected, remotePath));
+        }
+        await handler.send("result", { action: "download", path: remotePath, localPath: target.fsPath });
       }
-      await handler.send("result", { action: "download", path: remotePath, localPath: target.fsPath });
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("openFolderTerminal", async (content) => {
+    try {
+      const selected = connection();
+      if (!selected || (selected.type !== "SSH" && selected.type !== "SFTP")) {
+        throw new Error("Folder terminal requires an SSH or SFTP connection");
+      }
+      const item = record(record(content).item);
+      const remotePath = normalizedRemotePath(item.path, currentPath);
+      await services.webviews.createWebviewPanel({
+        title: `${selected.name || selected.id} · ${remotePath}`,
+        type: "sshTerminal",
+        id: "sshTerminal",
+        route: "sshTerminal",
+        state: { connection: selected, path: remotePath },
+        eventHandler: (terminalHandler) => registerSshTerminal({
+          route: "sshTerminal",
+          target: { connection: selected, path: remotePath },
+          state: { connection: selected, path: remotePath },
+          webviewState: { route: "sshTerminal", connection: selected, path: remotePath },
+          services,
+          handler: terminalHandler,
+        }),
+      });
     } catch (error) {
       await sendError(handler, error);
     }
@@ -387,6 +506,13 @@ function registerSshTerminal(context: UtilityProtocolContext): void {
       channel = shell;
       shell.on("data", (value: Buffer | string) => { void output(value); });
       shell.stderr.on("data", (value: Buffer | string) => { void output(value); });
+      const initialPath = normalizedRemotePath(
+        state.path || record(state.target).path,
+        "/",
+      );
+      if (initialPath !== "/") {
+        shell.write(`cd ${shellQuote(initialPath)}\n`);
+      }
       shell.once("close", () => {
         channel = undefined;
         void handler.send("close");
@@ -761,6 +887,7 @@ function registerRedisKey(context: UtilityProtocolContext): void {
   const target = targetRecord(state);
   let key = stringValue(target.key || target.label || target.name, "key");
   let redisType = stringValue(target.type, "string");
+  let lastValue: unknown;
   const connection = (): ConnectionOptions | undefined => targetConnection(state) || services.activeConnection.get();
   const execute = async (command: string): Promise<Record<string, unknown>[]> => {
     const selected = connection();
@@ -775,7 +902,16 @@ function registerRedisKey(context: UtilityProtocolContext): void {
   };
   const loadStatus = async (): Promise<void> => {
     try {
-      await handler.send("status", await valueOf("INFO"));
+      const infoMap = parseRedisInfo(await valueOf("INFO"));
+      await handler.send("status", {
+        database: stringValue(target.database || target.db, "0"),
+        tags: [infoMap.redis_version ? `Redis ${infoMap.redis_version}` : "Redis"],
+        uptime: infoMap.uptime_in_seconds || "-",
+        connectedClients: infoMap.connected_clients || "0",
+        memoryUsage: infoMap.used_memory_human || infoMap.used_memory || "-",
+        infoMap,
+        infoList: Object.entries(infoMap).map(([key, value]) => ({ key, value })),
+      });
     } catch (error) {
       await sendError(handler, error);
     }
@@ -813,6 +949,10 @@ function registerRedisKey(context: UtilityProtocolContext): void {
           value = await valueOf(`GET ${JSON.stringify(key)}`);
           break;
       }
+      if (redisType === "ReJSON-RL" && typeof value === "string") {
+        try { value = JSON.parse(value); } catch { /* RedisJSON may contain a scalar string. */ }
+      }
+      lastValue = value;
       const ttl = await valueOf(`TTL ${JSON.stringify(key)}`);
       await handler.send("detail", {
         key,
@@ -892,6 +1032,108 @@ function registerRedisKey(context: UtilityProtocolContext): void {
       await load();
     } catch (error) { await sendError(handler, error); }
   };
+  const createKey = async (content: unknown): Promise<void> => {
+    try {
+      const payload = record(record(content).key || content);
+      const name = stringValue(payload.name || payload.key).trim();
+      const type = stringValue(payload.type, "string");
+      if (!name) throw new Error("Redis key name cannot be empty");
+      const contentValue = stringValue(payload.content, "value");
+      const args = (value: unknown): string => JSON.stringify(stringValue(value));
+      switch (type) {
+        case "hash": {
+          const items = Array.isArray(payload.hashItems) ? payload.hashItems : [];
+          const rows = items.length > 0 ? items : [{ field: "field", value: contentValue }];
+          for (const item of rows) {
+            const row = record(item);
+            await execute(`HSET ${JSON.stringify(name)} ${args(row.field || row.key || "field")} ${args(row.value ?? contentValue)}`);
+          }
+          break;
+        }
+        case "list": {
+          const values = Array.isArray(payload.listItems) ? payload.listItems : [{ value: contentValue }];
+          for (const item of values) await execute(`RPUSH ${JSON.stringify(name)} ${args(record(item).value ?? item)}`);
+          break;
+        }
+        case "set": {
+          const values = Array.isArray(payload.setItems) ? payload.setItems : [{ value: contentValue }];
+          for (const item of values) await execute(`SADD ${JSON.stringify(name)} ${args(record(item).value ?? item)}`);
+          break;
+        }
+        case "zset": {
+          const values = Array.isArray(payload.zsetItems) ? payload.zsetItems : [{ score: 0, value: contentValue }];
+          for (const item of values) {
+            const row = record(item);
+            await execute(`ZADD ${JSON.stringify(name)} ${Number(row.score) || 0} ${args(row.value ?? contentValue)}`);
+          }
+          break;
+        }
+        case "stream": {
+          const values = Array.isArray(payload.streamItems) ? payload.streamItems : [{ field: "field", value: contentValue }];
+          for (const item of values) {
+            const row = record(item);
+            await execute(`XADD ${JSON.stringify(name)} * ${args(row.field || "field")} ${args(row.value ?? contentValue)}`);
+          }
+          break;
+        }
+        case "ReJSON-RL": {
+          let value: unknown = payload.content ?? contentValue;
+          if (typeof value === "string") {
+            try { value = JSON.parse(value); } catch { /* Keep scalar JSON strings as-is. */ }
+          }
+          const serialized = JSON.stringify(value);
+          if (serialized === undefined) throw new Error("RedisJSON value is not serializable");
+          await execute(`JSON.SET ${JSON.stringify(name)} $ ${serialized}`);
+          break;
+        }
+        default:
+          await execute(`SET ${JSON.stringify(name)} ${args(payload.content ?? contentValue)}`);
+      }
+      const ttl = Number(payload.ttl);
+      if (Number.isFinite(ttl) && ttl >= 0) await execute(`EXPIRE ${JSON.stringify(name)} ${Math.trunc(ttl)}`);
+      key = name;
+      redisType = type;
+      await handler.send("success", `Redis key ${name} created.`);
+      await load();
+    } catch (error) { await sendError(handler, error); }
+  };
+  const deleteLine = async (content: unknown): Promise<void> => {
+    try {
+      const row = record(record(content).item || content);
+      switch (redisType) {
+        case "hash":
+          await execute(`HDEL ${JSON.stringify(key)} ${JSON.stringify(stringValue(row.key || row.field))}`);
+          break;
+        case "list":
+          await execute(`LREM ${JSON.stringify(key)} 1 ${JSON.stringify(stringValue(row.value))}`);
+          break;
+        case "set":
+          await execute(`SREM ${JSON.stringify(key)} ${JSON.stringify(stringValue(row.value))}`);
+          break;
+        case "zset":
+          await execute(`ZREM ${JSON.stringify(key)} ${JSON.stringify(stringValue(row.value))}`);
+          break;
+        case "stream":
+          await execute(`XDEL ${JSON.stringify(key)} ${JSON.stringify(stringValue(row.id || row.key))}`);
+          break;
+        default:
+          throw new Error(`Cannot delete an item from Redis type ${redisType}`);
+      }
+      await handler.send("success", "Redis item deleted.");
+      await load();
+    } catch (error) { await sendError(handler, error); }
+  };
+  const changePage = async (content: unknown): Promise<void> => {
+    const payload = record(content);
+    const pageNum = Math.max(1, Number(payload.pageNum || record(payload.page).pageNum) || 1);
+    const pageSize = Math.max(1, Number(payload.pageSize || record(payload.page).pageSize) || 100);
+    const values = Array.isArray(lastValue) ? lastValue : [];
+    await handler.send("pagination", {
+      page: { pageNum, pageSize },
+      value: values.slice((pageNum - 1) * pageSize, pageNum * pageSize),
+      count: values.length,
+    });
+  };
   handler.on("init", load);
   handler.on("refresh", load);
   handler.on("detail", load);
@@ -899,6 +1141,18 @@ function registerRedisKey(context: UtilityProtocolContext): void {
   handler.on("refreshStatus", loadStatus);
   handler.on("update", update);
   handler.on("saveItem", update);
+  handler.on("createKey", createKey);
+  handler.on("deleteLine", deleteLine);
+  handler.on("changePage", changePage);
+  handler.on("deleteConsumerGroup", async (content) => {
+    try {
+      const group = stringValue(record(content).name || record(content).group || content).trim();
+      if (!group) throw new Error("Redis consumer group name is required");
+      await execute(`XGROUP DESTROY ${JSON.stringify(key)} ${JSON.stringify(group)}`);
+      await handler.send("success", `Consumer group ${group} deleted.`);
+      await load();
+    } catch (error) { await sendError(handler, error); }
+  });
   handler.on("ttl", async (content) => {
     try {
       const seconds = Number(record(content).ttl ?? content);
@@ -932,8 +1186,18 @@ function registerElasticsearchStatus(context: UtilityProtocolContext): void {
     try {
       const selected = targetConnection(state) || services.activeConnection.get();
       if (!selected) throw new Error("No Elasticsearch connection selected");
-      const result = await services.connections.query<Record<string, unknown>>(selected, "GET /_cluster/health");
-      await handler.send("esStatus", rowsOf(result)[0] || {});
+      const result = await services.connections.query<Record<string, unknown>>(
+        selected,
+        "GET /_cat/nodes?v=true&h=ip,name,master,heap.percent,disk.used,disk.total,cpu,load_5m,segments.count,segments.memory&format=json",
+      );
+      const rows = rowsOf(result);
+      const nested = rows.length === 1 && Array.isArray(rows[0].value)
+        ? rows[0].value.filter(
+          (item): item is Record<string, unknown> =>
+            Boolean(item && typeof item === "object" && !Array.isArray(item)),
+        )
+        : rows;
+      await handler.send("esStatus", elasticSearchStatusRows(nested));
     } catch (error) { await sendError(handler, error); }
   };
   handler.on("esStatus", load);

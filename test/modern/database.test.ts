@@ -16,6 +16,7 @@ import {
   OracleSynonymNode,
 } from "../../src/modern/database/oracle/synonyms";
 import { normalizeDriverResult } from "../../src/modern/database/resultConverter";
+import { elasticSearchRows } from "../../src/modern/database/nosqlFactories";
 import { createStandardConnectionFactories } from "../../src/modern/database/standardFactories";
 import { SqlTableGroup } from "../../src/modern/database/sqlTree";
 import type {
@@ -175,6 +176,27 @@ test("driver results normalize rows, fields, and affected counts at the adapter 
   assert.deepEqual(mysqlResult.fields, [
     { name: "id", columnType: 3 },
   ]);
+});
+
+test("Elasticsearch adapter preserves array responses and search hit metadata", () => {
+  assert.deepEqual(
+    elasticSearchRows([
+      { ip: "127.0.0.1", master: "*" },
+      { ip: "127.0.0.2", master: "-" },
+    ]),
+    [
+      { ip: "127.0.0.1", master: "*" },
+      { ip: "127.0.0.2", master: "-" },
+    ],
+  );
+  assert.deepEqual(
+    elasticSearchRows({
+      hits: {
+        hits: [{ _id: "1", _index: "orders", _source: { status: "open" } }],
+      },
+    }),
+    [{ _id: "1", _index: "orders", status: "open" }],
+  );
 });
 
 class FakeConnection implements DatabaseConnection {

@@ -256,6 +256,41 @@ function neo4jConnector(): DriverConnector {
   };
 }
 
+export function elasticSearchRows(payload: unknown): Record<string, unknown>[] {
+  if (Array.isArray(payload)) {
+    return payload.filter(
+      (item): item is Record<string, unknown> =>
+        Boolean(item && typeof item === "object" && !Array.isArray(item)),
+    );
+  }
+  if (!payload || typeof payload !== "object") {
+    return [{ value: payload }];
+  }
+  const response = payload as Record<string, unknown>;
+  const hits = response.hits;
+  if (hits && typeof hits === "object" && !Array.isArray(hits)) {
+    const records = (hits as { hits?: unknown }).hits;
+    if (Array.isArray(records)) {
+      return records
+        .filter(
+          (item): item is Record<string, unknown> =>
+            Boolean(item && typeof item === "object" && !Array.isArray(item)),
+        )
+        .map((item) => {
+          const source = item._source;
+          return {
+            _id: item._id,
+            _index: item._index,
+            ...(source && typeof source === "object" && !Array.isArray(source)
+              ? source as Record<string, unknown>
+              : {}),
+          };
+        });
+    }
+  }
+  return [response];
+}
+
 function elasticSearchConnector(): DriverConnector {
   return {
     type: "ElasticSearch",
@@ -282,14 +317,7 @@ function elasticSearchConnector(): DriverConnector {
             url: url.startsWith("/") ? url : `/${url}`,
             data: requestData,
           });
-          const payload = request.data as Record<string, unknown>;
-          const hits = (payload.hits as { hits?: Array<Record<string, unknown>> } | undefined)?.hits;
-          const rows = hits?.map((hit) => ({
-            _id: hit._id,
-            _index: hit._index,
-            ...(hit._source as Record<string, unknown> | undefined),
-          })) ?? [payload];
-          return { rows, fields: [] };
+          return { rows: elasticSearchRows(request.data), fields: [] };
         },
         async ping(querySignal) {
           requireNotAborted(querySignal, "Elasticsearch ping");

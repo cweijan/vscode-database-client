@@ -16,6 +16,8 @@ import RedisView from "./components/RedisView.vue";
 import RemoteFileManagerView from "./components/RemoteFileManagerView.vue";
 import ResultView from "./components/ResultView.vue";
 import RouteWorkbench from "./components/RouteWorkbench.vue";
+import SshStatusView from "./components/SshStatusView.vue";
+import SshTerminalView from "./components/SshTerminalView.vue";
 import type { WebviewRouteName } from "./routeRegistry";
 export {
   normalizeRouteName,
@@ -63,9 +65,9 @@ export function createWebviewRouter() {
     { path: "/rabbitQueueView", name: "rabbitQueueView", component: RabbitQueueView },
     surfaceRoute("/forward", "forward"),
     surfaceRoute("/xterm", "xterm"),
-    surfaceRoute("/sshTerminal", "sshTerminal"),
+    { path: "/sshTerminal", name: "sshTerminal", component: SshTerminalView },
     { path: "/fileManager", name: "fileManager", component: RemoteFileManagerView },
-    surfaceRoute("/sshStatus", "sshStatus"),
+    { path: "/sshStatus", name: "sshStatus", component: SshStatusView },
     surfaceRoute("/sshMonitor", "sshMonitor"),
     {
       path: "/center",

@@ -25,6 +25,7 @@ export interface RemoteEntry {
   readonly kind: "file" | "directory" | "link" | "other";
   readonly size: number;
   readonly modifiedAt?: Date;
+  readonly owner?: string;
 }
 
 export interface SshSession {
@@ -158,6 +159,9 @@ function remoteList(
           kind: classifyRemoteEntry(entry.longname),
           size: entry.attrs.size,
           modifiedAt: entry.attrs.mtime ? new Date(entry.attrs.mtime * 1000) : undefined,
+          owner: entry.attrs.uid == null && entry.attrs.gid == null
+            ? undefined
+            : `${entry.attrs.uid ?? "?"}:${entry.attrs.gid ?? "?"}`,
         })),
       );
     });
@@ -215,12 +219,17 @@ function sftpMkdir(
   });
 }
 
-function sftpRemove(
+async function sftpRemove(
   sftp: SFTPWrapper,
   remotePath: string,
   directory: boolean,
 ): Promise<void> {
-  return new Promise((resolve, reject) => {
+  if (directory) {
+    for (const entry of await remoteList(sftp, remotePath)) {
+      await sftpRemove(sftp, entry.path, entry.kind === "directory");
+    }
+  }
+  await new Promise<void>((resolve, reject) => {
     const callback = (error: Error | null | undefined) => {
       if (error) reject(error);
       else resolve();

@@ -5,6 +5,7 @@ import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
 import UiButton from "./UiButton.vue";
 import UiInput from "./UiInput.vue";
+import UiSelect from "./UiSelect.vue";
 
 interface RedisDetail {
   key?: string;
@@ -38,6 +39,10 @@ const ttlText = ref(detail.ttl == null ? "-1" : String(detail.ttl));
 const renameText = ref(detail.key || "");
 const status = ref("");
 const redisStatus = ref<unknown>();
+const newKeyName = ref("");
+const newKeyType = ref("string");
+const newKeyValue = ref("");
+const newKeyTtl = ref("-1");
 let detailSubscription: BridgeDisposable | undefined;
 let paginationSubscription: BridgeDisposable | undefined;
 let statusSubscription: BridgeDisposable | undefined;
@@ -151,6 +156,24 @@ function remove(): void {
   emit("del");
 }
 
+function createKey(): void {
+  const name = newKeyName.value.trim();
+  if (!name) {
+    status.value = "A new Redis key name is required.";
+    return;
+  }
+  emit("createKey", {
+    key: {
+      name,
+      type: newKeyType.value,
+      content: newKeyValue.value,
+      ttl: Number(newKeyTtl.value),
+    },
+  });
+  newKeyName.value = "";
+  newKeyValue.value = "";
+}
+
 const statusText = computed(() => {
   if (typeof redisStatus.value === "string") return redisStatus.value;
   const value = record(redisStatus.value);
@@ -158,6 +181,11 @@ const statusText = computed(() => {
   return entries.length > 0
     ? entries.map(([name, item]) => `${name}: ${text(item)}`).join(" · ")
     : "";
+});
+
+const statusRows = computed(() => {
+  const value = record(redisStatus.value);
+  return Array.isArray(value.infoList) ? value.infoList : [];
 });
 
 onMounted(() => {
@@ -237,6 +265,41 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
+    <details>
+      <summary>Create a new key</summary>
+      <div class="connection-view__grid">
+        <UiInput
+          v-model="newKeyName"
+          label="New key"
+          placeholder="redis:key"
+        />
+        <UiSelect
+          v-model="newKeyType"
+          label="Type"
+          :options="['string', 'hash', 'list', 'set', 'zset', 'stream', 'ReJSON-RL']"
+        />
+        <UiInput
+          v-model="newKeyTtl"
+          label="TTL (seconds)"
+          type="number"
+        />
+        <label class="vsc-field vsc-field--wide">
+          <span class="vsc-field__label">Initial value</span>
+          <textarea
+            v-model="newKeyValue"
+            class="console-view__editor"
+            placeholder="Value or JSON"
+          />
+        </label>
+        <UiButton
+          type="button"
+          @click="createKey"
+        >
+          Create key
+        </UiButton>
+      </div>
+    </details>
+
     <label class="vsc-field vsc-field--wide">
       <span class="vsc-field__label">Value</span>
       <textarea
@@ -294,5 +357,24 @@ onBeforeUnmount(() => {
         </tbody>
       </table>
     </div>
+    <details v-if="statusRows.length > 0">
+      <summary>Redis status</summary>
+      <div class="result-view__table-wrap">
+        <table class="result-view__table">
+          <thead>
+            <tr><th>Metric</th><th>Value</th></tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="item in statusRows"
+              :key="text(record(item).key)"
+            >
+              <td>{{ text(record(item).key) }}</td>
+              <td>{{ text(record(item).value) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
   </section>
 </template>

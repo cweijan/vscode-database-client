@@ -5,6 +5,7 @@ import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
 import UiButton from "./UiButton.vue";
 import UiInput from "./UiInput.vue";
+import UiSelect from "./UiSelect.vue";
 
 interface RemoteEntry {
   readonly name: string;
@@ -12,6 +13,8 @@ interface RemoteEntry {
   readonly type: string;
   readonly size?: unknown;
   readonly modified?: unknown;
+  readonly owner?: unknown;
+  readonly linkTarget?: unknown;
   readonly kind?: string;
 }
 
@@ -33,6 +36,8 @@ const selected = ref<RemoteEntry>();
 const newName = ref("");
 const loading = ref(false);
 const status = ref("");
+const sortBy = ref("name");
+const sortDescending = ref(false);
 let configSubscription: BridgeDisposable | undefined;
 let fileListSubscription: BridgeDisposable | undefined;
 let loadingSubscription: BridgeDisposable | undefined;
@@ -58,9 +63,15 @@ function normalizeEntry(value: unknown): RemoteEntry | undefined {
   return {
     name,
     path,
-    type: type === "directory" || type === "dir" ? "directory" : "file",
+    type: type === "directory" || type === "dir"
+      ? "directory"
+      : type === "link"
+        ? "link"
+        : type === "other" ? "other" : "file",
     size: item.size,
     modified: item.modified || item.mtime,
+    owner: item.owner,
+    linkTarget: item.linkTarget || item.target,
     kind: text(item.kind || item.type),
   };
 }
@@ -127,6 +138,49 @@ function remove(): void {
 }
 
 const canMutate = computed(() => Boolean(config.value && !config.value.sftpDisabled));
+const sortedFiles = computed(() => {
+  const values = [...files.value];
+  values.sort((left, right) => {
+    if (sortBy.value === "size") {
+      return Number(left.size || 0) - Number(right.size || 0);
+    }
+    if (sortBy.value === "modified") {
+      return String(left.modified || "").localeCompare(String(right.modified || ""));
+    }
+    if (sortBy.value === "type") {
+      return left.type.localeCompare(right.type) || left.name.localeCompare(right.name);
+    }
+    return left.name.localeCompare(right.name);
+  });
+  if (sortDescending.value) values.reverse();
+  return values;
+});
+const breadcrumbs = computed(() => {
+  const root = config.value.rootPath || "/";
+  const relative = currentPath.value.replace(/^\/+/, "").split("/").filter(Boolean);
+  const items = [{ name: root === "/" ? "/" : root, path: root }];
+  let pathValue = root === "/" ? "" : root.replace(/^\/+|\/+$/g, "");
+  for (const name of relative) {
+    pathValue = `${pathValue}/${name}`;
+    items.push({ name, path: `/${pathValue.replace(/^\/+/, "")}` });
+  }
+  return items;
+});
+
+function displayModified(value: unknown): string {
+  if (!value) return "-";
+  const date = new Date(String(value));
+  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+}
+
+function copy(value: string): void {
+  void navigator.clipboard?.writeText(value);
+  status.value = "Copied.";
+}
+
+function openFolderTerminal(entry: RemoteEntry): void {
+  emit("openFolderTerminal", { item: entry });
+}
 
 onMounted(() => {
   configSubscription = bridge?.on("config", applyConfig);
@@ -181,11 +235,43 @@ onBeforeUnmount(() => {
       </div>
     </header>
 
+    <nav
+      class="route-workspace__breadcrumbs"
+      aria-label="Remote path"
+    >
+      <button
+        v-for="breadcrumb in breadcrumbs"
+        :key="breadcrumb.path"
+        class="route-workspace__breadcrumb"
+        type="button"
+        @click="load(breadcrumb.path)"
+      >
+        {{ breadcrumb.name }}
+      </button>
+    </nav>
+
     <div class="route-workbench__toolbar">
       <UiInput
         v-model="currentPath"
         label="Path"
       />
+      <UiSelect
+        v-model="sortBy"
+        label="Sort by"
+        :options="[
+          { value: 'name', label: 'Name' },
+          { value: 'type', label: 'Type' },
+          { value: 'size', label: 'Size' },
+          { value: 'modified', label: 'Modified' },
+        ]"
+      />
+      <UiButton
+        type="button"
+        variant="default"
+        @click="sortDescending = !sortDescending"
+      >
+        {{ sortDescending ? "Ascending" : "Descending" }}
+      </UiButton>
       <UiButton
         type="button"
         @click="load()"
@@ -239,7 +325,7 @@ onBeforeUnmount(() => {
         </UiButton>
         <UiButton
           type="button"
-          :disabled="!selected || selected.type === 'directory'"
+          :disabled="!selected"
           @click="emit('download', { item: selected })"
         >
           Download
@@ -274,12 +360,33 @@ onBeforeUnmount(() => {
             <th>Type</th>
             <th>Size</th>
             <th>Modified</th>
+            <th>Owner</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="entry in files"
+            v-if="currentPath !== '/'"
+            class="remote-file-manager-view__parent"
+            @dblclick="load(parentPath())"
+          >
+            <td>..</td>
+            <td>directory</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>
+              <UiButton
+                type="button"
+                variant="default"
+                @click="load(parentPath())"
+              >
+                Open
+              </UiButton>
+            </td>
+          </tr>
+          <tr
+            v-for="entry in sortedFiles"
             :key="entry.path"
             :data-selected="selected?.path === entry.path"
             @click="selectEntry(entry)"
@@ -288,7 +395,8 @@ onBeforeUnmount(() => {
             <td>{{ entry.name }}</td>
             <td>{{ entry.type }}</td>
             <td>{{ entry.size ?? "-" }}</td>
-            <td>{{ entry.modified ?? "-" }}</td>
+            <td>{{ displayModified(entry.modified) }}</td>
+            <td>{{ text(entry.owner, "-") }}</td>
             <td>
               <UiButton
                 type="button"
@@ -296,6 +404,21 @@ onBeforeUnmount(() => {
                 @click.stop="openEntry(entry)"
               >
                 Open
+              </UiButton>
+              <UiButton
+                v-if="entry.type === 'directory'"
+                type="button"
+                variant="default"
+                @click.stop="openFolderTerminal(entry)"
+              >
+                Terminal
+              </UiButton>
+              <UiButton
+                type="button"
+                variant="default"
+                @click.stop="copy(entry.path)"
+              >
+                Copy path
               </UiButton>
             </td>
           </tr>

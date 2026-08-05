@@ -281,6 +281,9 @@
         "src/modern-webview/components/RabbitQueueView.vue",
         "src/modern-webview/components/ElasticsearchStatusView.vue",
         "src/modern-webview/components/RemoteFileManagerView.vue",
+        "src/modern-webview/components/SshStatusView.vue",
+        "src/modern-webview/components/SshTerminalView.vue",
+        "src/modern-webview/style.css",
         "src/modern-webview/router.ts",
         "src/modern/commands/webviewUtilityProtocols.ts",
         "src/modern/database/nosqlFactories.ts",
@@ -292,7 +295,7 @@
         "npm run build:modern:webview",
         "npm run verify:modern:activation"
       ],
-      "coverage": "readable Redis key, RabbitMQ queue, Elasticsearch status, and remote file manager pages with typed host message protocols",
+      "coverage": "readable Redis key, RabbitMQ queue, Elasticsearch node status, remote file manager, SSH status, and SSH terminal pages with typed host message protocols",
       "status": "implemented-foundation",
       "missingFiles": []
     }
@@ -507,7 +510,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/common/constants.ts",
-      "legacySha256": "a6e6c7b745380d786caa690860d5ad45e29766e555214ff335b7cda4d67c6ff9"
+      "legacySha256": "b9bb56174e50582e48464ff1f78b91de960af1c5872ba4398f26b4bf090c4a1b"
     },
     {
       "sourcePath": "src/common/convert/main/binaryConvert.ts",
@@ -1419,7 +1422,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/database/schemaNode.ts",
-      "legacySha256": "688f746f062d086946bf22318db8d717eb58c6811b0cd5111f9f70388017f2f9"
+      "legacySha256": "008d9746292f170852982eb7ff33e5ec54473f34ceec36fcfac04709025cc67d"
     },
     {
       "sourcePath": "src/model/database/table/columnGroup.ts",
@@ -1509,7 +1512,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/interface/node.ts",
-      "legacySha256": "e2e817a9964735499c4eabf91f253fed1c40ada58308bef9faa71e18bee783e1"
+      "legacySha256": "3768a6d95e34a36262afbe0e68459ebc6bea13f54d9f070b245c28952046c345"
     },
     {
       "sourcePath": "src/model/interface/nodeFieldType.ts",
@@ -1687,7 +1690,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/function.ts",
-      "legacySha256": "543c1dd9df650be28378a867ea7811e1f3e02cfaf24bc591333986d9a6730ef4"
+      "legacySha256": "1dc677765b01c50443adf10b39d813d05028a8cfee657060a56c376b9d60998f"
     },
     {
       "sourcePath": "src/model/main/functionGroup.ts",
@@ -1856,7 +1859,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/procedure.ts",
-      "legacySha256": "4588908c1b9104c6a7a7e1bd957dd9015b5b319c0bff71ab4ae17bdef75cd438"
+      "legacySha256": "4ecc72153764026ba032a0e86ecd9d314e48a486c7158ca00de133c0d69a68b2"
     },
     {
       "sourcePath": "src/model/main/procedureGroup.ts",
@@ -1906,7 +1909,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/tableNode.ts",
-      "legacySha256": "d6a13b5db734ca068663a23916e0797c755459cb1c00888b0edc2c4b02f2dc03"
+      "legacySha256": "0286e166d7356acb2d3e12ad294d5aa124841868e81c47aceba458b1ba276a4d"
     },
     {
       "sourcePath": "src/model/main/trigger.ts",
@@ -1919,7 +1922,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/trigger.ts",
-      "legacySha256": "034bfe1b903bec0daaa139cf8e274f750a34c541f5a9ea0b28bc56458e90ebc8"
+      "legacySha256": "bf3813e84d3bea3a0505babbd373b9111c46134c3ec8806d9f1d2a3b7bb476bf"
     },
     {
       "sourcePath": "src/model/main/triggerGroup.ts",
@@ -1958,7 +1961,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/main/viewNode.ts",
-      "legacySha256": "971938bf930bd16a4e30a77ad640cb8383ca70a127b3d2ac14ecbc8d3978d721"
+      "legacySha256": "f589d0197e3b7dac7e4d05ee7cd193a2f02602921848c9ce6bfe95247947ce00"
     },
     {
       "sourcePath": "src/model/mq/kafka/consumer/kafkaConsumerGroupGroupNode.ts",
@@ -2290,7 +2293,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/nodeUtil.ts",
-      "legacySha256": "22f8f2dab33bb5c528517cdd09f0c20edd4b443bc5881a877a21d4d6b5c05423"
+      "legacySha256": "12bc028632343e3f88929803d5a6642daef39f335b285c585697923247166473"
     },
     {
       "sourcePath": "src/model/nosql-file/docker/dockerBaseNode.ts",
@@ -3513,7 +3516,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/model/other/infoNode.ts",
-      "legacySha256": "37839f6ee0df1ff22f8f4e94e5bcdbe5181e660485b2ac44188549a4ba2dc769"
+      "legacySha256": "25c1a3dcc352e48816a21daa6e637bf4c71da3282a811883d7de04f92dd6a1d7"
     },
     {
       "sourcePath": "src/model/other/query/queryGroup.ts",
@@ -3660,7 +3663,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/provider/complete/chain/baseChain.ts",
-      "legacySha256": "f938da7c3fb604e32c7e5f854e5071d899bb7a92320afe7efdec7a83d650986d"
+      "legacySha256": "4216305bab96eef05883a4c7cc0e59ba3fabfc336157144eddfeae595c932343"
     },
     {
       "sourcePath": "src/provider/complete/chain/built-in/functionChain.ts",
@@ -3695,7 +3698,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/provider/complete/chain/columnChain.ts",
-      "legacySha256": "713fa943c19718b6282063e420aac5e2288f95346a9439243882004d5a207c71"
+      "legacySha256": "30079d3d7bad09c00fae2c6d9f9519fd447d478284887c11b5d035c51ea4dbad"
     },
     {
       "sourcePath": "src/provider/complete/chain/crudChain.ts",
@@ -3719,7 +3722,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/provider/complete/chain/ddlChain.ts",
-      "legacySha256": "bfea39957f5f3f03654a9fc4f526ab15917ebd2384156c8ab21430f1102107db"
+      "legacySha256": "b496397c37af154fc374705dafb4c6cd6cefd42b51b4d706918f349096cefa12"
     },
     {
       "sourcePath": "src/provider/complete/chain/dialect/completionTransfer.ts",
@@ -4514,7 +4517,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/provider/sqlFormattingProvider.ts",
-      "legacySha256": "99ec026cbea26953cc3818e13c0ea5cd0c9520984a3c46a70ebefe4b6d36fe03"
+      "legacySha256": "08bf7008a6ed5f495a139129640e8120a5fb0dd4baabfa963a43460e6a585fae"
     },
     {
       "sourcePath": "src/provider/sqlSymbolProvide.ts",
@@ -4540,7 +4543,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/provider/treeDataProvider.ts",
-      "legacySha256": "2d7282cdebd11f18be7bdd34e928f3a140fe58dd82c2757ee2f581b14be8fdd8"
+      "legacySha256": "72aedd5de1965f1fb076bbc44c7674fba264c142a0b9620500c87c85c9f8d59b"
     },
     {
       "sourcePath": "src/provider/treeViewDragController.ts",
@@ -4575,7 +4578,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/service/common/databaseCache.ts",
-      "legacySha256": "c1e2ab3458fe931bc6cf7a6126870bcd25fa936af073b2dd70ca6b9776c388bb"
+      "legacySha256": "6e4f4ac3cc32dd2d1fd621075f33c5894cb18d0b263801495d523646c4134400"
     },
     {
       "sourcePath": "src/service/common/delimiterHolder.ts",
@@ -4601,7 +4604,7 @@
       "legacySourcePresent": true,
       "recoveryAction": "review-existing-source-and-modernize-in-place",
       "legacyPath": "src/service/common/historyRecorder.ts",
-      "legacySha256": "9eb4366870ba6d6236e9ba65f13efe2e61f99b18cd171dde3be1cde3677cf5bf"
+      "legacySha256": "26c8946cbb4ce02ba9789238cac8616e255523fe426e63713722f2a6e82f2d80"
     },
     {
       "sourcePath": "src/service/common/node-exceljs/buildExcel.ts",

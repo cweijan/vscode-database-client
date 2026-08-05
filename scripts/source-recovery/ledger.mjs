@@ -352,6 +352,9 @@ const modernSlices = [
       "src/modern-webview/components/RabbitQueueView.vue",
       "src/modern-webview/components/ElasticsearchStatusView.vue",
       "src/modern-webview/components/RemoteFileManagerView.vue",
+      "src/modern-webview/components/SshStatusView.vue",
+      "src/modern-webview/components/SshTerminalView.vue",
+      "src/modern-webview/style.css",
       "src/modern-webview/router.ts",
       "src/modern/commands/webviewUtilityProtocols.ts",
       "src/modern/database/nosqlFactories.ts",
@@ -363,7 +366,7 @@ const modernSlices = [
       "npm run build:modern:webview",
       "npm run verify:modern:activation",
     ],
-    coverage: "readable Redis key, RabbitMQ queue, Elasticsearch status, and remote file manager pages with typed host message protocols",
+    coverage: "readable Redis key, RabbitMQ queue, Elasticsearch node status, remote file manager, SSH status, and SSH terminal pages with typed host message protocols",
   },
 ];
 

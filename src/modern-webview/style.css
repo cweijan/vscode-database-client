@@ -253,3 +253,53 @@ body {
   font-family: var(--vscode-editor-font-family, monospace);
   white-space: pre-wrap;
 }
+
+.route-workspace__breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.route-workspace__breadcrumb {
+  border: 0;
+  padding: 0.15rem 0.35rem;
+  color: var(--vscode-textLink-foreground, #3794ff);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.route-workspace__breadcrumb:hover {
+  text-decoration: underline;
+}
+
+.ssh-status-view__grid article {
+  min-width: 0;
+}
+
+.ssh-status-view__grid h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.ssh-status-view__grid pre {
+  margin: 0;
+  max-height: 18rem;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.ssh-terminal-view__output {
+  min-height: 20rem;
+  max-height: 55vh;
+  overflow: auto;
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--vscode-panel-border, #454545);
+  color: var(--vscode-terminal-foreground, #cccccc);
+  background: var(--vscode-terminal-background, #1e1e1e);
+  font-family: var(--vscode-editor-font-family, monospace);
+  white-space: pre-wrap;
+}
