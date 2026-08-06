@@ -11,6 +11,7 @@ import {
 } from "../../src/modern/core/errors";
 import { ConnectionManager } from "../../src/modern/database/connectionManager";
 import { loadErDiagram } from "../../src/modern/database/erDiagramService";
+import { normalizeMockModel } from "../../src/modern/database/mockModel";
 import { OracleDialect } from "../../src/modern/database/oracle/oracleDialect";
 import {
   OracleSynonymGroup,
@@ -238,6 +239,34 @@ test("ER diagram service uses per-table foreign-key metadata for SQLite", async 
   assert.deepEqual(data.nodes.map((node) => node.name), ["child", "parent"]);
   assert.equal(data.edges[0].fromColumns, "parent_id");
   assert.equal(data.edges[0].targetColumns, "id");
+});
+
+test("Mock model normalization keeps the protocol payload bounded and typed", () => {
+  const model = normalizeMockModel({
+    table: "orders",
+    mockCount: 99_999,
+    mockStartIndex: "0",
+    mockValueReference: "https://mockjs.com/examples.html#DPD",
+    mock: {
+      id: { type: "bigint", value: "$mockIndex", nullable: false },
+      amount: { type: "decimal", value: "@float(0,100)", nullable: true },
+      ignored: "not-an-object",
+    },
+  });
+
+  assert.ok(model);
+  assert.equal(model.mockCount, 10_000);
+  assert.equal(model.mockStartIndex, 0);
+  assert.deepEqual(model.mock.id, {
+    type: "bigint",
+    value: "$mockIndex",
+    nullable: false,
+  });
+  assert.deepEqual(model.mock.ignored, {
+    type: "varchar",
+    value: "",
+  });
+  assert.equal(normalizeMockModel({ mock: {} }), undefined);
 });
 
 test("driver results normalize rows, fields, and affected counts at the adapter boundary", () => {

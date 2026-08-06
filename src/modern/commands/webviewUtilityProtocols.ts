@@ -12,6 +12,10 @@ import type {
   QueryResult,
 } from "../database/types";
 import { loadErDiagram, type ErDiagramData } from "../database/erDiagramService";
+import {
+  normalizeMockModel,
+  type MockModel,
+} from "../database/mockModel";
 import type { RemoteEntry, SshConnectionOptions, SshSession } from "../remote/sshService";
 import type { SshForwardType } from "../remote/sshForwardingService";
 import { fetchSshMonitorSnapshot } from "../remote/sshMonitorService";
@@ -42,14 +46,6 @@ interface MockColumn {
   readonly value: string;
   readonly nullable: boolean;
   readonly isIndex?: boolean;
-}
-
-interface MockModel {
-  readonly table: string;
-  readonly mockCount: number;
-  readonly mockStartIndex: number | string;
-  readonly mockValueReference?: string;
-  readonly mock: Record<string, { type: string; value: string; nullable?: boolean }>;
 }
 
 interface ForwardEntry {
@@ -576,8 +572,9 @@ function registerSshTerminal(context: UtilityProtocolContext): void {
       const payload = record(content);
       const rows = Math.max(1, Number(payload.rows) || 24);
       const cols = Math.max(1, Number(payload.cols) || 80);
-      const candidate = channel as unknown as { setWindow?: (rows: number, cols: number, height: number, width: number) => void } | undefined;
-      candidate?.setWindow?.(rows, cols, 0, 0);
+      if (channel && "setWindow" in channel && typeof channel.setWindow === "function") {
+        channel.setWindow(String(rows), String(cols), "0", "0");
+      }
     } catch (error) { await sendError(handler, error); }
   });
   const closeChannel = (): void => {
@@ -676,7 +673,7 @@ async function buildMockModel(
     table,
     mockCount: 10,
     mockStartIndex: columns.some((column) => column.isIndex) ? "auto" : 1,
-    mockValueReference: "https://mockjs.com/examples.html",
+    mockValueReference: "http://mockjs.com/examples.html#DPD",
     mock: Object.fromEntries(columns.map((column) => [
       column.name,
       { type: column.type, value: column.value, nullable: column.nullable },
@@ -684,8 +681,8 @@ async function buildMockModel(
   };
   if (reset) return defaults;
   const saved = services.state.get<Record<string, unknown>>("mysql.mock.models", {});
-  const cached = record(saved[mockKey(state)]);
-  return cached.table ? { ...defaults, ...cached, mock: record(cached.mock) as MockModel["mock"] } : defaults;
+  const cached = normalizeMockModel(saved[mockKey(state)]);
+  return cached?.table === table ? cached : defaults;
 }
 
 async function saveMockModel(
@@ -752,9 +749,9 @@ function registerMock(context: UtilityProtocolContext): void {
   handler.onInit("mock", () => load(false));
   handler.on("saveMock", async (content) => {
     try {
-      const model = record(content) as unknown as MockModel;
+      const model = normalizeMockModel(content);
+      if (!model) throw new Error("Invalid Mock model");
       await saveMockModel(state, services, model);
-      await handler.send("mockMeta", model);
     } catch (error) {
       await sendError(handler, error);
     }
@@ -762,7 +759,8 @@ function registerMock(context: UtilityProtocolContext): void {
   handler.on("resetMock", () => load(true));
   handler.on("runMock", async (content) => {
     try {
-      const model = record(content) as unknown as MockModel;
+      const model = normalizeMockModel(content);
+      if (!model) throw new Error("Invalid Mock model");
       await saveMockModel(state, services, model);
       const affectedRows = await runMockModel(state, services, model);
       await handler.send("mock_done", {

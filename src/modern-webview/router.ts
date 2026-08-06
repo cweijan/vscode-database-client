@@ -64,7 +64,11 @@ export function createWebviewRouter() {
           name: "erDiagram",
           component: () => import("./components/ErDiagramView.vue"),
         },
-        surfaceRoute("mock", "mock"),
+        {
+          path: "mock",
+          name: "mock",
+          component: () => import("./components/MockView.vue"),
+        },
       ],
     },
     { path: "/structDiff", name: "structDiff", component: StructureDiffView },

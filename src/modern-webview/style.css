@@ -254,6 +254,89 @@ body {
   white-space: pre-wrap;
 }
 
+.mock-view__header-row,
+.mock-view__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mock-view__table-icon {
+  color: var(--vscode-textLink-foreground, #3794ff);
+}
+
+.mock-view__notice,
+.mock-view__reference {
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.mock-view__reference {
+  color: var(--vscode-textLink-foreground, #3794ff);
+}
+
+.mock-view__config {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.mock-view__table-wrap {
+  overflow: auto;
+  border: 1px solid var(--vscode-panel-border, #454545);
+}
+
+.mock-view__table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.mock-view__table th,
+.mock-view__table td {
+  padding: 0.35rem 0.6rem;
+  border-right: 1px solid var(--vscode-panel-border, #454545);
+  border-bottom: 1px solid var(--vscode-panel-border, #454545);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.mock-view__table th {
+  position: sticky;
+  top: 0;
+  color: var(--vscode-editor-foreground, #cccccc);
+  background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+}
+
+.mock-view__checkbox-cell {
+  width: 3rem;
+  text-align: center !important;
+}
+
+.mock-view__nullable-cell {
+  text-align: center !important;
+}
+
+.mock-view__value-input {
+  width: min(38rem, 100%);
+  min-width: 14rem;
+}
+
+.mock-view__empty {
+  padding: 1.5rem !important;
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+  text-align: center !important;
+}
+
+.mock-view__status--error {
+  color: var(--vscode-errorForeground, #f48771);
+}
+
+.mock-view__status--success {
+  color: var(--vscode-testing-iconPassed, #73c991);
+}
+
 .route-workspace__breadcrumbs {
   display: flex;
   flex-wrap: wrap;

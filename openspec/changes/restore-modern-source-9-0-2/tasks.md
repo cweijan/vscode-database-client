@@ -7,6 +7,7 @@
 - 本检查点已完成：`SshMonitorView.vue` 已替代 `sshMonitor` 路由的通用工作台，接通服务器选择、`ssh_monitor_keys` 持久化、指标轮询、单行更新、状态/终端跳转和移除监控协议；Linux/macOS/Windows 指标采集位于独立的强类型服务。
 - 本检查点已完成：`XtermView.vue` 已替代 `xterm` 路由的通用工作台，接通 xterm.js、终端配置、逐字符输入、resize、远程链接和文件编辑协议；终端依赖通过懒加载拆分，SSH/SFTP shell 可用，其他连接类型保持显式边界。
 - 本检查点已完成：`ErDiagramView.vue` 已替代 `erDiagram` 路由的通用工作台，接通结果页入口、跨方言外键元数据、关系邻居展开、SVG/JSON 导出和刷新协议；目标页使用轻量 SVG/CSS 图层，未引入旧版压缩图形组件。
+- 本检查点已完成：`MockView.vue` 已替代 `mock` 路由的通用工作台，接通模型初始化、列启用/禁用、MockJS 值编辑、保存/重置/生成协议；host payload 经过边界归一化，不再把 Webview 任意输入直接断言为模型。
 - 下一切片：继续审计命令注册剩余能力，并补齐目标中仍由通用工作台承载的页面。
 - 每个切片完成后必须更新源码 ledger、补充协议测试并运行现代类型检查、lint、测试、构建、激活 smoke、源码契约和打包验证。
 

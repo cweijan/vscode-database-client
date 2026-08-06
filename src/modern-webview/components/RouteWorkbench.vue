@@ -31,7 +31,6 @@ const title = computed(() => {
     manager: "Connection Manager",
     esStatus: "Elasticsearch Status",
     erDiagram: "ER Diagram",
-    mock: "Data Mock",
     structDiff: "Structure Diff",
     keyView: "Key-Value Viewer",
     rabbitQueueView: "RabbitMQ Queue",
@@ -68,9 +67,6 @@ function parseInput(): unknown {
 
 function initializeProtocol(): void {
   switch (props.routeName) {
-    case "mock":
-      bridge?.init("mock");
-      return;
     case "fileManager":
       bridge?.init("fileManager");
       return;
@@ -240,26 +236,6 @@ onBeforeUnmount(() => {
           @click="sendPayload('revert')"
         >
           Revert file
-        </UiButton>
-      </template>
-      <template v-else-if="routeName === 'mock'">
-        <UiButton
-          type="button"
-          @click="sendPayload('saveMock', state.mockMeta || parseInput())"
-        >
-          Save model
-        </UiButton>
-        <UiButton
-          type="button"
-          @click="sendPayload('resetMock')"
-        >
-          Reset model
-        </UiButton>
-        <UiButton
-          type="button"
-          @click="sendPayload('runMock', state.mockMeta || parseInput())"
-        >
-          Run mock
         </UiButton>
       </template>
       <template v-else-if="routeName === 'rabbitQueueView'">
