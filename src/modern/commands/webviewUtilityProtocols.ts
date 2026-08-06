@@ -40,6 +40,34 @@ interface FileManagerEntry {
   readonly kind?: string;
 }
 
+function normalizedDocumentationHost(value: unknown): string {
+  return stringValue(value).trim().replace(/\/+$/, "");
+}
+
+function registerDocument(context: UtilityProtocolContext): void {
+  const emitResourceHost = async (): Promise<void> => {
+    const stateHost = context.webviewState.resourceHost ?? context.state.resourceHost;
+    const host = normalizedDocumentationHost(
+      typeof stateHost === "string"
+        ? stateHost
+        : context.services.config.get("documentationHost"),
+    );
+    if (!host) {
+      await context.handler.send("error", {
+        message: "Documentation host is not configured.",
+      });
+      return;
+    }
+    await context.handler.send("resourceHost", {
+      host,
+      language: vscode.env.language || "en",
+    });
+  };
+
+  context.handler.on("resourceHost", emitResourceHost);
+  context.handler.onInit("document", emitResourceHost);
+}
+
 interface MockColumn {
   readonly name: string;
   readonly type: string;
@@ -2177,6 +2205,7 @@ export async function openErDiagramPanel(
 }
 
 export function registerWebviewUtilityProtocols(context: UtilityProtocolContext): void {
+  if (context.route === "document") registerDocument(context);
   if (context.route === "fileManager" || context.route === "sshTerminal") {
     registerRemoteFileManager(context);
   }

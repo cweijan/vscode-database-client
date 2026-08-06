@@ -89,7 +89,11 @@ export function createWebviewRouter() {
       name: "center",
       component: RouteLayout,
       children: [
-        surfaceRoute("document", "document"),
+        {
+          path: "document",
+          name: "document",
+          component: () => import("./components/DocumentView.vue"),
+        },
         surfaceRoute("plan", "plan"),
         { path: "console", name: "console", component: ConsoleView },
         surfaceRoute("util", "util"),

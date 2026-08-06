@@ -12,6 +12,7 @@ import {
   routePath,
   WEBVIEW_ROUTES,
 } from "../../src/modern-webview/routeRegistry";
+import { buildDocumentationUrl } from "../../src/modern-webview/document";
 import { WebviewStateStore } from "../../src/modern-webview/state";
 
 class FakeMessageTarget {
@@ -201,6 +202,18 @@ test("Webview route registry preserves target names and nested paths", () => {
   assert.equal(routeFromPath("/es-status")?.name, "esStatus");
   assert.equal(routePath("document"), "/center/document");
   assert.equal(routeFromPath("/center/document")?.name, "document");
+});
+
+test("documentation route preserves target language and theme URL semantics", () => {
+  assert.equal(
+    buildDocumentationUrl("https://database-client.com/", "en", "dark"),
+    "https://database-client.com/docs/?theme=dark",
+  );
+  assert.equal(
+    buildDocumentationUrl("http://127.0.0.1:8828/", "zh-CN", "light"),
+    "http://127.0.0.1:8828/docs/#/zh/?theme=light",
+  );
+  assert.equal(buildDocumentationUrl("", "en", "dark"), "");
 });
 
 test("Webview bootstrap reads host config and tolerates a development placeholder", () => {

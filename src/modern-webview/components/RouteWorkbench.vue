@@ -40,7 +40,6 @@ const title = computed(() => {
     fileManager: "File Manager",
     sshStatus: "SSH Status",
     sshMonitor: "SSH Monitor",
-    document: "Document",
     plan: "Plan",
     util: "Utilities",
     image: "Image",

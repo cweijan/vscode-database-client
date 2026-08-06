@@ -5,6 +5,7 @@ export interface DatabaseClientSettings {
   requestTimeout: number;
   connectTimeout: number;
   escapedAllObjectName: boolean;
+  documentationHost: string;
 }
 
 const defaults: DatabaseClientSettings = {
@@ -12,6 +13,7 @@ const defaults: DatabaseClientSettings = {
   requestTimeout: 30_000,
   connectTimeout: 30_000,
   escapedAllObjectName: false,
+  documentationHost: "https://database-client.com",
 };
 
 export class ConfigService {
@@ -29,6 +31,7 @@ export class ConfigService {
       requestTimeout: this.get("requestTimeout"),
       connectTimeout: this.get("connectTimeout"),
       escapedAllObjectName: this.get("escapedAllObjectName"),
+      documentationHost: this.get("documentationHost"),
     };
   }
 }

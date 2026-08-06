@@ -31,6 +31,7 @@ export function renderWebviewHtml(
     "style-src " +
     options.cspSource +
     " 'unsafe-inline'; " +
+    "frame-src http: https:; " +
     "script-src 'nonce-" +
     options.nonce +
     "';\">";

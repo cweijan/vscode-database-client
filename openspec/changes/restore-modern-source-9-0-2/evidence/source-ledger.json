@@ -317,6 +317,28 @@
       "coverage": "readable Redis key, RabbitMQ queue, Elasticsearch node status, remote file manager, SSH status, SSH monitor, SSH terminal, and xterm pages with typed host message protocols",
       "status": "implemented-foundation",
       "missingFiles": []
+    },
+    {
+      "id": "4.6",
+      "name": "target-cloud-and-document-pages",
+      "sourceFiles": [
+        "src/modern-webview/components/DocumentView.vue",
+        "src/modern-webview/document.ts",
+        "src/modern-webview/router.ts",
+        "src/modern-webview/style.css",
+        "src/modern/commands/webviewUtilityProtocols.ts",
+        "src/modern/core/config.ts",
+        "src/modern/core/webviewHtml.ts",
+        "test/modern/webview.test.ts"
+      ],
+      "validation": [
+        "npm run typecheck:modern",
+        "npm run test:modern",
+        "npm run build:modern:webview"
+      ],
+      "coverage": "target document iframe, resourceHost handshake, language/theme URL mapping, configurable documentation host, and frame CSP boundary",
+      "status": "implemented-foundation",
+      "missingFiles": []
     }
   ],
   "productModules": [
