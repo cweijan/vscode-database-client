@@ -180,82 +180,63 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div
-    v-if="showSqlPanel"
-    id="tableTab"
-    class="table-tab-shell"
-    data-route="main"
-  >
+  <div v-show="showSqlPanel">
     <ul
+      id="tableTab"
       class="tab"
-      role="tablist"
     >
       <li
-        v-for="item in tabItems"
-        :key="item.id"
-        class="tab__item"
-        :class="{
-          'tab__item--active': currentTab === item.id,
-          disabled: item.disabled,
-        }"
-        :aria-disabled="item.disabled"
-        :aria-selected="currentTab === item.id"
-        role="tab"
-        tabindex="0"
+        v-for="(item, index) in tabItems"
+        :key="index"
+        :class="[
+          'tab__item',
+          {
+            'tab__item--active': currentTab === item.id,
+            disabled: item.disabled,
+          },
+        ]"
         @click="void selectTab(item)"
-        @keydown.enter="void selectTab(item)"
-        @keydown.space.prevent="void selectTab(item)"
       >
         <i
-          class="tab__icon"
+          v-if="item.icon"
+          type="icon"
           :class="item.icon"
-          aria-hidden="true"
+          style="position: relative; top: 3px"
         />
-        {{ item.label }}
+        {{ " " + item.label }}
       </li>
-      <li
-        class="panel-icon"
-        :title="translator.t('table.viewAsJSON', 'View as JSON')"
-        role="button"
-        tabindex="0"
-        @click="viewAsJson"
-        @keydown.enter="viewAsJson"
-      >
-        <i class="codicon codicon-json text-yellow" aria-hidden="true" />
-      </li>
-      <li
-        class="panel-icon"
-        :title="translator.t('table.history', 'History')"
-        role="button"
-        tabindex="0"
-        @click="viewHistory"
-        @keydown.enter="viewHistory"
-      >
-        <i class="codicon codicon-history" aria-hidden="true" />
-      </li>
+      <VscTooltip :title="translator.t('table.viewAsJSON', 'View as JSON')">
+        <div
+          class="panel-icon"
+          @click="viewAsJson"
+        >
+          <i class="codicon-json text-yellow" />
+        </div>
+      </VscTooltip>
+      <VscTooltip :title="translator.t('table.history', 'History')">
+        <div
+          class="panel-icon"
+          @click="viewHistory"
+        >
+          <i class="codicon-history" />
+        </div>
+      </VscTooltip>
       <template v-if="database">
-        <li
-          class="panel-icon info db-info-clickable"
-          :class="{ loading: loadingSchema }"
-          role="button"
-          tabindex="0"
+        <div
+          :class="['panel-icon info ml-1 db-info-clickable', { loading: loadingSchema }]"
           @click="void pickDatabaseSchema()"
-          @keydown.enter="void pickDatabaseSchema()"
         >
-          <i class="codicon codicon-database blue" aria-hidden="true" />
+          <i class="codicon-database blue mr-0.5 text-sm" />
           {{ database }}
-        </li>
-        <li
+        </div>
+        <div
           v-if="schema"
-          class="panel-icon info db-info-clickable"
-          role="button"
-          tabindex="0"
+          :class="['panel-icon info db-info-clickable', { loading: loadingSchema }]"
           @click="void pickDatabaseSchema()"
-          @keydown.enter="void pickDatabaseSchema()"
         >
-          <i class="codicon codicon-symbol-structure yellow" aria-hidden="true" />
+          <i class="codicon-symbol-structure yellow mr-0.5" />
           {{ schema }}
-        </li>
+        </div>
       </template>
     </ul>
   </div>
