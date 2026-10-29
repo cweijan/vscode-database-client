@@ -30,21 +30,10 @@ const viewportHeight = ref(
   typeof window === "undefined" ? 0 : Math.max(0, window.innerHeight - 30),
 );
 let statusSubscription: BridgeDisposable | undefined;
+let refreshSubscription: BridgeDisposable | undefined;
 let errorSubscription: BridgeDisposable | undefined;
 
-const columns = [
-  { key: "ip", labelKey: "esStatus.ip", fallback: "IP", className: "ip" },
-  { key: "name", labelKey: "esStatus.name", fallback: "Name", className: "name" },
-  { key: "master", labelKey: "esStatus.master", fallback: "Master", className: "master" },
-  { key: "heap", labelKey: "esStatus.heapUsage", fallback: "Heap usage", className: "metric" },
-  { key: "diskUsage", labelKey: "esStatus.diskUsage", fallback: "Disk usage", className: "metric" },
-  { key: "cpu", labelKey: "esStatus.cpuUsage", fallback: "CPU usage", className: "metric" },
-  { key: "load", labelKey: "esStatus.load5m", fallback: "Load (5m)", className: "load" },
-  { key: "segmentsCount", labelKey: "esStatus.segmentsCount", fallback: "Segments", className: "segments" },
-  { key: "segmentsSize", labelKey: "esStatus.segmentsSize", fallback: "Segment memory", className: "segments" },
-  { key: "diskUsed", labelKey: "esStatus.diskUsed", fallback: "Disk used", className: "disk" },
-  { key: "diskTotal", labelKey: "esStatus.diskTotal", fallback: "Disk total", className: "disk" },
-] as const;
+const progressMetrics = ["heapPercent", "diskUsage", "cpuUsage"] as const;
 
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -107,6 +96,7 @@ nodes.value = valueFromInitial();
 
 onMounted(() => {
   statusSubscription = bridge?.on("esStatus", applyStatus);
+  refreshSubscription = bridge?.on("refresh_es_status", () => bridge?.emit("esStatus"));
   errorSubscription = bridge?.on("error", (content) => {
     message.value = text(record(content).message || content, "Elasticsearch status request failed.");
   });
@@ -117,6 +107,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   statusSubscription?.dispose();
+  refreshSubscription?.dispose();
   errorSubscription?.dispose();
   window.removeEventListener("resize", updateViewportHeight);
 });
@@ -126,88 +117,85 @@ onBeforeUnmount(() => {
   <div
     class="es-status"
     :style="{ height: `${viewportHeight}px` }"
-    data-route="esStatus"
   >
     <div class="es-status__toolbar">
       <div class="es-status__title">
-        <i class="codicon codicon-server es-status__icon" aria-hidden="true" />
+        <i class="codicon codicon-server es-status__icon" />
         <span>{{ translator.t("esStatus.node", "Node") }}</span>
-        <button
-          class="vsc-button vsc-button--icon"
-          type="button"
+        <VscTooltip
           :title="translator.t('common.refresh', 'Refresh')"
-          @click="emit('esStatus')"
+          placement="bottom"
         >
-          <i class="codicon codicon-refresh" aria-hidden="true" />
-        </button>
+          <VscButton
+            size="micro"
+            icon="codicon-refresh"
+            @click="emit('esStatus')"
+          />
+        </VscTooltip>
       </div>
     </div>
 
     <div class="es-status__list-wrap">
       <div class="es-status__list">
         <div class="es-status__header">
-          <span
-            v-for="column in columns"
-            :key="column.key"
-            class="es-status__col"
-            :class="`es-status__col--${column.className}`"
-          >
-            {{ translator.t(column.labelKey, column.fallback) }}
-          </span>
+          <span class="es-status__col es-status__col--ip">{{ translator.t("esStatus.ip", "IP") }}</span>
+          <span class="es-status__col es-status__col--name">{{ translator.t("esStatus.name", "Name") }}</span>
+          <span class="es-status__col es-status__col--master">{{ translator.t("esStatus.master", "Master") }}</span>
+          <span class="es-status__col es-status__col--metric">{{ translator.t("esStatus.heapUsage", "Heap usage") }}</span>
+          <span class="es-status__col es-status__col--metric">{{ translator.t("esStatus.diskUsage", "Disk usage") }}</span>
+          <span class="es-status__col es-status__col--metric">{{ translator.t("esStatus.cpuUsage", "CPU usage") }}</span>
+          <span class="es-status__col es-status__col--load">{{ translator.t("esStatus.load5m", "Load (5m)") }}</span>
+          <span class="es-status__col es-status__col--segments">{{ translator.t("esStatus.segmentsCount", "Segments") }}</span>
+          <span class="es-status__col es-status__col--segments">{{ translator.t("esStatus.segmentsSize", "Segment memory") }}</span>
+          <span class="es-status__col es-status__col--disk">{{ translator.t("esStatus.diskUsed", "Disk used") }}</span>
+          <span class="es-status__col es-status__col--disk">{{ translator.t("esStatus.diskTotal", "Disk total") }}</span>
         </div>
 
         <div
           v-if="nodes.length === 0"
           class="es-status__empty"
         >
-          <i class="codicon codicon-server es-status__empty-icon" aria-hidden="true" />
+          <i class="codicon codicon-server es-status__empty-icon" />
           <span>{{ emptyMessage }}</span>
         </div>
 
         <div
-          v-for="(node, index) in nodes"
-          :key="`${text(node.ip)}-${text(node.name)}-${index}`"
+          v-for="node in nodes"
+          :key="`${text(node.ip)}-${text(node.name)}`"
           class="es-status__row"
         >
           <span class="es-status__col es-status__col--ip">
-            <span class="es-status__mono" :title="text(node.ip)">{{ text(node.ip) }}</span>
+            <span
+              class="es-status__mono"
+              :title="text(node.ip)"
+            >{{ text(node.ip) }}</span>
           </span>
           <span class="es-status__col es-status__col--name">
-            <span class="es-status__name" :title="text(node.name)">{{ text(node.name) }}</span>
+            <span
+              class="es-status__name"
+              :title="text(node.name)"
+            >{{ text(node.name) }}</span>
           </span>
           <span class="es-status__col es-status__col--master">
             <span
               class="es-status__master"
               :class="node.isMain ? 'es-status__master--yes' : 'es-status__master--no'"
-            >
-              {{ node.isMain
-                ? translator.t("esStatus.yes", "Yes")
-                : translator.t("esStatus.no", "No") }}
-            </span>
+            >{{ node.isMain ? translator.t("esStatus.yes", "Yes") : translator.t("esStatus.no", "No") }}</span>
           </span>
-          <span class="es-status__col es-status__col--metric">
-            <span class="es-progress">
-              <span class="es-progress__track">
-                <span class="es-progress__fill" :style="progressStyle(node.heapPercent)" />
-              </span>
-              <span class="es-progress__label">{{ text(node.heapPercent) }}</span>
-            </span>
-          </span>
-          <span class="es-status__col es-status__col--metric">
-            <span class="es-progress">
-              <span class="es-progress__track">
-                <span class="es-progress__fill" :style="progressStyle(node.diskUsage)" />
-              </span>
-              <span class="es-progress__label">{{ text(node.diskUsage) }}</span>
-            </span>
-          </span>
-          <span class="es-status__col es-status__col--metric">
-            <span class="es-progress">
-              <span class="es-progress__track">
-                <span class="es-progress__fill" :style="progressStyle(node.cpuUsage)" />
-              </span>
-              <span class="es-progress__label">{{ text(node.cpuUsage) }}</span>
-            </span>
+          <span
+            v-for="metric in progressMetrics"
+            :key="metric"
+            class="es-status__col es-status__col--metric"
+          >
+            <div class="es-progress">
+              <div class="es-progress__track">
+                <div
+                  class="es-progress__fill"
+                  :style="progressStyle(node[metric])"
+                />
+              </div>
+              <span class="es-progress__label">{{ text(node[metric]) }}</span>
+            </div>
           </span>
           <span class="es-status__col es-status__col--load">
             <span class="es-status__mono">{{ text(node.load_5m) }}</span>

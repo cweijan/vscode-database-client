@@ -1,39 +1,44 @@
 <script setup lang="ts">
+import {
+  ElCheckbox,
+  ElInput,
+  ElInputNumber,
+  ElRadio,
+  ElRadioGroup,
+} from "element-plus";
 import { computed, inject, onBeforeUnmount, onMounted, ref } from "vue";
 
-import {
-  normalizeMockModel,
-  type MockModel,
-} from "../../modern/database/mockModel";
+import { type MockModel, normalizeMockModel } from "../../modern/database/mockModel";
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
-import UiInput from "./UiInput.vue";
+import { createTranslator } from "../i18n";
+import { usePayState } from "../license";
 
 interface MockRow {
-  readonly name: string;
-  readonly type: string;
-  readonly nullable: boolean;
-  readonly isIndex: boolean;
+  name: string;
+  type: string;
+  nullable: boolean;
+  isIndex: boolean;
   enabled: boolean;
   value: string;
 }
 
 const bridge = inject(WEBVIEW_BRIDGE_KEY);
 const bootstrap = readWebviewBootstrap();
+const translator = createTranslator(bootstrap.language);
+const isPay = usePayState();
+
 const table = ref("");
-const mockCount = ref("10");
+const mockCount = ref(10);
 const startMode = ref<"auto" | "manual">("auto");
-const startIndex = ref("1");
+const startIndex = ref(1);
 const mockValueReference = ref("http://mockjs.com/examples.html#DPD");
 const rows = ref<MockRow[]>([]);
-const loading = ref(true);
+const loading = ref(false);
 const generating = ref(false);
-const status = ref("");
-const statusKind = ref<"normal" | "error" | "success">("normal");
 let modelSubscription: BridgeDisposable | undefined;
 let doneSubscription: BridgeDisposable | undefined;
 let refreshSubscription: BridgeDisposable | undefined;
-let errorSubscription: BridgeDisposable | undefined;
 
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -41,52 +46,43 @@ function record(value: unknown): Record<string, unknown> {
     : {};
 }
 
-function text(value: unknown, fallback = ""): string {
-  return value == null ? fallback : String(value);
-}
-
 function applyModel(content: unknown): void {
+  loading.value = false;
   const model = normalizeMockModel(content);
-  if (!model) {
-    loading.value = false;
-    statusKind.value = "error";
-    status.value = "Host returned an invalid Mock model.";
-    return;
-  }
+  if (!model) return;
   table.value = model.table;
-  mockCount.value = String(model.mockCount);
+  mockCount.value = Number(model.mockCount) || 10;
+  mockValueReference.value = model.mockValueReference || mockValueReference.value;
   if (model.mockStartIndex === "auto") {
     startMode.value = "auto";
   } else {
     startMode.value = "manual";
-    startIndex.value = String(model.mockStartIndex);
+    startIndex.value = Number(model.mockStartIndex) || 1;
   }
-  mockValueReference.value = model.mockValueReference || mockValueReference.value;
   rows.value = Object.entries(model.mock).map(([name, field]) => ({
     name,
     type: field.type,
-    nullable: field.nullable === true,
-    isIndex: field.value === "#mockIndex" || field.value === "$mockIndex",
+    value: field.value ?? "",
     enabled: true,
-    value: field.value,
+    isIndex: field.value === "#mockIndex" || field.value === "$mockIndex",
+    nullable: field.nullable === true,
   }));
-  loading.value = false;
-  statusKind.value = "normal";
-  status.value = "";
 }
 
 const enabledRows = computed(() => rows.value.filter((row) => row.enabled));
+
 const allSelected = computed({
   get: () => rows.value.length > 0 && enabledRows.value.length === rows.value.length,
   set: (value: boolean) => {
     for (const row of rows.value) row.enabled = value;
   },
 });
-const partiallySelected = computed(() =>
-  enabledRows.value.length > 0 && enabledRows.value.length < rows.value.length,
+
+const partiallySelected = computed(
+  () => enabledRows.value.length > 0 && enabledRows.value.length < rows.value.length,
 );
 
-function createModel(): MockModel {
+function buildModel(): MockModel {
   const raw = {
     table: table.value,
     mockCount: mockCount.value,
@@ -96,7 +92,6 @@ function createModel(): MockModel {
       enabledRows.value.map((row) => [row.name, {
         type: row.type,
         value: row.value,
-        nullable: row.nullable,
       }]),
     ),
   };
@@ -105,239 +100,214 @@ function createModel(): MockModel {
   return model;
 }
 
-function persist(): void {
-  if (loading.value || !table.value) return;
-  try {
-    bridge?.emit("saveMock", createModel());
-  } catch (error) {
-    statusKind.value = "error";
-    status.value = text(error, "Unable to save Mock model.");
-  }
+function setMockCount(value: number | undefined): void {
+  mockCount.value = Number(value ?? 1);
+}
+
+function setStartIndex(value: number | undefined): void {
+  startIndex.value = Number(value ?? 0);
+}
+
+function setStartMode(value: string | number | boolean | undefined): void {
+  startMode.value = value === "manual" ? "manual" : "auto";
+}
+
+function setAllSelected(value: string | number | boolean): void {
+  allSelected.value = Boolean(value);
+}
+
+function setRowEnabled(row: MockRow, value: unknown): void {
+  row.enabled = Boolean(value);
 }
 
 function save(): void {
-  persist();
-  statusKind.value = "success";
-  status.value = "Mock model saved.";
+  if (!table.value) return;
+  try {
+    bridge?.emit("saveMock", buildModel());
+  } catch {
+    // The host reports validation failures through the page protocol.
+  }
+}
+
+function load(): void {
+  loading.value = true;
+  bridge?.emit("init", { type: "mock" });
 }
 
 function reset(): void {
-  loading.value = true;
-  statusKind.value = "normal";
-  status.value = "Loading default Mock model…";
   bridge?.emit("resetMock");
 }
 
 function run(): void {
-  if (enabledRows.value.length === 0) {
-    statusKind.value = "error";
-    status.value = "Select at least one column.";
-    return;
-  }
-  try {
-    generating.value = true;
-    statusKind.value = "normal";
-    status.value = "Generating mock data…";
-    bridge?.emit("runMock", createModel());
-  } catch (error) {
-    generating.value = false;
-    statusKind.value = "error";
-    status.value = text(error, "Unable to run Mock.");
-  }
-}
-
-function refresh(): void {
-  loading.value = true;
-  statusKind.value = "normal";
-  status.value = "Refreshing Mock model…";
-  bridge?.init("mock");
+  if (enabledRows.value.length === 0) return;
+  generating.value = true;
+  bridge?.emit("runMock", buildModel());
 }
 
 onMounted(() => {
   modelSubscription = bridge?.on("mockMeta", applyModel);
-  doneSubscription = bridge?.on("mock_done", (content) => {
-    const result = record(content);
+  doneSubscription = bridge?.on("mock_done", () => {
     generating.value = false;
-    statusKind.value = result.success === false ? "error" : "success";
-    status.value = text(
-      result.message,
-      result.success === false ? "Mock generation failed." : "Mock data generated.",
-    );
   });
-  refreshSubscription = bridge?.on("refresh_mock", refresh);
-  errorSubscription = bridge?.on("error", (content) => {
-    generating.value = false;
-    statusKind.value = "error";
-    status.value = text(record(content).message || content, "Mock action failed.");
-  });
-
+  refreshSubscription = bridge?.on("refresh_mock", load);
   const initialState = record(bootstrap.state);
   if (initialState.mock) applyModel(initialState.mock);
-  bridge?.init("mock");
+  load();
 });
 
 onBeforeUnmount(() => {
   modelSubscription?.dispose();
   doneSubscription?.dispose();
   refreshSubscription?.dispose();
-  errorSubscription?.dispose();
 });
 </script>
 
 <template>
-  <section
-    class="route-workspace mock-view"
-    data-route="mock"
-  >
-    <header class="route-workspace__header">
-      <div>
-        <h1>
-          <span class="mock-view__table-icon">▦</span>
-          {{ table || "Data Mock" }}
-        </h1>
-        <p class="route-workspace__subline">
-          Configure generated rows for the selected table.
+  <div class="mock-container">
+    <div
+      id="mockPanel"
+      class="mock-header"
+    >
+      <div class="mock-header__main">
+        <span class="mock-table">
+          <i class="codicon-table blue mr-1" />
+          {{ table }}
+        </span>
+        <p class="mock-notice">
+          {{ translator.t("mock.notice", "Mock data follows the Mock.js expression syntax.") }}
         </p>
       </div>
-      <div class="route-workspace__actions">
-        <VscButton
-          @click="refresh"
-        >
-          Refresh
-        </VscButton>
-        <VscButton
-          type="default"
-          @click="save"
-        >
-          Save
-        </VscButton>
-      </div>
-    </header>
-
-    <div class="mock-view__header-row">
-      <p class="mock-view__notice">
-        Values use Mock.js expressions where supported by the selected database.
-      </p>
       <a
-        class="mock-view__reference"
+        class="mock-reference"
         :href="mockValueReference"
         target="_blank"
         rel="noreferrer"
       >
-        MockJS reference ↗
+        <i class="codicon-link-external" />
+        MockJS
       </a>
     </div>
 
-    <div class="mock-view__config">
-      <UiInput
-        v-model="mockCount"
-        label="Rows"
-        type="number"
-        @update:model-value="persist"
-      />
-      <label class="inline-block mr-10">
-        <span class="common_input_label">Start index</span>
-        <select
-          v-model="startMode"
-          class="field__input"
-          @change="persist"
+    <div class="mock-config">
+      <div class="mock-config__row">
+        <span class="mock-config__label">{{ translator.t("mock.count", "Count") }}</span>
+        <ElInputNumber
+          :model-value="mockCount"
+          :min="1"
+          :max="10000"
+          size="small"
+          @update:model-value="setMockCount"
+          @change="save"
+        />
+      </div>
+      <div class="mock-config__row">
+        <span class="mock-config__label">{{ translator.t("mock.startIndex", "Start index") }}</span>
+        <ElRadioGroup
+          :model-value="startMode"
+          size="small"
+          @update:model-value="setStartMode"
+          @change="save"
         >
-          <option value="auto">Auto</option>
-          <option value="manual">Manual</option>
-        </select>
-      </label>
-      <UiInput
-        v-if="startMode === 'manual'"
-        v-model="startIndex"
-        label="Manual index"
-        type="number"
-        @update:model-value="persist"
-      />
+          <ElRadio
+            value="auto"
+            :label="translator.t('mock.auto', 'Auto')"
+          />
+          <ElRadio
+            value="manual"
+            :label="translator.t('mock.manual', 'Manual')"
+          />
+        </ElRadioGroup>
+        <ElInputNumber
+          v-if="startMode === 'manual'"
+          :model-value="startIndex"
+          :min="0"
+          size="small"
+          @update:model-value="setStartIndex"
+          @change="save"
+        />
+      </div>
     </div>
 
-    <div class="mock-view__table-wrap">
-      <table class="mock-view__table">
-        <thead>
-          <tr>
-            <th class="mock-view__checkbox-cell">
-              <input
-                v-model="allSelected"
-                type="checkbox"
-                :indeterminate="partiallySelected"
-                aria-label="Select all columns"
-                @change="persist"
-              >
-            </th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Nullable</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody v-if="rows.length > 0">
-          <tr
-            v-for="row in rows"
-            :key="row.name"
-          >
-            <td class="mock-view__checkbox-cell">
-              <input
-                v-model="row.enabled"
-                type="checkbox"
-                :aria-label="`Enable ${row.name}`"
-                @change="persist"
-              >
-            </td>
-            <td>{{ row.name }}</td>
-            <td>{{ row.type }}</td>
-            <td class="mock-view__nullable-cell">
-              {{ row.nullable ? "✅" : "❌" }}
-            </td>
-            <td>
-              <input
-                v-model="row.value"
-                class="field__input mock-view__value-input"
-                :disabled="!row.enabled"
-                :placeholder="row.isIndex ? 'Primary-key index' : 'Mock.js expression'"
-                @change="persist"
-              >
-            </td>
-          </tr>
-        </tbody>
-        <tbody v-else>
-          <tr>
-            <td
-              class="mock-view__empty"
-              colspan="5"
-            >
-              {{ loading ? "Loading columns…" : "No mockable columns found." }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="mock-data-table-wrap">
+      <VscTable
+        class="mock-data-table"
+        :data="rows"
+        row-key="name"
+        :loading="loading"
+      >
+        <VscTableColumn
+          width="50"
+          align="center"
+        >
+          <template #header>
+            <ElCheckbox
+              :model-value="allSelected"
+              :indeterminate="partiallySelected"
+              @update:model-value="setAllSelected"
+              @change="save"
+            />
+          </template>
+          <template #default="{ row }">
+            <ElCheckbox
+              :model-value="row.enabled"
+              @update:model-value="(value: unknown) => setRowEnabled(row, value)"
+              @change="save"
+            />
+          </template>
+        </VscTableColumn>
+        <VscTableColumn
+          prop="name"
+          :label="translator.t('common.name', 'Name')"
+          width="160"
+        />
+        <VscTableColumn
+          prop="type"
+          :label="translator.t('common.type', 'Type')"
+          width="130"
+        />
+        <VscTableColumn
+          :label="translator.t('mock.nullable', 'Nullable')"
+          width="80"
+          align="center"
+        >
+          <template #default="{ row }">
+            {{ row.nullable ? "✅" : "❌" }}
+          </template>
+        </VscTableColumn>
+        <VscTableColumn
+          :label="translator.t('mock.value', 'Value')"
+          min-width="200"
+        >
+          <template #default="{ row }">
+            <ElInput
+              v-model="row.value"
+              size="small"
+              :disabled="!row.enabled"
+              :placeholder="row.isIndex ? translator.t('mock.indexHint', 'Primary key index') : ''"
+              @change="save"
+            />
+          </template>
+        </VscTableColumn>
+      </VscTable>
     </div>
 
-    <div class="mock-view__footer">
+    <div class="mock-footer">
       <VscButton
-        type="default"
+        type="secondary"
         @click="reset"
       >
-        Reset
+        {{ translator.t("mock.reset", "Reset") }}
       </VscButton>
-      <VscButton
-        type="primary"
-        :disabled="generating || loading"
-        @click="run"
-      >
-        {{ generating ? "Generating…" : "Generate" }}
-      </VscButton>
+      <PayBadge>
+        <VscButton
+          type="primary"
+          :loading="generating"
+          :disabled="!isPay"
+          @click="run"
+        >
+          {{ translator.t("mock.generate", "Generate") }}
+        </VscButton>
+      </PayBadge>
     </div>
-
-    <p
-      v-if="status"
-      class="route-workspace__status"
-      :class="`mock-view__status--${statusKind}`"
-    >
-      {{ status }}
-    </p>
-  </section>
+  </div>
 </template>
