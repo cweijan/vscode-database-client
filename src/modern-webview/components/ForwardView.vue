@@ -3,7 +3,6 @@ import { computed, inject, onBeforeUnmount, onMounted, reactive, ref } from "vue
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
-import UiButton from "./UiButton.vue";
 import UiInput from "./UiInput.vue";
 import UiSelect from "./UiSelect.vue";
 
@@ -299,26 +298,23 @@ onBeforeUnmount(() => {
         </p>
       </div>
       <div class="route-workspace__actions">
-        <UiButton
-          type="button"
-          variant="default"
+        <VscButton
+          type="default"
           @click="showServerManager = !showServerManager"
         >
           {{ showServerManager ? "Forwarding rules" : "SSH servers" }}
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="reload"
         >
           Refresh
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="openNew"
         >
           Add rule
-        </UiButton>
+        </VscButton>
       </div>
     </header>
 
@@ -345,20 +341,18 @@ onBeforeUnmount(() => {
         <h2>SSH servers</h2>
         <div class="route-workspace__actions">
           <span class="route-workspace__subline">Select a server to manage its rules.</span>
-          <UiButton
-            type="button"
-            variant="default"
+          <VscButton
+            type="default"
             @click="emit('exportConfig')"
           >
             Export config
-          </UiButton>
-          <UiButton
-            type="button"
-            variant="default"
+          </VscButton>
+          <VscButton
+            type="default"
             @click="emit('importConfig', { type: 'merge' })"
           >
             Import config
-          </UiButton>
+          </VscButton>
         </div>
       </div>
       <div
@@ -384,13 +378,12 @@ onBeforeUnmount(() => {
               <td>{{ server.host || "-" }}</td>
               <td>{{ server.count }}</td>
               <td>
-                <UiButton
-                  type="button"
-                  variant="default"
+                <VscButton
+                  type="default"
                   @click="selectServer(server.key)"
                 >
                   Manage
-                </UiButton>
+                </VscButton>
               </td>
             </tr>
           </tbody>
@@ -484,19 +477,17 @@ onBeforeUnmount(() => {
         {{ editorError }}
       </p>
       <div class="route-workspace__actions">
-        <UiButton
-          type="submit"
-          variant="primary"
+        <VscButton
+          type="primary"
         >
           Save rule
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="closeEditor"
         >
           Cancel
-        </UiButton>
+        </VscButton>
       </div>
     </form>
 
@@ -552,36 +543,32 @@ onBeforeUnmount(() => {
               </td>
               <td>
                 <div class="forward-view__row-actions">
-                  <UiButton
+                  <VscButton
                     v-if="entry.state !== 1"
-                    type="button"
                     :disabled="entry.loading"
                     @click="startEntry(entry)"
                   >
                     Start
-                  </UiButton>
-                  <UiButton
+                  </VscButton>
+                  <VscButton
                     v-else
-                    type="button"
-                    variant="default"
+                    type="default"
                     @click="stopEntry(entry)"
                   >
                     Stop
-                  </UiButton>
-                  <UiButton
-                    type="button"
-                    variant="default"
+                  </VscButton>
+                  <VscButton
+                    type="default"
                     @click="openEdit(entry)"
                   >
                     Edit
-                  </UiButton>
-                  <UiButton
-                    type="button"
-                    variant="danger"
+                  </VscButton>
+                  <VscButton
+                    type="danger"
                     @click="removeEntry(entry)"
                   >
                     Delete
-                  </UiButton>
+                  </VscButton>
                 </div>
               </td>
             </tr>

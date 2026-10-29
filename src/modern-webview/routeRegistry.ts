@@ -13,6 +13,7 @@ export const WEBVIEW_ROUTES = [
   { path: "/mock", name: "mock" },
   { path: "/structDiff", name: "structDiff" },
   { path: "/keyView", name: "keyView" },
+  { path: "/lokiLog", name: "lokiLog" },
   { path: "/rabbitQueueView", name: "rabbitQueueView" },
   { path: "/forward", name: "forward" },
   { path: "/xterm", name: "xterm" },

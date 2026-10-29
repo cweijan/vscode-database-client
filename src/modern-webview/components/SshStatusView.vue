@@ -3,7 +3,6 @@ import { inject, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
-import UiButton from "./UiButton.vue";
 import UiInput from "./UiInput.vue";
 
 const bridge = inject(WEBVIEW_BRIDGE_KEY);
@@ -63,24 +62,22 @@ onBeforeUnmount(() => {
           {{ serverType }} · {{ lastAction || "Ready" }}
         </p>
       </div>
-      <UiButton
-        type="button"
+      <VscButton
         @click="bridge?.init('sshStatus')"
       >
         Refresh info
-      </UiButton>
+      </VscButton>
     </header>
 
     <div class="route-workbench__protocol-actions">
-      <UiButton
+      <VscButton
         v-for="metric in ['cpu', 'memory', 'disk', 'network']"
         :key="metric"
-        type="button"
-        variant="default"
+        type="default"
         @click="load(metric)"
       >
         {{ metric }}
-      </UiButton>
+      </VscButton>
     </div>
 
     <div class="connection-view__grid">
@@ -89,12 +86,11 @@ onBeforeUnmount(() => {
         label="Process count"
         type="number"
       />
-      <UiButton
-        type="button"
+      <VscButton
         @click="load('processes')"
       >
         Load processes
-      </UiButton>
+      </VscButton>
     </div>
 
     <div class="connection-view__grid ssh-status-view__grid">

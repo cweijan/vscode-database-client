@@ -9,3 +9,5 @@ yarn.lock
 openspec/
 .codex/
 dist-modern/
+
+/reference/

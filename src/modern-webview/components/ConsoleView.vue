@@ -2,11 +2,12 @@
 import { inject, onBeforeUnmount, onMounted, ref } from "vue";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
-import UiButton from "./UiButton.vue";
+import SettingsView from "./SettingsView.vue";
 
 const bridge = inject(WEBVIEW_BRIDGE_KEY);
 const sql = ref("SELECT 1;");
 const status = ref("");
+const settingsVisible = ref(false);
 let resultSubscription: BridgeDisposable | undefined;
 let errorSubscription: BridgeDisposable | undefined;
 
@@ -20,12 +21,20 @@ function clear(): void {
   status.value = "";
 }
 
+function messageText(content: unknown, fallback: string): string {
+  if (content && typeof content === "object" && !Array.isArray(content)) {
+    const message = (content as { message?: unknown }).message;
+    if (message) return String(message);
+  }
+  return content ? String(content) : fallback;
+}
+
 onMounted(() => {
   resultSubscription = bridge?.on("result", () => {
     status.value = "Query completed.";
   });
   errorSubscription = bridge?.on("error", (content) => {
-    status.value = String(content ?? "Query failed.");
+    status.value = messageText(content, "Query failed.");
   });
   bridge?.emit("route-console");
 });
@@ -49,26 +58,33 @@ onBeforeUnmount(() => {
         </p>
       </div>
       <div class="route-workspace__actions">
-        <UiButton
-          type="button"
+        <VscButton
           @click="run"
         >
           Run
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="clear"
         >
           Clear
-        </UiButton>
+        </VscButton>
+        <VscButton
+          type="default"
+          @click="settingsVisible = !settingsVisible"
+        >
+          {{ settingsVisible ? "Console" : "Settings" }}
+        </VscButton>
       </div>
     </header>
-    <textarea
-      v-model="sql"
-      class="vsc-input console-view__editor"
-      spellcheck="false"
-    />
+    <template v-if="!settingsVisible">
+      <textarea
+        v-model="sql"
+        class="vsc-input console-view__editor"
+        spellcheck="false"
+      />
+    </template>
+    <SettingsView v-else />
     <p
       v-if="status"
       class="route-workspace__status"

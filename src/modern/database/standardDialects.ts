@@ -27,6 +27,12 @@ function schemaFilter(schema: string | null | undefined): string {
   return schema ? `TABLE_SCHEMA = '${schema.replaceAll("'", "''")}'` : "1 = 1";
 }
 
+function processId(process: Record<string, unknown>): number | undefined {
+  const value = process.ID ?? process.Id ?? process.id ?? process.pid ?? process.Process;
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 ? id : undefined;
+}
+
 abstract class InformationSchemaDialect implements Dialect {
   public abstract readonly id: string;
 
@@ -68,6 +74,22 @@ abstract class InformationSchemaDialect implements Dialect {
     return `SELECT TABLE_NAME "name" FROM information_schema.VIEWS WHERE ${schemaFilter(schema)} ORDER BY TABLE_NAME;`;
   }
 
+  public showMaterialViews(schema?: string | null): string {
+    return `SELECT TABLE_NAME "name" FROM information_schema.TABLES WHERE ${schemaFilter(schema)} AND TABLE_TYPE = 'MATERIALIZED VIEW' ORDER BY TABLE_NAME;`;
+  }
+
+  public showSequences(schema?: string | null): string {
+    return `SELECT SEQUENCE_NAME "name" FROM information_schema.SEQUENCES WHERE ${schemaFilter(schema)} ORDER BY SEQUENCE_NAME;`;
+  }
+
+  public showCustomTypes(schema?: string | null): string {
+    return `SELECT USER_DEFINED_TYPE_NAME "name", USER_DEFINED_TYPE_CATEGORY "type" FROM information_schema.USER_DEFINED_TYPES WHERE ${schemaFilter(schema)} ORDER BY USER_DEFINED_TYPE_NAME;`;
+  }
+
+  public showExternalTables(schema?: string | null): string {
+    return `SELECT FOREIGN_TABLE_NAME "name", FOREIGN_SERVER_NAME "server", FOREIGN_SERVER_CATALOG "server_db" FROM information_schema.FOREIGN_TABLES WHERE ${schemaFilter(schema)} ORDER BY FOREIGN_TABLE_NAME;`;
+  }
+
   public showDatabases(): string {
     return "SELECT SCHEMA_NAME AS \"Database\" FROM information_schema.schemata ORDER BY SCHEMA_NAME;";
   }
@@ -76,12 +98,20 @@ abstract class InformationSchemaDialect implements Dialect {
     return this.showDatabases();
   }
 
+  public createDatabase(): string {
+    return "CREATE DATABASE database_name;";
+  }
+
   public showTableSource(schema: string | null, table: string): string {
     return `SHOW CREATE TABLE ${schema ? `${this.quoteIdentifier(schema)}.` : ""}${this.quoteIdentifier(table)};`;
   }
 
   public showViewSource(schema: string | null, view: string): string {
     return `SHOW CREATE VIEW ${schema ? `${this.quoteIdentifier(schema)}.` : ""}${this.quoteIdentifier(view)};`;
+  }
+
+  public showPartitions(schema: string | null, table: string): string {
+    return `SELECT PARTITION_NAME "name", PARTITION_METHOD "strategy", PARTITION_EXPRESSION "columnName", PARTITION_DESCRIPTION "value", TABLE_ROWS "rows", DATA_LENGTH "length" FROM information_schema.PARTITIONS WHERE TABLE_SCHEMA = ${this.escapeLiteral(normalized(schema))} AND TABLE_NAME = ${this.escapeLiteral(table)} AND PARTITION_NAME IS NOT NULL;`;
   }
 
   public showProcedures(schema?: string | null): string {
@@ -112,7 +142,11 @@ abstract class InformationSchemaDialect implements Dialect {
   }
 
   public processList(): string {
-    return "SELECT * FROM information_schema.PROCESSLIST;";
+    return "";
+  }
+
+  public kill(_process: Record<string, unknown>): string | null {
+    return null;
   }
 
   public showIndex(schema: string | null, table: string): string {
@@ -190,6 +224,25 @@ export class MySqlDialect extends InformationSchemaDialect {
     return `SELECT TRIGGER_NAME "name" FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = ${this.escapeLiteral(normalized(schema))} ORDER BY TRIGGER_NAME;`;
   }
 
+  public showEvents(schema?: string | null): string {
+    return `SELECT EVENT_NAME "name" FROM information_schema.EVENTS WHERE EVENT_SCHEMA = ${this.escapeLiteral(normalized(schema))} ORDER BY EVENT_NAME;`;
+  }
+
+  public showEventSource(schema: string | null, name: string): string {
+    const qualifiedName = schema
+      ? `${this.quoteIdentifier(schema)}.${this.quoteIdentifier(name)}`
+      : this.quoteIdentifier(name);
+    return `SHOW CREATE EVENT ${qualifiedName};`;
+  }
+
+  public eventTemplate(): string {
+    return "CREATE EVENT event_name\nON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 HOUR\nDO\nBEGIN\n  SELECT NOW();\nEND;";
+  }
+
+  public override createDatabase(): string {
+    return "CREATE DATABASE database_name DEFAULT CHARACTER SET = 'utf8mb4';";
+  }
+
   public override showTableSource(schema: string | null, table: string): string {
     const qualifiedName = schema
       ? `${this.quoteIdentifier(schema)}.${this.quoteIdentifier(table)}`
@@ -223,12 +276,38 @@ export class MySqlDialect extends InformationSchemaDialect {
     return "SELECT @@version AS server_version;";
   }
 
+  public truncateDatabase(database: string): string {
+    const schema = this.escapeLiteral(normalized(database));
+    return `SELECT CONCAT('TRUNCATE TABLE \`', REPLACE(TABLE_SCHEMA, '\`', '\`\`'), '\`.\`', REPLACE(TABLE_NAME, '\`', '\`\`'), '\`;') AS trun FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ${schema} AND TABLE_TYPE <> 'VIEW';`;
+  }
+
+  public dropDatabase(database: string): string {
+    return `DROP DATABASE ${this.quoteIdentifier(database)};`;
+  }
+
   public override processList(): string {
     return "SELECT ID, USER AS \"User\", DB, COMMAND AS \"Command\", STATE AS \"State\", TIME, INFO AS \"SQL\" FROM information_schema.PROCESSLIST;";
   }
 
+  public override kill(process: Record<string, unknown>): string | null {
+    const id = processId(process);
+    return id ? `KILL ${id};` : null;
+  }
+
   public override tableTemplate(): string {
     return "CREATE TABLE table_name (\n  id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,\n  create_time DATETIME,\n  column_name VARCHAR(255)\n) DEFAULT CHARSET = utf8mb4;";
+  }
+
+  public showUsers(): string {
+    return "SELECT user AS \"user\", host AS \"host\" FROM mysql.user ORDER BY user, host;";
+  }
+
+  public createUser(): string {
+    return "CREATE USER 'username'@'%' IDENTIFIED BY 'password';\nGRANT SELECT ON *.* TO 'username'@'%';\nGRANT ALL PRIVILEGES ON *.* TO 'username'@'%';";
+  }
+
+  public updateUser(username: string, host?: string | null): string {
+    return `ALTER USER ${this.escapeLiteral(username)}@${this.escapeLiteral(host || "%")} IDENTIFIED BY 'newPassword';`;
   }
 }
 
@@ -251,8 +330,32 @@ export class PostgresDialect extends InformationSchemaDialect {
     return "SELECT catalog_name \"Database\", schema_name \"schema\" FROM information_schema.schemata ORDER BY schema_name;";
   }
 
+  public override createDatabase(): string {
+    return "CREATE DATABASE database_name;";
+  }
+
   public override showTableSource(): string {
     return "";
+  }
+
+  public override showMaterialViews(schema?: string | null): string {
+    return `SELECT matviewname "name" FROM pg_catalog.pg_matviews WHERE schemaname = ${this.escapeLiteral(normalized(schema))} ORDER BY matviewname;`;
+  }
+
+  public override showSequences(schema?: string | null): string {
+    return `SELECT sequencename "name", last_value "sequence", increment_by "increment" FROM pg_catalog.pg_sequences WHERE schemaname = ${this.escapeLiteral(normalized(schema))} ORDER BY sequencename;`;
+  }
+
+  public override showCustomTypes(schema?: string | null): string {
+    return `SELECT t.typname "name", t.typtype "type", string_agg(e.enumlabel, ',') "enum_values" FROM pg_catalog.pg_type t LEFT JOIN pg_catalog.pg_enum e ON e.enumtypid = t.oid LEFT JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace WHERE (t.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = t.typrelid)) AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_type element WHERE element.oid = t.typelem AND element.typarray = t.oid) AND n.nspname = ${this.escapeLiteral(normalized(schema))} GROUP BY t.typname, t.typtype ORDER BY t.typname;`;
+  }
+
+  public override showExternalTables(schema?: string | null): string {
+    return `SELECT foreign_table_name "name", foreign_server_name "server", foreign_server_catalog "server_db" FROM information_schema.foreign_tables WHERE foreign_table_schema = ${this.escapeLiteral(normalized(schema))} ORDER BY foreign_table_name;`;
+  }
+
+  public override showPartitions(schema: string | null, table: string): string {
+    return `SELECT col.column_name "columnName", pt.partition_strategy "strategy" FROM (SELECT partrelid, partstrat, unnest(partattrs) column_index, CASE partstrat WHEN 'h' THEN 'HASH' WHEN 'l' THEN 'LIST' WHEN 'r' THEN 'RANGE' END partition_strategy FROM pg_catalog.pg_partitioned_table) pt JOIN pg_catalog.pg_class pc ON pc.oid = pt.partrelid JOIN pg_catalog.pg_namespace pn ON pn.oid = pc.relnamespace JOIN information_schema.columns col ON col.table_schema = pn.nspname AND col.table_name = pc.relname AND col.ordinal_position = pt.column_index WHERE pn.nspname = ${this.escapeLiteral(normalized(schema))} AND pc.relname = ${this.escapeLiteral(table)};`;
   }
 
   public override showViewSource(schema: string | null, view: string): string {
@@ -288,8 +391,53 @@ export class PostgresDialect extends InformationSchemaDialect {
     return "SELECT version() AS server_version;";
   }
 
+  public showUsers(): string {
+    return "SELECT usename AS \"user\" FROM pg_user ORDER BY usename;";
+  }
+
+  public createUser(): string {
+    return "CREATE USER \"username\" WITH PASSWORD 'password';\nGRANT SELECT ON ALL TABLES IN SCHEMA \"public\" TO \"username\";";
+  }
+
+  public updateUser(username: string): string {
+    return `ALTER USER ${this.quoteIdentifier(username)} WITH PASSWORD 'newPassword';`;
+  }
+
+  public showRoles(): string {
+    return "SELECT rolname AS \"role\" FROM pg_roles ORDER BY rolname;";
+  }
+
+  public createRole(): string {
+    return "CREATE ROLE role_name;\nGRANT role_name TO username;";
+  }
+
+  public updateRole(role: string): string {
+    return `ALTER ROLE ${this.quoteIdentifier(role)};`;
+  }
+
+  public dropRole(role: string): string {
+    return `DROP ROLE ${this.quoteIdentifier(role)};`;
+  }
+
+  public grantRole(role: string): string {
+    return `GRANT ${this.quoteIdentifier(role)} TO username;`;
+  }
+
+  public truncateDatabase(database: string): string {
+    return `SELECT 'TRUNCATE TABLE ' || quote_ident(table_schema) || '.' || quote_ident(table_name) || ';' AS trun FROM information_schema.tables WHERE table_schema = ${this.escapeLiteral(normalized(database))} AND table_type = 'BASE TABLE';`;
+  }
+
+  public dropDatabase(database: string): string {
+    return `DROP SCHEMA ${this.quoteIdentifier(database)};`;
+  }
+
   public override processList(): string {
     return "SELECT pid AS \"ID\", usename AS \"User\", datname AS \"DB\", state AS \"State\", query AS \"SQL\", query_start AS \"Time\" FROM pg_stat_activity ORDER BY pid;";
+  }
+
+  public override kill(process: Record<string, unknown>): string | null {
+    const id = processId(process);
+    return id ? `SELECT pg_terminate_backend(${id});` : null;
   }
 
   public override pingDatabase(schema?: string | null): string | null {
@@ -339,6 +487,66 @@ export class SqlServerDialect extends InformationSchemaDialect {
   public override showVersion(): string {
     return "SELECT @@VERSION AS server_version;";
   }
+
+  public showUsers(): string {
+    return "SELECT name AS \"user\" FROM sys.database_principals WHERE type = 'S' ORDER BY name;";
+  }
+
+  public createUser(): string {
+    return "CREATE LOGIN [login_name] WITH PASSWORD = 'password';\nCREATE USER [user_name] FOR LOGIN [login_name];";
+  }
+
+  public showLogins(): string {
+    return "SELECT name AS \"login\" FROM sys.server_principals WHERE type IN ('S', 'U', 'G', 'E') ORDER BY name;";
+  }
+
+  public showRoles(): string {
+    return "SELECT name AS \"role\" FROM sys.server_principals WHERE type = 'R' ORDER BY name;";
+  }
+
+  public showDatabaseUsers(): string {
+    return "SELECT name AS \"user\" FROM sys.database_principals WHERE type IN ('S', 'U', 'G', 'E') ORDER BY name;";
+  }
+
+  public showDatabaseRoles(): string {
+    return "SELECT name AS \"role\" FROM sys.database_principals WHERE type = 'R' ORDER BY name;";
+  }
+
+  public createRole(): string {
+    return "CREATE ROLE role_name;\nALTER ROLE role_name ADD MEMBER user_name;";
+  }
+
+  public updateRole(role: string): string {
+    return `ALTER ROLE ${this.quoteIdentifier(role)};`;
+  }
+
+  public dropRole(role: string): string {
+    return `DROP ROLE ${this.quoteIdentifier(role)};`;
+  }
+
+  public grantRole(role: string): string {
+    return `ALTER ROLE ${this.quoteIdentifier(role)} ADD MEMBER user_name;`;
+  }
+
+  public createLogin(): string {
+    return "CREATE LOGIN [login_name] WITH PASSWORD = 'password';";
+  }
+
+  public updateLogin(login: string): string {
+    return `ALTER LOGIN ${this.quoteIdentifier(login)} WITH PASSWORD = 'newPassword';`;
+  }
+
+  public dropLogin(login: string): string {
+    return `DROP LOGIN ${this.quoteIdentifier(login)};`;
+  }
+
+  public truncateDatabase(database: string): string {
+    return `SELECT CONCAT('TRUNCATE TABLE ', QUOTENAME(TABLE_SCHEMA), '.', QUOTENAME(TABLE_NAME), ';') AS trun FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = ${this.escapeLiteral(normalized(database))};`;
+  }
+
+  public dropDatabase(database: string): string {
+    return `DROP SCHEMA ${this.quoteIdentifier(database)};`;
+  }
 }
 
 export class SqliteDialect extends InformationSchemaDialect {
@@ -370,6 +578,15 @@ export class SqliteDialect extends InformationSchemaDialect {
 
   public override showViews(): string {
     return `SELECT name, type FROM sqlite_master WHERE type = 'view' ORDER BY name;`;
+  }
+
+  public override showTriggers(_schema?: string | null, table?: string | null): string {
+    const tableFilter = table ? ` AND tbl_name = ${this.escapeLiteral(table)}` : "";
+    return `SELECT name, tbl_name, sql FROM sqlite_master WHERE type = 'trigger'${tableFilter} ORDER BY name;`;
+  }
+
+  public override showSequences(): string {
+    return "SELECT name, seq AS sequence FROM sqlite_sequence ORDER BY name;";
   }
 
   public override showTableSource(_schema: string | null, table: string): string {

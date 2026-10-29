@@ -143,13 +143,20 @@ export function parseElasticRequests(source: string): ElasticRequest[] {
         const candidateEnd = lineEnd(source, candidateStart);
         const candidate = source.slice(candidateStart, candidateEnd);
         if (candidate.trim()) {
-          if (candidate.trimStart().startsWith("{") || candidate.trimStart().startsWith("[")) {
+          if (!requestLine.test(candidate)) {
             bodyStart = candidateStart + candidate.search(/\S/);
-            bodyEnd = findJsonEnd(source, bodyStart);
+            const bodyOpening = source[bodyStart];
+            bodyEnd = bodyOpening === "{" || bodyOpening === "["
+              ? findJsonEnd(source, bodyStart)
+              : candidateEnd;
             bodyText = source.slice(bodyStart, bodyEnd).trimEnd();
-            const parsed = parseBody(bodyText);
-            body = parsed.body;
-            error = parsed.error;
+            if (bodyOpening === "{" || bodyOpening === "[") {
+              const parsed = parseBody(bodyText);
+              body = parsed.body;
+              error = parsed.error;
+            } else {
+              error = "Request body is not valid JSON.";
+            }
           }
           break;
         }

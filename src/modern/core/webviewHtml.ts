@@ -27,14 +27,19 @@ export function renderWebviewHtml(
     " data:; " +
     "font-src " +
     options.cspSource +
-    "; " +
+    " data:; " +
     "style-src " +
     options.cspSource +
     " 'unsafe-inline'; " +
     "frame-src http: https:; " +
+    "connect-src " +
+    options.cspSource +
+    "; " +
     "script-src 'nonce-" +
     options.nonce +
-    "';\">";
+    "' " +
+    options.cspSource +
+    ";\">";
   let html = template.replace("{{configs}}", serializedConfig);
   html = html.replace(
     /(<(?:script|link)\b[^>]+(?:src|href)=["'])\.\/([^"']+)(["'][^>]*>)/gi,

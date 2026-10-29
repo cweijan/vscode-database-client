@@ -9,7 +9,6 @@ import type {
   ErDiagramEdge,
   ErDiagramNode,
 } from "../../modern/database/erDiagramService";
-import UiButton from "./UiButton.vue";
 
 interface LayoutNode {
   readonly left: number;
@@ -244,26 +243,23 @@ onBeforeUnmount(() => {
         </p>
       </div>
       <div class="route-workspace__actions">
-        <UiButton
-          type="button"
+        <VscButton
           @click="bridge?.emit('refreshCache')"
         >
           Refresh
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="exportDiagram('svg')"
         >
           Export SVG
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="exportDiagram('json')"
         >
           Export JSON
-        </UiButton>
+        </VscButton>
       </div>
     </header>
 

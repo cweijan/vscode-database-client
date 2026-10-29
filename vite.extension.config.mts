@@ -28,30 +28,19 @@ export default defineConfig({
       fileName: () => "extension.js",
     },
     rollupOptions: {
-      // Database drivers are Node-oriented CommonJS packages. Keep them in
-      // the extension's normal dependency graph so their own built-in-module
-      // resolution remains intact at activation time.
+      // The staged extension is intentionally self-contained: its package
+      // does not ship the workspace's node_modules directory. Keep only the
+      // VS Code API and Node built-ins external; bundling the application
+      // dependencies also makes optional providers work after installation.
       external: [
         "vscode",
-        "@cweijan/mysql2",
-        "@cweijan/mysql2/promise",
-        "pg",
-        "axios",
-        "ioredis",
+        // These driver wrappers are already part of the legacy out/node_modules
+        // closure and include optional/native paths that should not be parsed
+        // as application JavaScript by the extension bundler.
         "mongodb",
         "neo4j-driver",
         "tedious",
-        "@cweijan/ssh2",
-        "kafkajs",
-        "sql.js",
         "@database-client/dmdb",
-        "@databricks/sql",
-        "snowflake-sdk",
-        "@google-cloud/bigquery",
-        "@aws-sdk/client-s3",
-        "basic-ftp",
-        "etcd3",
-        "webdav",
         ...nodeBuiltins,
       ],
     },

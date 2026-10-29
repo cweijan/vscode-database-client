@@ -243,7 +243,10 @@ function duckDbConnector(): DriverConnector {
   };
 }
 
-function sqliteConnector(type: "SQLite" | "DuckDB" | "libSQL" | "D1"): DriverConnector {
+function sqliteConnector(
+  type: "SQLite" | "DuckDB" | "libSQL" | "D1",
+  sqliteWasmDirectory?: string,
+): DriverConnector {
   if (type === "DuckDB") {
     return duckDbConnector();
   }
@@ -273,8 +276,8 @@ function sqliteConnector(type: "SQLite" | "DuckDB" | "libSQL" | "D1"): DriverCon
     type,
     async connect(options, signal) {
       active(signal, `Opening ${type} connection`);
-      const sqlModulePath = require.resolve("sql.js");
-      const SQL = await initSqlJs({ locateFile: (file) => path.join(path.dirname(sqlModulePath), file) });
+      const wasmDirectory = sqliteWasmDirectory || path.dirname(require.resolve("sql.js"));
+      const SQL = await initSqlJs({ locateFile: (file) => path.join(wasmDirectory, file) });
       const databasePath = options.dbPath || String(option(options, "dbPath") || "");
       const readonly = Boolean(option(options, "readonly"));
       let database: SqlJsDatabase;
@@ -436,12 +439,14 @@ function databricksConnector(): DriverConnector {
   };
 }
 
-export function createExtendedConnectionFactories(): DriverConnectionFactory[] {
+export function createExtendedConnectionFactories(
+  sqliteWasmDirectory?: string,
+): DriverConnectionFactory[] {
   return [
-    new DriverConnectionFactory(sqliteConnector("SQLite")),
-    new DriverConnectionFactory(sqliteConnector("libSQL")),
-    new DriverConnectionFactory(sqliteConnector("D1")),
-    new DriverConnectionFactory(sqliteConnector("DuckDB")),
+    new DriverConnectionFactory(sqliteConnector("SQLite", sqliteWasmDirectory)),
+    new DriverConnectionFactory(sqliteConnector("libSQL", sqliteWasmDirectory)),
+    new DriverConnectionFactory(sqliteConnector("D1", sqliteWasmDirectory)),
+    new DriverConnectionFactory(sqliteConnector("DuckDB", sqliteWasmDirectory)),
     new DriverConnectionFactory(dmConnector("DM")),
     new DriverConnectionFactory(dmConnector("达梦")),
     new DriverConnectionFactory(snowflakeConnector()),

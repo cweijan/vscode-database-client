@@ -16,7 +16,7 @@ const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(scriptDirectory, "../..");
 const inventoryPath = path.join(
   projectRoot,
-  "openspec/changes/restore-modern-source-9-0-2/evidence/target-inventory.json",
+  "openspec/changes/restore-target-visual-parity/evidence/target-inventory.json",
 );
 const stagedRoot = path.join(projectRoot, "dist-modern", "package");
 

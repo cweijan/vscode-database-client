@@ -1,4 +1,5 @@
 import * as path from "node:path";
+import * as os from "node:os";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 
 import * as vscode from "vscode";
@@ -11,14 +12,32 @@ import type {
   QueryOptions,
   QueryResult,
 } from "../database/types";
+import { asConnectionOptions } from "../database/connectionOptions";
 import { loadErDiagram, type ErDiagramData } from "../database/erDiagramService";
 import {
   normalizeMockModel,
   type MockModel,
 } from "../database/mockModel";
+import {
+  isDumpSupported,
+  normalizeDumpConfig,
+} from "../database/dumpService";
+import type { DumpConfig } from "../database/dumpService";
+import { loadDatabaseDashboard, isMysql, isPostgres } from "../database/statusService";
 import type { RemoteEntry, SshConnectionOptions, SshSession } from "../remote/sshService";
 import type { SshForwardType } from "../remote/sshForwardingService";
 import { fetchSshMonitorSnapshot } from "../remote/sshMonitorService";
+import {
+  boundRemotePath,
+  childRemotePath,
+  normalizeRemotePath,
+  parentRemotePath,
+} from "../remote/remotePaths";
+import { decodeImageDataUrl } from "../core/imageService";
+import {
+  buildRedisItemCommands,
+  normalizeRedisConsumerGroups,
+} from "../database/redisValues";
 
 export interface UtilityProtocolContext {
   readonly route: string;
@@ -28,6 +47,7 @@ export interface UtilityProtocolContext {
   readonly services: ExtensionServices;
   readonly handler: TypedWebviewHandler;
   readonly openUtility?: (route: string, title: string, target?: unknown) => Promise<unknown>;
+  readonly openConnectionConfig?: (workspace?: boolean) => Promise<unknown>;
 }
 
 interface FileManagerEntry {
@@ -47,10 +67,11 @@ function normalizedDocumentationHost(value: unknown): string {
 function registerDocument(context: UtilityProtocolContext): void {
   const emitResourceHost = async (): Promise<void> => {
     const stateHost = context.webviewState.resourceHost ?? context.state.resourceHost;
+    const resourceServerHost = await context.services.resourceServer.getHost();
     const host = normalizedDocumentationHost(
       typeof stateHost === "string"
         ? stateHost
-        : context.services.config.get("documentationHost"),
+        : resourceServerHost || context.services.config.get("documentationHost"),
     );
     if (!host) {
       await context.handler.send("error", {
@@ -117,8 +138,7 @@ function parseRedisInfo(value: unknown): Record<string, string> {
 }
 
 function asConnection(value: unknown): ConnectionOptions | undefined {
-  const candidate = record(value) as Partial<ConnectionOptions>;
-  return candidate.id && candidate.type ? candidate as ConnectionOptions : undefined;
+  return asConnectionOptions(value);
 }
 
 function targetConnection(value: unknown): ConnectionOptions | undefined {
@@ -145,23 +165,6 @@ function firstText(...values: unknown[]): string | undefined {
     }
   }
   return undefined;
-}
-
-function normalizedRemotePath(value: unknown, fallback = "/"): string {
-  const source = stringValue(value, fallback).trim() || fallback;
-  if (source === "/") return source;
-  return `/${source.replace(/^\/+|\/+$/g, "")}`;
-}
-
-function childRemotePath(parent: string, name: string): string {
-  const cleanName = name.replace(/^\/+/, "");
-  return parent === "/" ? `/${cleanName}` : `${parent.replace(/\/$/, "")}/${cleanName}`;
-}
-
-function parentRemotePath(value: string): string {
-  if (value === "/") return "/";
-  const parent = path.posix.dirname(value);
-  return parent === "." ? "/" : parent;
 }
 
 function rowsOf<Row extends Record<string, unknown>>(result: QueryResult<Row>): Row[] {
@@ -248,6 +251,567 @@ async function sendError(handler: TypedWebviewHandler, error: unknown): Promise<
   await handler.send("error", { message: errorText(error) });
 }
 
+function registerCloudPage(context: UtilityProtocolContext): void {
+  if (context.route !== "plan" && context.route !== "console") return;
+  const { handler, services } = context;
+
+  const sendUser = async (): Promise<void> => {
+    await handler.send("user", services.cloud.getUser());
+  };
+  const sendOptions = async (): Promise<void> => {
+    await handler.send("options", { options: await services.settings.list() });
+  };
+  const openSite = async (value: unknown): Promise<void> => {
+    const source = typeof value === "string" ? value.trim() : "";
+    if (!source) return;
+    const host = vscode.env.language.toLowerCase() === "zh-cn"
+      ? "https://zh.database-client.com"
+      : "https://database-client.com";
+    const url = /^https?:\/\//i.test(source) ? source : `${host}/${source.replace(/^\/+/, "")}`;
+    await vscode.env.openExternal(vscode.Uri.parse(url));
+  };
+  const storedConnectionCount = (): number => {
+    const ids = new Set<string>();
+    for (const key of ["database.connections", "nosql.connections"]) {
+      for (const connection of connectionRecords(services.state.get(key, {}))) {
+        ids.add(connection.id);
+      }
+    }
+    return ids.size;
+  };
+
+  handler.onInit(context.route, async () => {
+    await sendUser();
+    await handler.send("syncKey", services.cloud.getSyncKey());
+    await handler.send("email", services.cloud.getEmail());
+    await handler.send("appName", vscode.env.appName);
+  });
+
+  handler.on("getEmail", async () => {
+    await handler.send("email", services.cloud.getEmail());
+  });
+  handler.on("saveEmail", (content) => services.cloud.saveEmail(content));
+  handler.on("bindUser", async (content) => {
+    try {
+      await services.cloud.setUser(content);
+      await sendUser();
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("getUser", sendUser);
+  handler.on("login", async (content) => {
+    const payload = record(content);
+    try {
+      const user = await services.cloud.login(
+        stringValue(payload.email).trim(),
+        stringValue(payload.password),
+      );
+      await handler.send("user", user);
+      await handler.send("loginRes", { errMsg: undefined });
+    } catch (error) {
+      await handler.send("loginRes", { errMsg: errorText(error) });
+    }
+  });
+  handler.on("copyMachineId", async () => {
+    await vscode.env.clipboard.writeText(services.cloud.getMachineId());
+    await vscode.window.showInformationMessage("The machine ID has been copied to the clipboard.");
+  });
+  handler.on("license", async (content) => {
+    try {
+      const user = await services.cloud.bindLicense(stringValue(content));
+      if (user) {
+        await handler.send("user", user);
+        await handler.send("boundLicense", user);
+      }
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("open", (content) => openSite(content));
+  handler.on("openSite", (content) => openSite(content));
+  handler.on("loginOnBrowser", () => openSite("login"));
+  handler.on("resourceHost", async () => {
+    const host = await services.resourceServer.getHost()
+      || services.config.get("documentationHost");
+    await handler.send("resourceHost", {
+      host,
+      language: vscode.env.language || "en",
+    });
+  });
+  handler.on("payNotice", async () => {
+    if (context.route !== "plan" && context.openUtility) {
+      await context.openUtility("plan", "Plan");
+    }
+  });
+
+  if (context.route !== "console") return;
+  handler.on("options", () => sendOptions());
+  handler.on("updateOption", async (content) => {
+    try {
+      const payload = record(content);
+      await services.settings.update({
+        name: stringValue(payload.name),
+        value: payload.value,
+        type: stringValue(payload.type, typeof payload.value),
+      });
+      await handler.send("configSuccess", "Configuration updated.");
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("resetOption", async (content) => {
+    try {
+      const options = Array.isArray(content)
+        ? content.map((item) => ({ name: stringValue(record(item).name) }))
+        : [];
+      await services.settings.reset(options);
+      await handler.send("resetSuccess", "Reset to default settings.");
+      await sendOptions();
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("openMoreSettings", (content) => services.settings.openMoreSettings(content));
+  handler.on("editConfig", async (content) => {
+    const payload = record(content);
+    const workspace = content === true || payload.workspace === true;
+    if (context.openConnectionConfig) {
+      await context.openConnectionConfig(workspace);
+      return;
+    }
+    await services.settings.openMoreSettings(content === true ? undefined : content);
+  });
+  handler.on("exportConfig", async (content) => {
+    try {
+      const payload = record(content);
+      const exported = await services.connectionConfig.exportConfig(
+        payload.workspace === true,
+        payload.withQueryFiles === true,
+      );
+      if (exported) await handler.send("configSuccess", "Configuration exported.");
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("importConfig", async (content) => {
+    try {
+      const payload = record(content);
+      const workspace = payload.workspace === true;
+      const type = payload.type === "merge" ? "merge" : "";
+      if (payload.confirm !== true && type !== "merge" && storedConnectionCount() > 0) {
+        await handler.send(workspace ? "importWorkspaceConfirm" : "importConfirm");
+        return;
+      }
+      const imported = await services.connectionConfig.importConfig(type, workspace);
+      await handler.send("importResult", {
+        success: imported,
+        cancel: !imported,
+        message: imported ? "Imported connection configuration." : "No configuration was imported.",
+      });
+      await sendOptions();
+    } catch (error) {
+      await handler.send("importResult", { success: false, message: errorText(error) });
+    }
+  });
+  handler.on("closeAllConnections", async () => {
+    try {
+      const confirmed = await vscode.window.showWarningMessage(
+        "Close all database connections?",
+        { modal: true },
+        "Close all",
+      );
+      if (confirmed !== "Close all") return;
+      await services.connections.closeAll();
+      services.activeConnection.clear();
+      await handler.send("success", "Close all connections success!");
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("clearCache", async () => {
+    await services.cache.clear();
+    await vscode.window.showInformationMessage("Clear cache success!");
+    await handler.send("success", "Clear cache success!");
+  });
+  handler.on("chooseSyncKey", async () => {
+    const files = await vscode.window.showOpenDialog({
+      defaultUri: vscode.Uri.file(path.join(os.homedir(), ".ssh")),
+      canSelectFiles: true,
+      canSelectFolders: false,
+      canSelectMany: false,
+      openLabel: "Choose sync key",
+    });
+    const selected = files?.[0];
+    if (!selected) return;
+    await services.cloud.setSyncKey(selected.fsPath);
+    await handler.send("syncKey", selected.fsPath);
+  });
+  handler.on("uploadConfig", async (content) => {
+    let success = true;
+    let message = "Upload config success!";
+    try {
+      const payload = record(content);
+      const keyPath = stringValue(payload.keyPath || content, services.cloud.getSyncKey());
+      await services.cloud.setSyncKey(keyPath);
+      const size = await services.cloudSync.upload(keyPath);
+      message = `Upload config success! (${size} bytes)`;
+    } catch (error) {
+      success = false;
+      message = errorText(error);
+    }
+    await handler.send("uploadRes", { success, message });
+  });
+  handler.on("removeConfig", async () => {
+    let success = true;
+    let message = "Cloud configuration removed.";
+    try {
+      await services.cloudSync.remove();
+    } catch (error) {
+      success = false;
+      message = errorText(error);
+    }
+    await handler.send("removeRes", { success, message });
+  });
+  handler.on("downloadConfig", async (content) => {
+    const payload = record(content);
+    const keyPath = stringValue(payload.keyPath, services.cloud.getSyncKey());
+    const type = payload.type === "merge" ? "merge" : "";
+    if (payload.confirm !== true && type !== "merge" && storedConnectionCount() > 0) {
+      await handler.send("downloadConfirm");
+      return;
+    }
+    let success = true;
+    let message = "Download config success!";
+    try {
+      await services.cloud.setSyncKey(keyPath);
+      const result = await services.cloudSync.download({ keyPath, type });
+      message = `Download config success! (${result.settings} settings, ${result.state} state entries, ${result.files} files)`;
+    } catch (error) {
+      success = false;
+      message = errorText(error);
+    }
+    await handler.send("downloadResult", { success, message });
+    if (success) await sendOptions();
+  });
+}
+
+function registerImage(context: UtilityProtocolContext): void {
+  if (context.route !== "image") return;
+  const { handler, services } = context;
+  const sendTinyPngStatus = async (): Promise<void> => {
+    await handler.send("tinyPngApiKeyStatus", services.tinyPng.getStatus());
+  };
+
+  handler.onInit("image", sendTinyPngStatus);
+  handler.on("getTinyPngApiKey", sendTinyPngStatus);
+  handler.on("saveTinyPngApiKey", async (content) => {
+    try {
+      await handler.send("tinyPngApiKeyStatus", await services.tinyPng.setApiKey(content));
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("compressTinyPng", async (content) => {
+    try {
+      const result = await services.tinyPng.compress(record(content).dataUrl);
+      await handler.send("compressTinyPngResult", { success: true, ...result });
+    } catch (error) {
+      await handler.send("compressTinyPngResult", {
+        success: false,
+        message: errorText(error),
+      });
+    }
+  });
+  handler.on("saveImageFile", async (content) => {
+    try {
+      const payload = record(content);
+      const image = decodeImageDataUrl(payload.dataUrl);
+      if (!image) throw new Error("Invalid image data");
+      const file = await vscode.window.showSaveDialog({
+        saveLabel: "Save image",
+        defaultUri: vscode.Uri.file(
+          stringValue(payload.fileName, `image-${Date.now()}.${image.extension}`),
+        ),
+        filters: { Images: ["png", "jpg", "jpeg", "webp", "gif"] },
+      });
+      if (file) await vscode.workspace.fs.writeFile(file, image.bytes);
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("saveSvgFile", async (content) => {
+    try {
+      const payload = record(content);
+      const source = stringValue(payload.content);
+      if (!source.trim()) throw new Error("SVG content is empty");
+      const file = await vscode.window.showSaveDialog({
+        saveLabel: "Save SVG",
+        defaultUri: vscode.Uri.file(stringValue(payload.fileName, `image-${Date.now()}.svg`)),
+        filters: { SVG: ["svg"] },
+      });
+      if (file) await vscode.workspace.fs.writeFile(file, Buffer.from(source, "utf8"));
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("telemetry", (content) => {
+    services.logger.debug("Image tool telemetry", content);
+  });
+}
+
+interface ManagerCapabilities {
+  readonly log: boolean;
+  readonly dashBoard: boolean;
+  readonly processList: boolean;
+  readonly hasAnyMonitor: boolean;
+  readonly dump: boolean;
+  readonly structDiff: boolean;
+}
+
+async function emitDatabaseClientLog(handler: TypedWebviewHandler): Promise<void> {
+  const outputPath = path.join(os.homedir(), ".dbclient", "storage", "output.bin-log");
+  try {
+    const content = await readFile(outputPath, "utf8");
+    const lines = content.split(/\r?\n/);
+    await handler.send("data", "\x1Bc");
+    await handler.send("data", lines.slice(-500).join("\n"));
+  } catch {
+    // The target keeps the log terminal empty until the first output file exists.
+  }
+}
+
+function managerConnection(context: UtilityProtocolContext): ConnectionOptions | undefined {
+  return targetConnection(context.webviewState.connection)
+    || targetConnection(context.state.connection)
+    || targetConnection(context.target)
+    || context.services.activeConnection.get();
+}
+
+function managerCapabilities(connection: ConnectionOptions | undefined, context: UtilityProtocolContext): ManagerCapabilities {
+  if (!connection) {
+    return {
+      log: false,
+      dashBoard: false,
+      processList: false,
+      hasAnyMonitor: false,
+      dump: false,
+      structDiff: false,
+    };
+  }
+  let processList = false;
+  try {
+    processList = Boolean(context.services.dialects.resolve(connection.type).processList?.());
+  } catch {
+    processList = false;
+  }
+  const sqlDatabase = isMysql(connection.type) || isPostgres(connection.type);
+  return {
+    log: Boolean(connection),
+    dashBoard: sqlDatabase,
+    processList,
+    hasAnyMonitor: sqlDatabase || processList,
+    dump: isDumpSupported(connection.type),
+    structDiff: sqlDatabase,
+  };
+}
+
+function managerInfo(connection: ConnectionOptions | undefined): Record<string, unknown> {
+  if (!connection) return { dbType: undefined };
+  const { password: _password, ...safeConnection } = connection;
+  return {
+    ...safeConnection,
+    dbType: connection.type,
+  };
+}
+
+function registerManager(context: UtilityProtocolContext): void {
+  if (context.route !== "manager") return;
+  const { handler, services } = context;
+
+  const connection = (): ConnectionOptions | undefined => managerConnection(context);
+  registerTerminalUiProtocols(context, () => connection()?.type || "SSH");
+  handler.on("initTerminal", async () => {
+    await emitDatabaseClientLog(handler);
+  });
+
+  const sendInfo = async (): Promise<ConnectionOptions | undefined> => {
+    const selected = connection();
+    const capabilities = managerCapabilities(selected, context);
+    await handler.send("info", {
+      ...managerInfo(selected),
+      monitorStatus: capabilities,
+    });
+    await handler.send("dbType", selected?.type);
+    await handler.send("monitorStatus", capabilities);
+    await handler.send("user", services.cloud.getUser());
+    return selected;
+  };
+
+  const sendProcessList = async (): Promise<void> => {
+    const connection = managerConnection(context);
+    if (!connection) throw new Error("No database connection selected");
+    const dialect = services.dialects.resolve(connection.type);
+    const sql = dialect.processList?.();
+    if (!sql) throw new Error(`Process list is not supported for ${connection.type}`);
+    const result = await services.connections.query(connection, sql);
+    await handler.send("processList", {
+      fields: result.fields,
+      rows: result.rows,
+      supportKill: typeof dialect.kill === "function",
+    });
+  };
+
+  handler.onInit("manager", async () => {
+    await sendInfo();
+    if (context.webviewState.openDump === true) await handler.send("open_dump");
+  });
+  handler.on("processList", async () => {
+    try {
+      await sendProcessList();
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("killProcess", async (content) => {
+    try {
+      const connection = managerConnection(context);
+      if (!connection) throw new Error("No database connection selected");
+      const dialect = services.dialects.resolve(connection.type);
+      const sql = dialect.kill?.(record(content));
+      if (!sql) throw new Error(`Process termination is not supported for ${connection.type}`);
+      await services.connections.query(connection, sql);
+      await sendProcessList();
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("dashBoard", async () => {
+    try {
+      const selected = connection();
+      if (!selected) throw new Error("No database connection selected");
+      const dashboard = await loadDatabaseDashboard(
+        selected.type,
+        (sql) => services.connections.query(selected, sql),
+      );
+      await handler.send("dashBoard", dashboard);
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("dumpInit", async () => {
+    try {
+      const connection = managerConnection(context);
+      if (!connection) throw new Error("No database connection selected");
+      await handler.send("dumpInit", await services.dump.initialize(connection));
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("dumpChoose", async (content) => {
+    try {
+      const event = stringValue(record(content).event);
+      if (event !== "executable" && event !== "output") return;
+      if (event === "executable") {
+        const files = await vscode.window.showOpenDialog({
+          canSelectFiles: true,
+          canSelectFolders: false,
+          canSelectMany: false,
+          openLabel: "Select dump executable",
+        });
+        const file = files?.[0];
+        if (file) await handler.send("dumpChoose", { event, path: file.fsPath });
+      } else {
+        const file = await vscode.window.showSaveDialog({
+          saveLabel: "Select dump output",
+          filters: { SQL: ["sql"] },
+        });
+        if (file) await handler.send("dumpChoose", { event, path: file.fsPath });
+      }
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("installDependency", async (content) => {
+    try {
+      const connection = managerConnection(context);
+      if (!connection) throw new Error("No database connection selected");
+      const requested = typeof content === "string"
+        ? content
+        : stringValue(record(content).command || record(content).dependency);
+      const executable = await services.dump.findExecutable(connection, requested || undefined);
+      if (executable) {
+        await handler.send("dumpChoose", { event: "executable", path: executable });
+        await handler.send("dependencyStatus", { installed: true, path: executable });
+        return;
+      }
+      const command = isPostgres(connection.type) ? "pg_dump" : connection.type === "MariaDB" ? "mariadb-dump" : "mysqldump";
+      await handler.send("dependencyStatus", {
+        installed: false,
+        command,
+        message: `${command} was not found on PATH. Install the database client and try again.`,
+      });
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("dumpRun", async (content) => {
+    try {
+      const connection = managerConnection(context);
+      if (!connection) throw new Error("No database connection selected");
+      const config: DumpConfig = normalizeDumpConfig(connection, content);
+      const result = await services.dump.run(connection, config);
+      await handler.send("dumpResult", result);
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("refreshManager", async () => { await sendInfo(); });
+}
+
+function registerUtility(context: UtilityProtocolContext): void {
+  if (context.route !== "util") return;
+  const { handler, services } = context;
+
+  handler.onInit("util", async () => {
+    await handler.send("randomValue", services.utility.randomValue());
+  });
+  handler.on("computeValue", async (content) => {
+    try {
+      await handler.send("computedValue", services.utility.computeValue(stringValue(content)));
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
+  handler.on("getRandom", async () => {
+    await handler.send("randomValue", services.utility.randomValue());
+  });
+  handler.on("getSystemProcesses", async () => {
+    try {
+      await handler.send("systemProcesses", await services.utility.listProcesses());
+    } catch (error) {
+      await handler.send("systemProcessError", { message: errorText(error) });
+    }
+  });
+  handler.on("killSystemProcess", async (content) => {
+    try {
+      const pid = await services.utility.killProcess(record(content).pid);
+      await handler.send("systemProcessKilled", {
+        pid,
+        message: `Ended process ${pid}`,
+      });
+    } catch (error) {
+      await handler.send("systemProcessError", {
+        pid: Number(record(content).pid) || 0,
+        message: errorText(error),
+      });
+    }
+  });
+  handler.on("telemetry", (content) => {
+    services.logger.debug("Utility telemetry", content);
+  });
+}
+
 function connectionRecords(value: unknown): ConnectionOptions[] {
   if (Array.isArray(value)) {
     return value.map(asConnection).filter((item): item is ConnectionOptions => Boolean(item));
@@ -259,7 +823,11 @@ function connectionRecords(value: unknown): ConnectionOptions[] {
 
 function registerRemoteFileManager(context: UtilityProtocolContext): void {
   const { handler, services, state, webviewState } = context;
-  let currentPath = normalizedRemotePath(webviewState.path || state.path, "/");
+  const rootPath = normalizeRemotePath(
+    webviewState.rootPath || state.rootPath || targetRecord(state).rootPath,
+    "/",
+  );
+  let currentPath = boundRemotePath(webviewState.path || state.path, rootPath);
 
   const connection = (): ConnectionOptions | undefined =>
     targetConnection(state) || services.activeConnection.get();
@@ -272,7 +840,7 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
       name: selected?.name || selected?.id || selected?.host || "Remote files",
       sftpDisabled: !supported,
       fsType: isSsh ? "sftp" : selected?.type?.toLowerCase() || "sftp",
-      rootPath: "/",
+      rootPath,
       currentPath,
     });
   };
@@ -280,7 +848,7 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
   const list = async (requestedPath?: unknown): Promise<void> => {
     const selected = connection();
     if (requestedPath != null) {
-      currentPath = normalizedRemotePath(requestedPath, currentPath);
+      currentPath = boundRemotePath(requestedPath, rootPath);
     }
     if (!selected) {
       await emitConfig();
@@ -361,7 +929,10 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
     for (const remoteEntry of await entries) {
       const name = stringValue(remoteEntry.name);
       if (!name || name === "." || name === "..") continue;
-      const remoteChild = stringValue(remoteEntry.path, childRemotePath(remotePath, name));
+      const remoteChild = boundRemotePath(
+        stringValue(remoteEntry.path, childRemotePath(remotePath, name)),
+        rootPath,
+      );
       const localChild = path.join(localPath, name);
       if (remoteEntry.type === "directory") {
         await downloadDirectory(selected, remoteChild, localChild);
@@ -383,11 +954,21 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
   handler.on("init", onInit);
   handler.on("load", (content) => list(record(content).path));
   handler.on("refreshAdapter", onInit);
+  handler.on("copyText", async (content) => {
+    try {
+      const value = stringValue(record(content).value || content).trim();
+      if (!value) return;
+      await vscode.env.clipboard.writeText(value);
+      await handler.send("result", { action: "copyText" });
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  });
   handler.on("createFolder", (content) => safeRemoteMutation(async (selected) => {
     const item = record(content);
     const name = stringValue(item.name).trim();
     if (!name) return;
-    const parent = normalizedRemotePath(item.path, currentPath);
+    const parent = boundRemotePath(item.path, rootPath);
     if (selected.type === "SSH" || selected.type === "SFTP") {
       const session = await services.ssh.open(selected as SshConnectionOptions);
       await session.mkdir(childRemotePath(parent, name), true);
@@ -399,12 +980,12 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
     const item = record(content);
     const name = stringValue(item.name).trim();
     if (!name) return;
-    const parent = normalizedRemotePath(item.path, currentPath);
+    const parent = boundRemotePath(item.path, rootPath);
     await writeRemote(selected, childRemotePath(parent, name), Buffer.alloc(0));
   }));
   handler.on("delete", (content) => safeRemoteMutation(async (selected) => {
     const item = record(record(content).item);
-    const remotePath = stringValue(item.path);
+    const remotePath = boundRemotePath(item.path, rootPath);
     if (!remotePath) return;
     const confirmed = await vscode.window.showWarningMessage(
       `Delete remote ${item.type === "directory" ? "directory" : "file"} ${remotePath}?`,
@@ -422,10 +1003,10 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
   handler.on("rename", (content) => safeRemoteMutation(async (selected) => {
     const payload = record(content);
     const item = record(payload.item);
-    const remotePath = stringValue(item.path);
+    const remotePath = boundRemotePath(item.path, rootPath);
     const newName = stringValue(payload.newName).trim();
     if (!remotePath || !newName) return;
-    const newPath = childRemotePath(parentRemotePath(remotePath), newName);
+    const newPath = boundRemotePath(childRemotePath(parentRemotePath(remotePath), newName), rootPath);
     if (selected.type === "SSH" || selected.type === "SFTP") {
       const session = await services.ssh.open(selected as SshConnectionOptions);
       await session.rename(remotePath, newPath);
@@ -434,7 +1015,7 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
     }
   }));
   handler.on("upload", (content) => safeRemoteMutation(async (selected) => {
-    const parent = normalizedRemotePath(record(content).path, currentPath);
+    const parent = boundRemotePath(record(content).path, rootPath);
     const files = await vscode.window.showOpenDialog({ canSelectFiles: true, canSelectFolders: false, canSelectMany: true });
     for (const file of files || []) {
       const remotePath = childRemotePath(parent, path.basename(file.fsPath));
@@ -449,7 +1030,7 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
   handler.on("download", async (content) => {
     try {
       const item = record(record(content).item);
-      const remotePath = stringValue(item.path);
+      const remotePath = boundRemotePath(item.path, rootPath);
       const isDirectory = item.type === "directory" || item.kind === "directory";
       if (!remotePath) return;
       const selected = connection();
@@ -490,7 +1071,7 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
         throw new Error("Folder terminal requires an SSH or SFTP connection");
       }
       const item = record(record(content).item);
-      const remotePath = normalizedRemotePath(item.path, currentPath);
+      const remotePath = boundRemotePath(item.path, rootPath);
       await services.webviews.createWebviewPanel({
         title: `${selected.name || selected.id} · ${remotePath}`,
         type: "sshTerminal",
@@ -513,7 +1094,7 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
   handler.on("openFile", async (content) => {
     try {
       const item = record(record(content).item);
-      const remotePath = stringValue(item.path);
+      const remotePath = boundRemotePath(item.path, rootPath);
       if (!remotePath) return;
       if (item.type === "directory") {
         await list(remotePath);
@@ -534,7 +1115,7 @@ function registerRemoteFileManager(context: UtilityProtocolContext): void {
 }
 
 function registerSshTerminal(context: UtilityProtocolContext): void {
-  const { handler, services, state } = context;
+  const { handler, services, state, openUtility } = context;
   let channel: Awaited<ReturnType<SshSession["shell"]>> | undefined;
   let opening: Promise<void> | undefined;
   const selected = (): SshConnectionOptions | undefined => {
@@ -543,6 +1124,9 @@ function registerSshTerminal(context: UtilityProtocolContext): void {
       ? connection as SshConnectionOptions
       : undefined;
   };
+  if (context.route === "sshTerminal") {
+    registerTerminalUiProtocols(context, () => selected()?.type || "SSH");
+  }
   const output = async (value: unknown): Promise<void> => {
     const text = Buffer.isBuffer(value) ? value.toString("utf8") : String(value ?? "");
     if (text) await handler.send("data", text);
@@ -558,7 +1142,7 @@ function registerSshTerminal(context: UtilityProtocolContext): void {
       channel = shell;
       shell.on("data", (value: Buffer | string) => { void output(value); });
       shell.stderr.on("data", (value: Buffer | string) => { void output(value); });
-      const initialPath = normalizedRemotePath(
+      const initialPath = normalizeRemotePath(
         state.path || record(state.target).path,
         "/",
       );
@@ -577,8 +1161,17 @@ function registerSshTerminal(context: UtilityProtocolContext): void {
       opening = undefined;
     }
   };
-  handler.on("initTerminal", async () => {
-    try { await open(); } catch (error) { await sendError(handler, error); }
+  const closeChannel = (): void => {
+    channel?.end();
+    channel = undefined;
+  };
+  handler.on("initTerminal", async (content) => {
+    try {
+      if (record(content).reconnect === true) {
+        closeChannel();
+      }
+      await open();
+    } catch (error) { await sendError(handler, error); }
   });
   handler.on("input", async (content) => {
     try {
@@ -605,25 +1198,107 @@ function registerSshTerminal(context: UtilityProtocolContext): void {
       }
     } catch (error) { await sendError(handler, error); }
   });
-  const closeChannel = (): void => {
-    channel?.end();
-    channel = undefined;
-  };
+  handler.on("editInVSCode", async (content) => {
+    try {
+      const remotePath = stringValue(content).trim();
+      const connection = selected();
+      if (!remotePath || !connection) {
+        throw new Error("A remote SSH file is required");
+      }
+      const session = await services.ssh.open(connection);
+      const document = await vscode.workspace.openTextDocument({
+        content: (await session.readFile(remotePath)).toString("utf8"),
+        language: languageForFile(path.posix.basename(remotePath)),
+      });
+      const saveSubscription = vscode.workspace.onDidSaveTextDocument((saved) => {
+        if (saved.uri.toString() !== document.uri.toString()) return;
+        void session.writeFile(remotePath, Buffer.from(saved.getText(), "utf8"))
+          .catch((error) => { void sendError(handler, error); });
+      });
+      const closeSubscription = vscode.workspace.onDidCloseTextDocument((closed) => {
+        if (closed.uri.toString() !== document.uri.toString()) return;
+        saveSubscription.dispose();
+        closeSubscription.dispose();
+      });
+      await vscode.window.showTextDocument(document);
+    } catch (error) { await sendError(handler, error); }
+  });
+  handler.on("openSettings", () => services.settings.openMoreSettings());
+  handler.on("duplicateTab", async () => {
+    try {
+      const connection = selected();
+      if (!connection || !openUtility) return;
+      await openUtility(
+        "sshTerminal",
+        `${connection.name || connection.id} · SSH Terminal`,
+        { connection, path: normalizeRemotePath(state.path || record(state.target).path, "/") },
+      );
+    } catch (error) { await sendError(handler, error); }
+  });
   handler.on("closeTerminal", closeChannel);
   handler.onDidReset(closeChannel);
   handler.onDidDispose(closeChannel);
 }
 
-function registerXterm(context: UtilityProtocolContext): void {
-  const { handler, state, services } = context;
-  const connection = (): ConnectionOptions | undefined =>
-    targetConnection(state) || services.activeConnection.get();
+type TerminalOptionKey =
+  | "fontSize"
+  | "lineHeight"
+  | "cursorStyle"
+  | "cursorBlinking"
+  | "scrollback"
+  | "fontFamily";
 
-  handler.on("terminalConfig", async () => {
-    const selected = connection();
+function isTerminalOptionKey(value: string): value is TerminalOptionKey {
+  return ["fontSize", "lineHeight", "cursorStyle", "cursorBlinking", "scrollback", "fontFamily"]
+    .includes(value);
+}
+
+function registerTerminalUiProtocols(
+  context: UtilityProtocolContext,
+  databaseType: () => string,
+): void {
+  const { handler } = context;
+  const emitDatabaseType = async (): Promise<void> => {
+    await handler.send("dbType", databaseType());
+  };
+  const emitTerminalConfig = async (): Promise<void> => {
+    const terminal = vscode.workspace.getConfiguration("terminal.integrated");
+    const editor = vscode.workspace.getConfiguration("editor");
+    const configuredFontFamily = terminal.get<string>("fontFamily")
+      || editor.get<string>("fontFamily")
+      || "";
+    const fontFamily = configuredFontFamily
+      ? `${configuredFontFamily}, Menlo, Monaco, Consolas, 'Courier New', monospace`
+      : "Menlo, Monaco, Consolas, 'Courier New', monospace";
     await handler.send("terminalConfig", {
-      dbType: selected?.type || "SSH",
+      dbType: databaseType(),
+      fontSize: terminal.get<number>("fontSize"),
+      fontFamily,
+      lineHeight: terminal.get<number | string>("lineHeight"),
+      cursorStyle: terminal.get<string>("cursorStyle"),
+      cursorBlinking: terminal.get<boolean>("cursorBlinking"),
+      scrollback: terminal.get<number>("scrollback"),
     });
+  };
+
+  handler.onInit(context.route, emitDatabaseType);
+  handler.on("terminalConfig", emitTerminalConfig);
+  handler.on("updateOption", async (content) => {
+    try {
+      const payload = record(content);
+      const key = stringValue(payload.key).trim();
+      if (!isTerminalOptionKey(key)) {
+        throw new Error(`Unsupported terminal option: ${key || "(empty)"}`);
+      }
+      await vscode.workspace.getConfiguration("terminal.integrated").update(
+        key,
+        payload.value,
+        vscode.ConfigurationTarget.Global,
+      );
+      await emitTerminalConfig();
+    } catch (error) {
+      await sendError(handler, error);
+    }
   });
   handler.on("openLink", async (content) => {
     try {
@@ -636,6 +1311,20 @@ function registerXterm(context: UtilityProtocolContext): void {
       await sendError(handler, error);
     }
   });
+  handler.on("openFontSetting", async () => {
+    await vscode.commands.executeCommand(
+      "workbench.action.openSettings",
+      { query: "@id:terminal.integrated.fontFamily" },
+    );
+  });
+}
+
+function registerXterm(context: UtilityProtocolContext): void {
+  const { handler, state, services } = context;
+  const connection = (): ConnectionOptions | undefined =>
+    targetConnection(state) || services.activeConnection.get();
+
+  registerTerminalUiProtocols(context, () => connection()?.type || "SSH");
   handler.on("editInVSCode", async (content) => {
     try {
       const remotePath = stringValue(content).trim();
@@ -774,7 +1463,7 @@ function registerMock(context: UtilityProtocolContext): void {
       await sendError(handler, error);
     }
   };
-  handler.onInit("mock", () => load(false));
+  handler.onInit("mock", () => load(webviewState.resetMock === true));
   handler.on("saveMock", async (content) => {
     try {
       const model = normalizeMockModel(content);
@@ -999,10 +1688,14 @@ function registerRabbitQueue(context: UtilityProtocolContext): void {
 
 function registerRedisKey(context: UtilityProtocolContext): void {
   const { handler, services, state } = context;
+  registerTerminalUiProtocols(context, () => targetConnection(state)?.type || "Redis");
   const target = targetRecord(state);
-  let key = stringValue(target.key || target.label || target.name, "key");
+  let newKey = target.newKey === true;
+  let key = stringValue(target.key || target.label || target.name);
   let redisType = stringValue(target.type, "string");
   let lastValue: unknown;
+  let terminalInput = "";
+  let terminalReady = false;
   const connection = (): ConnectionOptions | undefined => targetConnection(state) || services.activeConnection.get();
   const execute = async (command: string): Promise<Record<string, unknown>[]> => {
     const selected = connection();
@@ -1010,6 +1703,63 @@ function registerRedisKey(context: UtilityProtocolContext): void {
     return rowsOf(await services.connections.query<Record<string, unknown>>(selected, command));
   };
   const valueOf = async (command: string): Promise<unknown> => (await execute(command))[0]?.value;
+  const terminalPrompt = (): string => {
+    const selected = connection();
+    const host = selected?.host || selected?.name || "redis";
+    const port = selected?.port || 6379;
+    return `${host}:${port}> `;
+  };
+  const terminalValue = (value: unknown): string => {
+    if (value == null) return "(nil)";
+    if (typeof value === "string") return value;
+    try { return JSON.stringify(value, null, 2) || "(nil)"; } catch { return String(value); }
+  };
+  const terminalRows = (rows: readonly Record<string, unknown>[]): string => {
+    if (rows.length === 0) return "(nil)";
+    if (rows.length === 1 && "value" in rows[0]) return terminalValue(rows[0].value);
+    return terminalValue(rows.length === 1 ? rows[0] : rows);
+  };
+  const initializeTerminal = async (): Promise<void> => {
+    terminalInput = "";
+    terminalReady = true;
+    await handler.send("data", `\x1bc${terminalPrompt()}`);
+  };
+  const processTerminalInput = async (content: unknown): Promise<void> => {
+    if (!terminalReady) await initializeTerminal();
+    for (const character of stringValue(content)) {
+      if (character === "\r" || character === "\n") {
+        const command = terminalInput.trim();
+        terminalInput = "";
+        if (!command) {
+          await handler.send("data", `\r\n${terminalPrompt()}`);
+          continue;
+        }
+        try {
+          const rows = await execute(command);
+          await handler.send("data", `\r\n${terminalRows(rows)}\r\n${terminalPrompt()}`);
+        } catch (error) {
+          await handler.send("data", `\r\n(error) ${errorText(error)}\r\n${terminalPrompt()}`);
+        }
+        continue;
+      }
+      if (character === "\u0003") {
+        terminalInput = "";
+        await handler.send("data", `^C\r\n${terminalPrompt()}`);
+        continue;
+      }
+      if (character === "\u007f") {
+        if (terminalInput.length > 0) {
+          terminalInput = terminalInput.slice(0, -1);
+          await handler.send("data", "\b \b");
+        }
+        continue;
+      }
+      if (character >= " ") {
+        terminalInput += character;
+        await handler.send("data", character);
+      }
+    }
+  };
   const collectionCount = (value: unknown): number | undefined => {
     if (Array.isArray(value)) return value.length;
     if (value && typeof value === "object") return Object.keys(value).length;
@@ -1033,6 +1783,24 @@ function registerRedisKey(context: UtilityProtocolContext): void {
   };
   const load = async (): Promise<void> => {
     try {
+      if (newKey && !key) {
+        await handler.send("newKey", {
+          prefix: stringValue(target.prefix),
+          stack: target.stack === true,
+        });
+        await handler.send("detail", {
+          key: "",
+          value: "",
+          type: "string",
+          ttl: -1,
+          count: 0,
+          prefix: stringValue(target.prefix),
+          stack: target.stack === true,
+          consumerGroups: [],
+        });
+        return;
+      }
+      if (!key) throw new Error("Redis key name is empty");
       redisType = stringValue(await valueOf(`TYPE ${JSON.stringify(key)}`), "string");
       let value: unknown;
       switch (redisType) {
@@ -1069,13 +1837,18 @@ function registerRedisKey(context: UtilityProtocolContext): void {
       }
       lastValue = value;
       const ttl = await valueOf(`TTL ${JSON.stringify(key)}`);
-      await handler.send("detail", {
-        key,
-        value,
-        type: redisType,
-        ttl,
-        count: collectionCount(value),
-      });
+      const consumerGroups = redisType === "stream"
+        ? normalizeRedisConsumerGroups(await valueOf(`XINFO GROUPS ${JSON.stringify(key)}`))
+        : [];
+        await handler.send("detail", {
+          key,
+          value,
+          type: redisType,
+          ttl,
+          count: collectionCount(value),
+          consumerGroups,
+          page: { pageNum: 1, pageSize: 100 },
+        });
     } catch (error) {
       await sendError(handler, error);
     }
@@ -1083,8 +1856,9 @@ function registerRedisKey(context: UtilityProtocolContext): void {
   const update = async (content: unknown): Promise<void> => {
     try {
       const payload = record(content);
-      const value = payload.value ?? content;
-      const type = stringValue(payload.type, redisType);
+      const nestedKey = record(payload.key);
+      const value = payload.value ?? nestedKey.content ?? content;
+      const type = stringValue(payload.type || nestedKey.type, redisType);
       const serialized = typeof value === "string" ? value : JSON.stringify(value);
       switch (type) {
         case "hash": {
@@ -1208,6 +1982,7 @@ function registerRedisKey(context: UtilityProtocolContext): void {
       if (Number.isFinite(ttl) && ttl >= 0) await execute(`EXPIRE ${JSON.stringify(name)} ${Math.trunc(ttl)}`);
       key = name;
       redisType = type;
+      newKey = false;
       await handler.send("success", `Redis key ${name} created.`);
       await load();
     } catch (error) { await sendError(handler, error); }
@@ -1252,10 +2027,72 @@ function registerRedisKey(context: UtilityProtocolContext): void {
   handler.on("init", load);
   handler.on("refresh", load);
   handler.on("detail", load);
+  handler.on("initTerminal", initializeTerminal);
+  handler.on("data", async (content) => {
+    try { await processTerminalInput(content); } catch (error) { await sendError(handler, error); }
+  });
+  handler.on("closeTerminal", () => {
+    terminalInput = "";
+    terminalReady = false;
+  });
+  handler.onDidReset(() => {
+    terminalInput = "";
+    terminalReady = false;
+  });
   handler.on("initStatus", loadStatus);
   handler.on("refreshStatus", loadStatus);
+  handler.on("execute", async (content) => {
+    try {
+      const command = stringValue(record(content).command || content).trim();
+      if (!command) throw new Error("Redis command cannot be empty");
+      await handler.send("result", await execute(command));
+    } catch (error) { await sendError(handler, error); }
+  });
   handler.on("update", update);
-  handler.on("saveItem", update);
+  handler.on("saveItem", async (content) => {
+    try {
+      const payload = record(content);
+      const type = stringValue(payload.type, redisType);
+      const keyName = stringValue(payload.keyName, key);
+      if (type.toLowerCase() === "stream") {
+        const streamItems = Array.isArray(payload.streamItems)
+          ? payload.streamItems
+          : [payload];
+        for (const item of streamItems) {
+          const row = record(item);
+          const fields = record(row.value);
+          const pairs = Object.entries(fields).filter(([field]) => field.trim());
+          if (pairs.length === 0) {
+            const field = stringValue(row.field || row.key).trim();
+            if (!field) throw new Error("Redis stream field cannot be empty");
+            pairs.push([field, stringValue(row.value)]);
+          }
+          const args = pairs.flatMap(([field, value]) => [JSON.stringify(field), JSON.stringify(stringValue(value))]);
+          await execute(`XADD ${JSON.stringify(keyName)} * ${args.join(" ")}`);
+        }
+        key = keyName;
+        redisType = type;
+        await handler.send("success", "Redis stream item updated.");
+        await load();
+        return;
+      }
+      const commands = buildRedisItemCommands({
+        keyName,
+        type,
+        old: record(payload.old),
+        key: payload.key,
+        value: payload.value,
+        score: payload.score,
+        index: payload.index,
+        position: payload.position === "head" ? "head" : "tail",
+      });
+      for (const command of commands) await execute(command);
+      key = keyName;
+      redisType = type;
+      await handler.send("success", "Redis item updated.");
+      await load();
+    } catch (error) { await sendError(handler, error); }
+  });
   handler.on("createKey", createKey);
   handler.on("deleteLine", deleteLine);
   handler.on("changePage", changePage);
@@ -1270,7 +2107,9 @@ function registerRedisKey(context: UtilityProtocolContext): void {
   });
   handler.on("ttl", async (content) => {
     try {
-      const seconds = Number(record(content).ttl ?? content);
+      const payload = record(content);
+      const nestedKey = record(payload.key);
+      const seconds = Number(payload.ttl ?? nestedKey.ttl ?? content);
       if (!Number.isFinite(seconds)) throw new Error("Redis TTL must be a number");
       await execute(`EXPIRE ${JSON.stringify(key)} ${Math.max(0, Math.trunc(seconds))}`);
       await handler.send("success", "Redis TTL updated.");
@@ -1285,7 +2124,9 @@ function registerRedisKey(context: UtilityProtocolContext): void {
   });
   handler.on("rename", async (content) => {
     try {
-      const nextKey = stringValue(record(content).name || record(content).key || content).trim();
+      const payload = record(content);
+      const nestedKey = record(payload.key);
+      const nextKey = stringValue(payload.name || payload.newName || nestedKey.newName || nestedKey.name || content).trim();
       if (!nextKey) throw new Error("Redis key name is empty");
       await execute(`RENAME ${JSON.stringify(key)} ${JSON.stringify(nextKey)}`);
       key = nextKey;
@@ -1293,6 +2134,113 @@ function registerRedisKey(context: UtilityProtocolContext): void {
       await load();
     } catch (error) { await sendError(handler, error); }
   });
+  handler.on("openSettings", () => services.settings.openMoreSettings());
+}
+
+interface LokiLogRequest {
+  readonly start?: number;
+  readonly end?: number;
+  readonly previousMinute?: number | string;
+  readonly query?: string;
+  readonly live?: boolean;
+}
+
+function finiteNumber(value: unknown): number | undefined {
+  const number = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(number) ? number : undefined;
+}
+
+function lokiLogTime(value: unknown): number | undefined {
+  const timestamp = finiteNumber(value);
+  if (timestamp === undefined) return undefined;
+  if (timestamp > 1_000_000_000_000_000) return timestamp / 1_000_000;
+  if (timestamp > 1_000_000_000_000) return timestamp;
+  return timestamp * 1_000;
+}
+
+function lokiLogText(
+  result: QueryResult<Record<string, unknown>>,
+  live: boolean,
+): { text: string; lastTime: number; hasLog: boolean } {
+  const entries: Array<{ timestamp: number; value: string }> = [];
+  let lastTime = Date.now();
+  for (const row of rowsOf(result)) {
+    const values = row.values;
+    if (!Array.isArray(values)) continue;
+    for (const item of values) {
+      if (!Array.isArray(item) || item.length < 2) continue;
+      const timestamp = lokiLogTime(item[0]);
+      if (timestamp === undefined) continue;
+      lastTime = Math.max(lastTime, timestamp + 1);
+      entries.push({ timestamp, value: stringValue(item[1]).replace(/\n/g, "\n\r") });
+    }
+  }
+  entries.sort((left, right) => right.timestamp - left.timestamp);
+  if (entries.length === 0) {
+    return { text: live ? "" : "No logs found.", lastTime, hasLog: false };
+  }
+  return {
+    text: entries
+      .map((entry) => `${new Date(entry.timestamp).toISOString()} ${entry.value}`)
+      .join("\n\r"),
+    lastTime,
+    hasLog: true,
+  };
+}
+
+function registerLokiLog(context: UtilityProtocolContext): void {
+  const { handler, services, state } = context;
+  registerTerminalUiProtocols(context, () => targetConnection(state)?.type || "Loki");
+  const initial = { ...state, ...targetRecord(state) };
+  const connection = (): ConnectionOptions | undefined =>
+    targetConnection(state) || services.activeConnection.get();
+  const parentLabel = stringValue(initial.parentLabel).trim();
+  const labelName = stringValue(initial.labelName).trim();
+  const load = async (content?: unknown): Promise<void> => {
+    try {
+      const selected = connection();
+      if (!selected || selected.type !== "Loki") {
+        throw new Error("No Loki connection selected");
+      }
+      if (!parentLabel || !labelName) {
+        throw new Error("Loki label state is incomplete");
+      }
+      const request = record(content) as LokiLogRequest;
+      const end = finiteNumber(request.end) ?? Date.now();
+      const previousMinute = Math.max(1, finiteNumber(request.previousMinute) ?? 30);
+      const start = finiteNumber(request.start) ?? end - previousMinute * 60_000;
+      const query = stringValue(request.query).trim()
+        || `{${parentLabel}=${JSON.stringify(labelName)}} |= \"\"`;
+      const params = new URLSearchParams({
+        query,
+        start: `${Math.trunc(start)}000000`,
+        end: `${Math.trunc(end)}000000`,
+      });
+      if (!request.live) {
+        await handler.send("data", "Loading logs...");
+      }
+      const result = await services.connections.query<Record<string, unknown>>(
+        selected,
+        `GET /loki/api/v1/query_range?${params.toString()}`,
+      );
+      const output = lokiLogText(result, request.live === true);
+      await handler.send("query", query);
+      await handler.send("lastTime", {
+        lastTime: output.lastTime,
+        hasLog: output.hasLog,
+      });
+      if (output.text || !request.live) await handler.send("data", output.text);
+    } catch (error) {
+      await sendError(handler, error);
+    }
+  };
+
+  handler.on("getLogs", (content) => load(content));
+  handler.on("openDocument", async () => {
+    await vscode.env.openExternal(vscode.Uri.parse("https://grafana.com/docs/loki/latest/logql/log_queries"));
+  });
+  handler.on("openSettings", () => services.settings.openMoreSettings());
+  handler.onInit("lokiLog", () => load());
 }
 
 function registerElasticsearchStatus(context: UtilityProtocolContext): void {
@@ -1332,7 +2280,7 @@ function registerForwarding(context: UtilityProtocolContext): void {
       .map((key) => [key.slice("ssh.forwardings.".length), readList(key.slice("ssh.forwardings.".length))]),
   );
   const emit = async (): Promise<void> => {
-    const connections = connectionRecords(services.state.get("ssh.connections", services.state.get("mysql.connections", {})))
+    const connections = connectionRecords(services.state.get("ssh.connections", services.state.get("nosql.connections", services.state.get("database.connections", {}))))
       .filter((item) => item.type === "SSH" || item.type === "SFTP")
       .map((item) => ({ key: item.id, name: item.name || item.id, host: item.host }));
     await handler.send("serverKey", selectedServer);
@@ -1406,7 +2354,7 @@ function registerForwarding(context: UtilityProtocolContext): void {
     const id = stringValue(record(content).id, stringValue(content));
     try {
       const info = readList(selectedServer).find((item) => String(item.id ?? "") === id);
-      const server = connectionRecords(services.state.get("ssh.connections", services.state.get("mysql.connections", {})))
+      const server = connectionRecords(services.state.get("ssh.connections", services.state.get("nosql.connections", services.state.get("database.connections", {}))))
         .find((item) => item.id === selectedServer);
       if (!info || !server || (server.type !== "SSH" && server.type !== "SFTP")) {
         throw new Error("Forwarding server or entry was not found");
@@ -1543,7 +2491,7 @@ function registerSshMonitor(context: UtilityProtocolContext): void {
 
   const connections = (): SshConnectionOptions[] => {
     const stored = connectionRecords(
-      services.state.get("ssh.connections", services.state.get("mysql.connections", {})),
+      services.state.get("ssh.connections", services.state.get("nosql.connections", services.state.get("database.connections", {}))),
     )
       .filter((item) => item.type === "SSH" || item.type === "SFTP")
       .filter((item) => stringValue(item.options?.type).toLowerCase() !== "native")
@@ -1805,7 +2753,7 @@ function registerStructureDiff(context: UtilityProtocolContext): void {
   };
   const references = new Map<string, DiffReference>();
   const connections = (): ConnectionOptions[] => {
-    const stored = connectionRecords(services.state.get("mysql.connections", {}));
+    const stored = connectionRecords(services.state.get("database.connections", {}));
     const target = asConnection(targetRecord(context.state));
     if (target && !stored.some((item) => item.id === target.id)) stored.push(target);
     return stored;
@@ -2206,13 +3154,22 @@ export async function openErDiagramPanel(
 
 export function registerWebviewUtilityProtocols(context: UtilityProtocolContext): void {
   if (context.route === "document") registerDocument(context);
+  if (context.route === "plan" || context.route === "console") registerCloudPage(context);
+  if (context.route === "image") registerImage(context);
+  if (context.route === "manager") registerManager(context);
+  if (context.route === "util") registerUtility(context);
   if (context.route === "fileManager" || context.route === "sshTerminal") {
     registerRemoteFileManager(context);
   }
-  if (context.route === "sshTerminal") registerSshTerminal(context);
+  if (context.route === "sshTerminal") {
+    registerSshTerminal(context);
+    registerSshMonitor(context);
+    registerForwarding(context);
+  }
   if (context.route === "mock") registerMock(context);
   if (context.route === "rabbitQueueView") registerRabbitQueue(context);
   if (context.route === "keyView") registerRedisKey(context);
+  if (context.route === "lokiLog") registerLokiLog(context);
   if (context.route === "esStatus") registerElasticsearchStatus(context);
   if (context.route === "forward") registerForwarding(context);
   if (context.route === "sshStatus") registerSshStatus(context);
@@ -2221,6 +3178,8 @@ export function registerWebviewUtilityProtocols(context: UtilityProtocolContext)
     registerXterm(context);
     registerSshTerminal(context);
   }
-  if (context.route === "structDiff") registerStructureDiff(context);
+  if (context.route === "structDiff" || context.route === "manager") {
+    registerStructureDiff(context);
+  }
   if (context.route === "erDiagram") registerErDiagram(context);
 }

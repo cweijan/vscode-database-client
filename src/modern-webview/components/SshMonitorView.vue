@@ -2,7 +2,6 @@
 import { computed, inject, onBeforeUnmount, onMounted, ref } from "vue";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
-import UiButton from "./UiButton.vue";
 import UiInput from "./UiInput.vue";
 
 interface MonitorServer {
@@ -236,13 +235,12 @@ onBeforeUnmount(() => {
             Choose the servers whose status should be polled.
           </p>
         </div>
-        <UiButton
-          type="button"
-          variant="default"
+        <VscButton
+          type="default"
           @click="emit('load')"
         >
           Refresh servers
-        </UiButton>
+        </VscButton>
       </header>
 
       <div
@@ -273,22 +271,20 @@ onBeforeUnmount(() => {
       </p>
 
       <div class="route-workspace__actions">
-        <UiButton
-          type="button"
-          variant="primary"
+        <VscButton
+          type="primary"
           :disabled="monitoredKeys.length === 0"
           @click="saveSelection"
         >
           Start monitor
-        </UiButton>
-        <UiButton
+        </VscButton>
+        <VscButton
           v-if="metrics.length > 0 || monitoredKeys.length > 0"
-          type="button"
-          variant="default"
+          type="default"
           @click="cancelSetup"
         >
           Cancel
-        </UiButton>
+        </VscButton>
       </div>
     </div>
 
@@ -309,20 +305,18 @@ onBeforeUnmount(() => {
             label=""
             placeholder="Filter servers"
           />
-          <UiButton
-            type="button"
-            variant="default"
+          <VscButton
+            type="default"
             @click="emit('refresh')"
           >
             Refresh
-          </UiButton>
-          <UiButton
-            type="button"
-            variant="default"
+          </VscButton>
+          <VscButton
+            type="default"
             @click="manage"
           >
             Manage
-          </UiButton>
+          </VscButton>
         </div>
       </header>
 
@@ -410,20 +404,18 @@ onBeforeUnmount(() => {
               <td>{{ networkSpeed(metric) }}</td>
               <td>
                 <div class="ssh-monitor-view__row-actions">
-                  <UiButton
-                    type="button"
-                    variant="default"
+                  <VscButton
+                    type="default"
                     @click.stop="openTerminal(metric.key)"
                   >
                     Terminal
-                  </UiButton>
-                  <UiButton
-                    type="button"
-                    variant="danger"
+                  </VscButton>
+                  <VscButton
+                    type="danger"
                     @click.stop="removeMetric(metric.key)"
                   >
                     Remove
-                  </UiButton>
+                  </VscButton>
                 </div>
               </td>
             </tr>

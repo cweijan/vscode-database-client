@@ -4,7 +4,6 @@ import { computed, inject, onBeforeUnmount, onMounted, reactive, ref } from "vue
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
 import type { WebviewRouteName } from "../routeRegistry";
-import UiButton from "./UiButton.vue";
 
 const props = defineProps<{
   routeName: WebviewRouteName;
@@ -160,19 +159,17 @@ onBeforeUnmount(() => {
         </p>
       </div>
       <div class="route-workspace__actions">
-        <UiButton
-          type="button"
+        <VscButton
           @click="emitAction('refresh')"
         >
           Refresh
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="emitAction('close')"
         >
           Close
-        </UiButton>
+        </VscButton>
       </div>
     </header>
 
@@ -183,186 +180,160 @@ onBeforeUnmount(() => {
         :placeholder="routeName === 'xterm' || routeName === 'sshTerminal' ? 'Enter command' : 'JSON payload or path'"
         @keyup.enter="emitAction(routeName === 'xterm' || routeName === 'sshTerminal' ? 'input' : 'execute')"
       >
-      <UiButton
-        type="button"
+      <VscButton
         @click="emitAction('execute')"
       >
         Send
-      </UiButton>
+      </VscButton>
     </div>
 
     <div class="route-workbench__protocol-actions">
       <template v-if="routeName === 'fileManager' || routeName === 'sshTerminal'">
-        <UiButton
-          type="button"
+        <VscButton
           @click="sendPayload('load', { path: input || '/' })"
         >
           Load path
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="sendPayload('refreshAdapter')"
         >
           Reload adapter
-        </UiButton>
+        </VscButton>
       </template>
       <template v-else-if="routeName === 'dbFileConnect'">
-        <UiButton
-          type="button"
+        <VscButton
           @click="sendPayload('connecting', { connectionOption: { dbPath: input || state.fileName, dbType: 'SQLite', name: state.fileName } })"
         >
           Connect SQLite
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="sendPayload('reveal')"
         >
           Reveal file
-        </UiButton>
+        </VscButton>
       </template>
       <template v-else-if="routeName === 'parquet'">
-        <UiButton
-          type="button"
+        <VscButton
           @click="sendPayload('save')"
         >
           Save file
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="sendPayload('revert')"
         >
           Revert file
-        </UiButton>
+        </VscButton>
       </template>
       <template v-else-if="routeName === 'rabbitQueueView'">
-        <UiButton
-          type="button"
+        <VscButton
           @click="sendPayload('loadMessages', { count: Number(input) || 30 })"
         >
           Messages
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('loadBindings')"
         >
           Bindings
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('loadExchanges')"
         >
           Exchanges
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('loadConsumers')"
         >
           Consumers
-        </UiButton>
+        </VscButton>
       </template>
       <template v-else-if="routeName === 'keyView'">
-        <UiButton
-          type="button"
+        <VscButton
           @click="sendPayload('refresh')"
         >
           Refresh key
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('update', { value: input })"
         >
           Save value
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="sendPayload('del')"
         >
           Delete key
-        </UiButton>
+        </VscButton>
       </template>
       <template v-else-if="routeName === 'esStatus'">
-        <UiButton
-          type="button"
+        <VscButton
           @click="sendPayload('refresh_es_status')"
         >
           Refresh status
-        </UiButton>
+        </VscButton>
       </template>
       <template v-else-if="routeName === 'forward'">
-        <UiButton
-          type="button"
+        <VscButton
           @click="sendPayload('reloadForward')"
         >
           Reload forwards
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('save', parseInput())"
         >
           Save forward
-        </UiButton>
+        </VscButton>
       </template>
       <template v-else-if="routeName === 'structDiff'">
-        <UiButton
-          type="button"
+        <VscButton
           @click="sendPayload('loadDB', { key: input || (state.connection as Record<string, unknown> | undefined)?.id })"
         >
           Load source DB
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('loadDB', { key: input || (state.connection as Record<string, unknown> | undefined)?.id, isTarget: true })"
         >
           Load target DB
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('getUser')"
         >
           Load user
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('compare')"
         >
           Compare
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('sync', { sqlList: Array.isArray(state.sqlList) ? state.sqlList : [], option: state.option || {} })"
         >
           Sync
-        </UiButton>
+        </VscButton>
       </template>
       <template v-else-if="routeName === 'sshStatus' || routeName === 'sshMonitor'">
-        <UiButton
-          type="button"
+        <VscButton
           @click="sendPayload('cpu')"
         >
           CPU
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('memory')"
         >
           Memory
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('disk')"
         >
           Disk
-        </UiButton>
-        <UiButton
-          type="button"
+        </VscButton>
+        <VscButton
           @click="sendPayload('processes')"
         >
           Processes
-        </UiButton>
+        </VscButton>
       </template>
     </div>
 

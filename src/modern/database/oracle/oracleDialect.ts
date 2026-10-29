@@ -16,6 +16,26 @@ function normalizeOwner(owner: string): string {
   return owner.trim().toUpperCase();
 }
 
+function ownerLiteral(dialect: OracleDialect, owner?: string | null): string {
+  return owner ? dialect.escapeLiteral(normalizeOwner(owner)) : "USER";
+}
+
+function objectLiteral(value: string): string {
+  return `'${value.trim().toUpperCase().replaceAll("'", "''")}'`;
+}
+
+function processNumber(
+  process: Record<string, unknown>,
+  ...names: string[]
+): number | undefined {
+  const key = Object.keys(process).find((candidate) =>
+    names.some((name) => candidate.toLowerCase() === name.toLowerCase()),
+  );
+  if (!key) return undefined;
+  const value = Number(process[key]);
+  return Number.isInteger(value) && value > 0 ? value : undefined;
+}
+
 export class OracleDialect implements Dialect {
   public readonly id = "oracle";
 
@@ -45,7 +65,7 @@ export class OracleDialect implements Dialect {
   }
 
   public showTables(schema?: string | null): string {
-    const owner = schema ? this.escapeLiteral(normalizeOwner(schema)) : "USER";
+    const owner = ownerLiteral(this, schema);
     return [
       "select",
       "  o.object_name \"name\",",
@@ -58,6 +78,185 @@ export class OracleDialect implements Dialect {
       "where o.owner = " + owner + " and o.object_type = 'TABLE'",
       "order by \"name\"",
     ].join("\n");
+  }
+
+  public showDatabases(): string {
+    return 'select username as "Database" from sys.all_users order by username';
+  }
+
+  public showSchemas(): string {
+    return this.showDatabases();
+  }
+
+  public showViews(schema?: string | null): string {
+    const owner = ownerLiteral(this, schema);
+    return `select object_name "name" from all_objects where object_type = 'VIEW' and owner = ${owner} order by object_name`;
+  }
+
+  public showProcedures(schema?: string | null): string {
+    const owner = ownerLiteral(this, schema);
+    return `select object_name "name" from all_objects where object_type = 'PROCEDURE' and owner = ${owner} order by object_name`;
+  }
+
+  public showFunctions(schema?: string | null): string {
+    const owner = ownerLiteral(this, schema);
+    return `select object_name "name" from all_objects where object_type = 'FUNCTION' and owner = ${owner} order by object_name`;
+  }
+
+  public showTriggers(
+    schema?: string | null,
+    table?: string | null,
+  ): string {
+    const owner = ownerLiteral(this, schema);
+    const tableFilter = table
+      ? ` and table_name = ${objectLiteral(table)}`
+      : "";
+    return [
+      'select trigger_name "trigger_name", table_name "table_name",',
+      '       triggering_event "event"',
+      "from all_triggers",
+      `where owner = ${owner}${tableFilter}`,
+      "order by trigger_name",
+    ].join("\n");
+  }
+
+  public showIndex(schema: string | null, table: string): string {
+    const owner = ownerLiteral(this, schema);
+    return [
+      'select',
+      '  col.column_name "column_name",',
+      '  col.index_name "index_name",',
+      '  idx.uniqueness "uniqueness"',
+      "from all_ind_columns col",
+      "join all_indexes idx on col.index_name = idx.index_name and col.index_owner = idx.owner",
+      `where col.table_owner = ${owner}`,
+      `  and col.table_name = ${objectLiteral(table)}`,
+      'order by col.index_name, col.column_position',
+    ].join("\n");
+  }
+
+  public showChecks(schema: string | null, table: string): string {
+    const owner = ownerLiteral(this, schema);
+    return [
+      'select c.constraint_name "name", c.search_condition "clause"',
+      "from all_constraints c",
+      `where c.owner = ${owner}`,
+      `  and c.table_name = ${objectLiteral(table)}`,
+      "  and c.constraint_type = 'C'",
+      'order by c.constraint_name',
+    ].join("\n");
+  }
+
+  public showVersion(): string {
+    return `select RTRIM(SUBSTR(REPLACE(banner,'Oracle Database ',''),1,3)) "server_version" from v$version where rownum=1`;
+  }
+
+  public truncateDatabase(database: string): string {
+    const owner = this.escapeLiteral(normalizeOwner(database));
+    return `SELECT 'TRUNCATE TABLE "' || owner || '"."' || object_name || '";' AS trun FROM all_objects WHERE owner = ${owner} AND object_type = 'TABLE';`;
+  }
+
+  public createDatabase(): string {
+    return 'CREATE USER "username" IDENTIFIED BY "password";\nGRANT CREATE SESSION TO "username";';
+  }
+
+  public dropDatabase(database: string): string {
+    return `DROP USER ${this.quoteIdentifier(normalizeOwner(database))} CASCADE;`;
+  }
+
+  public processList(): string {
+    return [
+      "SELECT",
+      '  SID, SERIAL# as SERIAL,',
+      '  s.username "User", s.schemaname "Schema",',
+      '  s.status "Status",',
+      '  sql.sql_text SQL',
+      "FROM v$session s, v$sql sql",
+      "WHERE sql.sql_id(+) = s.sql_id",
+      "  AND s.type = 'USER'",
+    ].join("\n");
+  }
+
+  public kill(process: Record<string, unknown>): string | null {
+    const sid = processNumber(process, "sid");
+    const serial = processNumber(process, "serial", "serial#");
+    return sid && serial
+      ? `ALTER SYSTEM KILL SESSION '${sid},${serial}' IMMEDIATE;`
+      : null;
+  }
+
+  public showUsers(): string {
+    return 'select username "user" from all_users order by username';
+  }
+
+  public showRoles(): string {
+    return 'select role "role" from dba_roles order by role';
+  }
+
+  public showPackages(schema?: string | null): string {
+    const owner = ownerLiteral(this, schema);
+    return [
+      'select object_name "name", status "status"',
+      "from all_objects",
+      `where object_type = 'PACKAGE' and owner = ${owner}`,
+      'order by "name"',
+    ].join("\n");
+  }
+
+  public showMaterialViews(schema?: string | null): string {
+    const owner = ownerLiteral(this, schema);
+    return `select object_name "name" from all_objects where object_type = 'MATERIALIZED VIEW' and owner = ${owner} order by object_name`;
+  }
+
+  public showTableSource(schema: string | null, table: string): string {
+    const owner = ownerLiteral(this, schema);
+    return `select DBMS_METADATA.GET_DDL('TABLE', ${objectLiteral(table)}, ${owner}) "definition" from dual`;
+  }
+
+  public showViewSource(schema: string | null, view: string): string {
+    const owner = ownerLiteral(this, schema);
+    return `select DBMS_METADATA.GET_DDL('VIEW', ${objectLiteral(view)}, ${owner}) "definition" from dual`;
+  }
+
+  public showRoutineSource(
+    kind: "procedure" | "function" | "trigger",
+    schema: string | null,
+    name: string,
+  ): string {
+    const owner = ownerLiteral(this, schema);
+    const objectName = objectLiteral(name);
+    if (kind === "trigger") {
+      return `select trigger_body "definition" from all_triggers where owner = ${owner} and trigger_name = ${objectName}`;
+    }
+    return `select text "definition" from all_source where owner = ${owner} and name = ${objectName} and type = '${kind.toUpperCase()}' order by line`;
+  }
+
+  public showPackageSource(schema: string | null, name: string): string {
+    return `select text from all_source where owner = ${this.escapeLiteral(normalizeOwner(schema || ""))} and name = ${this.escapeLiteral(name.trim().toUpperCase())} and type = 'PACKAGE' order by line`;
+  }
+
+  public createUser(): string {
+    return 'CREATE USER "username" IDENTIFIED BY "password";\nGRANT CREATE SESSION TO "username";';
+  }
+
+  public packageTemplate(): string {
+    return "CREATE OR REPLACE PACKAGE package_name AS\n  PROCEDURE process(arg VARCHAR2);\nEND;\n/";
+  }
+
+  public updateUser(username: string): string {
+    return `ALTER USER ${this.quoteIdentifier(username)} IDENTIFIED BY "newPassword";`;
+  }
+
+  public createRole(): string {
+    return 'CREATE ROLE "role_name";\nGRANT "role_name" TO "username";';
+  }
+
+  public updateRole(role: string): string {
+    return `ALTER ROLE ${this.quoteIdentifier(role)} IDENTIFIED BY "newPassword";`;
+  }
+
+  public grantRole(role: string): string {
+    return `GRANT ${this.quoteIdentifier(role)} TO "username";`;
   }
 
   public showColumns(schema: string | null, table: string): string {

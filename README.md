@@ -115,15 +115,19 @@ Common options:
 ### Prerequisites
 
 - Node.js 20+
-- [Yarn](https://yarnpkg.com/)
+- npm 10+
 
 ### Build
 
 ```bash
-yarn install
-yarn dev      # watch mode for development
-yarn build    # production build to out/
-yarn lint     # type check
+npm ci
+npm run dev:webview        # Webview development server
+npm run dev:extension      # extension watch build
+npm run build              # modern extension and Webview build
+npm run typecheck:modern
+npm run lint:modern
+npm run test:modern
+npm run verify:modern      # build, stage, package-contract, and activation checks
 ```
 
 Press `F5` in VS Code to launch the Extension Development Host.
@@ -131,8 +135,11 @@ Press `F5` in VS Code to launch the Extension Development Host.
 ### Package
 
 ```bash
-yarn repackage  # build and create .vsix
+npm run repackage  # build, stage, and create .vsix
 ```
+
+The staged installable package is written to `dist-modern/package`; the VSIX
+created by `repackage` is written to the repository root.
 
 ## Credits
 

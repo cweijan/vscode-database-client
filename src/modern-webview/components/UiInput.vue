@@ -13,20 +13,20 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <label class="vsc-field">
-    <span
+  <div class="inline-flex items-center">
+    <label
       v-if="label"
-      class="vsc-field__label"
+      class="common_input_label"
     >
       {{ label }}
-    </span>
+    </label>
     <input
-      class="vsc-input"
+      class="common_input_width field__input"
       :value="modelValue"
       :placeholder="placeholder"
       :disabled="disabled"
       :type="type"
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     >
-  </label>
+  </div>
 </template>

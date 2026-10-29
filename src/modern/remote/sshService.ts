@@ -1,21 +1,31 @@
 import { promises as fs } from "node:fs";
+import { homedir } from "node:os";
+import { isAbsolute, join, resolve } from "node:path";
 
 import {
   Client,
   type ClientChannel,
   type ConnectConfig,
   type SFTPWrapper,
+  type Algorithms,
+  type AuthenticationType,
 } from "@cweijan/ssh2";
 
 import { OperationCancelledError } from "../core/errors";
+import { connectionOption, sshConnectionNamespace } from "../database/connectionOptions";
 import type { ConnectionOptions } from "../database/types";
 
 export interface SshConnectionOptions extends ConnectionOptions {
+  readonly ssh?: Record<string, unknown>;
+  readonly sshConnect?: Record<string, unknown>;
   readonly options?: Record<string, unknown> & {
+    readonly type?: string;
+    readonly authType?: string;
     readonly privateKeyPath?: string;
     readonly passphrase?: string;
     readonly agent?: string;
     readonly readyTimeout?: number;
+    readonly algorithms?: Algorithms;
   };
 }
 
@@ -24,8 +34,14 @@ export interface RemoteEntry {
   readonly path: string;
   readonly kind: "file" | "directory" | "link" | "other";
   readonly size: number;
+  readonly createdAt?: Date;
   readonly modifiedAt?: Date;
   readonly owner?: string;
+}
+
+export interface SshRemoteForward {
+  readonly port: number;
+  close(): Promise<void>;
 }
 
 export interface SshSession {
@@ -48,11 +64,53 @@ export interface SshSession {
     destinationPort: number,
     signal?: AbortSignal,
   ): Promise<NodeJS.ReadWriteStream>;
+  forwardIn(
+    remoteHost: string,
+    remotePort: number,
+    onConnection: (channel: NodeJS.ReadWriteStream) => void,
+    signal?: AbortSignal,
+  ): Promise<SshRemoteForward>;
   close(): Promise<void>;
 }
 
 function option(options: SshConnectionOptions, key: string): unknown {
-  return options.options?.[key];
+  const ssh = sshConnectionNamespace(options);
+  if (key === "readyTimeout" && ssh.waitingTime !== undefined) {
+    return ssh.waitingTime;
+  }
+  if (ssh[key] !== undefined) return ssh[key];
+  const configured = options.options?.[key];
+  if (configured !== undefined && key !== "type") return configured;
+  if (key === "type") return undefined;
+  return connectionOption(options, key);
+}
+
+export function expandSshPath(value: string): string {
+  const source = value.trim();
+  if (!source) return source;
+  const home = homedir();
+  const expanded = source
+    .replaceAll("{homedir}", home)
+    .replace(/^~(?=[\\/]|$)/, home);
+  return isAbsolute(expanded) ? expanded : resolve(expanded);
+}
+
+function authMode(options: SshConnectionOptions): string {
+  const value = option(options, "type") ?? option(options, "authType");
+  return typeof value === "string" && value.trim()
+    ? value.trim().toLowerCase()
+    : "auto";
+}
+
+function authMethods(mode: string): AuthenticationType[] | undefined {
+  if (mode === "password") return ["password"];
+  if (mode === "privatekey") return ["publickey"];
+  if (mode === "agent") return ["agent"];
+  if (mode === "privatekeyandpassword") return ["publickey", "password"];
+  if (mode === "none") return ["none"];
+  return process.platform === "win32"
+    ? ["password", "publickey"]
+    : ["password", "publickey", "agent"];
 }
 
 function abortIfNeeded(signal: AbortSignal | undefined, operation: string): void {
@@ -66,6 +124,13 @@ export function buildSshConnectConfig(
   privateKey?: Buffer,
 ): ConnectConfig {
   const configuredAgent = option(options, "agent");
+  const configuredAlgorithms = option(options, "algorithms");
+  const mode = authMode(options);
+  const agent = typeof configuredAgent === "string" && configuredAgent.trim()
+    ? configuredAgent.trim()
+    : (mode === "agent" || mode === "auto" || mode === "native"
+      ? process.env.SSH_AUTH_SOCK
+      : undefined);
   return {
     host: options.host || "localhost",
     port: options.port || 22,
@@ -75,10 +140,14 @@ export function buildSshConnectConfig(
     passphrase: typeof option(options, "passphrase") === "string"
       ? option(options, "passphrase") as string
       : undefined,
-    agent: typeof configuredAgent === "string" ? configuredAgent : undefined,
+    agent,
+    authHandler: authMethods(mode === "native" ? "auto" : mode),
     readyTimeout: typeof option(options, "readyTimeout") === "number"
       ? option(options, "readyTimeout") as number
       : 30_000,
+    algorithms: configuredAlgorithms && typeof configuredAlgorithms === "object"
+      ? configuredAlgorithms as Algorithms
+      : undefined,
     keepaliveInterval: 10_000,
   };
 }
@@ -158,6 +227,7 @@ function remoteList(
           path: joinRemotePath(remotePath, entry.filename),
           kind: classifyRemoteEntry(entry.longname),
           size: entry.attrs.size,
+          createdAt: entry.attrs.atime ? new Date(entry.attrs.atime * 1000) : undefined,
           modifiedAt: entry.attrs.mtime ? new Date(entry.attrs.mtime * 1000) : undefined,
           owner: entry.attrs.uid == null && entry.attrs.gid == null
             ? undefined
@@ -298,6 +368,57 @@ function forwardOut(
   });
 }
 
+function unforwardIn(
+  client: Client,
+  remoteHost: string,
+  remotePort: number,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    client.unforwardIn(remoteHost, remotePort, (error) => {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+}
+
+function forwardIn(
+  client: Client,
+  remoteHost: string,
+  remotePort: number,
+  onConnection: (channel: NodeJS.ReadWriteStream) => void,
+): Promise<SshRemoteForward> {
+  let assignedPort = remotePort;
+  const listener = (
+    details: { readonly destPort: number },
+    accept: () => ClientChannel,
+    reject: () => void,
+  ) => {
+    if (details.destPort !== assignedPort) {
+      reject();
+      return;
+    }
+    onConnection(accept());
+  };
+  client.on("tcp connection", listener);
+  return new Promise((resolve, reject) => {
+    client.forwardIn(remoteHost, remotePort, (error, portNumber) => {
+      if (error) {
+        client.removeListener("tcp connection", listener);
+        reject(error);
+        return;
+      }
+      assignedPort = portNumber;
+      resolve({
+        port: portNumber,
+        close: async () => {
+          client.removeListener("tcp connection", listener);
+          await unforwardIn(client, remoteHost, portNumber);
+        },
+      });
+    });
+  });
+}
+
 function sessionFromClient(
   id: string,
   options: SshConnectionOptions,
@@ -369,6 +490,10 @@ function sessionFromClient(
       abortIfNeeded(signal, "Forward SSH port");
       return forwardOut(client, sourceHost, sourcePort, destinationHost, destinationPort);
     },
+    async forwardIn(remoteHost, remotePort, onConnection, signal) {
+      abortIfNeeded(signal, "Forward SSH port");
+      return forwardIn(client, remoteHost, remotePort, onConnection);
+    },
     close,
   };
 }
@@ -410,10 +535,21 @@ export class SshService {
     options: SshConnectionOptions,
     signal?: AbortSignal,
   ): Promise<SshSession> {
-    const privateKeyPath = option(options, "privateKeyPath");
-    const privateKey = typeof privateKeyPath === "string"
-      ? await fs.readFile(privateKeyPath)
-      : undefined;
+    const configuredPath = option(options, "privateKeyPath");
+    const mode = authMode(options);
+    const keyPath = typeof configuredPath === "string" && configuredPath.trim()
+      ? expandSshPath(configuredPath)
+      : ["auto", "privatekey", "privatekeyandpassword"].includes(mode)
+        ? join(homedir(), ".ssh", "id_rsa")
+        : undefined;
+    let privateKey: Buffer | undefined;
+    if (keyPath) {
+      try {
+        privateKey = await fs.readFile(keyPath);
+      } catch (error) {
+        if (configuredPath) throw error;
+      }
+    }
     const client = await connectClient(buildSshConnectConfig(options, privateKey), signal);
     try {
       const sftp = await openSftp(client);

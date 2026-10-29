@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ElOption, ElSelect } from "element-plus";
+
 defineProps<{
   modelValue: string;
   label?: string;
@@ -23,26 +25,25 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <label class="vsc-field">
-    <span
+  <div class="inline-flex items-center">
+    <label
       v-if="label"
-      class="vsc-field__label"
+      class="common_input_label"
     >
       {{ label }}
-    </span>
-    <select
-      class="vsc-input"
-      :value="modelValue"
+    </label>
+    <ElSelect
+      :model-value="modelValue"
+      size="small"
       :disabled="disabled"
-      @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+      @update:model-value="emit('update:modelValue', String($event ?? ''))"
     >
-      <option
+      <ElOption
         v-for="option in options"
         :key="optionValue(option)"
         :value="optionValue(option)"
-      >
-        {{ optionLabel(option) }}
-      </option>
-    </select>
-  </label>
+        :label="optionLabel(option)"
+      />
+    </ElSelect>
+  </div>
 </template>

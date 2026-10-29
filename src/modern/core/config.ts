@@ -6,6 +6,12 @@ export interface DatabaseClientSettings {
   connectTimeout: number;
   escapedAllObjectName: boolean;
   documentationHost: string;
+  enableEditorCodeLens: boolean;
+  splitSQLByNewLine: boolean;
+  enableFlexibleSQLParser: boolean;
+  enableSQLVariable: boolean;
+  showSecurity: boolean;
+  showTrigger: boolean;
 }
 
 const defaults: DatabaseClientSettings = {
@@ -14,6 +20,12 @@ const defaults: DatabaseClientSettings = {
   connectTimeout: 30_000,
   escapedAllObjectName: false,
   documentationHost: "https://database-client.com",
+  enableEditorCodeLens: true,
+  splitSQLByNewLine: true,
+  enableFlexibleSQLParser: true,
+  enableSQLVariable: true,
+  showSecurity: true,
+  showTrigger: false,
 };
 
 export class ConfigService {
@@ -32,6 +44,12 @@ export class ConfigService {
       connectTimeout: this.get("connectTimeout"),
       escapedAllObjectName: this.get("escapedAllObjectName"),
       documentationHost: this.get("documentationHost"),
+      enableEditorCodeLens: this.get("enableEditorCodeLens"),
+      splitSQLByNewLine: this.get("splitSQLByNewLine"),
+      enableFlexibleSQLParser: this.get("enableFlexibleSQLParser"),
+      enableSQLVariable: this.get("enableSQLVariable"),
+      showSecurity: this.get("showSecurity"),
+      showTrigger: this.get("showTrigger"),
     };
   }
 }

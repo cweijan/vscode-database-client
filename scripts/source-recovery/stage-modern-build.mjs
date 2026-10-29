@@ -50,14 +50,29 @@ async function main() {
       await fs.copyFile(path.join(projectRoot, fileName), path.join(output, fileName));
     }
   }
+  await fs.writeFile(
+    path.join(output, ".vscodeignore"),
+    "node_modules/\nout/**/*.map\n",
+    "utf8",
+  );
 
   const staticOut = path.join(projectRoot, "out");
   const stagedOut = path.join(output, "out");
   await fs.cp(staticOut, stagedOut, { recursive: true });
-  await fs.copyFile(
-    path.join(projectRoot, "dist-modern", "extension", "extension.js"),
-    path.join(stagedOut, "extension.js"),
+  // Vite may emit shared chunks for dynamic imports. Copy the whole
+  // extension output so the staged package has the same relative module
+  // closure as the build directory, rather than only its entry file.
+  await fs.cp(
+    path.join(projectRoot, "dist-modern", "extension"),
+    stagedOut,
+    { recursive: true, force: true },
   );
+  for (const fileName of ["sql-wasm.wasm", "sql-wasm-browser.wasm"]) {
+    await fs.copyFile(
+      path.join(projectRoot, "node_modules", "sql.js", "dist", fileName),
+      path.join(stagedOut, fileName),
+    );
+  }
   await fs.rm(path.join(stagedOut, "webview"), { recursive: true, force: true });
   await fs.cp(
     path.join(projectRoot, "dist-modern", "webview"),

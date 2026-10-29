@@ -7,7 +7,6 @@ import {
 } from "../../modern/database/mockModel";
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
-import UiButton from "./UiButton.vue";
 import UiInput from "./UiInput.vue";
 
 interface MockRow {
@@ -201,19 +200,17 @@ onBeforeUnmount(() => {
         </p>
       </div>
       <div class="route-workspace__actions">
-        <UiButton
-          type="button"
+        <VscButton
           @click="refresh"
         >
           Refresh
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="save"
         >
           Save
-        </UiButton>
+        </VscButton>
       </div>
     </header>
 
@@ -320,21 +317,19 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="mock-view__footer">
-      <UiButton
-        type="button"
-        variant="default"
+      <VscButton
+        type="default"
         @click="reset"
       >
         Reset
-      </UiButton>
-      <UiButton
-        type="button"
-        variant="primary"
+      </VscButton>
+      <VscButton
+        type="primary"
         :disabled="generating || loading"
         @click="run"
       >
         {{ generating ? "Generating…" : "Generate" }}
-      </UiButton>
+      </VscButton>
     </div>
 
     <p

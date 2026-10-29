@@ -11,10 +11,11 @@ import {
   DriverConnectionFactory,
   type DriverConnector,
 } from "./driverConnectionFactory";
+import { s3PublicUrl, splitS3ResourcePath } from "./s3Urls";
 import type { ConnectionOptions, QueryField } from "./types";
 
 interface ResourceCommand {
-  operation: "LIST" | "READ" | "WRITE" | "DELETE" | "MKDIR" | "RENAME";
+  operation: "LIST" | "READ" | "CREATE" | "WRITE" | "DELETE" | "MKDIR" | "RENAME" | "URL_TEMP" | "URL_PUBLIC";
   path: string;
   body: string;
 }
@@ -56,7 +57,7 @@ function parseResourceCommand(source: string): ResourceCommand {
   const body = newline < 0 ? "" : normalized.slice(newline + 1);
   const separator = firstLine.indexOf(" ");
   const operation = (separator < 0 ? firstLine : firstLine.slice(0, separator)).toUpperCase();
-  if (!["LIST", "READ", "WRITE", "DELETE", "MKDIR", "RENAME"].includes(operation)) {
+  if (!["LIST", "READ", "CREATE", "WRITE", "DELETE", "MKDIR", "RENAME", "URL_TEMP", "URL_PUBLIC"].includes(operation)) {
     throw new UnsupportedDatabaseOperationError("Resource command", operation || "empty");
   }
   const path = (separator < 0 ? "/" : firstLine.slice(separator + 1).trim()) || "/";
@@ -73,6 +74,7 @@ function resourceFields(): QueryField[] {
     { name: "path" },
     { name: "kind" },
     { name: "size" },
+    { name: "created" },
     { name: "modified" },
   ];
 }
@@ -140,6 +142,10 @@ function ftpConnector(): DriverConnector {
           case "RENAME":
             await client.rename(command.path, command.body.trim());
             return { rows: [], fields: [] };
+          case "URL_TEMP":
+          case "URL_PUBLIC":
+          case "CREATE":
+            throw new UnsupportedDatabaseOperationError("FTP resource command", command.operation);
         }
       };
       return {
@@ -221,6 +227,10 @@ function webDavConnector(): DriverConnector {
           case "RENAME":
             await client.moveFile(command.path, command.body.trim());
             return { rows: [], fields: [] };
+          case "URL_TEMP":
+          case "URL_PUBLIC":
+          case "CREATE":
+            throw new UnsupportedDatabaseOperationError("WebDAV resource command", command.operation);
         }
       };
       return {
@@ -235,14 +245,6 @@ function webDavConnector(): DriverConnector {
       };
     },
   };
-}
-
-function s3Path(source: string): { bucket: string; key: string } {
-  const clean = source.replace(/^\/+/, "");
-  const separator = clean.indexOf("/");
-  return separator < 0
-    ? { bucket: clean, key: "" }
-    : { bucket: clean.slice(0, separator), key: clean.slice(separator + 1) };
 }
 
 function s3Connector(): DriverConnector {
@@ -280,12 +282,13 @@ function s3Connector(): DriverConnector {
               const response = await client.send(new ListBucketsCommand({}), { abortSignal: querySignal });
               return resultRows((response.Buckets || []).map((bucket) => ({
                 name: bucket.Name || "",
-                path: `/${bucket.Name || ""}`,
-                kind: "directory",
-                modified: bucket.CreationDate?.toISOString(),
+              path: `/${bucket.Name || ""}`,
+              kind: "directory",
+              created: bucket.CreationDate?.toISOString(),
+              modified: bucket.CreationDate?.toISOString(),
               })));
             }
-            const { bucket, key } = s3Path(command.path);
+            const { bucket, key } = splitS3ResourcePath(command.path);
             const response = await client.send(new ListObjectsV2Command({
               Bucket: bucket,
               Prefix: key,
@@ -310,7 +313,7 @@ function s3Connector(): DriverConnector {
             return resultRows([...directories, ...files]);
           }
           case "READ": {
-            const { bucket, key } = s3Path(command.path);
+            const { bucket, key } = splitS3ResourcePath(command.path);
             const response = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }), { abortSignal: querySignal });
             const bytes = response.Body ? await response.Body.transformToByteArray() : new Uint8Array();
             return {
@@ -319,7 +322,7 @@ function s3Connector(): DriverConnector {
             };
           }
           case "WRITE": {
-            const { bucket, key } = s3Path(command.path);
+            const { bucket, key } = splitS3ResourcePath(command.path);
             await client.send(new PutObjectCommand({
               Bucket: bucket,
               Key: key,
@@ -328,12 +331,12 @@ function s3Connector(): DriverConnector {
             return { rows: [], fields: [] };
           }
           case "DELETE": {
-            const { bucket, key } = s3Path(command.path);
+            const { bucket, key } = splitS3ResourcePath(command.path);
             await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }), { abortSignal: querySignal });
             return { rows: [], fields: [] };
           }
           case "MKDIR": {
-            const { bucket, key } = s3Path(command.path);
+            const { bucket, key } = splitS3ResourcePath(command.path);
             if (key) {
               await client.send(new PutObjectCommand({
                 Bucket: bucket,
@@ -346,8 +349,8 @@ function s3Connector(): DriverConnector {
             return { rows: [], fields: [] };
           }
           case "RENAME": {
-            const sourcePath = s3Path(command.path);
-            const targetPath = s3Path(command.body.trim());
+            const sourcePath = splitS3ResourcePath(command.path);
+            const targetPath = splitS3ResourcePath(command.body.trim());
             const object = await client.send(new GetObjectCommand({ Bucket: sourcePath.bucket, Key: sourcePath.key }), { abortSignal: querySignal });
             const bytes = object.Body ? await object.Body.transformToByteArray() : new Uint8Array();
             await client.send(new PutObjectCommand({
@@ -358,6 +361,23 @@ function s3Connector(): DriverConnector {
             await client.send(new DeleteObjectCommand({ Bucket: sourcePath.bucket, Key: sourcePath.key }), { abortSignal: querySignal });
             return { rows: [], fields: [] };
           }
+          case "URL_TEMP": {
+            const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+            const { bucket, key } = splitS3ResourcePath(command.path);
+            const url = await getSignedUrl(
+              client,
+              new GetObjectCommand({ Bucket: bucket, Key: key }),
+              { expiresIn: 36_000 },
+            );
+            return { rows: [{ url }], fields: [{ name: "url" }] };
+          }
+          case "URL_PUBLIC":
+            return {
+              rows: [{ url: s3PublicUrl(options, command.path) }],
+              fields: [{ name: "url" }],
+            };
+          case "CREATE":
+            throw new UnsupportedDatabaseOperationError("S3 resource command", command.operation);
         }
       };
       await client.send(new ListBucketsCommand({}), { abortSignal: signal });
@@ -397,12 +417,13 @@ function etcdConnector(): DriverConnector {
         async query(source, queryOptions) {
           ensureActive(queryOptions?.signal, "etcd command");
           const command = parseResourceCommand(source);
+          const key = command.path.replace(/^\/+/, "");
           if (command.operation === "READ") {
-            const value = await client.get(command.path).string();
-            return { rows: [{ key: command.path, value }], fields: [{ name: "key" }, { name: "value" }] };
+            const value = await client.get(key).string();
+            return { rows: [{ key, value }], fields: [{ name: "key" }, { name: "value" }] };
           }
           if (command.operation === "LIST") {
-            const values = await client.getAll().prefix(command.path.replace(/^\//, "")).strings();
+            const values = await client.getAll().prefix(key).strings();
             return resultRows(Object.entries(values).map(([key, value]) => ({
               name: key,
               path: `/${key}`,
@@ -411,12 +432,12 @@ function etcdConnector(): DriverConnector {
               value,
             })));
           }
-          if (command.operation === "WRITE") {
-            await client.put(command.path).value(command.body);
+          if (command.operation === "CREATE" || command.operation === "WRITE") {
+            await client.put(key).value(command.body).exec();
             return { rows: [], fields: [] };
           }
           if (command.operation === "DELETE") {
-            await client.delete().key(command.path);
+            await client.delete().key(key).exec();
             return { rows: [], fields: [] };
           }
           throw new UnsupportedDatabaseOperationError(command.operation, "etcd");
@@ -433,11 +454,128 @@ function etcdConnector(): DriverConnector {
   };
 }
 
+function zookeeperConnector(): DriverConnector {
+  return {
+    type: "Zookeeper",
+    async connect(options, signal) {
+      ensureActive(signal, "Opening Zookeeper connection");
+      const { default: zookeeper } = await import("node-zookeeper-client");
+      const address = (options.connectionUrl || `${options.host || "localhost"}:${options.port || 2181}`)
+        .replace(/^zookeeper:\/\//i, "");
+      const client = zookeeper.createClient(address);
+      await new Promise<void>((resolve, reject) => {
+        let settled = false;
+        const fail = (error: Error) => {
+          if (settled) return;
+          settled = true;
+          reject(error);
+        };
+        client.once("error", fail);
+        client.once("connected", () => {
+          if (settled) return;
+          settled = true;
+          resolve();
+        });
+        try {
+          client.connect();
+        } catch (error) {
+          fail(error instanceof Error ? error : new Error(String(error)));
+        }
+      });
+
+      const execute = async (source: string, querySignal?: AbortSignal) => {
+        ensureActive(querySignal, "Zookeeper command");
+        const command = parseResourceCommand(source);
+        if (command.operation === "LIST") {
+          const children = await new Promise<string[]>((resolve, reject) => {
+            client.getChildren(command.path, (error, value) => {
+              if (error) {
+                reject(error);
+                return;
+              }
+              resolve(value || []);
+            });
+          });
+          const prefix = command.path.replace(/\/$/, "") || "";
+          return resultRows(children.sort().map((name) => ({
+            name,
+            path: `${prefix}/${name}` || "/",
+            kind: "node",
+          })));
+        }
+        if (command.operation === "READ") {
+          const data = await new Promise<Buffer>((resolve, reject) => {
+            client.getData(command.path, (error, value) => {
+              if (error) {
+                reject(error);
+                return;
+              }
+              resolve(value || Buffer.alloc(0));
+            });
+          });
+          return {
+            rows: [{ key: command.path, value: data.toString("utf8") }],
+            fields: [{ name: "key" }, { name: "value" }],
+          };
+        }
+        if (command.operation === "CREATE") {
+          await new Promise<void>((resolve, reject) => {
+            const done = (error: Error | undefined) => error ? reject(error) : resolve();
+            if (command.body) {
+              client.create(command.path, Buffer.from(command.body, "utf8"), done);
+            } else {
+              client.create(command.path, done);
+            }
+          });
+          return { rows: [], fields: [] };
+        }
+        if (command.operation === "WRITE") {
+          await new Promise<void>((resolve, reject) => {
+            client.setData(command.path, command.body, (error) => {
+              if (error) reject(error);
+              else resolve();
+            });
+          });
+          return { rows: [], fields: [] };
+        }
+        if (command.operation === "DELETE") {
+          await new Promise<void>((resolve, reject) => {
+            client.removeRecursive(command.path, (error) => {
+              if (error) reject(error);
+              else resolve();
+            });
+          });
+          return { rows: [], fields: [] };
+        }
+        throw new UnsupportedDatabaseOperationError(command.operation, "Zookeeper");
+      };
+      return {
+        async query(source, queryOptions) {
+          return execute(source, queryOptions?.signal);
+        },
+        async ping(querySignal) {
+          ensureActive(querySignal, "Zookeeper ping");
+          await new Promise<void>((resolve, reject) => {
+            client.getChildren("/", (error) => {
+              if (error) reject(error);
+              else resolve();
+            });
+          });
+        },
+        async close() {
+          client.close();
+        },
+      };
+    },
+  };
+}
+
 export function createResourceConnectionFactories(): DriverConnectionFactory[] {
   return [
     new DriverConnectionFactory(ftpConnector()),
     new DriverConnectionFactory(webDavConnector()),
     new DriverConnectionFactory(s3Connector()),
     new DriverConnectionFactory(etcdConnector()),
+    new DriverConnectionFactory(zookeeperConnector()),
   ];
 }

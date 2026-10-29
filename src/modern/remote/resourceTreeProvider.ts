@@ -4,7 +4,18 @@ import * as path from "node:path";
 import * as vscode from "vscode";
 
 import type { ExtensionServices } from "../core/extensionServices";
+import { s3WebsiteUrl } from "../database/s3Urls";
 import type { ConnectionOptions, QueryResult } from "../database/types";
+import { prettyBytes } from "../core/utilityService";
+import {
+  connectionTreeIcon,
+  targetRemoteFileIcon,
+  targetPresentationCollapsibleState,
+  targetPresentationTreeIcon,
+} from "../tree/targetTreeIcon";
+import { targetRemoteTreePresentations } from "../tree/targetTreePresentation";
+
+const RESOURCE_CONNECTION_STATE_KEY = "nosql.connections";
 
 export interface ResourceStoredConnection extends ConnectionOptions {
   readonly name?: string;
@@ -20,9 +31,53 @@ function isS3(connection: ResourceStoredConnection): boolean {
   return connection.type === "S3";
 }
 
+function isFtp(connection: ResourceStoredConnection): boolean {
+  return connection.type === "FTP";
+}
+
+function isWebDav(connection: ResourceStoredConnection): boolean {
+  return connection.type === "WebDAV";
+}
+
+function emptyMessage(
+  connection: ResourceStoredConnection,
+  root: boolean,
+): string {
+  if (isS3(connection) && root) return "No bucket found!";
+  if (isWebDav(connection) && root) return "No folder found!";
+  if (isWebDav(connection)) return "This folder is empty";
+  return "This folder has no files.";
+}
+
+function record(value: unknown): Record<string, unknown> | undefined {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : undefined;
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function configuredS3Buckets(connection: ResourceStoredConnection): string[] {
+  const s3 = record(connection.options?.s3);
+  const configured = s3?.includeBuckets ?? connection.options?.includeBuckets;
+  if (typeof configured !== "string") return [];
+  return configured.split(",").map((value) => value.trim()).filter(Boolean);
+}
+
 function entryPath(parentPath: string, name: string): string {
   if (parentPath === "/") return `/${name}`;
   return `${parentPath.replace(/\/$/, "")}/${name}`;
+}
+
+function resourceDate(value: unknown): string {
+  if (value == null) return "";
+  const date = value instanceof Date ? value : new Date(String(value));
+  if (Number.isNaN(date.getTime())) return String(value);
+  const pad = (part: number): string => String(part).padStart(2, "0");
+  const hours = date.getHours() % 12 || 12;
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(hours)}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
 function resultRows(result: QueryResult<Record<string, unknown>>): Record<string, unknown>[] {
@@ -75,13 +130,61 @@ export class ResourceConnectionNode extends vscode.TreeItem {
     super(displayName(connection), vscode.TreeItemCollapsibleState.Collapsed);
     this.contextValue = `${connection.type.toLowerCase()}Connection`;
     this.description = connection.host || connection.connectionUrl || connection.type;
-    this.iconPath = new vscode.ThemeIcon(connection.type === "S3" ? "cloud" : "remote-explorer");
+    this.iconPath = isFtp(connection)
+      ? new vscode.ThemeIcon("server")
+      : connectionTreeIcon(
+        this.services.resources,
+        connection,
+        this.services.activeConnection.get(),
+      );
   }
 
-  public async getChildren(): Promise<Array<ResourceDirectoryNode | ResourceInfoNode>> {
+  public async getChildren(): Promise<Array<ResourceDirectoryNode | ResourceFileNode | ResourceInfoNode>> {
     if (this.connection.disabled) return [new ResourceInfoNode("Connection is disabled.")];
     await this.services.connections.getConnection(this.connection);
-    return [new ResourceDirectoryNode(this.connection, "/", this.services, this, this.onRefresh)];
+    const rows = resultRows(await this.query("LIST /"));
+    const configuredBuckets = isS3(this.connection)
+      ? configuredS3Buckets(this.connection)
+      : [];
+    const visible = rows.filter((row) =>
+      configuredBuckets.length === 0
+      || rowText(row, "kind") !== "directory"
+      || configuredBuckets.includes(rowText(row, "name")),
+    );
+    const filtered = isWebDav(this.connection)
+      ? visible.filter((row) => rowText(row, "kind") === "directory")
+      : visible;
+    if (!filtered.length) return [new ResourceInfoNode(emptyMessage(this.connection, true))];
+    const directories = filtered
+      .filter((row) => rowText(row, "kind") === "directory")
+      .sort((left, right) => rowText(left, "name").localeCompare(rowText(right, "name")))
+      .map((row) => new ResourceDirectoryNode(
+        this.connection,
+        rowText(row, "path", entryPath("/", rowText(row, "name"))),
+        this.services,
+        this,
+        this.onRefresh,
+        {
+          created: row.created,
+          modified: row.modified,
+        },
+      ));
+    const files = filtered
+      .filter((row) => rowText(row, "kind") !== "directory")
+      .sort((left, right) => rowText(left, "name").localeCompare(rowText(right, "name")))
+      .map((row) => new ResourceFileNode(
+        this.connection,
+        {
+          name: rowText(row, "name"),
+          path: rowText(row, "path", entryPath("/", rowText(row, "name"))),
+          size: row.size,
+          created: row.created,
+          modified: row.modified,
+        },
+        this.services,
+        this,
+      ));
+    return [...directories, ...files];
   }
 
   public async openConnection(): Promise<void> {
@@ -107,6 +210,10 @@ export class ResourceConnectionNode extends vscode.TreeItem {
     return this.copyName();
   }
 
+  public refresh(): void {
+    this.onRefresh();
+  }
+
   public async newBucket(): Promise<void> {
     const name = await vscode.window.showInputBox({ prompt: "S3 bucket name" });
     if (!name) return;
@@ -114,12 +221,23 @@ export class ResourceConnectionNode extends vscode.TreeItem {
   }
 
   public async selectBuckets(): Promise<void> {
-    await this.openFileManager("S3 Buckets");
+    if (!isS3(this.connection)) throw new Error("Bucket selection requires an S3 connection");
+    const buckets = resultRows(await this.query("LIST /"))
+      .filter((row) => rowText(row, "kind") === "directory")
+      .map((row) => rowText(row, "name"))
+      .filter(Boolean);
+    const selected = configuredS3Buckets(this.connection);
+    const picked = await vscode.window.showQuickPick(
+      buckets.map((label) => ({ label, picked: selected.includes(label) })),
+      { canPickMany: true, title: "Select displayed buckets" },
+    );
+    if (!picked) return;
+    await this.saveS3Buckets(picked.length ? picked.map((item) => item.label).join(",") : null);
+    this.onRefresh();
   }
 
   public async openSite(): Promise<void> {
-    const url = this.connection.connectionUrl;
-    if (url) await vscode.env.openExternal(vscode.Uri.parse(url));
+    await vscode.env.openExternal(vscode.Uri.parse(s3WebsiteUrl(this.connection)));
   }
 
   public async fileManager(): Promise<void> {
@@ -142,6 +260,34 @@ export class ResourceConnectionNode extends vscode.TreeItem {
   private async query(source: string): Promise<QueryResult<Record<string, unknown>>> {
     return this.services.connections.query(this.connection, source);
   }
+
+  private async saveS3Buckets(includeBuckets: string | null): Promise<void> {
+    const currentOptions = this.connection.options || {};
+    const currentS3 = record(currentOptions.s3) || {};
+    const nextOptions = {
+      ...currentOptions,
+      s3: { ...currentS3, includeBuckets },
+    };
+    const nextConnection: ResourceStoredConnection = {
+      ...this.connection,
+      options: nextOptions,
+    };
+    this.connection.options = nextOptions;
+
+    const raw = this.services.state.get<unknown>(RESOURCE_CONNECTION_STATE_KEY, {});
+    if (Array.isArray(raw)) {
+      await this.services.state.update(
+        RESOURCE_CONNECTION_STATE_KEY,
+        raw.map((item) => record(item)?.id === this.connection.id ? nextConnection : item),
+      );
+      return;
+    }
+    const connections = record(raw) || {};
+    await this.services.state.update(RESOURCE_CONNECTION_STATE_KEY, {
+      ...connections,
+      [this.connection.id]: nextConnection,
+    });
+  }
 }
 
 export class ResourceDirectoryNode extends vscode.TreeItem {
@@ -151,20 +297,32 @@ export class ResourceDirectoryNode extends vscode.TreeItem {
     private readonly services: ExtensionServices,
     public readonly parent: ResourceConnectionNode | ResourceDirectoryNode,
     private readonly onRefresh: () => void = () => undefined,
+    private readonly metadata: ResourceEntryMetadata = {},
   ) {
+    const presentation = isS3(connection) && parent instanceof ResourceConnectionNode
+      ? targetRemoteTreePresentations.s3RootFolder
+      : targetRemoteTreePresentations.remoteFolder;
     super(
       remotePath === "/" ? "/" : path.posix.basename(remotePath.replace(/\/$/, "")),
-      vscode.TreeItemCollapsibleState.Collapsed,
+      targetPresentationCollapsibleState(presentation),
     );
-    this.contextValue = isS3(connection) ? "s3Folder" : "folder";
-    this.tooltip = remotePath;
-    this.iconPath = new vscode.ThemeIcon("folder");
+    this.contextValue = presentation.contextValue;
+    const date = resourceDate(
+      isS3(connection) ? this.metadata.created ?? this.metadata.modified : this.metadata.modified,
+    );
+    this.tooltip = date || remotePath;
+    this.iconPath = targetPresentationTreeIcon(this.services.resources, presentation);
   }
 
   public async getChildren(): Promise<Array<ResourceDirectoryNode | ResourceFileNode | ResourceInfoNode>> {
     const result = await this.query(`LIST ${this.remotePath}`);
-    const rows = resultRows(result);
-    if (!rows.length) return [new ResourceInfoNode("There are no files in this folder.")];
+    const configuredBuckets = this.remotePath === "/" && isS3(this.connection)
+      ? configuredS3Buckets(this.connection)
+      : [];
+    const rows = resultRows(result).filter((row) =>
+      configuredBuckets.length === 0 || rowText(row, "kind") !== "directory" || configuredBuckets.includes(rowText(row, "name")),
+    );
+    if (!rows.length) return [new ResourceInfoNode(emptyMessage(this.connection, false))];
     const directories = rows
       .filter((row) => rowText(row, "kind") === "directory")
       .sort((left, right) => rowText(left, "name").localeCompare(rowText(right, "name")))
@@ -174,6 +332,10 @@ export class ResourceDirectoryNode extends vscode.TreeItem {
         this.services,
         this,
         this.onRefresh,
+        {
+          created: row.created,
+          modified: row.modified,
+        },
       ));
     const files = rows
       .filter((row) => rowText(row, "kind") !== "directory")
@@ -184,6 +346,7 @@ export class ResourceDirectoryNode extends vscode.TreeItem {
           name: rowText(row, "name"),
           path: rowText(row, "path", entryPath(this.remotePath, rowText(row, "name"))),
           size: row.size,
+          created: row.created,
           modified: row.modified,
         },
         this.services,
@@ -274,7 +437,13 @@ interface ResourceFileEntry {
   name: string;
   path: string;
   size?: unknown;
+  created?: unknown;
   modified?: unknown;
+}
+
+interface ResourceEntryMetadata {
+  readonly created?: unknown;
+  readonly modified?: unknown;
 }
 
 export class ResourceFileNode extends vscode.TreeItem {
@@ -282,13 +451,16 @@ export class ResourceFileNode extends vscode.TreeItem {
     public readonly connection: ResourceStoredConnection,
     public readonly entry: ResourceFileEntry,
     private readonly services: ExtensionServices,
-    public readonly parent: ResourceDirectoryNode,
+    public readonly parent: ResourceConnectionNode | ResourceDirectoryNode,
   ) {
     super(entry.name, vscode.TreeItemCollapsibleState.None);
     this.contextValue = isS3(connection) ? "s3File" : "file";
-    this.description = entry.size == null ? undefined : `${String(entry.size)} bytes`;
-    this.tooltip = entry.path;
-    this.iconPath = new vscode.ThemeIcon("file");
+    this.description = entry.size == null ? undefined : prettyBytes(entry.size);
+    const date = resourceDate(entry.modified);
+    this.tooltip = date
+      ? isS3(connection) ? `Create time: ${date}` : date
+      : entry.path;
+    this.iconPath = targetRemoteFileIcon(this.services.resources, entry.name);
   }
 
   public async open(): Promise<void> {
@@ -351,8 +523,31 @@ export class ResourceFileNode extends vscode.TreeItem {
     await this.copyPath();
   }
 
+  public async getTempUrl(): Promise<void> {
+    await this.copyS3Url("URL_TEMP", "temporary");
+  }
+
+  public async getPublicUrl(): Promise<void> {
+    await this.copyS3Url("URL_PUBLIC", "public");
+  }
+
   private async query(source: string): Promise<QueryResult<Record<string, unknown>>> {
     return this.services.connections.query(this.connection, source);
+  }
+
+  private async copyS3Url(
+    operation: "URL_TEMP" | "URL_PUBLIC",
+    label: "temporary" | "public",
+  ): Promise<void> {
+    try {
+      const result = await this.query(`${operation} ${this.entry.path}`);
+      const url = rowText(resultRows(result)[0] || {}, "url");
+      if (!url) throw new Error(`The S3 ${label} URL was empty`);
+      await vscode.env.clipboard.writeText(url);
+      void vscode.window.showInformationMessage(`The ${label} URL has been copied into the clipboard.`);
+    } catch (error) {
+      void vscode.window.showErrorMessage(errorMessage(error));
+    }
   }
 
   private async confirm(message: string): Promise<boolean> {

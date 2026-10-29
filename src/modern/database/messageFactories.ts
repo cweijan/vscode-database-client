@@ -29,6 +29,27 @@ function rowsFromPayload(payload: unknown): Record<string, unknown>[] {
     : [{ value: payload }];
 }
 
+function recordValue(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+export function normalizeLokiRows(response: unknown): Record<string, unknown>[] {
+  const root = recordValue(response);
+  const payload = root.data === undefined ? response : root.data;
+  const data = recordValue(payload);
+  const result = data.result === undefined ? payload : data.result;
+  if (Array.isArray(result)) {
+    return result.map((item) => {
+      if (typeof item === "string") return { name: item, value: item };
+      return recordValue(item);
+    });
+  }
+  if (result && typeof result === "object") return [recordValue(result)];
+  return result === undefined ? [] : [{ value: result }];
+}
+
 function fieldsFromRows(rows: Record<string, unknown>[]): Array<{ name: string }> {
   return Object.keys(rows[0] ?? {}).map((name) => ({ name }));
 }
@@ -110,11 +131,7 @@ function lokiConnector(): DriverConnector {
             url: request.path === "/" ? "/loki/api/v1/query_range" : request.path,
             data: request.body,
           });
-          const data = response.data as Record<string, unknown>;
-          const result = data.data && typeof data.data === "object"
-            ? (data.data as Record<string, unknown>).result
-            : data;
-          const rows = rowsFromPayload(result);
+          const rows = normalizeLokiRows(response.data);
           return { rows, fields: fieldsFromRows(rows) };
         },
         async ping(querySignal) {
@@ -127,7 +144,7 @@ function lokiConnector(): DriverConnector {
   };
 }
 
-function kafkaBrokers(options: ConnectionOptions): string[] {
+export function kafkaBrokers(options: ConnectionOptions): string[] {
   const configured = option(options, "brokers");
   if (Array.isArray(configured)) {
     return configured.map(String).filter(Boolean);
@@ -141,19 +158,23 @@ function kafkaBrokers(options: ConnectionOptions): string[] {
   return [`${options.host || "localhost"}:${options.port || 9092}`];
 }
 
+export function createKafkaClient(options: ConnectionOptions): Kafka {
+  return new Kafka({
+    clientId: String(option(options, "clientId") || options.id),
+    brokers: kafkaBrokers(options),
+    ssl: Boolean(option(options, "ssl")),
+    sasl: options.user
+      ? { mechanism: "plain", username: options.user, password: options.password || "" }
+      : undefined,
+  });
+}
+
 function createKafkaConnector(): DriverConnector {
   return {
     type: "Kafka",
     async connect(options, signal) {
       requireActive(signal, "Opening Kafka connection");
-      const kafka = new Kafka({
-        clientId: String(option(options, "clientId") || options.id),
-        brokers: kafkaBrokers(options),
-        ssl: Boolean(option(options, "ssl")),
-        sasl: options.user
-          ? { mechanism: "plain", username: options.user, password: options.password || "" }
-          : undefined,
-      });
+      const kafka = createKafkaClient(options);
       const admin = kafka.admin();
       const producer = kafka.producer();
       await admin.connect();

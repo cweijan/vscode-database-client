@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 import { collectManifestSurface } from "./inventory.mjs";
 
 const DEFAULT_INVENTORY =
-  "openspec/changes/restore-modern-source-9-0-2/evidence/target-inventory.json";
+  "openspec/changes/restore-target-visual-parity/evidence/target-inventory.json";
 const QUOTE = "[\"'" + String.fromCharCode(96) + "]";
 
 function parseArguments(argv) {

@@ -332,7 +332,8 @@ function collectWebviewAssetPaths(activeFiles) {
 function collectResourcePaths(activeFiles) {
   return activeFiles
     .filter((file) => file.kind === "resource")
-    .map((file) => file.relativePath)
+    .map((file) => file.path ?? file.relativePath)
+    .filter(Boolean)
     .sort((left, right) => left.localeCompare(right));
 }
 

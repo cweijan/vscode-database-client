@@ -5,8 +5,14 @@ import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
-import UiButton from "./UiButton.vue";
+import { applyTerminalConfiguration } from "../terminalConfig";
 
+interface XtermProps {
+  readonly embedded?: boolean;
+  readonly padding?: number;
+}
+
+const props = defineProps<XtermProps>();
 const bridge = inject(WEBVIEW_BRIDGE_KEY);
 const terminalContainer = ref<HTMLDivElement>();
 const status = ref("Waiting for terminal configuration…");
@@ -33,7 +39,12 @@ function fitTerminal(): void {
 function createTerminal(content: unknown): void {
   const config = content && typeof content === "object" ? content as Record<string, unknown> : {};
   dbType.value = text(config.dbType, dbType.value);
-  if (terminal.value || !terminalContainer.value) return;
+  if (terminal.value) {
+    applyTerminalConfiguration(terminal.value, config);
+    fitTerminal();
+    return;
+  }
+  if (!terminalContainer.value) return;
 
   const instance = new Terminal({
     convertEol: true,
@@ -51,6 +62,7 @@ function createTerminal(content: unknown): void {
   instance.open(terminalContainer.value);
   terminal.value = instance;
   fitAddon.value = fit;
+  applyTerminalConfiguration(instance, config);
   instance.onData((value) => bridge?.emit("data", value));
   instance.onResize(({ cols, rows }) => bridge?.emit("resize", { cols, rows }));
   fitTerminal();
@@ -112,9 +124,13 @@ onBeforeUnmount(() => {
 <template>
   <section
     class="route-workspace xterm-view"
+    :class="{ 'xterm-view--embedded': props.embedded }"
     data-route="xterm"
   >
-    <header class="route-workspace__header">
+    <header
+      v-if="!props.embedded"
+      class="route-workspace__header"
+    >
       <div>
         <h1>Terminal</h1>
         <p class="route-workspace__subline">
@@ -122,20 +138,18 @@ onBeforeUnmount(() => {
         </p>
       </div>
       <div class="route-workspace__actions">
-        <UiButton
-          type="button"
-          variant="default"
+        <VscButton
+          type="default"
           @click="fitTerminal"
         >
           Fit
-        </UiButton>
-        <UiButton
-          type="button"
-          variant="default"
+        </VscButton>
+        <VscButton
+          type="default"
           @click="clearTerminal"
         >
           Clear
-        </UiButton>
+        </VscButton>
       </div>
     </header>
     <div

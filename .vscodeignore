@@ -9,13 +9,9 @@ images/**
 tsconfig.json
 vsc-extension-quickstart.md
 node_modules/
-webpack.config.js
 tslint.json
 .github/
 public/
 types/
-webpack.config.lib.js
-tailwind.config.js
 backlog.md
 i18n.js
-postcss.config.js

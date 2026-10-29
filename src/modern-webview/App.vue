@@ -10,6 +10,7 @@ import {
 import { readWebviewBootstrap } from "./bootstrap";
 import StatusBanner from "./components/StatusBanner.vue";
 import { createTranslator } from "./i18n";
+import { applyUserState } from "./license";
 import { normalizeRouteName, routeLocation } from "./router";
 import { WebviewStateStore } from "./state";
 
@@ -28,6 +29,7 @@ const routeError = ref<string | undefined>();
 let messageSubscription: BridgeDisposable | undefined;
 let routeSubscription: BridgeDisposable | undefined;
 let stateSubscription: BridgeDisposable | undefined;
+let userSubscription: BridgeDisposable | undefined;
 const removeRouteHook = router.afterEach((route) => {
   const name = normalizeRouteName(route.name);
   if (name) {
@@ -65,6 +67,7 @@ onMounted(() => {
       state.replace(content as Record<string, unknown>);
     }
   });
+  userSubscription = bridge.on("user", applyUserState);
   bridge.emit("init");
   void goToRoute(bootstrap.route ?? state.get("page", "main"));
 });
@@ -73,6 +76,7 @@ onBeforeUnmount(() => {
   messageSubscription?.dispose();
   routeSubscription?.dispose();
   stateSubscription?.dispose();
+  userSubscription?.dispose();
   removeRouteHook();
   bridge.dispose();
 });
@@ -83,18 +87,11 @@ onBeforeUnmount(() => {
     class="modern-shell"
     data-testid="modern-webview-shell"
   >
-    <div class="modern-shell__diagnostics">
-      <StatusBanner
-        v-if="routeError"
-        kind="error"
-        :message="routeError"
-      />
-      <StatusBanner
-        v-else
-        :message="translator.t('webview.waiting', lastMessage)"
-      />
-      <output aria-live="polite">Last host message: {{ lastMessage }}</output>
-    </div>
+    <StatusBanner
+      v-if="routeError"
+      kind="error"
+      :message="routeError"
+    />
     <RouterView />
   </main>
 </template>

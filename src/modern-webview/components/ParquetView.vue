@@ -4,7 +4,6 @@ import { parquetMetadata, parquetReadObjects, parquetSchema } from "hyparquet";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
-import UiButton from "./UiButton.vue";
 
 interface ParquetRow {
   readonly [key: string]: unknown;
@@ -125,12 +124,11 @@ onBeforeUnmount(() => {
           Parquet schema and first 1,000 rows
         </p>
       </div>
-      <UiButton
-        type="button"
+      <VscButton
         @click="requestSave"
       >
         Save
-      </UiButton>
+      </VscButton>
     </header>
     <p class="route-workspace__status">
       {{ status }}

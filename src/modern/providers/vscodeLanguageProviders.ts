@@ -1,45 +1,49 @@
 import * as vscode from "vscode";
 
+import type { ExtensionServices } from "../core/extensionServices";
 import { registerElasticsearchProviders } from "./elasticsearchDocumentFeatures";
 import { registerMongoJavaScriptProviders } from "./mongoJavaScriptProviders";
-import { SqlCompletionProvider } from "./sqlCompletionProvider";
+import { SqlMetadataCompletionProvider } from "./sqlMetadataCompletion";
 import { registerSqlDocumentFeatures } from "./sqlDocumentFeatures";
+import { SqlDdlContentProvider } from "./sqlMetadataProviders";
 import { registerSupplementalLanguageProviders } from "./supplementalLanguageProviders";
+import { registerSqlNotebookProviders } from "./sqlNotebookProvider";
 
-export function registerModernLanguageProviders(): vscode.Disposable[] {
-  const provider = new SqlCompletionProvider();
+export function registerModernLanguageProviders(
+  services: ExtensionServices,
+): vscode.Disposable[] {
+  const provider = new SqlMetadataCompletionProvider(services);
+  const cacheRegistration = services.cache.register(() => provider.clearCache());
   const registration = vscode.languages.registerCompletionItemProvider(
     ["sql", "postgres", "cql"],
     {
       provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
-      ): vscode.CompletionItem[] {
-        const items = provider.provide({
-          text: document.getText(),
-          offset: document.offsetAt(position),
-        });
-        return items.map((item) => {
-          const completion = new vscode.CompletionItem(
-            item.label,
-            item.kind === "keyword"
-              ? vscode.CompletionItemKind.Keyword
-              : item.kind === "table"
-                ? vscode.CompletionItemKind.Struct
-                : vscode.CompletionItemKind.Field,
-          );
-          completion.detail = item.detail;
-          return completion;
-        });
+      ): Promise<vscode.CompletionItem[]> {
+        return provider.provideCompletionItems(document, position);
       },
     },
+    " ",
     ".",
+    ">",
+    "<",
+    "=",
+    "(",
+    "'",
+    "@",
   );
   return [
     registration,
-    ...registerSqlDocumentFeatures(),
-    ...registerSupplementalLanguageProviders(),
+    cacheRegistration,
+    ...registerSqlDocumentFeatures(services),
+    vscode.workspace.registerTextDocumentContentProvider(
+      "db_ddl",
+      new SqlDdlContentProvider(services),
+    ),
+    ...registerSupplementalLanguageProviders(services),
     ...registerElasticsearchProviders(),
-    ...registerMongoJavaScriptProviders(),
+    ...registerMongoJavaScriptProviders(services),
+    ...registerSqlNotebookProviders(),
   ];
 }

@@ -145,17 +145,20 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
     panel: vscode.WebviewPanel,
     handler: TypedWebviewHandler,
   ): void {
+    const route = this.routeFor(document.uri);
     const key = document.uri.toString();
     this.handlers.set(key, handler);
     handler.on("init", async () => {
-      if (this.routeFor(document.uri) !== "parquet") {
+      if (route === "sqlite") {
+        await handler.send("open", this.openPayload(document));
+      } else if (route !== "parquet") {
         await this.sendDatabaseFileInfo(document, handler, false);
       } else {
         await handler.send("open", this.openPayload(document));
       }
     });
     handler.on("connecting", async (content) => {
-      if (this.routeFor(document.uri) === "parquet") return;
+      if (route !== "dbFileConnect") return;
       try {
         await this.connectDatabaseFile(document, handler, content);
       } catch (error) {
@@ -231,8 +234,8 @@ class BinaryDocumentProvider implements vscode.CustomEditorProvider<ModernBinary
         readonly: false,
       },
     };
-    const records = this.services.state.get<Record<string, unknown>>("mysql.connections", {});
-    await this.services.state.update("mysql.connections", { ...records, [connection.id]: connection });
+    const records = this.services.state.get<Record<string, unknown>>("database.connections", {});
+    await this.services.state.update("database.connections", { ...records, [connection.id]: connection });
     await this.services.connections.getConnection(connection);
     this.services.activeConnection.set(connection);
     await this.sendDatabaseFileInfo(document, handler, true, connection);

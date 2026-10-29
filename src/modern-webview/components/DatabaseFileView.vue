@@ -4,7 +4,6 @@ import { useRoute } from "vue-router";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
-import UiButton from "./UiButton.vue";
 import UiInput from "./UiInput.vue";
 import UiSelect from "./UiSelect.vue";
 
@@ -114,12 +113,11 @@ onBeforeUnmount(() => {
           Connect a local SQLite or DuckDB file.
         </p>
       </div>
-      <UiButton
-        type="button"
+      <VscButton
         @click="connect"
       >
         {{ fileInfo.connected ? "Reconnect" : "Connect" }}
-      </UiButton>
+      </VscButton>
     </header>
     <div class="route-workbench__toolbar">
       <UiSelect
@@ -139,27 +137,24 @@ onBeforeUnmount(() => {
       />
     </div>
     <div class="route-workspace__actions">
-      <UiButton
-        type="button"
-        variant="default"
+      <VscButton
+        type="default"
         @click="bridge?.emit('reveal')"
       >
         Reveal file
-      </UiButton>
-      <UiButton
-        type="button"
-        variant="default"
+      </VscButton>
+      <VscButton
+        type="default"
         @click="installDependency"
       >
         Check dependency
-      </UiButton>
-      <UiButton
-        type="button"
-        variant="default"
+      </VscButton>
+      <VscButton
+        type="default"
         @click="bridge?.emit('openSite', 'pricing')"
       >
         Dependency help
-      </UiButton>
+      </VscButton>
     </div>
     <p
       v-if="status"

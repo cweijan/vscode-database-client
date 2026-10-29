@@ -1,19 +1,20 @@
 name: CI
 on:
   push:
-    branches: [ master,webpack ]
+    branches: [ master ]
   pull_request:
-    branches: [ master,webpack ]
+    branches: [ master ]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
-        node-version: 14.x
-    - run: npm i
+        node-version: 20.x
+        cache: npm
+    - run: npm ci
     - run: |
-        echo ">>> Start compile vscode-mysql."
-        npm run build
-        echo ">>> Compile vscode-mysql sucess!"
+        npm run typecheck:modern
+        npm run test:modern
+        npm run verify:modern:package

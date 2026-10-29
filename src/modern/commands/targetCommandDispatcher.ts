@@ -75,6 +75,10 @@ const targetNodeMethods: Readonly<Record<string, string>> = {
   "mysql.template.table.insert": "insertTemplate",
   "mysql.template.table.update": "updateSQLTemplate",
   "mysql.template.table.delete": "deleteSQLTemplate",
+  "mysql.user.grant": "grandTemplate",
+  "mysql.change.user": "changePasswordTemplate",
+  "mysql.template.user": "createTemplate",
+  "mysql.delete.user": "drop",
   "mysql.mongo.collection.insert": "insertTemplate",
   "mysql.mongo.collection.delete": "drop",
   "mysql.connection.neo4j.browser": "openNeo4jBrowser",
@@ -86,6 +90,7 @@ const targetNodeMethods: Readonly<Record<string, string>> = {
   "mysql.keyValue.node.new": "newNode",
   "mysql.keyValue.node.edit": "editData",
   "mysql.keyValue.node.delete": "reqDelete",
+  "mysql.loki.label.viewLog": "viewLog",
   "mysql.rabbit.queue.new": "reqCreate",
   "mysql.rabbit.queue.bind": "reqCreateBinding",
   "mysql.rabbit.queue.inspect": "inspectMessages",
@@ -154,6 +159,10 @@ const targetNodeMethods: Readonly<Record<string, string>> = {
   "mysql.node.favorite.clear": "clear",
   "mysql.node.favorite": "doFavorite",
   "mysql.node.favorite.cancel": "doFavorite",
+  "mysql.s3.selectBuckets": "selectBuckets",
+  "mysql.s3.url.temp": "getTempUrl",
+  "mysql.s3.url.public": "getPublicUrl",
+  "mysql.s3.openSite": "openSite",
   "mysql.ftp.connect": "connectToNewWindow",
   "mysql.show.esIndex": "viewData",
   "mysql.es.template.search": "searchTemplate",
@@ -197,6 +206,38 @@ function pendingHandler(command: string): CommandHandler {
   };
 }
 
+function managerDumpTarget(target: unknown): Record<string, unknown> {
+  if (!target || typeof target !== "object" || Array.isArray(target)) {
+    return { connection: target, openDump: true };
+  }
+  const candidate = target as Record<string, unknown>;
+  return {
+    ...candidate,
+    connection: candidate.connection ?? candidate.options ?? target,
+    openDump: true,
+  };
+}
+
+function elasticDumpTarget(target: unknown): Record<string, unknown> | undefined {
+  if (!target || typeof target !== "object" || Array.isArray(target)) return undefined;
+  const candidate = target as Record<string, unknown>;
+  const connection = candidate.connection && typeof candidate.connection === "object"
+    ? candidate.connection as Record<string, unknown>
+    : candidate;
+  return connection.type === "ElasticSearch" && typeof candidate.dump === "function"
+    ? candidate
+    : undefined;
+}
+
+function runElasticDump(target: unknown, withData: boolean): Promise<unknown> | unknown | undefined {
+  const candidate = elasticDumpTarget(target);
+  if (!candidate) return undefined;
+  const dump = candidate.dump;
+  return typeof dump === "function"
+    ? dump.call(target, { withData })
+    : undefined;
+}
+
 function createDirectCommandHandlers(
   host: ModernCommandHost,
 ): Readonly<Record<string, CommandHandler>> {
@@ -233,8 +274,10 @@ function createDirectCommandHandlers(
     "mysql.connection.quickConnect": (target) => host.openConnection("create", target),
     "mysql.node.create": (target) => host.createNode(target),
     "mysql.query.switch": (target) => host.openQuery(target),
-    "mysql.notebook.new": () => host.openQuery(),
-    "mysql.notebook.open": () => host.openQuery(),
+    "mysql.notebook.new": () =>
+      optional("mysql.notebook.new", host.openNotebook ? () => host.openNotebook?.("new") : undefined)(),
+    "mysql.notebook.open": () =>
+      optional("mysql.notebook.open", host.openNotebook ? () => host.openNotebook?.("open") : undefined)(),
     "mysql.history.open": (target) => host.openHistory(target),
     "mysql.history.open.all": () => host.openHistory(),
     "mysql.history.clear": () => host.clearHistory(),
@@ -249,33 +292,21 @@ function createDirectCommandHandlers(
     "mysql.mock.run": (target) => optional("mysql.mock.run", host.runMock ? () => host.runMock?.(target) : undefined)(),
     "mysql.changeTableName": (target) => optional("mysql.changeTableName", host.changeTableName ? () => host.changeTableName?.(target) : undefined)(),
     "mysql.table.fullTextSearch": (target) => optional("mysql.table.fullTextSearch", host.fullTextSearch ? () => host.fullTextSearch?.(target) : undefined)(),
-    "mysql.user.grant": (target) => optional("mysql.user.grant", host.userAction ? () => host.userAction?.("grant", target) : undefined)(),
-    "mysql.change.user": (target) => optional("mysql.change.user", host.userAction ? () => host.userAction?.("change", target) : undefined)(),
-    "mysql.template.user": (target) => optional("mysql.template.user", host.userAction ? () => host.userAction?.("template", target) : undefined)(),
-    "mysql.delete.user": (target) => optional("mysql.delete.user", host.userAction ? () => host.userAction?.("delete", target) : undefined)(),
-    "mysql.s3.selectBuckets": (target) => optional("mysql.s3.selectBuckets", host.openUtility ? () => host.openUtility?.("fileManager", "S3 Buckets", target) : undefined)(),
-    "mysql.s3.url.temp": (target) => optional("mysql.s3.url.temp", host.openUtility ? () => host.openUtility?.("fileManager", "S3 Temporary URL", target) : undefined)(),
-    "mysql.s3.url.public": (target) => optional("mysql.s3.url.public", host.openUtility ? () => host.openUtility?.("fileManager", "S3 Public URL", target) : undefined)(),
-    "mysql.s3.openSite": (target) => optional("mysql.s3.openSite", host.openUtility ? () => host.openUtility?.("fileManager", "S3 Website", target) : undefined)(),
     "mysql.file.manager": (target) => optional("mysql.file.manager", host.openUtility ? () => host.openUtility?.("fileManager", "File Manager", target) : undefined)(),
-    "mysql.mongo.dump": (target) => optional("mysql.mongo.dump", host.openUtility ? () => host.openUtility?.("dbFileConnect", "MongoDB Dump", target) : undefined)(),
-    "mysql.mongo.restore": (target) => optional("mysql.mongo.restore", host.openUtility ? () => host.openUtility?.("dbFileConnect", "MongoDB Restore", target) : undefined)(),
+    "mysql.mongo.dump": (target) => optional("mysql.mongo.dump", host.mongoDump ? () => host.mongoDump?.(target) : undefined)(),
+    "mysql.mongo.restore": (target) => optional("mysql.mongo.restore", host.mongoRestore ? () => host.mongoRestore?.(target) : undefined)(),
     "mysql.docker.compose.run": (target) => optional("mysql.docker.compose.run", host.runDockerCompose ? () => host.runDockerCompose?.(target) : undefined)(),
     "mysql.treeview.collapse": () => optional("mysql.treeview.collapse", host.collapseTrees ? () => host.collapseTrees?.(false) : undefined)(),
     "mysql.treeview.nosql.collapse": () => optional("mysql.treeview.nosql.collapse", host.collapseTrees ? () => host.collapseTrees?.(true) : undefined)(),
-    "mysql.package.source": (target) => optional("mysql.package.source", host.openUtility ? () => host.openUtility?.("document", "Object Source", target) : undefined)(),
-    "mysql.package.drop": (target) => optional("mysql.package.drop", host.openUtility ? () => host.openUtility?.("document", "Drop Object", target) : undefined)(),
-    "mysql.query.link": (target) => optional("mysql.query.link", host.openUtility ? () => host.openUtility?.("manager", "Query Folder", target) : undefined)(),
-    "mysql.query.add": (target) => optional("mysql.query.add", host.openQuery ? () => host.openQuery?.(target) : undefined)(),
-    "mysql.query.book.add": (target) => optional("mysql.query.book.add", host.openQuery ? () => host.openQuery?.(target) : undefined)(),
-    "mysql.query.rename": (target) => optional("mysql.query.rename", host.openUtility ? () => host.openUtility?.("manager", "Rename Query", target) : undefined)(),
-    "mysql.query.delete": (target) => optional("mysql.query.delete", host.openUtility ? () => host.openUtility?.("manager", "Delete Query", target) : undefined)(),
-    "mysql.template.new": (target) => optional("mysql.template.new", host.openUtility ? () => host.openUtility?.("document", "New Template", target) : undefined)(),
-    "mysql.delete.event": (target) => optional("mysql.delete.event", host.openUtility ? () => host.openUtility?.("document", "Delete Event", target) : undefined)(),
-    "mysql.data.dump": (target) => optional("mysql.data.dump", host.openUtility ? () => host.openUtility?.("dbFileConnect", "Data Export", target) : undefined)(),
-    "mysql.struct.dump": (target) => optional("mysql.struct.dump", host.openUtility ? () => host.openUtility?.("dbFileConnect", "Structure Export", target) : undefined)(),
-    "mysql.table.sort": (target) => optional("mysql.table.sort", host.openUtility ? () => host.openUtility?.("manager", "Table Sort", target) : undefined)(),
-    "mysql.ftp.connect": (target) => optional("mysql.ftp.connect", host.openUtility ? () => host.openUtility?.("fileManager", "FTP Connection", target) : undefined)(),
+    "mysql.query.link": (target) => optional("mysql.query.link", host.linkQueryFolder ? () => host.linkQueryFolder?.(target) : undefined)(),
+    "mysql.query.add": (target) => optional("mysql.query.add", host.addQuery ? () => host.addQuery?.(target, false) : undefined)(),
+    "mysql.query.book.add": (target) => optional("mysql.query.book.add", host.addQuery ? () => host.addQuery?.(target, true) : undefined)(),
+    "mysql.query.rename": (target) => optional("mysql.query.rename", host.renameQuery ? () => host.renameQuery?.(target) : undefined)(),
+    "mysql.query.delete": (target) => optional("mysql.query.delete", host.deleteQuery ? () => host.deleteQuery?.(target) : undefined)(),
+    "mysql.data.dump": (target) => runElasticDump(target, true)
+      ?? optional("mysql.data.dump", host.openUtility ? () => host.openUtility?.("manager", "Data Export", managerDumpTarget(target)) : undefined)(),
+    "mysql.struct.dump": (target) => runElasticDump(target, false)
+      ?? optional("mysql.struct.dump", host.openUtility ? () => host.openUtility?.("manager", "Structure Export", managerDumpTarget(target)) : undefined)(),
   };
 }
 
@@ -301,42 +332,9 @@ const TABLE_COMMAND_IDS = new Set([
   "mysql.template.table.select",
 ]);
 
-const GENERIC_ROUTE_COMMAND_IDS = new Set([
-  "mysql.struct.diff",
-  "mysql.mock.run",
-  "mysql.user.grant",
-  "mysql.change.user",
-  "mysql.template.user",
-  "mysql.delete.user",
-  "mysql.s3.selectBuckets",
-  "mysql.s3.url.temp",
-  "mysql.s3.url.public",
-  "mysql.s3.openSite",
-  "mysql.file.manager",
-  "mysql.mongo.dump",
-  "mysql.mongo.restore",
-  "mysql.package.source",
-  "mysql.package.drop",
-  "mysql.query.link",
-  "mysql.query.rename",
-  "mysql.query.delete",
-  "mysql.template.new",
-  "mysql.delete.event",
-  "mysql.data.dump",
-  "mysql.struct.dump",
-  "mysql.table.sort",
-  "mysql.ftp.connect",
-]);
+const GENERIC_ROUTE_COMMAND_IDS = new Set<string>();
 
-const SEMANTIC_REVIEW_COMMAND_IDS = new Set([
-  "mysql.query.switch",
-  "mysql.notebook.sql",
-  "mysql.notebook.new",
-  "mysql.notebook.open",
-  "mysql.query.add",
-  "mysql.query.book.add",
-  "mysql.table.fullTextSearch",
-]);
+const SEMANTIC_REVIEW_COMMAND_IDS = new Set<string>();
 
 const CONDITIONAL_COMMAND_IDS = new Set([
   "mysql.db.truncate",
@@ -410,8 +408,11 @@ export function summarizeTargetCommands(): TargetCommandRegistrationSummary {
     "mysql.table.copy",
     "mysql.table.truncate",
     "mysql.table.drop",
+    "mysql.table.sort",
     "mysql.table.design",
     "mysql.table.show",
+    "mysql.package.source",
+    "mysql.package.drop",
     "mysql.view.source",
     "mysql.delete.view",
     "mysql.delete.procedure",
@@ -420,6 +421,9 @@ export function summarizeTargetCommands(): TargetCommandRegistrationSummary {
     "mysql.show.procedure",
     "mysql.show.function",
     "mysql.show.trigger",
+    "mysql.show.event",
+    "mysql.template.new",
+    "mysql.delete.event",
     "mysql.column.up",
     "mysql.column.down",
     "mysql.column.add",
@@ -431,6 +435,10 @@ export function summarizeTargetCommands(): TargetCommandRegistrationSummary {
     "mysql.template.table.insert",
     "mysql.template.table.update",
     "mysql.template.table.delete",
+    "mysql.user.grant",
+    "mysql.change.user",
+    "mysql.template.user",
+    "mysql.delete.user",
     "mysql.template.table",
     "mysql.template.view",
     "mysql.mongo.collection.insert",
@@ -472,6 +480,7 @@ export function summarizeTargetCommands(): TargetCommandRegistrationSummary {
     "mysql.keyValue.node.new",
     "mysql.keyValue.node.edit",
     "mysql.keyValue.node.delete",
+    "mysql.loki.label.viewLog",
     "mysql.mongo.collection.insert",
     "mysql.mongo.collection.delete",
     "mysql.redis.dump",
@@ -488,6 +497,11 @@ export function summarizeTargetCommands(): TargetCommandRegistrationSummary {
     "mysql.node.favorite",
     "mysql.node.favorite.cancel",
     "mysql.node.favorite.clear",
+    "mysql.s3.selectBuckets",
+    "mysql.s3.url.temp",
+    "mysql.s3.url.public",
+    "mysql.s3.openSite",
+    "mysql.ftp.connect",
     "mysql.fs.terminal",
     "mysql.mongo.dump",
     "mysql.mongo.restore",

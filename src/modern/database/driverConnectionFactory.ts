@@ -1,5 +1,5 @@
 import { OperationCancelledError } from "../core/errors";
-import { normalizeDriverResult } from "./resultConverter";
+import { normalizeDriverResult, normalizeResultValues } from "./resultConverter";
 import type {
   ConnectionFactory,
   ConnectionOptions,
@@ -37,8 +37,8 @@ class DriverConnectionAdapter implements DatabaseConnection {
     if (options?.signal?.aborted) {
       throw new OperationCancelledError("Query");
     }
-    return normalizeDriverResult<Row>(
-      await this.driver.query(sql, options),
+    return normalizeResultValues(
+      normalizeDriverResult<Row>(await this.driver.query(sql, options)),
     );
   }
 

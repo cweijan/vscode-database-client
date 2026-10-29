@@ -31,20 +31,26 @@ function requestAt(
   );
 }
 
-export class ElasticsearchCodeLensProvider implements vscode.CodeLensProvider {
+export class ElasticsearchCodeLensProvider implements vscode.CodeLensProvider, vscode.Disposable {
+  private readonly diagnosticsCollection = vscode.languages.createDiagnosticCollection(
+    "dbclient-es-jsonValidate",
+  );
+
+  public dispose(): void {
+    this.diagnosticsCollection.dispose();
+  }
+
   public provideCodeLenses(document: vscode.TextDocument): vscode.CodeLens[] {
     if (!isElasticDocument(document)) {
+      this.diagnosticsCollection.delete(document.uri);
       return [];
     }
-    return parseElasticRequests(document.getText()).flatMap((request) => {
+    const diagnostics: vscode.Diagnostic[] = [];
+    const lenses = parseElasticRequests(document.getText()).flatMap((request) => {
       const range = new vscode.Range(
         document.positionAt(request.methodStart),
         document.positionAt(request.methodEnd),
       );
-      if (request.error) {
-        return [new vscode.CodeLens(range, { title: "⚠ Invalid JSON", command: "" })];
-      }
-
       const lenses = [
         new vscode.CodeLens(range, {
           title: "▶ Run Query",
@@ -66,7 +72,35 @@ export class ElasticsearchCodeLensProvider implements vscode.CodeLensProvider {
           }),
         );
       }
-      if (request.body !== undefined) {
+      lenses.push(
+        new vscode.CodeLens(range, {
+          title: "Copy as cURL",
+          command: "mysql.elastic.copyAsCurl",
+          arguments: [request],
+        }),
+      );
+      if (request.error) {
+        const bodyRange = hasBodyRange(request)
+          ? new vscode.Range(
+              document.positionAt(request.bodyStart),
+              document.positionAt(request.bodyEnd),
+            )
+          : range;
+        diagnostics.push(
+          new vscode.Diagnostic(
+            bodyRange,
+            `Invalid JSON body: ${request.error}`,
+            vscode.DiagnosticSeverity.Error,
+          ),
+        );
+        lenses.push(
+          new vscode.CodeLens(range, {
+            title: "🔥 Invalid Body",
+            command: "mysql.elastic.lint",
+            arguments: [request],
+          }),
+        );
+      } else if (request.body !== undefined) {
         lenses.push(
           new vscode.CodeLens(range, {
             title: "⚡ Auto indent",
@@ -77,6 +111,8 @@ export class ElasticsearchCodeLensProvider implements vscode.CodeLensProvider {
       }
       return lenses;
     });
+    this.diagnosticsCollection.set(document.uri, diagnostics.length > 0 ? diagnostics : undefined);
+    return lenses;
   }
 }
 
@@ -148,8 +184,10 @@ export class ElasticsearchCompletionProvider implements vscode.CompletionItemPro
 
 export function registerElasticsearchProviders(): vscode.Disposable[] {
   const selector = "es";
+  const codeLensProvider = new ElasticsearchCodeLensProvider();
   return [
-    vscode.languages.registerCodeLensProvider(selector, new ElasticsearchCodeLensProvider()),
+    vscode.languages.registerCodeLensProvider(selector, codeLensProvider),
+    codeLensProvider,
     vscode.languages.registerDocumentFormattingEditProvider(selector, new ElasticsearchFormattingProvider()),
     vscode.languages.registerCompletionItemProvider(
       selector,

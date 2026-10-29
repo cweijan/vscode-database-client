@@ -92,10 +92,13 @@ export class VscodeWebviewManager implements Disposable {
       panel.iconPath = options.iconPath;
     }
 
+    const webviewResourceRoot = vscode.Uri.joinPath(this.extensionUri, "out", "webview");
+    const extensionResourceRoot = vscode.Uri.joinPath(this.extensionUri, "resources");
     panel.webview.options = {
       enableScripts: true,
       localResourceRoots: [
-        vscode.Uri.joinPath(this.extensionUri, "out", "webview"),
+        webviewResourceRoot,
+        extensionResourceRoot,
       ],
     };
 
@@ -128,7 +131,11 @@ export class VscodeWebviewManager implements Disposable {
         {
           route: options.route,
           state: options.state ?? {},
-          config: options.config ?? {},
+          config: {
+            ...(options.config ?? {}),
+            assetBase: options.config?.assetBase
+              ?? panel.webview.asWebviewUri(extensionResourceRoot).toString(),
+          },
         },
         options.entry,
       );
