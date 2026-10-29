@@ -47,14 +47,19 @@ const PAGE_MODULES = {
 const CLASS_TOKEN = /(?<![\w-])[a-z][a-z0-9]*(?:-[a-z0-9]+)*__(?:[a-z0-9]+-)*[a-z0-9]+|(?<![\w-])(?:es|ssh|er|db|vsc|tw|mock|redis|rabbit|struct|data|line|metric)-[a-z0-9]+(?:-[a-z0-9]+)*/g;
 
 function parseArguments(argv) {
-  const options = { reference: "reference/target-webview/modules", output: null };
+  const options = {
+    reference: "reference/target-webview/modules",
+    styles: "reference/target-webview/styles",
+    output: null,
+  };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--reference") options.reference = argv[++index];
+    else if (argument === "--styles") options.styles = argv[++index];
     else if (argument === "--output") options.output = argv[++index];
     else if (argument === "--help" || argument === "-h") {
       console.log(
-        "Usage: node scripts/source-recovery/webview-parity.mjs [--reference <dir>] [--output <json>]",
+        "Usage: node scripts/source-recovery/webview-parity.mjs [--reference <dir>] [--styles <dir>] [--output <json>]",
       );
       process.exit(0);
     } else {
@@ -62,6 +67,35 @@ function parseArguments(argv) {
     }
   }
   return options;
+}
+
+/**
+ * Classes the target itself authored. Only selectors carrying a scope attribute are considered, and
+ * classes that a chunk also ships unscoped (Tailwind utilities, Element Plus internals, `:deep()`
+ * escapes) are removed, so third-party markup never counts as an expected page class.
+ */
+async function loadProjectClasses(stylesRoot) {
+  const scoped = new Set();
+  const unscoped = new Set();
+  let files = [];
+  try {
+    files = (await fs.readdir(stylesRoot)).filter((name) => name.endsWith(".css"));
+  } catch {
+    return scoped;
+  }
+  for (const file of files) {
+    const css = await fs.readFile(path.join(stylesRoot, file), "utf8");
+    for (const match of css.matchAll(/([^{}]*)\{/g)) {
+      const selector = match[1];
+      const isScoped = selector.includes("[data-v-") && !selector.includes(":deep(");
+      for (const name of selector.matchAll(/\.(-?[_a-zA-Z][\w-]*)/g)) {
+        if (isScoped) scoped.add(name[1]);
+        else unscoped.add(name[1]);
+      }
+    }
+  }
+  for (const name of unscoped) scoped.delete(name);
+  return scoped;
 }
 
 function collect(source, pattern) {
@@ -89,20 +123,37 @@ function targetClasses(source) {
   return classes;
 }
 
-function candidateClasses(source) {
-  const classes = new Set();
-  for (const match of source.matchAll(/class="([^"]+)"/g)) {
-    for (const name of match[1].split(/\s+/)) {
-      if (name && !name.includes("{")) classes.add(name);
-    }
+function escapeForPattern(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** A class counts as rendered when the page or one of its local child components mentions it. */
+function componentUsesClass(source, className) {
+  return new RegExp(`(?<![-\\w])${escapeForPattern(className)}(?![-\\w])`).test(source);
+}
+
+/**
+ * Concatenates the page component with the local components it renders so a page's surface is
+ * measured as a whole (the target bundle also inlines those children in the page chunk).
+ */
+async function collectPageSource(entryPath, depth = 0, seen = new Set()) {
+  if (depth > 3 || seen.has(entryPath)) return "";
+  seen.add(entryPath);
+  let source;
+  try {
+    source = await fs.readFile(entryPath, "utf8");
+  } catch {
+    return "";
   }
-  for (const match of source.matchAll(/'([a-z][\w-]*(?:__|--)[\w-]+)'/g)) {
-    classes.add(match[1]);
+  const parts = [source];
+  const directory = path.dirname(entryPath);
+  for (const match of source.matchAll(/from\s+"(\.[^"]+)"/g)) {
+    const specifier = match[1];
+    if (!/\.(vue|ts)$/.test(specifier)) continue;
+    const resolved = path.resolve(directory, specifier);
+    parts.push(await collectPageSource(resolved, depth + 1, seen));
   }
-  for (const match of source.matchAll(/`([a-z][\w-]*(?:__|--)[\w-]+)`/g)) {
-    classes.add(match[1]);
-  }
-  return classes;
+  return parts.join("\n");
 }
 
 async function main() {
@@ -110,6 +161,7 @@ async function main() {
   const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
   const referenceRoot = path.resolve(repositoryRoot, options.reference);
   const componentsRoot = path.resolve(repositoryRoot, "src/modern-webview/components");
+  const projectClasses = await loadProjectClasses(path.resolve(repositoryRoot, options.styles));
 
   const pages = [];
   for (const [moduleName, componentName] of Object.entries(PAGE_MODULES)) {
@@ -122,15 +174,13 @@ async function main() {
     } catch {
       continue;
     }
-    try {
-      componentSource = await fs.readFile(componentPath, "utf8");
-    } catch {
-      componentSource = "";
-    }
-    const expected = targetClasses(moduleSource);
-    const actual = candidateClasses(componentSource);
-    const missing = [...expected].filter((name) => !actual.has(name)).sort();
-    const shared = [...expected].filter((name) => actual.has(name)).length;
+    componentSource = await collectPageSource(componentPath);
+    const expected = new Set(
+      [...targetClasses(moduleSource)].filter((name) => projectClasses.has(name)),
+    );
+    const matched = [...expected].filter((name) => componentUsesClass(componentSource, name));
+    const missing = [...expected].filter((name) => !matched.includes(name)).sort();
+    const shared = matched.length;
     pages.push({
       module: moduleName,
       component: componentName,

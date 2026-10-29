@@ -1,9 +1,22 @@
 <script setup lang="ts">
-import { inject, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+import { computed, inject, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
+import { createTranslator } from "../i18n";
+import {
+  ElColorPicker,
+  ElInput,
+  ElPopover,
+  ElRadio,
+  ElRadioGroup,
+} from "element-plus";
+
 import ConnectionDialog from "./ConnectionDialog.vue";
+import ServiceSelector from "./ServiceSelector.vue";
+import PasswordInput from "./target/PasswordInput.vue";
+import ConnectResult from "./target/ConnectResult.vue";
+import { usePayState } from "../license";
 import UiInput from "./UiInput.vue";
 import UiSelect from "./UiSelect.vue";
 
@@ -11,6 +24,7 @@ interface ConnectionForm {
   id: string;
   name: string;
   group: string;
+  color: string;
   type: string;
   host: string;
   port: string;
@@ -132,6 +146,7 @@ const form = reactive<ConnectionForm>({
   id: initial.id ?? "connection-" + Date.now(),
   name: initial.name ?? "",
   group: initial.group ?? "",
+  color: initial.color ?? "",
   type: initial.type ?? "MySQL",
   host: initial.host ?? (initial.type === "SSH" ? initialSsh.host : undefined) ?? "localhost",
   port: initial.port == null
@@ -208,6 +223,13 @@ const form = reactive<ConnectionForm>({
   optionsText: initial.options ? JSON.stringify(initial.options, null, 2) : "",
 });
 const message = ref("");
+const translator = createTranslator(readWebviewBootstrap().language);
+const isPay = usePayState();
+const groupVisible = ref(false);
+const connectionGroups = ref<string[]>([]);
+const showTrinoWarning = computed(
+  () => form.type === "Trino",
+);
 const advanceVisible = ref(false);
 const redisAdvanceVisible = ref(false);
 const sslVisible = ref(false);
@@ -279,6 +301,35 @@ const coreServerRows: readonly (readonly (readonly ServerChoice[])[])[] = [
 ];
 
 const coreServerGroups = coreServerRows.flat();
+
+const selectorGroups = [
+  { choices: coreServerRows[0].flat() },
+  { choices: coreServerRows[1].flat(), more: true },
+] as const;
+
+const moreServerTypes = [
+  "DuckDB",
+  "libSQL",
+  "D1",
+  "AzureSQLServer",
+  "Hive",
+  "Redshift",
+  "CockroachDB",
+  "Athena",
+  "BigQuery",
+  "Snowflake",
+  "Databricks",
+  "DMDB",
+  "GaussDB",
+  "TDengine",
+  "Doris",
+  "Trino",
+  "PrestoDB",
+  "Loki",
+  "etcd",
+  "WebDAV",
+  "Zookeeper",
+] as const;
 
 const coreServerTypes = new Set(
   coreServerGroups.flat().map((choice) => choice.type),
@@ -590,110 +641,102 @@ onBeforeUnmount(() => {
 
       <div class="connection-panel">
         <div id="connect-config-container">
-          <div class="connect-input-item connection-view__server-selector">
-            <span class="common_input_label">Server Type</span>
-            <div class="connection-server-groups">
-              <div
-                v-for="(row, rowIndex) in coreServerRows"
-                :key="rowIndex"
-                class="connection-server-row"
-              >
-                <template
-                  v-for="(group, groupIndex) in row"
-                  :key="groupIndex"
-                >
-                  <ul class="connection-server-group">
-                    <li
-                      v-for="choice in group"
-                      :key="choice.type"
-                      class="connection-server-choice"
-                      :class="{ 'connection-server-choice--active': form.type === choice.type }"
-                      :title="choice.label"
-                      :aria-label="choice.label"
-                      @click="form.type = choice.type"
-                    >
-                      <img
-                        class="server-item"
-                        :src="serverIcon(choice.icon)"
-                        :alt="choice.label"
-                      >
-                      <span>{{ choice.label }}</span>
-                    </li>
-                  </ul>
-                  <span
-                    v-if="groupIndex < row.length - 1"
-                    class="connection-server-divider"
-                    aria-hidden="true"
-                  >|</span>
-                </template>
-                <span
-                  v-if="rowIndex === 1"
-                  class="connection-server-divider"
-                  aria-hidden="true"
-                >|</span>
-                <details
-                  v-if="rowIndex === 1"
-                  class="connection-server-more"
-                  :open="!coreServerTypes.has(form.type)"
-                >
-                  <summary title="More server types">
-                    <img
-                      class="server-item"
-                      :src="serverIcon('more.png')"
-                      alt="More"
-                    >
-                    <span>{{ coreServerTypes.has(form.type) ? 'More' : form.type }}</span>
-                  </summary>
-                  <div class="connection-server-more__list">
-                    <button
-                      v-for="type in databaseTypes.filter((item) => !coreServerTypes.has(item))"
-                      :key="type"
-                      type="button"
-                      class="connection-server-more__choice"
-                      :class="{ 'connection-server-more__choice--active': form.type === type }"
-                      @click="form.type = type"
-                    >
-                      <img
-                        class="server-item"
-                        :src="serverIcon(type)"
-                        :alt="type"
-                      >
-                      <span>{{ type }}</span>
-                    </button>
-                  </div>
-                </details>
-              </div>
-            </div>
-          </div>
+          <ConnectResult />
+          <ServiceSelector
+            v-model="form.type"
+            :groups="selectorGroups"
+            :icon-for="serverIcon"
+            :more-types="moreServerTypes"
+          />
 
-          <div class="connection-view__option-row">
-            <label class="connection-view__option-field">
-              <span class="common_input_label">Name</span>
-              <UiInput
-                v-model="form.name"
-                placeholder="Connection name"
+          <section class="connect-input-item mb-3 group-selection">
+            <div class="inline-block mr-3">
+              <label class="mr-4 inline-block min-w-8">{{ translator.t("connect.name", "Name") }}</label>
+              <ElInput
+                :model-value="form.name"
+                class="field__input w-32 lg:w-36"
+                :placeholder="translator.t('connect.connectionName', 'Connection name')"
+                clearable
+                @update:model-value="(value: string) => (form.name = value)"
               />
-            </label>
-            <label class="connection-view__option-field">
-              <span class="common_input_label">Group</span>
-              <UiInput
-                v-model="form.group"
-                placeholder="Optional group"
-              />
-            </label>
-            <VscButton
-              type="default"
-              @click="advanceVisible = true"
-            >
-              ⚙ Advance
-            </VscButton>
-            <label class="connection-view__scope-field">
-              <span class="common_input_label">Scope</span>
-              <span><input
-                v-model="form.global"
-                type="checkbox"
-              > Global</span>
-            </label>
+            </div>
+            <div class="inline-block mr-3">
+              <label class="mr-4 inline-block min-w-10">
+                <RedMark />{{ translator.t("connect.group", "Group") }}
+              </label>
+              <ElPopover
+                :visible="groupVisible"
+                placement="bottom"
+                popper-class="!p-0"
+                trigger="click"
+                :hide-after="0"
+                @update:visible="(value: boolean) => (groupVisible = value)"
+              >
+                <template #reference>
+                  <ElInput
+                    :model-value="form.group"
+                    class="field__input w-32"
+                    :placeholder="translator.t('connect.groupPlaceholder', 'Optional group')"
+                    clearable
+                    @update:model-value="(value: string) => (form.group = value)"
+                    @input="groupVisible = false"
+                  />
+                </template>
+                <div class="max-h-[300px]">
+                  <div
+                    v-for="entry in connectionGroups"
+                    :key="entry"
+                    class="el-select-dropdown__item min-w-[100px]"
+                    @click="form.group = entry; groupVisible = false"
+                  >
+                    {{ entry }}
+                  </div>
+                </div>
+              </ElPopover>
+            </div>
+            <div class="inline-block mr-5">
+              <VscButton
+                icon="codicon-gear"
+                size="mini"
+                @click="advanceVisible = true"
+              >
+                {{ translator.t("connect.advance", "Advance") }}
+              </VscButton>
+            </div>
+            <div class="inline-flex items-center">
+              <label class="mr-4">
+                <RedMark />{{ translator.t("connect.scope", "Scope") }}
+              </label>
+              <ElRadioGroup
+                :model-value="form.global"
+                @update:model-value="(value) => (form.global = Boolean(value))"
+              >
+                <ElRadio :value="true">
+                  {{ translator.t("connect.global", "Global") }}
+                </ElRadio>
+                <ElRadio
+                  :value="false"
+                  :disabled="!isPay"
+                >
+                  {{ translator.t("connect.current", "Workspace") }}
+                </ElRadio>
+                <PayBadge
+                  :left="-40"
+                  style="top: -5px"
+                />
+              </ElRadioGroup>
+            </div>
+          </section>
+
+          <div
+            v-if="showTrinoWarning"
+            class="warning-message mb-2"
+          >
+            <i
+              class="codicon-warning"
+              style="color: var(--vscode-editorWarning-foreground); margin-right: 5px"
+            />
+            {{ translator.t("connect.trinoWarning", "Trino requires a JDBC driver.") }}
           </div>
 
           <div
@@ -733,10 +776,7 @@ onBeforeUnmount(() => {
               class="inline-block mr-10"
             >
               <span class="common_input_label">Password</span>
-              <UiInput
-                v-model="form.password"
-                type="password"
-              />
+              <PasswordInput v-model="form.password" />
             </label>
             <label
               v-if="form.type !== 'SSH'"
@@ -1064,6 +1104,17 @@ onBeforeUnmount(() => {
               title="Advance"
               @close="advanceVisible = false"
             >
+              <div class="mb-2 config-item">
+                <div class="inline-block mr-10">
+                  <label class="common_input_label">{{ translator.t("connect.color", "Color") }}</label>
+                  <ElColorPicker
+                    :model-value="form.color"
+                    class="color-tag"
+                    size="small"
+                    @update:model-value="(value: string | null) => (form.color = value ?? '')"
+                  />
+                </div>
+              </div>
               <div class="connection-dialog__section-title">
                 Tree View:
               </div>

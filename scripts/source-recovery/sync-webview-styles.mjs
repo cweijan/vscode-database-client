@@ -55,6 +55,21 @@ function stableName(fileName, used) {
   return collisions === 0 ? candidate : `${base}-${collisions + 1}.css`;
 }
 
+/** Collects the class names the chunk's own scoped rules target. */
+function collectScopedClasses(css) {
+  const classes = new Set();
+  const pattern = /([^{}]*)\{/g;
+  let match;
+  while ((match = pattern.exec(css)) !== null) {
+    const selector = match[1];
+    if (!selector.includes("[data-v-")) continue;
+    for (const name of selector.matchAll(/\.(-?[_a-zA-Z][\w-]*)/g)) {
+      classes.add(name[1]);
+    }
+  }
+  return classes;
+}
+
 async function main() {
   const options = parseArguments(process.argv.slice(2));
   const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -71,6 +86,7 @@ async function main() {
 
   const used = new Map();
   const written = [];
+  const scopedClasses = {};
 
   for (const file of entries.filter((name) => name.endsWith(".css"))) {
     const source = await fs.readFile(path.join(assetsDirectory, file), "utf8");
@@ -87,11 +103,15 @@ async function main() {
       await fs.copyFile(path.join(assetsDirectory, asset), target);
     }
 
+    const target = stableName(file, used);
+    // Classes declared under a scope attribute belong to the page itself rather than to a
+    // third-party stylesheet, so they are the authoritative per-page class set.
+    scopedClasses[target] = [...collectScopedClasses(source)].sort();
+
     const css = source
       .replace(SCOPE_ATTRIBUTE, "")
       .replace(ASSET_URL, (_match, asset) => `url(./assets/${asset.replace(/\?.*$/, "")})`);
 
-    const target = stableName(file, used);
     await fs.writeFile(path.join(outputDirectory, target), css, "utf8");
     written.push(target);
   }
@@ -102,6 +122,11 @@ async function main() {
     "",
   ].join("\n");
   await fs.writeFile(path.join(outputDirectory, "index.ts"), index, "utf8");
+  await fs.writeFile(
+    path.join(outputDirectory, "scoped-classes.json"),
+    `${JSON.stringify(scopedClasses, null, 2)}\n`,
+    "utf8",
+  );
 
   console.log(`synced ${written.length} target stylesheets into ${options.output}`);
 }

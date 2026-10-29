@@ -480,12 +480,12 @@ test("core connection page preserves target shell and separate save/connect acti
     path.join(process.cwd(), "src/modern-webview/components/ConnectionView.vue"),
     "utf8",
   );
+  source;
   for (const marker of [
     "root-container flex mx-auto",
     "connect-container max-lg:px-5",
     "connection-panel",
     "connect-config-container",
-    "server-item",
     "coreServerRows",
     "mysql_dark.svg",
     "mariadb.svg",
@@ -509,7 +509,7 @@ test("core connection page preserves target shell and separate save/connect acti
     "gnu.svg",
     "rdp.png",
     "more.png",
-    "connection-server-more",
+    "ServiceSelector",
     "ConnectionDialog",
     "advanceVisible",
     "redisAdvanceVisible",
@@ -534,6 +534,14 @@ test("core connection page preserves target shell and separate save/connect acti
   }
   assert.doesNotMatch(source, /bridge\?\.emit\("save",/);
   assert.doesNotMatch(source, /\bas\s+any\b/);
+
+  const selector = await readFile(
+    path.join(process.cwd(), "src/modern-webview/components/ServiceSelector.vue"),
+    "utf8",
+  );
+  for (const marker of ["server-item", "tab__item", "more-server-container", "divider"]) {
+    assert.ok(selector.includes(marker), marker);
+  }
 });
 
 test("core connection page applies the DESIGN.md visual tokens", async () => {
