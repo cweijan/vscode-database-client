@@ -67,68 +67,83 @@ function openLogin(): void {
 </script>
 
 <template>
-  <header class="navbar">
-    <div class="navbar__inner">
-      <a
-        class="navbar__brand"
-        href="#"
-        @click.prevent="bridge?.emit('openSite', '/')"
-      >
-        <img
-          class="logo logo-dark"
-          :src="targetLogoDark"
-          alt="Database Client"
-        />
-        <img
-          class="logo logo-light"
-          :src="targetLogoLight"
-          alt="Database Client"
-        />
-      </a>
-      <nav
-        class="navbar__nav"
-        role="navigation"
-      >
-        <button
-          class="navbar__item navbar__item--external"
-          type="button"
-          @click="openChangelog"
+  <div class="center-layout">
+    <header class="navbar">
+      <div class="navbar__inner">
+        <a
+          class="navbar__brand"
+          href="#"
+          @click.prevent="bridge?.emit('openSite', '/')"
         >
-          <i class="codicon codicon-link-external navbar__icon" aria-hidden="true" />
-          <span>{{ translator.t("global.changeLog", "Changelog") }}</span>
-        </button>
-        <button
-          v-for="item in items"
-          :key="item.id"
-          class="navbar__item"
-          :class="{ 'navbar__item--active': route.name === item.id }"
-          type="button"
-          @click="navigate(item)"
+          <img
+            class="logo logo-dark"
+            :src="targetLogoDark"
+            alt="Database Client"
+          >
+          <img
+            class="logo logo-light"
+            :src="targetLogoLight"
+            alt="Database Client"
+          >
+        </a>
+        <nav
+          class="navbar__nav"
+          role="navigation"
         >
-          <i class="navbar__icon" :class="item.icon" aria-hidden="true" />
-          <span>{{ item.label }}</span>
-        </button>
-      </nav>
-      <div class="navbar__user">
-        <button
-          v-if="userName"
-          class="navbar__item navbar__item--login"
-          type="button"
-          @click="openLogin"
-        >
-          <span class="navbar__avatar">{{ userName.slice(0, 1).toUpperCase() }}</span>
-          <span>{{ userName }}</span>
-        </button>
-        <button
-          v-else
-          class="navbar__item navbar__item--login"
-          type="button"
-          @click="openLogin"
-        >
-          <i class="codicon codicon-account navbar__icon orange" aria-hidden="true" />
-          <span>{{ translator.t("global.login", "Login") }}</span>
-        </button>
+          <button
+            class="navbar__item navbar__item--external"
+            type="button"
+            @click="openChangelog"
+          >
+            <i
+              class="codicon codicon-link-external navbar__icon"
+              aria-hidden="true"
+            />
+            <span>{{ translator.t("global.changeLog", "Changelog") }}</span>
+          </button>
+          <button
+            v-for="item in items"
+            :key="item.id"
+            class="navbar__item"
+            :class="{ 'navbar__item--active': route.name === item.id }"
+            type="button"
+            @click="navigate(item)"
+          >
+            <i
+              class="navbar__icon"
+              :class="item.icon"
+              aria-hidden="true"
+            />
+            <span>{{ item.label }}</span>
+          </button>
+        </nav>
+        <div class="navbar__user">
+          <button
+            v-if="userName"
+            class="navbar__item navbar__item--login"
+            type="button"
+            @click="openLogin"
+          >
+            <span class="navbar__avatar">{{ userName.slice(0, 1).toUpperCase() }}</span>
+            <span>{{ userName }}</span>
+          </button>
+          <button
+            v-else
+            class="navbar__item navbar__item--login"
+            type="button"
+            @click="openLogin"
+          >
+            <i
+              class="codicon codicon-account navbar__icon orange"
+              aria-hidden="true"
+            />
+            <span>{{ translator.t("global.login", "Login") }}</span>
+          </button>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
+    <main class="center-main">
+      <RouterView />
+    </main>
+  </div>
 </template>

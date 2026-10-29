@@ -4,7 +4,8 @@ import {
   type RouteRecordRaw,
 } from "vue-router";
 
-import RouteLayout from "./components/RouteLayout.vue";
+import CenterView from "./components/CenterView.vue";
+import MainView from "./components/MainView.vue";
 import ConnectionView from "./components/ConnectionView.vue";
 import DatabaseFileView from "./components/DatabaseFileView.vue";
 import DesignView from "./components/DesignView.vue";
@@ -45,7 +46,7 @@ export function createWebviewRouter() {
     {
       path: "/",
       name: "main",
-      component: RouteLayout,
+      component: MainView,
       children: [
         { path: "result", name: "result", component: ResultView },
         { path: "manager", name: "manager", component: ManagerView },
@@ -80,7 +81,7 @@ export function createWebviewRouter() {
     {
       path: "/center",
       name: "center",
-      component: RouteLayout,
+      component: CenterView,
       children: [
         {
           path: "document",
