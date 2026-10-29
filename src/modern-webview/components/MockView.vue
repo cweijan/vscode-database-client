@@ -235,11 +235,11 @@ onBeforeUnmount(() => {
         type="number"
         @update:model-value="persist"
       />
-      <label class="vsc-field">
-        <span class="vsc-field__label">Start index</span>
+      <label class="inline-block mr-10">
+        <span class="common_input_label">Start index</span>
         <select
           v-model="startMode"
-          class="vsc-input"
+          class="field__input"
           @change="persist"
         >
           <option value="auto">Auto</option>
@@ -295,7 +295,7 @@ onBeforeUnmount(() => {
             <td>
               <input
                 v-model="row.value"
-                class="vsc-input mock-view__value-input"
+                class="field__input mock-view__value-input"
                 :disabled="!row.enabled"
                 :placeholder="row.isIndex ? 'Primary-key index' : 'Mock.js expression'"
                 @change="persist"

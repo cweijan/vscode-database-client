@@ -80,7 +80,7 @@ onBeforeUnmount(() => {
     <template v-if="!settingsVisible">
       <textarea
         v-model="sql"
-        class="vsc-input console-view__editor"
+        class="field__input console-view__editor"
         spellcheck="false"
       />
     </template>

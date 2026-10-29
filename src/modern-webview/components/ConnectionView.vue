@@ -691,9 +691,9 @@ onBeforeUnmount(() => {
           >
       <label
         v-if="form.type !== 'SSH'"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Host</span>
+        <span class="common_input_label">Host</span>
         <UiInput
           v-model="form.host"
           placeholder="localhost"
@@ -701,9 +701,9 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="form.type !== 'SSH'"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Port</span>
+        <span class="common_input_label">Port</span>
         <UiInput
           v-model="form.port"
           type="number"
@@ -712,16 +712,16 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="form.type !== 'SSH'"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">User</span>
+        <span class="common_input_label">User</span>
         <UiInput v-model="form.user" />
       </label>
       <label
         v-if="form.type !== 'SSH'"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Password</span>
+        <span class="common_input_label">Password</span>
         <UiInput
           v-model="form.password"
           type="password"
@@ -729,9 +729,9 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="form.type !== 'SSH'"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Database</span>
+        <span class="common_input_label">Database</span>
         <UiInput v-model="form.database" />
         <VscButton
           v-if="isCoreConnectionType(form.type)"
@@ -743,9 +743,9 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="['MySQL', 'MariaDB', 'MySQLCompatible'].includes(form.type)"
-        class="vsc-field connection-view__socket-field"
+        class="inline-block mr-10 connection-view__socket-field"
       >
-        <span class="vsc-field__label">Socket path</span>
+        <span class="common_input_label">Socket path</span>
         <UiInput
           v-model="form.socketPath"
           placeholder="/var/run/mysqld/mysqld.sock"
@@ -753,16 +753,16 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="!isCoreConnectionType(form.type)"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Schema</span>
+        <span class="common_input_label">Schema</span>
         <UiInput v-model="form.schema" />
       </label>
       <label
         v-if="!isCoreConnectionType(form.type)"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Include databases</span>
+        <span class="common_input_label">Include databases</span>
         <UiInput
           v-model="form.includeDatabases"
           placeholder="db1,db2"
@@ -770,9 +770,9 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="!isCoreConnectionType(form.type)"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Connection URL</span>
+        <span class="common_input_label">Connection URL</span>
         <UiInput
           v-model="form.connectionUrl"
           placeholder="Optional driver URL"
@@ -780,9 +780,9 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="!isCoreConnectionType(form.type)"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Database file</span>
+        <span class="common_input_label">Database file</span>
         <UiInput
           v-model="form.dbPath"
           placeholder="SQLite / DuckDB path"
@@ -790,9 +790,9 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="!isCoreConnectionType(form.type)"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Connection timeout</span>
+        <span class="common_input_label">Connection timeout</span>
         <UiInput
           v-model="form.connectTimeout"
           type="number"
@@ -801,9 +801,9 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="!isCoreConnectionType(form.type)"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Request timeout</span>
+        <span class="common_input_label">Request timeout</span>
         <UiInput
           v-model="form.requestTimeout"
           type="number"
@@ -812,9 +812,9 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="!isCoreConnectionType(form.type)"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Timezone</span>
+        <span class="common_input_label">Timezone</span>
         <UiInput
           v-model="form.timezone"
           placeholder="+00:00"
@@ -822,9 +822,9 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="!isCoreConnectionType(form.type)"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Auth type</span>
+        <span class="common_input_label">Auth type</span>
         <UiSelect
           v-model="form.authType"
           :options="['default', 'account', 'token', 'password', 'scram-sha-256', 'scram-sha-512']"
@@ -832,16 +832,16 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="!isCoreConnectionType(form.type)"
-        class="vsc-field"
+        class="inline-block mr-10"
       >
-        <span class="vsc-field__label">Auth source</span>
+        <span class="common_input_label">Auth source</span>
         <UiInput v-model="form.authSource" />
       </label>
       <label
         v-if="!isCoreConnectionType(form.type) || isCoreSqlConnectionType(form.type) || form.type === 'Redis'"
-        class="vsc-field vsc-field--inline"
+        class="inline-block mr-10 inline-flex items-center"
       >
-        <span class="vsc-field__label">Transport</span>
+        <span class="common_input_label">Transport</span>
         <span>
           <input v-model="form.useSSL" type="checkbox"> SSL
           <VscButton
@@ -856,9 +856,9 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="form.type === 'MongoDB'"
-        class="vsc-field vsc-field--inline"
+        class="inline-block mr-10 inline-flex items-center"
       >
-        <span class="vsc-field__label">MongoDB</span>
+        <span class="common_input_label">MongoDB</span>
         <span>
           <input v-model="form.srv" type="checkbox"> SRV
           <input v-model="form.useConnectionString" type="checkbox"> Connection string
@@ -866,9 +866,9 @@ onBeforeUnmount(() => {
       </label>
       <label
         v-if="form.useConnectionString && !isCoreConnectionType(form.type)"
-        class="vsc-field vsc-field--wide"
+        class="inline-block mr-10 w-full"
       >
-        <span class="vsc-field__label">Connection string</span>
+        <span class="common_input_label">Connection string</span>
         <UiInput
           v-model="form.connectionUrl"
           placeholder="mongodb+srv://user:password@server/database"
@@ -876,11 +876,11 @@ onBeforeUnmount(() => {
       </label>
       <section
         v-if="form.type === 'Redis'"
-        class="connection-view__special-section vsc-field--wide"
+        class="connection-view__special-section w-full"
       >
         <div class="connection-view__redis-socket">
-          <label class="vsc-field">
-            <span class="vsc-field__label">Socket path</span>
+          <label class="inline-block mr-10">
+            <span class="common_input_label">Socket path</span>
             <UiInput
               v-model="form.socketPath"
               placeholder="/var/run/redis/redis.sock"
@@ -894,78 +894,78 @@ onBeforeUnmount(() => {
           </VscButton>
         </div>
         <div class="connection-view__grid connection-view__grid--checks">
-          <label class="vsc-field vsc-field--inline"><span class="vsc-field__label">Databases</span><span><input v-model="form.redisConfig.allDatabase" type="checkbox"> All Database</span></label>
-          <label class="vsc-field vsc-field--inline"><span class="vsc-field__label">Mode</span><span><input v-model="form.redisConfig.cluster" type="checkbox" :disabled="Boolean(form.socketPath)"> Cluster</span></label>
-          <label class="vsc-field vsc-field--inline"><span class="vsc-field__label">Module</span><span><input v-model="form.redisConfig.stack" type="checkbox"> Redis JSON</span></label>
+          <label class="inline-block mr-10 inline-flex items-center"><span class="common_input_label">Databases</span><span><input v-model="form.redisConfig.allDatabase" type="checkbox"> All Database</span></label>
+          <label class="inline-block mr-10 inline-flex items-center"><span class="common_input_label">Mode</span><span><input v-model="form.redisConfig.cluster" type="checkbox" :disabled="Boolean(form.socketPath)"> Cluster</span></label>
+          <label class="inline-block mr-10 inline-flex items-center"><span class="common_input_label">Module</span><span><input v-model="form.redisConfig.stack" type="checkbox"> Redis JSON</span></label>
         </div>
       </section>
       <section
         v-if="form.useSSL && !isCoreConnectionType(form.type)"
-        class="connection-view__advanced vsc-field--wide"
+        class="connection-view__advanced w-full"
       >
         <h2>SSL options</h2>
         <div class="connection-view__grid">
-          <label class="vsc-field"><span class="vsc-field__label">CA certificate</span><UiInput v-model="form.caPath" placeholder="CA path" /></label>
-          <label class="vsc-field"><span class="vsc-field__label">Client certificate</span><UiInput v-model="form.clientCertPath" placeholder="Client cert path" /></label>
-          <label class="vsc-field"><span class="vsc-field__label">Client key</span><UiInput v-model="form.clientKeyPath" placeholder="Client key path" /></label>
-          <label class="vsc-field vsc-field--inline"><span class="vsc-field__label">TLS</span><span><input v-model="form.disableTLSVerification" type="checkbox"> Disable certificate verification</span></label>
+          <label class="inline-block mr-10"><span class="common_input_label">CA certificate</span><UiInput v-model="form.caPath" placeholder="CA path" /></label>
+          <label class="inline-block mr-10"><span class="common_input_label">Client certificate</span><UiInput v-model="form.clientCertPath" placeholder="Client cert path" /></label>
+          <label class="inline-block mr-10"><span class="common_input_label">Client key</span><UiInput v-model="form.clientKeyPath" placeholder="Client key path" /></label>
+          <label class="inline-block mr-10 inline-flex items-center"><span class="common_input_label">TLS</span><span><input v-model="form.disableTLSVerification" type="checkbox"> Disable certificate verification</span></label>
         </div>
       </section>
       <section
         v-if="form.usingSSH || form.type === 'SSH'"
-        class="connection-view__special-section vsc-field--wide"
+        class="connection-view__special-section w-full"
       >
         <div class="connection-view__grid">
-          <label class="vsc-field"><span class="vsc-field__label">SSH host</span><UiInput v-model="form.ssh.host" placeholder="SSH host" /></label>
-          <label class="vsc-field"><span class="vsc-field__label">SSH port</span><UiInput v-model="form.ssh.port" type="number" placeholder="22" /></label>
-          <label class="vsc-field"><span class="vsc-field__label">SSH user</span><span class="connection-view__field-with-action"><UiInput v-model="form.ssh.username" placeholder="root" /><VscButton
+          <label class="inline-block mr-10"><span class="common_input_label">SSH host</span><UiInput v-model="form.ssh.host" placeholder="SSH host" /></label>
+          <label class="inline-block mr-10"><span class="common_input_label">SSH port</span><UiInput v-model="form.ssh.port" type="number" placeholder="22" /></label>
+          <label class="inline-block mr-10"><span class="common_input_label">SSH user</span><span class="connection-view__field-with-action"><UiInput v-model="form.ssh.username" placeholder="root" /><VscButton
             v-if="form.type === 'SSH'"
             type="default"
             @click="sshAdvanceVisible = true"
           >⚙ Advance</VscButton></span></label>
-          <label class="vsc-field"><span class="vsc-field__label">SSH auth</span><UiSelect v-model="form.ssh.type" :options="form.type === 'SSH' ? ['native', 'auto', 'password', 'privateKey', 'privateKeyAndPassword', 'agent'] : ['auto', 'password', 'privateKey', 'privateKeyAndPassword', 'agent']" /></label>
+          <label class="inline-block mr-10"><span class="common_input_label">SSH auth</span><UiSelect v-model="form.ssh.type" :options="form.type === 'SSH' ? ['native', 'auto', 'password', 'privateKey', 'privateKeyAndPassword', 'agent'] : ['auto', 'password', 'privateKey', 'privateKeyAndPassword', 'agent']" /></label>
           <label
             v-if="['password', 'privateKeyAndPassword', 'auto'].includes(form.ssh.type)"
-            class="vsc-field"
-          ><span class="vsc-field__label">SSH password</span><UiInput v-model="form.ssh.password" type="password" /></label>
+            class="inline-block mr-10"
+          ><span class="common_input_label">SSH password</span><UiInput v-model="form.ssh.password" type="password" /></label>
           <label
             v-if="['privateKey', 'privateKeyAndPassword', 'auto', 'native'].includes(form.ssh.type)"
-            class="vsc-field"
-          ><span class="vsc-field__label">Private key</span><UiInput v-model="form.ssh.privateKeyPath" placeholder="~/.ssh/id_ed25519" /></label>
+            class="inline-block mr-10"
+          ><span class="common_input_label">Private key</span><UiInput v-model="form.ssh.privateKeyPath" placeholder="~/.ssh/id_ed25519" /></label>
           <label
             v-if="form.ssh.type !== 'native'"
-            class="vsc-field"
-          ><span class="vsc-field__label">Passphrase</span><UiInput v-model="form.ssh.passphrase" type="password" /></label>
+            class="inline-block mr-10"
+          ><span class="common_input_label">Passphrase</span><UiInput v-model="form.ssh.passphrase" type="password" /></label>
           <label
             v-if="form.ssh.type === 'agent'"
-            class="vsc-field"
-          ><span class="vsc-field__label">Agent path</span><UiInput v-model="form.ssh.agentPath" placeholder="env.SSH_AUTH_SOCK" /></label>
+            class="inline-block mr-10"
+          ><span class="common_input_label">Agent path</span><UiInput v-model="form.ssh.agentPath" placeholder="env.SSH_AUTH_SOCK" /></label>
           <label
         v-if="form.type !== 'SSH'"
-            class="vsc-field"
-          ><span class="vsc-field__label">Ready timeout</span><UiInput v-model="form.ssh.waitingTime" type="number" placeholder="30000" /></label>
-          <label class="vsc-field"><span class="vsc-field__label">Cipher</span><UiSelect v-model="form.ssh.cipher" :options="['aes128-ctr', 'aes256-ctr', 'aes128-cbc', 'aes256-cbc', 'chacha20-poly1305']" /></label>
+            class="inline-block mr-10"
+          ><span class="common_input_label">Ready timeout</span><UiInput v-model="form.ssh.waitingTime" type="number" placeholder="30000" /></label>
+          <label class="inline-block mr-10"><span class="common_input_label">Cipher</span><UiSelect v-model="form.ssh.cipher" :options="['aes128-ctr', 'aes256-ctr', 'aes128-cbc', 'aes256-cbc', 'chacha20-poly1305']" /></label>
         </div>
       </section>
       <section
         v-if="form.type === 'RDP'"
-        class="connection-view__special-section vsc-field--wide"
+        class="connection-view__special-section w-full"
       >
         <div class="connection-view__grid connection-view__grid--checks">
-          <label class="vsc-field vsc-field--inline"><span class="vsc-field__label">Display</span><span><input v-model="form.rdpConfig.fullScreen" type="checkbox"> Full Screen</span></label>
-          <label class="vsc-field vsc-field--inline"><span class="vsc-field__label">Sizing</span><span><input v-model="form.rdpConfig.smartSizing" type="checkbox"> Smart Sizing</span></label>
-          <label class="vsc-field vsc-field--inline"><span class="vsc-field__label">Devices</span><span><input v-model="form.rdpConfig.redirectDrives" type="checkbox"> Redirect Drivers</span></label>
-          <label class="vsc-field vsc-field--inline"><span class="vsc-field__label">Keyboard</span><span><input v-model="form.rdpConfig.forwardComposition" type="checkbox"> Forward Composition Key</span></label>
+          <label class="inline-block mr-10 inline-flex items-center"><span class="common_input_label">Display</span><span><input v-model="form.rdpConfig.fullScreen" type="checkbox"> Full Screen</span></label>
+          <label class="inline-block mr-10 inline-flex items-center"><span class="common_input_label">Sizing</span><span><input v-model="form.rdpConfig.smartSizing" type="checkbox"> Smart Sizing</span></label>
+          <label class="inline-block mr-10 inline-flex items-center"><span class="common_input_label">Devices</span><span><input v-model="form.rdpConfig.redirectDrives" type="checkbox"> Redirect Drivers</span></label>
+          <label class="inline-block mr-10 inline-flex items-center"><span class="common_input_label">Keyboard</span><span><input v-model="form.rdpConfig.forwardComposition" type="checkbox"> Forward Composition Key</span></label>
         </div>
       </section>
       <label
         v-if="!isCoreConnectionType(form.type)"
-        class="vsc-field vsc-field--wide"
+        class="inline-block mr-10 w-full"
       >
-        <span class="vsc-field__label">Driver options (JSON)</span>
+        <span class="common_input_label">Driver options (JSON)</span>
       <textarea
           v-model="form.optionsText"
-          class="vsc-input connection-view__options"
+          class="field__input connection-view__options"
           spellcheck="false"
           placeholder="{&quot;ssl&quot;: true}"
         />
@@ -993,7 +993,7 @@ onBeforeUnmount(() => {
         </label>
         <label class="connection-dialog__field">
           <span>Hide system schemas</span>
-          <select v-model="form.advance.hideSystemSchema" class="vsc-input">
+          <select v-model="form.advance.hideSystemSchema" class="field__input">
             <option value="recommended">Recommended</option>
             <option :value="true">Yes</option>
             <option :value="false">No</option>
@@ -1033,11 +1033,11 @@ onBeforeUnmount(() => {
         </label>
         <label class="connection-dialog__field">
           <span>Custom terminal command</span>
-          <textarea v-model="form.advance.customTerminalCommand" class="vsc-input connection-dialog__textarea" />
+          <textarea v-model="form.advance.customTerminalCommand" class="field__input connection-dialog__textarea" />
         </label>
         <label class="connection-dialog__field">
           <span>Startup SQL</span>
-          <textarea v-model="form.advance.startupSQL" class="vsc-input connection-dialog__textarea" />
+          <textarea v-model="form.advance.startupSQL" class="field__input connection-dialog__textarea" />
         </label>
       </ConnectionDialog>
       <ConnectionDialog
@@ -1073,7 +1073,7 @@ onBeforeUnmount(() => {
         </label>
         <label class="connection-dialog__field">
           <span>Shell</span>
-          <textarea v-model="form.ssh.shell" class="vsc-input connection-dialog__textarea" placeholder="Default remote shell" />
+          <textarea v-model="form.ssh.shell" class="field__input connection-dialog__textarea" placeholder="Default remote shell" />
         </label>
         <div class="connection-dialog__section-title">SFTP:</div>
         <label class="connection-dialog__field">

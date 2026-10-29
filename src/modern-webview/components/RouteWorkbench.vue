@@ -176,7 +176,7 @@ onBeforeUnmount(() => {
     <div class="route-workbench__toolbar">
       <input
         v-model="input"
-        class="vsc-input"
+        class="field__input"
         :placeholder="routeName === 'xterm' || routeName === 'sshTerminal' ? 'Enter command' : 'JSON payload or path'"
         @keyup.enter="emitAction(routeName === 'xterm' || routeName === 'sshTerminal' ? 'input' : 'execute')"
       >

@@ -338,7 +338,7 @@ onBeforeUnmount(() => {
           <div class="settings-view__sync-row">
             <input
               v-model="syncKey"
-              class="vsc-input"
+              class="field__input"
               placeholder="Sync encryption key (optional)"
               spellcheck="false"
             >
@@ -470,7 +470,7 @@ onBeforeUnmount(() => {
                 <select
                   v-else-if="choicesFor(option).length > 0"
                   v-model="drafts[option.name]"
-                  class="vsc-input"
+                  class="field__input"
                   @change="update(option)"
                 >
                   <option
@@ -483,7 +483,7 @@ onBeforeUnmount(() => {
                 </select>
                 <input
                   v-else
-                  class="vsc-input"
+                  class="field__input"
                   :value="displayValue(option)"
                   @change="updateText(option, $event)"
                   @keyup.enter="update(option)"

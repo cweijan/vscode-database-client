@@ -1301,8 +1301,8 @@ onBeforeUnmount(() => {
       v-if="showSqlPanel"
       class="panel-container sql-pannel"
     >
-      <label class="vsc-field vsc-field--wide">
-        <span class="vsc-field__label">
+      <label class="inline-block mr-10 w-full">
+        <span class="common_input_label">
           Update SQL (optional; used by Save changes)
         </span>
         <textarea
@@ -1421,7 +1421,7 @@ onBeforeUnmount(() => {
               :key="column"
             >
               <input
-                class="vsc-input"
+                class="field__input"
                 :value="columnFilterValues[column] || ''"
                 :placeholder="'Filter ' + column"
                 @input="setColumnFilterValue(column, ($event.target as HTMLInputElement).value)"
@@ -1456,7 +1456,7 @@ onBeforeUnmount(() => {
               <template v-if="editing?.displayIndex === rowIndex && editing.column === column">
                 <input
                   v-model="draft"
-                  class="vsc-input"
+                  class="field__input"
                   :type="editorInputType(column) ?? 'text'"
                   @keyup.enter="saveCell"
                   @keyup.esc="cancelEdit"

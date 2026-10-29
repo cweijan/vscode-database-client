@@ -868,7 +868,7 @@ onBeforeUnmount(() => {
               <span class="key-label key-detail-type">{{ redisType }}</span>
               <input
                 v-model="keyName"
-                class="vsc-input redis-key-name-input"
+                class="field__input redis-key-name-input"
                 placeholder="Please input key name"
                 @keyup.enter="rename"
               >
@@ -889,7 +889,7 @@ onBeforeUnmount(() => {
               <span class="key-label">TTL</span>
               <input
                 v-model="ttlText"
-                class="vsc-input redis-ttl-input"
+                class="field__input redis-ttl-input"
                 @keyup.enter="updateTtl"
               >
               <VscButton
@@ -953,12 +953,12 @@ onBeforeUnmount(() => {
               <input
                 v-if="redisType === 'hash'"
                 v-model="searchField"
-                class="vsc-input redis-toolbar__search--field"
+                class="field__input redis-toolbar__search--field"
                 placeholder="Search field"
               >
               <input
                 v-model="searchValue"
-                class="vsc-input redis-toolbar__search"
+                class="field__input redis-toolbar__search"
                 placeholder="Search"
               >
               <VscButton
@@ -1090,7 +1090,7 @@ onBeforeUnmount(() => {
             >
               <input
                 v-model="searchValue"
-                class="vsc-input redis-toolbar__search"
+                class="field__input redis-toolbar__search"
                 placeholder="Search"
               >
               <VscButton
@@ -1264,30 +1264,30 @@ onBeforeUnmount(() => {
         <div class="redis-modal__body">
           <label
             v-if="redisType === 'list' && !editingItem"
-            class="vsc-field"
+            class="inline-block mr-10"
           >
-            <span class="vsc-field__label">Position</span>
-            <select v-model="itemPosition" class="vsc-input">
+            <span class="common_input_label">Position</span>
+            <select v-model="itemPosition" class="field__input">
               <option value="head">Head</option>
               <option value="tail">Tail</option>
             </select>
           </label>
           <label
             v-if="redisType === 'hash' || redisType === 'stream'"
-            class="vsc-field"
+            class="inline-block mr-10"
           >
-            <span class="vsc-field__label">{{ redisType === 'stream' ? 'Field' : 'Field' }}</span>
-            <input v-model="itemField" class="vsc-input">
+            <span class="common_input_label">{{ redisType === 'stream' ? 'Field' : 'Field' }}</span>
+            <input v-model="itemField" class="field__input">
           </label>
           <label
             v-if="redisType === 'zset'"
-            class="vsc-field"
+            class="inline-block mr-10"
           >
-            <span class="vsc-field__label">Score</span>
-            <input v-model="itemScore" class="vsc-input">
+            <span class="common_input_label">Score</span>
+            <input v-model="itemScore" class="field__input">
           </label>
-          <label class="vsc-field">
-            <span class="vsc-field__label">{{ redisType === 'list' ? 'Element' : redisType === 'stream' ? 'Value' : 'Value' }}</span>
+          <label class="inline-block mr-10">
+            <span class="common_input_label">{{ redisType === 'list' ? 'Element' : redisType === 'stream' ? 'Value' : 'Value' }}</span>
             <textarea v-model="itemValue" class="console-view__editor" />
           </label>
         </div>
@@ -1314,14 +1314,14 @@ onBeforeUnmount(() => {
           <button type="button" class="redis-modal__close" @click="closeNewKey">×</button>
         </div>
         <div class="redis-modal__body redis-new-key-form">
-          <label class="vsc-field">
-            <span class="vsc-field__label">Key name</span>
-            <input v-model="newKeyName" class="vsc-input" placeholder="redis:key">
+          <label class="inline-block mr-10">
+            <span class="common_input_label">Key name</span>
+            <input v-model="newKeyName" class="field__input" placeholder="redis:key">
           </label>
-          <label class="vsc-field">
-            <span class="vsc-field__label">Type</span>
+          <label class="inline-block mr-10">
+            <span class="common_input_label">Type</span>
             <select
-              class="vsc-input"
+              class="field__input"
               :value="newKeyType"
               @change="selectNewKeyType(($event.target as HTMLSelectElement).value)"
             >
@@ -1334,22 +1334,22 @@ onBeforeUnmount(() => {
               </option>
             </select>
           </label>
-          <label class="vsc-field">
-            <span class="vsc-field__label">TTL</span>
-            <input v-model="newKeyTtl" class="vsc-input" placeholder="-1">
+          <label class="inline-block mr-10">
+            <span class="common_input_label">TTL</span>
+            <input v-model="newKeyTtl" class="field__input" placeholder="-1">
           </label>
           <label
             v-if="newKeyType === 'string' || newKeyType === 'ReJSON-RL'"
-            class="vsc-field"
+            class="inline-block mr-10"
           >
-            <span class="vsc-field__label">{{ newKeyType === 'ReJSON-RL' ? 'JSON' : 'Value' }}</span>
+            <span class="common_input_label">{{ newKeyType === 'ReJSON-RL' ? 'JSON' : 'Value' }}</span>
             <textarea v-model="newKeyContent" class="console-view__editor" />
           </label>
           <div
             v-else
-            class="vsc-field"
+            class="inline-block mr-10"
           >
-            <span class="vsc-field__label">{{ newKeyItemLabel }}</span>
+            <span class="common_input_label">{{ newKeyItemLabel }}</span>
             <div class="redis-new-key-list">
               <div
                 v-for="(row, index) in newKeyRows"
@@ -1359,18 +1359,18 @@ onBeforeUnmount(() => {
                 <input
                   v-if="newKeyType === 'hash' || newKeyType === 'stream'"
                   v-model="row.field"
-                  class="vsc-input"
+                  class="field__input"
                   :placeholder="newKeyType === 'stream' ? 'Field' : 'Field'"
                 >
                 <input
                   v-if="newKeyType === 'zset'"
                   v-model="row.score"
-                  class="vsc-input redis-new-key-row__score"
+                  class="field__input redis-new-key-row__score"
                   placeholder="Score"
                 >
                 <input
                   v-model="row.value"
-                  class="vsc-input"
+                  class="field__input"
                   placeholder="Value"
                 >
                 <VscButton

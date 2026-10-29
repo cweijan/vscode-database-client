@@ -266,7 +266,7 @@ onBeforeUnmount(() => {
     <div class="er-diagram-view__toolbar">
       <input
         v-model="filter"
-        class="vsc-input"
+        class="field__input"
         placeholder="Filter tables"
       >
       <span class="route-workspace__subline">

@@ -191,7 +191,7 @@ onBeforeUnmount(() => {
       </div>
       <textarea
         v-model="license"
-        class="vsc-input plan-view__license"
+        class="field__input plan-view__license"
         placeholder="Paste your license here"
         spellcheck="false"
       />

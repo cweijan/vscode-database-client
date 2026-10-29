@@ -69,7 +69,7 @@ function selectValue(event: Event): string {
         <label class="terminal-settings-modal__field">
           <span>Scrollback</span>
           <input
-            class="vsc-input"
+            class="field__input"
             type="number"
             min="0"
             :value="draft.scrollback"
@@ -79,7 +79,7 @@ function selectValue(event: Event): string {
         <label class="terminal-settings-modal__field">
           <span>Font size</span>
           <input
-            class="vsc-input"
+            class="field__input"
             type="number"
             min="8"
             max="32"
@@ -90,7 +90,7 @@ function selectValue(event: Event): string {
         <label class="terminal-settings-modal__field">
           <span>Line height</span>
           <input
-            class="vsc-input"
+            class="field__input"
             type="number"
             min="1"
             max="2"
@@ -102,7 +102,7 @@ function selectValue(event: Event): string {
         <label class="terminal-settings-modal__field">
           <span>Cursor</span>
           <select
-            class="vsc-input"
+            class="field__input"
             :value="draft.cursorStyle"
             @change="commit('cursorStyle', selectValue($event) as TerminalCursorStyle)"
           >
@@ -122,7 +122,7 @@ function selectValue(event: Event): string {
         <label class="terminal-settings-modal__field">
           <span>Theme</span>
           <select
-            class="vsc-input"
+            class="field__input"
             :value="draft.terminalTheme"
             @change="commit('terminalTheme', selectValue($event) as TerminalTheme)"
           >

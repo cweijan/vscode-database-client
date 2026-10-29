@@ -225,7 +225,7 @@ onBeforeUnmount(() => {
       </VscButton>
       <select
         v-model="tool"
-        class="vsc-input"
+        class="field__input"
       >
         <option value="crop">
           Crop
@@ -255,35 +255,35 @@ onBeforeUnmount(() => {
       v-if="tool === 'crop'"
       class="image-view__controls"
     >
-      <label class="vsc-field">
-        <span class="vsc-field__label">X</span>
+      <label class="inline-block mr-10">
+        <span class="common_input_label">X</span>
         <input
           v-model.number="cropX"
-          class="vsc-input"
+          class="field__input"
           type="number"
         >
       </label>
-      <label class="vsc-field">
-        <span class="vsc-field__label">Y</span>
+      <label class="inline-block mr-10">
+        <span class="common_input_label">Y</span>
         <input
           v-model.number="cropY"
-          class="vsc-input"
+          class="field__input"
           type="number"
         >
       </label>
-      <label class="vsc-field">
-        <span class="vsc-field__label">Width</span>
+      <label class="inline-block mr-10">
+        <span class="common_input_label">Width</span>
         <input
           v-model.number="cropWidth"
-          class="vsc-input"
+          class="field__input"
           type="number"
         >
       </label>
-      <label class="vsc-field">
-        <span class="vsc-field__label">Height</span>
+      <label class="inline-block mr-10">
+        <span class="common_input_label">Height</span>
         <input
           v-model.number="cropHeight"
-          class="vsc-input"
+          class="field__input"
           type="number"
         >
       </label>
@@ -292,19 +292,19 @@ onBeforeUnmount(() => {
       v-else-if="tool === 'resize'"
       class="image-view__controls"
     >
-      <label class="vsc-field">
-        <span class="vsc-field__label">Width</span>
+      <label class="inline-block mr-10">
+        <span class="common_input_label">Width</span>
         <input
           v-model.number="outputWidth"
-          class="vsc-input"
+          class="field__input"
           type="number"
         >
       </label>
-      <label class="vsc-field">
-        <span class="vsc-field__label">Height</span>
+      <label class="inline-block mr-10">
+        <span class="common_input_label">Height</span>
         <input
           v-model.number="outputHeight"
-          class="vsc-input"
+          class="field__input"
           type="number"
         >
       </label>
@@ -335,7 +335,7 @@ onBeforeUnmount(() => {
     <textarea
       v-else-if="tool === 'svg'"
       v-model="svgSource"
-      class="vsc-input image-view__svg"
+      class="field__input image-view__svg"
       spellcheck="false"
     />
 

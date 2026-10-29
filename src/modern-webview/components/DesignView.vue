@@ -531,7 +531,7 @@ onBeforeUnmount(() => {
     >
       <textarea
         v-model="design.ddl"
-        class="vsc-input design-view__editor"
+        class="field__input design-view__editor"
         readonly
         spellcheck="false"
       />
@@ -648,7 +648,7 @@ onBeforeUnmount(() => {
           v-model="indexForm.type"
           :options="['BTREE', 'HASH', 'GIN', 'GIST', 'FULLTEXT', 'SPATIAL']"
         />
-        <label class="vsc-field vsc-field--inline"
+        <label class="inline-block mr-10 inline-flex items-center"
           ><input v-model="indexForm.unique" type="checkbox" /> Unique</label
         >
         <VscButton @click="createIndex">Create index</VscButton>
@@ -761,7 +761,7 @@ onBeforeUnmount(() => {
       <div class="design-view__new-row">
         <textarea
           v-model="triggerSql"
-          class="vsc-input"
+          class="field__input"
           placeholder="CREATE TRIGGER ..."
         />
         <VscButton

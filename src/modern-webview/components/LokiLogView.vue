@@ -201,7 +201,7 @@ onBeforeUnmount(() => {
         />
         <input
           v-model="query"
-          class="vsc-input loki-toolbar__input"
+          class="field__input loki-toolbar__input"
           :placeholder="queryPlaceholder"
           @keyup.enter="requestLogs"
         >

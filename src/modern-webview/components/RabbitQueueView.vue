@@ -452,7 +452,7 @@ onBeforeUnmount(() => {
             <span class="rabbit-messages-sep" />
             <label class="rabbit-messages-field">
               <span class="rabbit-messages-field__label">Load count</span>
-              <select v-model="loadCount" class="vsc-input rabbit-messages-count">
+              <select v-model="loadCount" class="field__input rabbit-messages-count">
                 <option
                   v-for="option in pageSizeOptions"
                   :key="option"
@@ -605,7 +605,7 @@ onBeforeUnmount(() => {
               <span class="rabbit-publish-label">Headers (optional)</span>
               <textarea
                 v-model="publishHeaders"
-                class="vsc-input rabbit-publish-textarea"
+                class="field__input rabbit-publish-textarea"
                 placeholder="{}"
               />
             </label>
@@ -613,7 +613,7 @@ onBeforeUnmount(() => {
               <span class="rabbit-publish-label">Properties (optional)</span>
               <textarea
                 v-model="publishProperties"
-                class="vsc-input rabbit-publish-textarea"
+                class="field__input rabbit-publish-textarea"
                 placeholder="{}"
               />
             </label>
@@ -819,8 +819,8 @@ onBeforeUnmount(() => {
         </div>
         <div class="rabbit-modal__body">
           <template v-if="dialog === 'target'">
-            <label class="vsc-field">
-              <span class="vsc-field__label">Target queue</span>
+            <label class="inline-block mr-10">
+              <span class="common_input_label">Target queue</span>
               <UiSelect
                 v-model="targetQueue"
                 :options="queueChoices"

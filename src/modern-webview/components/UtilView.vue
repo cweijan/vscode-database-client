@@ -250,7 +250,7 @@ onBeforeUnmount(() => {
         <h2>Input</h2>
         <textarea
           v-model="source"
-          class="vsc-input util-view__source"
+          class="field__input util-view__source"
           placeholder="Enter text to calculate hashes or encode values"
           spellcheck="false"
           @input="compute"
@@ -259,34 +259,34 @@ onBeforeUnmount(() => {
 
       <article class="util-view__section">
         <h2>Hash</h2>
-        <label class="vsc-field">
-          <span class="vsc-field__label">MD5</span>
+        <label class="inline-block mr-10">
+          <span class="common_input_label">MD5</span>
           <input
-            class="vsc-input"
+            class="field__input"
             :value="computedValue.md5"
             readonly
           >
         </label>
-        <label class="vsc-field">
-          <span class="vsc-field__label">SHA1</span>
+        <label class="inline-block mr-10">
+          <span class="common_input_label">SHA1</span>
           <input
-            class="vsc-input"
+            class="field__input"
             :value="computedValue.sha1"
             readonly
           >
         </label>
-        <label class="vsc-field">
-          <span class="vsc-field__label">SHA256</span>
+        <label class="inline-block mr-10">
+          <span class="common_input_label">SHA256</span>
           <input
-            class="vsc-input"
+            class="field__input"
             :value="computedValue.sha256"
             readonly
           >
         </label>
-        <label class="vsc-field">
-          <span class="vsc-field__label">Pretty bytes</span>
+        <label class="inline-block mr-10">
+          <span class="common_input_label">Pretty bytes</span>
           <input
-            class="vsc-input"
+            class="field__input"
             :value="computedValue.prettyBytes"
             readonly
           >
@@ -297,7 +297,7 @@ onBeforeUnmount(() => {
         <h2>Encode / Decode</h2>
         <select
           v-model="encodingMode"
-          class="vsc-input"
+          class="field__input"
         >
           <option value="base64">
             Base64
@@ -310,54 +310,54 @@ onBeforeUnmount(() => {
           </option>
         </select>
         <template v-if="encodingMode === 'base64'">
-          <label class="vsc-field">
-            <span class="vsc-field__label">Base64 encode</span>
+          <label class="inline-block mr-10">
+            <span class="common_input_label">Base64 encode</span>
             <textarea
-              class="vsc-input"
+              class="field__input"
               :value="computedValue.base64Encode"
               readonly
             />
           </label>
-          <label class="vsc-field">
-            <span class="vsc-field__label">Base64 decode</span>
+          <label class="inline-block mr-10">
+            <span class="common_input_label">Base64 decode</span>
             <textarea
-              class="vsc-input"
+              class="field__input"
               :value="computedValue.base64Decode"
               readonly
             />
           </label>
         </template>
         <template v-else-if="encodingMode === 'url'">
-          <label class="vsc-field">
-            <span class="vsc-field__label">URL encode</span>
+          <label class="inline-block mr-10">
+            <span class="common_input_label">URL encode</span>
             <textarea
-              class="vsc-input"
+              class="field__input"
               :value="computedValue.urlEncode"
               readonly
             />
           </label>
-          <label class="vsc-field">
-            <span class="vsc-field__label">URL decode</span>
+          <label class="inline-block mr-10">
+            <span class="common_input_label">URL decode</span>
             <textarea
-              class="vsc-input"
+              class="field__input"
               :value="computedValue.urlDecode"
               readonly
             />
           </label>
         </template>
         <template v-else>
-          <label class="vsc-field">
-            <span class="vsc-field__label">Unicode encode</span>
+          <label class="inline-block mr-10">
+            <span class="common_input_label">Unicode encode</span>
             <textarea
-              class="vsc-input"
+              class="field__input"
               :value="unicodeEncode"
               readonly
             />
           </label>
-          <label class="vsc-field">
-            <span class="vsc-field__label">Unicode decode</span>
+          <label class="inline-block mr-10">
+            <span class="common_input_label">Unicode decode</span>
             <textarea
-              class="vsc-input"
+              class="field__input"
               :value="unicodeDecode"
               readonly
             />
@@ -374,26 +374,26 @@ onBeforeUnmount(() => {
             Generate
           </VscButton>
         </div>
-        <label class="vsc-field">
-          <span class="vsc-field__label">Username</span>
+        <label class="inline-block mr-10">
+          <span class="common_input_label">Username</span>
           <input
-            class="vsc-input"
+            class="field__input"
             :value="randomValue.username"
             readonly
           >
         </label>
-        <label class="vsc-field">
-          <span class="vsc-field__label">Password</span>
+        <label class="inline-block mr-10">
+          <span class="common_input_label">Password</span>
           <input
-            class="vsc-input"
+            class="field__input"
             :value="randomValue.password"
             readonly
           >
         </label>
-        <label class="vsc-field">
-          <span class="vsc-field__label">UUID</span>
+        <label class="inline-block mr-10">
+          <span class="common_input_label">UUID</span>
           <input
-            class="vsc-input"
+            class="field__input"
             :value="randomValue.uuid"
             readonly
           >
@@ -402,19 +402,19 @@ onBeforeUnmount(() => {
 
       <article class="util-view__section">
         <h2>Timestamp Converter</h2>
-        <label class="vsc-field">
-          <span class="vsc-field__label">Timestamp</span>
+        <label class="inline-block mr-10">
+          <span class="common_input_label">Timestamp</span>
           <input
-            class="vsc-input"
+            class="field__input"
             :value="timestamp"
             type="number"
             @input="updateTimestamp(($event.target as HTMLInputElement).value)"
           >
         </label>
-        <label class="vsc-field">
-          <span class="vsc-field__label">Date</span>
+        <label class="inline-block mr-10">
+          <span class="common_input_label">Date</span>
           <input
-            class="vsc-input"
+            class="field__input"
             :value="dateText"
             @input="updateDate(($event.target as HTMLInputElement).value)"
           >
@@ -443,7 +443,7 @@ onBeforeUnmount(() => {
       <div class="util-view__process-toolbar">
         <input
           v-model="processFilter"
-          class="vsc-input"
+          class="field__input"
           placeholder="Search name, PID, user or command"
         >
         <label class="util-view__checkbox">
