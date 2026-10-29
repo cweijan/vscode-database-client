@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElDialog } from "element-plus";
 import { computed, inject, onBeforeUnmount, onMounted, ref, shallowRef } from "vue";
 import initSqlJs, { type SqlJsDatabase } from "sql.js";
 import sqlWasmUrl from "sql.js/dist/sql-wasm.wasm?url";
@@ -12,6 +13,9 @@ import {
   type SqliteFileTable,
 } from "../../modern/database/sqliteFile";
 import { resultValueText } from "../../modern/database/resultValues";
+import DatabaseFilePanel from "./DatabaseFilePanel.vue";
+import ConnectResult from "./target/ConnectResult.vue";
+import { readViewerThemeClass } from "../viewerTheme";
 
 interface SqliteOpenPayload {
   readonly data?: unknown;
@@ -20,6 +24,8 @@ interface SqliteOpenPayload {
 }
 
 const pageSize = 50;
+const connectVisible = ref(false);
+const viewerThemeClass = readViewerThemeClass();
 const bridge = inject(WEBVIEW_BRIDGE_KEY);
 const bootstrap = readWebviewBootstrap();
 const initial = bootstrap.state as SqliteOpenPayload;
@@ -135,92 +141,107 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section
-    class="route-workspace sqlite-view"
-    data-route="sqlite"
+  <div
+    class="data-viewer"
+    :class="viewerThemeClass"
   >
-    <header class="route-workspace__header">
-      <div>
-        <h1>{{ fileName }}</h1>
-        <p class="route-workspace__subline">
-          SQLite tables and views · {{ tables.length }} object(s)
-        </p>
-      </div>
-      <VscButton
-        type="default"
-        @click="bridge?.emit('reveal')"
-      >
-        Reveal file
-      </VscButton>
-    </header>
-    <p
-      v-if="loading"
-      class="route-workspace__status"
-    >
-      Loading SQLite database…
-    </p>
-    <p
-      v-else-if="error"
-      class="route-workspace__status route-workspace__status--error"
-    >
-      {{ error }}
-    </p>
     <div
-      v-else
-      class="sqlite-view__body"
+      v-if="loading"
+      class="data-viewer__overlay"
     >
-      <aside class="sqlite-view__sidebar">
-        <strong>Tables</strong>
-        <button
-          v-for="table in tables"
-          :key="table.name"
-          type="button"
-          class="sqlite-view__table-button"
-          :class="{ 'sqlite-view__table-button--active': table.name === selectedTable }"
-          @click="selectTable(table.name)"
-        >
-          <span>{{ table.name }}</span>
-          <small>{{ table.type }} · {{ table.rowCount }}</small>
-        </button>
-        <p
-          v-if="tables.length === 0"
-          class="route-workspace__empty"
-        >
-          No user tables or views found.
-        </p>
+      <i class="codicon codicon-loading codicon-modifier-spin" />
+      <span>Loading SQLite database...</span>
+    </div>
+    <div class="data-viewer__body">
+      <aside class="data-viewer__sider">
+        <div class="data-viewer__sider-inner">
+          <div class="data-viewer__sider-header">
+            <i class="codicon codicon-table" /> Tables
+          </div>
+          <div
+            v-if="fileName"
+            class="data-viewer__sider-title"
+          >
+            <i class="codicon codicon-database blue" />
+            <span>{{ fileName }}</span>
+          </div>
+          <div
+            v-if="tables.length"
+            class="data-viewer__meta data-viewer__meta--grid"
+          >
+            <div class="data-viewer__stat">
+              <span class="data-viewer__stat-label"><i class="codicon codicon-table" /> Tables</span>
+              <strong class="data-viewer__stat-value">{{ tables.length }}</strong>
+            </div>
+            <div class="data-viewer__stat">
+              <span class="data-viewer__stat-label"><i class="codicon codicon-database" /> Rows</span>
+              <strong class="data-viewer__stat-value">{{ (page?.total ?? 0).toLocaleString() }}</strong>
+            </div>
+          </div>
+          <div class="data-viewer__list">
+            <div
+              v-for="table in tables"
+              :key="table.name"
+              class="data-viewer__list-item data-viewer__list-item--clickable"
+              :class="{ 'is-active': table.name === selectedTable }"
+              :title="table.name"
+              @click="selectTable(table.name)"
+            >
+              <i
+                class="codicon data-viewer__list-icon"
+                :class="table.type === 'view' ? 'codicon-eye' : 'codicon-table yellow'"
+              />
+              <span class="data-viewer__list-name">{{ table.name }}</span>
+              <span class="data-viewer__list-meta">{{ table.type === "view" ? "view" : table.rowCount }}</span>
+            </div>
+          </div>
+          <div class="data-viewer__sider-bottom">
+            <div class="data-viewer__sider-footer">
+              <VscButton
+                size="small"
+                icon="codicon-database"
+                class="data-viewer__footer-btn"
+                @click="bridge?.emit('reveal')"
+              >
+                Show in tree
+              </VscButton>
+              <VscButton
+                size="small"
+                icon="codicon-plug"
+                class="data-viewer__footer-btn"
+                @click="connectVisible = true"
+              >
+                Add connection
+              </VscButton>
+            </div>
+            <ConnectResult />
+          </div>
+        </div>
       </aside>
-      <div class="sqlite-view__content">
-        <template v-if="page && selectedTable">
-          <div class="sqlite-view__content-header">
-            <div>
-              <h2>{{ selectedTable }}</h2>
-              <span class="route-workspace__subline">
-                {{ selectedMetadata?.type }} · {{ page.total }} row(s)
-              </span>
-            </div>
-            <div class="route-workspace__actions">
-              <VscButton
-                type="default"
-                :disabled="pageNum <= 1"
-                @click="changePage(-1)"
-              >
-                Previous
-              </VscButton>
-              <span>Page {{ pageNum }} / {{ pageCount }}</span>
-              <VscButton
-                type="default"
-                :disabled="pageNum >= pageCount"
-                @click="changePage(1)"
-              >
-                Next
-              </VscButton>
-            </div>
+      <main class="data-viewer__main">
+        <div
+          v-if="error"
+          class="data-viewer__empty"
+        >
+          <div class="data-viewer__error">
+            <i class="codicon codicon-error" />
+            <span>{{ error }}</span>
+          </div>
+        </div>
+        <template v-else-if="page && selectedTable">
+          <div class="data-viewer__content-header">
+            <i
+              class="codicon data-viewer__list-icon"
+              :class="selectedMetadata?.type === 'view' ? 'codicon-eye' : 'codicon-table yellow'"
+            />
+            <span class="data-viewer__content-title">{{ selectedTable }}</span>
+            <span class="data-viewer__content-meta">{{ selectedMetadata?.type }} · {{ page.total }} row(s)</span>
           </div>
           <div
             v-if="page.rows.length > 0"
-            class="result-view__table-wrap"
+            class="data-viewer__table-wrap"
           >
-            <table class="result-view__table">
+            <table>
               <thead>
                 <tr>
                   <th
@@ -246,20 +267,55 @@ onBeforeUnmount(() => {
               </tbody>
             </table>
           </div>
-          <p
+          <div
             v-else
-            class="route-workspace__empty"
+            class="data-viewer__empty"
           >
             No rows returned.
-          </p>
+          </div>
+          <div class="data-viewer__footer">
+            <span class="data-viewer__footer-total">{{ page.total }} row(s)</span>
+            <div class="data-viewer__pager">
+              <VscButton
+                size="micro"
+                type="secondary"
+                icon="codicon-chevron-left"
+                :disabled="pageNum <= 1"
+                @click="changePage(-1)"
+              />
+              <span class="data-viewer__pager-info">{{ pageNum }} / {{ pageCount }}</span>
+              <VscButton
+                size="micro"
+                type="secondary"
+                icon="codicon-chevron-right"
+                :disabled="pageNum >= pageCount"
+                @click="changePage(1)"
+              />
+            </div>
+          </div>
         </template>
-        <p
-          v-else-if="tables.length > 0"
-          class="route-workspace__empty"
+        <div
+          v-else
+          class="data-viewer__empty"
         >
-          Select a table or view.
-        </p>
-      </div>
+          {{ tables.length ? "Select a table or view." : "No user tables or views found." }}
+        </div>
+      </main>
     </div>
-  </section>
+    <ElDialog
+      v-model="connectVisible"
+      title="Add SQLite connection"
+      width="480px"
+      class="sqlite-connect-dialog"
+      close-on-click-modal
+      destroy-on-close
+    >
+      <DatabaseFilePanel
+        embedded
+        :db-path="fileName"
+        :file-name="fileName"
+        :has-dependency="true"
+      />
+    </ElDialog>
+  </div>
 </template>

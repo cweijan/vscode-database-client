@@ -4,6 +4,7 @@ import { parquetMetadata, parquetReadObjects, parquetSchema } from "hyparquet";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
+import { readViewerThemeClass } from "../viewerTheme";
 
 interface ParquetRow {
   readonly [key: string]: unknown;
@@ -28,6 +29,7 @@ let saveSubscription: BridgeDisposable | undefined;
 let loadSequence = 0;
 
 const rowCountText = computed(() => rowCount.value.toString());
+const viewerThemeClass = readViewerThemeClass();
 
 function stateBytes(value: unknown): Uint8Array | undefined {
   const data = value && typeof value === "object" ? (value as ParquetState).data : undefined;
@@ -113,55 +115,108 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section
-    class="route-workspace parquet-view"
-    data-route="parquet"
+  <div
+    class="data-viewer"
+    :class="viewerThemeClass"
   >
-    <header class="route-workspace__header">
-      <div>
-        <h1>{{ fileName }}</h1>
-        <p class="route-workspace__subline">
-          Parquet schema and first 1,000 rows
-        </p>
-      </div>
-      <VscButton
-        @click="requestSave"
-      >
-        Save
-      </VscButton>
-    </header>
-    <p class="route-workspace__status">
-      {{ status }}
-    </p>
-    <div
-      v-if="rows.length > 0"
-      class="result-view__table-wrap"
-    >
-      <table class="result-view__table">
-        <thead>
-          <tr>
-            <th
-              v-for="column in columns"
-              :key="column"
-            >
-              {{ column }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(row, index) in rows"
-            :key="index"
+    <div class="data-viewer__body">
+      <aside class="data-viewer__sider">
+        <div class="data-viewer__sider-inner">
+          <div class="data-viewer__sider-header">
+            <i class="codicon codicon-table" /> Parquet
+          </div>
+          <div
+            v-if="fileName"
+            class="data-viewer__sider-title"
           >
-            <td
+            <i class="codicon codicon-database blue" />
+            <span>{{ fileName }}</span>
+          </div>
+          <div
+            v-if="columns.length"
+            class="data-viewer__meta data-viewer__meta--grid"
+          >
+            <div class="data-viewer__stat">
+              <span class="data-viewer__stat-label"><i class="codicon codicon-symbol-field" /> Columns</span>
+              <strong class="data-viewer__stat-value">{{ columns.length }}</strong>
+            </div>
+            <div class="data-viewer__stat">
+              <span class="data-viewer__stat-label"><i class="codicon codicon-database" /> Rows</span>
+              <strong class="data-viewer__stat-value">{{ rowCountText }}</strong>
+            </div>
+          </div>
+          <div class="data-viewer__list">
+            <div
               v-for="column in columns"
               :key="column"
+              class="data-viewer__list-item"
+              :title="column"
             >
-              {{ cell(row[column]) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <i class="codicon codicon-symbol-field data-viewer__list-icon" />
+              <span class="data-viewer__list-name">{{ column }}</span>
+            </div>
+          </div>
+          <div class="data-viewer__sider-bottom">
+            <div class="data-viewer__sider-footer">
+              <VscButton
+                size="small"
+                icon="codicon-save"
+                class="data-viewer__footer-btn"
+                @click="requestSave"
+              >
+                Save
+              </VscButton>
+            </div>
+          </div>
+        </div>
+      </aside>
+      <main class="data-viewer__main">
+        <div class="data-viewer__content-header">
+          <i class="codicon codicon-table yellow data-viewer__list-icon" />
+          <span class="data-viewer__content-title">{{ fileName }}</span>
+          <span class="data-viewer__content-meta">{{ status }}</span>
+        </div>
+        <div
+          v-if="rows.length > 0"
+          class="data-viewer__table-wrap"
+        >
+          <table>
+            <thead>
+              <tr>
+                <th
+                  v-for="column in columns"
+                  :key="column"
+                >
+                  {{ column }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(row, index) in rows"
+                :key="index"
+              >
+                <td
+                  v-for="column in columns"
+                  :key="column"
+                >
+                  <input
+                    class="data-viewer__cell-input"
+                    :value="cell(row[column])"
+                    readonly
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div
+          v-else
+          class="data-viewer__empty"
+        >
+          {{ status }}
+        </div>
+      </main>
     </div>
-  </section>
+  </div>
 </template>

@@ -16,6 +16,7 @@ import ConnectionDialog from "./ConnectionDialog.vue";
 import ServiceSelector from "./ServiceSelector.vue";
 import PasswordInput from "./target/PasswordInput.vue";
 import ConnectResult from "./target/ConnectResult.vue";
+import { connectResult } from "../connectState";
 import { usePayState } from "../license";
 import UiInput from "./UiInput.vue";
 import UiSelect from "./UiSelect.vue";
@@ -1341,7 +1342,10 @@ onBeforeUnmount(() => {
             </ConnectionDialog>
           </div>
         </div>
-        <div class="connect-bar">
+        <div
+          class="connect-bar"
+          :class="{ loading: connectResult.loading }"
+        >
           <VscButton
             @click="save"
           >
