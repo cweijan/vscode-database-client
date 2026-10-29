@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElOption, ElSelect } from "element-plus";
 import { computed, inject, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
@@ -16,6 +17,10 @@ import {
 import UiInput from "./UiInput.vue";
 import UiSelect from "./UiSelect.vue";
 import HexViewer from "./HexViewer.vue";
+import ResultDeleteConfirm from "./ResultDeleteConfirm.vue";
+import ResultIoDialog from "./ResultIoDialog.vue";
+import ResultStyleDialog from "./ResultStyleDialog.vue";
+import ResultToolbarConfig from "./ResultToolbarConfig.vue";
 
 interface ResultFilter {
   column: string;
@@ -116,6 +121,43 @@ const detailEditor = ref<DetailEditor>();
 const showSqlPanel = ref(false);
 const queryRunning = ref(false);
 const autoRefresh = ref("-1");
+interface TableStyle {
+  fontSize: number;
+  fontFamily: string;
+  maximumWidth: number;
+  showHeaderFilter: boolean;
+}
+const tableStyle = reactive<TableStyle>({
+  fontSize: 13,
+  fontFamily: "Consolas, monospace",
+  maximumWidth: 0,
+  showHeaderFilter: true,
+});
+const showHeaderFilter = computed(() => tableStyle.showHeaderFilter);
+const resultTableStyle = computed(() => ({
+  fontSize: `${tableStyle.fontSize}px`,
+  fontFamily: tableStyle.fontFamily || undefined,
+}));
+const styleDialogVisible = ref(false);
+const toolbarConfigVisible = ref(false);
+const ioDialogVisible = ref(false);
+const deleteConfirmVisible = ref(false);
+const toolbarItems = ref([
+  { id: "export", label: "Export", shortcut: "", enabled: true },
+  { id: "import", label: "Import", shortcut: "", enabled: true },
+  { id: "save", label: "Save changes", shortcut: "Ctrl+S", enabled: true },
+  { id: "pin", label: "Pin result", shortcut: "", enabled: true },
+  { id: "history", label: "SQL history", shortcut: "", enabled: true, premium: true },
+]);
+const autoRefreshOptions = [
+  { value: "-1", label: "None" },
+  { value: "1", label: "1s" },
+  { value: "3", label: "3s" },
+  { value: "5", label: "5s" },
+  { value: "30", label: "30s" },
+  { value: "60", label: "1m" },
+  { value: "300", label: "5m" },
+] as const;
 let autoRefreshTimer: number | undefined;
 
 const rows = computed(() => payload.rows ?? []);
@@ -739,13 +781,23 @@ function setInsertValue(name: string, value: string): void {
   if (insertModel.value) insertModel.value[name] = value;
 }
 
+const selectedRowCount = computed(() => selectedRows.value.length);
+
 function deleteSelected(): void {
   if (!canMutate.value || selectedRows.value.length === 0) return;
-  if (!window.confirm(`Delete ${selectedRows.value.length} selected row(s)?`)) return;
+  deleteConfirmVisible.value = true;
+}
+
+function deleteSelectedRows(): void {
+  if (!canMutate.value || selectedRows.value.length === 0) return;
   const currentRows = rows.value;
   bridge?.emit("saveModify", {
     deletes: selectedRows.value.map((index) => record(currentRows[index])),
   });
+}
+
+function onIoSubmit(payload: { type: string; path: string; format: string }): void {
+  bridge?.emit("export", payload);
 }
 
 function updateActiveFilter(column: string, operator: string, value: string): void {
@@ -968,6 +1020,30 @@ onBeforeUnmount(() => {
         <button
           class="result-toolbar__icon"
           type="button"
+          title="Toolbar settings"
+          aria-label="Toolbar settings"
+          @click="toolbarConfigVisible = true"
+        >
+          <i
+            class="codicon codicon-settings-gear"
+            aria-hidden="true"
+          />
+        </button>
+        <button
+          class="result-toolbar__icon"
+          type="button"
+          title="Column style"
+          aria-label="Column style"
+          @click="styleDialogVisible = true"
+        >
+          <i
+            class="codicon codicon-paintcan"
+            aria-hidden="true"
+          />
+        </button>
+        <button
+          class="result-toolbar__icon"
+          type="button"
           title="SQL panel"
           aria-label="Toggle SQL panel"
           @click="bridge?.emit('openConsole')"
@@ -1053,7 +1129,7 @@ onBeforeUnmount(() => {
           />
         </button>
         <button
-          class="result-toolbar__icon"
+          class="result-toolbar__icon detail-btn"
           type="button"
           title="Import data"
           aria-label="Import data"
@@ -1066,7 +1142,7 @@ onBeforeUnmount(() => {
           />
         </button>
         <button
-          class="result-toolbar__icon"
+          class="result-toolbar__icon export-btn"
           type="button"
           title="Export data"
           aria-label="Export data"
@@ -1131,20 +1207,28 @@ onBeforeUnmount(() => {
             aria-hidden="true"
           />
         </button>
-        <UiSelect
-          :model-value="autoRefresh"
-          label="Auto refresh"
-          :options="[
-            { value: '-1', label: 'None' },
-            { value: '1', label: '1s' },
-            { value: '3', label: '3s' },
-            { value: '5', label: '5s' },
-            { value: '30', label: '30s' },
-            { value: '60', label: '1m' },
-            { value: '300', label: '5m' },
-          ]"
-          @update:model-value="setAutoRefresh"
-        />
+        <div class="auto-refresh-select">
+          <ElSelect
+            :model-value="autoRefresh"
+            size="small"
+            @update:model-value="(value: string) => setAutoRefresh(value)"
+          >
+            <ElOption
+              v-for="option in autoRefreshOptions"
+              :key="option.value"
+              :value="option.value"
+              :label="option.label"
+            >
+              <span class="auto-refresh-option">
+                <i
+                  v-if="autoRefresh === option.value"
+                  class="codicon codicon-check auto-refresh-option__check"
+                />
+                {{ option.label }}
+              </span>
+            </ElOption>
+          </ElSelect>
+        </div>
         <span class="el-pagination__total">
           {{ payload.total ?? filteredRows.length }} row(s)
         </span>
@@ -1176,6 +1260,10 @@ onBeforeUnmount(() => {
       :class="{ 'info-panel-error': payload.error }"
       role="status"
     >
+      <i
+        class="codicon codicon-info message-badge"
+        aria-hidden="true"
+      />
       {{ payload.error || status }}
     </div>
     <div
@@ -1352,7 +1440,7 @@ onBeforeUnmount(() => {
         </span>
         <textarea
           v-model="updateSql"
-          class="console-view__editor"
+          class="console-view__editor preview-editor codemirror-container"
           :disabled="readonly"
           placeholder="UPDATE table_name SET column_name = value WHERE id = ..."
         />
@@ -1436,7 +1524,10 @@ onBeforeUnmount(() => {
       v-else-if="!payload.error"
       class="result-view__table-wrap umy-table-body-viewport-container"
     >
-      <table class="result-view__table umy-table umy-table-bordered umy-table-auto-height">
+      <table
+        class="result-view__table umy-table umy-table-bordered umy-table-auto-height"
+        :style="resultTableStyle"
+      >
         <thead class="umy-table-header">
           <tr class="umy-table-row">
             <th class="umy-table-selection-column col--checkbox">
@@ -1453,15 +1544,28 @@ onBeforeUnmount(() => {
               @click="toggleSort(column)"
             >
               <span class="umy-table-column-title">{{ column }}</span>
-              <span v-if="sortState?.column === column">
-                {{ sortState.descending ? " ↓" : " ↑" }}
+              <span
+                class="caret-wrapper"
+                :class="{ ascending: sortState?.column === column && !sortState.descending }"
+              >
+                <i
+                  class="sort-caret"
+                  :class="{ ascending: sortState?.column === column && !sortState.descending }"
+                />
+                <i
+                  class="sort-caret"
+                  :class="{ descending: sortState?.column === column && sortState.descending }"
+                />
               </span>
             </th>
             <th class="umy-table-header-cell">
               Actions
             </th>
           </tr>
-          <tr class="result-view__filter-row umy-table-row umy-table-filter-dropdown">
+          <tr
+            v-if="showHeaderFilter"
+            class="result-view__filter-row umy-table-row umy-table-filter-dropdown"
+          >
             <th />
             <th
               v-for="column in columns"
@@ -1570,6 +1674,27 @@ onBeforeUnmount(() => {
         </tbody>
       </table>
     </div>
+    <ResultStyleDialog
+      v-model="styleDialogVisible"
+      :style="tableStyle"
+      @update:style="(value: TableStyle) => Object.assign(tableStyle, value)"
+    />
+    <ResultToolbarConfig
+      v-model="toolbarConfigVisible"
+      :items="toolbarItems"
+      @update:items="(value) => (toolbarItems = value)"
+    />
+    <ResultIoDialog
+      v-model="ioDialogVisible"
+      mode="export"
+      @submit="onIoSubmit"
+    />
+    <ResultDeleteConfirm
+      v-model:visible="deleteConfirmVisible"
+      :has-primary-key="true"
+      :count="selectedRowCount"
+      @confirm="deleteSelectedRows"
+    />
     <div
       v-if="aggregate"
       class="status-bar fixed bottom-2 flex z-10 opacity-95"

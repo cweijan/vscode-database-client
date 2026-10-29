@@ -342,7 +342,7 @@ test("SQL result page preserves target execution states and mutation actions", a
     "bridge?.emit('viewHistory')",
     "bridge?.emit('viewJSON')",
     "setAutoRefresh",
-    "{ value: '300', label: '5m' }",
+    "autoRefreshOptions",
     'bridge?.emit("saveModify"',
     'bridge?.emit("filterResult"',
     'bridge?.emit("exportFile"',
