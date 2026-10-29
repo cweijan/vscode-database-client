@@ -11,3 +11,4 @@ openspec/
 dist-modern/
 
 /reference/
+.render-smoke/
