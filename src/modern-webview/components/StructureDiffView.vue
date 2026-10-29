@@ -222,6 +222,11 @@ function connectionLabel(connection: ConnectionNode | undefined): string {
   return `${label}${host}`;
 }
 
+function connectionOptionDescription(connection: ConnectionNode): string {
+  const parts = [connection.dbType, connection.host].filter(Boolean).map(String);
+  return parts.join(" · ");
+}
+
 function connectionOptionLabel(connection: ConnectionNode): string {
   return connection.group ? `${connectionLabel(connection)} (${connection.group})` : connectionLabel(connection);
 }
@@ -664,28 +669,27 @@ onBeforeUnmount(() => {
         <div class="config-form">
           <label class="config-field">
             <span class="config-field__label">Connection</span>
-            <span class="config-select-wrap">
-              <img
-                v-if="sourceConnection"
-                class="connection-select__icon"
-                :src="connectionIcon(sourceConnection)"
-                alt=""
+            <div class="connection-option-list">
+              <button
+                v-for="connection in filteredConnections"
+                :key="connection.key"
+                type="button"
+                class="connection-option"
+                :class="{ 'connection-option--active': source.connectionKey === connection.key }"
+                @click="chooseConnection(false, connection.key)"
               >
-              <select
-                class="config-select"
-                :value="source.connectionKey"
-                @change="chooseConnection(false, ($event.target as HTMLSelectElement).value)"
-              >
-                <option value="">Select connection</option>
-                <option
-                  v-for="connection in filteredConnections"
-                  :key="connection.key"
-                  :value="connection.key"
+                <img
+                  class="connection-option__icon connection-select__icon"
+                  :src="connectionIcon(connection)"
+                  alt=""
                 >
-                  {{ connectionOptionLabel(connection) }}
-                </option>
-              </select>
-            </span>
+                <span class="connection-option__label">{{ connectionOptionLabel(connection) }}</span>
+                <span
+                  v-if="connectionOptionDescription(connection)"
+                  class="connection-option__desc"
+                >{{ connectionOptionDescription(connection) }}</span>
+              </button>
+            </div>
           </label>
           <label class="config-field">
             <span class="config-field__label">Database</span>
@@ -790,28 +794,27 @@ onBeforeUnmount(() => {
         <div class="config-form">
           <label class="config-field">
             <span class="config-field__label">Connection</span>
-            <span class="config-select-wrap">
-              <img
-                v-if="targetConnection"
-                class="connection-select__icon"
-                :src="connectionIcon(targetConnection)"
-                alt=""
+            <div class="connection-option-list">
+              <button
+                v-for="connection in filteredConnections"
+                :key="connection.key"
+                type="button"
+                class="connection-option"
+                :class="{ 'connection-option--active': target.connectionKey === connection.key }"
+                @click="chooseConnection(true, connection.key)"
               >
-              <select
-                class="config-select"
-                :value="target.connectionKey"
-                @change="chooseConnection(true, ($event.target as HTMLSelectElement).value)"
-              >
-                <option value="">Select connection</option>
-                <option
-                  v-for="connection in filteredConnections"
-                  :key="connection.key"
-                  :value="connection.key"
+                <img
+                  class="connection-option__icon connection-select__icon"
+                  :src="connectionIcon(connection)"
+                  alt=""
                 >
-                  {{ connectionOptionLabel(connection) }}
-                </option>
-              </select>
-            </span>
+                <span class="connection-option__label">{{ connectionOptionLabel(connection) }}</span>
+                <span
+                  v-if="connectionOptionDescription(connection)"
+                  class="connection-option__desc"
+                >{{ connectionOptionDescription(connection) }}</span>
+              </button>
+            </div>
           </label>
           <label class="config-field">
             <span class="config-field__label">Database</span>
