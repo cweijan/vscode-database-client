@@ -1509,11 +1509,15 @@ onBeforeUnmount(() => {
             class="inline-block mr-10"
           >
             <span class="common_input_label">{{ newKeyItemLabel }}</span>
-            <div class="redis-new-key-list">
+            <div
+              class="redis-new-key-list"
+              :class="{ 'redis-stream-entry-list': newKeyType === 'stream' }"
+            >
               <div
                 v-for="(row, index) in newKeyRows"
                 :key="index"
                 class="redis-new-key-row"
+                :class="{ 'redis-stream-entry-row': newKeyType === 'stream' }"
               >
                 <input
                   v-if="newKeyType === 'hash' || newKeyType === 'stream'"
@@ -1545,14 +1549,12 @@ onBeforeUnmount(() => {
                 </VscButton>
               </div>
               <VscButton
-                class="redis-new-key-add"
-                type="default"
+                class="redis-new-key-add redis-stream-entry-add"
+                type="secondary"
+                size="micro"
+                icon="codicon-add"
                 @click="addNewKeyRow"
               >
-                <i
-                  class="codicon codicon-add"
-                  aria-hidden="true"
-                />
                 Add row
               </VscButton>
             </div>

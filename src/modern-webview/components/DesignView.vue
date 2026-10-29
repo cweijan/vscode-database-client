@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElInput, ElOption, ElSelect } from "element-plus";
 import { computed, inject, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 
 import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
@@ -74,6 +75,7 @@ const error = ref("");
 const originalTable = ref("");
 const originalComment = ref("");
 const originalCollation = ref("");
+const collationOptions = ref<string[]>([]);
 const columnDrafts = ref<Record<string, ColumnDraft>>({});
 const newColumn = reactive<ColumnDraft>({
   name: "",
@@ -465,49 +467,73 @@ onBeforeUnmount(() => {
       </div>
     </header>
 
-    <section
-      class="design-view__info-panel"
-      data-region="info-panel"
-    >
-      <div class="design-view__info-row">
-        <div class="design-view__info-field">
-          <UiInput
-            v-model="design.table"
-            label="Table"
+    <div class="design-info-panel">
+      <div
+        class="design-info-row"
+        @keyup.enter="updateTable"
+      >
+        <div class="design-info-field">
+          <label class="design-info-label">Table</label>
+          <ElInput
+            :model-value="design.table"
+            class="design-info-input"
+            @update:model-value="(value: string) => (design.table = value)"
           />
         </div>
-        <div class="design-view__info-field">
-          <UiInput
-            v-model="design.comment"
-            label="Comment"
+        <div class="design-info-field">
+          <label class="design-info-label">Comment</label>
+          <ElInput
+            :model-value="design.comment"
+            class="design-info-input"
+            @update:model-value="(value: string) => (design.comment = value)"
           />
         </div>
       </div>
-      <div class="design-view__info-row">
+      <div class="design-info-row">
         <div
           v-if="design.engine"
-          class="design-view__info-field"
+          class="design-info-field"
         >
-          <UiInput
+          <label class="design-info-label">Engine</label>
+          <ElInput
             :model-value="design.engine"
-            label="Engine"
+            class="design-info-input--sm"
             disabled
           />
         </div>
-        <div class="design-view__info-field">
-          <UiInput
-            v-model="design.collation"
-            label="Collation"
-          />
+        <div class="design-info-field">
+          <label class="design-info-label">Collation</label>
+          <ElSelect
+            :model-value="design.collation"
+            size="small"
+            filterable
+            class="design-info-select"
+            @update:model-value="(value: string) => (design.collation = value)"
+          >
+            <ElOption
+              v-if="design.collation"
+              :value="design.collation"
+              :label="design.collation"
+            />
+            <ElOption
+              v-for="option in collationOptions"
+              :key="option"
+              :value="option"
+              :label="option"
+            />
+          </ElSelect>
         </div>
-        <VscButton
-          type="primary"
-          @click="updateTable"
-        >
-          Update
-        </VscButton>
+        <div class="design-info-field">
+          <VscButton
+            type="primary"
+            @click="updateTable"
+          >
+            Update
+          </VscButton>
+        </div>
       </div>
-    </section>
+      <div class="type-hr" />
+    </div>
 
     <nav
       class="design-view__tabs"

@@ -541,7 +541,7 @@ onBeforeUnmount(() => {
           </div>
           <span class="file-list__col file-list__col--size file-list__muted">--</span>
           <span class="file-list__col file-list__col--modified file-list__muted">--</span>
-          <span class="file-list__col file-list__col--type file-list__muted">{{ translator.t("fileManager.folder", "folder") }}</span>
+          <span class="file-list__col file-list__col--kind file-list__muted">{{ translator.t("fileManager.folder", "folder") }}</span>
           <span class="file-list__col file-list__col--owner file-list__muted">--</span>
           <span class="file-list__col file-list__col--actions" />
         </div>
@@ -579,7 +579,7 @@ onBeforeUnmount(() => {
             <span class="file-list__date">{{ displayDate(entry.mtime) }}</span>
             <span class="file-list__time">{{ displayTime(entry.mtime) }}</span>
           </span>
-          <span class="file-list__col file-list__col--type file-list__muted">{{ entryKind(entry) }}</span>
+          <span class="file-list__col file-list__col--kind file-list__muted">{{ entryKind(entry) }}</span>
           <span class="file-list__col file-list__col--owner file-list__muted">{{ text(entry.owner, "--") }}</span>
           <span class="file-list__col file-list__col--actions file-list__actions">
             <button
