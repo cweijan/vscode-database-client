@@ -321,7 +321,10 @@ onBeforeUnmount(() => {
               target="_blank"
               rel="noreferrer"
             >
-              <i class="codicon codicon-book" aria-hidden="true" />
+              <i
+                class="codicon codicon-book"
+                aria-hidden="true"
+              />
             </a>
           </header>
           <p class="settings-view__subline">
@@ -346,7 +349,10 @@ onBeforeUnmount(() => {
               type="default"
               @click="chooseSyncKey"
             >
-              <i class="codicon codicon-file" aria-hidden="true" />
+              <i
+                class="codicon codicon-file"
+                aria-hidden="true"
+              />
             </VscButton>
           </div>
           <div class="settings-view__actions">

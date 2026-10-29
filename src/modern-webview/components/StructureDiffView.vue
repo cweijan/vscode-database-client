@@ -598,10 +598,17 @@ onBeforeUnmount(() => {
     >
       <div class="header-main">
         <div class="page-title-row">
-          <i class="codicon codicon-git-compare page-title__icon" aria-hidden="true" />
-          <h2 class="page-title">Structure Diff</h2>
+          <i
+            class="codicon codicon-git-compare page-title__icon"
+            aria-hidden="true"
+          />
+          <h2 class="page-title">
+            Structure Diff
+          </h2>
         </div>
-        <p class="page-subtitle">Compare database structures and generate migration scripts.</p>
+        <p class="page-subtitle">
+          Compare database structures and generate migration scripts.
+        </p>
       </div>
     </header>
 
@@ -637,7 +644,10 @@ onBeforeUnmount(() => {
           title="Refresh"
           @click="refresh"
         >
-          <i class="codicon codicon-refresh" aria-hidden="true" />
+          <i
+            class="codicon codicon-refresh"
+            aria-hidden="true"
+          />
         </button>
       </div>
     </div>
@@ -645,7 +655,10 @@ onBeforeUnmount(() => {
     <div class="config-panel">
       <article class="config-card">
         <header class="config-card__header">
-          <i class="codicon codicon-database blue" aria-hidden="true" />
+          <i
+            class="codicon codicon-database blue"
+            aria-hidden="true"
+          />
           <span>Reference</span>
         </header>
         <div class="config-form">
@@ -694,7 +707,10 @@ onBeforeUnmount(() => {
               v-if="sourceDbLoading"
               class="field-loading"
             >
-              <i class="codicon codicon-loading codicon-modifier-spin" aria-hidden="true" />
+              <i
+                class="codicon codicon-loading codicon-modifier-spin"
+                aria-hidden="true"
+              />
               Loading databases…
             </span>
             <span
@@ -725,7 +741,10 @@ onBeforeUnmount(() => {
               v-if="sourceSchemaLoading"
               class="field-loading"
             >
-              <i class="codicon codicon-loading codicon-modifier-spin" aria-hidden="true" />
+              <i
+                class="codicon codicon-loading codicon-modifier-spin"
+                aria-hidden="true"
+              />
               Loading schemas…
             </span>
             <span
@@ -738,7 +757,9 @@ onBeforeUnmount(() => {
           v-if="sourceConnection"
           class="connection-info"
         >
-          <div class="connection-info__title">Connection info</div>
+          <div class="connection-info__title">
+            Connection info
+          </div>
           <div
             v-for="item in sourceInfo"
             :key="item.label"
@@ -760,7 +781,10 @@ onBeforeUnmount(() => {
 
       <article class="config-card config-card--target">
         <header class="config-card__header">
-          <i class="codicon codicon-database orange" aria-hidden="true" />
+          <i
+            class="codicon codicon-database orange"
+            aria-hidden="true"
+          />
           <span>Target</span>
         </header>
         <div class="config-form">
@@ -809,7 +833,10 @@ onBeforeUnmount(() => {
               v-if="targetDbLoading"
               class="field-loading"
             >
-              <i class="codicon codicon-loading codicon-modifier-spin" aria-hidden="true" />
+              <i
+                class="codicon codicon-loading codicon-modifier-spin"
+                aria-hidden="true"
+              />
               Loading databases…
             </span>
             <span
@@ -840,7 +867,10 @@ onBeforeUnmount(() => {
               v-if="targetSchemaLoading"
               class="field-loading"
             >
-              <i class="codicon codicon-loading codicon-modifier-spin" aria-hidden="true" />
+              <i
+                class="codicon codicon-loading codicon-modifier-spin"
+                aria-hidden="true"
+              />
               Loading schemas…
             </span>
             <span
@@ -853,7 +883,9 @@ onBeforeUnmount(() => {
           v-if="targetConnection"
           class="connection-info"
         >
-          <div class="connection-info__title">Connection info</div>
+          <div class="connection-info__title">
+            Connection info
+          </div>
           <div
             v-for="item in targetInfo"
             :key="item.label"
@@ -872,7 +904,10 @@ onBeforeUnmount(() => {
         :disabled="!canCompare || comparing || !isPay"
         @click="compare"
       >
-        <i class="codicon codicon-git-compare" aria-hidden="true" />
+        <i
+          class="codicon codicon-git-compare"
+          aria-hidden="true"
+        />
         Compare
       </VscButton>
     </div>
@@ -881,13 +916,18 @@ onBeforeUnmount(() => {
       v-if="error"
       class="struct-diff-error"
       role="alert"
-    >{{ error }}</div>
+    >
+      {{ error }}
+    </div>
     <div
       v-if="comparing"
       class="loading-hint"
       aria-live="polite"
     >
-      <i class="codicon codicon-loading codicon-modifier-spin" aria-hidden="true" />
+      <i
+        class="codicon codicon-loading codicon-modifier-spin"
+        aria-hidden="true"
+      />
       <span>Comparing database structures…</span>
     </div>
     <div
@@ -898,9 +938,16 @@ onBeforeUnmount(() => {
       v-else-if="sqlList.length === 0 && status"
       class="empty-state"
     >
-      <i class="codicon codicon-check green" aria-hidden="true" />
-      <p class="empty-state__title">No structural differences</p>
-      <p class="empty-state__hint">The selected databases already have the same table structure.</p>
+      <i
+        class="codicon codicon-check green"
+        aria-hidden="true"
+      />
+      <p class="empty-state__title">
+        No structural differences
+      </p>
+      <p class="empty-state__hint">
+        The selected databases already have the same table structure.
+      </p>
     </div>
 
     <div
@@ -916,21 +963,30 @@ onBeforeUnmount(() => {
         aria-labelledby="struct-diff-migration-title"
       >
         <header class="struct-diff-dialog__header">
-          <h2 id="struct-diff-migration-title">Migration</h2>
+          <h2 id="struct-diff-migration-title">
+            Migration
+          </h2>
           <button
             class="struct-diff-dialog__close"
             type="button"
             title="Close"
             @click="closeResult"
           >
-            <i class="codicon codicon-close" aria-hidden="true" />
+            <i
+              class="codicon codicon-close"
+              aria-hidden="true"
+            />
           </button>
         </header>
         <div class="migration-panel">
           <div class="migration-trees">
             <div class="migration-tree-col">
-              <div class="migration-tree-col__header">Reference</div>
-              <div class="migration-tree-col__conn">{{ connectionLabel(sourceConnection) }}</div>
+              <div class="migration-tree-col__header">
+                Reference
+              </div>
+              <div class="migration-tree-col__conn">
+                {{ connectionLabel(sourceConnection) }}
+              </div>
               <div class="migration-tree-col__scroll">
                 <div class="migration-tree">
                   <div
@@ -942,7 +998,10 @@ onBeforeUnmount(() => {
                       :class="isExpanded('root') ? 'codicon-chevron-down' : 'codicon-chevron-right'"
                       aria-hidden="true"
                     />
-                    <i class="codicon codicon-database blue" aria-hidden="true" />
+                    <i
+                      class="codicon codicon-database blue"
+                      aria-hidden="true"
+                    />
                     <span>{{ sourceInfo.find((item) => item.label === 'Database')?.value || source.database || '-' }}</span>
                   </div>
                   <div
@@ -958,7 +1017,10 @@ onBeforeUnmount(() => {
                         :class="isExpanded('tables') ? 'codicon-chevron-down' : 'codicon-chevron-right'"
                         aria-hidden="true"
                       />
-                      <i class="codicon codicon-folder" aria-hidden="true" />
+                      <i
+                        class="codicon codicon-folder"
+                        aria-hidden="true"
+                      />
                       <span>Tables</span>
                     </div>
                     <div
@@ -973,7 +1035,10 @@ onBeforeUnmount(() => {
                         @click="activeTable = group.name"
                       >
                         <span class="migration-tree__indent" />
-                        <i class="codicon codicon-table" aria-hidden="true" />
+                        <i
+                          class="codicon codicon-table"
+                          aria-hidden="true"
+                        />
                         <span>{{ group.name }}</span>
                       </div>
                     </div>
@@ -983,8 +1048,12 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="migration-tree-col">
-              <div class="migration-tree-col__header">Target</div>
-              <div class="migration-tree-col__conn">{{ connectionLabel(targetConnection) }}</div>
+              <div class="migration-tree-col__header">
+                Target
+              </div>
+              <div class="migration-tree-col__conn">
+                {{ connectionLabel(targetConnection) }}
+              </div>
               <div class="migration-tree-col__scroll">
                 <div class="migration-tree migration-tree--target">
                   <div
@@ -996,7 +1065,10 @@ onBeforeUnmount(() => {
                       :class="isExpanded('root') ? 'codicon-chevron-down' : 'codicon-chevron-right'"
                       aria-hidden="true"
                     />
-                    <i class="codicon codicon-database orange" aria-hidden="true" />
+                    <i
+                      class="codicon codicon-database orange"
+                      aria-hidden="true"
+                    />
                     <span>{{ targetInfo.find((item) => item.label === 'Database')?.value || target.database || '-' }}</span>
                   </div>
                   <div
@@ -1020,7 +1092,10 @@ onBeforeUnmount(() => {
                         @click.stop
                         @change="toggleAll(($event.target as HTMLInputElement).checked)"
                       >
-                      <i class="codicon codicon-folder" aria-hidden="true" />
+                      <i
+                        class="codicon codicon-folder"
+                        aria-hidden="true"
+                      />
                       <span>Tables</span>
                     </div>
                     <div
@@ -1043,8 +1118,8 @@ onBeforeUnmount(() => {
                             v-if="groupHasDetails(group)"
                             class="migration-tree__expand codicon"
                             :class="isExpanded(`table:${group.name}`) ? 'codicon-chevron-down' : 'codicon-chevron-right'"
-                            @click.stop="toggleExpanded(`table:${group.name}`)"
                             aria-hidden="true"
+                            @click.stop="toggleExpanded(`table:${group.name}`)"
                           />
                           <span
                             v-else
@@ -1057,7 +1132,10 @@ onBeforeUnmount(() => {
                             @click.stop
                             @change="setTableSelected(group.name, ($event.target as HTMLInputElement).checked)"
                           >
-                          <i class="codicon codicon-table" aria-hidden="true" />
+                          <i
+                            class="codicon codicon-table"
+                            aria-hidden="true"
+                          />
                           <span>{{ group.name }}</span>
                           <span
                             v-if="group.type !== 'create' && group.type !== 'drop'"
@@ -1077,10 +1155,13 @@ onBeforeUnmount(() => {
                               <i
                                 class="migration-tree__expand codicon"
                                 :class="isExpanded(`table:${group.name}:columns`) ? 'codicon-chevron-down' : 'codicon-chevron-right'"
+                                aria-hidden="true"
                                 @click.stop="toggleExpanded(`table:${group.name}:columns`)"
+                              />
+                              <i
+                                class="codicon codicon-folder"
                                 aria-hidden="true"
                               />
-                              <i class="codicon codicon-folder" aria-hidden="true" />
                               <span>Columns</span>
                             </div>
                             <div
@@ -1094,7 +1175,10 @@ onBeforeUnmount(() => {
                                 :class="`migration-tree__node--${column.type}`"
                               >
                                 <span class="migration-tree__indent" />
-                                <i class="codicon codicon-symbol-field" aria-hidden="true" />
+                                <i
+                                  class="codicon codicon-symbol-field"
+                                  aria-hidden="true"
+                                />
                                 <span>{{ column.name }}</span>
                                 <span
                                   v-if="column.detail"
@@ -1111,10 +1195,13 @@ onBeforeUnmount(() => {
                               <i
                                 class="migration-tree__expand codicon"
                                 :class="isExpanded(`table:${group.name}:keys`) ? 'codicon-chevron-down' : 'codicon-chevron-right'"
+                                aria-hidden="true"
                                 @click.stop="toggleExpanded(`table:${group.name}:keys`)"
+                              />
+                              <i
+                                class="codicon codicon-folder"
                                 aria-hidden="true"
                               />
-                              <i class="codicon codicon-folder" aria-hidden="true" />
                               <span>Keys</span>
                             </div>
                             <div
@@ -1128,7 +1215,10 @@ onBeforeUnmount(() => {
                                 :class="`migration-tree__node--${key.type}`"
                               >
                                 <span class="migration-tree__indent" />
-                                <i class="codicon codicon-key" aria-hidden="true" />
+                                <i
+                                  class="codicon codicon-key"
+                                  aria-hidden="true"
+                                />
                                 <span>{{ key.name }}</span>
                                 <span
                                   v-if="key.detail"
@@ -1146,7 +1236,9 @@ onBeforeUnmount(() => {
             </div>
           </div>
           <div class="migration-detail">
-            <div class="migration-detail__header">Script preview</div>
+            <div class="migration-detail__header">
+              Script preview
+            </div>
             <textarea
               class="migration-editor"
               :value="sqlPreview"
@@ -1156,7 +1248,9 @@ onBeforeUnmount(() => {
           </div>
         </div>
         <footer class="struct-diff-dialog__footer">
-          <VscButton @click="closeResult">Cancel</VscButton>
+          <VscButton @click="closeResult">
+            Cancel
+          </VscButton>
           <VscButton
             :disabled="selectedItems.length === 0"
             @click="openQuery"

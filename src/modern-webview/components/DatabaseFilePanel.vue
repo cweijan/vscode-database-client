@@ -56,7 +56,7 @@ const translator = createTranslator(bootstrap.language);
 const isPay = usePayState();
 
 const path = ref("");
-const dbType = ref("SQLite");
+const currentType = ref("SQLite");
 const name = ref("");
 const group = ref("");
 const globalScope = ref(true);
@@ -69,7 +69,7 @@ let optionSubscription: BridgeDisposable | undefined;
 let errorSubscription: BridgeDisposable | undefined;
 let successSubscription: BridgeDisposable | undefined;
 
-const isDuckDb = computed(() => dbType.value === "DuckDB");
+const isDuckDb = computed(() => currentType.value === "DuckDB");
 const iconPath = computed(() => isDuckDb.value
   ? "resources/icon/server/duckdb.svg"
   : "resources/icon/server/sqlite.svg");
@@ -94,7 +94,7 @@ function applyFileInfo(content: unknown): void {
     groups?: FileGroup[];
   };
   if (info.dbPath) path.value = info.dbPath;
-  if (info.dbType) dbType.value = info.dbType;
+  if (info.dbType) currentType.value = info.dbType;
   if (info.name != null) name.value = info.name;
   if (info.connected != null) {
     connectedState.value = info.connected;
@@ -107,7 +107,7 @@ watch(() => props.dbPath, (value) => {
   if (value) path.value = value;
 }, { immediate: true });
 watch(() => props.dbType, (value) => {
-  if (value) dbType.value = value;
+  if (value) currentType.value = value;
 }, { immediate: true });
 watch(() => props.fileName, (value) => {
   if (value && !name.value) name.value = value.replace(/\.[^.]+$/, "");
@@ -124,7 +124,7 @@ watch(() => props.initialName, (value) => {
 
 function connectionOption(): Record<string, unknown> {
   return {
-    dbType: dbType.value,
+    dbType: currentType.value,
     dbPath: path.value,
     name: name.value,
     group: group.value,
@@ -206,7 +206,7 @@ onBeforeUnmount(() => {
         </span>
         <div class="db-file-card__meta">
           <span class="db-file-card__filename">{{ fileName }}</span>
-          <span class="db-file-card__badge">{{ dbType }}</span>
+          <span class="db-file-card__badge">{{ currentType }}</span>
         </div>
       </div>
 
@@ -234,7 +234,7 @@ onBeforeUnmount(() => {
           class="db-file-alert"
         >
           <i class="codicon codicon-warning" />
-          <span>{{ dbType }} {{ translator.t("dbFile.notInstalled", "is not installed") }}</span>
+          <span>{{ currentType }} {{ translator.t("dbFile.notInstalled", "is not installed") }}</span>
           <VscButton
             size="small"
             @click="install"

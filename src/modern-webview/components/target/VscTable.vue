@@ -56,9 +56,9 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  "selection-change": [rows: Row[]];
-  "row-click": [row: Row, event: MouseEvent];
-  "row-dblclick": [row: Row, event: MouseEvent];
+  "selection-change": [rows: Record<string, unknown>[]];
+  "row-click": [row: Record<string, unknown>, event: MouseEvent];
+  "row-dblclick": [row: Record<string, unknown>, event: MouseEvent];
 }>();
 
 const TableRender = defineComponent({

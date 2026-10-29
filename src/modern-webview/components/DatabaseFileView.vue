@@ -15,7 +15,7 @@ const translator = createTranslator(readWebviewBootstrap().language);
     <div class="connect-container max-lg:px-5">
       <header class="db-file-hero">
         <img
-          src="icon.png"
+          :src="'icon.png'"
           alt=""
           class="connect-logo"
           @click="bridge?.emit('openSite')"

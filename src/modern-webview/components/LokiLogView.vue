@@ -209,14 +209,20 @@ onBeforeUnmount(() => {
           title="Run query"
           @click="requestLogs"
         >
-          <i class="codicon codicon-play text-base green" aria-hidden="true" />
+          <i
+            class="codicon codicon-play text-base green"
+            aria-hidden="true"
+          />
         </VscButton>
         <VscButton
           title="Query documentation"
           type="default"
           @click="openDocumentation"
         >
-          <i class="codicon codicon-notebook text-base" aria-hidden="true" />
+          <i
+            class="codicon codicon-notebook text-base"
+            aria-hidden="true"
+          />
         </VscButton>
       </div>
       <div class="loki-toolbar__divider" />
@@ -257,13 +263,19 @@ onBeforeUnmount(() => {
           type="default"
           @click="requestLogs"
         >
-          <i class="codicon codicon-refresh text-base" aria-hidden="true" />
+          <i
+            class="codicon codicon-refresh text-base"
+            aria-hidden="true"
+          />
         </VscButton>
         <VscButton
           title="Settings"
           @click="terminalSettingsVisible = true"
         >
-          <i class="codicon codicon-settings-gear text-base" aria-hidden="true" />
+          <i
+            class="codicon codicon-settings-gear text-base"
+            aria-hidden="true"
+          />
         </VscButton>
       </div>
     </div>

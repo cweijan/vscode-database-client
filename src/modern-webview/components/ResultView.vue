@@ -955,7 +955,10 @@ onBeforeUnmount(() => {
           aria-label="Pin result"
           @click="bridge?.emit('pin')"
         >
-          <i class="codicon codicon-pin" aria-hidden="true" />
+          <i
+            class="codicon codicon-pin"
+            aria-hidden="true"
+          />
         </button>
         <UiInput
           v-model="search"
@@ -969,7 +972,10 @@ onBeforeUnmount(() => {
           aria-label="Toggle SQL panel"
           @click="bridge?.emit('openConsole')"
         >
-          <i class="codicon codicon-settings-gear" aria-hidden="true" />
+          <i
+            class="codicon codicon-settings-gear"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="result-toolbar__icon"
@@ -978,7 +984,10 @@ onBeforeUnmount(() => {
           aria-label="Copy result"
           @click="copyRows"
         >
-          <i class="codicon codicon-copy" aria-hidden="true" />
+          <i
+            class="codicon codicon-copy"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="result-toolbar__icon"
@@ -988,7 +997,10 @@ onBeforeUnmount(() => {
           :disabled="!cellSelection"
           @click="copyCellSelection"
         >
-          <i class="codicon codicon-clippy" aria-hidden="true" />
+          <i
+            class="codicon codicon-clippy"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="result-toolbar__icon"
@@ -997,7 +1009,10 @@ onBeforeUnmount(() => {
           aria-label="View SQL history"
           @click="bridge?.emit('viewHistory')"
         >
-          <i class="codicon codicon-history" aria-hidden="true" />
+          <i
+            class="codicon codicon-history"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="result-toolbar__icon"
@@ -1006,7 +1021,10 @@ onBeforeUnmount(() => {
           aria-label="View JSON"
           @click="bridge?.emit('viewJSON')"
         >
-          <i class="codicon codicon-json" aria-hidden="true" />
+          <i
+            class="codicon codicon-json"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="result-toolbar__icon"
@@ -1016,7 +1034,10 @@ onBeforeUnmount(() => {
           :disabled="!canMutate"
           @click="openInsert"
         >
-          <i class="codicon codicon-add text-cyan" aria-hidden="true" />
+          <i
+            class="codicon codicon-add text-cyan"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="result-toolbar__icon"
@@ -1026,7 +1047,10 @@ onBeforeUnmount(() => {
           :disabled="!canMutate || selectedRows.length === 0"
           @click="deleteSelected"
         >
-          <i class="codicon codicon-trash red" aria-hidden="true" />
+          <i
+            class="codicon codicon-trash red"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="result-toolbar__icon"
@@ -1036,7 +1060,10 @@ onBeforeUnmount(() => {
           :disabled="!canMutate"
           @click="importRows"
         >
-          <i class="codicon codicon-arrow-up yellow" aria-hidden="true" />
+          <i
+            class="codicon codicon-arrow-up yellow"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="result-toolbar__icon"
@@ -1046,7 +1073,10 @@ onBeforeUnmount(() => {
           :disabled="pageRows.length === 0"
           @click="exportRows()"
         >
-          <i class="codicon codicon-arrow-down blue" aria-hidden="true" />
+          <i
+            class="codicon codicon-arrow-down blue"
+            aria-hidden="true"
+          />
         </button>
         <button
           v-if="hasPendingChanges"
@@ -1056,7 +1086,10 @@ onBeforeUnmount(() => {
           aria-label="Save changes"
           @click="saveChanges"
         >
-          <i class="codicon codicon-check green" aria-hidden="true" />
+          <i
+            class="codicon codicon-check green"
+            aria-hidden="true"
+          />
         </button>
         <button
           v-if="!queryRunning"
@@ -1067,7 +1100,10 @@ onBeforeUnmount(() => {
           :disabled="!payload.sql && !payload.baseSql"
           @click="executeSql"
         >
-          <i class="codicon codicon-play green" aria-hidden="true" />
+          <i
+            class="codicon codicon-play green"
+            aria-hidden="true"
+          />
         </button>
         <button
           v-else
@@ -1077,7 +1113,10 @@ onBeforeUnmount(() => {
           aria-label="Stop execute"
           @click="stopExecute"
         >
-          <i class="codicon codicon-debug-stop red" aria-hidden="true" />
+          <i
+            class="codicon codicon-debug-stop red"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="result-toolbar__icon"
@@ -1087,7 +1126,10 @@ onBeforeUnmount(() => {
           :disabled="!payload.sql"
           @click="bridge?.emit('refresh')"
         >
-          <i class="codicon codicon-refresh" aria-hidden="true" />
+          <i
+            class="codicon codicon-refresh"
+            aria-hidden="true"
+          />
         </button>
         <UiSelect
           :model-value="autoRefresh"
@@ -1140,7 +1182,10 @@ onBeforeUnmount(() => {
       v-if="payload.table && canMutate && payload.tableCount === 1 && !hasPrimaryKey"
       class="hint result-view__primary-key-warning"
     >
-      <i class="codicon codicon-warning" aria-hidden="true" />
+      <i
+        class="codicon codicon-warning"
+        aria-hidden="true"
+      />
       No primary key found for <span class="red">{{ payload.table }}</span>; edits may affect multiple rows.
     </div>
 
@@ -1412,7 +1457,9 @@ onBeforeUnmount(() => {
                 {{ sortState.descending ? " ↓" : " ↑" }}
               </span>
             </th>
-            <th class="umy-table-header-cell">Actions</th>
+            <th class="umy-table-header-cell">
+              Actions
+            </th>
           </tr>
           <tr class="result-view__filter-row umy-table-row umy-table-filter-dropdown">
             <th />

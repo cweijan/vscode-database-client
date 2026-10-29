@@ -117,7 +117,10 @@ onBeforeUnmount(() => {
           :class="{ 'ssh-terminal-tabs__item--active': activeTab === tab.id }"
           @click="selectTab(tab.id)"
         >
-          <i :class="`codicon ${tab.icon}`" aria-hidden="true" />
+          <i
+            :class="`codicon ${tab.icon}`"
+            aria-hidden="true"
+          />
           {{ tab.label }}
         </li>
       </ul>
@@ -131,7 +134,10 @@ onBeforeUnmount(() => {
           title="Edit current remote file in VS Code"
           @click="openEditor"
         >
-          <i class="codicon codicon-edit" aria-hidden="true" />
+          <i
+            class="codicon codicon-edit"
+            aria-hidden="true"
+          />
           <span>Edit in VS Code</span>
         </button>
         <button
@@ -141,7 +147,10 @@ onBeforeUnmount(() => {
           title="Toggle SFTP split"
           @click="sftpVisible = !sftpVisible"
         >
-          <i class="codicon codicon-split-horizontal" aria-hidden="true" />
+          <i
+            class="codicon codicon-split-horizontal"
+            aria-hidden="true"
+          />
         </button>
         <button
           v-if="!sftpDisabled"
@@ -150,7 +159,10 @@ onBeforeUnmount(() => {
           title="Change split direction"
           @click="toggleSplit"
         >
-          <i class="codicon codicon-layout-sidebar-right" aria-hidden="true" />
+          <i
+            class="codicon codicon-layout-sidebar-right"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="ssh-terminal-actions__item"
@@ -158,7 +170,10 @@ onBeforeUnmount(() => {
           title="Reconnect"
           @click="bridge?.emit('initTerminal', { reconnect: true })"
         >
-          <i class="codicon codicon-symbol-event blue" aria-hidden="true" />
+          <i
+            class="codicon codicon-symbol-event blue"
+            aria-hidden="true"
+          />
           <span>Reconnect</span>
         </button>
         <button
@@ -167,7 +182,10 @@ onBeforeUnmount(() => {
           title="Duplicate terminal"
           @click="bridge?.emit('duplicateTab')"
         >
-          <i class="codicon codicon-copy green" aria-hidden="true" />
+          <i
+            class="codicon codicon-copy green"
+            aria-hidden="true"
+          />
           <span>Duplicate</span>
         </button>
         <button
@@ -176,7 +194,10 @@ onBeforeUnmount(() => {
           title="Terminal settings"
           @click="bridge?.emit('openSettings')"
         >
-          <i class="codicon codicon-gear" aria-hidden="true" />
+          <i
+            class="codicon codicon-gear"
+            aria-hidden="true"
+          />
         </button>
       </div>
     </div>

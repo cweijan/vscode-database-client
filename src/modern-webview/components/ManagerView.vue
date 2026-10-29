@@ -479,7 +479,10 @@ onBeforeUnmount(() => {
           <div class="dashboard__top">
             <section class="dashboard__server-info">
               <div class="dashboard__server-head">
-                <i class="codicon codicon-server dashboard__server-icon" aria-hidden="true" />
+                <i
+                  class="codicon codicon-server dashboard__server-icon"
+                  aria-hidden="true"
+                />
                 <span class="dashboard__server-title">Server Info</span>
               </div>
               <div class="dashboard__server-list">
@@ -509,7 +512,10 @@ onBeforeUnmount(() => {
 
             <section class="dashboard__chart-card">
               <div class="dashboard__chart-head">
-                <i class="codicon codicon-pulse dashboard__chart-icon green" aria-hidden="true" />
+                <i
+                  class="codicon codicon-pulse dashboard__chart-icon green"
+                  aria-hidden="true"
+                />
                 <span>Traffic</span>
               </div>
               <div class="dashboard__chart-body">
@@ -523,7 +529,10 @@ onBeforeUnmount(() => {
 
           <section class="dashboard__chart-card dashboard__chart-card--full">
             <div class="dashboard__chart-head">
-              <i class="codicon codicon-graph-line dashboard__chart-icon blue" aria-hidden="true" />
+              <i
+                class="codicon codicon-graph-line dashboard__chart-icon blue"
+                aria-hidden="true"
+              />
               <span>Queries</span>
             </div>
             <div class="dashboard__chart-body dashboard__chart-body--tall">
@@ -548,7 +557,10 @@ onBeforeUnmount(() => {
             :disabled="loading"
             @click="loadProcesses"
           >
-            <i class="codicon codicon-refresh" aria-hidden="true" />
+            <i
+              class="codicon codicon-refresh"
+              aria-hidden="true"
+            />
           </button>
         </div>
         <div class="manager-process-list__table-wrap">
@@ -561,7 +573,9 @@ onBeforeUnmount(() => {
                 >
                   {{ field.name }}
                 </th>
-                <th v-if="process.supportKill">Action</th>
+                <th v-if="process.supportKill">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -584,7 +598,10 @@ onBeforeUnmount(() => {
                     :disabled="loading"
                     @click="killProcess(row)"
                   >
-                    <i class="codicon codicon-debug-stop" aria-hidden="true" />
+                    <i
+                      class="codicon codicon-debug-stop"
+                      aria-hidden="true"
+                    />
                   </button>
                 </td>
               </tr>

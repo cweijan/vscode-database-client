@@ -389,7 +389,10 @@ onBeforeUnmount(() => {
           :title="translator.t('fileManager.parentDir', 'Parent directory')"
           @click="load(parentPath())"
         >
-          <i class="codicon codicon-arrow-up" aria-hidden="true" />
+          <i
+            class="codicon codicon-arrow-up"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="vsc-button vsc-button--icon"
@@ -398,7 +401,10 @@ onBeforeUnmount(() => {
           :title="translator.t('common.refresh', 'Refresh')"
           @click="load()"
         >
-          <i class="codicon codicon-refresh file-manager-refresh-icon" aria-hidden="true" />
+          <i
+            class="codicon codicon-refresh file-manager-refresh-icon"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="vsc-button vsc-button--icon"
@@ -407,7 +413,10 @@ onBeforeUnmount(() => {
           :title="translator.t('fileManager.newFolder', 'New folder')"
           @click="create('createFolder')"
         >
-          <i class="codicon codicon-new-folder" aria-hidden="true" />
+          <i
+            class="codicon codicon-new-folder"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="vsc-button vsc-button--icon"
@@ -416,7 +425,10 @@ onBeforeUnmount(() => {
           :title="translator.t('fileManager.newFile', 'New file')"
           @click="create('createFile')"
         >
-          <i class="codicon codicon-new-file" aria-hidden="true" />
+          <i
+            class="codicon codicon-new-file"
+            aria-hidden="true"
+          />
         </button>
         <button
           class="vsc-button vsc-button--icon"
@@ -425,7 +437,10 @@ onBeforeUnmount(() => {
           :title="translator.t('fileManager.upload', 'Upload')"
           @click="emit('upload', { path: currentPath })"
         >
-          <i class="codicon codicon-cloud-upload file-manager-upload-icon" aria-hidden="true" />
+          <i
+            class="codicon codicon-cloud-upload file-manager-upload-icon"
+            aria-hidden="true"
+          />
         </button>
       </div>
       <nav
@@ -453,7 +468,10 @@ onBeforeUnmount(() => {
               class="codicon codicon-root-folder breadcrumb-root-icon"
               aria-hidden="true"
             />
-            <span v-else class="breadcrumb-label">{{ breadcrumb.name }}</span>
+            <span
+              v-else
+              class="breadcrumb-label"
+            >{{ breadcrumb.name }}</span>
           </button>
         </template>
       </nav>
@@ -468,7 +486,10 @@ onBeforeUnmount(() => {
           v-if="loading"
           class="file-list__loading"
         >
-          <i class="codicon codicon-loading codicon-modifier-spin file-list__loading-icon" aria-hidden="true" />
+          <i
+            class="codicon codicon-loading codicon-modifier-spin file-list__loading-icon"
+            aria-hidden="true"
+          />
         </div>
         <div class="file-list__header">
           <button
@@ -485,9 +506,18 @@ onBeforeUnmount(() => {
               :class="`file-list__sort-icon--${sortIndicator(column.key)}`"
               aria-hidden="true"
             >
-              <svg class="file-list__sort-svg" viewBox="0 0 8 10">
-                <polygon class="file-list__sort-triangle file-list__sort-triangle--up" points="4,0 8,4 0,4" />
-                <polygon class="file-list__sort-triangle file-list__sort-triangle--down" points="0,5 8,5 4,9" />
+              <svg
+                class="file-list__sort-svg"
+                viewBox="0 0 8 10"
+              >
+                <polygon
+                  class="file-list__sort-triangle file-list__sort-triangle--up"
+                  points="4,0 8,4 0,4"
+                />
+                <polygon
+                  class="file-list__sort-triangle file-list__sort-triangle--down"
+                  points="0,5 8,5 4,9"
+                />
               </svg>
             </span>
           </button>
@@ -502,7 +532,10 @@ onBeforeUnmount(() => {
         >
           <div class="file-list__col file-list__col--name">
             <div class="file-list__name-cell">
-              <i class="codicon codicon-folder file-list__icon file-list__icon--folder" aria-hidden="true" />
+              <i
+                class="codicon codicon-folder file-list__icon file-list__icon--folder"
+                aria-hidden="true"
+              />
               <span class="file-list__name">..</span>
             </div>
           </div>
@@ -556,7 +589,10 @@ onBeforeUnmount(() => {
               :title="translator.t('common.download', 'Download')"
               @click.stop="emit('download', { item: entry })"
             >
-              <i class="codicon codicon-cloud-download blue" aria-hidden="true" />
+              <i
+                class="codicon codicon-cloud-download blue"
+                aria-hidden="true"
+              />
             </button>
             <button
               v-if="entry.type !== 'directory'"
@@ -566,7 +602,10 @@ onBeforeUnmount(() => {
               :disabled="!canMutate"
               @click.stop="remove(entry)"
             >
-              <i class="codicon codicon-trash red" aria-hidden="true" />
+              <i
+                class="codicon codicon-trash red"
+                aria-hidden="true"
+              />
             </button>
           </span>
         </div>
@@ -593,7 +632,10 @@ onBeforeUnmount(() => {
         :disabled="action.disabled"
         @click="runContextAction(action.id)"
       >
-        <i :class="action.icon" aria-hidden="true" />
+        <i
+          :class="action.icon"
+          aria-hidden="true"
+        />
         <span>{{ action.label }}</span>
       </button>
     </div>

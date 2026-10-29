@@ -7,8 +7,9 @@ withDefaults(
     placement?: ElTooltipProps["placement"];
     delay?: number;
     visible?: boolean;
+    disabled?: boolean;
   }>(),
-  { placement: "bottom-start", delay: 350 },
+  { placement: "bottom-start", delay: 350, disabled: false },
 );
 </script>
 
@@ -20,6 +21,7 @@ withDefaults(
     :placement="placement"
     :show-after="delay"
     :visible="visible"
+    :disabled="disabled"
   >
     <slot />
   </ElTooltip>

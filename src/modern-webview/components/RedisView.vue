@@ -742,7 +742,10 @@ onBeforeUnmount(() => {
             type="button"
             @click="terminalSettingsVisible = true"
           >
-            <i class="codicon codicon-settings-gear" aria-hidden="true" />
+            <i
+              class="codicon codicon-settings-gear"
+              aria-hidden="true"
+            />
             <span>Settings</span>
           </button>
         </div>
@@ -773,11 +776,17 @@ onBeforeUnmount(() => {
                 title="Refresh"
                 @click="emit('refreshStatus')"
               >
-                <i class="codicon codicon-refresh" aria-hidden="true" />
+                <i
+                  class="codicon codicon-refresh"
+                  aria-hidden="true"
+                />
               </VscButton>
             </div>
             <div class="redis-key-status__overview-meta">
-              <i class="codicon codicon-server" aria-hidden="true" />
+              <i
+                class="codicon codicon-server"
+                aria-hidden="true"
+              />
               <span class="redis-key-status__meta-label">OS</span>
               <span
                 class="redis-key-status__meta-value"
@@ -793,8 +802,12 @@ onBeforeUnmount(() => {
               :key="metric.label"
               class="redis-key-status__metric"
             >
-              <div class="redis-key-status__metric-label">{{ metric.label }}</div>
-              <div class="redis-key-status__metric-value">{{ metric.value }}</div>
+              <div class="redis-key-status__metric-label">
+                {{ metric.label }}
+              </div>
+              <div class="redis-key-status__metric-value">
+                {{ metric.value }}
+              </div>
             </div>
           </div>
           <div class="redis-key-status__subtabs">
@@ -840,7 +853,12 @@ onBeforeUnmount(() => {
                   <td>{{ row.avg_ttl }}</td>
                 </tr>
                 <tr v-if="keyStatistics.length === 0">
-                  <td colspan="4" class="redis-empty">No key statistics</td>
+                  <td
+                    colspan="4"
+                    class="redis-empty"
+                  >
+                    No key statistics
+                  </td>
                 </tr>
               </tbody>
               <tbody v-else>
@@ -852,7 +870,12 @@ onBeforeUnmount(() => {
                   <td>{{ row.value }}</td>
                 </tr>
                 <tr v-if="redisStatus.infoList.length === 0">
-                  <td colspan="2" class="redis-empty">No status info</td>
+                  <td
+                    colspan="2"
+                    class="redis-empty"
+                  >
+                    No status info
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -876,13 +899,19 @@ onBeforeUnmount(() => {
                 title="Copy"
                 @click="copyText(keyName)"
               >
-                <i class="codicon codicon-copy" aria-hidden="true" />
+                <i
+                  class="codicon codicon-copy"
+                  aria-hidden="true"
+                />
               </VscButton>
               <VscButton
                 title="New key"
                 @click="openNewKey"
               >
-                <i class="codicon codicon-add" aria-hidden="true" />
+                <i
+                  class="codicon codicon-add"
+                  aria-hidden="true"
+                />
               </VscButton>
             </div>
             <div class="redis-key-row redis-key-row--ttl">
@@ -896,14 +925,20 @@ onBeforeUnmount(() => {
                 title="Save TTL"
                 @click="updateTtl"
               >
-                <i class="codicon codicon-save" aria-hidden="true" />
+                <i
+                  class="codicon codicon-save"
+                  aria-hidden="true"
+                />
               </VscButton>
               <VscButton
                 title="Delete key"
                 type="danger"
                 @click="remove"
               >
-                <i class="codicon codicon-trash" aria-hidden="true" />
+                <i
+                  class="codicon codicon-trash"
+                  aria-hidden="true"
+                />
               </VscButton>
             </div>
           </div>
@@ -925,10 +960,16 @@ onBeforeUnmount(() => {
                 title="Refresh"
                 @click="emit('refresh')"
               >
-                <i class="codicon codicon-refresh" aria-hidden="true" />
+                <i
+                  class="codicon codicon-refresh"
+                  aria-hidden="true"
+                />
               </VscButton>
               <VscButton @click="saveValue">
-                <i class="codicon codicon-save" aria-hidden="true" />
+                <i
+                  class="codicon codicon-save"
+                  aria-hidden="true"
+                />
                 <span>Save</span>
               </VscButton>
             </div>
@@ -965,13 +1006,19 @@ onBeforeUnmount(() => {
                 title="Refresh"
                 @click="emit('refresh')"
               >
-                <i class="codicon codicon-refresh" aria-hidden="true" />
+                <i
+                  class="codicon codicon-refresh"
+                  aria-hidden="true"
+                />
               </VscButton>
               <VscButton
                 title="Add new item"
                 @click="beginItem()"
               >
-                <i class="codicon codicon-add yellow" aria-hidden="true" />
+                <i
+                  class="codicon codicon-add yellow"
+                  aria-hidden="true"
+                />
               </VscButton>
               <div class="redis-pagination">
                 <VscButton
@@ -1000,9 +1047,15 @@ onBeforeUnmount(() => {
               <table class="result-view__table">
                 <thead>
                   <tr>
-                    <th v-if="redisType === 'list'">Index</th>
-                    <th v-if="redisType === 'hash'">Field</th>
-                    <th v-if="redisType === 'zset'">Score</th>
+                    <th v-if="redisType === 'list'">
+                      Index
+                    </th>
+                    <th v-if="redisType === 'hash'">
+                      Field
+                    </th>
+                    <th v-if="redisType === 'zset'">
+                      Score
+                    </th>
                     <th>{{ redisType === 'list' ? 'Element' : redisType === 'hash' ? 'Value' : 'Member' }}</th>
                     <th>Operation</th>
                   </tr>
@@ -1012,9 +1065,15 @@ onBeforeUnmount(() => {
                     v-for="row in filteredRows"
                     :key="rowKey(row)"
                   >
-                    <td v-if="redisType === 'list'">{{ text(row.index) }}</td>
-                    <td v-if="redisType === 'hash'">{{ text(row.key) }}</td>
-                    <td v-if="redisType === 'zset'">{{ text(row.score) }}</td>
+                    <td v-if="redisType === 'list'">
+                      {{ text(row.index) }}
+                    </td>
+                    <td v-if="redisType === 'hash'">
+                      {{ text(row.key) }}
+                    </td>
+                    <td v-if="redisType === 'zset'">
+                      {{ text(row.score) }}
+                    </td>
                     <td>
                       <span
                         class="item-value"
@@ -1029,20 +1088,29 @@ onBeforeUnmount(() => {
                           title="Copy"
                           @click="copyText(row.value ?? row)"
                         >
-                          <i class="codicon codicon-copy" aria-hidden="true" />
+                          <i
+                            class="codicon codicon-copy"
+                            aria-hidden="true"
+                          />
                         </VscButton>
                         <VscButton
                           title="Edit"
                           @click="beginItem(row)"
                         >
-                          <i class="codicon codicon-edit yellow" aria-hidden="true" />
+                          <i
+                            class="codicon codicon-edit yellow"
+                            aria-hidden="true"
+                          />
                         </VscButton>
                         <VscButton
                           title="Delete"
                           type="danger"
                           @click="deleteItem(row)"
                         >
-                          <i class="codicon codicon-trash" aria-hidden="true" />
+                          <i
+                            class="codicon codicon-trash"
+                            aria-hidden="true"
+                          />
                         </VscButton>
                       </div>
                     </td>
@@ -1052,7 +1120,10 @@ onBeforeUnmount(() => {
                       :colspan="redisType === 'list' || redisType === 'hash' || redisType === 'zset' ? 3 : 2"
                       class="redis-empty"
                     >
-                      <i class="codicon codicon-database" aria-hidden="true" />
+                      <i
+                        class="codicon codicon-database"
+                        aria-hidden="true"
+                      />
                       No data
                     </td>
                   </tr>
@@ -1072,7 +1143,10 @@ onBeforeUnmount(() => {
                 :class="{ 'tab__item--active': streamTab === 'entries' }"
                 @click="streamTab = 'entries'"
               >
-                <i class="codicon codicon-list-unordered blue" aria-hidden="true" />
+                <i
+                  class="codicon codicon-list-unordered blue"
+                  aria-hidden="true"
+                />
                 Entries
               </li>
               <li
@@ -1080,7 +1154,10 @@ onBeforeUnmount(() => {
                 :class="{ 'tab__item--active': streamTab === 'groups' }"
                 @click="streamTab = 'groups'"
               >
-                <i class="codicon codicon-combine" aria-hidden="true" />
+                <i
+                  class="codicon codicon-combine"
+                  aria-hidden="true"
+                />
                 Groups
               </li>
             </ul>
@@ -1097,13 +1174,19 @@ onBeforeUnmount(() => {
                 title="Refresh"
                 @click="emit('refresh')"
               >
-                <i class="codicon codicon-refresh" aria-hidden="true" />
+                <i
+                  class="codicon codicon-refresh"
+                  aria-hidden="true"
+                />
               </VscButton>
               <VscButton
                 title="Add entry"
                 @click="beginItem()"
               >
-                <i class="codicon codicon-add yellow" aria-hidden="true" />
+                <i
+                  class="codicon codicon-add yellow"
+                  aria-hidden="true"
+                />
               </VscButton>
               <div class="redis-pagination">
                 <VscButton
@@ -1131,7 +1214,10 @@ onBeforeUnmount(() => {
                 title="Refresh"
                 @click="emit('refresh')"
               >
-                <i class="codicon codicon-refresh" aria-hidden="true" />
+                <i
+                  class="codicon codicon-refresh"
+                  aria-hidden="true"
+                />
               </VscButton>
             </div>
             <div
@@ -1149,21 +1235,42 @@ onBeforeUnmount(() => {
                   >
                     <td>{{ text(row.id) }}</td>
                     <td>
-                      <span class="item-value" :title="rowValue(row)">{{ rowValue(row) }}</span>
+                      <span
+                        class="item-value"
+                        :title="rowValue(row)"
+                      >{{ rowValue(row) }}</span>
                     </td>
                     <td>
                       <div class="redis-op-buttons">
-                        <VscButton title="Copy" @click="copyText(row.value ?? row)">
-                          <i class="codicon codicon-copy" aria-hidden="true" />
+                        <VscButton
+                          title="Copy"
+                          @click="copyText(row.value ?? row)"
+                        >
+                          <i
+                            class="codicon codicon-copy"
+                            aria-hidden="true"
+                          />
                         </VscButton>
-                        <VscButton type="danger" title="Delete" @click="deleteItem(row)">
-                          <i class="codicon codicon-trash" aria-hidden="true" />
+                        <VscButton
+                          type="danger"
+                          title="Delete"
+                          @click="deleteItem(row)"
+                        >
+                          <i
+                            class="codicon codicon-trash"
+                            aria-hidden="true"
+                          />
                         </VscButton>
                       </div>
                     </td>
                   </tr>
                   <tr v-if="filteredRows.length === 0">
-                    <td colspan="3" class="redis-empty">No entries</td>
+                    <td
+                      colspan="3"
+                      class="redis-empty"
+                    >
+                      No entries
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -1193,12 +1300,20 @@ onBeforeUnmount(() => {
                         title="Delete"
                         @click.stop="deleteConsumerGroup(group)"
                       >
-                        <i class="codicon codicon-trash" aria-hidden="true" />
+                        <i
+                          class="codicon codicon-trash"
+                          aria-hidden="true"
+                        />
                       </VscButton>
                     </td>
                   </tr>
                   <tr v-if="normalizeRedisConsumerGroups(detail.consumerGroups).length === 0">
-                    <td colspan="5" class="redis-empty">No consumer groups</td>
+                    <td
+                      colspan="5"
+                      class="redis-empty"
+                    >
+                      No consumer groups
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -1206,7 +1321,9 @@ onBeforeUnmount(() => {
                 v-if="selectedGroup"
                 class="redis-stream-consumers"
               >
-                <div class="redis-stream-consumers__title">Consumers of {{ selectedGroup.name }}</div>
+                <div class="redis-stream-consumers__title">
+                  Consumers of {{ selectedGroup.name }}
+                </div>
                 <table class="result-view__table">
                   <thead><tr><th>Name</th><th>Pending</th><th>Idle</th></tr></thead>
                   <tbody>
@@ -1259,7 +1376,13 @@ onBeforeUnmount(() => {
       >
         <div class="redis-modal__header">
           <strong>{{ itemDialogTitle }}</strong>
-          <button type="button" class="redis-modal__close" @click="closeItemEditor">×</button>
+          <button
+            type="button"
+            class="redis-modal__close"
+            @click="closeItemEditor"
+          >
+            ×
+          </button>
         </div>
         <div class="redis-modal__body">
           <label
@@ -1267,7 +1390,10 @@ onBeforeUnmount(() => {
             class="inline-block mr-10"
           >
             <span class="common_input_label">Position</span>
-            <select v-model="itemPosition" class="field__input">
+            <select
+              v-model="itemPosition"
+              class="field__input"
+            >
               <option value="head">Head</option>
               <option value="tail">Tail</option>
             </select>
@@ -1277,23 +1403,39 @@ onBeforeUnmount(() => {
             class="inline-block mr-10"
           >
             <span class="common_input_label">{{ redisType === 'stream' ? 'Field' : 'Field' }}</span>
-            <input v-model="itemField" class="field__input">
+            <input
+              v-model="itemField"
+              class="field__input"
+            >
           </label>
           <label
             v-if="redisType === 'zset'"
             class="inline-block mr-10"
           >
             <span class="common_input_label">Score</span>
-            <input v-model="itemScore" class="field__input">
+            <input
+              v-model="itemScore"
+              class="field__input"
+            >
           </label>
           <label class="inline-block mr-10">
             <span class="common_input_label">{{ redisType === 'list' ? 'Element' : redisType === 'stream' ? 'Value' : 'Value' }}</span>
-            <textarea v-model="itemValue" class="console-view__editor" />
+            <textarea
+              v-model="itemValue"
+              class="console-view__editor"
+            />
           </label>
         </div>
         <div class="redis-modal__footer">
-          <VscButton type="default" @click="closeItemEditor">Cancel</VscButton>
-          <VscButton @click="saveItem">Confirm</VscButton>
+          <VscButton
+            type="default"
+            @click="closeItemEditor"
+          >
+            Cancel
+          </VscButton>
+          <VscButton @click="saveItem">
+            Confirm
+          </VscButton>
         </div>
       </div>
     </div>
@@ -1311,12 +1453,22 @@ onBeforeUnmount(() => {
       >
         <div class="redis-modal__header">
           <strong>New Redis key</strong>
-          <button type="button" class="redis-modal__close" @click="closeNewKey">×</button>
+          <button
+            type="button"
+            class="redis-modal__close"
+            @click="closeNewKey"
+          >
+            ×
+          </button>
         </div>
         <div class="redis-modal__body redis-new-key-form">
           <label class="inline-block mr-10">
             <span class="common_input_label">Key name</span>
-            <input v-model="newKeyName" class="field__input" placeholder="redis:key">
+            <input
+              v-model="newKeyName"
+              class="field__input"
+              placeholder="redis:key"
+            >
           </label>
           <label class="inline-block mr-10">
             <span class="common_input_label">Type</span>
@@ -1336,14 +1488,21 @@ onBeforeUnmount(() => {
           </label>
           <label class="inline-block mr-10">
             <span class="common_input_label">TTL</span>
-            <input v-model="newKeyTtl" class="field__input" placeholder="-1">
+            <input
+              v-model="newKeyTtl"
+              class="field__input"
+              placeholder="-1"
+            >
           </label>
           <label
             v-if="newKeyType === 'string' || newKeyType === 'ReJSON-RL'"
             class="inline-block mr-10"
           >
             <span class="common_input_label">{{ newKeyType === 'ReJSON-RL' ? 'JSON' : 'Value' }}</span>
-            <textarea v-model="newKeyContent" class="console-view__editor" />
+            <textarea
+              v-model="newKeyContent"
+              class="console-view__editor"
+            />
           </label>
           <div
             v-else
@@ -1379,7 +1538,10 @@ onBeforeUnmount(() => {
                   title="Remove row"
                   @click="removeNewKeyRow(index)"
                 >
-                  <i class="codicon codicon-trash" aria-hidden="true" />
+                  <i
+                    class="codicon codicon-trash"
+                    aria-hidden="true"
+                  />
                 </VscButton>
               </div>
               <VscButton
@@ -1387,15 +1549,25 @@ onBeforeUnmount(() => {
                 type="default"
                 @click="addNewKeyRow"
               >
-                <i class="codicon codicon-add" aria-hidden="true" />
+                <i
+                  class="codicon codicon-add"
+                  aria-hidden="true"
+                />
                 Add row
               </VscButton>
             </div>
           </div>
         </div>
         <div class="redis-modal__footer">
-          <VscButton type="default" @click="closeNewKey">Cancel</VscButton>
-          <VscButton @click="createKey">Confirm</VscButton>
+          <VscButton
+            type="default"
+            @click="closeNewKey"
+          >
+            Cancel
+          </VscButton>
+          <VscButton @click="createKey">
+            Confirm
+          </VscButton>
         </div>
       </div>
     </div>

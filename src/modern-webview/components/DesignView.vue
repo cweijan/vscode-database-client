@@ -440,7 +440,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="route-workspace design-view" data-route="design">
+  <section
+    class="route-workspace design-view"
+    data-route="design"
+  >
     <header class="route-workspace__header">
       <div>
         <h1>Table Design</h1>
@@ -450,10 +453,15 @@ onBeforeUnmount(() => {
         </p>
       </div>
       <div class="route-workspace__actions">
-        <VscButton type="default" @click="emitRefresh">
+        <VscButton
+          type="default"
+          @click="emitRefresh"
+        >
           Refresh
         </VscButton>
-        <VscButton @click="updateTable"> Save table </VscButton>
+        <VscButton @click="updateTable">
+          Save table
+        </VscButton>
       </div>
     </header>
 
@@ -517,10 +525,16 @@ onBeforeUnmount(() => {
       </button>
     </nav>
 
-    <div v-if="error" class="route-workspace__error">
+    <div
+      v-if="error"
+      class="route-workspace__error"
+    >
       {{ error }}
     </div>
-    <p v-if="status" class="route-workspace__status">
+    <p
+      v-if="status"
+      class="route-workspace__status"
+    >
       {{ status }}
     </p>
 
@@ -536,10 +550,16 @@ onBeforeUnmount(() => {
         spellcheck="false"
       />
       <div class="route-workspace__actions">
-        <VscButton type="default" @click="copyDdl">
+        <VscButton
+          type="default"
+          @click="copyDdl"
+        >
           Copy DDL
         </VscButton>
-        <VscButton type="default" @click="bridge?.emit('ddl')">
+        <VscButton
+          type="default"
+          @click="bridge?.emit('ddl')"
+        >
           Reload DDL
         </VscButton>
       </div>
@@ -563,7 +583,10 @@ onBeforeUnmount(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="column in design.columns" :key="column.name">
+            <tr
+              v-for="column in design.columns"
+              :key="column.name"
+            >
               <td><UiInput v-model="columnDrafts[column.name].name" /></td>
               <td><UiInput v-model="columnDrafts[column.name].type" /></td>
               <td>
@@ -574,12 +597,12 @@ onBeforeUnmount(() => {
                 <input
                   v-model="columnDrafts[column.name].isNotNull"
                   type="checkbox"
-                />
+                >
               </td>
               <td>
-                <VscButton @click="updateColumn(column)"
-                  >Update</VscButton
-                >
+                <VscButton @click="updateColumn(column)">
+                  Update
+                </VscButton>
                 <VscButton
                   type="default"
                   :disabled="!design.canAlterTable"
@@ -593,11 +616,25 @@ onBeforeUnmount(() => {
         </table>
       </div>
       <div class="design-view__new-row">
-        <UiInput v-model="newColumn.name" placeholder="New column" />
-        <UiInput v-model="newColumn.type" placeholder="Type" />
-        <UiInput v-model="newColumn.defaultValue" placeholder="Default" />
-        <UiInput v-model="newColumn.comment" placeholder="Comment" />
-        <VscButton @click="addColumn">Add column</VscButton>
+        <UiInput
+          v-model="newColumn.name"
+          placeholder="New column"
+        />
+        <UiInput
+          v-model="newColumn.type"
+          placeholder="Type"
+        />
+        <UiInput
+          v-model="newColumn.defaultValue"
+          placeholder="Default"
+        />
+        <UiInput
+          v-model="newColumn.comment"
+          placeholder="Comment"
+        />
+        <VscButton @click="addColumn">
+          Add column
+        </VscButton>
       </div>
     </section>
 
@@ -634,24 +671,34 @@ onBeforeUnmount(() => {
                 <VscButton
                   type="default"
                   @click="dropIndex(item)"
-                  >Drop</VscButton
                 >
+                  Drop
+                </VscButton>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="design-view__new-row">
-        <UiInput v-model="indexForm.name" placeholder="Index name" />
-        <UiInput v-model="indexForm.columns" placeholder="column_a, column_b" />
+        <UiInput
+          v-model="indexForm.name"
+          placeholder="Index name"
+        />
+        <UiInput
+          v-model="indexForm.columns"
+          placeholder="column_a, column_b"
+        />
         <UiSelect
           v-model="indexForm.type"
           :options="['BTREE', 'HASH', 'GIN', 'GIST', 'FULLTEXT', 'SPATIAL']"
         />
-        <label class="inline-block mr-10 inline-flex items-center"
-          ><input v-model="indexForm.unique" type="checkbox" /> Unique</label
-        >
-        <VscButton @click="createIndex">Create index</VscButton>
+        <label class="inline-block mr-10 inline-flex items-center"><input
+          v-model="indexForm.unique"
+          type="checkbox"
+        > Unique</label>
+        <VscButton @click="createIndex">
+          Create index
+        </VscButton>
       </div>
     </section>
 
@@ -673,13 +720,20 @@ onBeforeUnmount(() => {
           <VscButton
             type="default"
             @click="dropForeignKey(item)"
-            >Drop</VscButton
           >
+            Drop
+          </VscButton>
         </li>
       </ul>
       <div class="design-view__new-row">
-        <UiInput v-model="foreignKeyForm.name" placeholder="Constraint name" />
-        <UiInput v-model="foreignKeyForm.column" placeholder="Column" />
+        <UiInput
+          v-model="foreignKeyForm.name"
+          placeholder="Constraint name"
+        />
+        <UiInput
+          v-model="foreignKeyForm.column"
+          placeholder="Column"
+        />
         <UiInput
           v-model="foreignKeyForm.refTable"
           placeholder="Referenced table"
@@ -708,7 +762,9 @@ onBeforeUnmount(() => {
             'SET DEFAULT',
           ]"
         />
-        <VscButton @click="createForeignKey">Create FK</VscButton>
+        <VscButton @click="createForeignKey">
+          Create FK
+        </VscButton>
       </div>
     </section>
 
@@ -718,7 +774,10 @@ onBeforeUnmount(() => {
       data-region="check-panel"
     >
       <ul class="design-view__list">
-        <li v-for="(item, index) in design.checks" :key="index">
+        <li
+          v-for="(item, index) in design.checks"
+          :key="index"
+        >
           {{
             rowText(
               item,
@@ -728,16 +787,30 @@ onBeforeUnmount(() => {
               "DEFINITION",
             ) || JSON.stringify(item)
           }}
-          <VscButton type="default" @click="dropCheck(item)"
-            >Drop</VscButton
+          <VscButton
+            type="default"
+            @click="dropCheck(item)"
           >
+            Drop
+          </VscButton>
         </li>
       </ul>
-      <div v-if="design.isSupportCheck" class="design-view__new-row">
-        <UiInput v-model="checkClause" placeholder="price > 0" />
-        <VscButton @click="createCheck">Create check</VscButton>
+      <div
+        v-if="design.isSupportCheck"
+        class="design-view__new-row"
+      >
+        <UiInput
+          v-model="checkClause"
+          placeholder="price > 0"
+        />
+        <VscButton @click="createCheck">
+          Create check
+        </VscButton>
       </div>
-      <p v-else class="route-workspace__subline">
+      <p
+        v-else
+        class="route-workspace__subline"
+      >
         This database does not expose target check editing.
       </p>
     </section>
@@ -748,14 +821,20 @@ onBeforeUnmount(() => {
       data-region="trigger-panel"
     >
       <ul class="design-view__list">
-        <li v-for="(item, index) in design.triggers" :key="index">
+        <li
+          v-for="(item, index) in design.triggers"
+          :key="index"
+        >
           {{
             rowText(item, "name", "trigger_name", "TRIGGER_NAME") ||
-            JSON.stringify(item)
+              JSON.stringify(item)
           }}
-          <VscButton type="default" @click="dropTrigger(item)"
-            >Drop</VscButton
+          <VscButton
+            type="default"
+            @click="dropTrigger(item)"
           >
+            Drop
+          </VscButton>
         </li>
       </ul>
       <div class="design-view__new-row">
@@ -766,8 +845,9 @@ onBeforeUnmount(() => {
         />
         <VscButton
           @click="bridge?.emit('execute', { type: 'trigger', sql: triggerSql })"
-          >Execute trigger SQL</VscButton
         >
+          Execute trigger SQL
+        </VscButton>
       </div>
     </section>
   </section>

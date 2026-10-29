@@ -106,7 +106,11 @@ function selectValue(event: Event): string {
             :value="draft.cursorStyle"
             @change="commit('cursorStyle', selectValue($event) as TerminalCursorStyle)"
           >
-            <option v-for="style in cursorStyles" :key="style" :value="style">
+            <option
+              v-for="style in cursorStyles"
+              :key="style"
+              :value="style"
+            >
               {{ style }}
             </option>
           </select>
@@ -126,14 +130,22 @@ function selectValue(event: Event): string {
             :value="draft.terminalTheme"
             @change="commit('terminalTheme', selectValue($event) as TerminalTheme)"
           >
-            <option v-for="theme in themes" :key="theme" :value="theme">
+            <option
+              v-for="theme in themes"
+              :key="theme"
+              :value="theme"
+            >
               {{ theme }}
             </option>
           </select>
         </label>
       </div>
       <div class="terminal-settings-modal__footer">
-        <button class="vsc-button vsc-button--default" type="button" @click="close">
+        <button
+          class="vsc-button vsc-button--default"
+          type="button"
+          @click="close"
+        >
           Close
         </button>
       </div>

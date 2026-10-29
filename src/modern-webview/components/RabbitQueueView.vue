@@ -445,14 +445,20 @@ onBeforeUnmount(() => {
         <div class="rabbit-messages-toolbar">
           <div class="rabbit-messages-toolbar__left">
             <span class="rabbit-messages-stat">
-              <i class="codicon codicon-inbox blue" aria-hidden="true" />
+              <i
+                class="codicon codicon-inbox blue"
+                aria-hidden="true"
+              />
               <span class="rabbit-messages-stat__label">Messages ready</span>
               <strong class="rabbit-messages-stat__value">{{ detail.messagesReady ?? 0 }}</strong>
             </span>
             <span class="rabbit-messages-sep" />
             <label class="rabbit-messages-field">
               <span class="rabbit-messages-field__label">Load count</span>
-              <select v-model="loadCount" class="field__input rabbit-messages-count">
+              <select
+                v-model="loadCount"
+                class="field__input rabbit-messages-count"
+              >
                 <option
                   v-for="option in pageSizeOptions"
                   :key="option"
@@ -467,7 +473,10 @@ onBeforeUnmount(() => {
               :disabled="moving"
               @click="loadMessages"
             >
-              <i class="codicon codicon-refresh" aria-hidden="true" />
+              <i
+                class="codicon codicon-refresh"
+                aria-hidden="true"
+              />
             </VscButton>
           </div>
           <div class="rabbit-messages-toolbar__right">
@@ -475,7 +484,10 @@ onBeforeUnmount(() => {
               :disabled="selectedMessageRows.length === 0 || moving"
               @click="openTargetDialog('send')"
             >
-              <i class="codicon codicon-arrow-up" aria-hidden="true" />
+              <i
+                class="codicon codicon-arrow-up"
+                aria-hidden="true"
+              />
               Send
             </VscButton>
             <VscButton
@@ -483,7 +495,10 @@ onBeforeUnmount(() => {
               :disabled="selectedMessageRows.length === 0 || moving"
               @click="openTargetDialog('move')"
             >
-              <i class="codicon codicon-arrow-right" aria-hidden="true" />
+              <i
+                class="codicon codicon-arrow-right"
+                aria-hidden="true"
+              />
               Move
             </VscButton>
             <VscButton
@@ -491,7 +506,10 @@ onBeforeUnmount(() => {
               :disabled="selectedMessageRows.length === 0 || moving"
               @click="deleteSelectedMessage"
             >
-              <i class="codicon codicon-trash" aria-hidden="true" />
+              <i
+                class="codicon codicon-trash"
+                aria-hidden="true"
+              />
               Delete
             </VscButton>
           </div>
@@ -543,8 +561,12 @@ onBeforeUnmount(() => {
                     {{ message.propertiesPreview || "-" }}
                   </button>
                 </td>
-                <td class="rabbit-cell-ellipsis">{{ message.routingKey }}</td>
-                <td class="rabbit-cell-ellipsis">{{ message.exchange }}</td>
+                <td class="rabbit-cell-ellipsis">
+                  {{ message.routingKey }}
+                </td>
+                <td class="rabbit-cell-ellipsis">
+                  {{ message.exchange }}
+                </td>
                 <td>
                   <span
                     class="rabbit-tag"
@@ -555,8 +577,14 @@ onBeforeUnmount(() => {
                 </td>
               </tr>
               <tr v-if="messages.length === 0">
-                <td colspan="7" class="rabbit-empty">
-                  <i class="codicon codicon-inbox" aria-hidden="true" />
+                <td
+                  colspan="7"
+                  class="rabbit-empty"
+                >
+                  <i
+                    class="codicon codicon-inbox"
+                    aria-hidden="true"
+                  />
                   No messages
                 </td>
               </tr>
@@ -621,7 +649,10 @@ onBeforeUnmount(() => {
         </div>
         <div class="rabbit-publish-section rabbit-publish-section--payload">
           <div class="rabbit-publish-section__header">
-            <i class="codicon codicon-arrow-up green" aria-hidden="true" />
+            <i
+              class="codicon codicon-arrow-up green"
+              aria-hidden="true"
+            />
             <span class="rabbit-publish-label">Payload</span>
           </div>
           <textarea
@@ -636,7 +667,10 @@ onBeforeUnmount(() => {
             :disabled="publishing"
             @click="publishMessage"
           >
-            <i class="codicon codicon-arrow-up" aria-hidden="true" />
+            <i
+              class="codicon codicon-arrow-up"
+              aria-hidden="true"
+            />
             Publish
           </VscButton>
         </div>
@@ -651,7 +685,10 @@ onBeforeUnmount(() => {
             :disabled="bindingsLoading"
             @click="selectSection('bindings')"
           >
-            <i class="codicon codicon-refresh" aria-hidden="true" />
+            <i
+              class="codicon codicon-refresh"
+              aria-hidden="true"
+            />
             Refresh
           </VscButton>
         </div>
@@ -686,13 +723,22 @@ onBeforeUnmount(() => {
                     :disabled="bindingsLoading"
                     @click="deleteBinding(binding)"
                   >
-                    <i class="codicon codicon-trash" aria-hidden="true" />
+                    <i
+                      class="codicon codicon-trash"
+                      aria-hidden="true"
+                    />
                   </VscButton>
                 </td>
               </tr>
               <tr v-if="bindings.length === 0">
-                <td colspan="7" class="rabbit-empty">
-                  <i class="codicon codicon-link" aria-hidden="true" />
+                <td
+                  colspan="7"
+                  class="rabbit-empty"
+                >
+                  <i
+                    class="codicon codicon-link"
+                    aria-hidden="true"
+                  />
                   No bindings
                 </td>
               </tr>
@@ -707,7 +753,10 @@ onBeforeUnmount(() => {
       >
         <section class="rabbit-add-binding-section">
           <div class="rabbit-add-binding-section__header">
-            <i class="codicon codicon-add green" aria-hidden="true" />
+            <i
+              class="codicon codicon-add green"
+              aria-hidden="true"
+            />
             <span class="rabbit-add-binding-title">Add binding</span>
             <span class="rabbit-add-binding-hint">Choose an exchange and routing key.</span>
           </div>
@@ -733,7 +782,10 @@ onBeforeUnmount(() => {
               :disabled="exchanges.length === 0"
               @click="createBinding"
             >
-              <i class="codicon codicon-add" aria-hidden="true" />
+              <i
+                class="codicon codicon-add"
+                aria-hidden="true"
+              />
               Create binding
             </VscButton>
           </div>
@@ -755,7 +807,10 @@ onBeforeUnmount(() => {
             :disabled="consumersLoading"
             @click="selectSection('consumers')"
           >
-            <i class="codicon codicon-refresh" aria-hidden="true" />
+            <i
+              class="codicon codicon-refresh"
+              aria-hidden="true"
+            />
             Refresh
           </VscButton>
         </div>
@@ -775,15 +830,25 @@ onBeforeUnmount(() => {
                 v-for="consumer in consumers"
                 :key="consumer.consumerTag"
               >
-                <td class="rabbit-cell-ellipsis">{{ consumer.consumerTag }}</td>
-                <td class="rabbit-cell-ellipsis">{{ consumer.channel }}</td>
+                <td class="rabbit-cell-ellipsis">
+                  {{ consumer.consumerTag }}
+                </td>
+                <td class="rabbit-cell-ellipsis">
+                  {{ consumer.channel }}
+                </td>
                 <td>{{ consumer.prefetchCount }}</td>
                 <td>{{ consumer.ackRequired ? "Yes" : "No" }}</td>
                 <td>{{ consumer.exclusive ? "Yes" : "No" }}</td>
               </tr>
               <tr v-if="consumers.length === 0">
-                <td colspan="5" class="rabbit-empty">
-                  <i class="codicon codicon-person" aria-hidden="true" />
+                <td
+                  colspan="5"
+                  class="rabbit-empty"
+                >
+                  <i
+                    class="codicon codicon-person"
+                    aria-hidden="true"
+                  />
                   No consumers
                 </td>
               </tr>
@@ -815,7 +880,13 @@ onBeforeUnmount(() => {
           <strong>
             {{ dialog === 'payload' ? 'Message payload' : dialog === 'properties' ? 'Message properties' : targetAction === 'send' ? 'Select target queue' : 'Move messages' }}
           </strong>
-          <button type="button" class="rabbit-modal__close" @click="dialog = undefined">×</button>
+          <button
+            type="button"
+            class="rabbit-modal__close"
+            @click="dialog = undefined"
+          >
+            ×
+          </button>
         </div>
         <div class="rabbit-modal__body">
           <template v-if="dialog === 'target'">
@@ -840,7 +911,10 @@ onBeforeUnmount(() => {
               type="default"
               @click="copyText(dialog === 'payload' ? dialogRow?.payload : dialogRow?.properties)"
             >
-              <i class="codicon codicon-copy" aria-hidden="true" />
+              <i
+                class="codicon codicon-copy"
+                aria-hidden="true"
+              />
               Copy
             </VscButton>
           </template>
@@ -849,8 +923,15 @@ onBeforeUnmount(() => {
           v-if="dialog === 'target'"
           class="rabbit-modal__footer"
         >
-          <VscButton type="default" @click="dialog = undefined">Cancel</VscButton>
-          <VscButton @click="confirmTargetAction">Confirm</VscButton>
+          <VscButton
+            type="default"
+            @click="dialog = undefined"
+          >
+            Cancel
+          </VscButton>
+          <VscButton @click="confirmTargetAction">
+            Confirm
+          </VscButton>
         </div>
       </div>
     </div>
