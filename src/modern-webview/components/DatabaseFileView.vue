@@ -1,196 +1,31 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, reactive, ref } from "vue";
-import { useRoute } from "vue-router";
+import { inject } from "vue";
 
-import { WEBVIEW_BRIDGE_KEY, type BridgeDisposable } from "../bridge";
+import { WEBVIEW_BRIDGE_KEY } from "../bridge";
 import { readWebviewBootstrap } from "../bootstrap";
-import UiInput from "./UiInput.vue";
-import UiSelect from "./UiSelect.vue";
-
-interface FileGroup {
-  readonly name?: string;
-  readonly type?: string;
-  readonly rowCount?: number;
-}
-
-interface FileInfo {
-  connected?: boolean;
-  dbType?: string;
-  dbPath?: string;
-  fileName?: string;
-  name?: string;
-  groups?: FileGroup[];
-}
+import { createTranslator } from "../i18n";
+import DatabaseFilePanel from "./DatabaseFilePanel.vue";
 
 const bridge = inject(WEBVIEW_BRIDGE_KEY);
-const route = useRoute();
-const bootstrap = readWebviewBootstrap();
-const initial = bootstrap.state as FileInfo;
-const form = reactive({
-  dbType: initial.dbType || "SQLite",
-  dbPath: initial.dbPath || "",
-  name: initial.name || initial.fileName || "",
-});
-const fileInfo = reactive<FileInfo>({
-  connected: initial.connected,
-  dbType: initial.dbType,
-  dbPath: initial.dbPath,
-  fileName: initial.fileName,
-  name: initial.name,
-  groups: initial.groups || [],
-});
-const status = ref("");
-const hasDependency = ref<Record<string, unknown>>({});
-let infoSubscription: BridgeDisposable | undefined;
-let optionSubscription: BridgeDisposable | undefined;
-let errorSubscription: BridgeDisposable | undefined;
-let successSubscription: BridgeDisposable | undefined;
-
-const routeName = computed(() => route.name === "sqlite" ? "sqlite" : "dbFileConnect");
-const title = computed(() => routeName.value === "sqlite" ? "SQLite database" : "Database file");
-
-function applyInfo(content: unknown): void {
-  if (!content || typeof content !== "object") return;
-  const next = content as FileInfo;
-  Object.assign(fileInfo, next);
-  if (typeof next.dbType === "string") form.dbType = next.dbType;
-  if (typeof next.dbPath === "string") form.dbPath = next.dbPath;
-  if (typeof next.name === "string") form.name = next.name;
-}
-
-function connect(): void {
-  status.value = "Connecting…";
-  bridge?.emit("connecting", {
-    connectionOption: {
-      dbType: form.dbType,
-      dbPath: form.dbPath,
-      name: form.name,
-    },
-    saveOnly: true,
-  });
-}
-
-function installDependency(): void {
-  bridge?.emit("installDependency", form.dbType === "DuckDB" ? "duckDB" : "sqlite3");
-}
-
-onMounted(() => {
-  infoSubscription = bridge?.on("fileInfo", applyInfo);
-  optionSubscription = bridge?.on("option", (content) => {
-    const value = content as { dependency?: Record<string, unknown> };
-    if (value?.dependency) hasDependency.value = value.dependency;
-  });
-  errorSubscription = bridge?.on("error", (content) => {
-    status.value = content && typeof content === "object" && "message" in content
-      ? String((content as { message?: unknown }).message || "Connection failed")
-      : String(content || "Connection failed");
-  });
-  successSubscription = bridge?.on("success", (content) => {
-    status.value = content && typeof content === "object" && "message" in content
-      ? String((content as { message?: unknown }).message || "Connected")
-      : "Connected";
-  });
-  bridge?.emit("init");
-});
-
-onBeforeUnmount(() => {
-  infoSubscription?.dispose();
-  optionSubscription?.dispose();
-  errorSubscription?.dispose();
-  successSubscription?.dispose();
-});
+const translator = createTranslator(readWebviewBootstrap().language);
 </script>
 
 <template>
-  <section
-    class="route-workspace database-file-view"
-    :data-route="routeName"
-  >
-    <header class="route-workspace__header">
-      <div>
-        <h1>{{ title }}</h1>
-        <p class="route-workspace__subline">
-          Connect a local SQLite or DuckDB file.
-        </p>
-      </div>
-      <VscButton
-        @click="connect"
-      >
-        {{ fileInfo.connected ? "Reconnect" : "Connect" }}
-      </VscButton>
-    </header>
-    <div class="route-workbench__toolbar">
-      <UiSelect
-        v-model="form.dbType"
-        :options="[
-          { label: 'SQLite', value: 'SQLite' },
-          { label: 'DuckDB', value: 'DuckDB' },
-        ]"
-      />
-      <UiInput
-        v-model="form.name"
-        placeholder="Connection name"
-      />
-      <UiInput
-        v-model="form.dbPath"
-        placeholder="Database file path"
-      />
+  <div class="root-container flex mx-auto">
+    <div class="connect-container max-lg:px-5">
+      <header class="db-file-hero">
+        <img
+          src="icon.png"
+          alt=""
+          class="connect-logo"
+          @click="bridge?.emit('openSite')"
+        >
+        <div class="db-file-hero__text">
+          <h1>{{ translator.t("connect.title", "Database Client") }}</h1>
+          <p>{{ translator.t("dbFile.description", "Connect a database file") }}</p>
+        </div>
+      </header>
+      <DatabaseFilePanel />
     </div>
-    <div class="route-workspace__actions">
-      <VscButton
-        type="default"
-        @click="bridge?.emit('reveal')"
-      >
-        Reveal file
-      </VscButton>
-      <VscButton
-        type="default"
-        @click="installDependency"
-      >
-        Check dependency
-      </VscButton>
-      <VscButton
-        type="default"
-        @click="bridge?.emit('openSite', 'pricing')"
-      >
-        Dependency help
-      </VscButton>
-    </div>
-    <p
-      v-if="status"
-      class="route-workspace__status"
-    >
-      {{ status }}
-    </p>
-    <p
-      v-if="Object.keys(hasDependency).length > 0"
-      class="route-workspace__subline"
-    >
-      Dependency status received from host.
-    </p>
-    <div
-      v-if="fileInfo.groups?.length"
-      class="result-view__table-wrap"
-    >
-      <table class="result-view__table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Rows</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="group in fileInfo.groups"
-            :key="String(group.name)"
-          >
-            <td>{{ group.name }}</td>
-            <td>{{ group.type }}</td>
-            <td>{{ group.rowCount ?? "-" }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+  </div>
 </template>
