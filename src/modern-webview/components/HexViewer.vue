@@ -1,18 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-interface HexLine {
-  readonly offset: string;
-  readonly groups: readonly string[];
-  readonly ascii: string;
-}
-
 const props = withDefaults(
   defineProps<{
-    hexData: unknown;
+    hexData?: string | Uint8Array | number[];
     maxHeight?: string;
   }>(),
-  { maxHeight: "60vh" },
+  { hexData: "", maxHeight: "60vh" },
 );
 
 function normalizeHex(value: unknown): string {
@@ -25,8 +19,7 @@ function normalizeHex(value: unknown): string {
       return bytes.map((byte) => byte.toString(16).padStart(2, "0")).join("");
     }
   }
-  const text = String(value ?? "").trim().replace(/^0x/i, "").replaceAll(/\s+/g, "");
-  return /^[0-9a-f]*$/i.test(text) && text.length % 2 === 0 ? text : "";
+  return String(value ?? "").replace(/^0x/i, "").replaceAll(/\s+/g, "");
 }
 
 function printable(bytePair: string): string {
@@ -34,54 +27,52 @@ function printable(bytePair: string): string {
   return byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : ".";
 }
 
-const lines = computed<readonly HexLine[]>(() => {
-  const hex = normalizeHex(props.hexData).toLowerCase();
-  const bytes = hex.match(/.{2}/g) || [];
-  const result: HexLine[] = [];
-  for (let offset = 0; offset < bytes.length; offset += 32) {
-    const lineBytes = bytes.slice(offset, offset + 32);
-    const groups: string[] = [];
-    for (let groupStart = 0; groupStart < lineBytes.length; groupStart += 4) {
-      groups.push(lineBytes.slice(groupStart, groupStart + 4).join(" "));
+const lines = computed<string[][][]>(() => {
+  const hex = normalizeHex(props.hexData);
+  const rows: string[][][] = [];
+  for (let offset = 0; offset < hex.length; offset += 32) {
+    const bytes = hex.slice(offset, offset + 32).match(/.{1,2}/g) ?? [];
+    const groups: string[][] = [];
+    for (let index = 0; index < bytes.length; index += 4) {
+      groups.push(bytes.slice(index, index + 4));
     }
-    result.push({
-      offset: offset.toString(16).padStart(4, "0").slice(-4),
-      groups,
-      ascii: lineBytes.map(printable).join(""),
-    });
+    rows.push(groups);
   }
-  return result;
+  return rows;
 });
+
+function address(index: number): string {
+  return `${(index * 16).toString(16).padStart(4, "0").slice(-4)}`;
+}
+
+function ascii(groups: string[][]): string {
+  let text = "";
+  for (const group of groups) {
+    for (const byte of group) text += printable(byte);
+  }
+  return text;
+}
 </script>
 
 <template>
   <div
     class="hex-viewer"
     :style="{ maxHeight }"
-    data-testid="hex-viewer"
   >
     <div
-      v-for="line in lines"
-      :key="line.offset"
-      class="hex-viewer__line"
+      v-for="(groups, index) in lines"
+      :key="index"
+      class="hex-line"
     >
-      <span class="hex-viewer__offset">{{ line.offset }}</span>
-      <span class="hex-viewer__content">
+      <span class="hex-address select-none">{{ address(index) }}</span>
+      <span class="hex-content">
         <span
-          v-for="(group, index) in line.groups"
-          :key="`${line.offset}-${index}`"
-          class="hex-viewer__group"
-        >
-          {{ group }}
-        </span>
+          v-for="(group, groupIndex) in groups"
+          :key="groupIndex"
+          class="inline-block hex-group"
+        >{{ group.join(" ") }}</span>
       </span>
-      <span class="hex-viewer__ascii">{{ line.ascii }}</span>
+      <span class="hex-ascii ml-4 opacity-70 whitespace-nowrap">{{ ascii(groups) }}</span>
     </div>
-    <p
-      v-if="lines.length === 0"
-      class="route-workspace__empty"
-    >
-      No binary bytes to display.
-    </p>
   </div>
 </template>
