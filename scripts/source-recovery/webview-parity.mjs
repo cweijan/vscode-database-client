@@ -44,6 +44,14 @@ const PAGE_MODULES = {
   HexViewer: "HexViewer.vue",
 };
 
+/**
+ * Classes that belong to an embedded vendor renderer rather than to the page markup.
+ * `overlay` is the AntV X6 graph layer selector bundled by the er page.
+ */
+const VENDOR_CLASSES = {
+  er: ["overlay"],
+};
+
 const CLASS_TOKEN = /(?<![\w-])[a-z][a-z0-9]*(?:-[a-z0-9]+)*__(?:[a-z0-9]+-)*[a-z0-9]+|(?<![\w-])(?:es|ssh|er|db|vsc|tw|mock|redis|rabbit|struct|data|line|metric)-[a-z0-9]+(?:-[a-z0-9]+)*/g;
 
 function parseArguments(argv) {
@@ -175,8 +183,10 @@ async function main() {
       continue;
     }
     componentSource = await collectPageSource(componentPath);
+    const vendor = new Set(VENDOR_CLASSES[moduleName] ?? []);
     const expected = new Set(
-      [...targetClasses(moduleSource)].filter((name) => projectClasses.has(name)),
+      [...targetClasses(moduleSource)]
+        .filter((name) => projectClasses.has(name) && !vendor.has(name)),
     );
     const matched = [...expected].filter((name) => componentUsesClass(componentSource, name));
     const missing = [...expected].filter((name) => !matched.includes(name)).sort();
