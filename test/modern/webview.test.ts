@@ -285,8 +285,13 @@ test("SQL design page preserves the target info panel, tab order, and init proto
     "utf8",
   );
   for (const marker of [
-    "design-view__info-panel",
-    'data-region="info-panel"',
+    "design-info-panel",
+    "design-info-row",
+    "design-info-field",
+    "design-info-label",
+    "design-info-input",
+    "design-info-select",
+    "type-hr",
     'data-region="design-tabs"',
     "designPanelLabels",
     'foreignKey: "Foreign keys"',
