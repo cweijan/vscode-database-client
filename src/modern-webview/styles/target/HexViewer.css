@@ -1,0 +1,1 @@
+.hex-viewer{font-family:monospace;white-space:pre;overflow:auto}.hex-line{display:flex}.hex-address{color:#888}.hex-content{margin-left:10px}.hex-group+.hex-group{margin-left:5px;padding-left:5px;border-left:1px solid var(--border-color)}

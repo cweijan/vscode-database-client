@@ -15,7 +15,7 @@ const CLASS_PATTERN = /\.(-?[_a-zA-Z][\w-]*)/g;
 function parseArguments(argv) {
   const options = {
     candidate: "src/modern-webview",
-    targetStyles: "src/modern-webview/styles/target-app.css",
+    targetStyles: "src/modern-webview/styles/target",
     output: null,
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -56,15 +56,24 @@ async function main() {
   const candidateRoot = path.resolve(repositoryRoot, options.candidate);
   const targetStyles = path.resolve(repositoryRoot, options.targetStyles);
 
-  const stylesheet = await fs.readFile(targetStyles, "utf8");
-  const targetClasses = collectClasses(stylesheet);
+  const targetStat = await fs.stat(targetStyles);
+  const targetClasses = new Set();
+  const targetFiles = targetStat.isDirectory()
+    ? (await fs.readdir(targetStyles))
+        .filter((name) => name.endsWith(".css"))
+        .map((name) => path.join(targetStyles, name))
+    : [targetStyles];
+  for (const file of targetFiles) {
+    for (const className of collectClasses(await fs.readFile(file, "utf8"))) {
+      targetClasses.add(className);
+    }
+  }
 
   const entries = await fs.readdir(candidateRoot, { withFileTypes: true });
   const styleFiles = entries.filter((entry) => entry.isFile() && entry.name.endsWith(".css"));
 
   const invented = new Map();
   for (const entry of styleFiles) {
-    if (path.resolve(candidateRoot, entry.name) === targetStyles) continue;
     const css = await fs.readFile(path.join(candidateRoot, entry.name), "utf8");
     for (const className of collectClasses(css)) {
       if (targetClasses.has(className)) continue;

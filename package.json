@@ -3927,7 +3927,8 @@
     "schema": "npx --yes typescript-json-schema --refs true --aliasRefs true --ignoreErrors true --include  --required tsconfig.json DBConnectionConfig>public/schema.json",
     "verify:modern:render": "node scripts/source-recovery/render-smoke.mjs scripts/render-smoke/tableSmoke.ts",
     "decompile:webview": "node scripts/source-recovery/decompile-webview.mjs",
-    "audit:webview-style": "node scripts/source-recovery/webview-style-audit.mjs"
+    "audit:webview-style": "node scripts/source-recovery/webview-style-audit.mjs",
+    "sync:webview-styles": "node scripts/source-recovery/sync-webview-styles.mjs"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin-js": "^4.2.0",

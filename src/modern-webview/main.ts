@@ -5,7 +5,7 @@ import { targetComponentsPlugin } from "./components/target";
 import { createWebviewRouter } from "./router";
 import "./codicon.css";
 import "./style.css";
-import "./styles/target-app.css";
+import "./styles/target/index";
 
 const app = createApp(App);
 app.use(createWebviewRouter());
