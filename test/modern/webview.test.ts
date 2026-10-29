@@ -444,7 +444,7 @@ test("Manager, dump, and settings pages preserve target shared protocols", async
       "manager-dump__checks",
     ]],
     [settings, [
-      'data-route="console"',
+      'console-container',
       "Current workspace",
       "exportWithAdditionalFiles",
       "openMoreSettings",

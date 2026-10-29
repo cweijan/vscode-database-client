@@ -248,10 +248,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section
-    class="settings-view route-workspace"
-    data-route="console"
-  >
+  <div class="flex flex-wrap justify-center console-container">
     <div class="settings-view__layout">
       <aside class="settings-view__side">
         <section class="settings-view__card">
@@ -413,7 +410,7 @@ onBeforeUnmount(() => {
         </section>
       </aside>
 
-      <main class="settings-view__options">
+      <div class="option-container">
         <div class="settings-view__options-header">
           <div>
             <h1>Settings</h1>
@@ -428,90 +425,99 @@ onBeforeUnmount(() => {
             Refresh
           </VscButton>
         </div>
-        <section
+        <div
           v-for="group in optionGroups"
           :key="group.title"
-          class="settings-view__option-group"
+          class="card-container"
+          style="max-width: 350px; min-width: 300px"
         >
-          <header class="settings-view__group-header">
-            <h2>{{ group.title }}</h2>
-            <div class="settings-view__actions">
-              <VscButton
-                type="default"
-                @click="resetGroup(group)"
-              >
-                Reset
-              </VscButton>
-              <VscButton
-                v-if="group.tag"
-                type="default"
-                @click="bridge?.emit('openMoreSettings', group.tag)"
-              >
-                More settings
-              </VscButton>
-            </div>
-          </header>
-          <div class="settings-view__option-list">
-            <article
-              v-for="option in group.options"
-              :key="option.name"
-              class="settings-view__option"
-            >
-              <div class="settings-view__description">
-                <strong>{{ option.description }}</strong>
-                <span>{{ option.name }}</span>
+          <div class="card">
+            <div class="option-header">
+              <div class="option-title">
+                {{ group.title }}
               </div>
-              <div class="settings-view__control">
-                <label
-                  v-if="option.type === 'boolean'"
-                  class="settings-view__checkbox"
+              <div class="option-header__actions">
+                <VscTooltip :title="'Reset'">
+                  <VscButton
+                    icon="codicon-discard"
+                    size="micro"
+                    @click="resetGroup(group)"
+                  />
+                </VscTooltip>
+                <VscTooltip
+                  v-if="group.tag"
+                  title="Show More Settings"
                 >
-                  <input
+                  <VscButton
+                    icon="codicon-ellipsis"
+                    size="micro"
+                    @click="bridge?.emit('openMoreSettings', group.tag)"
+                  />
+                </VscTooltip>
+              </div>
+            </div>
+            <div class="option-list">
+              <div
+                v-for="option in group.options"
+                :key="option.name"
+                class="option-item"
+              >
+                <div class="settings-view__description">
+                  <strong>{{ option.description }}</strong>
+                  <span>{{ option.name }}</span>
+                </div>
+                <div class="settings-view__control">
+                  <label
+                    v-if="option.type === 'boolean'"
+                    class="settings-view__checkbox"
+                  >
+                    <input
+                      v-model="drafts[option.name]"
+                      type="checkbox"
+                      @change="update(option)"
+                    >
+                    <span>{{ drafts[option.name] ? "Enabled" : "Disabled" }}</span>
+                  </label>
+                  <select
+                    v-else-if="choicesFor(option).length > 0"
                     v-model="drafts[option.name]"
-                    type="checkbox"
+                    class="field__input"
                     @change="update(option)"
                   >
-                  <span>{{ drafts[option.name] ? "Enabled" : "Disabled" }}</span>
-                </label>
-                <select
-                  v-else-if="choicesFor(option).length > 0"
-                  v-model="drafts[option.name]"
-                  class="field__input"
-                  @change="update(option)"
-                >
-                  <option
-                    v-for="choice in choicesFor(option)"
-                    :key="String(choice.value)"
-                    :value="choice.value"
+                    <option
+                      v-for="choice in choicesFor(option)"
+                      :key="String(choice.value)"
+                      :value="choice.value"
+                    >
+                      {{ choice.label }}
+                    </option>
+                  </select>
+                  <input
+                    v-else
+                    class="field__input"
+                    :value="displayValue(option)"
+                    @change="updateText(option, $event)"
+                    @keyup.enter="update(option)"
                   >
-                    {{ choice.label }}
-                  </option>
-                </select>
-                <input
-                  v-else
-                  class="field__input"
-                  :value="displayValue(option)"
-                  @change="updateText(option, $event)"
-                  @keyup.enter="update(option)"
-                >
-                <VscButton
-                  v-if="option.type !== 'boolean' && choicesFor(option).length === 0"
-                  @click="update(option)"
-                >
-                  Apply
-                </VscButton>
+                  <VscButton
+                    v-if="option.type !== 'boolean' && choicesFor(option).length === 0"
+                    @click="update(option)"
+                  >
+                    Apply
+                  </VscButton>
+                </div>
               </div>
-            </article>
+            </div>
           </div>
-        </section>
-      </main>
-    </div>
+        </div>
+      </div>
 
-    <p
-      v-if="status"
-      class="route-workspace__status"
-    >
-      {{ status }}
-    </p>
-  </section>
+      <p
+        v-if="status"
+        class="route-workspace__status"
+      >
+        {{ status }}
+      </p>
+    </div>
+  </div>
 </template>
